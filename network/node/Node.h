@@ -8,6 +8,7 @@
 
 #include "NodeInfo.h"
 #include "../protocol/ClientConnection.h"
+#include "NetworkInfo.h"
 #include <Poco/Net/ServerSocket.h>
 #include <memory>
 #include <Poco/Net/TCPServer.h>
@@ -16,6 +17,8 @@ class Node {
 private:
     std::shared_ptr<Poco::Net::ServerSocket> serverSocket;
     std::shared_ptr<Poco::Net::TCPServer> server;
+    NodeInfo thisNodeInfo;
+    std::shared_ptr<NetworkInfo> networkInfo; //@todo może to przenieść do jakiegoś serwisu ? czemu node miałby mieć dane o sieci?
 public:
     void listen();
 

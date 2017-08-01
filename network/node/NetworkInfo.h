@@ -7,7 +7,7 @@
 
 
 #include <list>
-#include "node/NodeInfo.h"
+#include "NodeInfo.h"
 
 class NetworkInfo {
 
