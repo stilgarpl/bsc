@@ -7,7 +7,7 @@
 
 
 #include <Poco/Net/StreamSocket.h>
-#include "protocol/NetworkPacket.h"
+#include "NetworkPacket.h"
 
 class ClientConnection {
 

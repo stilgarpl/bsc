@@ -4,7 +4,7 @@
 
 #include <Poco/Net/SocketStream.h>
 #include "Node.h"
-#include "../ServerConnection.h"
+#include "../protocol/ServerConnection.h"
 #include "../protocol/ServerLogic.h"
 
 using namespace Poco::Net;

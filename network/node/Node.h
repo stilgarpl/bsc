@@ -7,7 +7,7 @@
 
 
 #include "NodeInfo.h"
-#include "../ClientConnection.h"
+#include "../protocol/ClientConnection.h"
 #include <Poco/Net/ServerSocket.h>
 #include <memory>
 #include <Poco/Net/TCPServer.h>
