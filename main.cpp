@@ -1,7 +1,7 @@
 #include <iostream>
 #include <thread>
 #include "network/node/Node.h"
-#include "network/protocol/ApplicationProtocol.h"
+
 
 using namespace std::chrono_literals;
 
@@ -55,8 +55,26 @@ int main() {
 //
 //    ApplicationProtocol::send(t2);
 
-    Node node;
+
+    std::shared_ptr<NetworkPacket> np1 = std::make_shared<NetworkPacketExtreme>();
+    std::shared_ptr<NetworkPacket> np2 = std::make_shared<NetworkPacket>();
+    std::shared_ptr<NetworkPacketExtreme> np3 = std::make_shared<NetworkPacketExtreme>();
+
+    np1->dd = 7;
+    np2->dd = 8;
+    np3->a = 99;
+    Node node, node1;
     node.listen();
+    Poco::Net::SocketAddress address("127.0.0.1:6777");
+    ClientConnection connection = node1.connectTo(address);
+
+    connection.send(np1);
+
+
+    connection.send(np2);
+    connection.send(np3);
+    std::this_thread::sleep_for(2s);
+    connection.send(np1);
     std::this_thread::sleep_for(30s);
     return 0;
 }

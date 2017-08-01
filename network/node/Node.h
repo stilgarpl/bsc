@@ -7,6 +7,7 @@
 
 
 #include "NodeInfo.h"
+#include "../ClientConnection.h"
 #include <Poco/Net/ServerSocket.h>
 #include <memory>
 #include <Poco/Net/TCPServer.h>
@@ -21,6 +22,9 @@ public:
     void stopListening();
 
     void connectTo(const NodeInfo &nodeInfo);
+
+    ClientConnection connectTo(const Poco::Net::SocketAddress &address);
+
 
     virtual ~Node();
 };
