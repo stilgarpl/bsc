@@ -9,22 +9,35 @@
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/polymorphic.hpp>
+#include "enum/Command.h"
 
 
 class NetworkPacket {
-
-public:
+private:
+    Command command;
 
 private:
     template<class Archive>
     void serialize(Archive &ar) {
+        ar & command;
+    }
+
+    friend class cereal::access;
+
+public:
+    Command getCommand() const {
+        return command;
+    }
+
+    void setCommand(Command command) {
+        NetworkPacket::command = command;
     }
 
 
-    friend class cereal::access;
+
 };
 
 
-CEREAL_REGISTER_TYPE(NetworkPacket);
+//CEREAL_REGISTER_TYPE(NetworkPacket);
 
 #endif //BASYCO_NETWORKPACKET_H
