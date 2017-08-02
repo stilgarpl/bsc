@@ -12,6 +12,8 @@ using namespace Poco::Net;
 void Node::listen() {
     //SocketAddress address("127.0.0.1:6777");
     if (serverSocket == nullptr) {
+        //@TODO numer portu dac z configuracji
+        ////@todo sprawdzanie bledow z bindowania socketa
         serverSocket = std::make_shared<ServerSocket>(6777);
     }
     server = std::make_shared<TCPServer>(new ServerConnectionFactory(*this, std::make_shared<ServerLogic>()),
@@ -21,6 +23,7 @@ void Node::listen() {
 
 
 void Node::stopListening() {
+    server->stop();
 
 }
 
@@ -48,4 +51,16 @@ ClientConnection Node::connectTo(const SocketAddress &address) {
 //    cereal::BinaryOutputArchive oa(str);
 //
 //    oa << np;
+}
+
+void Node::start() {
+
+    listen();
+
+
+}
+
+void Node::stop() {
+
+    stopListening();
 }

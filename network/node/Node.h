@@ -28,7 +28,9 @@ public:
 
     ClientConnection connectTo(const Poco::Net::SocketAddress &address);
 
-
+    void start();
+    void stop();
+    
     virtual ~Node();
 };
 
