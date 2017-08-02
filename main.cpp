@@ -68,15 +68,15 @@ int main() {
     node.listen();
     Poco::Net::SocketAddress address("127.0.0.1:6777");
     ClientConnection connection = node1.connectTo(address);
-    np1->setCommand(Command::ECHO);
-    connection.send(np1);
-    np1->setCommand(Command::DISCOVERY);
-    connection.send(np1);
-    np1->setCommand(Command::ECHO);
-    connection.send(np1);
-    np1->setCommand(Command::GET_NODEINFO);
-    connection.send(np1);
-//
+//    np1->setCommand(Command::ECHO);
+//    connection.send(np1);
+//    np1->setCommand(Command::DISCOVERY);
+//    connection.send(np1);
+//    np1->setCommand(Command::ECHO);
+//    connection.send(np1);
+//    np1->setCommand(Command::GET_NODEINFO);
+//    connection.send(np1);
+////
 //
 //    connection.send(np2);
 //    connection.send(np3);

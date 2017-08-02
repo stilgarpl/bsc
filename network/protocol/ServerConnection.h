@@ -8,7 +8,7 @@
 #include <Poco/Net/TCPServerConnection.h>
 #include <Poco/Net/TCPServerConnectionFactory.h>
 #include "../node/Node.h"
-#include "IServerLogic.h"
+#include "logic/IServerLogic.h"
 
 class ServerConnection : public Poco::Net::TCPServerConnection {
 

@@ -7,6 +7,7 @@
 
 
 #include <Poco/Net/StreamSocket.h>
+#include <Poco/Net/SocketStream.h>
 #include "NetworkPacket.h"
 
 class ClientConnection {
@@ -19,7 +20,20 @@ public:
 
     void send(std::shared_ptr<NetworkPacket> np);
 
-    std::shared_ptr<NetworkPacket> receive();
+    template<typename T>
+    void send(std::shared_ptr<T> np) {
+        Poco::Net::SocketStream stream(*socket);
+        cereal::BinaryOutputArchive oa(stream);
+        oa << np;
+    };
+
+    template<typename T>
+    std::shared_ptr<T> receive() {
+        std::shared_ptr<T> np;
+        Poco::Net::SocketStream stream(*socket);
+        cereal::BinaryInputArchive ia(stream);
+        ia >> np;
+    }
 
 };
 
