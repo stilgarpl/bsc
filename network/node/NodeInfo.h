@@ -14,7 +14,7 @@
 class NodeInfo {
 
     std::string nodeName;
-    std::list<Poco::Net::SocketAddress> knownAddresses;
+    std::list<std::string> knownAddresses;
 public:
     const std::string &getNodeName() const;
 
