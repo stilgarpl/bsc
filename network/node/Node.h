@@ -18,7 +18,7 @@ private:
     std::shared_ptr<Poco::Net::ServerSocket> serverSocket;
     std::shared_ptr<Poco::Net::TCPServer> server;
     NodeInfo thisNodeInfo;
-    std::shared_ptr<NetworkInfo> networkInfo; //@todo może to przenieść do jakiegoś serwisu ? czemu node miałby mieć dane o sieci?
+    std::shared_ptr<NetworkInfo> networkInfo; //network this node belongs to @todo more than 1?
 public:
     void listen();
 
