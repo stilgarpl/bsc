@@ -95,12 +95,6 @@ void Connection::stopSending() {
 }
 
 
-void Connection::startWorker(Poco::Net::StreamSocket &socket) {
-    if (workerThread == nullptr) {
-        workerThread = std::make_unique<std::thread>(&Connection::work, this, std::ref(socket));
-    }
-}
-
 void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
     receiving = true;
 
@@ -116,25 +110,3 @@ void Connection::stopReceiving() {
 
 }
 
-void Connection::work(Poco::Net::StreamSocket &socket) {
-//    Poco::Net::SocketInputStream is(socket);
-//    Poco::Net::SocketOutputStream os(socket);
-//
-//    std::shared_ptr<NetworkPacket> v;
-//
-//    ServerLogic logic;
-//
-//
-//    while (receiving || sending) {
-//        // std::cout << "work: " << socket.address().port() << std::endl;
-//
-//
-//        ///@todo while or if?
-//
-//    }
-
-}
-
-void Connection::stopWorker() {
-
-}
