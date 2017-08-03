@@ -12,6 +12,7 @@ void Connection::send(std::shared_ptr<NetworkPacket> np) {
     std::lock_guard<std::mutex> g(sendQueueLock);
     std::cout << "Adding packet ..." << std::endl;
     sendQueue.push(np);
+    sendReady.notify_all();
 
 }
 
@@ -29,23 +30,27 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
     while (sending) {
         //  std::cout << "sending " << socket.address().port() << std::endl;
         //check the queue
-
-        if (!sendQueue.empty()) {
+        std::unique_lock<std::mutex> g(sendQueueLock);
+        while (sendQueue.empty()) {
+            std::cout << "work::send waiting" << std::endl;
+            sendReady.wait(g);
+        }
+        while (!sendQueue.empty()) {
             std::cout << "work::send found packet to send" << std::endl;
             std::shared_ptr<NetworkPacket> v;
             {
-                std::lock_guard<std::mutex> g(sendQueueLock);
                 v = sendQueue.front();
                 {
                     cereal::BinaryOutputArchive oa(os);
                     oa << v;
                 }
-                os.flush();
+
                 sendQueue.pop();
             }
 
         }
-        std::this_thread::sleep_for(400ms);
+        os.flush();
+        //  std::this_thread::sleep_for(400ms);
     }
 
 }
@@ -57,7 +62,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
     ServerLogic logic;
     while (receiving) {
         cereal::BinaryInputArchive ia(is);
-        while (socket.available() > 0) {
+        /*while (socket.available() > 0)*/ {
             std::cout << "work::receive" << socket.address().port() << std::endl;
             std::shared_ptr<NetworkPacket> v;
 
@@ -68,7 +73,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                 logic.processPacket(v);
             }
         }
-        std::this_thread::sleep_for(400ms);
+        // std::this_thread::sleep_for(1ms);
 
     }
 }

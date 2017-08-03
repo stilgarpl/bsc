@@ -130,6 +130,17 @@ int main() {
     std::this_thread::sleep_for(500ms);
     np2->setCommand(Command::ECHO);
     connection.send(np2);
+    connection.send(std::make_shared<NetworkPacket>());
+    connection.send(std::make_shared<NetworkPacket>());
+    connection.send(std::make_shared<NetworkPacket>());
+    connection.send(std::make_shared<NetworkPacket>());
+    connection.send(std::make_shared<NetworkPacket>());
+    connection.send(std::make_shared<NetworkPacket>());
+    connection.send(std::make_shared<NetworkPacket>());
+    connection.send(std::make_shared<NetworkPacket>());
+    connection.send(std::make_shared<NetworkPacket>());
+    connection.send(std::make_shared<NetworkPacket>());
+
     // np1->setCommand(Command::GET_NODEINFO);
     //  connection.send(np1);
 ////

@@ -11,6 +11,7 @@
 #include <queue>
 #include <mutex>
 #include <thread>
+#include <condition_variable>
 #include "NetworkPacket.h"
 
 class Connection {
@@ -20,6 +21,7 @@ private:
     std::mutex receiveQueueLock;
     std::queue<std::shared_ptr<NetworkPacket>> sendQueue;
     std::queue<std::shared_ptr<NetworkPacket>> receiveQueue;
+    std::condition_variable sendReady;
 private:
 
     std::unique_ptr<std::thread> sendThread;

@@ -10,11 +10,8 @@ using namespace std::chrono_literals;
 
 void ServerConnection::run() {
     std::cout << "opening server connection" << std::endl;
-
-    auto &streamSocket = socket();
-    // streamSocket.setReceiveTimeout(Poco::Timespan(12,0));
-    // this->startSending(streamSocket);
     //run is already in a separate thread, so there is no need to start a new one
+    startSending(socket());
     workReceive(socket());
 
     std::cout << "CLOSING CONNECTION";
