@@ -22,21 +22,59 @@ std::shared_ptr<NetworkPacket> Connection::receive() {
     return v;
 }
 
-void Connection::workSend() {
+void Connection::workSend(Poco::Net::StreamSocket &socket) {
+    Poco::Net::SocketOutputStream os(socket);
 
+    std::shared_ptr<NetworkPacket> v;
+    while (sending) {
+        //   std::cout << "sending " << std::endl;
+        //check the queue
+        std::lock_guard<std::mutex> g(sendQueueLock);
+        if (!sendQueue.empty()) {
+            std::cout << "work::send found packet to send" << std::endl;
+            v = sendQueue.front();
+            {
+                cereal::BinaryOutputArchive oa(os);
+                oa << v;
+            }
+            os.flush();
+            sendQueue.pop();
+
+        }
+        std::this_thread::sleep_for(400ms);
+    }
 
 }
 
-void Connection::workReceive() {
+void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
+    Poco::Net::SocketInputStream is(socket);
 
+    std::shared_ptr<NetworkPacket> v;
+    ServerLogic logic;
+    while (receiving) {
+        if (socket.available() > 0) {
+            std::cout << "work::receive" << socket.address().port() << std::endl;
+            cereal::BinaryInputArchive ia(is);
+            ia >> v;
+            {
+                std::lock_guard<std::mutex> g(receiveQueueLock);
+                receiveQueue.push(v);
+            }
+        }
+        std::this_thread::sleep_for(400ms);
+
+    }
 }
 
 
 void Connection::startSending(Poco::Net::StreamSocket &socket) {
 
     sending = true;
-    startWorker(socket);
+    //startWorker(socket);
+    if (sendThread == nullptr) {
+        sendThread = std::make_unique<std::thread>(&Connection::workSend, this, std::ref(socket));
+    }
 }
 
 void Connection::stopSending() {
@@ -55,7 +93,9 @@ void Connection::startWorker(Poco::Net::StreamSocket &socket) {
 void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
     receiving = true;
 
-    startWorker(socket);
+    if (receiveThread == nullptr) {
+        receiveThread = std::make_unique<std::thread>(&Connection::workReceive, this, std::ref(socket));
+    }
 
 }
 
@@ -66,48 +106,21 @@ void Connection::stopReceiving() {
 }
 
 void Connection::work(Poco::Net::StreamSocket &socket) {
-    Poco::Net::SocketInputStream is(socket);
-    Poco::Net::SocketOutputStream os(socket);
-
-    std::shared_ptr<NetworkPacket> v;
-
-    ServerLogic logic;
-
-
-    while (receiving || sending) {
-        // std::cout << "work: " << socket.address().port() << std::endl;
-        if (sending) {
-            //   std::cout << "sending " << std::endl;
-            //check the queue
-            std::lock_guard<std::mutex> g(sendQueueLock);
-            if (!sendQueue.empty()) {
-                std::cout << "work::send found packet to send" << std::endl;
-                v = sendQueue.front();
-                {
-                    cereal::BinaryOutputArchive oa(os);
-                    oa << v;
-                }
-                os.flush();
-                sendQueue.pop();
-
-            }
-
-        }
-
-        ///@todo while or if?
-        while (receiving && socket.available() > 0) {
-            std::cout << "work::receive" << socket.address().port() << std::endl;
-            cereal::BinaryInputArchive ia(is);
-            ia >> v;
-            {
-                std::lock_guard<std::mutex> g(receiveQueueLock);
-                receiveQueue.push(v);
-                logic.processPacket(v);
-            }
-
-        }
-        std::this_thread::sleep_for(400ms);
-    }
+//    Poco::Net::SocketInputStream is(socket);
+//    Poco::Net::SocketOutputStream os(socket);
+//
+//    std::shared_ptr<NetworkPacket> v;
+//
+//    ServerLogic logic;
+//
+//
+//    while (receiving || sending) {
+//        // std::cout << "work: " << socket.address().port() << std::endl;
+//
+//
+//        ///@todo while or if?
+//
+//    }
 
 }
 

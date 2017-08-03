@@ -15,7 +15,7 @@ void ServerConnection::run() {
     // streamSocket.setReceiveTimeout(Poco::Timespan(12,0));
     // this->startSending(streamSocket);
     //run is already in a separate thread, so there is no need to start a new one
-    work(socket());
+    workReceive(socket());
 
     std::cout << "CLOSING CONNECTION";
 

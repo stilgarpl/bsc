@@ -29,24 +29,10 @@ private:
     bool receiving = true;
 
 protected:
-    template<typename T>
-    static void send(Poco::Net::StreamSocket &networkSocket, std::shared_ptr<T> np) {
-        Poco::Net::SocketStream stream(networkSocket);
-        cereal::BinaryOutputArchive oa(stream);
-        oa << np;
-    };
 
-    template<typename T>
-    std::shared_ptr<T> receive(Poco::Net::StreamSocket &networkSocket) {
-        std::shared_ptr<T> np;
-        Poco::Net::SocketStream stream(networkSocket);
-        cereal::BinaryInputArchive ia(stream);
-        ia >> np;
-    }
+    void workSend(Poco::Net::StreamSocket &socket);
 
-    void workSend();
-
-    void workReceive();
+    void workReceive(Poco::Net::StreamSocket &socket);
 
     void work(Poco::Net::StreamSocket &socket);
 
