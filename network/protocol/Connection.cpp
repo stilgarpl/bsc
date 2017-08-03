@@ -10,6 +10,7 @@ using namespace std::chrono_literals;
 
 void Connection::send(std::shared_ptr<NetworkPacket> np) {
     std::lock_guard<std::mutex> g(sendQueueLock);
+    std::cout << "Adding packet ..." << std::endl;
     sendQueue.push(np);
 
 }
@@ -25,20 +26,23 @@ std::shared_ptr<NetworkPacket> Connection::receive() {
 void Connection::workSend(Poco::Net::StreamSocket &socket) {
     Poco::Net::SocketOutputStream os(socket);
 
-    std::shared_ptr<NetworkPacket> v;
     while (sending) {
-        //   std::cout << "sending " << std::endl;
+        //  std::cout << "sending " << socket.address().port() << std::endl;
         //check the queue
-        std::lock_guard<std::mutex> g(sendQueueLock);
+
         if (!sendQueue.empty()) {
             std::cout << "work::send found packet to send" << std::endl;
-            v = sendQueue.front();
+            std::shared_ptr<NetworkPacket> v;
             {
-                cereal::BinaryOutputArchive oa(os);
-                oa << v;
+                std::lock_guard<std::mutex> g(sendQueueLock);
+                v = sendQueue.front();
+                {
+                    cereal::BinaryOutputArchive oa(os);
+                    oa << v;
+                }
+                os.flush();
+                sendQueue.pop();
             }
-            os.flush();
-            sendQueue.pop();
 
         }
         std::this_thread::sleep_for(400ms);
@@ -50,16 +54,18 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
     Poco::Net::SocketInputStream is(socket);
 
-    std::shared_ptr<NetworkPacket> v;
     ServerLogic logic;
     while (receiving) {
-        if (socket.available() > 0) {
+        cereal::BinaryInputArchive ia(is);
+        while (socket.available() > 0) {
             std::cout << "work::receive" << socket.address().port() << std::endl;
-            cereal::BinaryInputArchive ia(is);
+            std::shared_ptr<NetworkPacket> v;
+
             ia >> v;
             {
                 std::lock_guard<std::mutex> g(receiveQueueLock);
                 receiveQueue.push(v);
+                logic.processPacket(v);
             }
         }
         std::this_thread::sleep_for(400ms);

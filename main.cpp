@@ -102,7 +102,7 @@ int main() {
 
 
 
-//    std::shared_ptr<NetworkPacket> np2 = std::make_shared<NetworkPacket>();
+    std::shared_ptr<NetworkPacket> np2 = std::make_shared<NetworkPacket>();
 //    std::shared_ptr<NetworkPacketExtreme> np3 = std::make_shared<NetworkPacketExtreme>();
 //
 //    np1->dd = 7;
@@ -128,8 +128,8 @@ int main() {
     np1->setCommand(Command::DISCOVERY);
     connection.send(np1);
     std::this_thread::sleep_for(500ms);
-    //  np1->setCommand(Command::ECHO);
-    //  connection.send(np1);
+    np2->setCommand(Command::ECHO);
+    connection.send(np2);
     // np1->setCommand(Command::GET_NODEINFO);
     //  connection.send(np1);
 ////
