@@ -5,5 +5,8 @@
 #include <Poco/Net/SocketStream.h>
 #include "ClientConnection.h"
 
-ClientConnection::ClientConnection(std::shared_ptr<Poco::Net::StreamSocket> socket) : socket(socket) {}
 
+ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a) : socket(a) {
+    socket.setReceiveTimeout(Poco::Timespan(20, 0));
+
+}

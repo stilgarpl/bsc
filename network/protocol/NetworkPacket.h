@@ -4,7 +4,7 @@
 
 #ifndef BASYCO_NETWORKPACKET_H
 #define BASYCO_NETWORKPACKET_H
-
+#define CEREAL_THREAD_SAFE 1
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>

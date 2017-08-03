@@ -1,5 +1,7 @@
 #include <iostream>
 #include <thread>
+
+#define CEREAL_THREAD_SAFE 1
 #include "network/node/Node.h"
 
 
@@ -7,7 +9,18 @@ using namespace std::chrono_literals;
 
 #include <fstream>
 
+
+class Des {
+public:
+    virtual ~Des() {
+        std::cout << "Desti" << std::endl;
+    }
+};
+
 class SerialTest {
+
+public:
+    std::shared_ptr<std::string> temp = nsm(temp);
 
 private:
     int a, b, c;
@@ -31,6 +44,38 @@ int main() {
 
     char x1[50] = "lalalal test";
     char x2[50];
+
+//    NetworkServiceManager nsm2;
+
+    std::shared_ptr<std::string> temp1 = nsm(temp1);
+
+//
+//    *temp1 = "dupa";
+
+    //std::cout << *temp2 << std::endl;
+
+    std::queue<std::shared_ptr<std::string>> q;
+    q.push(std::make_shared<std::string>("dupa1"));
+    q.push(std::make_shared<std::string>("dupa2"));
+    q.push(std::make_shared<std::string>("dupa3"));
+
+    auto p = q.front();
+    q.pop();
+
+    std::cout << *p << std::endl;
+
+
+    std::queue<std::shared_ptr<Des>> q1;
+    q1.push(std::make_shared<Des>());
+    q1.push(std::make_shared<Des>());
+    q1.push(std::make_shared<Des>());
+    auto p1 = q1.front();
+    // auto p2 = p1;
+    std::cout << "F" << std::endl;
+    q1.pop();
+    std::cout << "P" << std::endl;
+
+
     //  str << x1;
 
 //    SerialTest st(1,2,3,"lal");
@@ -67,15 +112,26 @@ int main() {
     Node node, node1;
     node.listen();
     Poco::Net::SocketAddress address("127.0.0.1:6777");
-    ClientConnection connection = node1.connectTo(address);
+    Connection connection;
+    std::this_thread::sleep_for(300ms);
+    Poco::Net::StreamSocket socket1(address);
+
+    connection.startReceiving(socket1);
+    connection.startSending(socket1);
+//    connection.send(np1);
+//    connection.send(np1);
+//    connection.send(np1);
+//    connection.send(np1);
+    //ClientConnection connection = node1.connectTo(address);
 //    np1->setCommand(Command::ECHO);
 //    connection.send(np1);
-//    np1->setCommand(Command::DISCOVERY);
-//    connection.send(np1);
-//    np1->setCommand(Command::ECHO);
-//    connection.send(np1);
-//    np1->setCommand(Command::GET_NODEINFO);
-//    connection.send(np1);
+    np1->setCommand(Command::DISCOVERY);
+    connection.send(np1);
+    std::this_thread::sleep_for(500ms);
+    //  np1->setCommand(Command::ECHO);
+    //  connection.send(np1);
+    // np1->setCommand(Command::GET_NODEINFO);
+    //  connection.send(np1);
 ////
 //
 //    connection.send(np2);

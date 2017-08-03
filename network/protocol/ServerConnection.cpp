@@ -5,28 +5,17 @@
 #include <thread>
 #include <iostream>
 #include "ServerConnection.h"
-#include <Poco/Net/SocketStream.h>
 
 using namespace std::chrono_literals;
 
 void ServerConnection::run() {
+    std::cout << "opening server connection" << std::endl;
 
-    auto streamSocket = socket();
-    Poco::Net::SocketStream ss(streamSocket);
-    cereal::BinaryInputArchive ia(ss);
-    while (true) {
-        // std::cout << "new loop" << std::endl;
-        // if (streamSocket.available() > 0) {
-        std::cout << "connection" << std::endl;
-
-
-        std::shared_ptr<NetworkPacket> np;
-        //NetworkPacket np;
-        ia >> np;
-        serverLogic->processPacket(np);
-
-
-    }
+    auto &streamSocket = socket();
+    // streamSocket.setReceiveTimeout(Poco::Timespan(12,0));
+    // this->startSending(streamSocket);
+    //run is already in a separate thread, so there is no need to start a new one
+    work(socket());
 
     std::cout << "CLOSING CONNECTION";
 
@@ -37,6 +26,13 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &
                                                                                        serverNode(serverNode),
                                                                                        serverLogic(serverLogic) {}
 
+void ServerConnection::startReceiving(Poco::Net::StreamSocket &socket) {
+
+}
+
+void ServerConnection::stopReceiving() {
+    Connection::stopReceiving();
+}
 
 ServerConnectionFactory::ServerConnectionFactory(Node &serverNode, const std::shared_ptr<IServerLogic> &serverLogic)
         : serverNode(serverNode), serverLogic(serverLogic) {}

@@ -36,22 +36,23 @@ Node::~Node() {
 
 }
 
-ClientConnection Node::connectTo(const SocketAddress &address) {
-
-    std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
-    //@todo check for problems and handle them
-    return ClientConnection(socket);
-//    Poco::Net::SocketStream str(socket);
+//ClientConnection Node::connectTo(const SocketAddress &address) {
 //
-//    std::shared_ptr<NetworkPacket> np = std::make_shared<NetworkPacket>();
-//   // NetworkPacket np;
-//    std::cout << "connectTo" << std::endl;
-//    np->print();
-//    //np.print();
-//    cereal::BinaryOutputArchive oa(str);
+//    //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
+//    //@todo check for problems and handle them
 //
-//    oa << np;
-}
+//   // return ClientConnection(address);
+////    Poco::Net::SocketStream str(socket);
+////
+////    std::shared_ptr<NetworkPacket> np = std::make_shared<NetworkPacket>();
+////   // NetworkPacket np;
+////    std::cout << "connectTo" << std::endl;
+////    np->print();
+////    //np.print();
+////    cereal::BinaryOutputArchive oa(str);
+////
+////    oa << np;
+//}
 
 void Node::start() {
 
