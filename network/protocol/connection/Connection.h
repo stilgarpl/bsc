@@ -12,7 +12,7 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
-#include "NetworkPacket.h"
+#include "../packet/NetworkPacket.h"
 
 class Connection {
 

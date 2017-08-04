@@ -1,7 +1,7 @@
 #include <iostream>
 #include <thread>
 
-#define CEREAL_THREAD_SAFE 1
+//#define CEREAL_THREAD_SAFE 1
 #include "network/node/Node.h"
 
 

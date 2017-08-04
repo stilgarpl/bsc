@@ -4,12 +4,12 @@
 
 #ifndef BASYCO_NETWORKPACKET_H
 #define BASYCO_NETWORKPACKET_H
-#define CEREAL_THREAD_SAFE 1
+//#define CEREAL_THREAD_SAFE 1
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/polymorphic.hpp>
-#include "enum/Command.h"
+#include "../enum/Command.h"
 
 
 class NetworkPacket {

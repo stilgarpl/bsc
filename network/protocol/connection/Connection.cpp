@@ -1,10 +1,10 @@
 //
 // Created by stilgar on 03.08.17.
 //
-#define CEREAL_THREAD_SAFE 1
+//#define CEREAL_THREAD_SAFE 1
 
 #include "ClientConnection.h"
-#include "logic/ServerLogic.h"
+#include "../logic/ServerLogic.h"
 
 using namespace std::chrono_literals;
 

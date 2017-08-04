@@ -21,6 +21,10 @@ public:
 
     void setNodeName(const std::string &nodeName);
 
+    const std::string &getNetworkId() const;
+
+    const std::list<std::string> &getKnownAddresses() const;
+
 };
 
 

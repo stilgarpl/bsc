@@ -4,7 +4,7 @@
 
 #include <Poco/Net/SocketStream.h>
 #include "Node.h"
-#include "../protocol/ServerConnection.h"
+#include "../protocol/connection/ServerConnection.h"
 #include "../protocol/logic/ServerLogic.h"
 
 using namespace Poco::Net;
@@ -19,6 +19,7 @@ void Node::listen() {
     server = std::make_shared<TCPServer>(new ServerConnectionFactory(*this, std::make_shared<ServerLogic>()),
                                          *serverSocket);
     server->start();
+
 }
 
 
@@ -27,7 +28,16 @@ void Node::stopListening() {
 
 }
 
-void Node::connectTo(const NodeInfo &nodeInfo) {
+bool Node::connectTo(const NodeInfo &nodeInfo) {
+
+    for (auto i : nodeInfo.getKnownAddresses()) {
+
+        //try to connect
+        if (connectTo(i)) {
+
+            break;
+        }
+    }
 
 }
 
@@ -36,23 +46,16 @@ Node::~Node() {
 
 }
 
-//ClientConnection Node::connectTo(const SocketAddress &address) {
-//
-//    //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
-//    //@todo check for problems and handle them
-//
-//   // return ClientConnection(address);
-////    Poco::Net::SocketStream str(socket);
-////
-////    std::shared_ptr<NetworkPacket> np = std::make_shared<NetworkPacket>();
-////   // NetworkPacket np;
-////    std::cout << "connectTo" << std::endl;
-////    np->print();
-////    //np.print();
-////    cereal::BinaryOutputArchive oa(str);
-////
-////    oa << np;
-//}
+bool Node::connectTo(const SocketAddress &address) {
+
+    //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
+    //@todo check for problems and handle them
+    std::shared_ptr<Connection> connection = std::make_shared<Connection>(address);
+    ///@todo if connection is not connected, delete it and try another adddes
+    addActiveClientConnection(connection);
+    return true; ///@todo error checking
+
+}
 
 void Node::start() {
 
@@ -64,4 +67,31 @@ void Node::start() {
 void Node::stop() {
 
     stopListening();
+}
+
+void Node::addActiveClientConnection(std::shared_ptr<Connection> c) {
+
+    activeClientConnections.push_back(c);
+
+}
+
+void Node::removeActiveClientConnection(std::shared_ptr<Connection> c) {
+    //  auto el = std::find(activeClientConnections.begin(),activeClientConnections.end(),c);
+    activeClientConnections.remove(c);
+
+}
+
+bool Node::connectTo(const std::string &a) {
+    Poco::Net::SocketAddress address(a);
+    return connectTo(address);
+}
+
+void Node::work() {
+
+    for (auto &i : activeClientConnections) {
+        //@todo implement
+        //test if connection is still alive
+        //process all messages from receive queue
+    }
+
 }

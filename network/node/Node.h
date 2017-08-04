@@ -7,7 +7,7 @@
 
 
 #include "NodeInfo.h"
-#include "../protocol/ClientConnection.h"
+#include "../protocol/connection/ClientConnection.h"
 #include "NetworkInfo.h"
 #include "../service/NetworkServiceManager.h"
 #include <Poco/Net/ServerSocket.h>
@@ -20,19 +20,29 @@ private:
     std::shared_ptr<Poco::Net::TCPServer> server;
     NodeInfo thisNodeInfo;
     std::shared_ptr<NetworkInfo> networkInfo;// = nsm(networkInfo); //network this node belongs to @todo more than 1?
+    std::list<std::shared_ptr<Connection>> activeClientConnections;
+protected:
+    void addActiveClientConnection(std::shared_ptr<Connection> c);
+
+    void removeActiveClientConnection(std::shared_ptr<Connection> c);
+
+    void work();
 public:
     void listen();
 
     void stopListening();
 
-    void connectTo(const NodeInfo &nodeInfo);
+    bool connectTo(const NodeInfo &nodeInfo);
 
-    //ClientConnection connectTo(const Poco::Net::SocketAddress &address);
+    bool connectTo(const std::string &address);
+
 
     void start();
     void stop();
     
     virtual ~Node();
+
+    bool connectTo(const Poco::Net::SocketAddress &address);
 };
 
 

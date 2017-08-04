@@ -6,7 +6,7 @@
 #define BASYCO_ISERVERLOGIC_H
 
 
-#include "../NetworkPacket.h"
+#include "../packet/NetworkPacket.h"
 
 class IServerLogic {
 public:
