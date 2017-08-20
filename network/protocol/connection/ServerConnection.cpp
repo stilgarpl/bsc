@@ -24,6 +24,7 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &
                                                                                        serverLogic(serverLogic) {}
 
 void ServerConnection::startReceiving(Poco::Net::StreamSocket &socket) {
+    processor.start();
 
 }
 

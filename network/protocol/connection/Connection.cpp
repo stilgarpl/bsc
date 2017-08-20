@@ -4,7 +4,6 @@
 //#define CEREAL_THREAD_SAFE 1
 
 #include "ClientConnection.h"
-#include "../logic/ServerLogic.h"
 
 using namespace std::chrono_literals;
 
@@ -17,9 +16,14 @@ void Connection::send(std::shared_ptr<NetworkPacket> np) {
 }
 
 std::shared_ptr<NetworkPacket> Connection::receive() {
-    ///@todo tu nie bardzo lock, bardziej trzeba czekac na event ze w kolejce cos jest...
-    std::lock_guard<std::mutex> g(receiveQueueLock);
+    std::unique_lock<std::mutex> g(receiveQueueLock);
+    while (receiveQueue.empty()) {
+        std::cout << "work::receive waiting " << receiveQueue.size() << std::endl;
+        receiveReady.wait_for(g, 1s);
+    }
+    ///clion says it's an error. clion is WRONG.
     auto v = receiveQueue.front();
+    std::cout << "Popping " << std::endl;
     receiveQueue.pop();
     return v;
 }
@@ -58,24 +62,27 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
 void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
     Poco::Net::SocketInputStream is(socket);
-
-    ServerLogic logic;
+    processor.start();
     while (receiving) {
         cereal::BinaryInputArchive ia(is);
         /*while (socket.available() > 0)*/ {
-            std::cout << "work::receive" << socket.address().port() << std::endl;
+            std::cout << "work::receive " << socket.address().port() << std::endl;
             std::shared_ptr<NetworkPacket> v;
 
             ia >> v;
             {
                 std::lock_guard<std::mutex> g(receiveQueueLock);
                 receiveQueue.push(v);
-                logic.processPacket(v);
+                receiveReady.notify_all();
+                std::cout << "work::receive qs " << receiveQueue.size() << std::endl;
+                // logic.processPacket(v);
+
             }
         }
         // std::this_thread::sleep_for(1ms);
 
     }
+    processor.stop();
 }
 
 
@@ -101,12 +108,15 @@ void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
     if (receiveThread == nullptr) {
         receiveThread = std::make_unique<std::thread>(&Connection::workReceive, this, std::ref(socket));
     }
+    processor.start();
 
 }
 
 void Connection::stopReceiving() {
     receiving = false;
 
-
+    processor.stop();
 }
+
+Connection::Connection() : processor(*this) {}
 

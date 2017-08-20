@@ -49,6 +49,8 @@ int main() {
 
     std::shared_ptr<std::string> temp1 = nsm(temp1);
 
+
+
 //
 //    *temp1 = "dupa";
 
@@ -115,7 +117,8 @@ int main() {
     Connection connection;
     std::this_thread::sleep_for(300ms);
     Poco::Net::StreamSocket socket1(address);
-
+    ConnectionProcessor cp(connection);
+    cp.start();
     connection.startReceiving(socket1);
     connection.startSending(socket1);
 //    connection.send(np1);

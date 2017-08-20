@@ -13,15 +13,19 @@
 #include <thread>
 #include <condition_variable>
 #include "../packet/NetworkPacket.h"
+#include "../processor/ConnectionProcessor.h"
 
 class Connection {
 
+protected:
+    ConnectionProcessor processor;
 private:
     std::mutex sendQueueLock;
     std::mutex receiveQueueLock;
     std::queue<std::shared_ptr<NetworkPacket>> sendQueue;
     std::queue<std::shared_ptr<NetworkPacket>> receiveQueue;
     std::condition_variable sendReady;
+    std::condition_variable receiveReady;
 private:
 
     std::unique_ptr<std::thread> sendThread;
@@ -50,6 +54,8 @@ public:
     void send(std::shared_ptr<NetworkPacket> np);
 
     std::shared_ptr<NetworkPacket> receive();
+
+    Connection();
 };
 
 

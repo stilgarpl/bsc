@@ -1,0 +1,23 @@
+Start aplikacji:
+
+Załadować ustawienia node, uruchomić node na dostępnym porcie.
+
+Załadować listę sieci/nodów. Spróbować połączyć się z nodami.
+
+Z połączonych nodów, pobrać informacje o nich i ich stanie.
+
+
+
+procesowanie pakietow:
+
+odebrane pakiety idą na kolejkę w connectionie.
+connectionProcessor odbiera te pakiety z kolejki i odpala im ->process(context)
+procesowanie np. getNodeInfo powinno uzupełnić node info, co z kolei powinno zatriggerowac wszystkie future oczekujace na to
+
+bo np. jest jakiś wątek
+
+{
+do stuff...
+node->getNodeInfo(..., [&](){and then do this};
+do other stuff...
+}
