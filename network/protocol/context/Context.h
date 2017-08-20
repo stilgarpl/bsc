@@ -17,13 +17,18 @@ private:
         return val++;
     }
 
+    template<typename T>
+    unsigned int getTypeId() {
+        static auto typeId = getNextId();
+        return typeId;
+    };
     std::map<unsigned int, std::map<unsigned int, std::shared_ptr<void>>> data;
 public:
 
 
     template<typename T, typename... Vals>
     std::shared_ptr<T> get(unsigned int id, Vals... values) {
-        static auto typeId = getNextId();
+        static auto typeId = getTypeId<T>();
         if (data[typeId][id] == nullptr) {
             data[typeId][id] = std::make_shared<T>(values...);
         }

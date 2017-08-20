@@ -3,7 +3,6 @@
 
 //#define CEREAL_THREAD_SAFE 1
 #include "network/node/Node.h"
-#include "network/protocol/context/Context.h"
 
 
 using namespace std::chrono_literals;
@@ -16,6 +15,18 @@ public:
     virtual ~Des() {
         std::cout << "Desti" << std::endl;
     }
+};
+
+class A {
+
+public:
+    A() {
+        std::cout << "A::" << std::endl;
+    };
+
+    A(int a) {
+        std::cout << "A::int " << a << std::endl;
+    };
 };
 
 class SerialTest {
@@ -104,8 +115,9 @@ int main() {
 //    ApplicationProtocol::send(t2);
 
     Context context;
-    auto ddd = context.get<int>(0);// = std::make_shared<int>(5);
-    *ddd = 7;
+    auto ddd = context.get<int, int>(0, 6);// = std::make_shared<int>(5);
+    context.get<A>(0);
+    context.get<A, int>(1, 5);
 
     Context context2;
     auto ddd2 = context2.get<int>(0);// = std::make_shared<int>(5);
@@ -113,7 +125,7 @@ int main() {
 
     std::cout << "CONTEXT TEST " << *context.get<int>(0) << std::endl;
     std::cout << "CONTEXT TEST " << *context2.get<int>(0) << std::endl;
-    // exit(0);
+    //   exit(0);
     std::shared_ptr<NetworkPacket> np2 = std::make_shared<NetworkPacket>();
 //    std::shared_ptr<NetworkPacketExtreme> np3 = std::make_shared<NetworkPacketExtreme>();
 //

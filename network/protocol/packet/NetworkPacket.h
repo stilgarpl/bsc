@@ -10,6 +10,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/polymorphic.hpp>
 #include "../enum/Command.h"
+#include "../context/Context.h"
 
 
 class NetworkPacket {
@@ -33,6 +34,8 @@ public:
         NetworkPacket::command = command;
     }
 
+
+    virtual void process(Context &context);
 };
 
 
