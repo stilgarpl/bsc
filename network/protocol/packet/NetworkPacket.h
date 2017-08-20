@@ -33,8 +33,6 @@ public:
         NetworkPacket::command = command;
     }
 
-
-
 };
 
 

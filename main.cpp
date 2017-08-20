@@ -3,6 +3,7 @@
 
 //#define CEREAL_THREAD_SAFE 1
 #include "network/node/Node.h"
+#include "network/protocol/context/Context.h"
 
 
 using namespace std::chrono_literals;
@@ -102,8 +103,17 @@ int main() {
 //
 //    ApplicationProtocol::send(t2);
 
+    Context context;
+    auto ddd = context.get<int>(0);// = std::make_shared<int>(5);
+    *ddd = 7;
 
+    Context context2;
+    auto ddd2 = context2.get<int>(0);// = std::make_shared<int>(5);
+    *ddd2 = 8;
 
+    std::cout << "CONTEXT TEST " << *context.get<int>(0) << std::endl;
+    std::cout << "CONTEXT TEST " << *context2.get<int>(0) << std::endl;
+    // exit(0);
     std::shared_ptr<NetworkPacket> np2 = std::make_shared<NetworkPacket>();
 //    std::shared_ptr<NetworkPacketExtreme> np3 = std::make_shared<NetworkPacketExtreme>();
 //

@@ -19,7 +19,8 @@ std::shared_ptr<NetworkPacket> Connection::receive() {
     std::unique_lock<std::mutex> g(receiveQueueLock);
     while (receiveQueue.empty()) {
         std::cout << "work::receive waiting " << receiveQueue.size() << std::endl;
-        receiveReady.wait_for(g, 1s);
+        // receiveReady.wait_for(g, 1s);
+        receiveReady.wait(g);
     }
     ///clion says it's an error. clion is WRONG.
     auto v = receiveQueue.front();
@@ -62,6 +63,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
 void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
     Poco::Net::SocketInputStream is(socket);
+    ///@attention is it ok to start it here?
     processor.start();
     while (receiving) {
         cereal::BinaryInputArchive ia(is);
@@ -108,14 +110,14 @@ void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
     if (receiveThread == nullptr) {
         receiveThread = std::make_unique<std::thread>(&Connection::workReceive, this, std::ref(socket));
     }
-    processor.start();
+    //  processor.start();
 
 }
 
 void Connection::stopReceiving() {
     receiving = false;
 
-    processor.stop();
+    //  processor.stop();
 }
 
 Connection::Connection() : processor(*this) {}
