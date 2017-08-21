@@ -7,7 +7,8 @@
 
 
 #include <thread>
-#include "../../thread/Runnable.h"
+#include "../../../thread/Runnable.h"
+#include "../context/Context.h"
 
 
 class Connection;
@@ -15,6 +16,7 @@ class Connection;
 class ConnectionProcessor : public Runnable {
 
 protected:
+    Context context;
     Connection &connection;
 
     virtual void run();
@@ -23,6 +25,7 @@ public:
     ConnectionProcessor(Connection &connection);
 
 
+    Context &getContext();
 };
 
 

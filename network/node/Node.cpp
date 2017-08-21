@@ -5,7 +5,8 @@
 #include <Poco/Net/SocketStream.h>
 #include "Node.h"
 #include "../protocol/connection/ServerConnection.h"
-#include "../protocol/logic/ServerLogic.h"
+#include "../protocol/context/NodeContext.h"
+
 
 using namespace Poco::Net;
 
@@ -16,7 +17,9 @@ void Node::listen() {
         ////@todo sprawdzanie bledow z bindowania socketa
         serverSocket = std::make_shared<ServerSocket>(6777);
     }
-    server = std::make_shared<TCPServer>(new ServerConnectionFactory(*this, std::make_shared<ServerLogic>()),
+    //@todo list context setup perhaps?
+    std::shared_ptr<IContextSetup> ctxSet = std::make_shared<NodeContext::Setup>(*this, thisNodeInfo);
+    server = std::make_shared<TCPServer>(new ServerConnectionFactory(*this, ctxSet),
                                          *serverSocket);
     server->start();
 
@@ -70,7 +73,10 @@ void Node::stop() {
 }
 
 void Node::addActiveClientConnection(std::shared_ptr<Connection> c) {
-
+    NodeContext context(*this, thisNodeInfo);
+    if (c->getProcessor().getContext().get<NodeContext>(0) == nullptr) {
+        c->getProcessor().getContext().set<NodeContext>(0, context);
+    }
     activeClientConnections.push_back(c);
 
 }

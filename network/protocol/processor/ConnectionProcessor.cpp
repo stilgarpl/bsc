@@ -6,6 +6,7 @@
 #include "ConnectionProcessor.h"
 
 #include "../connection/Connection.h"
+#include "../context/ConnectionContext.h"
 
 ConnectionProcessor::ConnectionProcessor(Connection &connection) : connection(connection) {
 
@@ -13,7 +14,11 @@ ConnectionProcessor::ConnectionProcessor(Connection &connection) : connection(co
 
 void ConnectionProcessor::run() {
     std::cout << "ConnectionProcessor start" << std::endl;
-    Context context;
+    //set up context
+    ConnectionContext::Setup ctxSet(connection);
+    ctxSet.setup(context);
+
+
     while (!this->isStopping()) {
         std::cout << "ConnectionProcessor run" << std::endl;
         auto np = connection.receive();
@@ -21,4 +26,8 @@ void ConnectionProcessor::run() {
 
     }
 
+}
+
+Context &ConnectionProcessor::getContext() {
+    return context;
 }

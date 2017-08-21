@@ -11,34 +11,30 @@
 #include <cereal/types/polymorphic.hpp>
 #include "../enum/Command.h"
 #include "../context/Context.h"
+#include "../enum/Status.h"
 
 
 class NetworkPacket {
 private:
-    Command command;
-
+    Status status;
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar & command;
+        ar & status;
     }
 
     friend class cereal::access;
 
 public:
-    Command getCommand() const {
-        return command;
-    }
-
-    void setCommand(Command command) {
-        NetworkPacket::command = command;
-    }
-
 
     virtual void process(Context &context);
+
+    Status getStatus() const;
+
+    void setStatus(Status status);
 };
 
 
-//CEREAL_REGISTER_TYPE(NetworkPacket);
+CEREAL_REGISTER_TYPE(NetworkPacket);
 
 #endif //BASYCO_NETWORKPACKET_H

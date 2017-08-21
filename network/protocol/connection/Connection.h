@@ -56,6 +56,8 @@ public:
     std::shared_ptr<NetworkPacket> receive();
 
     Connection();
+
+    ConnectionProcessor &getProcessor();
 };
 
 

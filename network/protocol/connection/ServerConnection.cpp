@@ -18,10 +18,9 @@ void ServerConnection::run() {
 
 }
 
-ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode,
-                                   const std::shared_ptr<IServerLogic> &serverLogic) : TCPServerConnection(socket),
-                                                                                       serverNode(serverNode),
-                                                                                       serverLogic(serverLogic) {}
+ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode) : TCPServerConnection(
+        socket),
+                                                                                              serverNode(serverNode) {}
 
 void ServerConnection::startReceiving(Poco::Net::StreamSocket &socket) {
     processor.start();
@@ -32,9 +31,24 @@ void ServerConnection::stopReceiving() {
     Connection::stopReceiving();
 }
 
-ServerConnectionFactory::ServerConnectionFactory(Node &serverNode, const std::shared_ptr<IServerLogic> &serverLogic)
-        : serverNode(serverNode), serverLogic(serverLogic) {}
+ServerConnectionFactory::ServerConnectionFactory(Node &serverNode)
+        : serverNode(serverNode) {}
 
 Poco::Net::TCPServerConnection *ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket &socket) {
-    return new ServerConnection(socket, serverNode, serverLogic);
+    ServerConnection *connection = new ServerConnection(socket, serverNode);
+    if (contextSetup != nullptr) {
+        contextSetup->setup(connection->getProcessor().getContext());
+    }
+    return connection;
 }
+
+const std::shared_ptr<IContextSetup> &ServerConnectionFactory::getContextSetup() const {
+    return contextSetup;
+}
+
+void ServerConnectionFactory::setContextSetup(const std::shared_ptr<IContextSetup> &contextSetup) {
+    ServerConnectionFactory::contextSetup = contextSetup;
+}
+
+ServerConnectionFactory::ServerConnectionFactory(Node &serverNode, const std::shared_ptr<IContextSetup> &contextSetup)
+        : serverNode(serverNode), contextSetup(contextSetup) {}

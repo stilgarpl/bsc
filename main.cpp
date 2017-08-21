@@ -3,6 +3,7 @@
 
 //#define CEREAL_THREAD_SAFE 1
 #include "network/node/Node.h"
+#include "network/protocol/packet/CommandPacket.h"
 
 
 using namespace std::chrono_literals;
@@ -115,24 +116,27 @@ int main() {
 //    ApplicationProtocol::send(t2);
 
     Context context;
+    context.set<int, int>(0, 6);// = std::make_shared<int>(5);
+
     auto ddd = context.get<int, int>(0, 6);// = std::make_shared<int>(5);
-    context.get<A>(0);
-    context.get<A, int>(1, 5);
 
+
+    context.set<int>(0, 9);
+    *ddd = 1;
     Context context2;
-    auto ddd2 = context2.get<int>(0);// = std::make_shared<int>(5);
-    *ddd2 = 8;
+    //  auto ddd2 = context2.get<int>(0);// = std::make_shared<int>(5);
+    //  *ddd2 = 8;
 
-    std::cout << "CONTEXT TEST " << *context.get<int>(0) << std::endl;
-    std::cout << "CONTEXT TEST " << *context2.get<int>(0) << std::endl;
+    std::cout << "CONTEXT TEST " << *context.get<int>(0) << " " << *ddd << std::endl;
+    //  std::cout << "CONTEXT TEST " << *context2.get<int>(0) << std::endl;
     //   exit(0);
-    std::shared_ptr<NetworkPacket> np2 = std::make_shared<NetworkPacket>();
+    std::shared_ptr<CommandPacket> np2 = std::make_shared<CommandPacket>();
 //    std::shared_ptr<NetworkPacketExtreme> np3 = std::make_shared<NetworkPacketExtreme>();
 //
 //    np1->dd = 7;
 //    np2->dd = 8;
 //    np3->a = 99;
-    std::shared_ptr<NetworkPacket> np1 = std::make_shared<NetworkPacket>();
+    std::shared_ptr<CommandPacket> np1 = std::make_shared<CommandPacket>();
     Node node, node1;
     node.listen();
     Poco::Net::SocketAddress address("127.0.0.1:6777");

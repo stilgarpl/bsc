@@ -8,19 +8,17 @@
 #include <Poco/Net/TCPServerConnection.h>
 #include <Poco/Net/TCPServerConnectionFactory.h>
 #include "../../node/Node.h"
-#include "../logic/IServerLogic.h"
+#include "../context/IContextSetup.h"
 
 class ServerConnection : public Poco::Net::TCPServerConnection, public Connection {
 
 private:
     Node &serverNode;
-    std::shared_ptr<IServerLogic> serverLogic;
 
 public:
     void run() override;
 
-    ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode,
-                     const std::shared_ptr<IServerLogic> &serverLogic);
+    ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode);
 
     void startReceiving(Poco::Net::StreamSocket &socket) override;
 
@@ -31,13 +29,17 @@ public:
 class ServerConnectionFactory : public Poco::Net::TCPServerConnectionFactory {
 private:
     Node &serverNode;
-    std::shared_ptr<IServerLogic> serverLogic;
+    std::shared_ptr<IContextSetup> contextSetup;
 public:
-    ServerConnectionFactory(Node &serverNode, const std::shared_ptr<IServerLogic> &serverLogic);
+    ServerConnectionFactory(Node &serverNode);
+
+    ServerConnectionFactory(Node &serverNode, const std::shared_ptr<IContextSetup> &contextSetup);
 
     Poco::Net::TCPServerConnection *createConnection(const Poco::Net::StreamSocket &socket) override;
 
+    const std::shared_ptr<IContextSetup> &getContextSetup() const;
 
+    void setContextSetup(const std::shared_ptr<IContextSetup> &contextSetup);
 };
 
 

@@ -122,3 +122,7 @@ void Connection::stopReceiving() {
 
 Connection::Connection() : processor(*this) {}
 
+ConnectionProcessor &Connection::getProcessor() {
+    return processor;
+}
+
