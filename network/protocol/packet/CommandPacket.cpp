@@ -8,7 +8,7 @@
 void CommandPacket::process(Context &context) {
     logger.error("Command packet process ");
 
-    auto info = context.get_<ConnectionContext>(0);
+    auto info = context.get<ConnectionContext>();
     if (info != nullptr) {
         std::cout << info->test << "  ";
     }

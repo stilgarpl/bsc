@@ -13,14 +13,13 @@ ConnectionProcessor::ConnectionProcessor(Connection &connection) : connection(co
 }
 
 void ConnectionProcessor::run() {
-    std::cout << "ConnectionProcessor start" << std::endl;
+    logger.info("ConnectionProcessor start");
     //set up context
     ConnectionContext::Setup ctxSet(connection);
     ctxSet.setup(context);
 
 
     while (!this->isStopping()) {
-        std::cout << "ConnectionProcessor run" << std::endl;
         auto np = connection.receive();
         np->process(context);
 

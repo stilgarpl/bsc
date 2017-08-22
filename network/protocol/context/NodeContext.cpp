@@ -9,9 +9,9 @@ NodeContext::NodeContext(Node &node, NodeInfo &nodeInfo) : node(node), nodeInfo(
 
 //NodeContext::NodeContext(NodeInfo &nodeInfo) : nodeInfo(nodeInfo) {}
 void NodeContext::Setup::setup(Context &context) {
-    auto ctx = context.get<NodeContext>(0);
+    auto ctx = context.get<NodeContext>();
     if (ctx == nullptr) {
-        context.set<NodeContext>(0, std::ref(node), std::ref(nodeInfo));
+        context.set<NodeContext>(std::ref(node), std::ref(nodeInfo));
     }
 
 }

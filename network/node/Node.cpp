@@ -13,9 +13,13 @@ using namespace Poco::Net;
 void Node::listen() {
     //SocketAddress address("127.0.0.1:6777");
     if (serverSocket == nullptr) {
+        unsigned short port = 6777;
         //@TODO numer portu dac z configuracji
         ////@todo sprawdzanie bledow z bindowania socketa
-        serverSocket = std::make_shared<ServerSocket>(6777);
+        if (configuration != nullptr) {
+            port = configuration->getPort();
+        }
+        serverSocket = std::make_shared<ServerSocket>(port);
     }
     //@todo list context setup perhaps?
     std::shared_ptr<IContextSetup> ctxSet = std::make_shared<NodeContext::Setup>(*this, thisNodeInfo);
@@ -74,8 +78,8 @@ void Node::stop() {
 
 void Node::addActiveClientConnection(std::shared_ptr<Connection> c) {
     NodeContext context(*this, thisNodeInfo);
-    if (c->getProcessor().getContext().get<NodeContext>(0) == nullptr) {
-        c->getProcessor().getContext().set<NodeContext>(0, context);
+    if (c->getProcessor().getContext().get<NodeContext>() == nullptr) {
+        c->getProcessor().getContext().set<NodeContext>(context);
     }
     activeClientConnections.push_back(c);
 
@@ -100,4 +104,12 @@ void Node::work() {
         //process all messages from receive queue
     }
 
+}
+
+const std::shared_ptr<Node::Config> &Node::getConfiguration() const {
+    return configuration;
+}
+
+void Node::setConfiguration(const std::shared_ptr<Node::Config> &configuration) {
+    Node::configuration = configuration;
 }

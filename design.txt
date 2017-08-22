@@ -21,3 +21,18 @@ do stuff...
 node->getNodeInfo(..., [&](){and then do this};
 do other stuff...
 }
+
+
+logika na zasadzie
+
+source => trigger => action => result
+
+np.
+
+clock => @17:30 => discover_nodes => network_list updated
+
+sync_manager => new_file => update_journal
+sync_manager => journal_updated => push_info_to_other_nodes
+
+
+sources manager podobny do Context - mapa<ISource>, ale jednoczesnie mozna zrobic get<Clock>, zeby wziac konkretny source

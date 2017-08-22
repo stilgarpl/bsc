@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.7)
 project(basyco)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -pthread")
+SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -pthread -lstdc++fs")
 
 find_package(Poco REQUIRED COMPONENTS Foundation Net Util REQUIRED)
 find_package(Cereal REQUIRED)
@@ -18,7 +19,7 @@ include_directories(${INCLUDES})
 set(LIBS ${LIBS} ${Poco_LIBRARIES})
 
 message(libs:: ${LIBS})
-set(SOURCE_FILES main.cpp network/node/NodeInfo.cpp network/node/NodeInfo.h network/node/NetworkInfo.cpp network/node/NetworkInfo.h network/node/Node.cpp network/node/Node.h network/protocol/connection/ServerConnection.cpp network/protocol/connection/ServerConnection.h network/protocol/packet/NetworkPacket.cpp network/protocol/packet/NetworkPacket.h network/protocol/connection/ClientConnection.cpp network/protocol/connection/ClientConnection.h network/protocol/enum/Command.h network/service/NetworkServiceManager.cpp network/service/NetworkServiceManager.h network/protocol/connection/Connection.cpp network/protocol/connection/Connection.h network/protocol/processor/ConnectionProcessor.cpp network/protocol/processor/ConnectionProcessor.h thread/Runnable.cpp thread/Runnable.h network/protocol/context/Context.h network/protocol/packet/CommandPacket.cpp network/protocol/packet/CommandPacket.h network/protocol/enum/Status.h network/protocol/context/ConnectionContext.cpp network/protocol/context/ConnectionContext.h log/Logger.cpp log/Logger.h network/protocol/context/NodeContext.cpp network/protocol/context/NodeContext.h network/protocol/context/IContextSetup.h network/protocol/context/ListContextSetup.cpp network/protocol/context/ListContextSetup.h)
+set(SOURCE_FILES main.cpp network/node/NodeInfo.cpp network/node/NodeInfo.h network/node/NetworkInfo.cpp network/node/NetworkInfo.h network/node/Node.cpp network/node/Node.h network/protocol/connection/ServerConnection.cpp network/protocol/connection/ServerConnection.h network/protocol/packet/NetworkPacket.cpp network/protocol/packet/NetworkPacket.h network/protocol/connection/ClientConnection.cpp network/protocol/connection/ClientConnection.h network/protocol/enum/Command.h network/service/NetworkServiceManager.cpp network/service/NetworkServiceManager.h network/protocol/connection/Connection.cpp network/protocol/connection/Connection.h network/protocol/processor/ConnectionProcessor.cpp network/protocol/processor/ConnectionProcessor.h thread/Runnable.cpp thread/Runnable.h network/protocol/context/Context.h network/protocol/packet/CommandPacket.cpp network/protocol/packet/CommandPacket.h network/protocol/enum/Status.h network/protocol/context/ConnectionContext.cpp network/protocol/context/ConnectionContext.h log/Logger.cpp log/Logger.h network/protocol/context/NodeContext.cpp network/protocol/context/NodeContext.h network/protocol/context/IContextSetup.h network/protocol/context/ListContextSetup.cpp network/protocol/context/ListContextSetup.h configuration/ConfigurationManager.cpp configuration/ConfigurationManager.h configuration/IConfig.h signal/Signal.h)
 add_executable(basyco ${SOURCE_FILES})
 target_link_libraries(basyco ${LIBS})
 

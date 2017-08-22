@@ -12,9 +12,9 @@ Connection &ConnectionContext::getConnection() const {
 
 void ConnectionContext::Setup::setup(Context &context) {
 
-    auto ctx = context.get<ConnectionContext>(0);
+    auto ctx = context.get<ConnectionContext>();
     if (ctx == nullptr) {
-        context.set<ConnectionContext>(0, std::ref(connection));
+        context.set<ConnectionContext>(std::ref(connection));
     }
 
 

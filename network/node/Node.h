@@ -10,11 +10,43 @@
 #include "../protocol/connection/ClientConnection.h"
 #include "NetworkInfo.h"
 #include "../service/NetworkServiceManager.h"
+#include "../../configuration/IConfig.h"
 #include <Poco/Net/ServerSocket.h>
 #include <memory>
 #include <Poco/Net/TCPServer.h>
 
 class Node {
+
+public:
+    class Config : public IConfig {
+    private:
+        unsigned short port;
+    private:
+        template<class Archive>
+        void serialize(Archive &ar) {
+            ar & port;
+        }
+
+
+        friend class cereal::access;
+
+    public:
+        unsigned short getPort() const {
+            return port;
+        }
+
+        void setPort(unsigned short port) {
+            Config::port = port;
+        }
+    };
+
+private:
+    std::shared_ptr<Config> configuration;
+public:
+    const std::shared_ptr<Config> &getConfiguration() const;
+
+    void setConfiguration(const std::shared_ptr<Config> &configuration);
+
 private:
     std::shared_ptr<Poco::Net::ServerSocket> serverSocket;
     std::shared_ptr<Poco::Net::TCPServer> server;
@@ -45,5 +77,7 @@ public:
     bool connectTo(const Poco::Net::SocketAddress &address);
 };
 
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig, Node::Config);
 
 #endif //BASYCO_NODE_H
