@@ -36,3 +36,69 @@ sync_manager => journal_updated => push_info_to_other_nodes
 
 
 sources manager podobny do Context - mapa<ISource>, ale jednoczesnie mozna zrobic get<Clock>, zeby wziac konkretny source
+
+
+template <typename ISource>
+class Trigger {
+
+std::function<bool(const ISource&}> condition;
+
+chyba trzeba bedzie zrobic triggery ktore wiedza co robia
+generycznych sie nie bardzo da, bo jakie niby sygnaly mialyby wyslac? tylko puste
+
+
+wiec trigger bedzie mial taki flow:
+
+if (condition) {
+prepare_data();
+signal.signal(data1,data2,data3,...);
+}
+
+
+
+virtual Signal<Args...>& EventSource<Args...>::process(Args... args)
+
+
+
+virtual Signal<SigArgs...>& EventSource<Args...,SigArgs...>::process(Args... args)
+
+
+
+
+template<typename... Args, typename T<Args...>, typename... SigArgs, typename S<SigArgs...>>
+
+
+
+Signal<tick>& ClockSource::process(time, othershit)
+
+
+template <typename... Types>
+struct param {
+typedef Types Types;
+};
+
+
+EventSource {
+
+template<template<typename...> Ret, template<typename... Args>>
+Signal<typename Ret::Types...> process(Args::Types...) {
+}}
+
+
+
+
+
+a moze cos w stylu reaktorów z BHE?
+
+ClockSource -> ClockEvent
+Events have id
+map<id,Signal<ClockEvent>>
+
+template <typename EventType>
+Signal<EventType>& signal(EventType&)
+
+template <typename EventType>
+EventType& registerEvent(EventType::Id id)
+
+
+SourceManager can be a ISource itself and have event() and getSignal<>

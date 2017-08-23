@@ -2,7 +2,7 @@
 // Created by stilgar on 01.08.17.
 //
 
-#include "../context/Context.h"
+#include "../../../context/Context.h"
 #include "NetworkPacket.h"
 
 void NetworkPacket::process(Context &context) {

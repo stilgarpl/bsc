@@ -8,27 +8,25 @@
 
 #include <map>
 #include <memory>
-#include <iostream>
 
 class Context {
 
-    //@todo template ?
     typedef unsigned int KeyType;
     typedef unsigned int TypeIdType;
 private:
-    TypeIdType getNextTypeId() {
+    const TypeIdType getNextTypeId() const {
         static TypeIdType val = 0;
         return val++;
     }
 
-    KeyType getNextKey() {
+    const KeyType getNextKey() const {
         static KeyType val = 1;
         return val++;
     }
 
     ///@todo possible improvement: add key offset for different types, so for example keys "test" and 1 do not point to the same values
     template<typename T>
-    KeyType getKey(const T &t) {
+    const KeyType getKey(const T &t) const {
         static std::map<T, KeyType> keyMap;
         KeyType &result = keyMap[t];
         if (result == 0) {
@@ -39,12 +37,12 @@ private:
 
     //special case: treat c-string as std::string
     //needed because char * can't be a key in a map
-    KeyType getKey(const char *s) {
+    const KeyType getKey(const char *s) const {
         return getKey(std::string(s));
     }
 
     template<typename>
-    TypeIdType getTypeId() {
+    const TypeIdType getTypeId() const {
         static auto typeId = getNextTypeId();
         return typeId;
     };
@@ -60,11 +58,7 @@ public:
      * @param values
      * @return
      */
-//    template<typename T>
-//    std::shared_ptr<T> get(KeyType id) {
-//        static auto typeId = getTypeId<T>();
-//        return std::static_pointer_cast<T>(data[typeId][id]);
-//    }
+
 
     template<typename T, typename CustomKeyType>
     std::shared_ptr<T> get(const CustomKeyType &id) {
@@ -86,12 +80,7 @@ public:
      * @param id
      * @param values
      */
-//    template<typename T, typename... Vals>
-//    void setKey(KeyType id, Vals... values) {
-//        static auto typeId = getTypeId<T>();
-//        data[typeId][id] = std::make_shared<T>(values...);
-//    };
-//
+
     template<typename T, typename CustomKeyType, typename... Vals>
     void setKey(CustomKeyType id, Vals... values) {
         static auto typeId = getTypeId<T>();

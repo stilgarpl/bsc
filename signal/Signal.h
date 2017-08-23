@@ -10,7 +10,7 @@
 
 template<typename... Args>
 class Signal {
-private:
+public:
     typedef std::function<void(Args...)> Func;
     typedef std::shared_ptr<Func> FuncPtr;
     typedef std::list<FuncPtr> FuncList;
