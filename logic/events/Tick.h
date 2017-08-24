@@ -13,7 +13,7 @@
  */
 class Tick : public IEvent<std::chrono::milliseconds> {
 public:
-    typedef std::chrono:milliseconds duration;
+    typedef std::chrono::milliseconds duration;
 };
 
 

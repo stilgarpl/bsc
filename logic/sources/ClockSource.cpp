@@ -15,13 +15,14 @@ void ClockSource::work() {
     //ticks
     auto now = clock::now();
     for (auto &&it : getSignalMap<Tick>()) {
-        duration duration = it.first;
-        if (lastTick(duration) < now - duration) {
+        duration d = it.first;
+        if (getLastTick(d) < now - d) {
             tick.setEventId(it.first);
+            setLastTick(d,now);
             event<Tick>(tick);
         }
     }
 
-    std::this_thread::sleep_for(1s);
+    std::this_thread::sleep_for(10ms);
 
 }
