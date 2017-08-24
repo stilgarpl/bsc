@@ -8,14 +8,14 @@
 
 #include "../signal/Signal.h"
 #include "../context/Context.h"
-#include "../uber/uber.h"
+#include "../uber/Uber.h"
 
 
 class ISource {
 private:
     Context context;
-    uber<std::map> signalMap;
-    uber<type> globalSignal;
+    Uber<std::map> signalMap;
+    Uber<type> globalSignal;
 protected:
     template<typename T>
     void event(const T &event) {

@@ -13,9 +13,12 @@
 class SourceManager {
 public:
     typedef std::shared_ptr<ISource> SourcePtr;
+    typedef std::list<SourcePtr> SourceList;
+    typedef ISource *ProviderPtr;
+    typedef std::list<ISource *> ProviderList;
 private:
-    std::list<SourcePtr> sources;
-
+    SourceList sources;
+    StaticUber<ProviderList> providers;
 public:
 
     void work() {
@@ -35,6 +38,33 @@ public:
         sources.remove(source);
     }
 
+protected:
+
+    template<typename EventType>
+    ProviderList &getProviders() {
+        return providers.get<EventType>();
+    }
+
+public:
+    template<typename EventType>
+    void registerProvider(ProviderPtr p) {
+        providers.get<EventType>().push_back(p);
+    }
+
+
+    template<typename EventType>
+    void registerTrigger(typename ISource::SignalType<EventType>::Func func) {
+        for (auto &&it : getProviders<EventType>()) {
+            it->template getSignal<EventType>().assign(func);
+        }
+    }
+
+    template<typename EventType>
+    void registerTrigger(typename EventType::IdType id, typename ISource::SignalType<EventType>::Func func) {
+        for (auto &&it : getProviders<EventType>()) {
+            it->template getSignal<EventType>(id).assign(func);
+        }
+    }
 };
 
 

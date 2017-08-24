@@ -8,12 +8,11 @@
 #include <vector>
 #include <memory>
 
-template<template<typename...> typename container>
-class uber {
-
+class BaseUber {
+protected:
     typedef unsigned int TypeIdType;
     std::vector<std::shared_ptr<void>> containers;
-private:
+
     const TypeIdType getNextTypeId() const {
         static TypeIdType val = 0;
         return val++;
@@ -25,12 +24,14 @@ private:
         return typeId;
     };
 
+    //BaseUber() : containers(1) {}
+
+};
+
+
+template<template<typename...> typename container>
+class Uber : public BaseUber {
 public:
-
-    uber() : containers(1) {
-
-    }
-
 
     template<typename... Args>
     container<Args...> &get() {
@@ -44,7 +45,29 @@ public:
             ref = std::make_shared<ContainerType>();
 
         }
-        container<Args...> &result = *std::static_pointer_cast<ContainerType>(ref);
+        ContainerType &result = *std::static_pointer_cast<ContainerType>(ref);
+        return result;
+
+    }
+};
+
+template<typename container>
+class StaticUber : BaseUber {
+public:
+
+    template<typename... Args>
+    container &get() {
+        typedef container ContainerType;
+        const static auto typeId = getTypeId<Args...>();
+        if (containers.size() <= typeId) {
+            containers.resize(typeId + 2);
+        }
+        auto &ref = containers[typeId];
+        if (ref == nullptr) {
+            ref = std::make_shared<ContainerType>();
+
+        }
+        ContainerType &result = *std::static_pointer_cast<ContainerType>(ref);
         return result;
 
     }

@@ -4,7 +4,6 @@
 
 #include <thread>
 #include "ClockSource.h"
-#include "../events/Tick.h"
 
 
 using namespace std::chrono_literals;
@@ -18,11 +17,22 @@ void ClockSource::work() {
         duration d = it.first;
         if (getLastTick(d) < now - d) {
             tick.setEventId(it.first);
-            setLastTick(d,now);
+            setLastTick(d, now);
             event<Tick>(tick);
         }
     }
 
     std::this_thread::sleep_for(10ms);
 
+}
+
+ClockSource::time_point ClockSource::getLastTick(ClockSource::duration d) {
+    if (lastTick.count(d) == 0) {
+        lastTick[d] = clock::now();
+    }
+    return lastTick[d];
+}
+
+void ClockSource::setLastTick(ClockSource::duration d, ClockSource::time_point t) {
+    lastTick[d] = t;
 }

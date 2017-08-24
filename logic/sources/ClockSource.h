@@ -14,18 +14,12 @@ class ClockSource : public ISource {
     typedef std::chrono::time_point<clock> time_point;
     typedef Tick::duration duration;
 private:
-    std::map<duration,time_point> lastTick;
+    std::map<duration, time_point> lastTick;
 protected:
-    time_point getLastTick(duration d) {
-        if (lastTick.count(d) == 0 ) {
-                lastTick[d]=clock::now();
-            }
-        return lastTick[d];
-    };
-    void setLastTick(duration d, time_point t) {
-        lastTick[d] = t;
-    };
-    
+    time_point getLastTick(duration d);;
+
+    void setLastTick(duration d, time_point t);;
+
 public:
     void work() override;
 };

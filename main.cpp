@@ -6,7 +6,7 @@
 #include "network/protocol/packet/CommandPacket.h"
 #include "logic/ISource.h"
 #include "logic/sources/ClockSource.h"
-#include "logic/events/Tick.h"
+#include "logic/SourceManager.h"
 
 
 using namespace std::chrono_literals;
@@ -56,27 +56,27 @@ public:
 int main() {
 
 //    //EventSource eventSource;
-//    uber<std::vector> i;
+//    Uber<std::vector> i;
 //    i.get<int>().reserve(9);
 //   // i.get<float>().resize(19);
 //    i.get<std::string>().reserve(9);
 //    i.get<int>()[5] = 7;
-//    std::clog << "uber test" << i.get<int>()[5] << std::endl;
+//    std::clog << "Uber test" << i.get<int>()[5] << std::endl;
 //    i.get<float>().push_back(1.1f);
 //    i.get<float>().push_back(1.2f);
 //    i.get<float>().push_back(5.1f);
 //
 //    for (auto &&item : i.get<float>()) {
-//        std::clog << "uber test" << item << std::endl;
+//        std::clog << "Uber test" << item << std::endl;
 //    }
 //
 //
 //    i.get<std::string>().push_back("dupa");
-//    std::clog << "uber test" << i.get<std::string>()[0] << std::endl;
+//    std::clog << "Uber test" << i.get<std::string>()[0] << std::endl;
 //
-//    uber<std::list> l;
+//    Uber<std::list> l;
 //    l.get<int>().push_back(5);
-//    uber<std::map> m;
+//    Uber<std::map> m;
 //    m.get<int,int>()[5] = 7;
 //    ISource source;
 //    TempEvent event;
@@ -99,8 +99,15 @@ int main() {
 //    source.event(fe);
 //    source.event(se);
 
-
+    SourceManager manager;
     ClockSource clock;
+    manager.registerProvider<Tick>(&clock);
+
+    manager.registerTrigger<Tick>([](Context &, const Tick &) { std::clog << "registered tick " << std::endl; });
+    manager.registerTrigger<Tick>(500ms,
+                                  [](Context &, const Tick &) { std::clog << "registered tick 2" << std::endl; });
+
+
 
     clock.getSignal<Tick>(1000ms).assign(
             [](Context &, const Tick &) { std::clog << "signal Tick has signalled 100ms " << std::endl; });
