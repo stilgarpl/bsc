@@ -102,7 +102,7 @@ int main() {
 
     ClockSource clock;
 
-    clock.getSignal<Tick>(5).assign(
+    clock.getSignal<Tick>(1s).assign(
             [](Context &, const Tick &) { std::clog << "signal Tick has signalled " << std::endl; });
 
     clock.work();

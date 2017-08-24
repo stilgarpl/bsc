@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -pthread -lstdc++fs")
 
+set(CMAKE_LIBRARY_PATH  ${CMAKE_LIBRARY_PATH} "C:/_lib/poco-1.7.8p3")
+
 find_package(Poco REQUIRED COMPONENTS Foundation Net Util REQUIRED)
 find_package(Cereal REQUIRED)
 

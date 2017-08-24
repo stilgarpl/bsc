@@ -13,10 +13,13 @@ void ClockSource::work() {
 
     Tick tick;
     //ticks
+    auto now = clock::now();
     for (auto &&it : getSignalMap<Tick>()) {
-
-        tick.setEventId(it.first);
-        event<Tick>(tick);
+        duration duration = it.first;
+        if (lastTick(duration) < now - duration) {
+            tick.setEventId(it.first);
+            event<Tick>(tick);
+        }
     }
 
     std::this_thread::sleep_for(1s);

@@ -11,8 +11,9 @@
 /**
  * tickuje co int czasu
  */
-class Tick : public IEvent<int> {
-
+class Tick : public IEvent<std::chrono::milliseconds> {
+public:
+    typedef std::chrono:milliseconds duration;
 };
 
 
