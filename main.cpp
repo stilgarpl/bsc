@@ -4,9 +4,9 @@
 //#define CEREAL_THREAD_SAFE 1
 #include "network/node/Node.h"
 #include "network/protocol/packet/CommandPacket.h"
-#include "logic/ISource.h"
 #include "logic/sources/ClockSource.h"
-#include "logic/SourceManager.h"
+#include "logic/ActionManager.h"
+#include "logic/LogicManager.h"
 
 
 using namespace std::chrono_literals;
@@ -99,20 +99,28 @@ int main() {
 //    source.event(fe);
 //    source.event(se);
 
+
+    LogicManager logicManager;
+
+
     SourceManager manager;
     ClockSource clock;
-    manager.registerProvider<Tick>(&clock);
+    //manager.registerProvider<Tick>(&clock);
+    //logicManager.getSourceManager().registerProvider<Tick>(&clock);
+    //  logicManager.getActionManager().setAction<Tick>("dupa",[](Context &, const Tick &) { std::clog << "dupa " << std::endl; });
+    if (logicManager.assignAction<Tick>(1000ms, "dupa")) {
+        std::clog << "Assignment ok!" << std::endl;
+    }
 
-    manager.registerTrigger<Tick>([](Context &, const Tick &) { std::clog << "registered tick " << std::endl; });
-    manager.registerTrigger<Tick>(500ms,
-                                  [](Context &, const Tick &) { std::clog << "registered tick 2" << std::endl; });
+    // manager.registerTrigger<Tick>([](Context &, const Tick &) { std::clog << "registered tick " << std::endl; });
+    // manager.registerTrigger<Tick>(500ms,[](Context &, const Tick &) { std::clog << "tick every 500ms" << std::endl; });
 
 
 
-    clock.getSignal<Tick>(1000ms).assign(
-            [](Context &, const Tick &) { std::clog << "signal Tick has signalled 100ms " << std::endl; });
-    clock.getSignal<Tick>(3000ms).assign(
-            [](Context &, const Tick &) { std::clog << "signal Tick has signalled 300ms " << std::endl; });
+//    clock.getSignal<Tick>(1000ms).assign(
+//            [](Context &, const Tick &) { std::clog << "signal Tick has signalled 100ms " << std::endl; });
+//    clock.getSignal<Tick>(3000ms).assign(
+//            [](Context &, const Tick &) { std::clog << "signal Tick has signalled 300ms " << std::endl; });
     
     for (int i =0 ; i< 10000; i++)
     clock.work();

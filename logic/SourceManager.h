@@ -19,6 +19,7 @@ public:
 private:
     SourceList sources;
     StaticUber<ProviderList> providers;
+    std::shared_ptr<ISource> lastProvider = nullptr;
 public:
 
     void work() {
@@ -30,9 +31,7 @@ public:
         }
     }
 
-    void addSource(SourcePtr source) {
-        sources.push_back(source);
-    }
+    void addSource(SourcePtr source);
 
     void removeSource(SourcePtr source) {
         sources.remove(source);
@@ -53,14 +52,21 @@ public:
 
 
     template<typename EventType>
-    void registerTrigger(typename ISource::SignalType<EventType>::Func func) {
+    void registerProvider() {
+        providers.get<EventType>().push_back(lastProvider.get());
+    }
+
+
+    template<typename EventType>
+    void registerTrigger(const typename ISource::SignalType<EventType>::Func &func) {
         for (auto &&it : getProviders<EventType>()) {
             it->template getSignal<EventType>().assign(func);
         }
     }
 
     template<typename EventType>
-    void registerTrigger(typename EventType::IdType id, typename ISource::SignalType<EventType>::Func func) {
+    void
+    registerTrigger(const typename EventType::IdType &id, const typename ISource::SignalType<EventType>::Func &func) {
         for (auto &&it : getProviders<EventType>()) {
             it->template getSignal<EventType>(id).assign(func);
         }

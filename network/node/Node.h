@@ -11,6 +11,7 @@
 #include "NetworkInfo.h"
 #include "../service/NetworkServiceManager.h"
 #include "../../configuration/IConfig.h"
+#include "../../logic/SourceManager.h"
 #include <Poco/Net/ServerSocket.h>
 #include <memory>
 #include <Poco/Net/TCPServer.h>
@@ -42,6 +43,8 @@ public:
 
 private:
     std::shared_ptr<Config> configuration;
+    ///@todo zastanowic sie nad jakims interfejsem, moze node nie musi wiedziec o source?
+    SourceManager sourceManager;
 public:
     const std::shared_ptr<Config> &getConfiguration() const;
 

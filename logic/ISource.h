@@ -10,6 +10,7 @@
 #include "../context/Context.h"
 #include "../uber/Uber.h"
 
+class SourceManager;
 
 class ISource {
 private:
@@ -17,6 +18,7 @@ private:
     Uber<std::map> signalMap;
     Uber<type> globalSignal;
 protected:
+    ///@todo rozwazyc variadic templatexc
     template<typename T>
     void event(const T &event) {
         this->getSignal<T>(event.getEventId()).signal(context, event);
@@ -29,6 +31,9 @@ public:
     template<typename T>
     using SignalType = Signal<Context &, const T &>;
 
+    ///@todo dlaczego właściwie te sygnały w mapie są jako pointery?
+    /// jeśli mogą być niezdefiniowane, no to trzeba robic std::optional
+    ///ale ja zwracam referki i tak, więc moze lepiej w mapie przechowywac te sygnaly tak po prostu?
     template<typename T>
     using SignalTypePtr = std::shared_ptr<SignalType<T>>;
 
@@ -57,28 +62,25 @@ public:
 
     template<typename T>
     Signal<Context &, const T &> &getSignal() {
-//        typedef Signal<Context&, const T&> SignalType;
-//        typedef std::shared_ptr<SignalType> SignalTypePtr;
-
         return globalSignal.get<SignalType<T>>();
-
-
     }
 
     Context &getContext();
 
     virtual void work() =0;
 
-    ///@todo maybe later
-//    template<typename T>
-//    Signal<Context&, const T&>& assignSignal(const typename T::IdType& id,typename Signal<Context&, const T&>::FuncPtr funcPtr ) {
-//        this->getSignal<T>(id).assign(funcPtr);
-//    };
-//
-//    template<typename T>
-//    Signal<Context&, const T&>& assignSignal(const typename T::IdType& id,const typename Signal<Context&, const T&>::Func& funcPtr ) {
-//        this->getSignal<T>(id).assign(funcPtr);
-//    };
+    template<typename T>
+    SignalType<T> &assignSignal(const typename T::IdType &id, typename SignalType<T>::FuncPtr funcPtr) {
+        this->getSignal<T>(id).assign(funcPtr);
+    };
+
+    template<typename T>
+    SignalType<T> &assignSignal(const typename T::IdType &id, const typename SignalType<T>::Func &funcPtr) {
+        this->getSignal<T>(id).assign(funcPtr);
+    };
+
+
+    virtual void registerProviders(SourceManager *);
 };
 
 
