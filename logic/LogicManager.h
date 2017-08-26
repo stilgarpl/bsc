@@ -36,6 +36,17 @@ public:
         }
     }
 
+    template<typename EventType, typename ActionId>
+    bool assignAction(ActionId actionId) {
+        auto &&action = actionManager.getAction<EventType>(actionId);
+        if (action) {
+            sourceManager.registerTrigger<EventType>(*action);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     void addSource(std::shared_ptr<ISource> source) {
         sourceManager.addSource(source);
     }

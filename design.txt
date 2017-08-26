@@ -48,3 +48,20 @@ logic.assignAction<EVENT>([optional: event id,]action id);
 
 logic.aA<NetEvent,NetAction>(NetEvent::IdType::NODE_DISCOVERED,NetAction::IdType::SAVE_NODE_INFO);
 logic.aA<Tick,NetAction>(150s, "sendKeepAlive");
+
+
+
+
+
+
+
+
+ok, no to teraz pisze moj pierwszy istotny source, network source
+jak go zintegrować z warstwą protokołu?
+
+implementacja protokołu jest rozproszona na pakiety i spięta procesorem
+procesor móglby wszystkie pakiety przekazywać do net source, ale skad net source ma wiedziec co to, wirtualnych nie bedzie przeciez obslugiwac
+
+w tym momencie najbardziej widze to jako Observer:
+protokół w momencie wystąpienia istotnych momentów, np. connection establshed, node info received itd. robiłby notify do wszystkich zainteresowanych
+a tym byłby właśnie net source. net source pchałby to dalej

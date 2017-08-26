@@ -5,8 +5,6 @@
 #include "network/node/Node.h"
 #include "network/protocol/packet/CommandPacket.h"
 #include "logic/sources/ClockSource.h"
-#include "logic/ActionManager.h"
-#include "logic/LogicManager.h"
 
 
 using namespace std::chrono_literals;
@@ -105,7 +103,7 @@ int main() {
 
     SourceManager manager;
     ClockSource clock;
-    //manager.registerProvider<Tick>(&clock);
+    manager.registerProvider<Tick>(&clock);
     //logicManager.getSourceManager().registerProvider<Tick>(&clock);
     //  logicManager.getActionManager().setAction<Tick>("dupa",[](Context &, const Tick &) { std::clog << "dupa " << std::endl; });
     if (logicManager.assignAction<Tick>(1000ms, "dupa")) {

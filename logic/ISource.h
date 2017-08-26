@@ -10,13 +10,15 @@
 #include "../context/Context.h"
 #include "../uber/Uber.h"
 
+
+///@todo Clion jest głupi i uważa, że to jest pełna definicja.
 class SourceManager;
 
 class ISource {
 private:
     Context context;
     Uber<std::map> signalMap;
-    Uber<type> globalSignal;
+    Uber<Type> globalSignal;
 protected:
     ///@todo rozwazyc variadic templatexc
     template<typename T>

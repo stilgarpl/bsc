@@ -19,6 +19,10 @@ private:
     FuncList funcList;
 
 public:
+    //@todo można zrobić żeby to zamiast wykonywać od razu, wrzucało Func na kolejkę wykonania z której brałby to wątek sygnałów
+    //może przeciążona klasa AsyncSignal
+    //albo jakiś globalna funkcja - defaultowa by wywoływała od razu, async by robiła wątek
+    //a ta funkcja by tylko wywoływała tamtą z odpowiednimi parametrami
     virtual void signal(Args... args) {
         for (auto &&item : funcList) {
             (*item)(args...);

@@ -8,4 +8,5 @@
 void SourceManager::addSource(std::shared_ptr<ISource> source) {
     lastProvider = source;
     sources.push_back(source);
+    source->registerProviders(this);
 }

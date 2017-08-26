@@ -75,7 +75,7 @@ public:
 
 
 template<typename T>
-class type {
+class Type {
 private:
     T t;
 public:
