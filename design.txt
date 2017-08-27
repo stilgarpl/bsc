@@ -75,3 +75,8 @@ mysle, zeby mozna bylo zostawic nowy sposób, konteksty ConnectionContext i Node
 a jak zapewniac kontekst polaczenia? dla ConnectionContext moznaby robic identyfikator identyfikujacy polaczenie - kazde polaczenie mialoby swoj connectioncontext.
 
 brzydkie, wiem
+
+idea: hierarchiczny context: każdy poziom ma swój kontekst, node, connection etc. i context jak ma nulla u siebie to patrzy czy poziom wyzej cos jest
+idea2: sumowanei kontekstow
+
+w connection Context context += nodeContext; <- w tym przypadku kazdy ma swoj wlasny kontekst, nie ma problemow z thread safety ale za to zmiany w nodecontext nie propaguja sie nizej.
