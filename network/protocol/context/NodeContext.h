@@ -27,7 +27,7 @@ private:
 public:
 
     NodeContext(Node &node, NodeInfo &nodeInfo);
-    //NodeContext(NodeInfo &nodeInfo);
+
 };
 
 

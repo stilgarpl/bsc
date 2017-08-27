@@ -25,11 +25,11 @@ protected:
 
 public:
 
-    template<typename EventType, typename ActionId>
+    template<typename EventType, typename... Args, typename ActionId>
     bool assignAction(typename EventType::IdType eventId, ActionId actionId) {
-        auto &&action = actionManager.getAction<EventType>(actionId);
+        auto &&action = actionManager.getAction<EventType, Args...>(actionId);
         if (action) {
-            sourceManager.registerTrigger<EventType>(eventId, *action);
+            sourceManager.registerTrigger<EventType, Args...>(eventId, *action);
             return true;
         } else {
             return false;
@@ -47,11 +47,36 @@ public:
         }
     }
 
-    void addSource(std::shared_ptr<ISource> source) {
-        sourceManager.addSource(source);
+//    void addSource(std::shared_ptr<ISource> source) {
+//        sourceManager.addSource(source);
+//    }
+
+
+    template<typename SourceType, typename... Args>
+    void addSource(Args... args) {
+        sourceManager.addSource<SourceType>(args...);
+    }
+
+    template<typename SourceType>
+    SourceType &getSource() {
+        return sourceManager.getSource<SourceType>();
+    }
+
+    template<typename SourceType>
+    void removeSource() {
+        sourceManager.removeSource<SourceType>();
     }
 
 
+    void work() {
+        sourceManager.work();
+    }
+
+
+    template<typename... Args, typename ActionIdType>
+    void setAction(ActionIdType id, ActionManager::ActionType<Args...> action) {
+        actionManager.setAction<Args...>(id, action);
+    };
 };
 
 

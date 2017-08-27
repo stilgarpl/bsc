@@ -18,9 +18,11 @@ void ServerConnection::run() {
 
 }
 
-ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode) : TCPServerConnection(
+ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode, Context &context)
+        : TCPServerConnection(
         socket),
-                                                                                              serverNode(serverNode) {}
+          serverNode(serverNode),
+          Connection(context) {}
 
 void ServerConnection::startReceiving(Poco::Net::StreamSocket &socket) {
     processor.start();
@@ -31,24 +33,11 @@ void ServerConnection::stopReceiving() {
     Connection::stopReceiving();
 }
 
-ServerConnectionFactory::ServerConnectionFactory(Node &serverNode)
-        : serverNode(serverNode) {}
 
 Poco::Net::TCPServerConnection *ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket &socket) {
-    ServerConnection *connection = new ServerConnection(socket, serverNode);
-    if (contextSetup != nullptr) {
-        contextSetup->setup(connection->getProcessor().getContext());
-    }
+    ServerConnection *connection = new ServerConnection(socket, serverNode, context);
     return connection;
 }
 
-const std::shared_ptr<IContextSetup> &ServerConnectionFactory::getContextSetup() const {
-    return contextSetup;
-}
-
-void ServerConnectionFactory::setContextSetup(const std::shared_ptr<IContextSetup> &contextSetup) {
-    ServerConnectionFactory::contextSetup = contextSetup;
-}
-
-ServerConnectionFactory::ServerConnectionFactory(Node &serverNode, const std::shared_ptr<IContextSetup> &contextSetup)
-        : serverNode(serverNode), contextSetup(contextSetup) {}
+ServerConnectionFactory::ServerConnectionFactory(Node &serverNode, Context &context)
+        : serverNode(serverNode), context(context) {}

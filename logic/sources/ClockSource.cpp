@@ -4,6 +4,7 @@
 
 #include <thread>
 #include "ClockSource.h"
+#include "../SourceManager.h"
 
 
 using namespace std::chrono_literals;
@@ -35,4 +36,8 @@ ClockSource::time_point ClockSource::getLastTick(ClockSource::duration d) {
 
 void ClockSource::setLastTick(ClockSource::duration d, ClockSource::time_point t) {
     lastTick[d] = t;
+}
+
+void ClockSource::registerProviders(SourceManager *manager) {
+    manager->registerProvider<Tick>();
 }

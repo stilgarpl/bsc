@@ -7,6 +7,7 @@
 
 
 #include "../../../logic/ISource.h"
+#include "../../protocol/observer/INetworkObserver.h"
 
 class NetworkSource : public ISource {
 public:

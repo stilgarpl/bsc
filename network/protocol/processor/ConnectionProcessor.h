@@ -20,7 +20,6 @@ private:
     Logger logger = Logger("Connection Processor");
 
 protected:
-    Context context;
     Connection &connection;
 
     virtual void run();
@@ -28,8 +27,6 @@ protected:
 public:
     ConnectionProcessor(Connection &connection);
 
-
-    Context &getContext();
 };
 
 

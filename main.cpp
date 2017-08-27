@@ -5,6 +5,7 @@
 #include "network/node/Node.h"
 #include "network/protocol/packet/CommandPacket.h"
 #include "logic/sources/ClockSource.h"
+#include "network/logic/sources/NetworkSource.h"
 
 
 using namespace std::chrono_literals;
@@ -99,14 +100,28 @@ int main() {
 
 
     LogicManager logicManager;
+    logicManager.addSource<ClockSource>();
+    logicManager.addSource<NetworkSource>();
+
+    logicManager.setAction<Tick>("test", [](Context &, const Tick &t) {
+
+        std::clog << "test tick " << t.getEventId().count() << std::endl;
+    });
 
 
-    SourceManager manager;
-    ClockSource clock;
-    manager.registerProvider<Tick>(&clock);
+
+//    am.setAction<Tick,int,float>("test",[](Context&,const Tick&,int,float){});
     //logicManager.getSourceManager().registerProvider<Tick>(&clock);
     //  logicManager.getActionManager().setAction<Tick>("dupa",[](Context &, const Tick &) { std::clog << "dupa " << std::endl; });
-    if (logicManager.assignAction<Tick>(1000ms, "dupa")) {
+    if (logicManager.assignAction<Tick>(1000ms, "test")) {
+        std::clog << "Assignment ok!" << std::endl;
+    }
+
+    if (logicManager.assignAction<Tick>(599ms, "test")) {
+        std::clog << "Assignment ok!" << std::endl;
+    }
+
+    if (logicManager.assignAction<Tick>(50ms, "test")) {
         std::clog << "Assignment ok!" << std::endl;
     }
 
@@ -121,7 +136,7 @@ int main() {
 //            [](Context &, const Tick &) { std::clog << "signal Tick has signalled 300ms " << std::endl; });
     
     for (int i =0 ; i< 10000; i++)
-    clock.work();
+        logicManager.work();
 
     Context context;
 

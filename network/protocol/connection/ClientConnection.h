@@ -16,7 +16,7 @@ private:
     Poco::Net::StreamSocket socket;
 
 public:
-    ClientConnection(const Poco::Net::SocketAddress &a);
+    ClientConnection(const Poco::Net::SocketAddress &a, Context &);
 
 
 };

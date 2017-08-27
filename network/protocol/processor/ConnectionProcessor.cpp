@@ -6,7 +6,6 @@
 #include "ConnectionProcessor.h"
 
 #include "../connection/Connection.h"
-#include "../context/ConnectionContext.h"
 
 ConnectionProcessor::ConnectionProcessor(Connection &connection) : connection(connection) {
 
@@ -15,8 +14,7 @@ ConnectionProcessor::ConnectionProcessor(Connection &connection) : connection(co
 void ConnectionProcessor::run() {
     logger.info("ConnectionProcessor start");
     //set up context
-    ConnectionContext::Setup ctxSet(connection);
-    ctxSet.setup(context);
+    Context &context = connection.getConnectionContext();
 
 
     while (!this->isStopping()) {
@@ -27,6 +25,3 @@ void ConnectionProcessor::run() {
 
 }
 
-Context &ConnectionProcessor::getContext() {
-    return context;
-}

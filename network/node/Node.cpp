@@ -21,9 +21,8 @@ void Node::listen() {
         }
         serverSocket = std::make_shared<ServerSocket>(port);
     }
-    //@todo list context setup perhaps?
-    std::shared_ptr<IContextSetup> ctxSet = std::make_shared<NodeContext::Setup>(*this, thisNodeInfo);
-    server = std::make_shared<TCPServer>(new ServerConnectionFactory(*this, ctxSet),
+
+    server = std::make_shared<TCPServer>(new ServerConnectionFactory(*this, this->nodeContext),
                                          *serverSocket);
     server->start();
 
@@ -57,7 +56,8 @@ bool Node::connectTo(const SocketAddress &address) {
 
     //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
     //@todo check for problems and handle them
-    std::shared_ptr<Connection> connection = std::make_shared<ClientConnection>(address);
+    std::shared_ptr<Connection> connection = std::make_shared<ClientConnection>(address, nodeContext);
+    nodeContext.set<NodeContext>(*this, this->thisNodeInfo);
     ///@todo if connection is not connected, delete it and try another adddes
     addActiveClientConnection(connection);
     return true; ///@todo error checking
@@ -77,10 +77,6 @@ void Node::stop() {
 }
 
 void Node::addActiveClientConnection(std::shared_ptr<Connection> c) {
-    NodeContext context(*this, thisNodeInfo);
-    if (c->getProcessor().getContext().get<NodeContext>() == nullptr) {
-        c->getProcessor().getContext().set<NodeContext>(context);
-    }
     activeClientConnections.push_back(c);
 
 }

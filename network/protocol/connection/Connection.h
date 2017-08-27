@@ -26,6 +26,7 @@ private:
     std::queue<std::shared_ptr<NetworkPacket>> receiveQueue;
     std::condition_variable sendReady;
     std::condition_variable receiveReady;
+    Context &connectionContext;
 private:
 
     std::unique_ptr<std::thread> sendThread;
@@ -55,9 +56,11 @@ public:
 
     std::shared_ptr<NetworkPacket> receive();
 
-    Connection();
+    Connection(Context &context);
 
     ConnectionProcessor &getProcessor();
+
+    Context &getConnectionContext();
 };
 
 

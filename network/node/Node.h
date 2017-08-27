@@ -44,8 +44,8 @@ public:
 
 private:
     std::shared_ptr<Config> configuration;
-    ///@todo zastanowic sie nad jakims interfejsem, moze node nie musi wiedziec o source?
     LogicManager logicManager;
+    Context nodeContext;
 public:
     const std::shared_ptr<Config> &getConfiguration() const;
 

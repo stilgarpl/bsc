@@ -120,9 +120,13 @@ void Connection::stopReceiving() {
     //  processor.stop();
 }
 
-Connection::Connection() : processor(*this) {}
+Connection::Connection(Context &context) : processor(*this), connectionContext(context) {}
 
 ConnectionProcessor &Connection::getProcessor() {
     return processor;
+}
+
+Context &Connection::getConnectionContext() {
+    return connectionContext;
 }
 

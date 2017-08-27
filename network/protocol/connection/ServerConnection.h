@@ -18,7 +18,7 @@ private:
 public:
     void run() override;
 
-    ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode);
+    ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode, Context &context);
 
     void startReceiving(Poco::Net::StreamSocket &socket) override;
 
@@ -29,17 +29,13 @@ public:
 class ServerConnectionFactory : public Poco::Net::TCPServerConnectionFactory {
 private:
     Node &serverNode;
-    std::shared_ptr<IContextSetup> contextSetup;
+    Context &context;
 public:
-    ServerConnectionFactory(Node &serverNode);
 
-    ServerConnectionFactory(Node &serverNode, const std::shared_ptr<IContextSetup> &contextSetup);
+    ServerConnectionFactory(Node &serverNode, Context &context);
 
     Poco::Net::TCPServerConnection *createConnection(const Poco::Net::StreamSocket &socket) override;
 
-    const std::shared_ptr<IContextSetup> &getContextSetup() const;
-
-    void setContextSetup(const std::shared_ptr<IContextSetup> &contextSetup);
 };
 
 

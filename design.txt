@@ -65,3 +65,13 @@ procesor móglby wszystkie pakiety przekazywać do net source, ale skad net sour
 w tym momencie najbardziej widze to jako Observer:
 protokół w momencie wystąpienia istotnych momentów, np. connection establshed, node info received itd. robiłby notify do wszystkich zainteresowanych
 a tym byłby właśnie net source. net source pchałby to dalej
+
+
+
+blah, wlasnie zrobilem durnowata zmiane, bez przemyslenia.
+wprowadzilem globalny kontekst w Node, mimo, ze juz wczesniej to rozwiazalem również durnym sposobem na IContextSetup::setup
+
+mysle, zeby mozna bylo zostawic nowy sposób, konteksty ConnectionContext i NodeContext moznaby zostawic nawet w postaci czystych struktur
+a jak zapewniac kontekst polaczenia? dla ConnectionContext moznaby robic identyfikator identyfikujacy polaczenie - kazde polaczenie mialoby swoj connectioncontext.
+
+brzydkie, wiem

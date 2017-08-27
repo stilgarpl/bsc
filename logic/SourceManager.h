@@ -18,6 +18,8 @@ public:
     typedef std::list<ISource *> ProviderList;
 private:
     SourceList sources;
+    ///@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
+    Uber<Type> sourcesByType;
     StaticUber<ProviderList> providers;
     std::shared_ptr<ISource> lastProvider = nullptr;
 public:
@@ -31,6 +33,27 @@ public:
         }
     }
 
+    template<typename SourceType, typename... Args>
+    void addSource(Args... args) {
+        std::shared_ptr<SourceType> sourcePtr = std::make_shared<SourceType>(args...);
+        addSource(sourcePtr);
+        SourceType *&sbt = sourcesByType.get<SourceType *>();
+        sbt = sourcePtr.get();
+    }
+
+    template<typename SourceType>
+    SourceType &getSource() {
+        return sourcesByType.get<SourceType>();
+    }
+
+    template<typename SourceType>
+    void removeSource() {
+        std::shared_ptr<SourceType> sourcePtr = sourcesByType.get<SourceType *>();
+        removeSource(sourcePtr);
+        sourcesByType.get<SourceType *>() = nullptr;
+    }
+
+protected:
     void addSource(SourcePtr source);
 
     void removeSource(SourcePtr source) {
@@ -39,36 +62,37 @@ public:
 
 protected:
 
-    template<typename EventType>
+    template<typename EventType, typename... Args>
     ProviderList &getProviders() {
-        return providers.get<EventType>();
+        return providers.get<EventType, Args...>();
     }
 
 public:
-    template<typename EventType>
+    template<typename EventType, typename... Args>
     void registerProvider(ProviderPtr p) {
-        providers.get<EventType>().push_back(p);
+        providers.get<EventType, Args...>().push_back(p);
     }
 
 
-    template<typename EventType>
+    template<typename EventType, typename... Args>
     void registerProvider() {
-        providers.get<EventType>().push_back(lastProvider.get());
+        providers.get<EventType, Args...>().push_back(lastProvider.get());
     }
 
 
-    template<typename EventType>
+    template<typename EventType, typename... Args>
     void registerTrigger(const typename ISource::SignalType<EventType>::Func &func) {
-        for (auto &&it : getProviders<EventType>()) {
-            it->template getSignal<EventType>().assign(func);
+        for (auto &&it : getProviders<EventType, Args...>()) {
+            it->template getSignal<EventType, Args...>().assign(func);
         }
     }
 
-    template<typename EventType>
+    template<typename EventType, typename... Args>
     void
-    registerTrigger(const typename EventType::IdType &id, const typename ISource::SignalType<EventType>::Func &func) {
-        for (auto &&it : getProviders<EventType>()) {
-            it->template getSignal<EventType>(id).assign(func);
+    registerTrigger(const typename EventType::IdType &id,
+                    const typename ISource::SignalType<EventType, Args...>::Func &func) {
+        for (auto &&it : getProviders<EventType, Args...>()) {
+            it->template getSignal<EventType, Args...>(id).assign(func);
         }
     }
 };

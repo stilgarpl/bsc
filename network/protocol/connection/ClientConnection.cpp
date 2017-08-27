@@ -6,7 +6,8 @@
 #include "ClientConnection.h"
 
 
-ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a) : socket(a) {
+ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context &context) : socket(a),
+                                                                                          Connection(context) {
     socket.setReceiveTimeout(Poco::Timespan(20, 0));
 
 }
