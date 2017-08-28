@@ -58,9 +58,6 @@ public:
      * @param values
      * @return
      */
-
-
-
     template<typename T, typename CustomKeyType>
     std::shared_ptr<T> get(const CustomKeyType &id) {
         static auto typeId = getTypeId<T>();
@@ -93,6 +90,13 @@ public:
         static auto typeId = getTypeId<T>();
         data[typeId][getKey(0)] = std::make_shared<T>(values...);
     };
+
+
+    Context& operator+=(const Context& other) {
+         this->data += other.data;
+        return *this;
+    }
+
 
 
 };
