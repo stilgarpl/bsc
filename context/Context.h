@@ -93,7 +93,10 @@ public:
 
 
     Context& operator+=(const Context& other) {
-         this->data += other.data;
+        // this->data += other.data;
+        for (auto &&item : other.data) {
+            this->data[item.first] = item.second;
+        }
         return *this;
     }
 
