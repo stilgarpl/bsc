@@ -20,6 +20,7 @@ void TransmissionControl::onPacketReceived(Context &, const PacketEvent &event) 
             std::clog << "R-REQUEST" << packet->getId() << std::endl;
 
             // sent ack or sth? but what if proper response is being prepared?
+            //@todo send immediately? or wait for timeout?
             NetworkPacketPtr ackPacket = std::make_shared<NetworkPacket>();
             ackPacket->setId(packet->getId());
             ackPacket->setStatus(Status::ACK);
@@ -44,6 +45,20 @@ void TransmissionControl::onPacketSent(Context &, const PacketEvent &event) {
                                                                               Tick::clock::now());
     }
 
+}
+
+void TransmissionControl::work(Context &, const Tick &tick) {
+    //  std::clog << " TransControl::" << __func__ << std::endl;
+
+
+    for (auto &&it : waitingPackets) {
+        if (tick.getNow() - it.second->getTimeSent() > MAX_TIMEOUT) {
+            if (it.second->getConnection() != nullptr) {
+                std::clog << " Resending packet " << std::endl;
+                it.second->getConnection()->send(it.second->getPacketPtr());
+            }
+        }
+    }
 }
 
 NetworkPacketInfo::NetworkPacketInfo(const NetworkPacketPtr &packetPtr,

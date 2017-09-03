@@ -11,7 +11,7 @@
 #include "../../../../logic/events/Tick.h"
 
 ///@todo move to configuration
-static const Tick::clock::duration MAX_TIMEOUT = 500ms;
+static const Tick::clock::duration MAX_TIMEOUT = 2500ms;
 
 class NetworkPacketInfo {
 private:
@@ -49,19 +49,7 @@ public:
 
     void onPacketReceived(Context &, const PacketEvent &event);
 
-    void work(Context &, const Tick &tick) {
-        std::clog << " TransControl::" << __func__ << std::endl;
-
-
-        for (auto &&it : waitingPackets) {
-            if (tick.getNow() - it.second->getTimeSent() > MAX_TIMEOUT) {
-                if (it.second->getConnection() != nullptr) {
-                    std::clog << " Resending packet " << std::endl;
-                    it.second->getConnection()->send(it.second->getPacketPtr());
-                }
-            }
-        }
-    }
+    void work(Context &, const Tick &tick);
 
 };
 

@@ -45,7 +45,8 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
         std::unique_lock<std::mutex> g(sendQueueLock);
         while (sendQueue.empty()) {
             std::cout << "work::send waiting" << std::endl;
-            sendReady.wait_for(g, 1s);
+            //sendReady.wait_for(g, 1s);
+            sendReady.wait(g);
         }
         while (!sendQueue.empty()) {
             std::cout << "work::send found packet to send" << std::endl;
