@@ -15,8 +15,15 @@
 
 
 class NetworkPacket {
+public:
+    typedef unsigned int IdType;
 private:
+    IdType nextId() {
+        static IdType val = 0;
+        return val++;
+    };
     Status status;
+    IdType id = nextId();
 private:
     template<class Archive>
     void serialize(Archive &ar) {
@@ -32,8 +39,15 @@ public:
     Status getStatus() const;
 
     void setStatus(Status status);
+
+    IdType getId() const;
+
+    void setId(IdType id);
+
 };
 
+
+typedef std::shared_ptr<NetworkPacket> NetworkPacketPtr;
 
 CEREAL_REGISTER_TYPE(NetworkPacket);
 

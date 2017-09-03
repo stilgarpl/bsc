@@ -37,20 +37,20 @@ public:
     void addSource(Args... args) {
         std::shared_ptr<SourceType> sourcePtr = std::make_shared<SourceType>(args...);
         addSource(sourcePtr);
-        SourceType *&sbt = sourcesByType.get<SourceType *>();
-        sbt = sourcePtr.get();
+        auto &sbt = sourcesByType.get<std::shared_ptr<SourceType>>();
+        sbt = sourcePtr;
     }
 
     template<typename SourceType>
-    SourceType &getSource() {
-        return sourcesByType.get<SourceType>();
+    std::shared_ptr<SourceType> getSource() {
+        return sourcesByType.get<std::shared_ptr<SourceType>>();
     }
 
     template<typename SourceType>
     void removeSource() {
-        std::shared_ptr<SourceType> sourcePtr = sourcesByType.get<SourceType *>();
+        std::shared_ptr<SourceType> sourcePtr = sourcesByType.get<std::shared_ptr<SourceType>>();
         removeSource(sourcePtr);
-        sourcesByType.get<SourceType *>() = nullptr;
+        sourcesByType.get<std::shared_ptr<SourceType>>() = nullptr;
     }
 
 protected:
@@ -79,6 +79,10 @@ public:
         providers.get<EventType, Args...>().push_back(lastProvider.get());
     }
 
+    template<typename EventType, typename... Args>
+    bool hasProvider() {
+        return providers.get<EventType, Args...>().size() > 0;
+    };
 
     template<typename EventType, typename... Args>
     void registerTrigger(const typename ISource::SignalType<EventType>::Func &func) {

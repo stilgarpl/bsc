@@ -26,7 +26,7 @@ private:
     std::queue<std::shared_ptr<NetworkPacket>> receiveQueue;
     std::condition_variable sendReady;
     std::condition_variable receiveReady;
-    Context &connectionContext;
+    Context connectionContext;
 private:
 
     std::unique_ptr<std::thread> sendThread;
@@ -52,16 +52,20 @@ public:
 protected:
 
 public:
-    void send(std::shared_ptr<NetworkPacket> np);
+    void send(NetworkPacketPtr np);
 
-    std::shared_ptr<NetworkPacket> receive();
+    NetworkPacketPtr receive();
 
     Connection(Context &context);
 
     ConnectionProcessor &getProcessor();
 
     Context &getConnectionContext();
+
+
 };
 
+
+typedef std::shared_ptr<Connection> ConnectionPtr;
 
 #endif //BASYCO_CONNECTION_H

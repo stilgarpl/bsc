@@ -79,6 +79,16 @@ public:
     virtual ~Node();
 
     bool connectTo(const Poco::Net::SocketAddress &address);
+
+    Node();
+
+    Node(int port);
+
+    ///@todo remove this function
+
+    LogicManager &getLogicManager() {
+        return logicManager;
+    }
 };
 
 

@@ -8,8 +8,9 @@
 
 #include "SourceManager.h"
 #include "ActionManager.h"
+#include "../thread/Runnable.h"
 
-class LogicManager {
+class LogicManager : public Runnable {
 
 private:
     SourceManager sourceManager;
@@ -27,6 +28,9 @@ public:
 
     template<typename EventType, typename... Args, typename ActionId>
     bool assignAction(typename EventType::IdType eventId, ActionId actionId) {
+        if (!sourceManager.hasProvider<EventType, Args...>()) {
+            std::cerr << "Provider doesn't exist: " << typeid(EventType).name() << std::endl;
+        }
         auto &&action = actionManager.getAction<EventType, Args...>(actionId);
         if (action) {
             sourceManager.registerTrigger<EventType, Args...>(eventId, *action);
@@ -39,6 +43,9 @@ public:
     template<typename EventType, typename ActionId>
     bool assignAction(ActionId actionId) {
         auto &&action = actionManager.getAction<EventType>(actionId);
+        if (!sourceManager.hasProvider<EventType>()) {
+            std::cerr << "Provider doesn't exist: " << typeid(EventType).name() << std::endl;
+        }
         if (action) {
             sourceManager.registerTrigger<EventType>(*action);
             return true;
@@ -58,7 +65,7 @@ public:
     }
 
     template<typename SourceType>
-    SourceType &getSource() {
+    std::shared_ptr<SourceType> getSource() {
         return sourceManager.getSource<SourceType>();
     }
 
@@ -77,6 +84,18 @@ public:
     void setAction(ActionIdType id, ActionManager::ActionType<Args...> action) {
         actionManager.setAction<Args...>(id, action);
     };
+
+    LogicManager(const LogicManager &) = delete;
+
+    LogicManager() = default;
+
+    void run() override {
+        while (!isStopping()) {
+            work();
+            std::this_thread::sleep_for(0s);
+        }
+
+    }
 };
 
 

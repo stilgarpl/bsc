@@ -29,7 +29,7 @@ public:
 class ServerConnectionFactory : public Poco::Net::TCPServerConnectionFactory {
 private:
     Node &serverNode;
-    Context &context;
+    Context context;
 public:
 
     ServerConnectionFactory(Node &serverNode, Context &context);

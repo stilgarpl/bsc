@@ -9,9 +9,9 @@ Context &ISource::getContext() {
     return context;
 }
 
-void ISource::registerProviders(SourceManager *sourceManager) {
-//implement in derived classes as
-    // sourceManager->registerProvider<Tick>(this);
-    // sourceManager->registerProvider<Tick>(); // using last provider
-
-}
+//void ISource::registerProviders(SourceManager *sourceManager) {
+////implement in derived classes as
+//    // sourceManager->registerProvider<Tick>(this);
+//    // sourceManager->registerProvider<Tick>(); // using last provider
+//
+//}

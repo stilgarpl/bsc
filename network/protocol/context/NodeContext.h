@@ -11,15 +11,7 @@
 
 class NodeContext {
 public:
-    class Setup : public IContextSetup {
-    private:
-        Node &node;
-        NodeInfo &nodeInfo;
-    public:
-        void setup(Context &context) override;
 
-        Setup(Node &node, NodeInfo &nodeInfo);
-    };
 
 private:
     Node &node;
@@ -27,6 +19,10 @@ private:
 public:
 
     NodeContext(Node &node, NodeInfo &nodeInfo);
+
+    Node &getNode() const;
+
+    NodeInfo &getNodeInfo() const;
 
 };
 

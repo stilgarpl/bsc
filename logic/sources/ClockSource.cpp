@@ -14,6 +14,7 @@ void ClockSource::work() {
     Tick tick;
     //ticks
     auto now = clock::now();
+    tick.setNow(now);
     for (auto &&it : getSignalMap<Tick>()) {
         duration d = it.first;
         if (getLastTick(d) < now - d) {

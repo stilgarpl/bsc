@@ -4,10 +4,13 @@
 //#define CEREAL_THREAD_SAFE 1
 
 #include "ClientConnection.h"
+#include "../context/ConnectionContext.h"
+#include "../context/LogicContext.h"
+#include "../logic/sources/ConnectionSource.h"
 
 using namespace std::chrono_literals;
 
-void Connection::send(std::shared_ptr<NetworkPacket> np) {
+void Connection::send(NetworkPacketPtr np) {
     std::lock_guard<std::mutex> g(sendQueueLock);
     std::cout << "Adding packet ..." << std::endl;
     sendQueue.push(np);
@@ -15,7 +18,7 @@ void Connection::send(std::shared_ptr<NetworkPacket> np) {
 
 }
 
-std::shared_ptr<NetworkPacket> Connection::receive() {
+NetworkPacketPtr Connection::receive() {
     std::unique_lock<std::mutex> g(receiveQueueLock);
     while (receiveQueue.empty()) {
         std::cout << "work::receive waiting " << receiveQueue.size() << std::endl;
@@ -32,24 +35,30 @@ std::shared_ptr<NetworkPacket> Connection::receive() {
 void Connection::workSend(Poco::Net::StreamSocket &socket) {
     Poco::Net::SocketOutputStream os(socket);
 
+    auto lc = getConnectionContext().get<LogicContext>();
+    auto &logicManager = lc->getLogicManager();
+    auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
+
     while (sending) {
         //  std::cout << "sending " << socket.address().port() << std::endl;
         //check the queue
         std::unique_lock<std::mutex> g(sendQueueLock);
         while (sendQueue.empty()) {
             std::cout << "work::send waiting" << std::endl;
-            sendReady.wait(g);
+            sendReady.wait_for(g, 1s);
         }
         while (!sendQueue.empty()) {
             std::cout << "work::send found packet to send" << std::endl;
-            std::shared_ptr<NetworkPacket> v;
+            NetworkPacketPtr v;
             {
                 v = sendQueue.front();
                 {
                     cereal::BinaryOutputArchive oa(os);
                     oa << v;
                 }
-
+                if (connectionSourcePtr != nullptr) {
+                    connectionSourcePtr->sentPacket(v, this);
+                }
                 sendQueue.pop();
             }
 
@@ -62,6 +71,10 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
 
 void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
+    auto lc = getConnectionContext().get<LogicContext>();
+    auto &logicManager = lc->getLogicManager();
+    auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
+
     Poco::Net::SocketInputStream is(socket);
     ///@attention is it ok to start it here?
     processor.start();
@@ -69,7 +82,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
         cereal::BinaryInputArchive ia(is);
         /*while (socket.available() > 0)*/ {
             std::cout << "work::receive " << socket.address().port() << std::endl;
-            std::shared_ptr<NetworkPacket> v;
+            NetworkPacketPtr v;
 
             ia >> v;
             {
@@ -78,6 +91,9 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                 receiveReady.notify_all();
                 std::cout << "work::receive qs " << receiveQueue.size() << std::endl;
                 // logic.processPacket(v);
+                if (connectionSourcePtr != nullptr) {
+                    connectionSourcePtr->receivedPacket(v, this);
+                }
 
             }
         }
@@ -120,7 +136,10 @@ void Connection::stopReceiving() {
     //  processor.stop();
 }
 
-Connection::Connection(Context &context) : processor(*this), connectionContext(context) {}
+Connection::Connection(Context &context) : processor(*this), connectionContext(context) {
+
+    connectionContext.set<ConnectionContext, Connection &>(*this);
+}
 
 ConnectionProcessor &Connection::getProcessor() {
     return processor;

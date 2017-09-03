@@ -8,7 +8,7 @@
 
 #include <map>
 #include <memory>
-
+#include <iostream>
 class Context {
 
     typedef unsigned int KeyType;
@@ -88,19 +88,27 @@ public:
     template<typename T, typename... Vals>
     void set(Vals... values) {
         static auto typeId = getTypeId<T>();
+        std::clog << "Context::set type id " << typeId << std::endl;
         data[typeId][getKey(0)] = std::make_shared<T>(values...);
     };
 
 
     Context& operator+=(const Context& other) {
-        // this->data += other.data;
         for (auto &&item : other.data) {
+            std::clog << "Context::+= copying id " << item.first << std::endl;
             this->data[item.first] = item.second;
         }
         return *this;
     }
 
 
+    Context(const Context &other) {
+        for (auto &&item : other.data) {
+            this->data[item.first] = item.second;
+        }
+    }
+
+    Context() = default;
 
 };
 

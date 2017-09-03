@@ -8,6 +8,8 @@
 
 #include <thread>
 
+using namespace std::chrono_literals;
+
 class Runnable {
 private:
     std::unique_ptr<std::thread> thread;

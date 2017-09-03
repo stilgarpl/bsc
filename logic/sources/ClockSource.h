@@ -10,7 +10,7 @@
 #include "../ISource.h"
 
 class ClockSource : public ISource {
-    typedef std::chrono::steady_clock clock;
+    typedef Tick::clock clock;
     typedef std::chrono::time_point<clock> time_point;
     typedef Tick::duration duration;
 private:

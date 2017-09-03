@@ -6,6 +6,7 @@
 #include "Node.h"
 #include "../protocol/connection/ServerConnection.h"
 #include "../protocol/context/NodeContext.h"
+#include "../protocol/context/LogicContext.h"
 
 
 using namespace Poco::Net;
@@ -56,8 +57,8 @@ bool Node::connectTo(const SocketAddress &address) {
 
     //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
     //@todo check for problems and handle them
-    std::shared_ptr<Connection> connection = std::make_shared<ClientConnection>(address, nodeContext);
-    nodeContext.set<NodeContext>(*this, this->thisNodeInfo);
+    std::shared_ptr<Connection> connection = std::make_shared<ClientConnection>(address, std::ref(nodeContext));
+
     ///@todo if connection is not connected, delete it and try another adddes
     addActiveClientConnection(connection);
     return true; ///@todo error checking
@@ -66,6 +67,7 @@ bool Node::connectTo(const SocketAddress &address) {
 
 void Node::start() {
 
+    logicManager.start();
     listen();
 
 
@@ -73,6 +75,7 @@ void Node::start() {
 
 void Node::stop() {
 
+    logicManager.stop();
     stopListening();
 }
 
@@ -109,3 +112,19 @@ const std::shared_ptr<Node::Config> &Node::getConfiguration() const {
 void Node::setConfiguration(const std::shared_ptr<Node::Config> &configuration) {
     Node::configuration = configuration;
 }
+
+Node::Node() {
+
+    nodeContext.set<NodeContext, Node &, NodeInfo &>(*this, this->thisNodeInfo);
+    nodeContext.set<LogicContext, LogicManager &>(logicManager);
+
+
+}
+
+Node::Node(int port) : Node() {
+    std::shared_ptr<Node::Config> config = std::make_shared<Node::Config>();
+    config->setPort(port);
+    setConfiguration(config);
+
+}
+

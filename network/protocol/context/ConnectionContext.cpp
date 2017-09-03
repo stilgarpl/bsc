@@ -9,15 +9,3 @@ ConnectionContext::ConnectionContext(Connection &connection) : connection(connec
 Connection &ConnectionContext::getConnection() const {
     return connection;
 }
-
-void ConnectionContext::Setup::setup(Context &context) {
-
-    auto ctx = context.get<ConnectionContext>();
-    if (ctx == nullptr) {
-        context.set<ConnectionContext>(std::ref(connection));
-    }
-
-
-}
-
-ConnectionContext::Setup::Setup(Connection &connection) : connection(connection) {}

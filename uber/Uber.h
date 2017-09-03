@@ -82,6 +82,11 @@ public:
     operator T &() {
         return t;
     }
+
+    T &operator=(const T &other) {
+        t = other;
+        return t;
+    }
 };
 
 

@@ -6,6 +6,10 @@
 #include "network/protocol/packet/CommandPacket.h"
 #include "logic/sources/ClockSource.h"
 #include "network/logic/sources/NetworkSource.h"
+#include "network/protocol/logic/sources/AuthSource.h"
+#include "network/protocol/logic/sources/ConnectionSource.h"
+#include "network/logic/actions/ProtocolActions.h"
+#include "network/protocol/logic/actions/TransmissionControl.h"
 
 
 using namespace std::chrono_literals;
@@ -113,17 +117,17 @@ int main() {
 //    am.setAction<Tick,int,float>("test",[](Context&,const Tick&,int,float){});
     //logicManager.getSourceManager().registerProvider<Tick>(&clock);
     //  logicManager.getActionManager().setAction<Tick>("dupa",[](Context &, const Tick &) { std::clog << "dupa " << std::endl; });
-    if (logicManager.assignAction<Tick>(1000ms, "test")) {
-        std::clog << "Assignment ok!" << std::endl;
-    }
-
-    if (logicManager.assignAction<Tick>(599ms, "test")) {
-        std::clog << "Assignment ok!" << std::endl;
-    }
-
-    if (logicManager.assignAction<Tick>(50ms, "test")) {
-        std::clog << "Assignment ok!" << std::endl;
-    }
+//    if (logicManager.assignAction<Tick>(1000ms, "test")) {
+//        std::clog << "Assignment ok!" << std::endl;
+//    }
+//
+//    if (logicManager.assignAction<Tick>(599ms, "test")) {
+//        std::clog << "Assignment ok!" << std::endl;
+//    }
+//
+//    if (logicManager.assignAction<Tick>(50ms, "test")) {
+//        std::clog << "Assignment ok!" << std::endl;
+//    }
 
     // manager.registerTrigger<Tick>([](Context &, const Tick &) { std::clog << "registered tick " << std::endl; });
     // manager.registerTrigger<Tick>(500ms,[](Context &, const Tick &) { std::clog << "tick every 500ms" << std::endl; });
@@ -134,18 +138,106 @@ int main() {
 //            [](Context &, const Tick &) { std::clog << "signal Tick has signalled 100ms " << std::endl; });
 //    clock.getSignal<Tick>(3000ms).assign(
 //            [](Context &, const Tick &) { std::clog << "signal Tick has signalled 300ms " << std::endl; });
-    
-    for (int i =0 ; i< 10000; i++)
-        logicManager.work();
+
+//    for (int i =0 ; i< 10000; i++)
+//        logicManager.work();
 
     Context context;
+    TransmissionControl transmissionControl;
 
     context.setKey<std::string>(
             "test", "wartosc");
     std::clog << "Test context : " << *(context.get<std::string>("test")) << std::endl;
     context.set<int>(0);
-    Node thisNode;
+    Node thisNode(9191);
+    thisNode.getLogicManager().addSource<AuthSource>();
+    thisNode.getLogicManager().addSource<ClockSource>();
+    thisNode.getLogicManager().addSource<ConnectionSource>();
+    thisNode.getLogicManager().setAction<ConnectionEvent>("connDebug", [](Context &, const ConnectionEvent &event) {
+
+        std::clog << "Debug: connection event!" << std::endl;
+    });
+
+    thisNode.getLogicManager().setAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
+                                                      [&transmissionControl](Context &ctx,
+                                                                             const PacketEvent &packetEvent) {
+                                                          return transmissionControl.onPacketReceived(ctx, packetEvent);
+                                                      });
+    thisNode.getLogicManager().setAction<PacketEvent>(PacketEventId::PACKET_SENT, [&transmissionControl](Context &ctx,
+                                                                                                         const PacketEvent &packetEvent) {
+        return transmissionControl.onPacketSent(ctx, packetEvent);
+    });
+    thisNode.getLogicManager().setAction<Tick>("TransTick", [&transmissionControl](Context &ctx, const Tick &tick) {
+        return transmissionControl.work(ctx, tick);
+    });
+    if (thisNode.getLogicManager().assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
+                                                             PacketEventId::PACKET_RECEIVED)) {
+        std::clog << "Debug: PACK RECV assignment!" << std::endl;
+    }
+    thisNode.getLogicManager().assignAction<PacketEvent>(PacketEventId::PACKET_SENT, PacketEventId::PACKET_SENT);
+
+    if (thisNode.getLogicManager().assignAction<Tick>(500ms, "TransTick")) {
+        std::clog << "Debug: Trans tick assignment!" << std::endl;
+
+    }
+
+    if (thisNode.getLogicManager().assignAction<ConnectionEvent>("connDebug")) {
+        std::clog << "Debug: ConEv assignment!" << std::endl;
+
+    }
     thisNode.start();
+
+    Node otherNode(9999);
+    otherNode.getLogicManager().addSource<AuthSource>();
+    otherNode.getLogicManager().addSource<ClockSource>();
+    otherNode.getLogicManager().addSource<ConnectionSource>();
+    otherNode.getLogicManager().setAction<ConnectionEvent>("connDebug", [](Context &, const ConnectionEvent &event) {
+
+        std::clog << "Debug: connection event!" << std::endl;
+    });
+
+    otherNode.getLogicManager().setAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
+                                                       [&transmissionControl](Context &ctx,
+                                                                              const PacketEvent &packetEvent) {
+                                                           return transmissionControl.onPacketReceived(ctx,
+                                                                                                       packetEvent);
+                                                       });
+    otherNode.getLogicManager().setAction<PacketEvent>(PacketEventId::PACKET_SENT, [&transmissionControl](Context &ctx,
+                                                                                                          const PacketEvent &packetEvent) {
+        return transmissionControl.onPacketSent(ctx, packetEvent);
+    });
+    otherNode.getLogicManager().setAction<Tick>("TransTick", [&transmissionControl](Context &ctx, const Tick &tick) {
+        return transmissionControl.work(ctx, tick);
+    });
+    otherNode.getLogicManager().assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
+                                                          PacketEventId::PACKET_RECEIVED);
+    otherNode.getLogicManager().assignAction<PacketEvent>(PacketEventId::PACKET_SENT, PacketEventId::PACKET_SENT);
+
+
+    otherNode.getLogicManager().setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
+    thisNode.getLogicManager().setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
+
+    if (otherNode.getLogicManager().assignAction<ConnectionEvent>("connDebug")) {
+        std::clog << "Debug: ConEv assignment!" << std::endl;
+
+    }
+
+    if (otherNode.getLogicManager().assignAction<Tick>(500ms, "TransTick")) {
+        std::clog << "Debug: Trans tick assignment!" << std::endl;
+
+    }
+    if (otherNode.getLogicManager().assignAction<ConnectionEvent>("onConnect")) {
+        std::clog << "Debug: onConn assignment!" << std::endl;
+
+    }
+    if (thisNode.getLogicManager().assignAction<ConnectionEvent>("onConnect")) {
+        std::clog << "Debug: onConn assignment!" << std::endl;
+
+    }
+    otherNode.start();
+
+    thisNode.connectTo("127.0.0.1:9999");
+
     std::this_thread::sleep_for(30s);
     return 0;
 }

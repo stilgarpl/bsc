@@ -11,21 +11,13 @@
 
 class ConnectionContext {
 public:
-    class Setup : public IContextSetup {
-        Connection &connection;
-    public:
-        Setup(Connection &connection);
-
-    public:
-        void setup(Context &context) override;
-    };
 
 private:
     Connection &connection;
 
 
 public:
-    ConnectionContext(Connection &connection);
+    explicit ConnectionContext(Connection &connection);
 
     Connection &getConnection() const;
 

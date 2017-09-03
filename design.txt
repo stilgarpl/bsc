@@ -80,3 +80,9 @@ idea: hierarchiczny context: każdy poziom ma swój kontekst, node, connection e
 idea2: sumowanei kontekstow
 
 w connection Context context += nodeContext; <- w tym przypadku kazdy ma swoj wlasny kontekst, nie ma problemow z thread safety ale za to zmiany w nodecontext nie propaguja sie nizej.
+
+
+network packet id - autogenerowane kolejne liczby
+zapamietujemy ktore requesty wyszly z jakimi liczbami
+i na ktore dostalismy response
+jesli nie dostalismy response, mozna resendnac packet
