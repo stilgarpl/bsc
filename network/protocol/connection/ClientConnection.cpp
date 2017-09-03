@@ -24,3 +24,13 @@ ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context &c
     }
 
 }
+
+void ClientConnection::startReceiving() {
+    Connection::startReceiving(socket);
+
+}
+
+void ClientConnection::startSending() {
+    Connection::startSending(socket);
+
+}

@@ -41,6 +41,7 @@ protected:
     void workReceive(Poco::Net::StreamSocket &socket);
 
 public:
+    //@todo why do those methods need socket as parameter?
     virtual void startSending(Poco::Net::StreamSocket &s);
 
     virtual void stopSending();

@@ -57,10 +57,13 @@ bool Node::connectTo(const SocketAddress &address) {
 
     //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
     //@todo check for problems and handle them
-    std::shared_ptr<Connection> connection = std::make_shared<ClientConnection>(address, std::ref(nodeContext));
+
+    std::shared_ptr<ClientConnection> connection = std::make_shared<ClientConnection>(address, std::ref(nodeContext));
 
     ///@todo if connection is not connected, delete it and try another adddes
     addActiveClientConnection(connection);
+    connection->startSending();
+    connection->startReceiving();
     return true; ///@todo error checking
 
 }

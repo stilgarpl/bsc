@@ -18,6 +18,10 @@ private:
 public:
     ClientConnection(const Poco::Net::SocketAddress &a, Context &);
 
+    void startReceiving();
+
+    void startSending();
+
 
 };
 
