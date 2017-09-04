@@ -12,8 +12,6 @@
 ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context &context) : socket(a),
                                                                                           Connection(context) {
 
-    //@todo to jest zdecydowanie za wczesnie
-    socket.setReceiveTimeout(Poco::Timespan(20, 0));
     auto lm = getConnectionContext().get<LogicContext>();
     if (lm != nullptr) {
         std::clog << __func__ << " adding new connection!!!!!!!!!!!!!1 " << std::endl;

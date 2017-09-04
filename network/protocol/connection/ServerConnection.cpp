@@ -9,12 +9,13 @@
 using namespace std::chrono_literals;
 
 void ServerConnection::run() {
-    std::cout << "opening server connection" << std::endl;
+    // std::cout << "opening server connection" << std::endl;
+    LOGGER("Opening server connection");
     //run is already in a separate thread, so there is no need to start a new one
     startSending(socket());
     workReceive(socket());
 
-    std::cout << "CLOSING CONNECTION";
+    //  std::cout << "CLOSING CONNECTION";
 
 }
 

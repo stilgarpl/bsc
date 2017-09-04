@@ -8,15 +8,19 @@
 #include "Poco/Logger.h"
 #include <string>
 
+#define LOGGER(x) Logger(__FILE__).debug(__LINE__, x);
+
 class Logger {
 private:
     Poco::Logger &logger;
+    std::string loggerName;
 public:
 
     Logger(std::string name);
 
     void debug(std::string txt);
 
+    void debug(int line, std::string txt);
     void error(std::string txt);
 
     void info(std::string txt);

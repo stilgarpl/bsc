@@ -27,7 +27,7 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
     //setting actions
     logicManager.setAction<ConnectionEvent>("connDebug", [](Context &, const ConnectionEvent &event) {
 
-        std::clog << "Debug: connection event!" << std::endl;
+        // std::clog << "Debug: connection event!" << std::endl;
     });
 
     logicManager.setAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
@@ -84,6 +84,9 @@ int main() {
 
         std::clog << "test tick " << t.getEventId().count() << std::endl;
     });
+
+
+    LOGGER("dupa");
 
 
     Context context;

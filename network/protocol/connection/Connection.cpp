@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 void Connection::send(NetworkPacketPtr np) {
     std::lock_guard<std::mutex> g(sendQueueLock);
-    std::cout << "Adding packet ..." << std::endl;
+    // std::cout << "Adding packet ..." << std::endl;
     sendQueue.push(np);
     sendReady.notify_all();
 
@@ -21,13 +21,13 @@ void Connection::send(NetworkPacketPtr np) {
 NetworkPacketPtr Connection::receive() {
     std::unique_lock<std::mutex> g(receiveQueueLock);
     while (receiveQueue.empty()) {
-        std::cout << "work::receive waiting " << receiveQueue.size() << std::endl;
+        // std::cout << "work::receive waiting " << receiveQueue.size() << std::endl;
         // receiveReady.wait_for(g, 1s);
         receiveReady.wait(g);
     }
     ///clion says it's an error. clion is WRONG.
     auto v = receiveQueue.front();
-    std::cout << "Popping " << std::endl;
+    // std::cout << "Popping " << std::endl;
     receiveQueue.pop();
     return v;
 }
@@ -44,12 +44,12 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
         //check the queue
         std::unique_lock<std::mutex> g(sendQueueLock);
         while (sendQueue.empty()) {
-            std::cout << "work::send waiting" << std::endl;
+            // std::cout << "work::send waiting" << std::endl;
             //sendReady.wait_for(g, 1s);
             sendReady.wait(g);
         }
         while (!sendQueue.empty()) {
-            std::cout << "work::send found packet to send" << std::endl;
+            //  std::cout << "work::send found packet to send" << std::endl;
             NetworkPacketPtr v;
             {
                 v = sendQueue.front();
@@ -82,7 +82,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
     while (receiving) {
         cereal::BinaryInputArchive ia(is);
         /*while (socket.available() > 0)*/ {
-            std::cout << "work::receive " << socket.address().port() << std::endl;
+            //  std::cout << "work::receive " << socket.address().port() << std::endl;
             NetworkPacketPtr v;
 
             ia >> v;
@@ -90,7 +90,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                 std::lock_guard<std::mutex> g(receiveQueueLock);
                 receiveQueue.push(v);
                 receiveReady.notify_all();
-                std::cout << "work::receive qs " << receiveQueue.size() << std::endl;
+                //   std::cout << "work::receive qs " << receiveQueue.size() << std::endl;
                 // logic.processPacket(v);
                 if (connectionSourcePtr != nullptr) {
                     connectionSourcePtr->receivedPacket(v, this);
