@@ -121,6 +121,7 @@ Node::Node() {
     nodeContext.set<NodeContext, Node &, NodeInfo &>(*this, this->thisNodeInfo);
     nodeContext.set<LogicContext, LogicManager &>(logicManager);
 
+    logicManager.setContexts(nodeContext);
 
 }
 

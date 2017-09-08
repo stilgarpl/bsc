@@ -6,13 +6,13 @@
 #define BASYCO_NETWORKPACKET_H
 //#define CEREAL_THREAD_SAFE 1
 
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/polymorphic.hpp>
+
 #include "../enum/Command.h"
 #include "../../../context/Context.h"
 #include "../enum/Status.h"
 
+#include "../../../utils/cereal_include.h"
+#include "../../../log/Logger.h"
 
 class NetworkPacket {
 public:
@@ -23,18 +23,19 @@ private:
         return val++;
     };
     Status status;
-    IdType id = nextId();
+    IdType id;
+    bool retry = false;
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar & status;
-        ar & id;
+        ar(status, id, retry);
     }
 
     friend class cereal::access;
 
 public:
 
+    ///@todo pure virtual perhaps? or maybe that would mess up ACK? I can create AckPacket...
     virtual void process(Context &context);
 
     Status getStatus() const;
@@ -45,10 +46,23 @@ public:
 
     void setId(IdType id);
 
+    NetworkPacket(const NetworkPacket &) = delete;
+
+    NetworkPacket() : id(nextId()) {};
+
+    bool isRetry() const;
+
+    void setRetry(bool retry);
+
 };
 
 
 typedef std::shared_ptr<NetworkPacket> NetworkPacketPtr;
+
+template<typename NetworkPacketType = NetworkPacket>
+using NetworkPacketPointer = std::shared_ptr<NetworkPacketType>;
+
+
 
 CEREAL_REGISTER_TYPE(NetworkPacket);
 

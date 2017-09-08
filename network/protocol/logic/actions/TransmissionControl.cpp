@@ -3,27 +3,32 @@
 //
 
 #include "TransmissionControl.h"
+#include "../../context/NodeContext.h"
 
-void TransmissionControl::onPacketReceived(Context &, const PacketEvent &event) {
-    std::clog << __func__ << std::endl;
+void TransmissionControl::onPacketReceived(Context &context, const PacketEvent &event) {
+
     const NetworkPacketPtr &packet = event.getPacket();
+    //  NODECONTEXTLOGGER("on PacketReceived"+ std::to_string(packet->getId()));
+
     //@todo compare time
     switch (packet->getStatus()) {
         case Status::RESPONSE :
         case Status::ACK:
-            std::clog << "RESPONSE - ACK" << packet->getId() << std::endl;
+            NODECONTEXTLOGGER("RESPONSE - ACK " + std::to_string(packet->getId()));
 
             waitingPackets.erase(packet->getId());
 
             break;
         case Status::REQUEST : {
-            std::clog << "R-REQUEST" << packet->getId() << std::endl;
+            NODECONTEXTLOGGER("R-REQUEST " + std::to_string(packet->getId()));
 
             // sent ack or sth? but what if proper response is being prepared?
             //@todo send immediately? or wait for timeout?
             NetworkPacketPtr ackPacket = std::make_shared<NetworkPacket>();
             ackPacket->setId(packet->getId());
             ackPacket->setStatus(Status::ACK);
+            NODECONTEXTLOGGER("sending response " + std::to_string(ackPacket->getId()));
+
             event.getConnection()->send(ackPacket);
         }
             break;
@@ -33,12 +38,13 @@ void TransmissionControl::onPacketReceived(Context &, const PacketEvent &event) 
     }
 }
 
-void TransmissionControl::onPacketSent(Context &, const PacketEvent &event) {
-    std::clog << __func__ << std::endl;
+void TransmissionControl::onPacketSent(Context &context, const PacketEvent &event) {
     const NetworkPacketPtr packet = event.getPacket();
+    //  NODECONTEXTLOGGER("on PacketSent"+ std::to_string(packet->getId()));
+
     //@todo store sent time
-    if (packet->getStatus() == Status::REQUEST) {
-        std::clog << "S-REQUEST" << packet->getId() << std::endl;
+    if (packet->getStatus() == Status::REQUEST && !packet->isRetry()) {
+        NODECONTEXTLOGGER("S-REQUEST " + std::to_string(packet->getId()));
 
         ///@todo pointer or something else
         waitingPackets[packet->getId()] = std::make_shared<NetworkPacketInfo>(packet, event.getConnection(),
@@ -47,49 +53,18 @@ void TransmissionControl::onPacketSent(Context &, const PacketEvent &event) {
 
 }
 
-void TransmissionControl::work(Context &, const Tick &tick) {
+void TransmissionControl::work(Context &context, const Tick &tick) {
     //  std::clog << " TransControl::" << __func__ << std::endl;
 
 
     for (auto &&it : waitingPackets) {
         if (tick.getNow() - it.second->getTimeSent() > MAX_TIMEOUT) {
             if (it.second->getConnection() != nullptr) {
-                std::clog << " Resending packet " << std::endl;
+                NODECONTEXTLOGGER("Resending packet " + std::to_string(it.second->getPacketPtr()->getId()))
+                it.second->getPacketPtr()->setRetry(true);
                 it.second->getConnection()->send(it.second->getPacketPtr());
             }
         }
     }
 }
 
-NetworkPacketInfo::NetworkPacketInfo(const NetworkPacketPtr &packetPtr,
-                                     const std::chrono::time_point<Tick::clock> &timeSent)
-        : packetPtr(packetPtr), timeSent(timeSent) {}
-
-const NetworkPacketPtr &NetworkPacketInfo::getPacketPtr() const {
-    return packetPtr;
-}
-
-void NetworkPacketInfo::setPacketPtr(const NetworkPacketPtr &packetPtr) {
-    NetworkPacketInfo::packetPtr = packetPtr;
-}
-
-const std::chrono::time_point<Tick::clock> &NetworkPacketInfo::getTimeSent() const {
-    return timeSent;
-}
-
-void NetworkPacketInfo::setTimeSent(const std::chrono::time_point<Tick::clock> &timeSent) {
-    NetworkPacketInfo::timeSent = timeSent;
-}
-
-NetworkPacketInfo::NetworkPacketInfo(const NetworkPacketPtr &packetPtr, Connection *connection,
-                                     const std::chrono::time_point<Tick::clock> &timeSent) : packetPtr(packetPtr),
-                                                                                             connection(connection),
-                                                                                             timeSent(timeSent) {}
-
-Connection *NetworkPacketInfo::getConnection() const {
-    return connection;
-}
-
-void NetworkPacketInfo::setConnection(Connection *connection) {
-    NetworkPacketInfo::connection = connection;
-}

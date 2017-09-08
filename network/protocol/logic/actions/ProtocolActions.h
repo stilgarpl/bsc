@@ -6,8 +6,8 @@
 #define BASYCO_PROTOCOLACTIONS_H
 
 
-#include "../../../context/Context.h"
-#include "../../protocol/logic/events/ConnectionEvent.h"
+#include "../../../../context/Context.h"
+#include "../events/ConnectionEvent.h"
 
 class ProtocolActions {
 

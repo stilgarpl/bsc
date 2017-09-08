@@ -8,7 +8,9 @@
 #include "network/protocol/logic/sources/AuthSource.h"
 #include "network/protocol/logic/sources/ConnectionSource.h"
 #include "network/protocol/logic/actions/TransmissionControl.h"
-#include "network/logic/actions/ProtocolActions.h"
+#include "network/protocol/logic/actions/ProtocolActions.h"
+#include "network/node/protocol/logic/sources/NodeSource.h"
+#include "network/node/protocol/logic/actions/NodeActions.h"
 
 
 using namespace std::chrono_literals;
@@ -16,15 +18,30 @@ using namespace std::chrono_literals;
 #include <fstream>
 
 
+class RefX {
+    int &a;
+public:
+    int &getA() const { return a; };
+
+    RefX(int &a) : a(a) {};
+};
+
+
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
     //adding sources
     logicManager.addSource<AuthSource>();
     logicManager.addSource<ClockSource>();
     logicManager.addSource<ConnectionSource>();
+    logicManager.addSource<NetworkSource>();
+    logicManager.addSource<NodeSource>();
 
 
 
     //setting actions
+
+    logicManager.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
+    logicManager.setAction<NodeEvent>("upNoI", NodeActions::updateNodeInfo);
+
     logicManager.setAction<ConnectionEvent>("connDebug", [](Context &, const ConnectionEvent &event) {
 
         // std::clog << "Debug: connection event!" << std::endl;
@@ -65,16 +82,35 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
     }
 
 
-    if (logicManager.assignAction<ConnectionEvent>("onConnect")) {
-        std::clog << "Debug: onConn assignment!" << std::endl;
+//    if (logicManager.assignAction<ConnectionEvent>("onConnect")) {
+//        std::clog << "Debug: onConn assignment!" << std::endl;
+//
+//    }
+
+    if (logicManager.assignAction<ConnectionEvent>("reqNoI")) {
+        std::clog << "Debug: reqNoI assignment!" << std::endl;
 
     }
 
+    if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NODE_INFO, "upNoI")) {
+        std::clog << "Debug: upNoI assignment!" << std::endl;
+
+    }
+
+//
+//    IProtocol* protocol = new DummyProtocol();
+//    protocol->setupLogic(logicManager);
 
 }
 
 
 int main() {
+
+    int ii = 7;
+    RefX i(ii);
+    i.getA() = 5;
+    LOGGER(std::to_string(i.getA()));
+
 
     LogicManager logicManager;
     logicManager.addSource<ClockSource>();
@@ -96,10 +132,12 @@ int main() {
     std::clog << "Test context : " << *(context.get<std::string>("test")) << std::endl;
     context.set<int>(0);
     Node thisNode(9191);
+    thisNode.getNodeInfo().setNodeName("first Node");
     setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
     thisNode.start();
 
     Node otherNode(9999);
+    otherNode.getNodeInfo().setNodeName("second node");
     setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
     otherNode.start();
 

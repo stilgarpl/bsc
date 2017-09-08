@@ -15,7 +15,7 @@ void ConnectionSource::newConnection(Connection *con) {
 }
 
 void ConnectionSource::sentPacket(std::shared_ptr<NetworkPacket> p, Connection *connection) {
-    std::clog << __func__ << std::endl;
+    //lLOGGER()
 
     auto event = std::make_shared<PacketEvent>();
     event->setEventId(PacketEvent::IdType::PACKET_SENT);
@@ -25,7 +25,7 @@ void ConnectionSource::sentPacket(std::shared_ptr<NetworkPacket> p, Connection *
 }
 
 void ConnectionSource::receivedPacket(std::shared_ptr<NetworkPacket> p, Connection *connection) {
-    std::clog << __func__ << std::endl;
+    NODECONTEXTLOGGER("received Packet");
 
     auto event = std::make_shared<PacketEvent>();
     event->setEventId(PacketEvent::IdType::PACKET_RECEIVED);
@@ -35,6 +35,7 @@ void ConnectionSource::receivedPacket(std::shared_ptr<NetworkPacket> p, Connecti
 }
 
 void ConnectionSource::work() {
+
     connSource.work();
     packetSource.work();
 
@@ -44,6 +45,9 @@ void ConnectionSource::registerProviders(SourceManager *manager) {
 //    ISource::registerProviders(manager);
     connSource.registerProviders(manager);
     packetSource.registerProviders(manager);
+    ///@todo context settings not here...
+    connSource.setContext(context);
+    packetSource.setContext(context);
 }
 
 ConnectionSource::ConnectionSource() {

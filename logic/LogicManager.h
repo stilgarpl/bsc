@@ -92,9 +92,13 @@ public:
     void run() override {
         while (!isStopping()) {
             work();
-            std::this_thread::sleep_for(0s);
+            //  std::this_thread::sleep_for(0s);
         }
 
+    }
+
+    void setContexts(const Context &context) {
+        sourceManager.setContexts(context);
     }
 };
 

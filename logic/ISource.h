@@ -15,8 +15,9 @@
 class SourceManager;
 
 class ISource {
-private:
+protected:
     Context context;
+private:
     Uber<std::map> signalMap;
     Uber<Type> globalSignal;
 protected:
@@ -100,6 +101,8 @@ public:
 
     //@todo make pure virtual
     virtual void registerProviders(SourceManager *)=0;
+
+    void setContext(const Context &context);
 };
 
 

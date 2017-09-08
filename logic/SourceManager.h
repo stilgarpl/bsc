@@ -22,6 +22,7 @@ private:
     Uber<Type> sourcesByType;
     StaticUber<ProviderList> providers;
     std::shared_ptr<ISource> lastProvider = nullptr;
+    Context commonContext;
 public:
 
     void work() {
@@ -97,6 +98,13 @@ public:
                     const typename ISource::SignalType<EventType, Args...>::Func &func) {
         for (auto &&it : getProviders<EventType, Args...>()) {
             it->template getSignal<EventType, Args...>(id).assign(func);
+        }
+    }
+
+    void setContexts(const Context &context) {
+        commonContext += context;
+        for (auto &&it : sources) {
+            it->setContext(context);
         }
     }
 };

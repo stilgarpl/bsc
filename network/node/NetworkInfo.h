@@ -12,6 +12,7 @@
 class NetworkInfo {
 
 private:
+    //@todo turn into map?
     std::list<NodeInfo> knownNodes;
 };
 

@@ -17,8 +17,11 @@
 #include <memory>
 #include <Poco/Net/TCPServer.h>
 
-class Node {
+///@todo separate interface so NodeInfo can include INode, and Node can include NodeInfo
 
+class Node {
+public:
+    typedef unsigned int IdType; ///@todo replace it with a real id, hash or something
 public:
     class Config : public IConfig {
     private:
@@ -46,6 +49,14 @@ private:
     std::shared_ptr<Config> configuration;
     LogicManager logicManager;
     Context nodeContext;
+    IdType id = generateId();
+
+    IdType generateId() {
+        //@todo implement real id generation
+        static IdType i = 0;
+        return i++;
+    }
+
 public:
     const std::shared_ptr<Config> &getConfiguration() const;
 
@@ -88,6 +99,10 @@ public:
 
     LogicManager &getLogicManager() {
         return logicManager;
+    }
+
+    NodeInfo &getNodeInfo() {
+        return thisNodeInfo;
     }
 };
 

@@ -14,8 +14,8 @@
 class ConnectionSource : public ISource {
 
 private:
-    EventQueueSource<ConnectionEvent> connSource;
-    EventQueueSource<PacketEvent> packetSource;
+    EventQueueSource<ConnectionEvent, ConnectionSource> connSource;
+    EventQueueSource<PacketEvent, ConnectionSource> packetSource;
 public:
     void newConnection(Connection *con);
 

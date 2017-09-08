@@ -19,7 +19,8 @@ private:
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar & command;
+
+        ar & cereal::base_class<NetworkPacket>(this) & command;
     }
 
     friend class cereal::access;

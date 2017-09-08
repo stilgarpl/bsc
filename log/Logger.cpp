@@ -20,7 +20,7 @@ void Logger::error(std::string txt) {
 }
 
 void Logger::debug(std::string txt) {
-
+    std::lock_guard<std::mutex> g(getLock());
     logger.debug(txt);
     std::clog << loggerName << " : " << txt << std::endl;
 }
@@ -30,5 +30,7 @@ void Logger::info(std::string txt) {
 }
 
 void Logger::debug(int line, std::string txt) {
+
+    std::lock_guard<std::mutex> g(getLock());
     std::clog << loggerName << " @ " << line << " : " << txt << std::endl;
 }

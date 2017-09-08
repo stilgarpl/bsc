@@ -27,3 +27,11 @@ NetworkPacket::IdType NetworkPacket::getId() const {
 void NetworkPacket::setId(NetworkPacket::IdType id) {
     NetworkPacket::id = id;
 }
+
+bool NetworkPacket::isRetry() const {
+    return retry;
+}
+
+void NetworkPacket::setRetry(bool retry) {
+    NetworkPacket::retry = retry;
+}

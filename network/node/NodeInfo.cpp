@@ -19,3 +19,11 @@ const std::string &NodeInfo::getNetworkId() const {
 const std::list<std::string> &NodeInfo::getKnownAddresses() const {
     return knownAddresses;
 }
+
+//Node::IdType NodeInfo::getId() const {
+//    return id;
+//}
+//
+//void NodeInfo::setId(Node::IdType id) {
+//    NodeInfo::id = id;
+//}

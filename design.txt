@@ -86,3 +86,66 @@ network packet id - autogenerowane kolejne liczby
 zapamietujemy ktore requesty wyszly z jakimi liczbami
 i na ktore dostalismy response
 jesli nie dostalismy response, mozna resendnac packet
+
+
+
+
+request => future promise => fullfill
+
+protocol: transactions
+transaction id
+transaction has flow composed of packets
+
+
+protocol->startTransaction(transaction) -> future<transactionresult>
+
+transaction:
+
+send CommandPacket::REQUEST
+receive CommandPacket::RESPONSE -> run thisTransaction->nextPhase?
+send OtherPacket::REQUEST
+receive OtherPacket::RESPONSE
+
+
+protocol->send(Packet, [&](receivedPacket){ do sth and then protocol->send(otherPacket,[&](receivedPacket2){do something else;});})
+
+
+~ : public NetworkPacket
+<~>
+Result<~> send(PacketPtr<~>);
+
+<~>
+Result {
+future<~> f
+std::function<> and_then;
+}
+
+<~>
+void send(PacketPtr<~>, std::function<Context&>) {
+Result r = send(...);
+std::thread t([](r){result.f.get(); result.and_then()};
+t.detach();
+}
+
+
+
+
+ALBO LEPIEJ
+
+niech send zwraca future result
+
+transakcja to wątek
+sendX, wait, do stuff, sendY, wait, do stuff
+
+a moze by zdefiniowac sobie traitsy?
+
+NetworkPacket::ResponseTo<CommandPacket>::type => CommandResponsePacket
+albo wykorzystac wirtuale i niech process robi co trzeba...
+
+przykladowy flow:
+
+runTrans() {
+
+response = send<NodeInfoResponse>(Request for NodeInfo)
+response.wait() // the actual action will take place in response->process(); which will probably do nothing but request->process() will be the one which prepares the actual answer
+

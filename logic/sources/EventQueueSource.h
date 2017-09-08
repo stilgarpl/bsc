@@ -9,52 +9,51 @@
 #include <queue>
 #include "../ISource.h"
 #include "../SourceManager.h"
+#include "../../log/Logger.h"
+#include "../../network/protocol/context/NodeContext.h"
 
-template<typename EventType>
+class NullClass {
+};
+
+template<typename EventType_, typename FriendClass=NullClass>
 class EventQueueSource : public ISource {
+    friend FriendClass;
+protected:
+    typedef EventType_ EventType;
 public:
-    typedef std::shared_ptr<EventType> EventTypePtr;
+    typedef std::shared_ptr<EventType_> EventTypePtr;
 private:
-    ISource *owner = nullptr;
     ///@todo thread safety
     std::queue<EventTypePtr> eventQueue;
-public: //@todo na pewno public?
+protected:
     void queueEvent(EventTypePtr event) {
         eventQueue.push(event);
     }
 
+    template<typename ... Args>
+    EventTypePtr newEvent(Args... args) {
+        return std::make_shared<EventType_>(args...);
+    }
 public:
     void work() override {
 
         while (!eventQueue.empty()) {
-            std::clog << __func__ << " processing event" << std::endl;
-
+            //  NODECONTEXTLOGGER("Processing event");
             auto &i = eventQueue.front();
             this->event(*i);
-//            if(owner!= nullptr) {
-//                owner->event(*i);
-//            }
-
             eventQueue.pop();
         }
 
     }
 
     void registerProviders(SourceManager *manager) override {
-        manager->registerProvider<EventType>();
+        manager->registerProvider<EventType_>();
     }
 
-    ISource *getOwner() const {
-        return owner;
-    }
-
-    void setOwner(ISource *owner) {
-        EventQueueSource::owner = owner;
-    }
-
-    EventQueueSource(ISource *owner) : owner(owner) {}
 
     EventQueueSource() = default;
+
+
 };
 
 

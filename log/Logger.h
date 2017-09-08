@@ -7,15 +7,22 @@
 
 #include "Poco/Logger.h"
 #include <string>
+#include <mutex>
 
 #define LOGGER(x) Logger(__FILE__).debug(__LINE__, x);
+#define NODECONTEXTLOGGER(x) if (context.get<NodeContext>()) Logger("["+context.get<NodeContext>()->getNodeInfo().getNodeName() + "] " + __FILE__).debug(__LINE__,x);
 
 class Logger {
 private:
+
     Poco::Logger &logger;
     std::string loggerName;
 public:
 
+    std::mutex &getLock() {
+        static std::mutex lock;
+        return lock;
+    }
     Logger(std::string name);
 
     void debug(std::string txt);

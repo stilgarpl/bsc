@@ -17,6 +17,7 @@ private:
 private:
     template<class Archive>
     void serialize(Archive &ar) {
+        ar & cereal::base_class<NetworkPacket>(this);
     }
 
 
