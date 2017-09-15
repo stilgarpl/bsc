@@ -124,6 +124,10 @@ public:
         }
     }
 
+    static void setActiveContext(Context* ctx) {
+        activeContext = ctx;
+    }
+
 };
 
 

@@ -25,15 +25,18 @@ protected:
 
     template<typename T, typename... Args>
     void event(const T &event, Args... args) {
-        this->getSignal<T, Args...>(event.getEventId()).signal(context, event, args...);
-        this->getSignal<T, Args...>().signal(context, event, args...);
+
+        ///@todo pass to executor
+        Context::setActiveContext(&context);
+        this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
+        this->getSignal<T, Args...>().signal(event, args...);
     }
 
 
 public:
 
     template<typename T, typename... Args>
-    using SignalType = Signal<Context &, const T &, Args...>;
+    using SignalType = Signal<const T &, Args...>;
 
     ///@todo dlaczego właściwie te sygnały w mapie są jako pointery?
     /// jeśli mogą być niezdefiniowane, no to trzeba robic std::optional
