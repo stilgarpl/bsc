@@ -116,7 +116,7 @@ public:
 
 public:
     static Context& getActiveContext() {
-        static Context defaultContext;
+        thread_local static Context defaultContext;
         if (activeContext == nullptr) {
             return defaultContext;
         } else {
