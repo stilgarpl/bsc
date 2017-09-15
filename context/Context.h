@@ -9,11 +9,18 @@
 #include <map>
 #include <memory>
 #include <iostream>
+
+
 class Context {
 
     typedef unsigned int KeyType;
     typedef unsigned int TypeIdType;
 private:
+    thread_local static Context* activeContext;
+
+    void temp();
+
+
     const TypeIdType getNextTypeId() const {
         static TypeIdType val = 0;
         return val++;
