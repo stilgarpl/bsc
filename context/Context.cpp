@@ -2,7 +2,7 @@
 // Created by stilg on 15.09.2017.
 //
 
-#includ "Context.h"
+#include "Context.h"
 
 
-Context::activeContext = nullptr;
+thread_local Context* Context::activeContext = nullptr;
