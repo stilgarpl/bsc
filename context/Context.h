@@ -18,9 +18,6 @@ class Context {
 private:
     thread_local static Context* activeContext;
 
-    void temp();
-
-
     const TypeIdType getNextTypeId() const {
         static TypeIdType val = 0;
         return val++;
@@ -116,6 +113,16 @@ public:
     }
 
     Context() = default;
+
+public:
+    static Context& getActiveContext() {
+        static Context defaultContext;
+        if (activeContext == nullptr) {
+            return defaultContext;
+        } else {
+            return *activeContext;
+        }
+    }
 
 };
 
