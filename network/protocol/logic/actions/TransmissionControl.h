@@ -17,7 +17,8 @@ static const Tick::clock::duration MAX_TIMEOUT = 0ms;
 
 class TransmissionControl /*: IProtocol*/{
 
-    std::map<NetworkPacket::IdType, std::shared_ptr<NetworkPacketInfo>> waitingPackets;
+    std::map<NetworkPacket::IdType, std::shared_ptr<NetworkPacketInfo>> packetsWaitingForAck;
+    std::map<NetworkPacket::IdType, std::shared_ptr<NetworkPacketInfo>> packetsWaitingToAck;
 
 public:
     void onPacketSent(const PacketEvent &event);

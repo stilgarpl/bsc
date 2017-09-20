@@ -25,7 +25,7 @@ void ConnectionSource::sentPacket(std::shared_ptr<NetworkPacket> p, Connection *
 }
 
 void ConnectionSource::receivedPacket(std::shared_ptr<NetworkPacket> p, Connection *connection) {
-    NODECONTEXTLOGGER("received Packet");
+    NODECONTEXTLOGGER("received Packet " + std::to_string(p->getId()) + " " + std::to_string((int) p->getStatus()));
 
     auto event = std::make_shared<PacketEvent>();
     event->setEventId(PacketEvent::IdType::PACKET_RECEIVED);
