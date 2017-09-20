@@ -42,23 +42,23 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
     logicManager.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
     logicManager.setAction<NodeEvent>("upNoI", NodeActions::updateNodeInfo);
 
-    logicManager.setAction<ConnectionEvent>("connDebug", [](Context &, const ConnectionEvent &event) {
+    logicManager.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent &event) {
 
         // std::clog << "Debug: connection event!" << std::endl;
     });
 
     logicManager.setAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
-                                        [&transmissionControl](Context &ctx,
+                                        [&transmissionControl](
                                                                const PacketEvent &packetEvent) {
-                                            return transmissionControl.onPacketReceived(ctx, packetEvent);
+                                            return transmissionControl.onPacketReceived(packetEvent);
                                         });
-    logicManager.setAction<PacketEvent>(PacketEventId::PACKET_SENT, [&transmissionControl](Context &ctx,
-                                                                                           const PacketEvent &packetEvent) {
-        return transmissionControl.onPacketSent(ctx, packetEvent);
+    logicManager.setAction<PacketEvent>(PacketEventId::PACKET_SENT,
+                                        [&transmissionControl](const PacketEvent &packetEvent) {
+                                            return transmissionControl.onPacketSent(packetEvent);
     });
 
-    logicManager.setAction<Tick>("TransTick", [&transmissionControl](Context &ctx, const Tick &tick) {
-        return transmissionControl.work(ctx, tick);
+    logicManager.setAction<Tick>("TransTick", [&transmissionControl](const Tick &tick) {
+        return transmissionControl.work(tick);
     });
 
 
@@ -92,7 +92,7 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
     }
 
-    if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NODE_INFO, "upNoI")) {
+    if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NODE_INFO_RECEIVED, "upNoI")) {
         std::clog << "Debug: upNoI assignment!" << std::endl;
 
     }
@@ -116,7 +116,7 @@ int main() {
     logicManager.addSource<ClockSource>();
     logicManager.addSource<NetworkSource>();
 
-    logicManager.setAction<Tick>("test", [](Context &, const Tick &t) {
+    logicManager.setAction<Tick>("test", [](const Tick &t) {
 
         std::clog << "test tick " << t.getEventId().count() << std::endl;
     });

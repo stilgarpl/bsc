@@ -20,11 +20,11 @@ class TransmissionControl /*: IProtocol*/{
     std::map<NetworkPacket::IdType, std::shared_ptr<NetworkPacketInfo>> waitingPackets;
 
 public:
-    void onPacketSent(Context &, const PacketEvent &event);
+    void onPacketSent(const PacketEvent &event);
 
-    void onPacketReceived(Context &, const PacketEvent &event);
+    void onPacketReceived(const PacketEvent &event);
 
-    void work(Context &, const Tick &tick);
+    void work(const Tick &tick);
 
 };
 

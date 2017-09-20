@@ -14,7 +14,7 @@ enum class NodeEventId {
     NEW_NODE,
     NODE_CONNECTED,
     NODE_DISCONNECTED,
-    NODE_INFO,
+    NODE_INFO_RECEIVED,
 };
 
 class NodeEvent : public IEvent<NodeEventId> {

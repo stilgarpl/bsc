@@ -4,12 +4,12 @@
 
 #include "GravitonProtocol.h"
 
-void GravitonProtocol::onPacketSent(Context &context, const PacketEvent &event) {
+void GravitonProtocol::onPacketSent(const PacketEvent &event) {
     LOGGER("onPacketSent");
     ///@todo maybe check if packet is in the response map?
 }
 
-void GravitonProtocol::onPacketReceived(Context &context, const PacketEvent &event) {
+void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
     LOGGER("onPacketReceived");
     ///
     if (event.getPacket()->getStatus() != Status::ACK) {
@@ -19,7 +19,7 @@ void GravitonProtocol::onPacketReceived(Context &context, const PacketEvent &eve
     }
 }
 
-void GravitonProtocol::work(Context &context, const Tick &tick) {
+void GravitonProtocol::work(const Tick &tick) {
     LOGGER("onWork");
 }
 

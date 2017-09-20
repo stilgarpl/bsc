@@ -12,7 +12,7 @@
 class ProtocolActions {
 
 public:
-    static void onNewConnection(Context &, const ConnectionEvent &connectionEvent);
+    static void onNewConnection(const ConnectionEvent &connectionEvent);
 };
 
 

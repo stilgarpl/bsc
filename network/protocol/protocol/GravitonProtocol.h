@@ -13,11 +13,11 @@ class GravitonProtocol : public IProtocol {
 private:
     std::map<NetworkPacket::IdType, std::shared_ptr<NetworkPacketInfo>> responseMap;
 public:
-    void onPacketSent(Context &context, const PacketEvent &event) override;
+    void onPacketSent(const PacketEvent &event) override;
 
-    void onPacketReceived(Context &context, const PacketEvent &event) override;
+    void onPacketReceived(const PacketEvent &event) override;
 
-    void work(Context &context, const Tick &tick) override;
+    void work(const Tick &tick) override;
 
     std::future<NetworkPacketPtr> send(Connection *conn, NetworkPacketPtr p) override;
 };

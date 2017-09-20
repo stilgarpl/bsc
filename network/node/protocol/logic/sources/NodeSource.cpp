@@ -5,10 +5,9 @@
 #include "NodeSource.h"
 
 void NodeSource::nodeInfoReceived(const NodeInfo &nodeInfo) {
-    LOGGER("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOODE IIIIIIIIIIIIIIINFOOOO");
     auto event = newEvent();
     event->setNodeInfo(nodeInfo);
-    event->setEventId(EventType::IdType::NODE_INFO);
+    event->setEventId(EventType::IdType::NODE_INFO_RECEIVED);
 
     queueEvent(event);
 }

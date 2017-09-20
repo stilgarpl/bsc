@@ -15,14 +15,15 @@
 class NodeActions {
 
 public:
-    static void sendNodeInfoRequest(Context &context, ConnectionEvent connectionEvent) {
+    static void sendNodeInfoRequest(ConnectionEvent connectionEvent) {
         //    LOGGER("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOODE IIIIIIIIIIIIIIINFOOOO");
 
         NetworkPacketPointer<NodeInfoRequest> req = std::make_shared<NodeInfoRequest>();
         connectionEvent.getConnection()->send(req);
     }
 
-    static void updateNodeInfo(Context &context, const NodeEvent &event) {
+    static void updateNodeInfo(const NodeEvent &event) {
+        Context &context = Context::getActiveContext();
         auto nodeContext = context.get<NodeContext>();
         if (nodeContext != nullptr) {
             LOGGER("received node info: " + event.getNodeInfo().getNodeName());

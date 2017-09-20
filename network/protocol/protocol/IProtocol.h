@@ -41,11 +41,11 @@ public:
         return ProtocolWrapper(conn, this);
     }
 
-    virtual void onPacketSent(Context &, const PacketEvent &event)= 0;
+    virtual void onPacketSent(const PacketEvent &event)= 0;
 
-    virtual void onPacketReceived(Context &, const PacketEvent &event)= 0;
+    virtual void onPacketReceived(const PacketEvent &event)= 0;
 
-    virtual void work(Context &, const Tick &tick)= 0;
+    virtual void work(const Tick &tick)= 0;
     //virtual void send(Connection *conn, NetworkPacketPtr p)= 0;
 
     virtual std::future<NetworkPacketPtr> send(Connection *conn, NetworkPacketPtr p) =0;
@@ -54,11 +54,11 @@ public:
 };
 
 class DummyProtocol : public IProtocol {
-    void onPacketSent(Context &context, const PacketEvent &event) override;
+    void onPacketSent(const PacketEvent &event) override;
 
-    void onPacketReceived(Context &context, const PacketEvent &event) override;
+    void onPacketReceived(const PacketEvent &event) override;
 
-    void work(Context &context, const Tick &tick) override;
+    void work(const Tick &tick) override;
 
 public:
     std::future<NetworkPacketPtr> send(Connection *conn, NetworkPacketPtr p) override;

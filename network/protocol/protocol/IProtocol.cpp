@@ -13,15 +13,15 @@ std::future<NetworkPacketPtr> ProtocolWrapper::send(NetworkPacketPtr p) {
     return std::future<NetworkPacketPtr>();
 }
 
-void DummyProtocol::onPacketSent(Context &context, const PacketEvent &event) {
+void DummyProtocol::onPacketSent(const PacketEvent &event) {
     LOGGER("on packet sent")
 }
 
-void DummyProtocol::onPacketReceived(Context &context, const PacketEvent &event) {
+void DummyProtocol::onPacketReceived(const PacketEvent &event) {
     LOGGER("on packet received")
 }
 
-void DummyProtocol::work(Context &context, const Tick &tick) {
+void DummyProtocol::work(const Tick &tick) {
     LOGGER("on work")
 }
 
@@ -32,10 +32,10 @@ std::future<NetworkPacketPtr> DummyProtocol::send(Connection *conn, NetworkPacke
 }
 
 void IProtocol::setupLogic(LogicManager &logicManager) {
-    logicManager.setAction<PacketEvent>(Actions::onPacketSent, std::bind(&IProtocol::onPacketSent, this, _1, _2));
+    logicManager.setAction<PacketEvent>(Actions::onPacketSent, std::bind(&IProtocol::onPacketSent, this, _1));
     logicManager.setAction<PacketEvent>(Actions::onPacketReceived,
-                                        std::bind(&IProtocol::onPacketReceived, this, _1, _2));
-    logicManager.setAction<Tick>(Actions::onWork, std::bind(&IProtocol::work, this, _1, _2));
+                                        std::bind(&IProtocol::onPacketReceived, this, _1));
+    logicManager.setAction<Tick>(Actions::onWork, std::bind(&IProtocol::work, this, _1));
 
     bool result = true;
 

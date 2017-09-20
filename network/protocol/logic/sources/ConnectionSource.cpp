@@ -54,8 +54,8 @@ ConnectionSource::ConnectionSource() {
 
     //@todo ugly mapping, reimplement some other way
     connSource.assignSignal<ConnectionEvent>(
-            [&, this](Context &ctx, const ConnectionEvent &connectionEvent) { this->event(connectionEvent); });
+            [&, this](const ConnectionEvent &connectionEvent) { this->event(connectionEvent); });
     packetSource.assignSignal<PacketEvent>(
-            [&, this](Context &ctx, const PacketEvent &packetEvent) { this->event(packetEvent); });
+            [&, this](const PacketEvent &packetEvent) { this->event(packetEvent); });
 
 }

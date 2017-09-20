@@ -20,7 +20,7 @@ public:
     using Action = typename Signal<Args...>::Func;
 
     template<typename... Args>
-    using ActionType = Action<Context &, Args...>;
+    using ActionType = Action<Args...>;
 
 
     template<typename... Args, typename ActionIdType>
