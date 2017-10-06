@@ -10,7 +10,7 @@
 #include <mutex>
 
 #define LOGGER(x) Logger(__FILE__).debug(__LINE__, x);
-#define NODECONTEXTLOGGER(x) if (context.get<NodeContext>()) Logger("["+context.get<NodeContext>()->getNodeInfo().getNodeName() + "] " + __FILE__).debug(__LINE__,x);
+#define NODECONTEXTLOGGER(x) if (Context::getActiveContext().get<NodeContext>()) Logger("["+Context::getActiveContext().get<NodeContext>()->getNodeInfo().getNodeId() + "] " + __FILE__).debug(__LINE__,x);
 
 class Logger {
 private:

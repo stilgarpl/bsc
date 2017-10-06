@@ -8,7 +8,7 @@
 #include "../../../protocol/context/ConnectionContext.h"
 
 void NodeInfoRequest::process(Context &context) {
-    NetworkPacket::process(context);
+    BasePacket::process(context);
 
     auto nodeContext = context.get<NodeContext>();
     auto connectionContext = context.get<ConnectionContext>();

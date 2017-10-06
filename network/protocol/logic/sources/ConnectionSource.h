@@ -19,9 +19,9 @@ private:
 public:
     void newConnection(Connection *con);
 
-    void sentPacket(std::shared_ptr<NetworkPacket> p, Connection *connection);
+    void sentPacket(std::shared_ptr<BasePacket> p, Connection *connection);
 
-    void receivedPacket(std::shared_ptr<NetworkPacket> p, Connection *connection);
+    void receivedPacket(std::shared_ptr<BasePacket> p, Connection *connection);
 
     void work() override;
 

@@ -14,7 +14,7 @@
 #include "../../../utils/cereal_include.h"
 #include "../../../log/Logger.h"
 
-class NetworkPacket {
+class BasePacket {
 public:
     typedef unsigned int IdType;
 private:
@@ -46,9 +46,9 @@ public:
 
     void setId(IdType id);
 
-    NetworkPacket(const NetworkPacket &) = delete;
+    BasePacket(const BasePacket &) = delete;
 
-    NetworkPacket() : id(nextId()) {};
+    BasePacket() : id(nextId()) {};
 
     bool isRetry() const;
 
@@ -57,13 +57,12 @@ public:
 };
 
 
-typedef std::shared_ptr<NetworkPacket> NetworkPacketPtr;
+typedef std::shared_ptr<BasePacket> NetworkPacketPtr;
 
-template<typename NetworkPacketType = NetworkPacket>
+template<typename NetworkPacketType = BasePacket>
 using NetworkPacketPointer = std::shared_ptr<NetworkPacketType>;
 
 
-
-CEREAL_REGISTER_TYPE(NetworkPacket);
+CEREAL_REGISTER_TYPE(BasePacket);
 
 #endif //BASYCO_NETWORKPACKET_H

@@ -123,12 +123,25 @@ Node::Node() {
 
     logicManager.setContexts(nodeContext);
 
+
 }
 
 Node::Node(int port) : Node() {
     std::shared_ptr<Node::Config> config = std::make_shared<Node::Config>();
     config->setPort(port);
     setConfiguration(config);
+    thisNodeInfo.addKnownAddress("127.0.0.1:" + std::to_string(getConfiguration()->getPort()));
 
+
+}
+
+std::shared_ptr<NetworkInfo> &Node::getNetworkInfo() {
+    return networkInfo;
+}
+
+bool Node::isConnectedTo(const NodeInfo &nodeInfo) {
+    for (auto &&it : activeClientConnections) {
+
+    }
 }
 

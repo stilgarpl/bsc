@@ -9,7 +9,7 @@
 //#include "../events/PacketEvent.h"
 #include <future>
 #include "../../../../logic/events/Tick.h"
-#include "../../packet/NetworkPacket.h"
+#include "../../packet/BasePacket.h"
 #include "../../connection/Connection.h"
 
 

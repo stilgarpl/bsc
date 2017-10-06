@@ -6,10 +6,10 @@
 #define BASYCO_NODEINFORESPONSE_H
 
 
-#include "../../../protocol/packet/NetworkPacket.h"
+#include "../../../protocol/packet/BasePacket.h"
 #include "../../NodeInfo.h"
 
-class NodeInfoResponse : public NetworkPacket {
+class NodeInfoResponse : public BasePacket {
 private:
     NodeInfo nodeInfo;
 
@@ -21,7 +21,7 @@ public:
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(cereal::base_class<NetworkPacket>(this), nodeInfo);
+        ar(cereal::base_class<BasePacket>(this), nodeInfo);
     }
 
 
@@ -38,7 +38,7 @@ public:
 
 CEREAL_REGISTER_TYPE(NodeInfoResponse);
 //
-//CEREAL_REGISTER_POLYMORPHIC_RELATION(NetworkPacket, NodeInfoResponse);
+//CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, NodeInfoResponse);
 
 
 #endif //BASYCO_NODEINFORESPONSE_H

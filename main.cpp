@@ -40,7 +40,13 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
     //setting actions
 
     logicManager.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
+    logicManager.setAction<ConnectionEvent>("reqNeI", NodeActions::sendNetworkInfoRequest);
     logicManager.setAction<NodeEvent>("upNoI", NodeActions::updateNodeInfo);
+    logicManager.setAction<NodeEvent>("upNeI", NodeActions::updateNetworkInfo);
+    logicManager.setAction<NodeEvent>("addKnownNode", NodeActions::addKnownNode);
+    logicManager.setAction<Tick>("trigNodeUp", NodeActions::triggerUpdateNode);
+    logicManager.setAction<NodeEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
+
 
     logicManager.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent &event) {
 
@@ -65,16 +71,16 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
     logicManager.setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
 
     //assigning actions
-    if (logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
-                                               PacketEventId::PACKET_RECEIVED)) {
-        std::clog << "Debug: PACK RECV assignment!" << std::endl;
-    }
-    logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_SENT, PacketEventId::PACKET_SENT);
-
-    if (logicManager.assignAction<Tick>(500ms, "TransTick")) {
-        std::clog << "Debug: Trans tick assignment!" << std::endl;
-
-    }
+//    if (logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
+//                                               PacketEventId::PACKET_RECEIVED)) {
+//        std::clog << "Debug: PACK RECV assignment!" << std::endl;
+//    }
+//    logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_SENT, PacketEventId::PACKET_SENT);
+//
+//    if (logicManager.assignAction<Tick>(500ms, "TransTick")) {
+//        std::clog << "Debug: Trans tick assignment!" << std::endl;
+//
+//    }
 
     if (logicManager.assignAction<ConnectionEvent>("connDebug")) {
         std::clog << "Debug: ConEv assignment!" << std::endl;
@@ -92,10 +98,36 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
     }
 
+    if (logicManager.assignAction<ConnectionEvent>("reqNeI")) {
+        std::clog << "Debug: reqNeI assignment!" << std::endl;
+
+    }
+
     if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NODE_INFO_RECEIVED, "upNoI")) {
         std::clog << "Debug: upNoI assignment!" << std::endl;
 
     }
+
+    if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NETWORK_INFO_RECEIVED, "upNeI")) {
+        std::clog << "Debug: upNoI assignment!" << std::endl;
+
+    }
+
+    if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NODE_INFO_RECEIVED, "addKnownNode")) {
+        std::clog << "Debug: addKnownNode assignment!" << std::endl;
+
+    }
+
+    if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NEW_NODE_DISCOVERED, "nodeDiscovered")) {
+        std::clog << "Debug: addKnownNode assignment!" << std::endl;
+
+    }
+
+    if (logicManager.assignAction<Tick>(1500ms, "trigNodeUp")) {
+        std::clog << "Debug: TtrigNodeUp assignment!" << std::endl;
+
+    }
+
 
 //
 //    IProtocol* protocol = new DummyProtocol();
@@ -132,18 +164,27 @@ int main() {
     std::clog << "Test context : " << *(context.get<std::string>("test")) << std::endl;
     context.set<int>(0);
     Node thisNode(9191);
-    thisNode.getNodeInfo().setNodeName("first Node");
+    thisNode.addToNetwork("TheNetwork");
+    thisNode.getNodeInfo().setNodeId("first Node");
     setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
     thisNode.start();
 
     Node otherNode(9999);
-    otherNode.getNodeInfo().setNodeName("second node");
+    otherNode.getNodeInfo().setNodeId("second node");
+    otherNode.addToNetwork("TheNetwork");
     setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
     otherNode.start();
 
+    Node thirdNode(9898);
+    thirdNode.getNodeInfo().setNodeId("third node");
+    thirdNode.addToNetwork("TheNetwork");
+    setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
+    thirdNode.start();
+
     thisNode.connectTo("127.0.0.1:9999");
+    otherNode.connectTo("127.0.0.1:9898");
 
 
-    std::this_thread::sleep_for(30s);
+    std::this_thread::sleep_for(300s);
     return 0;
 }

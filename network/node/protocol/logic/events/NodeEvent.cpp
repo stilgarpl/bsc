@@ -11,3 +11,11 @@ const NodeInfo &NodeEvent::getNodeInfo() const {
 void NodeEvent::setNodeInfo(const NodeInfo &nodeInfo) {
     NodeEvent::nodeInfo = nodeInfo;
 }
+
+const NetworkInfo &NodeEvent::getNetworkInfo() const {
+    return networkInfo;
+}
+
+void NodeEvent::setNetworkInfo(const NetworkInfo &networkInfo) {
+    NodeEvent::networkInfo = networkInfo;
+}

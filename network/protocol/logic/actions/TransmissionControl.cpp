@@ -3,18 +3,19 @@
 //
 
 #include "TransmissionControl.h"
+#include "../../context/NodeContext.h"
 
 void TransmissionControl::onPacketReceived(const PacketEvent &event) {
 
     const NetworkPacketPtr &packet = event.getPacket();
     //  NODECONTEXTLOGGER("on PacketReceived"+ std::to_string(packet->getId()));
-
+    //   LOGGER("TC::OPR" + std::to_string(packet->getId()));
     //@todo compare time
     switch (packet->getStatus()) {
         case Status::RESPONSE :
         case Status::ACK:
             //      NODECONTEXTLOGGER("RESPONSE - ACK " + std::to_string(packet->getId()));
-
+            // LOGGER("TC::OPR erasing packet "+ std::to_string(packet->getId()) + " count: " +std::to_string(packetsWaitingForAck.size()));
             packetsWaitingForAck.erase(packet->getId());
 
             break;
@@ -34,33 +35,34 @@ void TransmissionControl::onPacketReceived(const PacketEvent &event) {
 }
 
 void TransmissionControl::onPacketSent(const PacketEvent &event) {
-    const NetworkPacketPtr packet = event.getPacket();
-    //  NODECONTEXTLOGGER("on PacketSent"+ std::to_string(packet->getId()));
+    const NetworkPacketPtr packetPtr = event.getPacket();
+    //  NODECONTEXTLOGGER("on PacketSent"+ std::to_string(packetPtr->getId()));
+    if (packetPtr != nullptr) {
+        //@todo store sent time
+        switch (packetPtr->getStatus()) {
+            case Status::REQUEST: {
+                if (!packetPtr->isRetry()) {
+                    NODECONTEXTLOGGER("S-REQUEST " + std::to_string(packetPtr->getId()));
 
-    //@todo store sent time
-    switch (packet->getStatus()) {
-        case Status::REQUEST: {
-            if (!packet->isRetry()) {
-                // NODECONTEXTLOGGER("S-REQUEST " + std::to_string(packet->getId()));
+                    ///@todo pointer or something else
+                    packetsWaitingForAck[packetPtr->getId()] = std::make_shared<NetworkPacketInfo>(packetPtr,
+                                                                                                   event.getConnection(),
 
-                ///@todo pointer or something else
-                packetsWaitingForAck[packet->getId()] = std::make_shared<NetworkPacketInfo>(packet,
-                                                                                            event.getConnection(),
-
-                                                                                            Tick::clock::now());
+                                                                                                   Tick::clock::now());
+                }
             }
+                break;
+
+            case Status::RESPONSE:
+            case Status::ACK: {
+                packetsWaitingToAck.erase(packetPtr->getId());
+
+            }
+                break;
+
+            case Status::ERROR:
+                break;
         }
-            break;
-
-        case Status::RESPONSE:
-        case Status::ACK: {
-            packetsWaitingToAck.erase(packet->getId());
-
-        }
-            break;
-
-        case Status::ERROR:
-            break;
     }
 
 }
@@ -72,7 +74,7 @@ void TransmissionControl::work(const Tick &tick) {
     for (auto &&it : packetsWaitingForAck) {
         if (tick.getNow() - it.second->getTimeSent() > MAX_TIMEOUT) {
             if (it.second->getConnection() != nullptr) {
-                //    NODECONTEXTLOGGER("Resending packet " + std::to_string(it.second->getPacketPtr()->getId()))
+                LOGGER("Resending packet " + std::to_string(it.second->getPacketPtr()->getId()))
                 it.second->getPacketPtr()->setRetry(true);
                 it.second->getConnection()->send(it.second->getPacketPtr());
             }
@@ -83,7 +85,7 @@ void TransmissionControl::work(const Tick &tick) {
         if (tick.getNow() - it.second->getTimeSent() > MAX_TIMEOUT) {
             if (it.second->getConnection() != nullptr) {
                 //@todo send immediately? or wait for timeout?
-                NetworkPacketPtr ackPacket = std::make_shared<NetworkPacket>();
+                NetworkPacketPtr ackPacket = std::make_shared<BasePacket>();
                 ackPacket->setId(it.second->getPacketPtr()->getId());
                 ackPacket->setStatus(Status::ACK);
                 //  NODECONTEXTLOGGER("sending response " + std::to_string(ackPacket->getId()));

@@ -6,10 +6,10 @@
 #define BASYCO_COMMANDPACKET_H
 
 
-#include "NetworkPacket.h"
+#include "BasePacket.h"
 #include "../../../log/Logger.h"
 
-class CommandPacket : public NetworkPacket {
+class CommandPacket : public BasePacket {
 private:
     Logger logger = Logger("CommandPacket");
 
@@ -20,7 +20,7 @@ private:
     template<class Archive>
     void serialize(Archive &ar) {
 
-        ar & cereal::base_class<NetworkPacket>(this) & command;
+        ar & cereal::base_class<BasePacket>(this) & command;
     }
 
     friend class cereal::access;
@@ -35,6 +35,6 @@ public:
 
 CEREAL_REGISTER_TYPE(CommandPacket);
 
-CEREAL_REGISTER_POLYMORPHIC_RELATION(NetworkPacket, CommandPacket);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, CommandPacket);
 
 #endif //BASYCO_COMMANDPACKET_H

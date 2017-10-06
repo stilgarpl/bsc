@@ -19,7 +19,7 @@ NodeInfoResponse::NodeInfoResponse() {
 }
 
 void NodeInfoResponse::process(Context &context) {
-    NetworkPacket::process(context);
+    BasePacket::process(context);
 
     auto lc = context.get<LogicContext>();
     if (lc != nullptr) {
@@ -28,5 +28,5 @@ void NodeInfoResponse::process(Context &context) {
     }
 
 
-    LOGGER("Node response received" + std::to_string(this->getId()));
+    LOGGER("Node response received " + std::to_string(this->getId()));
 }

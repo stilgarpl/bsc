@@ -19,9 +19,12 @@
 
 ///@todo separate interface so NodeInfo can include INode, and Node can include NodeInfo
 
+
+
 class Node {
 public:
     typedef unsigned int IdType; ///@todo replace it with a real id, hash or something
+
 public:
     class Config : public IConfig {
     private:
@@ -67,7 +70,13 @@ private:
     std::shared_ptr<Poco::Net::TCPServer> server;
     NodeInfo thisNodeInfo;
     std::shared_ptr<NetworkInfo> networkInfo;// = nsm(networkInfo); //network this node belongs to @todo more than 1?
-    std::list<std::shared_ptr<Connection>> activeClientConnections;
+    std::list<ConnectionPtr> activeClientConnections;
+
+public:
+
+    decltype(activeClientConnections) getClientConnections() {
+        return activeClientConnections;
+    }
 protected:
     void addActiveClientConnection(std::shared_ptr<Connection> c);
 
@@ -83,6 +92,7 @@ public:
 
     bool connectTo(const std::string &address);
 
+    bool isConnectedTo(const NodeInfo &nodeInfo);
 
     void start();
     void stop();
@@ -104,6 +114,13 @@ public:
     NodeInfo &getNodeInfo() {
         return thisNodeInfo;
     }
+
+    void addToNetwork(NetworkIdType networkId) {
+        networkInfo = std::make_shared<NetworkInfo>();
+        networkInfo->setNetworkId(networkId);
+    }
+
+    std::shared_ptr<NetworkInfo> &getNetworkInfo();
 };
 
 

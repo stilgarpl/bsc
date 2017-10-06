@@ -110,7 +110,7 @@ receive OtherPacket::RESPONSE
 protocol->send(Packet, [&](receivedPacket){ do sth and then protocol->send(otherPacket,[&](receivedPacket2){do something else;});})
 
 
-~ : public NetworkPacket
+~ : public BasePacket
 <~>
 Result<~> send(PacketPtr<~>);
 
@@ -139,7 +139,7 @@ sendX, wait, do stuff, sendY, wait, do stuff
 
 a moze by zdefiniowac sobie traitsy?
 
-NetworkPacket::ResponseTo<CommandPacket>::type => CommandResponsePacket
+BasePacket::ResponseTo<CommandPacket>::type => CommandResponsePacket
 albo wykorzystac wirtuale i niech process robi co trzeba...
 
 przykladowy flow:

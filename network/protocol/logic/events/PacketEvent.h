@@ -6,7 +6,7 @@
 #define BASYCO_PACKETEVENT_H
 
 #include "../../../../logic/IEvent.h"
-#include "../../packet/NetworkPacket.h"
+#include "../../packet/BasePacket.h"
 #include "../../connection/Connection.h"
 
 enum class PacketEventId {

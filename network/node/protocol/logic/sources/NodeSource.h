@@ -13,6 +13,10 @@ class NodeSource : public EventQueueSource<NodeEvent> {
 public:
 
     void nodeInfoReceived(const NodeInfo &nodeInfo);
+
+    void networkInfoReceived(const NetworkInfo &networkInfo);
+
+    void nodeDiscovered(const NodeInfo &nodeInfo);
 };
 
 

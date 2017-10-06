@@ -14,7 +14,7 @@ void ConnectionSource::newConnection(Connection *con) {
 
 }
 
-void ConnectionSource::sentPacket(std::shared_ptr<NetworkPacket> p, Connection *connection) {
+void ConnectionSource::sentPacket(std::shared_ptr<BasePacket> p, Connection *connection) {
     //lLOGGER()
 
     auto event = std::make_shared<PacketEvent>();
@@ -24,7 +24,7 @@ void ConnectionSource::sentPacket(std::shared_ptr<NetworkPacket> p, Connection *
     packetSource.queueEvent(event);
 }
 
-void ConnectionSource::receivedPacket(std::shared_ptr<NetworkPacket> p, Connection *connection) {
+void ConnectionSource::receivedPacket(std::shared_ptr<BasePacket> p, Connection *connection) {
     NODECONTEXTLOGGER("received Packet " + std::to_string(p->getId()) + " " + std::to_string((int) p->getStatus()));
 
     auto event = std::make_shared<PacketEvent>();
@@ -53,9 +53,9 @@ void ConnectionSource::registerProviders(SourceManager *manager) {
 ConnectionSource::ConnectionSource() {
 
     //@todo ugly mapping, reimplement some other way
-    connSource.assignSignal<ConnectionEvent>(
-            [&, this](const ConnectionEvent &connectionEvent) { this->event(connectionEvent); });
-    packetSource.assignSignal<PacketEvent>(
-            [&, this](const PacketEvent &packetEvent) { this->event(packetEvent); });
+//    connSource.assignSignal<ConnectionEvent>(
+//            [&, this](const ConnectionEvent &connectionEvent) { this->event(connectionEvent); });
+//    packetSource.assignSignal<PacketEvent>(
+//            [&, this](const PacketEvent &packetEvent) { this->event(packetEvent); });
 
 }

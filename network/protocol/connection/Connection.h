@@ -12,7 +12,7 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
-#include "../packet/NetworkPacket.h"
+#include "../packet/BasePacket.h"
 #include "../processor/ConnectionProcessor.h"
 
 class Connection {
@@ -22,8 +22,8 @@ protected:
 private:
     std::mutex sendQueueLock;
     std::mutex receiveQueueLock;
-    std::queue<std::shared_ptr<NetworkPacket>> sendQueue;
-    std::queue<std::shared_ptr<NetworkPacket>> receiveQueue;
+    std::queue<std::shared_ptr<BasePacket>> sendQueue;
+    std::queue<std::shared_ptr<BasePacket>> receiveQueue;
     std::condition_variable sendReady;
     std::condition_variable receiveReady;
     Context connectionContext;

@@ -13,12 +13,12 @@
 #include "NetworkPacketInfo.h"
 
 ///@todo move to configuration
-static const Tick::clock::duration MAX_TIMEOUT = 0ms;
+static const Tick::clock::duration MAX_TIMEOUT = 5500ms;
 
 class TransmissionControl /*: IProtocol*/{
 
-    std::map<NetworkPacket::IdType, std::shared_ptr<NetworkPacketInfo>> packetsWaitingForAck;
-    std::map<NetworkPacket::IdType, std::shared_ptr<NetworkPacketInfo>> packetsWaitingToAck;
+    std::map<BasePacket::IdType, std::shared_ptr<NetworkPacketInfo>> packetsWaitingForAck;
+    std::map<BasePacket::IdType, std::shared_ptr<NetworkPacketInfo>> packetsWaitingToAck;
 
 public:
     void onPacketSent(const PacketEvent &event);

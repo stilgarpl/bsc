@@ -24,9 +24,11 @@ public:
     typedef std::shared_ptr<EventType_> EventTypePtr;
 private:
     ///@todo thread safety
+    std::mutex queueLock;
     std::queue<EventTypePtr> eventQueue;
 protected:
     void queueEvent(EventTypePtr event) {
+        std::lock_guard<std::mutex> g(queueLock);
         eventQueue.push(event);
     }
 
@@ -36,13 +38,25 @@ protected:
     }
 public:
     void work() override {
-
+        //std::lock_guard<std::mutex> g(queueLock);
+        queueLock.lock();
         while (!eventQueue.empty()) {
             //  NODECONTEXTLOGGER("Processing event");
+            ///@todo better locking and unlocking of mutex
             auto &i = eventQueue.front();
-            this->event(*i);
+
+            queueLock.unlock();
+            if (i != nullptr) {
+                this->event(*i);
+            } else {
+                LOGGER("BAD POINTER");
+            }
+            queueLock.lock();
             eventQueue.pop();
+
+
         }
+        queueLock.unlock();
 
     }
 

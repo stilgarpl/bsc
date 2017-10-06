@@ -15,17 +15,17 @@
 
 #include "../../utils/cereal_include.h"
 
+
+typedef std::string NodeIdType;
+typedef std::string NetworkIdType;
+
 class NodeInfo {
 
-    std::string nodeName;
-    std::string networkId;
+    NodeIdType nodeId;
+    NetworkIdType networkId;
     std::list<std::string> knownAddresses;
     //typename Node::IdType id;
 public:
-    const std::string &getNodeName() const;
-
-    void setNodeName(const std::string &nodeName);
-
     const std::string &getNetworkId() const;
 
     const std::list<std::string> &getKnownAddresses() const;
@@ -37,12 +37,20 @@ public:
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(nodeName, networkId, knownAddresses);
+        ar(nodeId, networkId, knownAddresses);
     }
 
 
     friend class cereal::access;
 
+public:
+    const NodeIdType &getNodeId() const;
+
+    void setNodeId(const NodeIdType &nodeId);
+
+    void addKnownAddress(std::string address) {
+        knownAddresses.push_back(address);
+    }
 };
 
 

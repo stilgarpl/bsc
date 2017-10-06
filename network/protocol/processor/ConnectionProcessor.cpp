@@ -15,7 +15,7 @@ void ConnectionProcessor::run() {
     logger.info("ConnectionProcessor start");
     //set up context
     Context &context = connection.getConnectionContext();
-
+    Context::setActiveContext(&context);
 
     while (!this->isStopping()) {
         auto np = connection.receive();

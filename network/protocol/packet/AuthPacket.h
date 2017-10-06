@@ -6,9 +6,9 @@
 #define BASYCO_AUTHPACKET_H
 
 
-#include "NetworkPacket.h"
+#include "BasePacket.h"
 
-class AuthPacket : public NetworkPacket {
+class AuthPacket : public BasePacket {
 private:
     //@todo zmienic to na jakis sensowny sposob autentykacji
     std::string login;
@@ -17,7 +17,7 @@ private:
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar & cereal::base_class<NetworkPacket>(this);
+        ar & cereal::base_class<BasePacket>(this);
     }
 
 

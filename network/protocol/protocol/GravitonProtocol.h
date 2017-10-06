@@ -11,7 +11,7 @@
 
 class GravitonProtocol : public IProtocol {
 private:
-    std::map<NetworkPacket::IdType, std::shared_ptr<NetworkPacketInfo>> responseMap;
+    std::map<BasePacket::IdType, std::shared_ptr<NetworkPacketInfo>> responseMap;
 public:
     void onPacketSent(const PacketEvent &event) override;
 

@@ -4,13 +4,6 @@
 
 #include "NodeInfo.h"
 
-const std::string &NodeInfo::getNodeName() const {
-    return nodeName;
-}
-
-void NodeInfo::setNodeName(const std::string &nodeName) {
-    NodeInfo::nodeName = nodeName;
-}
 
 const std::string &NodeInfo::getNetworkId() const {
     return networkId;
@@ -18,6 +11,14 @@ const std::string &NodeInfo::getNetworkId() const {
 
 const std::list<std::string> &NodeInfo::getKnownAddresses() const {
     return knownAddresses;
+}
+
+const NodeIdType &NodeInfo::getNodeId() const {
+    return nodeId;
+}
+
+void NodeInfo::setNodeId(const NodeIdType &nodeId) {
+    NodeInfo::nodeId = nodeId;
 }
 
 //Node::IdType NodeInfo::getId() const {

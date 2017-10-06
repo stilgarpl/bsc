@@ -11,3 +11,20 @@ void NodeSource::nodeInfoReceived(const NodeInfo &nodeInfo) {
 
     queueEvent(event);
 }
+
+void NodeSource::networkInfoReceived(const NetworkInfo &networkInfo) {
+    auto event = newEvent();
+    event->setNetworkInfo(networkInfo);
+    event->setEventId(EventType::IdType::NETWORK_INFO_RECEIVED);
+
+    queueEvent(event);
+
+}
+
+void NodeSource::nodeDiscovered(const NodeInfo &nodeInfo) {
+    auto event = newEvent();
+    event->setNodeInfo(nodeInfo);
+    event->setEventId(EventType::IdType::NEW_NODE_DISCOVERED);
+
+    queueEvent(event);
+}
