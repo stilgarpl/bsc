@@ -14,7 +14,7 @@ void NodeInfoRequest::process(Context &context) {
     auto connectionContext = context.get<ConnectionContext>();
 
     if (nodeContext != nullptr && connectionContext != nullptr) {
-        LOGGER("processing info request id" + std::to_string(this->getId()));
+        NODECONTEXTLOGGER("processing info request id" + std::to_string(this->getId()));
         auto &nodeInfo = nodeContext->getNodeInfo();
         NetworkPacketPointer<NodeInfoResponse> response = std::make_shared<NodeInfoResponse>();
         response->setNodeInfo(nodeInfo);

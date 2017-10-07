@@ -4,15 +4,15 @@
 
 #include "TransmissionControl.h"
 
-NetworkPacketInfo::NetworkPacketInfo(const NetworkPacketPtr &packetPtr,
+NetworkPacketInfo::NetworkPacketInfo(const BasePacketPtr &packetPtr,
                                      const std::chrono::time_point<Tick::clock> &timeSent)
         : packetPtr(packetPtr), timeSent(timeSent) {}
 
-const NetworkPacketPtr &NetworkPacketInfo::getPacketPtr() const {
+const BasePacketPtr &NetworkPacketInfo::getPacketPtr() const {
     return packetPtr;
 }
 
-void NetworkPacketInfo::setPacketPtr(const NetworkPacketPtr &packetPtr) {
+void NetworkPacketInfo::setPacketPtr(const BasePacketPtr &packetPtr) {
     NetworkPacketInfo::packetPtr = packetPtr;
 }
 
@@ -24,7 +24,7 @@ void NetworkPacketInfo::setTimeSent(const std::chrono::time_point<Tick::clock> &
     NetworkPacketInfo::timeSent = timeSent;
 }
 
-NetworkPacketInfo::NetworkPacketInfo(const NetworkPacketPtr &packetPtr, Connection *connection,
+NetworkPacketInfo::NetworkPacketInfo(const BasePacketPtr &packetPtr, Connection *connection,
                                      const std::chrono::time_point<Tick::clock> &timeSent) : packetPtr(packetPtr),
                                                                                              connection(connection),
                                                                                              timeSent(timeSent) {}
@@ -37,7 +37,7 @@ void NetworkPacketInfo::setConnection(Connection *connection) {
     NetworkPacketInfo::connection = connection;
 }
 
-std::promise<NetworkPacketPtr> &NetworkPacketInfo::getResponsePromise() {
+std::promise<BasePacketPtr> &NetworkPacketInfo::getResponsePromise() {
     return responsePromise;
 }
 

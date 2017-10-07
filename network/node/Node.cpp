@@ -7,7 +7,9 @@
 #include "../protocol/connection/ServerConnection.h"
 #include "../protocol/context/NodeContext.h"
 #include "../protocol/context/LogicContext.h"
-
+#include "protocol/packet/NodeInfoRequest.h"
+#include "protocol/packet/NodeInfoResponse.h"
+#include <Poco/Net/NetException.h>
 
 using namespace Poco::Net;
 
@@ -57,19 +59,22 @@ bool Node::connectTo(const SocketAddress &address) {
 
     //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
     //@todo check for problems and handle them
-
-    std::shared_ptr<ClientConnection> connection = std::make_shared<ClientConnection>(address, std::ref(nodeContext));
-
-    ///@todo if connection is not connected, delete it and try another adddes
-    addActiveClientConnection(connection);
-    connection->startSending();
-    connection->startReceiving();
-    return true; ///@todo error checking
-
+    try {
+        std::shared_ptr<ClientConnection> connection = std::make_shared<ClientConnection>(address,
+                                                                                          std::ref(nodeContext));
+        addActiveClientConnection(connection);
+        connection->startSending();
+        connection->startReceiving();
+        return true;
+    } catch (Poco::Net::ConnectionRefusedException) {
+        return false;
+    }
 }
 
 void Node::start() {
 
+    //@todo this should be somewhere else
+    protocol->setupLogic(logicManager);
     logicManager.start();
     listen();
 
@@ -83,11 +88,15 @@ void Node::stop() {
 }
 
 void Node::addActiveClientConnection(std::shared_ptr<Connection> c) {
-    activeClientConnections.push_back(c);
+    NodeConnectionInfoPtr info = std::make_shared<NodeConnectionInfo>();
+    info->connection = c;
+    info->nodeId = std::experimental::nullopt;
+
+    activeClientConnections.push_back(info);
 
 }
 
-void Node::removeActiveClientConnection(std::shared_ptr<Connection> c) {
+void Node::removeActiveClientConnection(NodeConnectionInfoPtr c) {
     //  auto el = std::find(activeClientConnections.begin(),activeClientConnections.end(),c);
     activeClientConnections.remove(c);
 
@@ -124,6 +133,7 @@ Node::Node() {
     logicManager.setContexts(nodeContext);
 
 
+
 }
 
 Node::Node(int port) : Node() {
@@ -143,5 +153,20 @@ bool Node::isConnectedTo(const NodeInfo &nodeInfo) {
     for (auto &&it : activeClientConnections) {
 
     }
+}
+
+void Node::updateNodeConnectionInfo() {
+    //this is meant to be run from a thread
+    for (auto &&item : activeClientConnections) {
+        BasePacketPtr packet = std::make_shared<NodeInfoRequest>();
+        auto future = protocol->send(item->connection.get(), packet);
+        future.wait();
+        NetworkPacketPointer<NodeInfoResponse> response = std::dynamic_pointer_cast<NodeInfoResponse>(future.get());
+        auto val = response->getNodeInfo().getNodeId();
+        (*(*item).nodeId) = val;
+        //item->nodeId = val;
+    }
+
+
 }
 

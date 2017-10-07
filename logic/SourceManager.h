@@ -86,19 +86,26 @@ public:
     };
 
     template<typename EventType, typename... Args>
-    void registerTrigger(const typename ISource::SignalType<EventType>::Func &func) {
+    int registerTrigger(const typename ISource::SignalType<EventType>::Func &func) {
+        int assigned = 0;
         for (auto &&it : getProviders<EventType, Args...>()) {
             it->template getSignal<EventType, Args...>().assign(func);
+            assigned++;
         }
+        return assigned;
     }
 
     template<typename EventType, typename... Args>
-    void
+    int
     registerTrigger(const typename EventType::IdType &id,
                     const typename ISource::SignalType<EventType, Args...>::Func &func) {
+        int assigned = 0;
         for (auto &&it : getProviders<EventType, Args...>()) {
             it->template getSignal<EventType, Args...>(id).assign(func);
+            assigned++;
+
         }
+        return assigned;
     }
 
     void setContexts(const Context &context) {

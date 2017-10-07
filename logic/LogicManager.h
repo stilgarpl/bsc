@@ -30,11 +30,13 @@ public:
     bool assignAction(typename EventType::IdType eventId, ActionId actionId) {
         if (!sourceManager.hasProvider<EventType, Args...>()) {
             std::cerr << "Provider doesn't exist: " << typeid(EventType).name() << std::endl;
+            return false;
         }
         auto &&action = actionManager.getAction<EventType, Args...>(actionId);
         if (action) {
-            sourceManager.registerTrigger<EventType, Args...>(eventId, *action);
-            return true;
+            auto ret = sourceManager.registerTrigger<EventType, Args...>(eventId, *action);
+            return ret > 0;
+
         } else {
             return false;
         }

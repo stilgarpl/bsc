@@ -11,6 +11,7 @@
 
 class GravitonProtocol : public IProtocol {
 private:
+    std::mutex lock;
     std::map<BasePacket::IdType, std::shared_ptr<NetworkPacketInfo>> responseMap;
 public:
     void onPacketSent(const PacketEvent &event) override;
@@ -19,7 +20,7 @@ public:
 
     void work(const Tick &tick) override;
 
-    std::future<NetworkPacketPtr> send(Connection *conn, NetworkPacketPtr p) override;
+    std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p) override;
 };
 
 

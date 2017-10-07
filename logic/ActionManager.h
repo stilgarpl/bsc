@@ -29,7 +29,7 @@ public:
         if (map.count(id) > 0) {
             return map[id];
         } else {
-            return {};
+            return std::experimental::nullopt;
         }
 
     }

@@ -18,13 +18,13 @@ using namespace std::placeholders;
 
 class ProtocolWrapper {
 private:
-    Connection *connection;
+    ConnectionPtr connection;
     IProtocol *protocol;
 
 public:
-    ProtocolWrapper(Connection *connection, IProtocol *protocol);
+    ProtocolWrapper(ConnectionPtr connection, IProtocol *protocol);
 
-    std::future<NetworkPacketPtr> send(NetworkPacketPtr p);
+    std::future<BasePacketPtr> send(BasePacketPtr p);
 };
 
 
@@ -37,7 +37,7 @@ public:
         onWork,
     };
 
-    ProtocolWrapper wrap(Connection *conn) {
+    ProtocolWrapper wrap(ConnectionPtr conn) {
         return ProtocolWrapper(conn, this);
     }
 
@@ -46,9 +46,9 @@ public:
     virtual void onPacketReceived(const PacketEvent &event)= 0;
 
     virtual void work(const Tick &tick)= 0;
-    //virtual void send(Connection *conn, NetworkPacketPtr p)= 0;
+    //virtual void send(Connection *conn, BasePacketPtr p)= 0;
 
-    virtual std::future<NetworkPacketPtr> send(Connection *conn, NetworkPacketPtr p) =0;
+    virtual std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p) =0;
 
     virtual void setupLogic(LogicManager &logicManager);
 };
@@ -61,7 +61,7 @@ class DummyProtocol : public IProtocol {
     void work(const Tick &tick) override;
 
 public:
-    std::future<NetworkPacketPtr> send(Connection *conn, NetworkPacketPtr p) override;
+    std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p) override;
 };
 
 #endif //BASYCO_IPROTOCOL_H

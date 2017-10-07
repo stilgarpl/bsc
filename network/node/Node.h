@@ -13,13 +13,22 @@
 #include "../../configuration/IConfig.h"
 #include "../../logic/SourceManager.h"
 #include "../../logic/LogicManager.h"
+#include "../protocol/protocol/IProtocol.h"
+#include "../protocol/protocol/GravitonProtocol.h"
 #include <Poco/Net/ServerSocket.h>
 #include <memory>
 #include <Poco/Net/TCPServer.h>
 
 ///@todo separate interface so NodeInfo can include INode, and Node can include NodeInfo
 
+class NodeActions;
 
+struct NodeConnectionInfo {
+    ConnectionPtr connection;
+    std::experimental::optional<NodeIdType> nodeId;
+};
+
+typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
 
 class Node {
 public:
@@ -49,6 +58,7 @@ public:
     };
 
 private:
+    std::unique_ptr<IProtocol> protocol = std::make_unique<GravitonProtocol>();
     std::shared_ptr<Config> configuration;
     LogicManager logicManager;
     Context nodeContext;
@@ -70,17 +80,18 @@ private:
     std::shared_ptr<Poco::Net::TCPServer> server;
     NodeInfo thisNodeInfo;
     std::shared_ptr<NetworkInfo> networkInfo;// = nsm(networkInfo); //network this node belongs to @todo more than 1?
-    std::list<ConnectionPtr> activeClientConnections;
+    std::list<NodeConnectionInfoPtr> activeClientConnections;
 
 public:
 
-    decltype(activeClientConnections) getClientConnections() {
+    decltype(activeClientConnections) &getClientConnections() {
         return activeClientConnections;
     }
+
 protected:
     void addActiveClientConnection(std::shared_ptr<Connection> c);
 
-    void removeActiveClientConnection(std::shared_ptr<Connection> c);
+    void removeActiveClientConnection(NodeConnectionInfoPtr c);
 
     void work();
 public:
@@ -123,6 +134,21 @@ public:
     }
 
     std::shared_ptr<NetworkInfo> &getNetworkInfo();
+
+
+    void updateNodeConnectionInfo();
+
+    void printConnections() {
+        for (auto &&item : activeClientConnections) {
+            if (item->nodeId) {
+                std::cout << "Connection: NO ID" << std::endl;
+            } else {
+                std::cout << "Connection: " << *item->nodeId << std::endl;
+            }
+        }
+    }
+
+    friend class NodeActions;
 };
 
 

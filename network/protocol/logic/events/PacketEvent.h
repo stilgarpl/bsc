@@ -17,14 +17,13 @@ enum class PacketEventId {
 class PacketEvent : public IEvent<PacketEventId> {
 private:
     ///@todo maybe merge with ConnectionEvent?
-    NetworkPacketPtr packet;
-    //@todo shared_ptr?
+    BasePacketPtr packet;
     Connection *connection;
 
 public:
-    const NetworkPacketPtr &getPacket() const;
+    const BasePacketPtr &getPacket() const;
 
-    void setPacket(const NetworkPacketPtr &packet);
+    void setPacket(const BasePacketPtr &packet);
 
     Connection *getConnection() const;
 

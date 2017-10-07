@@ -11,6 +11,7 @@ void ConnectionSource::newConnection(Connection *con) {
     event->setEventId(ConnectionEvent::IdType::NEW_CONNECTION);
     event->setConnection(con);
     connSource.queueEvent(event);
+    LOGGER("connection source: packet queue size " + std::to_string(packetSource.queueSize()))
 
 }
 
@@ -25,19 +26,24 @@ void ConnectionSource::sentPacket(std::shared_ptr<BasePacket> p, Connection *con
 }
 
 void ConnectionSource::receivedPacket(std::shared_ptr<BasePacket> p, Connection *connection) {
-    NODECONTEXTLOGGER("received Packet " + std::to_string(p->getId()) + " " + std::to_string((int) p->getStatus()));
+    //LOGGER("received Packet " + std::to_string(p->getId()) + " " + std::to_string((int) p->getStatus()));
 
     auto event = std::make_shared<PacketEvent>();
     event->setEventId(PacketEvent::IdType::PACKET_RECEIVED);
     event->setPacket(p);
     event->setConnection(connection);
     packetSource.queueEvent(event);
+    // LOGGER("packet source: packet queue size " + std::to_string(packetSource.queueSize()))
 }
 
 void ConnectionSource::work() {
-
+    //  LOGGER("connection source WOOOOORK")
     connSource.work();
+    auto qs = packetSource.queueSize();
+    // if (qs) LOGGER("before packet work")
     packetSource.work();
+    // if (qs) LOGGER("after packet work")
+
 
 }
 

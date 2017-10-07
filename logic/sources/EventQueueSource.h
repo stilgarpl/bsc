@@ -43,17 +43,18 @@ public:
         while (!eventQueue.empty()) {
             //  NODECONTEXTLOGGER("Processing event");
             ///@todo better locking and unlocking of mutex
-            auto &i = eventQueue.front();
 
+            EventTypePtr i = eventQueue.front();
+            eventQueue.pop();
             queueLock.unlock();
             if (i != nullptr) {
                 this->event(*i);
             } else {
                 LOGGER("BAD POINTER");
             }
-            queueLock.lock();
-            eventQueue.pop();
 
+
+            queueLock.lock();
 
         }
         queueLock.unlock();
@@ -61,10 +62,13 @@ public:
     }
 
     void registerProviders(SourceManager *manager) override {
-        manager->registerProvider<EventType_>();
+        manager->registerProvider<EventType_>(this);
     }
 
 
+    auto queueSize() {
+        return eventQueue.size();
+    }
     EventQueueSource() = default;
 
 

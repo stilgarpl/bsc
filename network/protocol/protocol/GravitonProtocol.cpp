@@ -5,28 +5,36 @@
 #include "GravitonProtocol.h"
 
 void GravitonProtocol::onPacketSent(const PacketEvent &event) {
+    std::lock_guard<std::mutex> g(lock);
     LOGGER("onPacketSent");
     ///@todo maybe check if packet is in the response map?
 }
 
 void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
+    std::lock_guard<std::mutex> g(lock);
     LOGGER("onPacketReceived");
     ///
     if (event.getPacket()->getStatus() != Status::ACK) {
         auto &ptr = responseMap[event.getPacket()->getId()];
-        ptr->getResponsePromise().set_value(event.getPacket());
-        responseMap.erase(event.getPacket()->getId());
+        if (ptr != nullptr) { //not all packets are from this protocol...
+            ptr->getResponsePromise().set_value(event.getPacket());
+            responseMap.erase(event.getPacket()->getId());
+        }
     }
 }
 
 void GravitonProtocol::work(const Tick &tick) {
+    std::lock_guard<std::mutex> g(lock);
     LOGGER("onWork");
 }
 
-std::future<NetworkPacketPtr> GravitonProtocol::send(Connection *conn, NetworkPacketPtr p) {
+std::future<BasePacketPtr> GravitonProtocol::send(Connection *conn, BasePacketPtr p) {
+    std::lock_guard<std::mutex> g(lock);
     LOGGER("send");
     std::shared_ptr<NetworkPacketInfo> ptr = std::make_shared<NetworkPacketInfo>(p, conn,
                                                                                  std::chrono::steady_clock::now());
+
     this->responseMap[p->getId()] = ptr;
+    conn->send(p);
     return ptr->getResponsePromise().get_future();
 }

@@ -9,6 +9,7 @@
 #include "../signal/Signal.h"
 #include "../context/Context.h"
 #include "../uber/Uber.h"
+#include "../log/Logger.h"
 
 
 ///@todo Clion jest głupi i uważa, że to jest pełna definicja.
@@ -28,8 +29,9 @@ protected:
 
         ///@todo pass to executor
         Context::setActiveContext(&context);
-        this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
-        this->getSignal<T, Args...>().signal(event, args...);
+        int a = this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
+        int b = this->getSignal<T, Args...>().signal(event, args...);
+        // LOGGER("event : a "+ std::to_string(a)+ " b:" + std::to_string(b));
     }
 
 

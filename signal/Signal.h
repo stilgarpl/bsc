@@ -23,10 +23,13 @@ public:
     //może przeciążona klasa AsyncSignal
     //albo jakiś globalna funkcja - defaultowa by wywoływała od razu, async by robiła wątek
     //a ta funkcja by tylko wywoływała tamtą z odpowiednimi parametrami
-    virtual void signal(Args... args) {
+    virtual int signal(Args... args) {
+        int executed = 0;
         for (auto &&item : funcList) {
             (*item)(args...);
+            executed++;
         }
+        return executed;
     };
 
     Signal<Args...> &assign(FuncPtr func) {

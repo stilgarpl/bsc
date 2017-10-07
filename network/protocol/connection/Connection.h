@@ -53,9 +53,9 @@ public:
 protected:
 
 public:
-    void send(NetworkPacketPtr np);
+    void send(BasePacketPtr np);
 
-    NetworkPacketPtr receive();
+    BasePacketPtr receive();
 
     Connection(Context &context);
 

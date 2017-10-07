@@ -9,7 +9,12 @@
 #include "../../../../../logic/IEvent.h"
 #include "../../../NetworkInfo.h"
 
-class NetworkInfoEvent : public IEvent<int> {
+enum class NetworInfoEventId {
+    NETWORK_INFO_RECEIVED
+
+};
+
+class NetworkInfoEvent : public IEvent<NetworInfoEventId> {
 private:
     NetworkInfo networkInfo;
 

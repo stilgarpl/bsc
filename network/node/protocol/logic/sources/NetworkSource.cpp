@@ -8,7 +8,7 @@
 void NetworkSource::networkInfoReceived(const NetworkInfo &networkInfo) {
     auto event = newEvent();
     event->setNetworkInfo(networkInfo);
-    //  event->setEventId(EventType::IdType::NETWORK_INFO_RECEIVED);
+    event->setEventId(EventType::IdType::NETWORK_INFO_RECEIVED);
 
     queueEvent(event);
 

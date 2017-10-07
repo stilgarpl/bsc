@@ -57,7 +57,7 @@ public:
 };
 
 
-typedef std::shared_ptr<BasePacket> NetworkPacketPtr;
+typedef std::shared_ptr<BasePacket> BasePacketPtr;
 
 template<typename NetworkPacketType = BasePacket>
 using NetworkPacketPointer = std::shared_ptr<NetworkPacketType>;

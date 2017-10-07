@@ -11,6 +11,7 @@
 #include "network/node/protocol/logic/sources/NodeSource.h"
 #include "network/node/protocol/logic/actions/NodeActions.h"
 #include "network/node/protocol/logic/sources/NetworkSource.h"
+#include "network/node/protocol/logic/actions/NetworkActions.h"
 
 
 using namespace std::chrono_literals;
@@ -42,7 +43,7 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
     logicManager.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
     logicManager.setAction<ConnectionEvent>("reqNeI", NodeActions::sendNetworkInfoRequest);
     logicManager.setAction<NodeInfoEvent>("upNoI", NodeActions::updateNodeInfo);
-    logicManager.setAction<NetworkInfoEvent>("upNeI", NodeActions::updateNetworkInfo);
+    logicManager.setAction<NetworkInfoEvent>("upNeI", NetworkActions::updateNetworkInfo);
     logicManager.setAction<NodeInfoEvent>("addKnownNode", NodeActions::addKnownNode);
     logicManager.setAction<Tick>("trigNodeUp", NodeActions::triggerUpdateNode);
     logicManager.setAction<NodeInfoEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
@@ -70,17 +71,17 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
     logicManager.setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
 
-    //assigning actions
-//    if (logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
-//                                               PacketEventId::PACKET_RECEIVED)) {
-//        std::clog << "Debug: PACK RECV assignment!" << std::endl;
-//    }
-//    logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_SENT, PacketEventId::PACKET_SENT);
-//
-//    if (logicManager.assignAction<Tick>(500ms, "TransTick")) {
-//        std::clog << "Debug: Trans tick assignment!" << std::endl;
-//
-//    }
+    //  assigning actions
+    if (logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
+                                               PacketEventId::PACKET_RECEIVED)) {
+        std::clog << "Debug: PACK RECV assignment!" << std::endl;
+    }
+    logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_SENT, PacketEventId::PACKET_SENT);
+
+    if (logicManager.assignAction<Tick>(500ms, "TransTick")) {
+        std::clog << "Debug: Trans tick assignment!" << std::endl;
+
+    }
 
     if (logicManager.assignAction<ConnectionEvent>("connDebug")) {
         std::clog << "Debug: ConEv assignment!" << std::endl;
@@ -108,7 +109,7 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
     }
 
-    if (logicManager.assignAction<NetworkInfoEvent>(/*NetworkInfoEvent::IdType::NETWORK_INFO_RECEIVED, */"upNeI")) {
+    if (logicManager.assignAction<NetworkInfoEvent>(NetworkInfoEvent::IdType::NETWORK_INFO_RECEIVED, "upNeI")) {
         std::clog << "Debug: upNoI assignment!" << std::endl;
 
     }
@@ -173,23 +174,26 @@ int main() {
     Node otherNode(9999);
     otherNode.getNodeInfo().setNodeId("second node");
     otherNode.addToNetwork("TheNetwork");
-    setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
+    // setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
     otherNode.start();
 
     Node thirdNode(9898);
     thirdNode.getNodeInfo().setNodeId("third node");
     thirdNode.addToNetwork("TheNetwork");
-    setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
-    thirdNode.start();
+    //  setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
+    // thirdNode.start();
 
 
     thisNode.getNodeInfo().printAll();
     otherNode.getNodeInfo().printAll();
     thirdNode.getNodeInfo().printAll();
     thisNode.connectTo("127.0.0.1:9999");
-    otherNode.connectTo("127.0.0.1:9898");
+    //  otherNode.connectTo("127.0.0.1:9898");
+    //   thisNode.connectTo("127.0.0.1:100");
+    std::this_thread::sleep_for(2s);
 
-
+    thisNode.updateNodeConnectionInfo();
+    thisNode.printConnections();
     std::this_thread::sleep_for(300s);
     return 0;
 }

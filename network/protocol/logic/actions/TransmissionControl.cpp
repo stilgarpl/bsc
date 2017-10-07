@@ -7,7 +7,7 @@
 
 void TransmissionControl::onPacketReceived(const PacketEvent &event) {
 
-    const NetworkPacketPtr &packet = event.getPacket();
+    const BasePacketPtr &packet = event.getPacket();
     //  NODECONTEXTLOGGER("on PacketReceived"+ std::to_string(packet->getId()));
     //   LOGGER("TC::OPR" + std::to_string(packet->getId()));
     //@todo compare time
@@ -35,8 +35,8 @@ void TransmissionControl::onPacketReceived(const PacketEvent &event) {
 }
 
 void TransmissionControl::onPacketSent(const PacketEvent &event) {
-    const NetworkPacketPtr packetPtr = event.getPacket();
-    //  NODECONTEXTLOGGER("on PacketSent"+ std::to_string(packetPtr->getId()));
+    const BasePacketPtr packetPtr = event.getPacket();
+    NODECONTEXTLOGGER("on PacketSent" + std::to_string(packetPtr->getId()));
     if (packetPtr != nullptr) {
         //@todo store sent time
         switch (packetPtr->getStatus()) {
@@ -85,7 +85,7 @@ void TransmissionControl::work(const Tick &tick) {
         if (tick.getNow() - it.second->getTimeSent() > MAX_TIMEOUT) {
             if (it.second->getConnection() != nullptr) {
                 //@todo send immediately? or wait for timeout?
-                NetworkPacketPtr ackPacket = std::make_shared<BasePacket>();
+                BasePacketPtr ackPacket = std::make_shared<BasePacket>();
                 ackPacket->setId(it.second->getPacketPtr()->getId());
                 ackPacket->setStatus(Status::ACK);
                 //  NODECONTEXTLOGGER("sending response " + std::to_string(ackPacket->getId()));

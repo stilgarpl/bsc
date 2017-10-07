@@ -10,6 +10,10 @@
 
 enum class ConnectionEventId {
     NEW_CONNECTION,
+    CONNECTION_REFUSED,
+    CONNECTION_ABORTED,
+    CONNECTION_RESET,
+    BAD_ADDRESS,
 
 };
 

@@ -4,11 +4,11 @@
 
 #include "PacketEvent.h"
 
-const NetworkPacketPtr &PacketEvent::getPacket() const {
+const BasePacketPtr &PacketEvent::getPacket() const {
     return packet;
 }
 
-void PacketEvent::setPacket(const NetworkPacketPtr &packet) {
+void PacketEvent::setPacket(const BasePacketPtr &packet) {
     PacketEvent::packet = packet;
 }
 

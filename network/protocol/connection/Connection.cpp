@@ -10,7 +10,7 @@
 
 using namespace std::chrono_literals;
 
-void Connection::send(NetworkPacketPtr np) {
+void Connection::send(BasePacketPtr np) {
     std::lock_guard<std::mutex> g(sendQueueLock);
     // std::cout << "Adding packet ..." << std::endl;
     sendQueue.push(np);
@@ -18,7 +18,7 @@ void Connection::send(NetworkPacketPtr np) {
 
 }
 
-NetworkPacketPtr Connection::receive() {
+BasePacketPtr Connection::receive() {
     std::unique_lock<std::mutex> g(receiveQueueLock);
     while (receiveQueue.empty()) {
         // std::cout << "work::receive waiting " << receiveQueue.size() << std::endl;
@@ -50,7 +50,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
         }
         while (!sendQueue.empty()) {
             //  std::cout << "work::send found packet to send" << std::endl;
-            NetworkPacketPtr v;
+            BasePacketPtr v;
             {
                 v = sendQueue.front();
                 {
@@ -83,7 +83,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
         cereal::BinaryInputArchive ia(is);
         /*while (socket.available() > 0)*/ {
             //  std::cout << "work::receive " << socket.address().port() << std::endl;
-            NetworkPacketPtr v;
+            BasePacketPtr v;
 
             ia >> v;
             {
@@ -93,7 +93,11 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                 //   std::cout << "work::receive qs " << receiveQueue.size() << std::endl;
                 // logic.processPacket(v);
                 if (connectionSourcePtr != nullptr) {
+                    //   LOGGER("CONNECTION SOURCE ISNT NULL")
+
                     connectionSourcePtr->receivedPacket(v, this);
+                } else {
+                    //    LOGGER("CONNECTION SOURCE IS NULL")
                 }
 
             }

@@ -5,12 +5,12 @@
 #include "IProtocol.h"
 
 
-ProtocolWrapper::ProtocolWrapper(Connection *connection, IProtocol *protocol) : connection(connection),
-                                                                                protocol(protocol) {}
+ProtocolWrapper::ProtocolWrapper(ConnectionPtr connection, IProtocol *protocol) : connection(connection),
+                                                                                  protocol(protocol) {}
 
-std::future<NetworkPacketPtr> ProtocolWrapper::send(NetworkPacketPtr p) {
+std::future<BasePacketPtr> ProtocolWrapper::send(BasePacketPtr p) {
     //return protocol->send(connection,p);
-    return std::future<NetworkPacketPtr>();
+    return std::future<BasePacketPtr>();
 }
 
 void DummyProtocol::onPacketSent(const PacketEvent &event) {
@@ -25,9 +25,9 @@ void DummyProtocol::work(const Tick &tick) {
     LOGGER("on work")
 }
 
-std::future<NetworkPacketPtr> DummyProtocol::send(Connection *conn, NetworkPacketPtr p) {
+std::future<BasePacketPtr> DummyProtocol::send(Connection *conn, BasePacketPtr p) {
     conn->send(p);
-    return std::future<NetworkPacketPtr>();
+    return std::future<BasePacketPtr>();
 
 }
 
