@@ -15,22 +15,20 @@ enum class NodeEventId {
     NODE_CONNECTED,
     NODE_DISCONNECTED,
     NODE_INFO_RECEIVED,
-    NETWORK_INFO_RECEIVED
+//    NETWORK_INFO_RECEIVED
 };
 
-class NodeEvent : public IEvent<NodeEventId> {
+class NodeInfoEvent : public IEvent<NodeEventId> {
 private:
     NodeInfo nodeInfo;
-    NetworkInfo networkInfo;
+
 
 public:
     const NodeInfo &getNodeInfo() const;
 
     void setNodeInfo(const NodeInfo &nodeInfo);
 
-    const NetworkInfo &getNetworkInfo() const;
 
-    void setNetworkInfo(const NetworkInfo &networkInfo);
 };
 
 

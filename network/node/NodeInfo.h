@@ -51,6 +51,15 @@ public:
     void addKnownAddress(std::string address) {
         knownAddresses.push_back(address);
     }
+
+    void printAll() {
+        std::cout << ":::NODE INFO:::" << std::endl
+                  << "id : " << nodeId << std::endl
+                  << "net id:" << networkId << std::endl;
+
+    }
+
+    void setNetworkId(const NetworkIdType &networkId);
 };
 
 

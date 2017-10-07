@@ -7,14 +7,12 @@
 
 
 #include "../../../../../logic/sources/EventQueueSource.h"
-#include "../events/NodeEvent.h"
+#include "../events/NodeInfoEvent.h"
 
-class NodeSource : public EventQueueSource<NodeEvent> {
+class NodeSource : public EventQueueSource<NodeInfoEvent> {
 public:
 
     void nodeInfoReceived(const NodeInfo &nodeInfo);
-
-    void networkInfoReceived(const NetworkInfo &networkInfo);
 
     void nodeDiscovered(const NodeInfo &nodeInfo);
 };

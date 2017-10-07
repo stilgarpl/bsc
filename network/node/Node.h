@@ -118,6 +118,8 @@ public:
     void addToNetwork(NetworkIdType networkId) {
         networkInfo = std::make_shared<NetworkInfo>();
         networkInfo->setNetworkId(networkId);
+        ///@todo this shouldn't be set twice... or should it?
+        thisNodeInfo.setNetworkId(networkId);
     }
 
     std::shared_ptr<NetworkInfo> &getNetworkInfo();

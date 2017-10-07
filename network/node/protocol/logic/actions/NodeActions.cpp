@@ -5,7 +5,7 @@
 #include "NodeActions.h"
 
 
-void NodeActions::newNodeDiscovered(const NodeEvent &event) {
+void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
     Context &context = Context::getActiveContext();
     auto nodeContext = context.get<NodeContext>();
     if (nodeContext != nullptr) {
@@ -16,34 +16,34 @@ void NodeActions::newNodeDiscovered(const NodeEvent &event) {
 
 }
 
-void NodeActions::updateNodeInfo(const NodeEvent &event) {
+void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
     Context &context = Context::getActiveContext();
     auto nodeContext = context.get<NodeContext>();
     if (nodeContext != nullptr) {
-        NODECONTEXTLOGGER("received node info: " + event.getNodeInfo().getNodeId());
+        //  NODECONTEXTLOGGER("received node info: " + event.getNodeInfo().getNodeId());
     }
 }
 
-void NodeActions::updateNetworkInfo(const NodeEvent &event) {
+void NodeActions::updateNetworkInfo(const NetworkInfoEvent &event) {
     Context &context = Context::getActiveContext();
     auto nodeContext = context.get<NodeContext>();
     if (nodeContext != nullptr) {
         auto &node = nodeContext->getNode();
         if (node.getNetworkInfo() != nullptr &&
             node.getNetworkInfo()->getNetworkId() == event.getNetworkInfo().getNetworkId()) {
-            LOGGER("SAME NETWORK! " + event.getNetworkInfo().getNetworkId());
+            //     LOGGER("SAME NETWORK! " + event.getNetworkInfo().getNetworkId());
             *node.getNetworkInfo() += event.getNetworkInfo();
 
         }
-        NODECONTEXTLOGGER("received network info: " + event.getNetworkInfo().getNetworkId());
+        // NODECONTEXTLOGGER("received network info: " + event.getNetworkInfo().getNetworkId());
     }
 }
 
-void NodeActions::addKnownNode(const NodeEvent &event) {
+void NodeActions::addKnownNode(const NodeInfoEvent &event) {
     Context &context = Context::getActiveContext();
     auto nodeContext = context.get<NodeContext>();
     if (nodeContext != nullptr) {
-        LOGGER("Adding known node " + event.getNodeInfo().getNodeId())
+        LOGGER("Adding known node " + event.getNodeInfo().getNodeId() + " ... " + event.getNodeInfo().getNetworkId())
         auto &node = nodeContext->getNode();
         if (event.getNodeInfo().getNetworkId() == node.getNodeInfo().getNetworkId()) {
             node.getNetworkInfo()->addKnownNode(event.getNodeInfo());

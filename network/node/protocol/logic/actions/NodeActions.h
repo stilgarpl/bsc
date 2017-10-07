@@ -9,12 +9,13 @@
 #include "../../../../../context/Context.h"
 #include "../../../../protocol/logic/events/ConnectionEvent.h"
 #include "../../packet/NodeInfoRequest.h"
-#include "../events/NodeEvent.h"
+#include "../events/NodeInfoEvent.h"
 #include "../../../../protocol/context/NodeContext.h"
 #include "../../packet/NetworkInfoRequest.h"
 #include "../../../../../logic/events/Tick.h"
 #include "../../../../protocol/context/LogicContext.h"
 #include "../sources/NodeSource.h"
+#include "../events/NetworkInfoEvent.h"
 
 class NodeActions {
 
@@ -31,11 +32,11 @@ public:
         connectionEvent.getConnection()->send(req);
     }
 
-    static void updateNodeInfo(const NodeEvent &event);
+    static void updateNodeInfo(const NodeInfoEvent &event);
 
-    static void addKnownNode(const NodeEvent &event);
+    static void addKnownNode(const NodeInfoEvent &event);
 
-    static void newNodeDiscovered(const NodeEvent &event);
+    static void newNodeDiscovered(const NodeInfoEvent &event);
 
     static void triggerUpdateNode(const Tick &tick) {
         Context &context = Context::getActiveContext();
@@ -52,7 +53,7 @@ public:
         }
     }
 
-    static void updateNetworkInfo(const NodeEvent &event);
+    static void updateNetworkInfo(const NetworkInfoEvent &event);
 };
 
 

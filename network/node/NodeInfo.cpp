@@ -21,6 +21,10 @@ void NodeInfo::setNodeId(const NodeIdType &nodeId) {
     NodeInfo::nodeId = nodeId;
 }
 
+void NodeInfo::setNetworkId(const NetworkIdType &networkId) {
+    NodeInfo::networkId = networkId;
+}
+
 //Node::IdType NodeInfo::getId() const {
 //    return id;
 //}

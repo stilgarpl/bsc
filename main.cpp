@@ -4,13 +4,13 @@
 //#define CEREAL_THREAD_SAFE 1
 #include "network/node/Node.h"
 #include "logic/sources/ClockSource.h"
-#include "network/logic/sources/NetworkSource.h"
 #include "network/protocol/logic/sources/AuthSource.h"
 #include "network/protocol/logic/sources/ConnectionSource.h"
 #include "network/protocol/logic/actions/TransmissionControl.h"
 #include "network/protocol/logic/actions/ProtocolActions.h"
 #include "network/node/protocol/logic/sources/NodeSource.h"
 #include "network/node/protocol/logic/actions/NodeActions.h"
+#include "network/node/protocol/logic/sources/NetworkSource.h"
 
 
 using namespace std::chrono_literals;
@@ -41,11 +41,11 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
     logicManager.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
     logicManager.setAction<ConnectionEvent>("reqNeI", NodeActions::sendNetworkInfoRequest);
-    logicManager.setAction<NodeEvent>("upNoI", NodeActions::updateNodeInfo);
-    logicManager.setAction<NodeEvent>("upNeI", NodeActions::updateNetworkInfo);
-    logicManager.setAction<NodeEvent>("addKnownNode", NodeActions::addKnownNode);
+    logicManager.setAction<NodeInfoEvent>("upNoI", NodeActions::updateNodeInfo);
+    logicManager.setAction<NetworkInfoEvent>("upNeI", NodeActions::updateNetworkInfo);
+    logicManager.setAction<NodeInfoEvent>("addKnownNode", NodeActions::addKnownNode);
     logicManager.setAction<Tick>("trigNodeUp", NodeActions::triggerUpdateNode);
-    logicManager.setAction<NodeEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
+    logicManager.setAction<NodeInfoEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
 
 
     logicManager.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent &event) {
@@ -103,22 +103,23 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
     }
 
-    if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NODE_INFO_RECEIVED, "upNoI")) {
+    if (logicManager.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "upNoI")) {
         std::clog << "Debug: upNoI assignment!" << std::endl;
 
     }
 
-    if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NETWORK_INFO_RECEIVED, "upNeI")) {
+    if (logicManager.assignAction<NetworkInfoEvent>(/*NetworkInfoEvent::IdType::NETWORK_INFO_RECEIVED, */"upNeI")) {
         std::clog << "Debug: upNoI assignment!" << std::endl;
 
     }
 
-    if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NODE_INFO_RECEIVED, "addKnownNode")) {
+    ///@todo upNoI powinno cos takiego robic, addKnownNode powinien byc wywolany tylko w przypadku
+    if (logicManager.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "addKnownNode")) {
         std::clog << "Debug: addKnownNode assignment!" << std::endl;
 
     }
 
-    if (logicManager.assignAction<NodeEvent>(NodeEvent::IdType::NEW_NODE_DISCOVERED, "nodeDiscovered")) {
+    if (logicManager.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NEW_NODE_DISCOVERED, "nodeDiscovered")) {
         std::clog << "Debug: addKnownNode assignment!" << std::endl;
 
     }
@@ -146,7 +147,7 @@ int main() {
 
     LogicManager logicManager;
     logicManager.addSource<ClockSource>();
-    logicManager.addSource<NetworkSource>();
+    //  logicManager.addSource<NetworkSource>();
 
     logicManager.setAction<Tick>("test", [](const Tick &t) {
 
@@ -181,6 +182,10 @@ int main() {
     setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
     thirdNode.start();
 
+
+    thisNode.getNodeInfo().printAll();
+    otherNode.getNodeInfo().printAll();
+    thirdNode.getNodeInfo().printAll();
     thisNode.connectTo("127.0.0.1:9999");
     otherNode.connectTo("127.0.0.1:9898");
 

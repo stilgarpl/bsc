@@ -5,6 +5,8 @@
 #include "NetworkInfoResponse.h"
 #include "../logic/sources/NodeSource.h"
 #include "../../../protocol/context/LogicContext.h"
+#include "../logic/sources/NetworkSource.h"
+
 
 void NetworkInfoResponse::process(Context &context) {
     BasePacket::process(context);
@@ -12,7 +14,7 @@ void NetworkInfoResponse::process(Context &context) {
 
     auto lc = context.get<LogicContext>();
     if (lc != nullptr) {
-        auto nodeSource = lc->getLogicManager().getSource<NodeSource>();
+        auto nodeSource = lc->getLogicManager().getSource<NetworkSource>();
         if (this->getNetworkInfo() != nullptr) {
             nodeSource->networkInfoReceived(*this->getNetworkInfo());
         } else {

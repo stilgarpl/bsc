@@ -20,8 +20,11 @@ void NetworkInfo::setNetworkId(const NetworkIdType &networkId) {
 void NetworkInfo::addKnownNode(const NodeInfo &nodeInfo) {
 
     Context &context = Context::getActiveContext();
-    //auto nodeContext = context.get<NodeContext>();
-    if (!isNodeKnown(nodeInfo.getNodeId())) {
+    auto nodeContext = context.get<NodeContext>();
+    auto &node = nodeContext->getNode();
+    //  NODECONTEXTLOGGER(node.getNetworkInfo()->getNetworkId());
+    //  NODECONTEXTLOGGER(nodeInfo.getNetworkId());
+    if (node.getNetworkInfo()->getNetworkId() == nodeInfo.getNetworkId() && !isNodeKnown(nodeInfo.getNodeId())) {
 
         auto lc = context.get<LogicContext>();
         if (lc != nullptr) {
@@ -30,9 +33,10 @@ void NetworkInfo::addKnownNode(const NodeInfo &nodeInfo) {
         }
     }
 
-    knownNodes[nodeInfo.getNodeId()] = nodeInfo;
 
-    for (auto &&node : knownNodes) {
-        NODECONTEXTLOGGER("KNOWN NODES: " + node.first);
-    }
+    knownNodes[nodeInfo.getNodeId()] = nodeInfo;
+//
+//    for (auto &&it : knownNodes) {
+//        NODECONTEXTLOGGER("KNOWN NODES: " + it.first);
+//    }
 }
