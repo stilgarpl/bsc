@@ -13,7 +13,7 @@
 #include "logic/events/Tick.h"
 
 
-class NetworkPacketInfo {
+class BasePacketInfo {
 private:
     BasePacketPtr packetPtr;
     Connection *connection = nullptr;
@@ -31,9 +31,9 @@ public:
     void setTimeSent(const std::chrono::time_point<Tick::clock> &timeSent);
 
 public:
-    NetworkPacketInfo(const BasePacketPtr &packetPtr, const std::chrono::time_point<Tick::clock> &timeSent);
+    BasePacketInfo(const BasePacketPtr &packetPtr, const std::chrono::time_point<Tick::clock> &timeSent);
 
-    NetworkPacketInfo(const BasePacketPtr &packetPtr, Connection *connection,
+    BasePacketInfo(const BasePacketPtr &packetPtr, Connection *connection,
                       const std::chrono::time_point<Tick::clock> &timeSent);
 
     Connection *getConnection() const;

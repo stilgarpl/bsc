@@ -3,10 +3,14 @@
 //
 
 #include <context/Context.h>
+
 #include <network/protocol/packet/BasePacket.h>
+#include "NetworkInfoResponse.h"
 #include <network/protocol/context/NodeContext.h>
 #include <network/protocol/context/ConnectionContext.h>
+
 #include "NetworkInfoRequest.h"
+
 
 void NetworkInfoRequest::process(Context &context) {
     BasePacket::process(context);

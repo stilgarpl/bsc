@@ -24,8 +24,8 @@ void TransmissionControl::onPacketReceived(const PacketEvent &event) {
             //      NODECONTEXTLOGGER("R-REQUEST " + std::to_string(packet->getId()));
 
             // sent ack or sth? but what if proper response is being prepared?
-            packetsWaitingToAck[packet->getId()] = std::make_shared<NetworkPacketInfo>(packet, event.getConnection(),
-                                                                                       Tick::clock::now());
+            packetsWaitingToAck[packet->getId()] = std::make_shared<BasePacketInfo>(packet, event.getConnection(),
+                                                                                    Tick::clock::now());
 
         }
             break;
@@ -46,10 +46,10 @@ void TransmissionControl::onPacketSent(const PacketEvent &event) {
                     NODECONTEXTLOGGER("S-REQUEST " + std::to_string(packetPtr->getId()));
 
                     ///@todo pointer or something else
-                    packetsWaitingForAck[packetPtr->getId()] = std::make_shared<NetworkPacketInfo>(packetPtr,
-                                                                                                   event.getConnection(),
+                    packetsWaitingForAck[packetPtr->getId()] = std::make_shared<BasePacketInfo>(packetPtr,
+                                                                                                event.getConnection(),
 
-                                                                                                   Tick::clock::now());
+                                                                                                Tick::clock::now());
                 }
             }
                 break;

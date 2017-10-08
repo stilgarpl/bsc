@@ -17,7 +17,6 @@
 using namespace std::chrono_literals;
 
 #include <fstream>
-#include <network/node/protocol/packet/NodeInfoResponse.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -136,11 +135,11 @@ int main() {
 //            LOGGER("STATUS OK");
 //            exit(0);
 //        }
-    NodeInfoGroup::Ack b1;
-    NodeInfoGroup::Response b2;
-    auto status = NodeInfoGroup::Ack::getPacketStatus();
-
-    exit(0);
+//    NodeInfoGroup::Ack b1;
+//    NodeInfoGroup::Response b2;
+//    auto status = NodeInfoGroup::Ack::getPacketStatus();
+//
+//    exit(0);
 //    BasePacket basePacket;
 //    PacketUtils::getNew<Status::RESPONSE>(basePacket);
 //

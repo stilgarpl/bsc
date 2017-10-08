@@ -6,14 +6,14 @@
 #define BASYCO_GRAVITONPROTOCOL_H
 
 
-#include <network/protocol/logic/actions/NetworkPacketInfo.h>
+#include <network/protocol/logic/actions/BasePacketInfo.h>
 #include "IProtocol.h"
 
 
 class GravitonProtocol : public IProtocol {
 private:
     std::mutex lock;
-    std::map<BasePacket::IdType, std::shared_ptr<NetworkPacketInfo>> responseMap;
+    std::map<BasePacket::IdType, std::shared_ptr<BasePacketInfo>> responseMap;
 public:
     void onPacketSent(const PacketEvent &event) override;
 

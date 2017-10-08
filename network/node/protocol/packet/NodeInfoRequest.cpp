@@ -6,7 +6,6 @@
 #include <network/protocol/context/ConnectionContext.h>
 #include "NodeInfoRequest.h"
 
-
 void NodeInfoRequest::process(Context &context) {
     BasePacket::process(context);
 

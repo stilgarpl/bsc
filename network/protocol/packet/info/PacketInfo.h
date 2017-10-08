@@ -128,7 +128,8 @@ struct Packet : public BasePacket {
     }
 
     static auto getNew() {
-        return std::make_shared<S>();
+        //return std::make_shared<S>();
+        return getNew<getPacketStatus()>();
     }
 
     constexpr static Status getPacketStatus() {

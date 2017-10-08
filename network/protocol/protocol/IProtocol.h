@@ -5,11 +5,11 @@
 #ifndef BASYCO_IPROTOCOL_H
 #define BASYCO_IPROTOCOL_H
 
-
+#include <network/protocol/packet/info/PacketInfo.h>
 #include <future>
 #include <network/protocol/connection/Connection.h>
 #include <network/protocol/logic/events/PacketEvent.h>
-#include <network/protocol/packet/info/PacketInfo.h>
+
 #include "logic/events/Tick.h"
 #include "logic/LogicManager.h"
 
@@ -53,11 +53,14 @@ public:
 
     virtual void setupLogic(LogicManager &logicManager);
 
-    template<typename SendType, typename ReturnType= typename PacketInfo<typename SendType::BaseType, Status::RESPONSE>::Type>
+    template<enum Status status = Status::RESPONSE, typename SendType>
     auto sendExpect(Connection *conn, NetworkPacketPointer<SendType> p) {
+        typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
         auto future = send(conn, p);
         return std::static_pointer_cast<ReturnType>(future.get());
     }
+
+
 };
 
 class DummyProtocol : public IProtocol {

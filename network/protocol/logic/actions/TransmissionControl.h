@@ -11,15 +11,15 @@
 
 #include "logic/events/Tick.h"
 
-#include "NetworkPacketInfo.h"
+#include "BasePacketInfo.h"
 
 ///@todo move to configuration
 static const Tick::clock::duration MAX_TIMEOUT = 5500ms;
 
 class TransmissionControl /*: IProtocol*/{
 
-    std::map<BasePacket::IdType, std::shared_ptr<NetworkPacketInfo>> packetsWaitingForAck;
-    std::map<BasePacket::IdType, std::shared_ptr<NetworkPacketInfo>> packetsWaitingToAck;
+    std::map<BasePacket::IdType, std::shared_ptr<BasePacketInfo>> packetsWaitingForAck;
+    std::map<BasePacket::IdType, std::shared_ptr<BasePacketInfo>> packetsWaitingToAck;
 
 public:
     void onPacketSent(const PacketEvent &event);

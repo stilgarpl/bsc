@@ -31,8 +31,8 @@ void GravitonProtocol::work(const Tick &tick) {
 std::future<BasePacketPtr> GravitonProtocol::send(Connection *conn, BasePacketPtr p) {
     std::lock_guard<std::mutex> g(lock);
     LOGGER("send");
-    std::shared_ptr<NetworkPacketInfo> ptr = std::make_shared<NetworkPacketInfo>(p, conn,
-                                                                                 std::chrono::steady_clock::now());
+    std::shared_ptr<BasePacketInfo> ptr = std::make_shared<BasePacketInfo>(p, conn,
+                                                                           std::chrono::steady_clock::now());
 
     this->responseMap[p->getId()] = ptr;
     conn->send(p);
