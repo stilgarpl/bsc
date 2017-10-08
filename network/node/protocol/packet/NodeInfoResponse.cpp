@@ -14,10 +14,6 @@ void NodeInfoResponse::setNodeInfo(const NodeInfo &nodeInfo) {
     NodeInfoResponse::nodeInfo = nodeInfo;
 }
 
-NodeInfoResponse::NodeInfoResponse() {
-    this->setStatus(Status::RESPONSE);
-}
-
 void NodeInfoResponse::process(Context &context) {
     BasePacket::process(context);
 

@@ -14,10 +14,15 @@
 
 #include "context/Context.h"
 
+struct PacketGroup;
+
 class BasePacket {
 public:
     typedef unsigned int IdType;
+    typedef PacketGroup BaseType;
 private:
+    ///@fixme Ids are not unique across nodes! Is that a problem for Transmission Control or Graviton? Probably not, but investigate
+    /// what if A sends id 5 to B and then C sends id 5 to B ? would that work?
     IdType nextId() {
         static IdType val = 0;
         return val++;
@@ -46,7 +51,8 @@ public:
 
     void setId(IdType id);
 
-    BasePacket(const BasePacket &) = delete;
+    //I don't remember why it was deleted, probably because of serialization bug(fixed) or maybe to not waste ids (who cares about ids?)
+    // BasePacket(const BasePacket &) = delete;
 
     BasePacket() : id(nextId()) {};
 

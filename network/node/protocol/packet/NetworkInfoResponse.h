@@ -6,8 +6,9 @@
 #define BASYCO_NETWORKINFORESPONSE_H
 
 
+#include "NetworkInfoGroup.h"
 
-class NetworkInfoResponse : public BasePacket {
+class NetworkInfoResponse : public Packet<NetworkInfoGroup, NetworkInfoResponse> {
 private:
     std::shared_ptr<NetworkInfo> networkInfo;
 public:
@@ -28,7 +29,6 @@ private:
     }
 
 public:
-    NetworkInfoResponse();
 
 private:
 

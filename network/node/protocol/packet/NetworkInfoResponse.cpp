@@ -28,8 +28,3 @@ void NetworkInfoResponse::process(Context &context) {
 
 
 }
-
-NetworkInfoResponse::NetworkInfoResponse() {
-
-    this->setStatus(Status::RESPONSE);
-}

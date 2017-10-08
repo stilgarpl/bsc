@@ -7,9 +7,10 @@
 
 
 #include <network/protocol/packet/BasePacket.h>
+#include "NodeInfoGroup.h"
 
 
-class NodeInfoRequest : public BasePacket {
+class NodeInfoRequest : public Packet<NodeInfoGroup, NodeInfoRequest> {
     ///@todo add optional id field - if empty, request is for this packet, if not, request is for node info for other known node
 private:
     template<class Archive>
@@ -23,7 +24,6 @@ private:
 public:
     void process(Context &context) override;
 
-    NodeInfoRequest();
 };
 
 

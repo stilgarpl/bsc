@@ -159,10 +159,10 @@ bool Node::isConnectedTo(const NodeInfo &nodeInfo) {
 void Node::updateNodeConnectionInfo() {
     //this is meant to be run from a thread
     for (auto &&item : activeClientConnections) {
-        BasePacketPtr packet = std::make_shared<NodeInfoRequest>();
-        auto future = protocol->send(item->connection.get(), packet);
-        future.wait();
-        NetworkPacketPointer<NodeInfoResponse> response = std::dynamic_pointer_cast<NodeInfoResponse>(future.get());
+        auto packet = NodeInfoRequest::getNew();
+        auto response = protocol->sendExpect(item->connection.get(), packet);
+        //future.wait();
+        //  auto response = future;//.get();//std::dynamic_pointer_cast<NodeInfoResponse>(future.get());
         auto val = response->getNodeInfo().getNodeId();
         (*(*item).nodeId) = val;
         //item->nodeId = val;

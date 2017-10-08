@@ -6,8 +6,6 @@
 #include <network/protocol/context/ConnectionContext.h>
 #include "NodeInfoRequest.h"
 
-#include "NodeInfoResponse.h"
-
 
 void NodeInfoRequest::process(Context &context) {
     BasePacket::process(context);
@@ -18,9 +16,8 @@ void NodeInfoRequest::process(Context &context) {
     if (nodeContext != nullptr && connectionContext != nullptr) {
         NODECONTEXTLOGGER("processing info request id" + std::to_string(this->getId()));
         auto &nodeInfo = nodeContext->getNodeInfo();
-        NetworkPacketPointer<NodeInfoResponse> response = std::make_shared<NodeInfoResponse>();
+        auto response = getNew<Status::RESPONSE>(this);//std::make_shared<NodeInfoResponse>();
         response->setNodeInfo(nodeInfo);
-        response->setId(this->getId());
         connectionContext->getConnection().send(response);
     } else {
         ///@todo error level
@@ -28,6 +25,3 @@ void NodeInfoRequest::process(Context &context) {
     }
 }
 
-NodeInfoRequest::NodeInfoRequest() {
-    this->setStatus(Status::REQUEST);
-}

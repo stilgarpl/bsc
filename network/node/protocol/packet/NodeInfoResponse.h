@@ -8,8 +8,9 @@
 
 #include <network/protocol/packet/BasePacket.h>
 #include <network/node/NodeInfo.h>
+#include "NodeInfoGroup.h"
 
-class NodeInfoResponse : public BasePacket {
+class NodeInfoResponse : public Packet<NodeInfoGroup, NodeInfoResponse> {
 private:
     NodeInfo nodeInfo;
 
@@ -28,7 +29,6 @@ private:
     friend class cereal::access;
 
 public:
-    NodeInfoResponse();
 
     void process(Context &context) override;
 

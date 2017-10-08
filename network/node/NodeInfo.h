@@ -52,7 +52,7 @@ public:
         knownAddresses.push_back(address);
     }
 
-    void printAll() {
+    void printAll() const {
         std::cout << ":::NODE INFO:::" << std::endl
                   << "id : " << nodeId << std::endl
                   << "net id:" << networkId << std::endl;

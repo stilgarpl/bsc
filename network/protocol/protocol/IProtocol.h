@@ -9,6 +9,7 @@
 #include <future>
 #include <network/protocol/connection/Connection.h>
 #include <network/protocol/logic/events/PacketEvent.h>
+#include <network/protocol/packet/info/PacketInfo.h>
 #include "logic/events/Tick.h"
 #include "logic/LogicManager.h"
 
@@ -51,6 +52,12 @@ public:
     virtual std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p) =0;
 
     virtual void setupLogic(LogicManager &logicManager);
+
+    template<typename SendType, typename ReturnType= typename PacketInfo<typename SendType::BaseType, Status::RESPONSE>::Type>
+    auto sendExpect(Connection *conn, NetworkPacketPointer<SendType> p) {
+        auto future = send(conn, p);
+        return std::static_pointer_cast<ReturnType>(future.get());
+    }
 };
 
 class DummyProtocol : public IProtocol {
@@ -62,6 +69,8 @@ class DummyProtocol : public IProtocol {
 
 public:
     std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p) override;
+
+
 };
 
 #endif //BASYCO_IPROTOCOL_H

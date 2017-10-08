@@ -7,7 +7,6 @@
 #include <network/protocol/context/NodeContext.h>
 #include <network/protocol/context/ConnectionContext.h>
 #include "NetworkInfoRequest.h"
-#include "NetworkInfoResponse.h"
 
 void NetworkInfoRequest::process(Context &context) {
     BasePacket::process(context);
@@ -18,8 +17,7 @@ void NetworkInfoRequest::process(Context &context) {
     if (nodeContext != nullptr && connectionContext != nullptr) {
         NODECONTEXTLOGGER("processing network info request id" + std::to_string(this->getId()));
         auto &node = nodeContext->getNode();
-        auto response = std::make_shared<NetworkInfoResponse>();
-        response->setId(this->getId());
+        auto response = getNew<Status::RESPONSE>(this);//std::make_shared<NetworkInfoResponse>();
         if (node.getNetworkInfo() == nullptr) {
             NODECONTEXTLOGGER("empty network info! ")
         }
@@ -33,6 +31,3 @@ void NetworkInfoRequest::process(Context &context) {
 
 }
 
-NetworkInfoRequest::NetworkInfoRequest() {
-    this->setStatus(Status::REQUEST);
-}

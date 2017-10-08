@@ -6,16 +6,15 @@
 #define BASYCO_NETWORKINFOREQUEST_H
 
 
-class NetworkInfoRequest : public BasePacket {
+#include "NetworkInfoGroup.h"
+
+class NetworkInfoRequest : public Packet<NetworkInfoGroup, NetworkInfoRequest> {
 private:
     template<class Archive>
     void serialize(Archive &ar) {
         ar & cereal::base_class<BasePacket>(this);
 
     }
-
-public:
-    NetworkInfoRequest();
 
 private:
 
