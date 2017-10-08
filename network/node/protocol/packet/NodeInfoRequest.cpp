@@ -4,6 +4,7 @@
 
 #include <network/protocol/context/NodeContext.h>
 #include <network/protocol/context/ConnectionContext.h>
+#include "NodeInfoResponse.h"
 #include "NodeInfoRequest.h"
 
 void NodeInfoRequest::process(Context &context) {
