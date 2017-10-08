@@ -6,15 +6,10 @@
 #define BASYCO_NODEACTIONS_H
 
 
-#include "../../../../../context/Context.h"
-#include "../../../../protocol/logic/events/ConnectionEvent.h"
-#include "../../packet/NodeInfoRequest.h"
-#include "../events/NodeInfoEvent.h"
-#include "../../../../protocol/context/NodeContext.h"
-#include "../../packet/NetworkInfoRequest.h"
-#include "../../../../../logic/events/Tick.h"
-#include "../../../../protocol/context/LogicContext.h"
-#include "../sources/NodeSource.h"
+#include <network/protocol/logic/events/ConnectionEvent.h>
+#include <network/node/protocol/logic/events/NodeInfoEvent.h>
+#include <logic/events/Tick.h>
+#include "context/Context.h"
 
 class NodeActions {
 

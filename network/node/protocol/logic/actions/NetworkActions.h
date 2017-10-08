@@ -6,7 +6,7 @@
 #define BASYCO_NETWORKACTIONS_H
 
 
-#include "../events/NetworkInfoEvent.h"
+#include <network/node/protocol/logic/events/NetworkInfoEvent.h>
 
 class NetworkActions {
 

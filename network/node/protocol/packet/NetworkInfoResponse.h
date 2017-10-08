@@ -6,8 +6,6 @@
 #define BASYCO_NETWORKINFORESPONSE_H
 
 
-#include "../../../protocol/packet/BasePacket.h"
-#include "../../NetworkInfo.h"
 
 class NetworkInfoResponse : public BasePacket {
 private:

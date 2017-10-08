@@ -7,10 +7,8 @@
 
 
 #include <queue>
-#include "../ISource.h"
-#include "../SourceManager.h"
-#include "../../log/Logger.h"
-#include "../../network/protocol/context/NodeContext.h"
+#include "log/Logger.h"
+#include "network/protocol/context/NodeContext.h"
 
 class NullClass {
 };

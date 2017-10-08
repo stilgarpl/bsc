@@ -5,7 +5,7 @@
 #ifndef BASYCO_NETEVENT_H
 #define BASYCO_NETEVENT_H
 
-#include "../../../logic/IEvent.h"
+#include "logic/IEvent.h"
 
 enum class ENetEvent {
     CONNECTION_ESTABLISHED,

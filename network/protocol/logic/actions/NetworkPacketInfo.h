@@ -5,12 +5,12 @@
 #ifndef BASYCO_NETWORKPACKETINFO_H
 #define BASYCO_NETWORKPACKETINFO_H
 
-//#include "../../../../context/Context.h"
-//#include "../events/PacketEvent.h"
+//#include "context/Context.h"
+//#include "events/PacketEvent.h"
 #include <future>
-#include "../../../../logic/events/Tick.h"
-#include "../../packet/BasePacket.h"
-#include "../../connection/Connection.h"
+#include <network/protocol/packet/BasePacket.h>
+#include <network/protocol/connection/Connection.h>
+#include "logic/events/Tick.h"
 
 
 class NetworkPacketInfo {

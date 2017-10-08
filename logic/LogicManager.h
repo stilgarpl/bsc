@@ -8,7 +8,7 @@
 
 #include "SourceManager.h"
 #include "ActionManager.h"
-#include "../thread/Runnable.h"
+#include "thread/Runnable.h"
 
 class LogicManager : public Runnable {
 

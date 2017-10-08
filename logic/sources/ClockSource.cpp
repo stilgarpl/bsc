@@ -3,8 +3,8 @@
 //
 
 #include <thread>
+#include <logic/SourceManager.h>
 #include "ClockSource.h"
-#include "../SourceManager.h"
 
 
 using namespace std::chrono_literals;

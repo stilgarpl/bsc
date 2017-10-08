@@ -3,10 +3,9 @@
 //
 
 #include <Poco/Net/SocketStream.h>
+#include <network/protocol/context/LogicContext.h>
+#include <network/protocol/logic/sources/ConnectionSource.h>
 #include "ClientConnection.h"
-#include "../logic/sources/ConnectionSource.h"
-#include "../../../logic/LogicManager.h"
-#include "../context/LogicContext.h"
 
 
 ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context &context) : socket(a),

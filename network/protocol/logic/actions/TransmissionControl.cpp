@@ -2,8 +2,9 @@
 // Created by stilgar on 03.09.17.
 //
 
+#include <network/protocol/context/NodeContext.h>
 #include "TransmissionControl.h"
-#include "../../context/NodeContext.h"
+
 
 void TransmissionControl::onPacketReceived(const PacketEvent &event) {
 

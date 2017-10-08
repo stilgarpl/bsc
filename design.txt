@@ -149,3 +149,19 @@ runTrans() {
 response = send<NodeInfoResponse>(Request for NodeInfo)
 response.wait() // the actual action will take place in response->process(); which will probably do nothing but request->process() will be the one which prepares the actual answer
 
+
+
+
+
+
+
+
+
+jak zrobic, zeby Graviton wiedzial, jaki jest typ odpowiedzi dla send() ?
+mozna zrobic np. tak:
+
+<T>
+PacketInfo<PacketInfo<T>::BaseType,Status::Response>::Type send(T)
+
+T : public packet<BaseT,Status::Request> <-- packet w jakis sposob by rejestrowal powiazanie T, BaseT i Status w PacketInfo
+

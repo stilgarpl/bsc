@@ -6,10 +6,8 @@
 #define BASYCO_CONNECTIONSOURCE_H
 
 
-#include "../../../../logic/sources/EventQueueSource.h"
-#include "../events/ConnectionEvent.h"
-#include "../../connection/Connection.h"
-#include "../events/PacketEvent.h"
+#include <network/protocol/logic/events/ConnectionEvent.h>
+#include "logic/sources/EventQueueSource.h"
 
 class ConnectionSource : public ISource {
 

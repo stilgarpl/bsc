@@ -6,8 +6,8 @@
 #define BASYCO_NODESOURCE_H
 
 
-#include "../../../../../logic/sources/EventQueueSource.h"
-#include "../events/NodeInfoEvent.h"
+#include <network/node/protocol/logic/events/NodeInfoEvent.h>
+#include "logic/sources/EventQueueSource.h"
 
 class NodeSource : public EventQueueSource<NodeInfoEvent> {
 public:

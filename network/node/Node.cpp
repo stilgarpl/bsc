@@ -4,12 +4,13 @@
 
 #include <Poco/Net/SocketStream.h>
 #include "Node.h"
-#include "../protocol/connection/ServerConnection.h"
-#include "../protocol/context/NodeContext.h"
-#include "../protocol/context/LogicContext.h"
 #include "protocol/packet/NodeInfoRequest.h"
 #include "protocol/packet/NodeInfoResponse.h"
 #include <Poco/Net/NetException.h>
+#include <network/protocol/connection/ServerConnection.h>
+#include <network/protocol/connection/ClientConnection.h>
+#include <network/protocol/context/NodeContext.h>
+#include <network/protocol/context/LogicContext.h>
 
 using namespace Poco::Net;
 

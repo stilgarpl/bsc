@@ -6,7 +6,7 @@
 #define BASYCO_NODECONTEXTINFO_H
 
 
-#include "../../node/Node.h"
+#include "network/node/Node.h"
 #include "IContextSetup.h"
 
 class NodeContext {

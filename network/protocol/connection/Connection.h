@@ -12,8 +12,9 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
-#include "../packet/BasePacket.h"
-#include "../processor/ConnectionProcessor.h"
+#include <network/protocol/processor/ConnectionProcessor.h>
+#include <network/protocol/packet/BasePacket.h>
+
 
 class Connection {
 

@@ -6,10 +6,11 @@
 #define BASYCO_TRANSMISSIONCONTROL_H
 
 
-#include "../../../../context/Context.h"
-#include "../events/PacketEvent.h"
-#include "../../../../logic/events/Tick.h"
-#include "../../protocol/IProtocol.h"
+#include <network/protocol/logic/events/PacketEvent.h>
+#include "context/Context.h"
+
+#include "logic/events/Tick.h"
+
 #include "NetworkPacketInfo.h"
 
 ///@todo move to configuration

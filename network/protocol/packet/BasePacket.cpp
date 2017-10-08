@@ -2,7 +2,7 @@
 // Created by stilgar on 01.08.17.
 //
 
-#include "../../../context/Context.h"
+#include "context/Context.h"
 #include "BasePacket.h"
 
 void BasePacket::process(Context &context) {

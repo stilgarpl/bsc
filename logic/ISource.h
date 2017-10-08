@@ -6,10 +6,10 @@
 #define BASYCO_SOURCE_H
 
 
-#include "../signal/Signal.h"
-#include "../context/Context.h"
-#include "../uber/Uber.h"
-#include "../log/Logger.h"
+#include "signal/Signal.h"
+#include "context/Context.h"
+#include "uber/Uber.h"
+#include "log/Logger.h"
 
 
 ///@todo Clion jest głupi i uważa, że to jest pełna definicja.

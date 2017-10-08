@@ -6,9 +6,10 @@
 #define BASYCO_NETWORKSOURCE_H
 
 
-#include "../events/NodeInfoEvent.h"
-#include "../../../../../logic/sources/EventQueueSource.h"
-#include "../events/NetworkInfoEvent.h"
+#include <network/node/protocol/logic/events/NetworkInfoEvent.h>
+
+#include "logic/sources/EventQueueSource.h"
+
 
 class NetworkSource : public EventQueueSource<NetworkInfoEvent> {
 

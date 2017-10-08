@@ -7,7 +7,7 @@
 
 
 #include "BasePacket.h"
-#include "../../../log/Logger.h"
+#include "log/Logger.h"
 
 class CommandPacket : public BasePacket {
 private:

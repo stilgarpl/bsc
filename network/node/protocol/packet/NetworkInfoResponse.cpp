@@ -2,10 +2,10 @@
 // Created by stilgar on 06.10.17.
 //
 
+#include <log/Logger.h>
+#include <network/node/protocol/logic/sources/NetworkSource.h>
+#include <network/protocol/context/LogicContext.h>
 #include "NetworkInfoResponse.h"
-#include "../logic/sources/NodeSource.h"
-#include "../../../protocol/context/LogicContext.h"
-#include "../logic/sources/NetworkSource.h"
 
 
 void NetworkInfoResponse::process(Context &context) {

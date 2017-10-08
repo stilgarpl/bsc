@@ -6,8 +6,9 @@
 #define BASYCO_NETWORKINFOEVENT_H
 
 
-#include "../../../../../logic/IEvent.h"
-#include "../../../NetworkInfo.h"
+#include <network/node/NetworkInfo.h>
+#include "logic/IEvent.h"
+
 
 enum class NetworInfoEventId {
     NETWORK_INFO_RECEIVED

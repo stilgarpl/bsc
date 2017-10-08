@@ -7,10 +7,10 @@
 
 
 #include <future>
-#include "../connection/Connection.h"
-#include "../../../logic/events/Tick.h"
-#include "../logic/events/PacketEvent.h"
-#include "../../../logic/LogicManager.h"
+#include <network/protocol/connection/Connection.h>
+#include <network/protocol/logic/events/PacketEvent.h>
+#include "logic/events/Tick.h"
+#include "logic/LogicManager.h"
 
 class IProtocol;
 

@@ -7,12 +7,12 @@
 //#define CEREAL_THREAD_SAFE 1
 
 
-#include "../enum/Command.h"
-#include "../../../context/Context.h"
-#include "../enum/Status.h"
 
-#include "../../../utils/cereal_include.h"
-#include "../../../log/Logger.h"
+#include <network/protocol/enum/Status.h>
+#include "utils/cereal_include.h"
+#include "log/Logger.h"
+
+#include "context/Context.h"
 
 class BasePacket {
 public:

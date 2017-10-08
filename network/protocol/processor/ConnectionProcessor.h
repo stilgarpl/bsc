@@ -7,9 +7,9 @@
 
 
 #include <thread>
-#include "../../../thread/Runnable.h"
-#include "../../../context/Context.h"
-#include "../../../log/Logger.h"
+#include "thread/Runnable.h"
+#include "context/Context.h"
+#include "log/Logger.h"
 
 
 class Connection;

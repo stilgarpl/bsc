@@ -2,6 +2,9 @@
 // Created by stilgar on 08.09.17.
 //
 
+#include <network/protocol/context/NodeContext.h>
+#include <network/node/protocol/packet/NodeInfoRequest.h>
+#include <network/node/protocol/packet/NetworkInfoRequest.h>
 #include "NodeActions.h"
 
 

@@ -6,8 +6,9 @@
 #define BASYCO_GRAVITONPROTOCOL_H
 
 
+#include <network/protocol/logic/actions/NetworkPacketInfo.h>
 #include "IProtocol.h"
-#include "../logic/actions/NetworkPacketInfo.h"
+
 
 class GravitonProtocol : public IProtocol {
 private:

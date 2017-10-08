@@ -2,9 +2,9 @@
 // Created by stilgar on 08.09.17.
 //
 
+#include <network/protocol/context/LogicContext.h>
+#include <network/node/protocol/logic/sources/NodeSource.h>
 #include "NodeInfoResponse.h"
-#include "../../../protocol/context/LogicContext.h"
-#include "../logic/sources/NodeSource.h"
 
 const NodeInfo &NodeInfoResponse::getNodeInfo() const {
     return nodeInfo;

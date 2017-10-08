@@ -13,7 +13,7 @@
 #include <cereal/access.hpp>
 //#include "Node.h"
 
-#include "../../utils/cereal_include.h"
+#include "utils/cereal_include.h"
 
 
 typedef std::string NodeIdType;

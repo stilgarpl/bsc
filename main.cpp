@@ -18,16 +18,96 @@ using namespace std::chrono_literals;
 
 #include <fstream>
 
-
-class RefX {
-    int &a;
+template<typename PacketType, enum Status>
+class PacketInfo {
 public:
-    int &getA() const { return a; };
 
-    RefX(int &a) : a(a) {};
+
+};
+
+template<typename PacketType>
+class PacketInfo<PacketType, Status::REQUEST> {
+public:
+    typedef typename PacketType::Request Type;
+};
+
+template<typename PacketType>
+class PacketInfo<PacketType, Status::RESPONSE> {
+public:
+
+
+    typedef typename PacketType::Response Type;
 };
 
 
+struct PacketBase {
+    //typedef PacketType::Base BaseType;
+
+
+};
+
+template<typename T>
+struct Packet {
+    typedef T BaseType;
+};
+
+class Base {
+public:
+    class Request : public Packet<Base> {
+    public:
+        void print() {
+            std::cout << "DUPA" << std::endl;
+            exit(0);
+        }
+        //  typedef Base BaseType;
+    };
+
+    class Response : public Packet<Base> {
+    public:
+        void print() {
+            std::cout << "Base Response" << std::endl;
+            exit(0);
+        }
+    };
+
+    class Error {
+    };
+
+    typedef Base BaseType;
+};
+
+class Derived : public Base {
+public:
+    class Request : public Packet<Derived> {
+    public:
+        void print() {
+            std::cout << "DUPA Derived" << std::endl;
+            exit(0);
+        }
+        //  typedef Base BaseType;
+    };
+
+    class Response : public Packet<Derived> {
+    public:
+        void print() {
+            std::cout << "Derived Response" << std::endl;
+            exit(0);
+        }
+    };
+};
+
+
+template<typename T>
+typename T::BaseType::Response getResponse(T request) {
+    typename T::BaseType::Response ret;
+    return ret;
+}
+
+template<enum Status s, typename T>
+auto getType(T t) {
+    typename PacketInfo<typename T::BaseType, s>::Type ret;
+    return ret;
+};
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
     //adding sources
     logicManager.addSource<AuthSource>();
@@ -140,11 +220,16 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
 int main() {
 
-    int ii = 7;
-    RefX i(ii);
-    i.getA() = 5;
-    LOGGER(std::to_string(i.getA()));
-
+//  //  Base::Request::BaseType::Request x1;
+//  //  std::cout << typeid(x1).name() << std::endl;
+//    PacketInfo<Derived,Status::REQUEST>::Type x;
+//    Base::Response y;
+//    auto reqY = getType<Status::REQUEST>(y);
+//    reqY.print();
+//    auto resp = getType<Status::REQUEST>(x);//getResponse(x);
+//    resp.print();
+//    x.print();
+//    //PacketInfo<Base,Status::RESPONSE>::Type a;
 
     LogicManager logicManager;
     logicManager.addSource<ClockSource>();

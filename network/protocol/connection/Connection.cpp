@@ -3,10 +3,9 @@
 //
 //#define CEREAL_THREAD_SAFE 1
 
-#include "ClientConnection.h"
-#include "../context/ConnectionContext.h"
-#include "../context/LogicContext.h"
-#include "../logic/sources/ConnectionSource.h"
+#include <network/protocol/logic/sources/ConnectionSource.h>
+#include <network/protocol/context/LogicContext.h>
+#include <network/protocol/context/ConnectionContext.h>
 
 using namespace std::chrono_literals;
 

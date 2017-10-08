@@ -6,8 +6,6 @@
 #define BASYCO_NETWORKINFOREQUEST_H
 
 
-#include "../../../protocol/packet/BasePacket.h"
-
 class NetworkInfoRequest : public BasePacket {
 private:
     template<class Archive>

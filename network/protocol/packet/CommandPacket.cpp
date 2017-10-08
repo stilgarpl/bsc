@@ -2,8 +2,11 @@
 // Created by stilgar on 21.08.17.
 //
 
+#include <context/Context.h>
+#include <network/protocol/context/ConnectionContext.h>
+#include <network/protocol/enum/Command.h>
 #include "CommandPacket.h"
-#include "../context/ConnectionContext.h"
+
 
 void CommandPacket::process(Context &context) {
     logger.error("Command packet process ");

@@ -6,7 +6,7 @@
 #define BASYCO_ICONTEXTSETUP_H
 
 
-#include "../../../context/Context.h"
+#include "context/Context.h"
 
 class IContextSetup {
 

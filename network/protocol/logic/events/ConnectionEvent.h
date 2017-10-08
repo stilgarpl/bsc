@@ -5,8 +5,9 @@
 #ifndef BASYCO_CONNECTIONEVENT_H
 #define BASYCO_CONNECTIONEVENT_H
 
-#include "../../../../logic/IEvent.h"
-#include "../../connection/Connection.h"
+#include <network/protocol/connection/Connection.h>
+#include "logic/IEvent.h"
+
 
 enum class ConnectionEventId {
     NEW_CONNECTION,

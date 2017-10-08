@@ -4,8 +4,8 @@
 
 
 #include "NetworkInfo.h"
-#include "../protocol/context/NodeContext.h"
-#include "../protocol/context/LogicContext.h"
+#include "network/protocol/context/NodeContext.h"
+#include "network/protocol/context/LogicContext.h"
 #include "protocol/logic/sources/NodeSource.h"
 
 

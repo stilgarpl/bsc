@@ -6,7 +6,7 @@
 #define BASYCO_CONNECTIONCONTEXTINFO_H
 
 
-#include "../connection/Connection.h"
+#include <network/protocol/connection/Connection.h>
 #include "IContextSetup.h"
 
 class ConnectionContext {

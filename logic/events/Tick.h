@@ -6,8 +6,9 @@
 #define BASYCO_TICK_H
 
 
-#include "../IEvent.h"
+
 #include <chrono>
+#include <logic/IEvent.h>
 
 /**
  * tickuje co int czasu

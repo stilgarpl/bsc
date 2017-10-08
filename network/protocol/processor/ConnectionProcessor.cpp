@@ -3,9 +3,8 @@
 //
 
 #include <iostream>
-#include "ConnectionProcessor.h"
+#include <network/protocol/connection/Connection.h>
 
-#include "../connection/Connection.h"
 
 ConnectionProcessor::ConnectionProcessor(Connection &connection) : connection(connection) {
 

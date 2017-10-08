@@ -2,7 +2,7 @@
 // Created by stilgar on 07.10.17.
 //
 
-#include "NodeActions.h"
+#include <network/protocol/context/NodeContext.h>
 #include "NetworkActions.h"
 
 void NetworkActions::updateNetworkInfo(const NetworkInfoEvent &event) {

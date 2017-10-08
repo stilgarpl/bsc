@@ -6,8 +6,8 @@
 #define BASYCO_NODEINFORESPONSE_H
 
 
-#include "../../../protocol/packet/BasePacket.h"
-#include "../../NodeInfo.h"
+#include <network/protocol/packet/BasePacket.h>
+#include <network/node/NodeInfo.h>
 
 class NodeInfoResponse : public BasePacket {
 private:

@@ -7,8 +7,8 @@
 
 #include <Poco/Net/TCPServerConnection.h>
 #include <Poco/Net/TCPServerConnectionFactory.h>
-#include "../../node/Node.h"
-#include "../context/IContextSetup.h"
+#include <network/node/Node.h>
+#include "Connection.h"
 
 class ServerConnection : public Poco::Net::TCPServerConnection, public Connection {
 

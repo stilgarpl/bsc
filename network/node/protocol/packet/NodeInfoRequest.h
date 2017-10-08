@@ -6,7 +6,8 @@
 #define BASYCO_NODEINFOREQUEST_H
 
 
-#include "../../../protocol/packet/BasePacket.h"
+#include <network/protocol/packet/BasePacket.h>
+
 
 class NodeInfoRequest : public BasePacket {
     ///@todo add optional id field - if empty, request is for this packet, if not, request is for node info for other known node

@@ -9,7 +9,7 @@
 #include <list>
 #include "NodeInfo.h"
 #include "cereal/types/map.hpp"
-#include "../../log/Logger.h"
+#include "log/Logger.h"
 #include "experimental/optional"
 
 //typedef std::string NetworkIdType;

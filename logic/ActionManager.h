@@ -7,9 +7,9 @@
 
 
 #include <map>
-#include "../uber/Uber.h"
-#include "../signal/Signal.h"
-#include "../context/Context.h"
+#include "uber/Uber.h"
+#include "signal/Signal.h"
+#include "context/Context.h"
 #include <experimental/optional>
 
 class ActionManager {

@@ -2,10 +2,11 @@
 // Created by stilgar on 06.10.17.
 //
 
+#include <context/Context.h>
+#include <network/protocol/packet/BasePacket.h>
+#include <network/protocol/context/NodeContext.h>
+#include <network/protocol/context/ConnectionContext.h>
 #include "NetworkInfoRequest.h"
-#include "NodeInfoResponse.h"
-#include "../../../protocol/context/ConnectionContext.h"
-#include "../../../protocol/context/NodeContext.h"
 #include "NetworkInfoResponse.h"
 
 void NetworkInfoRequest::process(Context &context) {

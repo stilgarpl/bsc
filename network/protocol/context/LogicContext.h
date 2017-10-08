@@ -6,7 +6,7 @@
 #define BASYCO_LOGICCONTEXT_H
 
 
-#include "../../../logic/LogicManager.h"
+#include "logic/LogicManager.h"
 
 class LogicContext {
 

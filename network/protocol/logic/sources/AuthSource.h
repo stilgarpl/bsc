@@ -6,9 +6,10 @@
 #define BASYCO_AUTHSOURCE_H
 
 
-#include "../../../../logic/ISource.h"
-#include "../../../../logic/sources/EventQueueSource.h"
-#include "../events/AuthEvent.h"
+#include <network/protocol/logic/events/AuthEvent.h>
+#include "logic/ISource.h"
+#include "logic/sources/EventQueueSource.h"
+
 
 class AuthSource : public EventQueueSource<AuthEvent> {
 public:

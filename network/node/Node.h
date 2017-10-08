@@ -7,17 +7,18 @@
 
 
 #include "NodeInfo.h"
-#include "../protocol/connection/ClientConnection.h"
+
 #include "NetworkInfo.h"
-#include "../service/NetworkServiceManager.h"
-#include "../../configuration/IConfig.h"
-#include "../../logic/SourceManager.h"
-#include "../../logic/LogicManager.h"
-#include "../protocol/protocol/IProtocol.h"
-#include "../protocol/protocol/GravitonProtocol.h"
+
+#include "configuration/IConfig.h"
+#include "logic/SourceManager.h"
+#include "logic/LogicManager.h"
 #include <Poco/Net/ServerSocket.h>
 #include <memory>
 #include <Poco/Net/TCPServer.h>
+#include <network/protocol/connection/Connection.h>
+#include <network/protocol/protocol/IProtocol.h>
+#include <network/protocol/protocol/GravitonProtocol.h>
 
 ///@todo separate interface so NodeInfo can include INode, and Node can include NodeInfo
 

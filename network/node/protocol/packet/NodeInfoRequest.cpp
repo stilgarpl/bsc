@@ -2,10 +2,12 @@
 // Created by stilgar on 08.09.17.
 //
 
+#include <network/protocol/context/NodeContext.h>
+#include <network/protocol/context/ConnectionContext.h>
 #include "NodeInfoRequest.h"
-#include "../../../protocol/context/NodeContext.h"
+
 #include "NodeInfoResponse.h"
-#include "../../../protocol/context/ConnectionContext.h"
+
 
 void NodeInfoRequest::process(Context &context) {
     BasePacket::process(context);

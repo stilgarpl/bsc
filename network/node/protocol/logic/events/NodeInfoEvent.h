@@ -6,9 +6,9 @@
 #define BASYCO_NODEEVENT_H
 
 
-#include "../../../NodeInfo.h"
-#include "../../../../../logic/IEvent.h"
-#include "../../../Node.h"
+#include <network/node/NodeInfo.h>
+#include "logic/IEvent.h"
+
 
 enum class NodeEventId {
     NEW_NODE_DISCOVERED,

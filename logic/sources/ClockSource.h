@@ -5,9 +5,9 @@
 #ifndef BASYCO_CLOCKSOURCE_H
 #define BASYCO_CLOCKSOURCE_H
 
-#include "../events/Tick.h"
 #include <chrono>
-#include "../ISource.h"
+#include <logic/ISource.h>
+#include <logic/events/Tick.h>
 
 class ClockSource : public ISource {
     typedef Tick::clock clock;
