@@ -25,7 +25,7 @@ Runnable::~Runnable() {
 
 void Runnable::stop() {
     stopping = true;
-    ///@todo kill ? join?iliokl
+    ///@todo kill ? join?
 
 }
 

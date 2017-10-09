@@ -92,7 +92,8 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
             //  std::cout << "work::receive " << socket.address().port() << std::endl;
             BasePacketPtr v;
             try {
-                while (!socket.available() && receiving) {
+                while (!socket.available() && receiving &&
+                       socket.poll(Poco::Timespan(1, 1), Poco::Net::Socket::SELECT_READ)) {
                     ///@todo not like this
                     std::this_thread::sleep_for(1ms);
                 }
@@ -120,11 +121,11 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                 //socket.close();
                 stopReceiving();
                 stopSending();
-                processor.stop();
+                //cprocessor.stop();
                 // if not receiving, then it's ok!
             }
             catch (Poco::Net::NetException e) {
-                processor.stop();
+                //processor.stop();
                 stopReceiving();
                 stopSending();
                 e.displayText();
@@ -194,6 +195,8 @@ Connection::~Connection() {
     if (sendThread != nullptr) {
         sendThread->join();
     }
+    processor.stop();
+    processor.join();
 
 
 }

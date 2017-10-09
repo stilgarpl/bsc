@@ -80,6 +80,7 @@ public:
 private:
     std::shared_ptr<Poco::Net::ServerSocket> serverSocket;
     std::shared_ptr<Poco::Net::TCPServer> server;
+    std::mutex acceptedConnectionsMutex;
     std::list<IServerConnection *> acceptedConnections; //server side
     NodeInfo thisNodeInfo;
     std::shared_ptr<NetworkInfo> networkInfo;// = nsm(networkInfo); //network this node belongs to @todo more than 1?

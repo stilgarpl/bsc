@@ -49,7 +49,7 @@ void ServerConnection::stop() {
     try {
         stopSending();
         stopReceiving();
-        // socket().shutdown();
+        socket().shutdown();
     }
     catch (const Poco::Net::NetException &e) {
         e.displayText();

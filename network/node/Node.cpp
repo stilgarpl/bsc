@@ -56,8 +56,9 @@ bool Node::connectTo(const NodeInfo &nodeInfo) {
 }
 
 Node::~Node() {
-
+    std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
     stop();
+
 
 }
 
@@ -204,10 +205,13 @@ void Node::printConnections() {
 }
 
 void Node::removeAcceptedConnection(IServerConnection *c) {
+    LOGGER("REMOVE REMOVE REMOVE");
+    std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
     acceptedConnections.remove(c);
 }
 
 void Node::addAcceptedConnection(IServerConnection *c) {
+    std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
     acceptedConnections.push_back(c);
 }
 
@@ -215,6 +219,7 @@ void Node::stopAcceptedConnections() {
     for (auto &&it : acceptedConnections) {
         it->stop();
     }
+    acceptedConnections.remove_if([](auto) { return true; });
 }
 
 void Node::purgeInactiveConnections() {

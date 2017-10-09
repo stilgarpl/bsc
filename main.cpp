@@ -222,8 +222,8 @@ int main() {
     thisNode.printConnections();
     otherNode.printConnections();
     thirdNode.printConnections();
-    std::this_thread::sleep_for(15s);
-    thirdNode.stop();
+    std::this_thread::sleep_for(5s);
+    thisNode.stop();
     otherNode.stop();
     thirdNode.stop();
     std::this_thread::sleep_for(5s);
@@ -234,5 +234,10 @@ int main() {
     thisNode.printConnections();
     otherNode.printConnections();
     thirdNode.printConnections();
+    LOGGER("finishing");
+
+    std::this_thread::sleep_for(5s);
+    LOGGER("finished");
+
     return 0;
 }
