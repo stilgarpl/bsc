@@ -192,7 +192,6 @@ void Node::purgeDuplicateConnections() {
 }
 
 void Node::printConnections() {
-    ///@todo remove debug
     std::cout << "[" << this->thisNodeInfo.getNodeId() << "]:" << std::to_string(acceptedConnections.size())
               << std::endl;
     for (auto &&item : activeClientConnections) {
@@ -205,7 +204,7 @@ void Node::printConnections() {
 }
 
 void Node::removeAcceptedConnection(IServerConnection *c) {
-    LOGGER("REMOVE REMOVE REMOVE");
+    // LOGGER("REMOVE REMOVE REMOVE");
     std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
     acceptedConnections.remove(c);
 }

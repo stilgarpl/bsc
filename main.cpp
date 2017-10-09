@@ -62,17 +62,17 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
     logicManager.setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
 
-    //  assigning actions
-    if (logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
-                                               PacketEventId::PACKET_RECEIVED)) {
-        std::clog << "Debug: PACK RECV assignment!" << std::endl;
-    }
-    logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_SENT, PacketEventId::PACKET_SENT);
-
-    if (logicManager.assignAction<Tick>(500ms, "TransTick")) {
-        std::clog << "Debug: Trans tick assignment!" << std::endl;
-
-    }
+//    //  assigning actions
+//    if (logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
+//                                               PacketEventId::PACKET_RECEIVED)) {
+//        std::clog << "Debug: PACK RECV assignment!" << std::endl;
+//    }
+//    logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_SENT, PacketEventId::PACKET_SENT);
+//
+//    if (logicManager.assignAction<Tick>(500ms, "TransTick")) {
+//        std::clog << "Debug: Trans tick assignment!" << std::endl;
+//
+//    }
 
     if (logicManager.assignAction<ConnectionEvent>("connDebug")) {
         std::clog << "Debug: ConEv assignment!" << std::endl;
@@ -115,11 +115,11 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
         std::clog << "Debug: addKnownNode assignment!" << std::endl;
 
     }
-//
-//    if (logicManager.assignAction<Tick>(1500ms, "trigNodeUp")) {
-//        std::clog << "Debug: TtrigNodeUp assignment!" << std::endl;
-//
-//    }
+
+    if (logicManager.assignAction<Tick>(1500ms, "trigNodeUp")) {
+        std::clog << "Debug: TtrigNodeUp assignment!" << std::endl;
+
+    }
 
 
 //
@@ -193,15 +193,15 @@ int main() {
     thirdNode.getNodeInfo().setNodeId("third node");
     thirdNode.addToNetwork("TheNetwork");
     setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
-    //   thirdNode.start();
+    thirdNode.start();
 
 
     thisNode.getNodeInfo().printAll();
     otherNode.getNodeInfo().printAll();
     thirdNode.getNodeInfo().printAll();
     thisNode.connectTo("127.0.0.1:9999");
-    //    otherNode.connectTo("127.0.0.1:9898");
-    // thisNode.connectTo("127.0.0.1:100");
+    otherNode.connectTo("127.0.0.1:9898");
+    thisNode.connectTo("127.0.0.1:100");
     std::this_thread::sleep_for(5s);
 
     thisNode.updateNodeConnectionInfo();
@@ -217,20 +217,22 @@ int main() {
     otherNode.purgeDuplicateConnections();
     thirdNode.purgeDuplicateConnections();
     thisNode.purgeInactiveConnections();
+    otherNode.purgeInactiveConnections();
+    thirdNode.purgeInactiveConnections();
     LOGGER("lala");
     std::this_thread::sleep_for(2s);
     thisNode.printConnections();
     otherNode.printConnections();
     thirdNode.printConnections();
     std::this_thread::sleep_for(5s);
+    LOGGER("stopping");
     thisNode.stop();
     otherNode.stop();
     thirdNode.stop();
     std::this_thread::sleep_for(5s);
     thisNode.purgeInactiveConnections();
-//    thisNode.updateNodeConnectionInfo();
-//    otherNode.updateNodeConnectionInfo();
-//    thirdNode.updateNodeConnectionInfo();
+    otherNode.purgeInactiveConnections();
+    thirdNode.purgeInactiveConnections();
     thisNode.printConnections();
     otherNode.printConnections();
     thirdNode.printConnections();

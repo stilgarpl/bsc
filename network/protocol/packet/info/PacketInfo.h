@@ -68,6 +68,13 @@ struct PacketUtils {
         return ptr;
     };
 
+    //used for shared_ptr<Packet>
+    template<enum Status s, typename TPtr>
+    static auto getNewPtr(const TPtr &t) {
+
+        return getNewPtr<s>(t.get());
+    };
+
     template<enum Status s, typename T>
     static auto getNewPtr() {
         std::shared_ptr<typename PacketInfo<typename T::BaseType, s>::Type> ret = std::make_shared<typename PacketInfo<typename T::BaseType, s>::Type>();

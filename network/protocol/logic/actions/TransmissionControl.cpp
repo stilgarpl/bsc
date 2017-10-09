@@ -8,6 +8,7 @@
 
 void TransmissionControl::onPacketReceived(const PacketEvent &event) {
 
+    std::lock_guard<std::mutex> g(controlLock);
     const BasePacketPtr &packet = event.getPacket();
     //  NODECONTEXTLOGGER("on PacketReceived"+ std::to_string(packet->getId()));
     //   LOGGER("TC::OPR" + std::to_string(packet->getId()));
@@ -36,6 +37,7 @@ void TransmissionControl::onPacketReceived(const PacketEvent &event) {
 }
 
 void TransmissionControl::onPacketSent(const PacketEvent &event) {
+    std::lock_guard<std::mutex> g(controlLock);
     const BasePacketPtr packetPtr = event.getPacket();
     //  NODECONTEXTLOGGER("on PacketSent" + std::to_string(packetPtr->getId()));
     if (packetPtr != nullptr) {
@@ -69,10 +71,12 @@ void TransmissionControl::onPacketSent(const PacketEvent &event) {
 }
 
 void TransmissionControl::work(const Tick &tick) {
+    std::lock_guard<std::mutex> g(controlLock);
     //  std::clog << " TransControl::" << __func__ << std::endl;
 
 
     for (auto &&it : packetsWaitingForAck) {
+        ///@todo segfault here, probably from second/it being deleted in another event
         if (tick.getNow() - it.second->getTimeSent() > MAX_TIMEOUT) {
             if (it.second->getConnection() != nullptr) {
                 LOGGER("Resending packet " + std::to_string(it.second->getPacketPtr()->getId()))
@@ -86,10 +90,11 @@ void TransmissionControl::work(const Tick &tick) {
         if (tick.getNow() - it.second->getTimeSent() > MAX_TIMEOUT) {
             if (it.second->getConnection() != nullptr) {
                 //@todo send immediately? or wait for timeout?
-                BasePacketPtr ackPacket = std::make_shared<BasePacket>();
-                ackPacket->setId(it.second->getPacketPtr()->getId());
-                ackPacket->setStatus(Status::ACK);
-                //  NODECONTEXTLOGGER("sending response " + std::to_string(ackPacket->getId()));
+
+                BasePacketPtr ackPacket = PacketUtils::getNewPtr<Status::ACK>(it.second->getPacketPtr());
+                //ackPacket->setId(it.second->getPacketPtr()->getId());
+                //ackPacket->setStatus(Status::ACK);
+                NODECONTEXTLOGGER("sending response " + std::to_string(ackPacket->getId()));
 
                 it.second->getConnection()->send(ackPacket);
             }

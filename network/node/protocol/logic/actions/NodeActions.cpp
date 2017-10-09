@@ -49,7 +49,7 @@ void NodeActions::triggerUpdateNode(const Tick &tick) {
         auto &node = nodeContext->getNode();
 
         for (auto &&it :node.getClientConnections()) {
-            BasePacketPtr req = std::make_shared<NodeInfoRequest>();
+            BasePacketPtr req = NodeInfoRequest::getNew();
             it->connection->send(req);
             req = std::make_shared<NetworkInfoRequest>();
             it->connection->send(req);

@@ -17,7 +17,7 @@
 static const Tick::clock::duration MAX_TIMEOUT = 5500ms;
 
 class TransmissionControl /*: IProtocol*/{
-
+    std::mutex controlLock;
     std::map<BasePacket::IdType, std::shared_ptr<BasePacketInfo>> packetsWaitingForAck;
     std::map<BasePacket::IdType, std::shared_ptr<BasePacketInfo>> packetsWaitingToAck;
 

@@ -186,7 +186,7 @@ Context &Connection::getConnectionContext() {
 
 Connection::~Connection() {
 
-    LOGGER("Closing connection")
+    //   LOGGER("Closing connection")
     stopReceiving();
     stopSending();
     if (receiveThread != nullptr) {
