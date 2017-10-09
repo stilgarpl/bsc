@@ -51,6 +51,10 @@ public:
 
     virtual void stopReceiving();
 
+    bool isActive() {
+        return sending && receiving;
+    }
+
 protected:
 
 public:
@@ -63,6 +67,8 @@ public:
     ConnectionProcessor &getProcessor();
 
     Context &getConnectionContext();
+
+    virtual ~Connection();
 
 
 };

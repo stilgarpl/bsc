@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <iostream>
+#include <Poco/Net/NetException.h>
 #include "ServerConnection.h"
 
 using namespace std::chrono_literals;
@@ -15,7 +16,7 @@ void ServerConnection::run() {
     startSending(socket());
     workReceive(socket());
 
-    //  std::cout << "CLOSING CONNECTION";
+    std::cout << "CLOSING CONNECTION" << std::endl;
 
 }
 
@@ -23,7 +24,10 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &
         : TCPServerConnection(
         socket),
           serverNode(serverNode),
-          Connection(context) {}
+          IServerConnection(context) {
+
+    serverNode.addAcceptedConnection(this);
+}
 
 void ServerConnection::startReceiving(Poco::Net::StreamSocket &socket) {
     processor.start();
@@ -32,6 +36,29 @@ void ServerConnection::startReceiving(Poco::Net::StreamSocket &socket) {
 
 void ServerConnection::stopReceiving() {
     Connection::stopReceiving();
+}
+
+ServerConnection::~ServerConnection() {
+    LOGGER("Server conn dest");
+    serverNode.removeAcceptedConnection(this);
+    stop();
+}
+
+void ServerConnection::stop() {
+    LOGGER("stop");
+    try {
+        stopSending();
+        stopReceiving();
+        // socket().shutdown();
+    }
+    catch (const Poco::Net::NetException &e) {
+        e.displayText();
+        auto nested = e.nested();
+        while (nested != nullptr) {
+            nested->displayText();
+            nested = nested->nested();
+        }
+    }
 }
 
 

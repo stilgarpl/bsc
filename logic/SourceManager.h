@@ -9,6 +9,9 @@
 #include "ISource.h"
 #include <list>
 #include <memory>
+#include <thread>
+
+using namespace std::chrono_literals;
 
 class SourceManager {
 public:
@@ -32,6 +35,7 @@ public:
                 i->work();
             }
         }
+        std::this_thread::sleep_for(10ms);
     }
 
     template<typename SourceType, typename... Args>

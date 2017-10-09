@@ -9,8 +9,9 @@
 #include <Poco/Net/TCPServerConnectionFactory.h>
 #include <network/node/Node.h>
 #include "Connection.h"
+#include "IServerConnection.h"
 
-class ServerConnection : public Poco::Net::TCPServerConnection, public Connection {
+class ServerConnection : public Poco::Net::TCPServerConnection, public IServerConnection {
 
 private:
     Node &serverNode;
@@ -23,6 +24,10 @@ public:
     void startReceiving(Poco::Net::StreamSocket &socket) override;
 
     void stopReceiving() override;
+
+    virtual ~ServerConnection();
+
+    void stop() override;
 };
 
 

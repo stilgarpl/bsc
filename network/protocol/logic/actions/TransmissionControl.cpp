@@ -37,13 +37,13 @@ void TransmissionControl::onPacketReceived(const PacketEvent &event) {
 
 void TransmissionControl::onPacketSent(const PacketEvent &event) {
     const BasePacketPtr packetPtr = event.getPacket();
-    NODECONTEXTLOGGER("on PacketSent" + std::to_string(packetPtr->getId()));
+    //  NODECONTEXTLOGGER("on PacketSent" + std::to_string(packetPtr->getId()));
     if (packetPtr != nullptr) {
         //@todo store sent time
         switch (packetPtr->getStatus()) {
             case Status::REQUEST: {
                 if (!packetPtr->isRetry()) {
-                    NODECONTEXTLOGGER("S-REQUEST " + std::to_string(packetPtr->getId()));
+                    //  NODECONTEXTLOGGER("S-REQUEST " + std::to_string(packetPtr->getId()));
 
                     ///@todo pointer or something else
                     packetsWaitingForAck[packetPtr->getId()] = std::make_shared<BasePacketInfo>(packetPtr,

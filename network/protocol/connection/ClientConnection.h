@@ -22,6 +22,8 @@ public:
 
     void startSending();
 
+    virtual ~ClientConnection();
+
 
 };
 

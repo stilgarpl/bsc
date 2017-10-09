@@ -6,13 +6,13 @@
 
 void GravitonProtocol::onPacketSent(const PacketEvent &event) {
     std::lock_guard<std::mutex> g(lock);
-    LOGGER("onPacketSent");
+    //  LOGGER("onPacketSent");
     ///@todo maybe check if packet is in the response map?
 }
 
 void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
     std::lock_guard<std::mutex> g(lock);
-    LOGGER("onPacketReceived");
+    //  LOGGER("onPacketReceived");
     ///
     if (event.getPacket()->getStatus() != Status::ACK) {
         auto &ptr = responseMap[event.getPacket()->getId()];
@@ -25,12 +25,12 @@ void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
 
 void GravitonProtocol::work(const Tick &tick) {
     std::lock_guard<std::mutex> g(lock);
-    LOGGER("onWork");
+    //  LOGGER("onWork");
 }
 
 std::future<BasePacketPtr> GravitonProtocol::send(Connection *conn, BasePacketPtr p) {
     std::lock_guard<std::mutex> g(lock);
-    LOGGER("send");
+    //  LOGGER("send");
     std::shared_ptr<BasePacketInfo> ptr = std::make_shared<BasePacketInfo>(p, conn,
                                                                            std::chrono::steady_clock::now());
 

@@ -18,9 +18,19 @@ void ConnectionProcessor::run() {
 
     while (!this->isStopping()) {
         auto np = connection.receive();
-        np->process(context);
+        if (np != nullptr) {
+            np->process(context);
+        } else {
+            ///@todo error handling
+        }
 
     }
+
+}
+
+ConnectionProcessor::~ConnectionProcessor() {
+
+    this->stop();
 
 }
 

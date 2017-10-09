@@ -31,3 +31,9 @@ void ClientConnection::startSending() {
     Connection::startSending(socket);
 
 }
+
+ClientConnection::~ClientConnection() {
+
+    socket.shutdown();
+
+}

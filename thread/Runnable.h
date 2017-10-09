@@ -22,6 +22,8 @@ public:
 
     virtual void stop() final;
 
+    virtual void join() final;
+
     void operator()();
 
     virtual ~Runnable();

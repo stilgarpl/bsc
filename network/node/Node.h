@@ -19,6 +19,7 @@
 #include <network/protocol/connection/Connection.h>
 #include <network/protocol/protocol/IProtocol.h>
 #include <network/protocol/protocol/GravitonProtocol.h>
+#include <network/protocol/connection/IServerConnection.h>
 
 ///@todo separate interface so NodeInfo can include INode, and Node can include NodeInfo
 
@@ -79,12 +80,15 @@ public:
 private:
     std::shared_ptr<Poco::Net::ServerSocket> serverSocket;
     std::shared_ptr<Poco::Net::TCPServer> server;
+    std::list<IServerConnection *> acceptedConnections; //server side
     NodeInfo thisNodeInfo;
     std::shared_ptr<NetworkInfo> networkInfo;// = nsm(networkInfo); //network this node belongs to @todo more than 1?
-    std::list<NodeConnectionInfoPtr> activeClientConnections;
+    std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
+
 
 public:
 
+    //@todo this should not be public
     decltype(activeClientConnections) &getClientConnections() {
         return activeClientConnections;
     }
@@ -95,6 +99,14 @@ protected:
     void removeActiveClientConnection(NodeConnectionInfoPtr c);
 
     void work();
+
+private:
+    void stopAcceptedConnections();
+
+public: // @todo should be public or shouldn't ?
+    void addAcceptedConnection(IServerConnection *c);
+
+    void removeAcceptedConnection(IServerConnection *c);
 public:
     void listen();
 
@@ -139,15 +151,11 @@ public:
 
     void updateNodeConnectionInfo();
 
-    void printConnections() {
-        for (auto &&item : activeClientConnections) {
-            if (item->nodeId) {
-                std::cout << "Connection: NO ID" << std::endl;
-            } else {
-                std::cout << "Connection: " << *item->nodeId << std::endl;
-            }
-        }
-    }
+    void purgeDuplicateConnections();
+
+    void purgeInactiveConnections();
+
+    void printConnections();
 
     friend class NodeActions;
 };

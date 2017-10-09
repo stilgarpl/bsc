@@ -27,6 +27,8 @@ protected:
 public:
     ConnectionProcessor(Connection &connection);
 
+    virtual ~ConnectionProcessor();
+
 };
 
 

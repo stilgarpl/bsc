@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 20.08.17.
+// Created by 23stilgar on 20.08.17.
 //
 
 #include "Runnable.h"
@@ -18,18 +18,22 @@ void Runnable::operator()() {
 Runnable::~Runnable() {
 
     //@todo kill the thread
-    if (thread != nullptr) {
-        thread->join();
-    }
+    join();
 
 
 }
 
 void Runnable::stop() {
     stopping = true;
+    ///@todo kill ? join?iliokl
 
 }
 
 bool Runnable::isStopping() const {
     return stopping;
+}
+
+void Runnable::join() {
+    if (thread != nullptr && thread->joinable())
+        thread->join();
 }

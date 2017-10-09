@@ -6,6 +6,7 @@
 #include <network/protocol/logic/sources/ConnectionSource.h>
 #include <network/protocol/context/LogicContext.h>
 #include <network/protocol/context/ConnectionContext.h>
+#include <Poco/Net/NetException.h>
 
 using namespace std::chrono_literals;
 
@@ -19,16 +20,23 @@ void Connection::send(BasePacketPtr np) {
 
 BasePacketPtr Connection::receive() {
     std::unique_lock<std::mutex> g(receiveQueueLock);
-    while (receiveQueue.empty()) {
+    while (receiveQueue.empty() && receiving) {
         // std::cout << "work::receive waiting " << receiveQueue.size() << std::endl;
-        // receiveReady.wait_for(g, 1s);
-        receiveReady.wait(g);
+        //@todo 1s? condition variable maybe?
+        receiveReady.wait_for(g, 1s);
+        //receiveReady.wait(g);
     }
-    ///clion says it's an error. clion is WRONG.
-    auto v = receiveQueue.front();
-    // std::cout << "Popping " << std::endl;
-    receiveQueue.pop();
-    return v;
+    if (!receiving) {
+        ///@todo error handling, maybe throw exception?
+        return nullptr;
+    } else {
+        ///clion says it's an error. clion is WRONG.
+        auto v = receiveQueue.front();
+        // std::cout << "Popping " << std::endl;
+        receiveQueue.pop();
+        return v;
+    }
+
 }
 
 void Connection::workSend(Poco::Net::StreamSocket &socket) {
@@ -42,10 +50,10 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
         //  std::cout << "sending " << socket.address().port() << std::endl;
         //check the queue
         std::unique_lock<std::mutex> g(sendQueueLock);
-        while (sendQueue.empty()) {
+        while (sendQueue.empty() && sending) {
             // std::cout << "work::send waiting" << std::endl;
             //sendReady.wait_for(g, 1s);
-            sendReady.wait(g);
+            sendReady.wait_for(g, 1s);
         }
         while (!sendQueue.empty()) {
             //  std::cout << "work::send found packet to send" << std::endl;
@@ -83,22 +91,43 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
         /*while (socket.available() > 0)*/ {
             //  std::cout << "work::receive " << socket.address().port() << std::endl;
             BasePacketPtr v;
-
-            ia >> v;
-            {
-                std::lock_guard<std::mutex> g(receiveQueueLock);
-                receiveQueue.push(v);
-                receiveReady.notify_all();
-                //   std::cout << "work::receive qs " << receiveQueue.size() << std::endl;
-                // logic.processPacket(v);
-                if (connectionSourcePtr != nullptr) {
-                    //   LOGGER("CONNECTION SOURCE ISNT NULL")
-
-                    connectionSourcePtr->receivedPacket(v, this);
-                } else {
-                    //    LOGGER("CONNECTION SOURCE IS NULL")
+            try {
+                while (!socket.available() && receiving) {
+                    ///@todo not like this
+                    std::this_thread::sleep_for(1ms);
                 }
+                if (receiving) {
+                    ia >> v;
+                    {
+                        std::lock_guard<std::mutex> g(receiveQueueLock);
+                        receiveQueue.push(v);
+                        receiveReady.notify_all();
+                        //   std::cout << "work::receive qs " << receiveQueue.size() << std::endl;
+                        // logic.processPacket(v);
+                        ///@todo maybe move this to processor?
+                        if (connectionSourcePtr != nullptr) {
+                            //   LOGGER("CONNECTION SOURCE ISNT NULL")
 
+                            connectionSourcePtr->receivedPacket(v, this);
+                        } else {
+                            //    LOGGER("CONNECTION SOURCE IS NULL")
+                        }
+
+                    }
+                }
+            }
+            catch (cereal::Exception e) {
+                //socket.close();
+                stopReceiving();
+                stopSending();
+                processor.stop();
+                // if not receiving, then it's ok!
+            }
+            catch (Poco::Net::NetException e) {
+                processor.stop();
+                stopReceiving();
+                stopSending();
+                e.displayText();
             }
         }
         // std::this_thread::sleep_for(1ms);
@@ -119,7 +148,7 @@ void Connection::startSending(Poco::Net::StreamSocket &socket) {
 
 void Connection::stopSending() {
     sending = false;
-
+    sendReady.notify_all();
 
 }
 
@@ -136,6 +165,7 @@ void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
 
 void Connection::stopReceiving() {
     receiving = false;
+    //  receiveReady.notify_all();
 
     //  processor.stop();
 }
@@ -151,5 +181,20 @@ ConnectionProcessor &Connection::getProcessor() {
 
 Context &Connection::getConnectionContext() {
     return connectionContext;
+}
+
+Connection::~Connection() {
+
+    LOGGER("Closing connection")
+    stopReceiving();
+    stopSending();
+    if (receiveThread != nullptr) {
+        receiveThread->join();
+    }
+    if (sendThread != nullptr) {
+        sendThread->join();
+    }
+
+
 }
 

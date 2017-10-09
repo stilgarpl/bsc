@@ -115,11 +115,11 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
         std::clog << "Debug: addKnownNode assignment!" << std::endl;
 
     }
-
-    if (logicManager.assignAction<Tick>(1500ms, "trigNodeUp")) {
-        std::clog << "Debug: TtrigNodeUp assignment!" << std::endl;
-
-    }
+//
+//    if (logicManager.assignAction<Tick>(1500ms, "trigNodeUp")) {
+//        std::clog << "Debug: TtrigNodeUp assignment!" << std::endl;
+//
+//    }
 
 
 //
@@ -186,26 +186,53 @@ int main() {
     Node otherNode(9999);
     otherNode.getNodeInfo().setNodeId("second node");
     otherNode.addToNetwork("TheNetwork");
-    // setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
+    setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
     otherNode.start();
 
     Node thirdNode(9898);
     thirdNode.getNodeInfo().setNodeId("third node");
     thirdNode.addToNetwork("TheNetwork");
-    //  setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
-    // thirdNode.start();
+    setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
+    //   thirdNode.start();
 
 
     thisNode.getNodeInfo().printAll();
     otherNode.getNodeInfo().printAll();
     thirdNode.getNodeInfo().printAll();
     thisNode.connectTo("127.0.0.1:9999");
-    //  otherNode.connectTo("127.0.0.1:9898");
-    //   thisNode.connectTo("127.0.0.1:100");
-    std::this_thread::sleep_for(2s);
+    //    otherNode.connectTo("127.0.0.1:9898");
+    // thisNode.connectTo("127.0.0.1:100");
+    std::this_thread::sleep_for(5s);
 
     thisNode.updateNodeConnectionInfo();
+    otherNode.updateNodeConnectionInfo();
+    thirdNode.updateNodeConnectionInfo();
+
     thisNode.printConnections();
-    std::this_thread::sleep_for(300s);
+    otherNode.printConnections();
+    thirdNode.printConnections();
+
+    std::this_thread::sleep_for(1s);
+    thisNode.purgeDuplicateConnections();
+    otherNode.purgeDuplicateConnections();
+    thirdNode.purgeDuplicateConnections();
+    thisNode.purgeInactiveConnections();
+    LOGGER("lala");
+    std::this_thread::sleep_for(2s);
+    thisNode.printConnections();
+    otherNode.printConnections();
+    thirdNode.printConnections();
+    std::this_thread::sleep_for(15s);
+    thirdNode.stop();
+    otherNode.stop();
+    thirdNode.stop();
+    std::this_thread::sleep_for(5s);
+    thisNode.purgeInactiveConnections();
+//    thisNode.updateNodeConnectionInfo();
+//    otherNode.updateNodeConnectionInfo();
+//    thirdNode.updateNodeConnectionInfo();
+    thisNode.printConnections();
+    otherNode.printConnections();
+    thirdNode.printConnections();
     return 0;
 }

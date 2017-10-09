@@ -34,7 +34,11 @@ void Node::listen() {
 
 
 void Node::stopListening() {
-    server->stop();
+
+    if (server != nullptr) {
+        server->stop();
+    }
+    stopAcceptedConnections();
 
 }
 
@@ -53,6 +57,7 @@ bool Node::connectTo(const NodeInfo &nodeInfo) {
 
 Node::~Node() {
 
+    stop();
 
 }
 
@@ -161,13 +166,61 @@ void Node::updateNodeConnectionInfo() {
     for (auto &&item : activeClientConnections) {
         auto packet = NodeInfoRequest::getNew();
         auto response = protocol->sendExpect(item->connection.get(), packet);
-        //future.wait();
-        //  auto response = future;//.get();//std::dynamic_pointer_cast<NodeInfoResponse>(future.get());
         auto val = response->getNodeInfo().getNodeId();
-        (*(*item).nodeId) = val;
-        //item->nodeId = val;
+        //(*(*item).nodeId) = val;
+        item->nodeId = val;
     }
 
+
+}
+
+void Node::purgeDuplicateConnections() {
+    for (auto &&item : activeClientConnections) {
+        if (item->nodeId) {
+            //find all connections to the same id
+            activeClientConnections.remove_if([&](NodeConnectionInfoPtr it) -> bool {
+                if (it->nodeId) {
+                    return *it->nodeId == *item->nodeId && it != item;
+                } else {
+                    return false;
+                }
+            });
+            //activeClientConnections.erase(duplicate);
+        }
+    }
+}
+
+void Node::printConnections() {
+    ///@todo remove debug
+    std::cout << "[" << this->thisNodeInfo.getNodeId() << "]:" << std::to_string(acceptedConnections.size())
+              << std::endl;
+    for (auto &&item : activeClientConnections) {
+        if (!item->nodeId) {
+            std::cout << "Connection: NO ID" << std::endl;
+        } else {
+            std::cout << "Connection: " << *item->nodeId << std::endl;
+        }
+    }
+}
+
+void Node::removeAcceptedConnection(IServerConnection *c) {
+    acceptedConnections.remove(c);
+}
+
+void Node::addAcceptedConnection(IServerConnection *c) {
+    acceptedConnections.push_back(c);
+}
+
+void Node::stopAcceptedConnections() {
+    for (auto &&it : acceptedConnections) {
+        it->stop();
+    }
+}
+
+void Node::purgeInactiveConnections() {
+    activeClientConnections.remove_if([&](NodeConnectionInfoPtr it) -> bool {
+        return it->connection == nullptr || !it->connection->isActive();
+    });
 
 }
 
