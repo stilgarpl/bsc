@@ -5,7 +5,7 @@
 #ifndef BASYCO_CLOCKEVENT_H
 #define BASYCO_CLOCKEVENT_H
 
-#include "p2p/IEvent.h"
+#include "IEvent.h"
 
 //enum class ClockEvent::Id;
 

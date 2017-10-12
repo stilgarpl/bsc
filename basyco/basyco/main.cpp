@@ -2,26 +2,25 @@
 #include <thread>
 
 //#define CEREAL_THREAD_SAFE 1
-#include "../p2p/network/node/Node.h"
-#include "../p2p/logic/sources/ClockSource.h"
-#include "../p2p/network/protocol/logic/sources/AuthSource.h"
-#include "../p2p/network/protocol/logic/sources/ConnectionSource.h"
-#include "../p2p/network/protocol/logic/actions/TransmissionControl.h"
-#include "../p2p/network/protocol/logic/actions/ProtocolActions.h"
-#include "../p2p/network/node/protocol/logic/sources/NodeSource.h"
-#include "../p2p/network/node/protocol/logic/actions/NodeActions.h"
-#include "../p2p/network/node/protocol/logic/sources/NetworkSource.h"
-#include "../p2p/network/node/protocol/logic/actions/NetworkActions.h"
+#include "p2p/network/node/Node.h"
+#include "p2p/logic/sources/ClockSource.h"
+#include "p2p/network/protocol/logic/sources/AuthSource.h"
+#include "p2p/network/protocol/logic/sources/ConnectionSource.h"
+#include "p2p/network/protocol/logic/actions/TransmissionControl.h"
+#include "p2p/network/protocol/logic/actions/ProtocolActions.h"
+#include "p2p/network/node/protocol/logic/sources/NodeSource.h"
+#include "p2p/network/node/protocol/logic/actions/NodeActions.h"
+#include "p2p/network/node/protocol/logic/sources/NetworkSource.h"
+#include "p2p/network/node/protocol/logic/actions/NetworkActions.h"
+
 
 
 using namespace std::chrono_literals;
 
 #include <fstream>
-#include "../p2p/configuration/ConfigurationManager.h"
-#include "../p2p/filesystem/network/packet/SendFile.h"
-#include "../p2p/filesystem/network/logic/sources/FileSource.h"
-#include "../p2p/filesystem/network/logic/actions/FileActions.h"
-#include "../p2p/logic/LogicManager.h"
+#include <p2p/filesystem/network/logic/sources/FileSource.h>
+#include <p2p/filesystem/network/logic/actions/FileActions.h>
+#include <p2p/configuration/ConfigurationManager.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -153,8 +152,8 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
         SendFile::Request::Ptr req = SendFile::Request::getNew();
         req->setFilePath("/tmp/basyco/testfile.txt");
-        req->setBegin(23);
-        req->setEnd(25);
+        req->setBegin(3);
+        req->setEnd(8);
         event.getConnection()->send(req);
     });
 

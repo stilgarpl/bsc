@@ -11,8 +11,8 @@
 #include <list>
 #include <Poco/Net/SocketAddress.h>
 #include <cereal/access.hpp>
-//#include "p2p/Node.h"
-#include "utils/cereal_include.h"
+//#include "Node.h"
+#include "p2p/utils/cereal_include.h"
 
 
 typedef std::string NodeIdType;

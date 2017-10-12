@@ -6,7 +6,7 @@
 #define BASYCO_AUTHPACKET_H
 
 
-#include "p2p/BasePacket.h"
+#include "BasePacket.h"
 
 class AuthPacket : public BasePacket {
 private:

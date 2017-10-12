@@ -80,6 +80,10 @@ void SendFile::Response::load_file(fs::path path) {
 }
 
 void SendFile::Response::save_file() const {
+    if (!fs::exists(filePath)) {
+        std::fstream f(filePath, std::ios_base::out | std::ofstream::binary);
+        f.close(); //file now exists always
+    }
     std::ofstream file(filePath, std::ios::in | std::ios::out | std::ofstream::binary);
     if (end == 0) {
         std::copy(data.begin(), data.end(), std::ostreambuf_iterator<char>(file));

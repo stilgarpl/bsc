@@ -77,6 +77,13 @@ public:
     }
 
 
+    template<typename SourceType, typename... Args>
+    void requireSource(Args... args) {
+        if (getSource<SourceType>() == nullptr) {
+            sourceManager.addSource<SourceType>(args...);
+        }
+    }
+
     void work() {
         sourceManager.work();
     }

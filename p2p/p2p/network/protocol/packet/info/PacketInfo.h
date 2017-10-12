@@ -158,5 +158,9 @@ struct PacketGroup {
 
 };
 
+CEREAL_REGISTER_TYPE(PacketGroup::Request);
+CEREAL_REGISTER_TYPE(PacketGroup::Response);
+CEREAL_REGISTER_TYPE(PacketGroup::Error);
+CEREAL_REGISTER_TYPE(PacketGroup::Ack);
 
 #endif //BASYCO_PACKETINFO_H

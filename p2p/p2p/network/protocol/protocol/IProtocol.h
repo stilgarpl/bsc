@@ -52,7 +52,6 @@ public:
 
     virtual std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p) =0;
 
-    virtual bool setupLogic(LogicManager &logicManager);
 
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto sendExpect(Connection *conn, NetworkPacketPointer<SendType> p) {
@@ -61,6 +60,11 @@ public:
         return std::static_pointer_cast<ReturnType>(future.get());
     }
 
+    void setupActions(LogicManager &logicManager) override;
+
+    bool assignActions(LogicManager &logicManager) override;
+
+    bool setupSources(LogicManager &logicManager) override;
 
 };
 
