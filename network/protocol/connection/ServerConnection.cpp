@@ -5,6 +5,8 @@
 #include <thread>
 #include <iostream>
 #include <Poco/Net/NetException.h>
+#include <network/protocol/logic/sources/ConnectionSource.h>
+#include <network/protocol/context/LogicContext.h>
 #include "ServerConnection.h"
 
 using namespace std::chrono_literals;
@@ -27,6 +29,10 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &
           IServerConnection(context) {
 
     serverNode.addAcceptedConnection(this);
+    auto lc = getConnectionContext().get<LogicContext>();
+    auto &logicManager = lc->getLogicManager();
+    auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
+    connectionSourcePtr->connectionAccepted(this);
 }
 
 void ServerConnection::startReceiving(Poco::Net::StreamSocket &socket) {

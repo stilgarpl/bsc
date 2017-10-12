@@ -15,7 +15,7 @@ ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context &c
     if (lm != nullptr) {
         std::clog << __func__ << " adding new connection!!!!!!!!!!!!!1 " << std::endl;
 
-        lm->getLogicManager().getSource<ConnectionSource>()->newConnection(this);
+        lm->getLogicManager().getSource<ConnectionSource>()->connectionEstablished(this);
     } else {
         std::clog << __func__ << " no logic manager in context!" << std::endl;
     }

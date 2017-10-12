@@ -19,6 +19,7 @@ struct PacketGroup;
 class BasePacket {
 public:
     typedef unsigned int IdType;
+    typedef std::shared_ptr<BasePacket> Ptr;
     typedef PacketGroup BaseType;
 private:
     ///@fixme Ids are not unique across nodes! Is that a problem for Transmission Control or Graviton? Probably not, but investigate

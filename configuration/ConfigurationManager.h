@@ -13,16 +13,17 @@ namespace fs = std::experimental::filesystem;
 
 class ConfigurationManager {
     typedef std::string IdType;
-    fs::path configPath{"~/basyco/"};
+    fs::path configPath;
 
 protected:
-    std::string filenameFromId(const IdType &id) {
+    fs::path filenameFromId(const IdType &id) {
         //@todo do something with it
-        return id;
+        fs::path ret = (id + ".cfg");
+        return ret;
     }
 
 public:
-    void save(IdType &id, std::shared_ptr<IConfig> config);
+    void save(const IdType &id, std::shared_ptr<IConfig> config);
 
     template<typename T>
     std::shared_ptr<T> load(const IdType &id) {
@@ -30,6 +31,9 @@ public:
     };
 protected:
     std::shared_ptr<void> load_void(const IdType &id);
+
+public:
+    ConfigurationManager();
 };
 
 

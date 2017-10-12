@@ -112,7 +112,7 @@ protocol->send(Packet, [&](receivedPacket){ do sth and then protocol->send(other
 
 ~ : public BasePacket
 <~>
-Result<~> send(PacketPtr<~>);
+Result<~> send(PacketTypePtr<~>);
 
 <~>
 Result {
@@ -121,7 +121,7 @@ std::function<> and_then;
 }
 
 <~>
-void send(PacketPtr<~>, std::function<Context&>) {
+void send(PacketTypePtr<~>, std::function<Context&>) {
 Result r = send(...);
 std::thread t([](r){result.f.get(); result.and_then()};
 t.detach();
@@ -146,7 +146,7 @@ przykladowy flow:
 
 runTrans() {
 
-response = send<NodeInfoResponse>(Request for NodeInfo)
+response = send<NodeInfoResponse>(SendFileRequest for NodeInfo)
 response.wait() // the actual action will take place in response->process(); which will probably do nothing but request->process() will be the one which prepares the actual answer
 
 
@@ -160,8 +160,8 @@ response.wait() // the actual action will take place in response->process(); whi
 jak zrobic, zeby Graviton wiedzial, jaki jest typ odpowiedzi dla send() ?
 mozna zrobic np. tak:
 
-<T>
-PacketInfo<PacketInfo<T>::BaseType,Status::Response>::Type send(T)
+<GroupType>
+PacketInfo<PacketInfo<GroupType>::BaseType,Status::SendFileResponse>::Type send(GroupType)
 
-T : public packet<BaseT,Status::Request> <-- packet w jakis sposob by rejestrowal powiazanie T, BaseT i Status w PacketInfo
+GroupType : public packet<BaseT,Status::SendFileRequest> <-- packet w jakis sposob by rejestrowal powiazanie GroupType, BaseT i Status w PacketInfo
 

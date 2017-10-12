@@ -11,6 +11,7 @@
 #include <network/protocol/connection/ClientConnection.h>
 #include <network/protocol/context/NodeContext.h>
 #include <network/protocol/context/LogicContext.h>
+#include <configuration/ConfigurationManager.h>
 
 using namespace Poco::Net;
 
@@ -147,6 +148,11 @@ Node::Node(int port) : Node() {
     std::shared_ptr<Node::Config> config = std::make_shared<Node::Config>();
     config->setPort(port);
     setConfiguration(config);
+
+    ///@todo debug remove
+    ConfigurationManager manager;
+    manager.save("Node", config);
+
     thisNodeInfo.addKnownAddress("127.0.0.1:" + std::to_string(getConfiguration()->getPort()));
 
 
@@ -166,8 +172,12 @@ void Node::updateNodeConnectionInfo() {
     //this is meant to be run from a thread
     for (auto &&item : activeClientConnections) {
         auto packet = NodeInfoRequest::getNew();
-        auto response = protocol->sendExpect(item->connection.get(), packet);
-        auto val = response->getNodeInfo().getNodeId();
+        NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
+        auto &ni = response->getNodeInfo();
+        ni.printAll();
+        auto nid = ni.getNodeId();
+        LOGGER(ni.getNetworkId());
+        const auto &val = response->getNodeInfo().getNodeId();
         //(*(*item).nodeId) = val;
         item->nodeId = val;
     }

@@ -8,8 +8,8 @@
 #include "logic/IEvent.h"
 
 enum class ENetEvent {
-    CONNECTION_ESTABLISHED,
-    CONNECTION_ACCEPTED,
+    CONNECTION_ESTABLISHED, //on client side, when connecting
+    CONNECTION_ACCEPTED, //on server side, when connected to
     CONNECTION_CLOSED, //as client, when closing connection
     CONNECTION_DISCONNECTED, //as server, when client is disconnected
 };

@@ -17,6 +17,7 @@ class SourceManager;
 
 class ISource {
 protected:
+    ///@todo maybe should be private and sources should use activeContext instead?
     Context context;
 private:
     Uber<std::map> signalMap;
@@ -58,9 +59,9 @@ public:
 
     template<typename T, typename... Args>
     SignalType<T, Args...> &getSignal(const typename T::IdType &id) {
-        // typedef Signal<Context&, const T&> SignalType;
+        // typedef Signal<Context&, const GroupType&> SignalType;
         //   typedef std::shared_ptr<SignalType> SignalTypePtr;
-        auto &map = getSignalMap<T, Args...>();//signalMap.get<typename T::IdType,SignalTypePtr<T>>();
+        auto &map = getSignalMap<T, Args...>();//signalMap.get<typename GroupType::IdType,SignalTypePtr<GroupType>>();
         if (map[id] == nullptr) {
             map[id] = std::make_shared<SignalType<T, Args...>>();
         }

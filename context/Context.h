@@ -17,6 +17,7 @@ class Context {
     typedef unsigned int TypeIdType;
 private:
     thread_local static Context* activeContext;
+    Context *parentContext = nullptr;
 
     const TypeIdType getNextTypeId() const {
         static TypeIdType val = 0;
@@ -65,13 +66,23 @@ public:
     template<typename T, typename CustomKeyType>
     std::shared_ptr<T> get(const CustomKeyType &id) {
         static auto typeId = getTypeId<T>();
-        return std::static_pointer_cast<T>(data[typeId][getKey(id)]);
+        auto ret = std::static_pointer_cast<T>(data[typeId][getKey(id)]);
+        if (ret == nullptr && parentContext != nullptr) {
+            return parentContext->get<T, CustomKeyType>(id);
+        } else {
+            return ret;
+        }
     }
 
     template<typename T>
     std::shared_ptr<T> get() {
         static auto typeId = getTypeId<T>();
-        return std::static_pointer_cast<T>(data[typeId][getKey(0)]);
+        auto ret = std::static_pointer_cast<T>(data[typeId][getKey(0)]);
+        if (ret == nullptr && parentContext != nullptr) {
+            return parentContext->get<T>();
+        } else {
+            return ret;
+        }
     }
 
     /**
@@ -90,44 +101,31 @@ public:
     };
 
     template<typename T, typename... Vals>
-    void set(Vals... values) {
+    auto set(Vals... values) {
         static auto typeId = getTypeId<T>();
         std::clog << "Context::set type id " << typeId << std::endl;
-        data[typeId][getKey(0)] = std::make_shared<T>(values...);
+        auto ret = std::make_shared<T>(values...);
+        data[typeId][getKey(0)] = ret;
+        return ret;
     };
 
 
-    Context& operator+=(const Context& other) {
-        for (auto &&item : other.data) {
-            std::clog << "Context::+= copying id " << item.first << std::endl;
-            this->data[item.first] = item.second;
-        }
-        return *this;
-    }
+    Context &operator+=(const Context &other);
 
+    Context &operator+=(Context &other);
 
-    Context(const Context &other) {
-        for (auto &&item : other.data) {
-            this->data[item.first] = item.second;
-        }
-    }
+    Context(const Context &other);
 
     Context() = default;
 
 public:
-    static Context& getActiveContext() {
-        thread_local static Context defaultContext;
-        if (activeContext == nullptr) {
-            return defaultContext;
-        } else {
-            return *activeContext;
-        }
-    }
+    static Context &getActiveContext();
 
-    static void setActiveContext(Context* ctx) {
-        activeContext = ctx;
-    }
+    static void setActiveContext(Context *ctx);
 
+    Context *getParentContext() const;
+
+    void setParentContext(Context *parentContext);
 };
 
 

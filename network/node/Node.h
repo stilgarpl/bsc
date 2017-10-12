@@ -43,6 +43,7 @@ public:
     private:
         template<class Archive>
         void serialize(Archive &ar) {
+            ar & cereal::base_class<IConfig>(this);
             ar & port;
         }
 
@@ -161,7 +162,7 @@ public:
     friend class NodeActions;
 };
 
-
+CEREAL_REGISTER_TYPE(Node::Config);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig, Node::Config);
 
 #endif //BASYCO_NODE_H

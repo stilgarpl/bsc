@@ -17,6 +17,10 @@
 using namespace std::chrono_literals;
 
 #include <fstream>
+#include <configuration/ConfigurationManager.h>
+#include <filesystem/network/packet/SendFile.h>
+#include <filesystem/network/logic/sources/FileSource.h>
+#include <filesystem/network/logic/actions/FileActions.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -26,6 +30,7 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
     logicManager.addSource<ConnectionSource>();
     logicManager.addSource<NetworkSource>();
     logicManager.addSource<NodeSource>();
+    logicManager.addSource<FileSource>();
 
 
 
@@ -62,6 +67,10 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
     logicManager.setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
 
+
+    logicManager.setAction<FileRequestEvent>("fileReq", FileActions::sendFile);
+    logicManager.setAction<FileResponseEvent>("fileRes", FileActions::receivedFile);
+
 //    //  assigning actions
 //    if (logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
 //                                               PacketEventId::PACKET_RECEIVED)) {
@@ -85,12 +94,12 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 //
 //    }
 
-    if (logicManager.assignAction<ConnectionEvent>("reqNoI")) {
+    if (logicManager.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNoI")) {
         std::clog << "Debug: reqNoI assignment!" << std::endl;
 
     }
 
-    if (logicManager.assignAction<ConnectionEvent>("reqNeI")) {
+    if (logicManager.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNeI")) {
         std::clog << "Debug: reqNeI assignment!" << std::endl;
 
     }
@@ -116,15 +125,35 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
     }
 
-    if (logicManager.assignAction<Tick>(1500ms, "trigNodeUp")) {
-        std::clog << "Debug: TtrigNodeUp assignment!" << std::endl;
+//    if (logicManager.assignAction<Tick>(1500ms, "trigNodeUp")) {
+//        std::clog << "Debug: TtrigNodeUp assignment!" << std::endl;
+//
+//    }
+
+
+    if (logicManager.assignAction<FileRequestEvent>("fileReq") &&
+        logicManager.assignAction<FileResponseEvent>("fileRes")) {
+        std::clog << "Debug: File assignment!" << std::endl;
 
     }
-
 
 //
 //    IProtocol* protocol = new DummyProtocol();
 //    protocol->setupLogic(logicManager);
+
+
+    ///@todo remove this debug:
+
+    logicManager.setAction<ConnectionEvent>("fileSendDebug", [](const ConnectionEvent &event) {
+
+        SendFile::Request::Ptr req = SendFile::Request::getNew();
+        req->setFilePath("/tmp/basyco/testfile.txt");
+        event.getConnection()->send(req);
+    });
+
+    if (logicManager.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "fileSendDebug")) {
+        std::clog << "Debug: File DEBUG assignment!" << std::endl;
+    }
 
 }
 
@@ -136,7 +165,7 @@ int main() {
 //            exit(0);
 //        }
 //    NodeInfoGroup::Ack b1;
-//    NodeInfoGroup::Response b2;
+//    NodeInfoGroup::SendFileResponse b2;
 //    auto status = NodeInfoGroup::Ack::getPacketStatus();
 //
 //    exit(0);
@@ -147,10 +176,10 @@ int main() {
 //    auto nRes = PacketUtils::getNew<Status::RESPONSE>(nReq);
 //    nRes.setId(5);
 //    nRes.getNodeInfo().printAll();
-//  //  Base::Request::BaseType::Request x1;
+//  //  Base::SendFileRequest::BaseType::SendFileRequest x1;
 //  //  std::cout << typeid(x1).name() << std::endl;
 //    PacketInfo<Derived,Status::REQUEST>::Type x;
-//    Base::Response y;
+//    Base::SendFileResponse y;
 //    auto reqY = getType<Status::REQUEST>(y);
 //    reqY.print();
 //    auto resp = getType<Status::REQUEST>(x);//getResponse(x);
@@ -168,7 +197,22 @@ int main() {
     });
 
 
+    SendFile::Response sfRes;
+    fs::path tmpPath = "/tmp/basyco/testfile.txt";
+    fs::path tmpPath2 = "/tmp/basyco/testfile2.txt";
+
+    sfRes.load_file(tmpPath);
+    sfRes.setFilePath(tmpPath2);
+    sfRes.save_file();
+//exit(0);
+
     LOGGER("dupa");
+
+    ConfigurationManager cfg;
+
+    auto ptrC = std::make_shared<IConfig>();
+    cfg.save("dupa", ptrC);
+
 
 
     Context context;
@@ -193,7 +237,7 @@ int main() {
     thirdNode.getNodeInfo().setNodeId("third node");
     thirdNode.addToNetwork("TheNetwork");
     setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
-    thirdNode.start();
+    //   thirdNode.start();
 
 
     thisNode.getNodeInfo().printAll();

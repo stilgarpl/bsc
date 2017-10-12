@@ -15,6 +15,8 @@ enum class ConnectionEventId {
     CONNECTION_ABORTED,
     CONNECTION_RESET,
     BAD_ADDRESS,
+    CONNECTION_ACCEPTED,//server side
+    CONNECTION_ESTABLISHED, //client side
 
 };
 

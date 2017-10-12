@@ -25,8 +25,11 @@ public:
 
     void registerProviders(SourceManager *manager) override;
 
+    void connectionAccepted(Connection *c);
+
     ConnectionSource();
 
+    void connectionEstablished(Connection *c);
 };
 
 

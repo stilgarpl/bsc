@@ -65,3 +65,21 @@ ConnectionSource::ConnectionSource() {
 //            [&, this](const PacketEvent &packetEvent) { this->event(packetEvent); });
 
 }
+
+void ConnectionSource::connectionAccepted(Connection *c) {
+
+    auto event = std::make_shared<ConnectionEvent>();
+    event->setEventId(ConnectionEvent::IdType::CONNECTION_ACCEPTED);
+    event->setConnection(c);
+    connSource.queueEvent(event);
+    newConnection(c);
+}
+
+void ConnectionSource::connectionEstablished(Connection *c) {
+
+    auto event = std::make_shared<ConnectionEvent>();
+    event->setEventId(ConnectionEvent::IdType::CONNECTION_ESTABLISHED);
+    event->setConnection(c);
+    connSource.queueEvent(event);
+    newConnection(c);
+}

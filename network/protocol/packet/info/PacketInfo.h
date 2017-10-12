@@ -41,87 +41,53 @@ struct PacketInfo<PacketType, Status::ERROR> {
 
 struct PacketUtils {
 
-//    template<enum Status s, typename T>
-//    static typename PacketInfo<typename T::BaseType, s>::Type getNew(T t) {
-//        typename PacketInfo<typename T::BaseType, s>::Type ret;
-//        ret.setStatus(s);
-//        ret.setId(t.getId());
-//        return ret;
-//    };
-//
-//    template<enum Status s, typename T>
-//    static typename PacketInfo<typename T::BaseType, s>::Type getNew(T t, BasePacket::IdType id) {
-//        auto ret = getNew<s>(t);
-//        ret.setId(id);
-//        return ret;
-//    };
-
-    template<enum Status s, typename T>
-    static auto getNewPtr(T *t) {
-//        std::shared_ptr<typename PacketInfo<typename T::BaseType, s>::Type> ret = std::make_shared<typename PacketInfo<typename T::BaseType, s>::Type>();
+    template<enum Status s, typename PacketType>
+    static auto getNewPtr(PacketType *t) {
+//        std::shared_ptr<typename PacketInfo<typename GroupType::BaseType, s>::Type> ret = std::make_shared<typename PacketInfo<typename GroupType::BaseType, s>::Type>();
 //        ret->setStatus(s);
 //        ret->setId(t->getId());
 //        return ret;
 
-        auto ptr = getNewPtr<s, T>();
+        auto ptr = getNewPtr<s, PacketType>();
         ptr->setId(t->getId());
         return ptr;
     };
 
     //used for shared_ptr<Packet>
-    template<enum Status s, typename TPtr>
-    static auto getNewPtr(const TPtr &t) {
+    template<enum Status s, typename PacketTypePtr>
+    static auto getNewPtr(const PacketTypePtr &t) {
 
         return getNewPtr<s>(t.get());
     };
 
-    template<enum Status s, typename T>
+    template<enum Status s, typename PacketType>
     static auto getNewPtr() {
-        std::shared_ptr<typename PacketInfo<typename T::BaseType, s>::Type> ret = std::make_shared<typename PacketInfo<typename T::BaseType, s>::Type>();
+        std::shared_ptr<typename PacketInfo<typename PacketType::BaseType, s>::Type> ret = std::make_shared<typename PacketInfo<typename PacketType::BaseType, s>::Type>();
         ret->setStatus(s);
         // ret->setId(t->getId());
         return ret;
     };
 
-//    template<enum Status s, typename T>
-//    static auto getNewPtr(T* t, BasePacket::IdType id) {
-//        auto ret = getNewPtr<s>(t);
-//        ret->setId(id);
-//        return ret;
-//    };
-
+    template<enum Status s, typename T>
+    static auto getNewPtr(const BasePacket::IdType &id) {
+        std::shared_ptr<typename PacketInfo<typename T::BaseType, s>::Type> ret = std::make_shared<typename PacketInfo<typename T::BaseType, s>::Type>();
+        ret->setStatus(s);
+        ret->setId(id);
+        return ret;
+    };
 };
-
-//template< typename T, enum Status status>
-//struct Packet : public BasePacket {
-//    typedef T BaseType;
-//
-//    static auto getNew() {
-//        return PacketUtils::getNewPtr<status,T>();
-//    }
-//
-//    constexpr static Status getPacketStatus() {
-//        return status;
-//
-//    };
-//
-//    Packet() {
-//        setStatus(getPacketStatus());
-//    }
-//
-//};
-
 
 /**
  * Base class for all packets that use packet grouping feature.
- * @tparam T Packet Group class, must inherit from PacketGroup class
+ * @tparam GroupType Packet Group class, must inherit from PacketGroup class
  * @tparam S packet class inheriting from Packet
  * @tparam overrideStatus DO NOT USE, INTERNAL USE ONLY
  * @tparam sts DO NOT USE, INTERNAL USE ONLY
  */
-template<typename T, typename S = BasePacket, bool overrideStatus = false, enum Status sts = Status::ERROR>
+template<typename GroupType, typename S = BasePacket, bool overrideStatus = false, enum Status sts = Status::ERROR>
 struct Packet : public BasePacket {
-    typedef T BaseType;
+    typedef GroupType BaseType;
+    typedef NetworkPacketPointer<S> Ptr;
 
 
     template<enum Status ss, typename Type>
@@ -131,7 +97,7 @@ struct Packet : public BasePacket {
 
     template<enum Status ss>
     static auto getNew() {
-        return PacketUtils::getNewPtr<ss, typename PacketInfo<T, ss>::Type>();
+        return PacketUtils::getNewPtr<ss, typename PacketInfo<GroupType, ss>::Type>();
     }
 
     static auto getNew() {
@@ -139,34 +105,56 @@ struct Packet : public BasePacket {
         return getNew<getPacketStatus()>();
     }
 
+    template<enum Status ss>
+    static auto getNew(const BasePacket::IdType &id) {
+        return PacketUtils::getNewPtr<ss, typename PacketInfo<GroupType, ss>::Type>(id);
+    }
+
+    static auto getNew(const BasePacket::IdType &id) {
+        //return std::make_shared<S>();
+        return getNew<getPacketStatus()>(id);
+    }
+
     constexpr static Status getPacketStatus() {
         if (overrideStatus) return sts;
-        if (std::is_same<typename T::Request, S>::value) return Status::REQUEST;
-        if (std::is_same<typename T::Response, S>::value) return Status::RESPONSE;
-        if (std::is_same<typename T::Ack, S>::value) return Status::ACK;
-        if (std::is_same<typename T::Error, S>::value) return Status::ERROR;
+        if (std::is_same<typename GroupType::Request, S>::value) return Status::REQUEST;
+        if (std::is_same<typename GroupType::Response, S>::value) return Status::RESPONSE;
+        if (std::is_same<typename GroupType::Ack, S>::value) return Status::ACK;
+        if (std::is_same<typename GroupType::Error, S>::value) return Status::ERROR;
         return Status::ERROR;
     };
 
     Packet() {
         setStatus(getPacketStatus());
     }
-//
-//
-//    static auto getNew() {
-//        return PacketUtils::getNewPtr<s,typename PacketInfo<T,s>::Type>();
-//    }
 
+private:
+    template<class Archive>
+    void serialize(Archive &ar) {
+        ar & cereal::base_class<BasePacket>(this);
+    }
+
+
+    friend class cereal::access;
 
 };
 
-
+//
+//struct BaseGroup {
+//    typedef BasePacket SendFileRequest;
+//    typedef BasePacket SendFileResponse;
+//    typedef BasePacket Error;
+//    typedef BasePacket Ack;
+//};
+//
+//template<typename Group=BaseGroup>
 struct PacketGroup {
 
     typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::REQUEST> Request;
     typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::RESPONSE> Response;
     typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::ERROR> Error;
     typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::ACK> Ack;
+
 
 };
 

@@ -19,6 +19,7 @@ public:
     void setEventId(IdType eventId) {
         IEvent::eventId = eventId;
     }
+
 };
 
 #endif //BASYCO_IEVENT_H
