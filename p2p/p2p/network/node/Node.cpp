@@ -117,11 +117,11 @@ bool Node::connectTo(const std::string &a) {
 
 void Node::work() {
 
-    for (auto &i : activeClientConnections) {
-        //@todo implement
-        //test if connection is still alive
-        //process all messages from receive queue
-    }
+//    for (auto &i : activeClientConnections) {
+//        //@todo implement
+//        //test if connection is still alive
+//        //process all messages from receive queue
+//    }
 
 }
 
@@ -163,9 +163,13 @@ std::shared_ptr<NetworkInfo> &Node::getNetworkInfo() {
 }
 
 bool Node::isConnectedTo(const NodeInfo &nodeInfo) {
+    bool ret = false;
     for (auto &&it : activeClientConnections) {
-
+        if (it->nodeId) {
+            ret |= nodeInfo.getNodeId() == (*it->nodeId);
+        }
     }
+    return ret;
 }
 
 void Node::updateNodeConnectionInfo() {

@@ -30,8 +30,8 @@ protected:
 
         ///@todo pass to executor
         Context::setActiveContext(&context);
-        int a = this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
-        int b = this->getSignal<T, Args...>().signal(event, args...);
+        /*int a =*/ this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
+        /*int b =*/ this->getSignal<T, Args...>().signal(event, args...);
         // LOGGER("event : a "+ std::to_string(a)+ " b:" + std::to_string(b));
     }
 

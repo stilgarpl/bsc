@@ -41,6 +41,7 @@ public:
                 addKnownNode(i.second);
             }
         }
+        return *this;
     }
 
     void addKnownNode(const NodeInfo &nodeInfo);

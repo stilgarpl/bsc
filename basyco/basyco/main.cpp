@@ -21,6 +21,7 @@ using namespace std::chrono_literals;
 #include <p2p/filesystem/network/logic/sources/FileSource.h>
 #include <p2p/filesystem/network/logic/actions/FileActions.h>
 #include <p2p/configuration/ConfigurationManager.h>
+#include <repo/journal/Journal.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -193,16 +194,14 @@ int main() {
 //    x.print();
 //    //PacketInfo<Base,Status::RESPONSE>::Type a;
 
-    LogicManager logicManager;
-    logicManager.addSource<ClockSource>();
-    //  logicManager.addSource<NetworkSource>();
+    Journal journal;
 
-    logicManager.setAction<Tick>("test", [](const Tick &t) {
-
-        std::clog << "test tick " << t.getEventId().count() << std::endl;
-    });
-
-
+    journal.append(JournalMethod::ADDED, "/tmp/dupa.txt");
+    journal.append(JournalMethod::DELETED, "/tmp/to_remove.txt");
+    journal.commitState();
+    journal.append(JournalMethod::UPDATED, "/tmp/dupa.txt");
+    journal.replay();
+    exit(0);
 //    SendFile::Response sfRes;
 //    fs::path tmpPath = "/tmp/basyco/testfile.txt";
 //    fs::path tmpPath2 = "/tmp/basyco/testfile2.txt";

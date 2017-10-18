@@ -1,0 +1,32 @@
+#cmake_minimum_required(VERSION 3.7)
+#project(basyco)
+
+set(CMAKE_CXX_STANDARD 17)
+
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+#SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -pthread -lstdc++fs")
+
+#set(CMAKE_LIBRARY_PATH  ${CMAKE_LIBRARY_PATH} "C:/_lib/poco-1.7.8p3")
+
+
+#find_package(Poco REQUIRED COMPONENTS Foundation Net Util REQUIRED)
+find_package(Cereal REQUIRED)
+FIND_PACKAGE(CPPexperimental)
+
+
+message(libs:: ${LIBS})
+
+set(INCLUDES ${Cereal_INCLUDE_DIRS})
+message(includ:: ${INCLUDES})
+include_directories(${INCLUDES})
+set(LIBS ${LIBS} ${CPPEXPERIMENTAL_LIBRARIES})
+
+message(libs:: ${LIBS})
+
+
+set(SOURCE_FILES repo/journal/Journal.cpp repo/journal/Journal.h repo/repository/Repository.cpp repo/repository/Repository.h repo/journal/IJournal.h repo/journal/PartialJournal.cpp repo/journal/PartialJournal.h repo/journal/JournalState.cpp repo/journal/JournalState.h repo/journal/JournalMethod.h repo/journal/JournalTypes.h)
+add_library(repo SHARED ${SOURCE_FILES})
+target_include_directories(repo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(repo ${LIBS})
+
