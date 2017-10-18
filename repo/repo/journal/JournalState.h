@@ -10,7 +10,22 @@
 #include <cereal/access.hpp>
 #include "JournalMethod.h"
 #include "JournalTypes.h"
-
+#include <chrono>
+#include <cryptopp/sha.h>
+#include <cryptopp/filters.h>
+#include <cryptopp/hex.h>
+#include <sstream>
+#include <cereal/cereal.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/portable_binary.hpp>
+#include <cereal/archives/xml.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/list.hpp>
+#include <cereal/types/chrono.hpp>
+#include <cereal/types/string.hpp>
 
 class JournalStateData {
 private:
@@ -54,11 +69,12 @@ public:
 class JournalState {
     JournalChecksumType checksum;
     std::list<JournalStateData> dataList;
+    std::chrono::system_clock::time_point commitTime;
 
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(checksum, dataList);
+        ar(checksum, dataList, commitTime);
     }
 
 
@@ -71,6 +87,10 @@ public:
     const std::list<JournalStateData> &getDataList() const;
 
     void setDataList(const std::list<JournalStateData> &dataList);
+
+    std::string calculateChecksum();
+
+    void commit();
 
 };
 

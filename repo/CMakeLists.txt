@@ -10,16 +10,18 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 #find_package(Poco REQUIRED COMPONENTS Foundation Net Util REQUIRED)
+#find_package(OpenSSL REQUIRED)
+find_package(Crypto++ REQUIRED)
 find_package(Cereal REQUIRED)
-FIND_PACKAGE(CPPexperimental)
+FIND_PACKAGE(CPPexperimental REQUIRED)
 
 
 message(libs:: ${LIBS})
 
-set(INCLUDES ${Cereal_INCLUDE_DIRS})
+set(INCLUDES ${Cereal_INCLUDE_DIRS} ${CRYPTO++_INCLUDE_DIR})
 message(includ:: ${INCLUDES})
 include_directories(${INCLUDES})
-set(LIBS ${LIBS} ${CPPEXPERIMENTAL_LIBRARIES})
+set(LIBS ${LIBS} ${CPPEXPERIMENTAL_LIBRARIES} ${CRYPTO++_LIBRARIES})
 
 message(libs:: ${LIBS})
 

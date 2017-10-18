@@ -201,6 +201,9 @@ int main() {
     journal.commitState();
     journal.append(JournalMethod::UPDATED, "/tmp/dupa.txt");
     journal.replay();
+    LOGGER(journal.calculateChecksum());
+    LOGGER(journal.calculateChecksum());
+    LOGGER(journal.calculateChecksum());
     exit(0);
 //    SendFile::Response sfRes;
 //    fs::path tmpPath = "/tmp/basyco/testfile.txt";

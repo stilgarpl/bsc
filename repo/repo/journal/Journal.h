@@ -18,6 +18,7 @@ private:
     std::shared_ptr<JournalState> currentState = nullptr;
     std::vector<std::shared_ptr<JournalState>> journalHistory;
 
+    FuncMap funcMap;
 private:
     template<class Archive>
     void serialize(Archive &ar) {
@@ -40,6 +41,25 @@ public:
 
     void replay() override;
 
+    void setFunc(const JournalMethod &method, Func func) {
+        funcMap[method] = func;
+    }
+
+
+    const std::string &calculateChecksum() {
+        checksum = "";
+        std::stringstream ss;
+        std::string hash;
+        {
+            cereal::BinaryOutputArchive oa(ss);
+            oa << *this;
+        }
+        CryptoPP::SHA1 sha1;
+        CryptoPP::StringSource(ss.str(), true, new CryptoPP::HashFilter(sha1, new CryptoPP::HexEncoder(
+                new CryptoPP::StringSink(hash))));
+        checksum = hash;
+        return checksum;
+    }
 
 };
 

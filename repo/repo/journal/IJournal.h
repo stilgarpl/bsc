@@ -8,14 +8,16 @@
 
 #include "JournalMethod.h"
 #include "JournalTypes.h"
+#include "JournalState.h"
 #include <map>
+#include <experimental/optional>
 
 class IJournal {
 public:
 
 public:
     typedef std::function<void(const JournalStateData &)> Func;
-    typedef std::map<JournalMethod, Func> FuncMap;
+    typedef std::map<JournalMethod, std::experimental::optional<Func>> FuncMap;
 public:
     virtual JournalChecksumType getChecksum() =0;
 
