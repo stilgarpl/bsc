@@ -3,3 +3,7 @@
 //
 
 #include "Repository.h"
+
+const Repository::RepoIdType &Repository::getRepositoryId() const {
+    return repositoryId;
+}

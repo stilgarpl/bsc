@@ -26,7 +26,7 @@ set(LIBS ${LIBS} ${CPPEXPERIMENTAL_LIBRARIES} ${CRYPTO++_LIBRARIES})
 message(libs:: ${LIBS})
 
 
-set(SOURCE_FILES repo/journal/Journal.cpp repo/journal/Journal.h repo/repository/Repository.cpp repo/repository/Repository.h repo/journal/IJournal.h repo/journal/PartialJournal.cpp repo/journal/PartialJournal.h repo/journal/JournalState.cpp repo/journal/JournalState.h repo/journal/JournalMethod.h repo/journal/JournalTypes.h repo/network/packet/JournalGroup.cpp repo/network/packet/JournalGroup.h repo/network/logic/sources/JournalSource.cpp repo/network/logic/sources/JournalSource.h repo/network/logic/events/JournalEvent.cpp repo/network/logic/events/JournalEvent.h)
+set(SOURCE_FILES repo/journal/Journal.cpp repo/journal/Journal.h repo/repository/Repository.cpp repo/repository/Repository.h repo/journal/IJournal.h repo/journal/PartialJournal.cpp repo/journal/PartialJournal.h repo/journal/JournalState.cpp repo/journal/JournalState.h repo/journal/JournalMethod.h repo/journal/JournalTypes.h repo/network/packet/JournalGroup.cpp repo/network/packet/JournalGroup.h repo/network/logic/sources/JournalSource.cpp repo/network/logic/sources/JournalSource.h repo/network/logic/events/JournalEvent.cpp repo/network/logic/events/JournalEvent.h repo/context/RepositoryContext.cpp repo/context/RepositoryContext.h repo/repository/RepositoryManager.cpp repo/repository/RepositoryManager.h repo/node/RepoModule.cpp repo/node/RepoModule.h)
 add_library(repo SHARED ${SOURCE_FILES})
 target_include_directories(repo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})

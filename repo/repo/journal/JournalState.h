@@ -26,6 +26,11 @@
 #include <cereal/types/list.hpp>
 #include <cereal/types/chrono.hpp>
 #include <cereal/types/string.hpp>
+#include <crypto++/files.h>
+
+#include <experimental/filesystem>
+
+namespace fs = std::experimental::filesystem;
 
 class JournalStateData {
 private:
@@ -36,17 +41,21 @@ public:
     typedef std::string PathType;
 private:
     PathType path;
+    uintmax_t size = 0;
+    std::string checksum; //checksum of the file.
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(method, path);
+        ar(CEREAL_NVP(method), CEREAL_NVP(path), CEREAL_NVP(size), CEREAL_NVP(checksum));
     }
 
 
     friend class cereal::access;
 
 public:
-    JournalStateData(JournalMethod method, const PathType &path) : method(method), path(path) {};
+    JournalStateData(JournalMethod method, const PathType &path) : method(method), path(path) {
+        update();
+    };
 
     JournalMethod getMethod() const {
         return method;
@@ -62,6 +71,20 @@ public:
 
     void setPath(const PathType &path) {
         JournalStateData::path = path;
+        update();
+    }
+
+    void update() {
+
+        ///@todo string -> path
+        if (fs::exists(fs::path(path))) {
+            CryptoPP::SHA256 hash;
+            std::string digest;
+            size = fs::file_size(fs::path(path));
+            CryptoPP::FileSource f(path.c_str(), true, new CryptoPP::HashFilter(hash, new CryptoPP::HexEncoder(
+                    new CryptoPP::StringSink(digest))));
+            checksum = std::move(digest);
+        }
     }
 };
 
@@ -74,7 +97,7 @@ class JournalState {
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(checksum, dataList, commitTime);
+        ar(CEREAL_NVP(checksum), CEREAL_NVP(dataList), CEREAL_NVP(commitTime));
     }
 
 

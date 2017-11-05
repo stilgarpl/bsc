@@ -21,7 +21,7 @@ void ConnectionProcessor::run() {
 
     auto lc = context.get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
-    auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
+    //auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
     auto processorContext = context.set<ProcessorContext, ConnectionProcessor &>(*this);
 

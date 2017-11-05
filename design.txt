@@ -7,3 +7,11 @@ or sth
 
 
 kazdy moduł miałby setupLogic które ustawiałoby logikę
+
+
+jak logicznie polaczyc PacketGroup z eventami?
+
+request -> event -> response... gdzie przetrzymac connection?
+event jest procesowany w innym wątku! nie mozna utrzymać kontekstu między pakietem a eventem... chyba, ze go bezpośrednio przekażemy
+
+w process jest ConnectionContext.

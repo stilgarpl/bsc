@@ -7,8 +7,16 @@
 
 
 #include <p2p/logic/IEvent.h>
+#include <repo/repository/Repository.h>
 
-class JournalEvent : public IEvent<int> {
+
+enum class JournalEventId {
+    JOURNAL_REQUEST
+};
+
+class JournalEvent : public IEvent<JournalEventId> {
+
+    //  Repository::
 
 };
 

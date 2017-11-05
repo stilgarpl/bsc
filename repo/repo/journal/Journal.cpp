@@ -15,10 +15,8 @@ void Journal::commitState() {
     if (currentState != nullptr) {
         currentState->commit();
         LOGGER(currentState->calculateChecksum());
-        LOGGER(currentState->calculateChecksum());
-        LOGGER(currentState->calculateChecksum());
-        LOGGER(currentState->calculateChecksum());
-        journalHistory.push_back(currentState);
+        journalHistory.push_back(*currentState);
+        currentState = nullptr;
     }
 }
 
@@ -26,7 +24,7 @@ void Journal::replay() {
 
     for (auto &&it : journalHistory) {
         ///@todo I would like to remove getDataList and just pass the Func to it somehow
-        for (auto &&jt : it->getDataList()) {
+        for (auto &&jt : it.getDataList()) {
             LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath());
             auto &func = funcMap[jt.getMethod()];
             if (func) {

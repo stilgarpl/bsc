@@ -18,7 +18,7 @@ void JournalState::setDataList(const std::list<JournalStateData> &dataList) {
 
 void JournalState::commit() {
     commitTime = std::chrono::system_clock::now();
-
+    checksum = calculateChecksum();
 //        std::stringstream ss;
 //        {
 //            cereal::XMLOutputArchive oa(ss);

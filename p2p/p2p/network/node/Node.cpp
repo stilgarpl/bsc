@@ -50,10 +50,11 @@ bool Node::connectTo(const NodeInfo &nodeInfo) {
         //try to connect
         if (connectTo(i)) {
 
-            break;
+            return true;
         }
     }
 
+    return false;
 }
 
 Node::~Node() {
@@ -81,7 +82,9 @@ bool Node::connectTo(const SocketAddress &address) {
 
 void Node::start() {
 
+    initialize();
     //@todo this should be somewhere else
+    ///@todo move to the ProtocolModule
     protocol->setupLogic(logicManager);
     logicManager.start();
     listen();

@@ -16,9 +16,9 @@ class ClockSource : public ISource {
 private:
     std::map<duration, time_point> lastTick;
 protected:
-    time_point getLastTick(duration d);;
+    time_point getLastTick(duration d);
 
-    void setLastTick(duration d, time_point t);;
+    void setLastTick(duration d, time_point t);
 
 public:
     void work() override;

@@ -10,19 +10,21 @@
 #include "JournalState.h"
 #include "IJournal.h"
 #include "JournalTypes.h"
+#include <cereal/types/memory.hpp>
+#include <cereal/types/vector.hpp>
 
 class Journal : public IJournal {
 
 private:
     JournalChecksumType checksum;
     std::shared_ptr<JournalState> currentState = nullptr;
-    std::vector<std::shared_ptr<JournalState>> journalHistory;
+    std::vector<JournalState> journalHistory;
 
     FuncMap funcMap;
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(checksum, journalHistory);
+        ar(CEREAL_NVP(checksum), CEREAL_NVP(journalHistory));
         //currentState is not serialized
     }
 

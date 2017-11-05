@@ -100,7 +100,7 @@ public:
     void setKey(CustomKeyType id, Vals... values) {
         static auto typeId = getTypeId<T>();
         data[typeId][getKey(id)] = std::make_shared<T>(values...);
-    };
+    }
 
     template<typename T, typename... Vals>
     auto set(Vals... values) {
@@ -109,7 +109,7 @@ public:
         auto ret = std::make_shared<T>(values...);
         data[typeId][getKey(0)] = ret;
         return ret;
-    };
+    }
 
 
     Context &operator+=(const Context &other);

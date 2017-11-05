@@ -22,6 +22,7 @@ using namespace std::chrono_literals;
 #include <p2p/filesystem/network/logic/actions/FileActions.h>
 #include <p2p/configuration/ConfigurationManager.h>
 #include <repo/journal/Journal.h>
+#include <repo/node/RepoModule.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -165,6 +166,11 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 }
 
 
+void setupModules(Node &node) {
+    node.addModule<RepoModule>();
+}
+
+
 int main() {
 //    auto ptr = NodeInfoGroup::Ack::getNew();
 //        if (ptr->getStatus() == Status::ACK) {
@@ -194,6 +200,13 @@ int main() {
 //    x.print();
 //    //PacketInfo<Base,Status::RESPONSE>::Type a;
 
+
+
+    StaticUber<std::string> staticTest;
+    staticTest.get<int>() = "lala int";
+    staticTest.get<float>() = "lala float";
+    staticTest.forEach([](std::string &s) { LOGGER(s); });
+
     Journal journal;
 
     journal.append(JournalMethod::ADDED, "/tmp/dupa.txt");
@@ -201,10 +214,18 @@ int main() {
     journal.commitState();
     journal.append(JournalMethod::UPDATED, "/tmp/dupa.txt");
     journal.replay();
+    journal.commitState();
+
+    {
+        std::ofstream os("/tmp/journal.xml");
+        cereal::XMLOutputArchive oa(os);
+        oa << journal;
+    }
+
     LOGGER(journal.calculateChecksum());
     LOGGER(journal.calculateChecksum());
     LOGGER(journal.calculateChecksum());
-    exit(0);
+    //  exit(0);
 //    SendFile::Response sfRes;
 //    fs::path tmpPath = "/tmp/basyco/testfile.txt";
 //    fs::path tmpPath2 = "/tmp/basyco/testfile2.txt";
@@ -233,12 +254,14 @@ int main() {
     thisNode.addToNetwork("TheNetwork");
     thisNode.getNodeInfo().setNodeId("first Node");
     setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
+    setupModules(thisNode);
     thisNode.start();
 
     Node otherNode(9999);
     otherNode.getNodeInfo().setNodeId("second node");
     otherNode.addToNetwork("TheNetwork");
     setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
+    setupModules(otherNode);
     otherNode.start();
 
     Node thirdNode(9898);

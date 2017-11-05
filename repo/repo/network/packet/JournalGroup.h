@@ -8,6 +8,8 @@
 
 #include <p2p/network/protocol/packet/info/PacketInfo.h>
 #include <repo/journal/Journal.h>
+#include <repo/network/logic/sources/JournalSource.h>
+#include <p2p/network/protocol/context/LogicContext.h>
 
 class JournalGroup : public PacketGroup {
 
@@ -26,6 +28,11 @@ class JournalGroup : public PacketGroup {
     public:
         void process(Context &context) override {
             BasePacket::process(context);
+            auto lc = context.get<LogicContext>();
+            if (lc != nullptr) {
+                auto journalSource = lc->getLogicManager().getSource<JournalSource>();
+
+            }
         }
     };
 

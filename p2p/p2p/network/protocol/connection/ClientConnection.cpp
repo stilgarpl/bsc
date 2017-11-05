@@ -8,8 +8,8 @@
 #include "ClientConnection.h"
 
 
-ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context &context) : socket(a),
-                                                                                          Connection(context) {
+ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context &context) : Connection(context),
+                                                                                          socket(a) {
 
     auto lm = getConnectionContext().get<LogicContext>();
     if (lm != nullptr) {

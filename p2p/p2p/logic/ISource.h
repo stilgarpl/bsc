@@ -96,13 +96,13 @@ public:
     SignalType<T, Args...> &
     assignSignal(typename SignalType<T, Args...>::FuncPtr funcPtr) {
         this->getSignal<T, Args...>().assign(funcPtr);
-    };
+    }
 
     template<typename T, typename... Args>
     SignalType<T, Args...> &
     assignSignal(const typename SignalType<T, Args...>::Func &funcPtr) {
         this->getSignal<T, Args...>().assign(funcPtr);
-    };
+    }
 
 
     //@todo make pure virtual

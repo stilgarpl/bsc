@@ -11,6 +11,11 @@
 
 class JournalSource : public EventQueueSource<JournalEvent> {
 
+public:
+    void journalRequested() {
+        auto event = newEvent();
+        queueEvent(event);
+    };
 };
 
 

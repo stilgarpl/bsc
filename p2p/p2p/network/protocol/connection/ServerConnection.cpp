@@ -25,8 +25,7 @@ void ServerConnection::run() {
 ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode, Context &context)
         : TCPServerConnection(
         socket),
-          serverNode(serverNode),
-          IServerConnection(context) {
+          IServerConnection(context), serverNode(serverNode) {
 
     serverNode.addAcceptedConnection(this);
     auto lc = getConnectionContext().get<LogicContext>();

@@ -9,8 +9,15 @@
 #include <repo/journal/Journal.h>
 
 class Repository {
+public:
+    typedef std::string RepoIdType;
 private:
     Journal journal;
+    RepoIdType repositoryId;
+
+public:
+    const RepoIdType &getRepositoryId() const;
+
 public:
 
 };

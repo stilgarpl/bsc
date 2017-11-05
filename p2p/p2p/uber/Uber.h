@@ -71,6 +71,15 @@ public:
         return result;
 
     }
+
+    void forEach(std::function<void(container &)> func) {
+        for (auto &&it : containers) {
+            if (it != nullptr) {
+                container &result = *std::static_pointer_cast<container>(it);
+                func(result);
+            }
+        }
+    }
 };
 
 

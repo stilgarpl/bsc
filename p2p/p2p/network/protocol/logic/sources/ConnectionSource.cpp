@@ -39,7 +39,7 @@ void ConnectionSource::receivedPacket(std::shared_ptr<BasePacket> p, Connection 
 void ConnectionSource::work() {
     //  LOGGER("connection source WOOOOORK")
     connSource.work();
-    auto qs = packetSource.queueSize();
+    /*   auto qs =*/ packetSource.queueSize();
     // if (qs) LOGGER("before packet work")
     packetSource.work();
     // if (qs) LOGGER("after packet work")

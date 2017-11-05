@@ -13,6 +13,8 @@
 #include "p2p/configuration/IConfig.h"
 #include "p2p/logic/SourceManager.h"
 #include "p2p/logic/LogicManager.h"
+#include "NodeModule.h"
+#include "INode.h"
 #include <Poco/Net/ServerSocket.h>
 #include <memory>
 #include <Poco/Net/TCPServer.h>
@@ -32,7 +34,7 @@ struct NodeConnectionInfo {
 
 typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
 
-class Node {
+class Node : public INode {
 public:
     typedef unsigned int IdType; ///@todo replace it with a real id, hash or something
 
@@ -87,6 +89,28 @@ private:
     std::shared_ptr<NetworkInfo> networkInfo;// = nsm(networkInfo); //network this node belongs to @todo more than 1?
     std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
 
+    typedef std::shared_ptr<NodeModule> NodeModulePtr;
+    StaticUber<NodeModulePtr> modules;
+
+
+public:
+
+    template<typename ModuleType>
+    void addModule() {
+        modules.get<ModuleType>() = std::make_shared<ModuleType>(std::ref(*this));
+    }
+
+    template<typename ModuleType>
+    NodeModulePtr getModulePtr() {
+        return modules.get<ModuleType>();
+    }
+
+    template<typename ModuleType>
+    NodeModule &getModule() {
+        ///@todo what if nullptr?
+        return *modules.get<ModuleType>();
+    }
+
 
 public:
 
@@ -101,6 +125,17 @@ protected:
     void removeActiveClientConnection(NodeConnectionInfoPtr c);
 
     void work();
+
+    void initialize() {
+        //initialize node modules
+
+        modules.forEach(
+                [&](NodeModulePtr ptr) {
+                    if (ptr != nullptr) {
+                        ptr->initialize();
+                    };
+                });
+    };
 
 private:
     void stopAcceptedConnections();
@@ -150,6 +185,7 @@ public:
 
     std::shared_ptr<NetworkInfo> &getNetworkInfo();
 
+    ///@todo move those random methods somewhere else:
 
     void updateNodeConnectionInfo();
 
@@ -162,7 +198,7 @@ public:
     friend class NodeActions;
 };
 
-CEREAL_REGISTER_TYPE(Node::Config);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig, Node::Config);
+CEREAL_REGISTER_TYPE(Node::Config)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig, Node::Config)
 
 #endif //BASYCO_NODE_H
