@@ -92,6 +92,8 @@ private:
     typedef std::shared_ptr<NodeModule> NodeModulePtr;
     StaticUber<NodeModulePtr> modules;
 
+    template<typename ModuleType>
+    using ModuleTypePtr = std::shared_ptr<ModuleType>;
 
 public:
 
@@ -100,15 +102,15 @@ public:
         modules.get<ModuleType>() = std::make_shared<ModuleType>(std::ref(*this));
     }
 
-    template<typename ModuleType>
-    NodeModulePtr getModulePtr() {
-        return modules.get<ModuleType>();
-    }
+//    template<typename ModuleType>
+//    ModuleTypePtr getModulePtr() {
+//        return modules.get<ModuleType>();
+//    }
 
     template<typename ModuleType>
-    NodeModule &getModule() {
-        ///@todo what if nullptr?
-        return *modules.get<ModuleType>();
+    ModuleTypePtr<ModuleType> getModule() {
+        return std::static_pointer_cast<ModuleType>(modules.get<ModuleType>());
+
     }
 
 

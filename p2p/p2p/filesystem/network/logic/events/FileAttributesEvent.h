@@ -7,8 +7,9 @@
 
 
 #include <p2p/logic/IEvent.h>
+#include <p2p/network/logic/events/NetworkingEvent.h>
 
-class FileAttributesEvent : public IEvent<int> {
+class FileAttributesEvent : public NetworkingEvent<int> {
 
 };
 

@@ -18,6 +18,12 @@ private:
 public:
     const RepoIdType &getRepositoryId() const;
 
+    const Journal &getJournal() const;
+
+    void setJournal(const Journal &journal);
+
+    void setRepositoryId(const RepoIdType &repositoryId);
+
 public:
 
 };

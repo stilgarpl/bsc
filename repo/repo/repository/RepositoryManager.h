@@ -12,13 +12,13 @@ class RepositoryManager {
 
     std::list<Repository> repositories;
 
+public:
     Repository &getRepository(Repository::RepoIdType id) {
         auto it = std::find_if(repositories.begin(), repositories.end(),
                                [&](const Repository &rep) -> bool { return rep.getRepositoryId() == id; });
         ///@todo error checking.
         return *it;
     }
-
 };
 
 

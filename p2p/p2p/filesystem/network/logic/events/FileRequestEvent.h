@@ -8,6 +8,7 @@
 #include <experimental/filesystem>
 #include <p2p/logic/IEvent.h>
 #include <p2p/network/protocol/connection/Connection.h>
+#include <p2p/network/logic/events/NetworkingEvent.h>
 
 namespace fs = std::experimental::filesystem;
 
@@ -17,14 +18,12 @@ enum class FileRequestId {
     GET_ATTRIBUTES, //? this event or other?
 };
 
-class FileRequestEvent : public IEvent<FileRequestId> {
+class FileRequestEvent : public NetworkingEvent<FileRequestId> {
 
 private:
     fs::path filePath;
     size_t begin, end;
-    //@todo think about it: Is it necessary? Can we respond in some other way?
-    Connection *connection;
-    BasePacket::IdType requestId;
+
 
 public:
     const std::experimental::filesystem::path &getFilePath() const;
@@ -39,13 +38,13 @@ public:
 
     void setEnd(size_t end);
 
-    Connection *getConnection() const;
+//    Connection *getConnection() const;
+//
+//    void setConnection(Connection *connection);
 
-    void setConnection(Connection *connection);
-
-    BasePacket::IdType getRequestId() const;
-
-    void setRequestId(BasePacket::IdType requestId);
+//    BasePacket::IdType getRequestId() const;
+//
+//    void setRequestId(BasePacket::IdType requestId);
 
 
 };

@@ -7,7 +7,7 @@
 #include <p2p/filesystem/network/packet/SendFile.h>
 
 void FileSource::requestFile(SendFile::Request *request) {
-    auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
+    // auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
 
     auto event = requestSource.newEvent();
     if (request->getEnd() == 0) {
@@ -19,7 +19,7 @@ void FileSource::requestFile(SendFile::Request *request) {
     event->setBegin(request->getBegin());
     event->setEnd(request->getEnd());
     event->setFilePath(request->getFilePath());
-    event->setConnection(&connectionContext->getConnection());
+    // event->setConnection(&connectionContext->getConnection());
     event->setRequestId(request->getId());
 
 //    event->setNetworkInfo(networkInfo);
@@ -41,7 +41,7 @@ void FileSource::registerProviders(SourceManager *manager) {
 }
 
 void FileSource::fileReceived(SendFile::Response::Ptr response) {
-    auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
+    //auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
 
     auto event = responseSource.newEvent();
     if (response->getEnd() == 0) {
@@ -50,7 +50,14 @@ void FileSource::fileReceived(SendFile::Response::Ptr response) {
         event->setEventId(FileResponseId::CHUNK_RECEIVED);
     }
     //whole file
-    event->setResponse(response);
+    //  event->setResponse(response);
+    //  SendFile::Response* response;
+    event->setFilePath(response->getFilePath());
+    ///@todo remove debug override
+    event->setFilePath("/tmp/basyco/received.file");
+    event->setBegin(response->getBegin());
+    event->setEnd(response->getEnd());
+    event->setData(response->getData());
 
     responseSource.queueEvent(event);
 }

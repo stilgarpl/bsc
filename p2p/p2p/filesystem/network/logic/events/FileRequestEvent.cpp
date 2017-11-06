@@ -28,18 +28,18 @@ void FileRequestEvent::setEnd(size_t end) {
     FileRequestEvent::end = end;
 }
 
-Connection *FileRequestEvent::getConnection() const {
-    return connection;
-}
+//Connection *FileRequestEvent::getConnection() const {
+//    return connection;
+//}
+//
+//void FileRequestEvent::setConnection(Connection *connection) {
+//    FileRequestEvent::connection = connection;
+//}
 
-void FileRequestEvent::setConnection(Connection *connection) {
-    FileRequestEvent::connection = connection;
-}
-
-BasePacket::IdType FileRequestEvent::getRequestId() const {
-    return requestId;
-}
-
-void FileRequestEvent::setRequestId(BasePacket::IdType requestId) {
-    FileRequestEvent::requestId = requestId;
-}
+//BasePacket::IdType FileRequestEvent::getRequestId() const {
+//    return requestId;
+//}
+//
+//void FileRequestEvent::setRequestId(BasePacket::IdType requestId) {
+//    FileRequestEvent::requestId = requestId;
+//}

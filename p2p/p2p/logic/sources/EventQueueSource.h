@@ -32,7 +32,9 @@ protected:
 
     template<typename ... Args>
     EventTypePtr newEvent(Args... args) {
-        return std::make_shared<EventType_>(args...);
+        auto ret = std::make_shared<EventType_>(args...);
+        setupOrigin<typename EventType::OriginType>::setup(ret->origin());
+        return ret;
     }
 public:
     void work() override {

@@ -3,3 +3,13 @@
 //
 
 #include "JournalSource.h"
+
+void JournalSource::work() {
+    requestSource.work();
+    responseSource.work();
+}
+
+void JournalSource::registerProviders(SourceManager *manager) {
+    requestSource.registerProviders(manager);
+    responseSource.registerProviders(manager);
+}

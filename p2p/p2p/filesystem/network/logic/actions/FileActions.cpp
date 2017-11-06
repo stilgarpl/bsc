@@ -5,7 +5,7 @@
 #include "FileActions.h"
 
 void FileActions::sendFile(const FileRequestEvent &event) {
-    Connection *connection = event.getConnection();
+    Connection *connection = event.origin();
 
 
     if (fs::exists(event.getFilePath())) {
@@ -23,6 +23,6 @@ void FileActions::sendFile(const FileRequestEvent &event) {
 }
 
 void FileActions::receivedFile(const FileResponseEvent &event) {
-    event.getResponse()->setFilePath("/tmp/basyco/received.file");
-    event.getResponse()->save_file();
+    //event.setFilePath("/tmp/basyco/received.file");
+    event.saveFile();
 }
