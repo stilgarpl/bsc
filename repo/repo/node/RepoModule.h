@@ -8,8 +8,10 @@
 
 #include <p2p/network/node/NodeModule.h>
 #include <repo/repository/RepositoryManager.h>
+#include <p2p/dependency/DependencyManaged.h>
+#include <repo/repository/Repository.h>
 
-class RepoModule : public NodeModule {
+class RepoModule : public NodeModule, DependencyManaged<RepoModule> {
 private:
     RepositoryManager repositoryManager;
 public:

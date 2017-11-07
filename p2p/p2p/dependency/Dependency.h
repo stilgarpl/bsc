@@ -1,0 +1,74 @@
+//
+// Created by stilgar on 07.11.17.
+//
+
+#ifndef BASYCO_DEPENDENCY_H
+#define BASYCO_DEPENDENCY_H
+
+
+#include <vector>
+#include <array>
+#include "IDependency.h"
+#include "DependencyManager.h"
+
+template<typename T, typename ... Args>
+class Dependency : public IDependency {
+
+public:
+    // typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
+    typedef DependencyManager::ArrayType ArrayType;
+private:
+    ArrayType dependency;
+public:
+    constexpr static ArrayType getDependencyIds() {
+        ArrayType ret;
+        ret.reserve(1 + sizeof...(Args));
+        ret.push_back(DependencyManager::getClassId<T>());
+        auto rest = Dependency<Args...>::getDependencyIds();
+        ret.insert(ret.end(), rest.begin(), rest.end());
+        return ret;
+    }
+
+public:
+    ArrayType getDependencyIdents() override {
+        return getDependencyIds();
+    }
+};
+
+template<typename T>
+class Dependency<T> : public IDependency {
+
+public:
+    typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
+
+    constexpr static ArrayType getDependencyIds() {
+        ArrayType ret;
+        ret.push_back(DependencyManager::getClassId<T>());
+        return ret;
+    }
+
+    ArrayType getDependencyIdents() override {
+        return getDependencyIds();
+    }
+};
+
+
+///@todo how to empty template?
+class Dependency1 : public IDependency {
+
+public:
+    typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
+
+    static ArrayType getDependencyIds() {
+        const ArrayType ret;
+        //ret.push_back(DependencyManager::getClassId<T>());
+        return ret;
+    }
+
+    ArrayType getDependencyIdents() override {
+        return getDependencyIds();
+    }
+};
+
+
+#endif //BASYCO_DEPENDENCY_H

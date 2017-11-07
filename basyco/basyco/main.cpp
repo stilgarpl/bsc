@@ -23,55 +23,24 @@ using namespace std::chrono_literals;
 #include <p2p/configuration/ConfigurationManager.h>
 #include <repo/journal/Journal.h>
 #include <repo/node/RepoModule.h>
+#include <p2p/network/node/modules/BasicModule.h>
+#include <p2p/network/node/modules/FilesystemModule.h>
+#include <p2p/dependency/Dependency.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
     //adding sources
-    logicManager.addSource<AuthSource>();
-    logicManager.addSource<ClockSource>();
-    logicManager.addSource<ConnectionSource>();
-    logicManager.addSource<NetworkSource>();
-    logicManager.addSource<NodeSource>();
-    logicManager.addSource<FileSource>();
+
+
 
 
 
     //setting actions
 
-    logicManager.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
-    logicManager.setAction<ConnectionEvent>("reqNeI", NodeActions::sendNetworkInfoRequest);
-    logicManager.setAction<NodeInfoEvent>("upNoI", NodeActions::updateNodeInfo);
-    logicManager.setAction<NetworkInfoEvent>("upNeI", NetworkActions::updateNetworkInfo);
-    logicManager.setAction<NodeInfoEvent>("addKnownNode", NodeActions::addKnownNode);
-    logicManager.setAction<Tick>("trigNodeUp", NodeActions::triggerUpdateNode);
-    logicManager.setAction<NodeInfoEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
 
 
-    logicManager.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent &event) {
-
-        // std::clog << "Debug: connection event!" << std::endl;
-    });
-
-    logicManager.setAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
-                                        [&transmissionControl](
-                                                               const PacketEvent &packetEvent) {
-                                            return transmissionControl.onPacketReceived(packetEvent);
-                                        });
-    logicManager.setAction<PacketEvent>(PacketEventId::PACKET_SENT,
-                                        [&transmissionControl](const PacketEvent &packetEvent) {
-                                            return transmissionControl.onPacketSent(packetEvent);
-    });
-
-    logicManager.setAction<Tick>("TransTick", [&transmissionControl](const Tick &tick) {
-        return transmissionControl.work(tick);
-    });
 
 
-    logicManager.setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
-
-
-    logicManager.setAction<FileRequestEvent>("fileReq", FileActions::sendFile);
-    logicManager.setAction<FileResponseEvent>("fileRes", FileActions::receivedFile);
 
 
 //    //  assigning actions
@@ -86,47 +55,7 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 //
 //    }
 
-    if (logicManager.assignAction<ConnectionEvent>("connDebug")) {
-        std::clog << "Debug: ConEv assignment!" << std::endl;
 
-    }
-
-
-//    if (logicManager.assignAction<ConnectionEvent>("onConnect")) {
-//        std::clog << "Debug: onConn assignment!" << std::endl;
-//
-//    }
-
-    if (logicManager.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNoI")) {
-        std::clog << "Debug: reqNoI assignment!" << std::endl;
-
-    }
-
-    if (logicManager.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNeI")) {
-        std::clog << "Debug: reqNeI assignment!" << std::endl;
-
-    }
-
-    if (logicManager.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "upNoI")) {
-        std::clog << "Debug: upNoI assignment!" << std::endl;
-
-    }
-
-    if (logicManager.assignAction<NetworkInfoEvent>(NetworkInfoEvent::IdType::NETWORK_INFO_RECEIVED, "upNeI")) {
-        std::clog << "Debug: upNoI assignment!" << std::endl;
-
-    }
-
-    ///@todo upNoI powinno cos takiego robic, addKnownNode powinien byc wywolany tylko w przypadku
-    if (logicManager.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "addKnownNode")) {
-        std::clog << "Debug: addKnownNode assignment!" << std::endl;
-
-    }
-
-    if (logicManager.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NEW_NODE_DISCOVERED, "nodeDiscovered")) {
-        std::clog << "Debug: addKnownNode assignment!" << std::endl;
-
-    }
 
 //    if (logicManager.assignAction<Tick>(1500ms, "trigNodeUp")) {
 //        std::clog << "Debug: TtrigNodeUp assignment!" << std::endl;
@@ -135,43 +64,69 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
 
     //both FILE and CHUNK events are assigned to the same function
-    if (logicManager.assignAction<FileRequestEvent>(FileRequestEvent::IdType::GET_FILE, "fileReq") &&
-        logicManager.assignAction<FileRequestEvent>(FileRequestEvent::IdType::GET_CHUNK, "fileReq") &&
-        logicManager.assignAction<FileResponseEvent>(FileResponseEvent::IdType::FILE_RECEIVED, "fileRes") &&
-        logicManager.assignAction<FileResponseEvent>(FileResponseEvent::IdType::CHUNK_RECEIVED, "fileRes")) {
-        std::clog << "Debug: File assignment!" << std::endl;
 
-    }
 
 //
 //    IProtocol* protocol = new DummyProtocol();
 //    protocol->setupLogic(logicManager);
 
 
-    ///@todo remove this debug:
 
-    logicManager.setAction<ConnectionEvent>("fileSendDebug", [](const ConnectionEvent &event) {
-
-        SendFile::Request::Ptr req = SendFile::Request::getNew();
-        req->setFilePath("/tmp/basyco/testfile.txt");
-        req->setBegin(3);
-        req->setEnd(8);
-        event.getConnection()->send(req);
-    });
-
-    if (logicManager.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "fileSendDebug")) {
-        std::clog << "Debug: File DEBUG assignment!" << std::endl;
-    }
 
 }
 
 
 void setupModules(Node &node) {
+    node.addModule<BasicModule>();
+    node.addModule<FilesystemModule>();
     node.addModule<RepoModule>();
 }
 
 
 int main() {
+
+
+    Dependency<int, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long> dep;
+    auto before = std::chrono::steady_clock::now();
+    auto val = dep.getDependencyIds();
+//     val = dep.getIds();
+//     val = dep.getIds();
+//     val = dep.getIds();
+    auto after = std::chrono::steady_clock::now();
+
+
+    for (auto &&item : val) {
+        std::cout << "Val : " << item << std::endl;
+    }
+
+
+    DependencyManager::DependencyList depList;
+    auto intD = std::make_shared<DependencyManaged<int>>();
+    auto floatD = std::make_shared<DependencyManaged<float>>();
+    auto doubleD = std::make_shared<DependencyManaged<double>>();
+    intD->setRequired(std::make_shared<Dependency1>());
+    floatD->setRequired(std::make_shared<Dependency<int>>());
+    doubleD->setRequired(std::make_shared<Dependency<int, float>>());
+
+
+    depList.push_back(doubleD);
+    depList.push_back(intD);
+    depList.push_back(floatD);
+
+    for (auto &&list : depList) {
+        std::cout << "edek : " << list->getDepedencyId() << std::endl;
+
+    }
+
+    auto redep = DependencyManager::dependencySort(depList);
+    for (auto &&list : redep) {
+        std::cout << "fedek : " << list->getDepedencyId() << std::endl;
+
+    }
+    exit(0);
+
+
+
 //    auto ptr = NodeInfoGroup::Ack::getNew();
 //        if (ptr->getStatus() == Status::ACK) {
 //            LOGGER("STATUS OK");
@@ -253,15 +208,17 @@ int main() {
     Node thisNode(9191);
     thisNode.addToNetwork("TheNetwork");
     thisNode.getNodeInfo().setNodeId("first Node");
-    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
+
     setupModules(thisNode);
+    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
     thisNode.start();
 
     Node otherNode(9999);
     otherNode.getNodeInfo().setNodeId("second node");
     otherNode.addToNetwork("TheNetwork");
-    setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
+
     setupModules(otherNode);
+    setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
     otherNode.start();
 
     Node thirdNode(9898);

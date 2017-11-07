@@ -7,9 +7,10 @@
 
 
 #include <p2p/logic/ILogicModule.h>
+#include <p2p/dependency/IDependencyManaged.h>
 #include "INode.h"
 
-class NodeModule : public ILogicModule {
+class NodeModule : public ILogicModule, virtual IDependencyManaged {
 
 private:
     INode &node;

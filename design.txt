@@ -18,3 +18,18 @@ w process jest ConnectionContext.
 
 
 setupOriginFromContext<OriginType>::setupOrigin(OriginType& origin)
+
+
+Dependencies module
+
+class Dupa {
+
+IDependency* after = new Dependency<Dupa1,Dupa2,Dupa3>();
+Dependency<Dupa4,Dupa5> before;
+
+}
+
+Dependency przerabia liste klas na liste intow mechanizmem z ubera. z kazdej klasy mozna pobrac jej id
+
+node uruchamiajac klasy moze je sobie posortowac odpowiednio
+dependency sorting

@@ -135,6 +135,7 @@ protected:
                 [&](NodeModulePtr ptr) {
                     if (ptr != nullptr) {
                         ptr->initialize();
+                        ptr->setupLogic(logicManager);
                     };
                 });
     };
