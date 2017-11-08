@@ -7,8 +7,9 @@
 
 
 #include <p2p/network/node/NodeModule.h>
+#include <p2p/dependency/DependencyManaged.h>
 
-class NodeNetworkModule : public NodeModule {
+class NodeNetworkModule : public NodeModule, public DependencyManaged<NodeNetworkModule> {
 public:
     NodeNetworkModule(INode &node);
 

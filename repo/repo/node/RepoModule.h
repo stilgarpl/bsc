@@ -11,7 +11,7 @@
 #include <p2p/dependency/DependencyManaged.h>
 #include <repo/repository/Repository.h>
 
-class RepoModule : public NodeModule, DependencyManaged<RepoModule> {
+class RepoModule : public NodeModule, public DependencyManaged<RepoModule> {
 private:
     RepositoryManager repositoryManager;
 public:

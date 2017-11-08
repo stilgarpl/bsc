@@ -9,7 +9,7 @@
 #include <p2p/network/node/NodeModule.h>
 #include <p2p/dependency/DependencyManaged.h>
 
-class FilesystemModule : public NodeModule, DependencyManaged<FilesystemModule> {
+class FilesystemModule : public NodeModule, public DependencyManaged<FilesystemModule> {
 public:
     FilesystemModule(INode &node);
 

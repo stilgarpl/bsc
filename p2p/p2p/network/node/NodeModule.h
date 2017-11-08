@@ -10,7 +10,7 @@
 #include <p2p/dependency/IDependencyManaged.h>
 #include "INode.h"
 
-class NodeModule : public ILogicModule, virtual IDependencyManaged {
+class NodeModule : public ILogicModule, public virtual IDependencyManaged {
 
 private:
     INode &node;

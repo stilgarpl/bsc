@@ -6,8 +6,12 @@
 #include <p2p/filesystem/network/logic/actions/FileActions.h>
 #include <p2p/network/protocol/logic/events/ConnectionEvent.h>
 #include "FilesystemModule.h"
+#include "BasicModule.h"
+#include "NodeNetworkModule.h"
 
-FilesystemModule::FilesystemModule(INode &node) : NodeModule(node) {}
+FilesystemModule::FilesystemModule(INode &node) : NodeModule(node) {
+    setRequired<BasicModule, NodeNetworkModule>();
+}
 
 void FilesystemModule::setupActions(LogicManager &logicManager) {
     logicManager.setAction<FileRequestEvent>("fileReq", FileActions::sendFile);

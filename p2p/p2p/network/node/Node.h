@@ -22,6 +22,7 @@
 #include <p2p/network/protocol/protocol/IProtocol.h>
 #include <p2p/network/protocol/protocol/GravitonProtocol.h>
 #include <p2p/network/protocol/connection/IServerConnection.h>
+#include <p2p/dependency/DependencyManager.h>
 
 ///@todo separate interface so NodeInfo can include INode, and Node can include NodeInfo
 
@@ -130,14 +131,22 @@ protected:
 
     void initialize() {
         //initialize node modules
-
+        std::list<NodeModulePtr> modulesList;
         modules.forEach(
                 [&](NodeModulePtr ptr) {
                     if (ptr != nullptr) {
-                        ptr->initialize();
-                        ptr->setupLogic(logicManager);
+                        //ptr->initialize();
+                        //ptr->setupLogic(logicManager);
+                        modulesList.push_back(ptr);
                     };
                 });
+        auto sortedList = DependencyManager::dependencySort(modulesList);
+
+        for (auto &&item : sortedList) {
+            item->initialize();
+            item->setupLogic(logicManager);
+        }
+
     };
 
 private:

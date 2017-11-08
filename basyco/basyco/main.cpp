@@ -26,6 +26,7 @@ using namespace std::chrono_literals;
 #include <p2p/network/node/modules/BasicModule.h>
 #include <p2p/network/node/modules/FilesystemModule.h>
 #include <p2p/dependency/Dependency.h>
+#include <p2p/network/node/modules/NodeNetworkModule.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -79,6 +80,7 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 void setupModules(Node &node) {
     node.addModule<BasicModule>();
     node.addModule<FilesystemModule>();
+    node.addModule<NodeNetworkModule>();
     node.addModule<RepoModule>();
 }
 
@@ -86,44 +88,44 @@ void setupModules(Node &node) {
 int main() {
 
 
-    Dependency<int, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long> dep;
-    auto before = std::chrono::steady_clock::now();
-    auto val = dep.getDependencyIds();
-//     val = dep.getIds();
-//     val = dep.getIds();
-//     val = dep.getIds();
-    auto after = std::chrono::steady_clock::now();
-
-
-    for (auto &&item : val) {
-        std::cout << "Val : " << item << std::endl;
-    }
-
-
-    DependencyManager::DependencyList depList;
-    auto intD = std::make_shared<DependencyManaged<int>>();
-    auto floatD = std::make_shared<DependencyManaged<float>>();
-    auto doubleD = std::make_shared<DependencyManaged<double>>();
-    intD->setRequired(std::make_shared<Dependency1>());
-    floatD->setRequired(std::make_shared<Dependency<int>>());
-    doubleD->setRequired(std::make_shared<Dependency<int, float>>());
-
-
-    depList.push_back(doubleD);
-    depList.push_back(intD);
-    depList.push_back(floatD);
-
-    for (auto &&list : depList) {
-        std::cout << "edek : " << list->getDepedencyId() << std::endl;
-
-    }
-
-    auto redep = DependencyManager::dependencySort(depList);
-    for (auto &&list : redep) {
-        std::cout << "fedek : " << list->getDepedencyId() << std::endl;
-
-    }
-    exit(0);
+//    Dependency<int, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long> dep;
+//    auto before = std::chrono::steady_clock::now();
+//    auto val = dep.getDependencyIds();
+////     val = dep.getIds();
+////     val = dep.getIds();
+////     val = dep.getIds();
+//    auto after = std::chrono::steady_clock::now();
+//
+//
+//    for (auto &&item : val) {
+//        std::cout << "Val : " << item << std::endl;
+//    }
+//
+//
+//    DependencyManager::DependencyList depList;
+//    auto intD = std::make_shared<DependencyManaged<int>>();
+//    auto floatD = std::make_shared<DependencyManaged<float>>();
+//    auto doubleD = std::make_shared<DependencyManaged<double>>();
+//    intD->setRequired(std::make_shared<Dependency1>());
+//    floatD->setRequired(std::make_shared<Dependency<int>>());
+//    doubleD->setRequired(std::make_shared<Dependency<int, float>>());
+//
+//
+//    depList.push_back(doubleD);
+//    depList.push_back(intD);
+//    depList.push_back(floatD);
+//
+//    for (auto &&list : depList) {
+//        std::cout << "edek : " << list->getDepedencyId() << std::endl;
+//
+//    }
+//
+//    auto redep = DependencyManager::dependencySort(depList);
+//    for (auto &&list : redep) {
+//        std::cout << "fedek : " << list->getDepedencyId() << std::endl;
+//
+//    }
+//    exit(0);
 
 
 

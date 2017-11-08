@@ -10,6 +10,7 @@
 #include "IDependency.h"
 #include "IDependencyManaged.h"
 #include "DependencyManager.h"
+#include "Dependency.h"
 
 #include <memory>
 
@@ -34,7 +35,10 @@ public:
 
 protected:
 
-
+    template<typename ... Args>
+    void setRequired() {
+        required = std::make_shared<Dependency<Args...>>();
+    }
 };
 
 

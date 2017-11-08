@@ -10,8 +10,11 @@
 #include <p2p/network/protocol/logic/actions/ProtocolActions.h>
 #include <p2p/network/node/protocol/logic/actions/NetworkActions.h>
 #include "NodeNetworkModule.h"
+#include "BasicModule.h"
 
-NodeNetworkModule::NodeNetworkModule(INode &node) : NodeModule(node) {}
+NodeNetworkModule::NodeNetworkModule(INode &node) : NodeModule(node) {
+    setRequired<BasicModule>();
+}
 
 void NodeNetworkModule::setupActions(LogicManager &logicManager) {
     logicManager.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
