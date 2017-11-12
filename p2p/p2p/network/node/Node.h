@@ -23,6 +23,7 @@
 #include <p2p/network/protocol/protocol/GravitonProtocol.h>
 #include <p2p/network/protocol/connection/IServerConnection.h>
 #include <p2p/dependency/DependencyManager.h>
+#include <p2p/network/protocol/role/RoleScope.h>
 
 ///@todo separate interface so NodeInfo can include INode, and Node can include NodeInfo
 
@@ -35,7 +36,7 @@ struct NodeConnectionInfo {
 
 typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
 
-class Node : public INode {
+class Node : public INode, public RoleScope {
 public:
     typedef unsigned int IdType; ///@todo replace it with a real id, hash or something
 

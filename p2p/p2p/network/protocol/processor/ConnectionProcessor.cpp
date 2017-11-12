@@ -7,6 +7,7 @@
 #include <p2p/network/protocol/context/LogicContext.h>
 #include <p2p/network/protocol/logic/sources/ConnectionSource.h>
 #include <p2p/network/protocol/context/ProcessorContext.h>
+#include <p2p/network/protocol/role/Roles.h>
 
 
 ConnectionProcessor::ConnectionProcessor(Connection &connection) : connection(connection) {
@@ -24,7 +25,7 @@ void ConnectionProcessor::run() {
     //auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
     auto processorContext = context.set<ProcessorContext, ConnectionProcessor &>(*this);
-
+    Roles::setActiveScope(&connection);
     while (!this->isStopping()) {
         auto np = connection.receive();
         if (np != nullptr) {

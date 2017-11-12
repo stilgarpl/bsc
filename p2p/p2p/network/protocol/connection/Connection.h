@@ -14,9 +14,10 @@
 #include <condition_variable>
 #include <p2p/network/protocol/processor/ConnectionProcessor.h>
 #include <p2p/network/protocol/packet/BasePacket.h>
+#include <p2p/network/protocol/role/RoleScope.h>
 
 
-class Connection {
+class Connection : public RoleScope {
 
 protected:
     ConnectionProcessor processor;

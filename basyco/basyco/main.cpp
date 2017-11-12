@@ -27,6 +27,7 @@ using namespace std::chrono_literals;
 #include <p2p/network/node/modules/FilesystemModule.h>
 #include <p2p/dependency/Dependency.h>
 #include <p2p/network/node/modules/NodeNetworkModule.h>
+#include <p2p/network/protocol/role/Roles.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -87,7 +88,15 @@ void setupModules(Node &node) {
 
 int main() {
 
+    RoleScope scope;
+    scope.addRole("lala");
 
+    scope.addRole("dupa");
+    scope.addRole("test");
+    Roles::setActiveScope(&scope);
+
+    Roles::allowed("lala", "dupa", "test");
+    exit(0);
 //    Dependency<int, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long> dep;
 //    auto before = std::chrono::steady_clock::now();
 //    auto val = dep.getDependencyIds();
