@@ -33,3 +33,10 @@ Dependency przerabia liste klas na liste intow mechanizmem z ubera. z kazdej kla
 
 node uruchamiajac klasy moze je sobie posortowac odpowiednio
 dependency sorting
+
+
+Command module with module submodules and mapping
+
+commandModule->map<BasicModule>("start", BasicModule::startNode);
+
+command by parsował parametry z main i wysylal command packet do wlasciwej instancji node.
