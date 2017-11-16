@@ -89,7 +89,7 @@ void setupModules(Node &node) {
 
 void test(CommandModule::ArgumentContainerType arguments) {
     for (auto &&argument : arguments) {
-        LOGGER(argument);
+        //LOGGER(argument);
     }
 }
 
@@ -98,21 +98,135 @@ void help(CommandModule::ArgumentContainerType arguments) {
 }
 
 
+void test1(std::string s) {
+
+}
+
+
+template<std::size_t... Indices>
+struct indices {
+    using next = indices<Indices..., sizeof...(Indices)>;
+};
+template<std::size_t N>
+struct build_indices {
+    using type = typename build_indices<N - 1>::type::next;
+};
+template<>
+struct build_indices<0> {
+    using type = indices<>;
+};
+template<std::size_t N>
+using BuildIndices = typename build_indices<N>::type;
+
+template<typename Iterator>
+using ValueType = typename std::iterator_traits<Iterator>::value_type;
+
+
+template<typename T, typename S>
+T from_string(const S &s) {
+    return T(s);
+}
+
+template<>
+int from_string<int>(const std::string &s) {
+    return std::atoi(s.c_str());
+}
+
+
+template<typename ... Strings>
+struct RunCastString {
+    template<typename T, typename ...Args>
+    void cast_all(T &t, void(T::*fun)(Args...), Strings...as) {
+        (t.*fun)(from_string<Args>(as)...);
+    }
+};
+
+
+template<typename T, typename RetType, typename ... Args, typename ... Strings>
+static void runStringCast(T &t, RetType (T::*f)(Args...), Strings ... strings) {
+    RunCastString<Strings...> r;
+    r.cast_all(t, f, strings...);
+};
+
+
+template<size_t num_args>
+struct unpack_caller {
+private:
+    template<typename T, typename RetType, typename ... Args, size_t... I>
+    void call(T &t, RetType(T::*f)(Args...), std::vector<std::string> &args, indices<I...>) {
+        runStringCast(t, f, args[I]...);
+    }
+
+    template<typename RetType, typename ... Args, size_t... I>
+    void call(RetType(*f)(Args...), std::vector<std::string> &args, indices<I...>) {
+        (*f)(args[I]...);
+    }
+
+
+public:
+    template<typename T, typename RetType, typename ... Args>
+    void operator()(T &t, RetType(T::*f)(Args...), std::vector<std::string> &args) {
+        assert(args.size() == num_args); // just to be sure
+        call(t, f, args, BuildIndices<num_args>{});
+    }
+
+    template<typename RetType, typename ... Args>
+    void operator()(RetType(*f)(Args...), std::vector<std::string> &args) {
+        //assert(args.size() == num_args); // just to be sure
+        call(f, args, BuildIndices<num_args>{});
+    }
+};
+
+
+template<typename T, typename RetType, typename ... Args>
+void getMemFun(T &t, RetType (T::*f)(Args...), std::vector<std::string> values) {
+    unpack_caller<sizeof... (Args)> a;
+    a(t, f, values);
+};
+
+
+template<typename ModuleType, typename T, typename RetType, typename ... Args>
+void mapFuncToModule(Node &node, std::string moduleName, std::string commandName, RetType (T::*f)(Args...)) {
+    auto mod = node.getModule<ModuleType>();
+    auto command = node.getModule<CommandModule>();
+    command->mapCommand(moduleName, commandName, [=](CommandModule::ArgumentContainerType vals) {
+        getMemFun(*mod, f, vals);
+    });
+};
+
+
+
+
+
+
 int main(int argc, char *argv[]) {
 
-    Node xnode;
 
+    std::string sss("lala");
+
+
+    Node xnode;
+    xnode.addModule<CommandModule>();
+    auto cmdM = xnode.getModule<CommandModule>();
+
+    mapFuncToModule<CommandModule>(xnode, "t1", "t2", &CommandModule::testingMethodInt);
+
+    std::vector<std::string> arguments1;
+    arguments1.push_back(std::string("gggg18675"));
+
+    cmdM->runCommand("t1", "t2", arguments1);
     CommandModule commandModule(xnode);
 
     commandModule.mapCommand("stuff", "do", &test);
     commandModule.mapCommand("help", "help", &help);
 
-    commandModule.runCommand("dupa", "xx", {"lalala"});
-    commandModule.runCommand("stuff", "do", {"test", "test2", "test3"});
+    commandModule.runCommand("dupa", "xx", {std::string("lalala")});
+    //  commandModule.runCommand("stuff", "do", {"test", "test2", "test3"});
 
     std::string moduleName = "help";
     std::string commandName = "help";
     std::vector<std::string> arguments;
+
     if (argc > 1) {
         moduleName = argv[1];
         if (argc > 2) {
@@ -123,14 +237,21 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+
+
+
+//    getMemFun(&TempTest::test, arguments1);
+//    getMemFun(&TempTest::test, arguments);
+//    getMemFun(&TempTest::test, arguments1);
+
 //
 //    LOGGER("pre")
 //    test(arguments);
 //    LOGGER("Post")
 
-    commandModule.runCommand(moduleName, commandName, arguments);
+    //  commandModule.runCommand(moduleName, commandName, arguments);
 
-    commandModule.mapCommandToModule<ModuleName, int, float, float>(moduleName, commandName, &ModuleName::function);
+    //commandModule.mapCommandToModule<ModuleName, int, float, float>(moduleName, commandName, &ModuleName::function);
 
     RoleScope scope;
     scope.addRole("lala");

@@ -10,6 +10,23 @@
 #include <p2p/network/node/NodeModule.h>
 #include <p2p/network/node/Node.h>
 
+///@todo remove class
+class Dupa {
+private:
+    int a;
+public:
+    Dupa(const std::string &s) {
+        a = std::atoi(s.c_str());
+    }
+
+    int getA() const {
+        return a;
+    }
+};
+
+
+
+
 class CommandModule : public NodeModule, public DependencyManaged<CommandModule> {
 
     /**
@@ -21,6 +38,7 @@ class CommandModule : public NodeModule, public DependencyManaged<CommandModule>
     Uber<std::map> commands;
 
 public:
+
 
     typedef const std::vector<std::string> &ArgumentContainerType;
 
@@ -59,6 +77,17 @@ public:
     bool assignActions(LogicManager &logicManager) override;
 
     bool setupSources(LogicManager &logicManager) override;
+
+
+public:
+
+    void testingMethod(Dupa a) {
+        LOGGER("Command testing method " + std::to_string(a.getA()));
+    }
+
+    void testingMethodInt(int a) {
+        LOGGER("Command testing method INT " + std::to_string(a));
+    }
 
 };
 
