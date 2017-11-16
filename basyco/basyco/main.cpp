@@ -28,6 +28,7 @@ using namespace std::chrono_literals;
 #include <p2p/dependency/Dependency.h>
 #include <p2p/network/node/modules/NodeNetworkModule.h>
 #include <p2p/network/protocol/role/Roles.h>
+#include <p2p/network/node/modules/CommandModule.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -86,7 +87,50 @@ void setupModules(Node &node) {
 }
 
 
-int main() {
+void test(CommandModule::ArgumentContainerType arguments) {
+    for (auto &&argument : arguments) {
+        LOGGER(argument);
+    }
+}
+
+void help(CommandModule::ArgumentContainerType arguments) {
+    std::cout << "Help!" << std::endl;
+}
+
+
+int main(int argc, char *argv[]) {
+
+    Node xnode;
+
+    CommandModule commandModule(xnode);
+
+    commandModule.mapCommand("stuff", "do", &test);
+    commandModule.mapCommand("help", "help", &help);
+
+    commandModule.runCommand("dupa", "xx", {"lalala"});
+    commandModule.runCommand("stuff", "do", {"test", "test2", "test3"});
+
+    std::string moduleName = "help";
+    std::string commandName = "help";
+    std::vector<std::string> arguments;
+    if (argc > 1) {
+        moduleName = argv[1];
+        if (argc > 2) {
+            commandName = argv[2];
+            arguments.resize(static_cast<unsigned long>(argc - 2));
+            for (int i = 3; i < argc; ++i) {
+                arguments[i - 3] = argv[i];
+            }
+        }
+    }
+//
+//    LOGGER("pre")
+//    test(arguments);
+//    LOGGER("Post")
+
+    commandModule.runCommand(moduleName, commandName, arguments);
+
+    commandModule.mapCommandToModule<ModuleName, int, float, float>(moduleName, commandName, &ModuleName::function);
 
     RoleScope scope;
     scope.addRole("lala");
