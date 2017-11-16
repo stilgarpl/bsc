@@ -84,6 +84,7 @@ void setupModules(Node &node) {
     node.addModule<FilesystemModule>();
     node.addModule<NodeNetworkModule>();
     node.addModule<RepoModule>();
+    node.addModule<CommandModule>();
 }
 
 
@@ -132,22 +133,37 @@ int from_string<int>(const std::string &s) {
     return std::atoi(s.c_str());
 }
 
+template<>
+float from_string<float>(const std::string &s) {
+    return static_cast<float>(std::atof(s.c_str()));
+}
+
+
 
 template<typename ... Strings>
 struct RunCastString {
     template<typename T, typename ...Args>
-    void cast_all(T &t, void(T::*fun)(Args...), Strings...as) {
+    static void cast_all(T &t, void(T::*fun)(Args...), Strings...as) {
         (t.*fun)(from_string<Args>(as)...);
+    }
+
+    template<typename ...Args>
+    static void cast_all(void(*fun)(Args...), Strings...as) {
+        (*fun)(from_string<Args>(as)...);
     }
 };
 
 
 template<typename T, typename RetType, typename ... Args, typename ... Strings>
 static void runStringCast(T &t, RetType (T::*f)(Args...), Strings ... strings) {
-    RunCastString<Strings...> r;
-    r.cast_all(t, f, strings...);
+    RunCastString<Strings...>::cast_all(t, f, strings...);
 };
 
+
+template<typename RetType, typename ... Args, typename ... Strings>
+static void runStringCast(RetType (*f)(Args...), Strings ... strings) {
+    RunCastString<Strings...>::cast_all(f, strings...);
+};
 
 template<size_t num_args>
 struct unpack_caller {
@@ -210,11 +226,13 @@ int main(int argc, char *argv[]) {
     auto cmdM = xnode.getModule<CommandModule>();
 
     mapFuncToModule<CommandModule>(xnode, "t1", "t2", &CommandModule::testingMethodInt);
-
+    mapFuncToModule<CommandModule>(xnode, "t1", "t3", &CommandModule::testingMethodIntFloat);
     std::vector<std::string> arguments1;
-    arguments1.push_back(std::string("gggg18675"));
-
+    arguments1.push_back(std::string("7"));
     cmdM->runCommand("t1", "t2", arguments1);
+    arguments1.push_back(std::string("2.3"));
+    cmdM->runCommand("t1", "t3", arguments1);
+
     CommandModule commandModule(xnode);
 
     commandModule.mapCommand("stuff", "do", &test);

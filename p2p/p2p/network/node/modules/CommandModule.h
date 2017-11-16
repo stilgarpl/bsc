@@ -89,6 +89,10 @@ public:
         LOGGER("Command testing method INT " + std::to_string(a));
     }
 
+    void testingMethodIntFloat(int a, float b) {
+        LOGGER("Command testing method INT " + std::to_string(a) + " " + std::to_string(b));
+    }
+
 };
 
 
