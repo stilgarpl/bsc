@@ -77,6 +77,13 @@ private:
         return i++;
     }
 
+
+public:
+    ///@todo testing...
+    void setNodeContextActive() {
+        Context::setActiveContext(&nodeContext);
+    }
+
 public:
     const std::shared_ptr<Config> &getConfiguration() const;
 
@@ -91,11 +98,10 @@ private:
     std::shared_ptr<NetworkInfo> networkInfo;// = nsm(networkInfo); //network this node belongs to @todo more than 1?
     std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
 
-    typedef std::shared_ptr<NodeModule> NodeModulePtr;
-    StaticUber<NodeModulePtr> modules;
+    // typedef std::shared_ptr<INodeModule> INodeModulePtr;
+    StaticUber<INodeModulePtr> modules;
 
-    template<typename ModuleType>
-    using ModuleTypePtr = std::shared_ptr<ModuleType>;
+
 
 public:
 
@@ -112,6 +118,7 @@ public:
     template<typename ModuleType>
     ModuleTypePtr<ModuleType> getModule() {
         return std::static_pointer_cast<ModuleType>(modules.get<ModuleType>());
+        //return modules.get<ModuleType>();
 
     }
 
@@ -130,25 +137,7 @@ protected:
 
     void work();
 
-    void initialize() {
-        //initialize node modules
-        std::list<NodeModulePtr> modulesList;
-        modules.forEach(
-                [&](NodeModulePtr ptr) {
-                    if (ptr != nullptr) {
-                        //ptr->initialize();
-                        //ptr->setupLogic(logicManager);
-                        modulesList.push_back(ptr);
-                    };
-                });
-        auto sortedList = DependencyManager::dependencySort(modulesList);
-
-        for (auto &&item : sortedList) {
-            item->initialize();
-            item->setupLogic(logicManager);
-        }
-
-    };
+    void initialize();;
 
 private:
     void stopAcceptedConnections();
@@ -180,7 +169,6 @@ public:
     Node(int port);
 
     ///@todo remove this function
-
     LogicManager &getLogicManager() {
         return logicManager;
     }
@@ -209,6 +197,33 @@ public:
     void printConnections();
 
     friend class NodeActions;
+
+    void startModules();
+
+    void stopModules();
+
+    void joinModules();
+
+protected:
+    template<typename Ret, typename ModuleType, typename ... Args>
+    void forEachModule(Ret(ModuleType::*f)(Args...), Args... args) {
+        std::list<INodeModulePtr> modulesList;
+        modules.forEach(
+                [&](INodeModulePtr ptr) {
+                    if (ptr != nullptr) {
+                        //ptr->initialize();
+                        //ptr->setupLogic(logicManager);
+                        modulesList.push_back(ptr);
+                    };
+                });
+        auto sortedList = DependencyManager::dependencySort(modulesList);
+
+        for (auto &&item : sortedList) {
+            ((*item).*f)(args...);
+        }
+    }
+
+    INodeModulePtr getModuleByDependencyId(DependencyManager::TypeIdType id) override;
 };
 
 CEREAL_REGISTER_TYPE(Node::Config)

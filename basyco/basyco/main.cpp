@@ -29,6 +29,7 @@ using namespace std::chrono_literals;
 #include <p2p/network/node/modules/NodeNetworkModule.h>
 #include <p2p/network/protocol/role/Roles.h>
 #include <p2p/network/node/modules/CommandModule.h>
+#include <p2p/network/node/modules/command/StandardCommandsDirectory.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -90,7 +91,7 @@ void setupModules(Node &node) {
 
 void test(CommandModule::ArgumentContainerType arguments) {
     for (auto &&argument : arguments) {
-        //LOGGER(argument);
+        LOGGER(argument);
     }
 }
 
@@ -104,112 +105,6 @@ void test1(std::string s) {
 }
 
 
-template<std::size_t... Indices>
-struct indices {
-    using next = indices<Indices..., sizeof...(Indices)>;
-};
-template<std::size_t N>
-struct build_indices {
-    using type = typename build_indices<N - 1>::type::next;
-};
-template<>
-struct build_indices<0> {
-    using type = indices<>;
-};
-template<std::size_t N>
-using BuildIndices = typename build_indices<N>::type;
-
-template<typename Iterator>
-using ValueType = typename std::iterator_traits<Iterator>::value_type;
-
-
-template<typename T, typename S>
-T from_string(const S &s) {
-    return T(s);
-}
-
-template<>
-int from_string<int>(const std::string &s) {
-    return std::atoi(s.c_str());
-}
-
-template<>
-float from_string<float>(const std::string &s) {
-    return static_cast<float>(std::atof(s.c_str()));
-}
-
-
-
-template<typename ... Strings>
-struct RunCastString {
-    template<typename T, typename ...Args>
-    static void cast_all(T &t, void(T::*fun)(Args...), Strings...as) {
-        (t.*fun)(from_string<Args>(as)...);
-    }
-
-    template<typename ...Args>
-    static void cast_all(void(*fun)(Args...), Strings...as) {
-        (*fun)(from_string<Args>(as)...);
-    }
-};
-
-
-template<typename T, typename RetType, typename ... Args, typename ... Strings>
-static void runStringCast(T &t, RetType (T::*f)(Args...), Strings ... strings) {
-    RunCastString<Strings...>::cast_all(t, f, strings...);
-};
-
-
-template<typename RetType, typename ... Args, typename ... Strings>
-static void runStringCast(RetType (*f)(Args...), Strings ... strings) {
-    RunCastString<Strings...>::cast_all(f, strings...);
-};
-
-template<size_t num_args>
-struct unpack_caller {
-private:
-    template<typename T, typename RetType, typename ... Args, size_t... I>
-    void call(T &t, RetType(T::*f)(Args...), std::vector<std::string> &args, indices<I...>) {
-        runStringCast(t, f, args[I]...);
-    }
-
-    template<typename RetType, typename ... Args, size_t... I>
-    void call(RetType(*f)(Args...), std::vector<std::string> &args, indices<I...>) {
-        (*f)(args[I]...);
-    }
-
-
-public:
-    template<typename T, typename RetType, typename ... Args>
-    void operator()(T &t, RetType(T::*f)(Args...), std::vector<std::string> &args) {
-        assert(args.size() == num_args); // just to be sure
-        call(t, f, args, BuildIndices<num_args>{});
-    }
-
-    template<typename RetType, typename ... Args>
-    void operator()(RetType(*f)(Args...), std::vector<std::string> &args) {
-        //assert(args.size() == num_args); // just to be sure
-        call(f, args, BuildIndices<num_args>{});
-    }
-};
-
-
-template<typename T, typename RetType, typename ... Args>
-void getMemFun(T &t, RetType (T::*f)(Args...), std::vector<std::string> values) {
-    unpack_caller<sizeof... (Args)> a;
-    a(t, f, values);
-};
-
-
-template<typename ModuleType, typename T, typename RetType, typename ... Args>
-void mapFuncToModule(Node &node, std::string moduleName, std::string commandName, RetType (T::*f)(Args...)) {
-    auto mod = node.getModule<ModuleType>();
-    auto command = node.getModule<CommandModule>();
-    command->mapCommand(moduleName, commandName, [=](CommandModule::ArgumentContainerType vals) {
-        getMemFun(*mod, f, vals);
-    });
-};
-
 
 
 
@@ -217,16 +112,52 @@ void mapFuncToModule(Node &node, std::string moduleName, std::string commandName
 
 int main(int argc, char *argv[]) {
 
+    StandardCommandPack<CommandModule, int> pack = {"aaa", "bbb", &CommandModule::testingMethodInt};
+
+    StandardCommandsDirectory<CommandModule, int> directory = {
+            {"t1", "t2", &CommandModule::testingMethodInt},
+            {"t1", "t3", &CommandModule::testingMethodInt},
+            {"t1", "t4", &CommandModule::testingMethodInt},
+
+    };
+
+    std::shared_ptr<StandardCommandsDirectory<CommandModule, int>> ptr = std::make_shared<StandardCommandsDirectory<CommandModule, int>>(
+
+//            {
+//                    {"t1", "t2", &CommandModule::testingMethodInt },
+//                    {"t1", "t3", &CommandModule::testingMethodInt },
+//                    {"t1", "t4", &CommandModule::testingMethodInt },
+//
+//            }
+    );
+
+
+    *ptr = {
+            {"t1", "t2", &CommandModule::testingMethodInt},
+            {"t1", "t3", &CommandModule::testingMethodInt},
+            {"t1", "t4", &CommandModule::testingMethodInt},
+
+    };
+//    StandardCommandsHelper::init<CommandModule>({
+//                                         {"t1", "t2", &CommandModule::testingMethodInt },
+//                                         {"t1", "t3", &CommandModule::testingMethodInt },
+//                                         {"t1", "t4", &CommandModule::testingMethodInt },
+//
+//                                 });
 
     std::string sss("lala");
-
+//    DependencyManaged<int> ddd;
+//
+//    ddd.addRequiredDependency<float,double,std::string>();
+//    ddd.addRequiredDependency<float,float,long,long>();
+//    exit(0);
 
     Node xnode;
     xnode.addModule<CommandModule>();
     auto cmdM = xnode.getModule<CommandModule>();
 
-    mapFuncToModule<CommandModule>(xnode, "t1", "t2", &CommandModule::testingMethodInt);
-    mapFuncToModule<CommandModule>(xnode, "t1", "t3", &CommandModule::testingMethodIntFloat);
+    cmdM->mapCommand("t1", "t2", &CommandModule::testingMethodInt);
+    cmdM->mapCommand("t1", "t3", &CommandModule::testingMethodIntFloat);
     std::vector<std::string> arguments1;
     arguments1.push_back(std::string("7"));
     cmdM->runCommand("t1", "t2", arguments1);
@@ -258,9 +189,9 @@ int main(int argc, char *argv[]) {
 
 
 
-//    getMemFun(&TempTest::test, arguments1);
-//    getMemFun(&TempTest::test, arguments);
-//    getMemFun(&TempTest::test, arguments1);
+//    runMemberFunction(&TempTest::test, arguments1);
+//    runMemberFunction(&TempTest::test, arguments);
+//    runMemberFunction(&TempTest::test, arguments1);
 
 //
 //    LOGGER("pre")
@@ -279,7 +210,7 @@ int main(int argc, char *argv[]) {
     Roles::setActiveScope(&scope);
 
     Roles::allowed("lala", "dupa", "test");
-    exit(0);
+    //  exit(0);
 //    Dependency<int, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long> dep;
 //    auto before = std::chrono::steady_clock::now();
 //    auto val = dep.getDependencyIds();
@@ -308,13 +239,13 @@ int main(int argc, char *argv[]) {
 //    depList.push_back(floatD);
 //
 //    for (auto &&list : depList) {
-//        std::cout << "edek : " << list->getDepedencyId() << std::endl;
+//        std::cout << "edek : " << list->getDependencyId() << std::endl;
 //
 //    }
 //
 //    auto redep = DependencyManager::dependencySort(depList);
 //    for (auto &&list : redep) {
-//        std::cout << "fedek : " << list->getDepedencyId() << std::endl;
+//        std::cout << "fedek : " << list->getDependencyId() << std::endl;
 //
 //    }
 //    exit(0);
@@ -393,6 +324,7 @@ int main(int argc, char *argv[]) {
 
 
 
+
     Context context;
     TransmissionControl transmissionControl;
     context.setKey<std::string>(
@@ -404,6 +336,13 @@ int main(int argc, char *argv[]) {
     thisNode.getNodeInfo().setNodeId("first Node");
 
     setupModules(thisNode);
+
+    auto cmdN = thisNode.getModule<CommandModule>();
+
+    cmdN->mapCommand("t1", "t2", &CommandModule::testingMethodInt);
+    cmdN->mapCommand("t1", "t3", &CommandModule::testingMethodIntFloat);
+    cmdN->setInteractive(true);
+
     setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
     thisNode.start();
 
@@ -464,7 +403,7 @@ int main(int argc, char *argv[]) {
     thirdNode.printConnections();
     LOGGER("finishing");
 
-    std::this_thread::sleep_for(5s);
+    std::this_thread::sleep_for(115s);
     LOGGER("finished");
 
     return 0;

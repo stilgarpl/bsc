@@ -18,7 +18,7 @@ public:
     // typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
     typedef DependencyManager::ArrayType ArrayType;
 private:
-    ArrayType dependency;
+    // ArrayType dependency;
 public:
     constexpr static ArrayType getDependencyIds() {
         ArrayType ret;
@@ -50,6 +50,38 @@ public:
     ArrayType getDependencyIdents() override {
         return getDependencyIds();
     }
+};
+
+
+class DependencyPack : public IDependency {
+    typedef DependencyManager::ArrayType ArrayType;
+private:
+    ArrayType dependency;
+
+
+public:
+    template<typename... Arrays>
+    void addDependency(const ArrayType &a, Arrays... arrays) {
+        addDependency(a);
+        addDependency(arrays...);
+
+    }
+
+    void addDependency(const ArrayType &a) {
+        dependency.insert(dependency.end(), a.begin(), a.end());
+    }
+
+    DependencyPack(const ArrayType &dependency) : dependency(dependency) {
+
+    }
+
+    DependencyPack() = default;
+
+public:
+    ArrayType getDependencyIdents() override {
+        return dependency;
+    }
+
 };
 
 

@@ -40,3 +40,17 @@ Command module with module submodules and mapping
 commandModule->map<BasicModule>("start", BasicModule::startNode);
 
 command by parsował parametry z main i wysylal command packet do wlasciwej instancji node.
+
+
+command powinien procesowac argumenty wejsciowe i stdin! zeby mozna bylo napisac skrypty
+
+w trybie remote control kazde polecenie powinno generowac command packet
+w trybie local polecenia maja byc wykonane na obecnym node
+
+moze byc niby-shell, gdzie do persystowania plikow mozna chodzic po drzewie katalogow
+
+Command source -> command event(module, command, v<data>) -> commandmodule->run(module,cmd,data);
+
+
+CommandModule should have dynamic dependency
+addDependency<Module> z mappingu

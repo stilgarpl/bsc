@@ -21,3 +21,22 @@ bool CommandModule::assignActions(LogicManager &logicManager) {
 bool CommandModule::setupSources(LogicManager &logicManager) {
     return false;
 }
+
+bool CommandModule::isInteractive() const {
+    return interactive;
+}
+
+void CommandModule::setInteractive(bool interactive) {
+    CommandModule::interactive = interactive;
+}
+
+void CommandModule::initialize() {
+    NodeModule::initialize();
+
+    for (auto &&directory : commandsDirectory) {
+        directory->configureCommands(*this);
+    }
+}
+
+IncorrectParametersException::IncorrectParametersException(size_t requiredParameters, size_t gotParameters)
+        : requiredParameters(requiredParameters), gotParameters(gotParameters) {}

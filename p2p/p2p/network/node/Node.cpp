@@ -88,6 +88,7 @@ void Node::start() {
     protocol->setupLogic(logicManager);
     logicManager.start();
     listen();
+    startModules();
 
 
 }
@@ -243,5 +244,56 @@ void Node::purgeInactiveConnections() {
         return it->connection == nullptr || !it->connection->isActive();
     });
 
+}
+
+void Node::startModules() {
+    forEachModule<void>(&NodeModule::start);
+}
+
+void Node::initialize() {
+    //initialize node modules
+//    std::list<INodeModulePtr> modulesList;
+//    modules.forEach(
+//            [&](INodeModulePtr ptr) {
+//                if (ptr != nullptr) {
+//                    //ptr->initialize();
+//                    //ptr->setupLogic(logicManager);
+//                    modulesList.push_back(ptr);
+//                };
+//            });
+//    auto sortedList = DependencyManager::dependencySort(modulesList);
+//
+//    for (auto &&item : sortedList) {
+//        item->initialize();
+//        item->setupLogic(logicManager);
+//    }
+
+    //this slightly changed the order of execution - instead of being initialized and setupLogic module by module,
+    //now all modules are initialized and then all modules are setupLogiced
+    //hope it doesn't break anything
+    forEachModule(&INodeModule::initialize);
+    forEachModule<bool, ILogicModule, LogicManager &>(&ILogicModule::setupLogic, logicManager);
+
+}
+
+void Node::stopModules() {
+    forEachModule(&NodeModule::stop);
+
+}
+
+void Node::joinModules() {
+    forEachModule(&NodeModule::join);
+
+}
+
+INodeModulePtr Node::getModuleByDependencyId(DependencyManager::TypeIdType id) {
+    INodeModulePtr result = nullptr;
+    modules.forEach([&](auto i) {
+        if (i->getDependencyId() == id) {
+            result = i;
+            return;
+        }
+    });
+    return result;
 }
 

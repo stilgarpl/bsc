@@ -92,6 +92,9 @@ bool NodeNetworkModule::assignActions(LogicManager &logicManager) {
         std::clog << "Debug: addKnownNode assignment!" << std::endl;
 
     }
+
+    ///@todo real value
+    return true;
 }
 
 bool NodeNetworkModule::setupSources(LogicManager &logicManager) {
@@ -100,4 +103,5 @@ bool NodeNetworkModule::setupSources(LogicManager &logicManager) {
     logicManager.addSource<ConnectionSource>();
     logicManager.addSource<NetworkSource>();
     logicManager.addSource<NodeSource>();
+    return true;
 }

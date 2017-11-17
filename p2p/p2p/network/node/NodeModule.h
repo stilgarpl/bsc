@@ -9,16 +9,21 @@
 #include <p2p/logic/ILogicModule.h>
 #include <p2p/dependency/IDependencyManaged.h>
 #include "INode.h"
+#include "INodeModule.h"
 
-class NodeModule : public ILogicModule, public virtual IDependencyManaged {
+class NodeModule : public INodeModule {
 
-private:
+protected:
     INode &node;
 public:
     ///@todo pure or not?
     virtual void initialize() {};
 
     NodeModule(INode &node) : node(node) {}
+
+    void run() override {
+        //do nothing, just so modules do not have to implement this if they don't want to
+    }
 };
 
 

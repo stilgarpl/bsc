@@ -37,6 +37,8 @@ public:
 
     template<typename T>
     static TypeIdType getClassId(T *t = nullptr) {
+
+        LOGGER("Class id for type " + std::string(typeid(T).name()) + " is " + std::to_string(getTypeId<T>()));
         return getTypeId<T>();
     }
 
@@ -49,7 +51,7 @@ public:
         while (source.size() > 0) {
             //take first element
             auto &e = source.front();
-            LOGGER("e = " + std::to_string(e->getDepedencyId()));
+            LOGGER("e = " + std::to_string(e->getDependencyId()));
             //get its dependency list
             ///@todo check if null?
             IDependency::ArrayType eDeps;
@@ -66,8 +68,8 @@ public:
                     std::remove_if(eDeps.begin(), eDeps.end(), [&](IDependency::TypeIdType it) -> bool {
                         auto found = std::find_if(result.begin(), result.end(),
                                                   [&](std::shared_ptr<IDependencyManaged> jt) -> bool {
-                                                      // LOGGER("jt " + std::to_string(jt->getDepedencyId()) + "  it :" + std::to_string(it));
-                                                      return jt->getDepedencyId() == it;
+                                                      // LOGGER("jt " + std::to_string(jt->getDependencyId()) + "  it :" + std::to_string(it));
+                                                      return jt->getDependencyId() == it;
                                                   });
                         return found != result.end();
                     }), eDeps.end());

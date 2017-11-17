@@ -10,7 +10,7 @@
 
 class IDependencyManaged {
 public:
-    virtual IDependency::TypeIdType getDepedencyId()=0;
+    virtual IDependency::TypeIdType getDependencyId()=0;
 
     virtual const std::shared_ptr<IDependency> &getRequiredDependencies() const =0;
 };
