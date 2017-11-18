@@ -7,6 +7,7 @@
 #include <Poco/Net/NetException.h>
 #include <p2p/network/protocol/logic/sources/ConnectionSource.h>
 #include <p2p/network/protocol/context/LogicContext.h>
+#include <p2p/network/node/modules/NodeNetworkModule.h>
 #include "ServerConnection.h"
 
 using namespace std::chrono_literals;
@@ -27,7 +28,7 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &
         socket),
           IServerConnection(context), serverNode(serverNode) {
 
-    serverNode.addAcceptedConnection(this);
+    serverNode.getModule<NodeNetworkModule>()->addAcceptedConnection(this);
     auto lc = getConnectionContext().get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
@@ -45,7 +46,7 @@ void ServerConnection::stopReceiving() {
 
 ServerConnection::~ServerConnection() {
     //  LOGGER("Server conn dest");
-    serverNode.removeAcceptedConnection(this);
+    serverNode.getModule<NodeNetworkModule>()->removeAcceptedConnection(this);
     stop();
 }
 

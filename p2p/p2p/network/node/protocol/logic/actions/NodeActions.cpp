@@ -5,6 +5,7 @@
 #include <p2p/network/protocol/context/NodeContext.h>
 #include <p2p/network/node/protocol/packet/NodeInfoRequest.h>
 #include <p2p/network/node/protocol/packet/NetworkInfoRequest.h>
+#include <p2p/network/node/modules/NodeNetworkModule.h>
 #include "NodeActions.h"
 
 
@@ -14,7 +15,7 @@ void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
     if (nodeContext != nullptr) {
         //  NODECONTEXTLOGGER("Node discovered (connecting): " + event.getNodeInfo().getNodeId())
         auto &node = nodeContext->getNode();
-        node.connectTo(event.getNodeInfo());
+        node.getModule<NodeNetworkModule>()->connectTo(event.getNodeInfo());
     }
 
 }
@@ -47,7 +48,7 @@ void NodeActions::triggerUpdateNode(const Tick &tick) {
     if (nodeContext != nullptr) {
         auto &node = nodeContext->getNode();
 
-        for (auto &&it :node.getClientConnections()) {
+        for (auto &&it :node.getModule<NodeNetworkModule>()->getClientConnections()) {
             BasePacketPtr req = NodeInfoRequest::getNew();
             it->connection->send(req);
             req = std::make_shared<NetworkInfoRequest>();

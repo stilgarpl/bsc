@@ -8,6 +8,8 @@
 
 #include <p2p/dependency/DependencyManager.h>
 #include "INodeModule.h"
+#include <p2p/network/node/NodeInfo.h>
+#include <p2p/context/Context.h>
 
 class INode {
 protected:
@@ -30,6 +32,10 @@ public:
         //possible to cast, we know exactly what type this pointer has (it has either good type or it's null
         return std::static_pointer_cast<ModuleType>(getModuleByDependencyId(id));
     }
+
+    virtual NodeInfo &getNodeInfo() =0;
+
+    virtual Context &getContext() =0;
 
 };
 

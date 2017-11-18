@@ -29,6 +29,11 @@ public:
     virtual ~Runnable();
 
     bool isStopping() const;
+
+    //actions:
+    virtual void onStop() {};
+
+    virtual void onStart() {};
 };
 
 

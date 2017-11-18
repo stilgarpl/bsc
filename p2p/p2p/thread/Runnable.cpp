@@ -12,7 +12,9 @@ void Runnable::start() {
 }
 
 void Runnable::operator()() {
+    onStart();
     run();
+    onStop();
 }
 
 Runnable::~Runnable() {

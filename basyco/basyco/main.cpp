@@ -265,6 +265,7 @@ int main(int argc, char *argv[]) {
     Node thirdNode(9898);
     thirdNode.getNodeInfo().setNodeId("third node");
     thirdNode.addToNetwork("TheNetwork");
+    setupModules(thirdNode);
     setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
     //   thirdNode.start();
 
@@ -272,43 +273,45 @@ int main(int argc, char *argv[]) {
     thisNode.getNodeInfo().printAll();
     otherNode.getNodeInfo().printAll();
     thirdNode.getNodeInfo().printAll();
-    thisNode.connectTo("127.0.0.1:9999");
-    otherNode.connectTo("127.0.0.1:9898");
-    thisNode.connectTo("127.0.0.1:100");
+    std::this_thread::sleep_for(2s);
+    bool ret = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+    LOGGER("connection was ... " + std::to_string(ret));
+    otherNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9898");
+    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:100");
     std::this_thread::sleep_for(5s);
 
-    thisNode.updateNodeConnectionInfo();
-    otherNode.updateNodeConnectionInfo();
-    thirdNode.updateNodeConnectionInfo();
+    thisNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
+    otherNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
+    thirdNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 
-    thisNode.printConnections();
-    otherNode.printConnections();
-    thirdNode.printConnections();
+    thisNode.getModule<NodeNetworkModule>()->printConnections();
+    otherNode.getModule<NodeNetworkModule>()->printConnections();
+    thirdNode.getModule<NodeNetworkModule>()->printConnections();
 
     std::this_thread::sleep_for(1s);
-    thisNode.purgeDuplicateConnections();
-    otherNode.purgeDuplicateConnections();
-    thirdNode.purgeDuplicateConnections();
-    thisNode.purgeInactiveConnections();
-    otherNode.purgeInactiveConnections();
-    thirdNode.purgeInactiveConnections();
+    thisNode.getModule<NodeNetworkModule>()->purgeDuplicateConnections();
+    otherNode.getModule<NodeNetworkModule>()->purgeDuplicateConnections();
+    thirdNode.getModule<NodeNetworkModule>()->purgeDuplicateConnections();
+    thisNode.getModule<NodeNetworkModule>()->purgeInactiveConnections();
+    otherNode.getModule<NodeNetworkModule>()->purgeInactiveConnections();
+    thirdNode.getModule<NodeNetworkModule>()->purgeInactiveConnections();
     //LOGGER("lala");
     std::this_thread::sleep_for(2s);
-    thisNode.printConnections();
-    otherNode.printConnections();
-    thirdNode.printConnections();
+    thisNode.getModule<NodeNetworkModule>()->printConnections();
+    otherNode.getModule<NodeNetworkModule>()->printConnections();
+    thirdNode.getModule<NodeNetworkModule>()->printConnections();
     std::this_thread::sleep_for(5s);
     LOGGER("stopping");
     thisNode.stop();
     otherNode.stop();
     thirdNode.stop();
     std::this_thread::sleep_for(5s);
-    thisNode.purgeInactiveConnections();
-    otherNode.purgeInactiveConnections();
-    thirdNode.purgeInactiveConnections();
-    thisNode.printConnections();
-    otherNode.printConnections();
-    thirdNode.printConnections();
+    thisNode.getModule<NodeNetworkModule>()->purgeInactiveConnections();
+    otherNode.getModule<NodeNetworkModule>()->purgeInactiveConnections();
+    thirdNode.getModule<NodeNetworkModule>()->purgeInactiveConnections();
+    thisNode.getModule<NodeNetworkModule>()->printConnections();
+    otherNode.getModule<NodeNetworkModule>()->printConnections();
+    thirdNode.getModule<NodeNetworkModule>()->printConnections();
     LOGGER("finishing");
 
     std::this_thread::sleep_for(115s);

@@ -51,7 +51,7 @@ public:
         while (source.size() > 0) {
             //take first element
             auto &e = source.front();
-            LOGGER("e = " + std::to_string(e->getDependencyId()));
+            //   LOGGER("e = " + std::to_string(e->getDependencyId()));
             //get its dependency list
             ///@todo check if null?
             IDependency::ArrayType eDeps;
@@ -60,9 +60,9 @@ public:
             } else {
 
             }
-            for (auto &&item : eDeps) {
-                std::cout << "edep : " << item << std::endl;
-            }
+//            for (auto &&item : eDeps) {
+//                std::cout << "edep : " << item << std::endl;
+//            }
             //remove fullfilled dependencies from it
             eDeps.erase(
                     std::remove_if(eDeps.begin(), eDeps.end(), [&](IDependency::TypeIdType it) -> bool {
@@ -73,9 +73,9 @@ public:
                                                   });
                         return found != result.end();
                     }), eDeps.end());
-            for (auto &&item : eDeps) {
-                std::cout << "bedep : " << item << std::endl;
-            }
+//            for (auto &&item : eDeps) {
+//                std::cout << "bedep : " << item << std::endl;
+//            }
             //if all dependencies are met, add it to result, remove from source
             if (eDeps.size() == 0) {
                 result.push_back(e);

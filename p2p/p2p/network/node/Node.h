@@ -15,9 +15,8 @@
 #include "p2p/logic/LogicManager.h"
 #include "NodeModule.h"
 #include "INode.h"
-#include <Poco/Net/ServerSocket.h>
+
 #include <memory>
-#include <Poco/Net/TCPServer.h>
 #include <p2p/network/protocol/connection/Connection.h>
 #include <p2p/network/protocol/protocol/IProtocol.h>
 #include <p2p/network/protocol/protocol/GravitonProtocol.h>
@@ -65,7 +64,7 @@ public:
     };
 
 private:
-    std::unique_ptr<IProtocol> protocol = std::make_unique<GravitonProtocol>();
+
     std::shared_ptr<Config> configuration;
     LogicManager logicManager;
     Context nodeContext;
@@ -77,6 +76,9 @@ private:
         return i++;
     }
 
+    virtual Context &getContext() {
+        return nodeContext;
+    }
 
 public:
     ///@todo testing...
@@ -90,13 +92,11 @@ public:
     void setConfiguration(const std::shared_ptr<Config> &configuration);
 
 private:
-    std::shared_ptr<Poco::Net::ServerSocket> serverSocket;
-    std::shared_ptr<Poco::Net::TCPServer> server;
-    std::mutex acceptedConnectionsMutex;
-    std::list<IServerConnection *> acceptedConnections; //server side
+
+
     NodeInfo thisNodeInfo;
     std::shared_ptr<NetworkInfo> networkInfo;// = nsm(networkInfo); //network this node belongs to @todo more than 1?
-    std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
+
 
     // typedef std::shared_ptr<INodeModule> INodeModulePtr;
     StaticUber<INodeModulePtr> modules;
@@ -123,46 +123,25 @@ public:
     }
 
 
-public:
-
-    //@todo this should not be public
-    decltype(activeClientConnections) &getClientConnections() {
-        return activeClientConnections;
-    }
 
 protected:
-    void addActiveClientConnection(std::shared_ptr<Connection> c);
 
-    void removeActiveClientConnection(NodeConnectionInfoPtr c);
 
     void work();
 
     void initialize();;
 
-private:
-    void stopAcceptedConnections();
 
-public: // @todo should be public or shouldn't ?
-    void addAcceptedConnection(IServerConnection *c);
-
-    void removeAcceptedConnection(IServerConnection *c);
 public:
-    void listen();
 
-    void stopListening();
 
-    bool connectTo(const NodeInfo &nodeInfo);
 
-    bool connectTo(const std::string &address);
-
-    bool isConnectedTo(const NodeInfo &nodeInfo);
 
     void start();
     void stop();
     
     virtual ~Node();
 
-    bool connectTo(const Poco::Net::SocketAddress &address);
 
     Node();
 
@@ -173,7 +152,7 @@ public:
         return logicManager;
     }
 
-    NodeInfo &getNodeInfo() {
+    virtual NodeInfo &getNodeInfo() {
         return thisNodeInfo;
     }
 
@@ -188,13 +167,7 @@ public:
 
     ///@todo move those random methods somewhere else:
 
-    void updateNodeConnectionInfo();
 
-    void purgeDuplicateConnections();
-
-    void purgeInactiveConnections();
-
-    void printConnections();
 
     friend class NodeActions;
 

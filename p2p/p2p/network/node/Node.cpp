@@ -2,7 +2,7 @@
 // Created by stilgar on 31.07.17.
 //
 
-#include <Poco/Net/SocketStream.h>
+
 #include "Node.h"
 #include "p2p/network/node/protocol/packet/NodeInfoRequest.h"
 #include "p2p/network/node/protocol/packet/NodeInfoResponse.h"
@@ -13,81 +13,24 @@
 #include <p2p/network/protocol/context/LogicContext.h>
 #include <p2p/configuration/ConfigurationManager.h>
 
-using namespace Poco::Net;
-
-void Node::listen() {
-    //SocketAddress address("127.0.0.1:6777");
-    if (serverSocket == nullptr) {
-        unsigned short port = 6777;
-        //@TODO numer portu dac z configuracji
-        ////@todo sprawdzanie bledow z bindowania socketa
-        if (configuration != nullptr) {
-            port = configuration->getPort();
-        }
-        serverSocket = std::make_shared<ServerSocket>(port);
-    }
-
-    server = std::make_shared<TCPServer>(new ServerConnectionFactory(*this, this->nodeContext),
-                                         *serverSocket);
-    server->start();
-
-}
 
 
-void Node::stopListening() {
-
-    if (server != nullptr) {
-        server->stop();
-    }
-    stopAcceptedConnections();
-
-}
-
-bool Node::connectTo(const NodeInfo &nodeInfo) {
-
-    for (auto i : nodeInfo.getKnownAddresses()) {
-
-        //try to connect
-        if (connectTo(i)) {
-
-            return true;
-        }
-    }
-
-    return false;
-}
 
 Node::~Node() {
-    std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
+
     stop();
 
 
 }
 
-bool Node::connectTo(const SocketAddress &address) {
 
-    //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
-    //@todo check for problems and handle them
-    try {
-        std::shared_ptr<ClientConnection> connection = std::make_shared<ClientConnection>(address,
-                                                                                          std::ref(nodeContext));
-        addActiveClientConnection(connection);
-        connection->startSending();
-        connection->startReceiving();
-        return true;
-    } catch (Poco::Net::ConnectionRefusedException) {
-        return false;
-    }
-}
 
 void Node::start() {
 
     initialize();
-    //@todo this should be somewhere else
-    ///@todo move to the ProtocolModule
-    protocol->setupLogic(logicManager);
+
     logicManager.start();
-    listen();
+
     startModules();
 
 
@@ -96,28 +39,10 @@ void Node::start() {
 void Node::stop() {
 
     logicManager.stop();
-    stopListening();
-}
-
-void Node::addActiveClientConnection(std::shared_ptr<Connection> c) {
-    NodeConnectionInfoPtr info = std::make_shared<NodeConnectionInfo>();
-    info->connection = c;
-    info->nodeId = std::experimental::nullopt;
-
-    activeClientConnections.push_back(info);
+    stopModules();
 
 }
 
-void Node::removeActiveClientConnection(NodeConnectionInfoPtr c) {
-    //  auto el = std::find(activeClientConnections.begin(),activeClientConnections.end(),c);
-    activeClientConnections.remove(c);
-
-}
-
-bool Node::connectTo(const std::string &a) {
-    Poco::Net::SocketAddress address(a);
-    return connectTo(address);
-}
 
 void Node::work() {
 
@@ -166,85 +91,9 @@ std::shared_ptr<NetworkInfo> &Node::getNetworkInfo() {
     return networkInfo;
 }
 
-bool Node::isConnectedTo(const NodeInfo &nodeInfo) {
-    bool ret = false;
-    for (auto &&it : activeClientConnections) {
-        if (it->nodeId) {
-            ret |= nodeInfo.getNodeId() == (*it->nodeId);
-        }
-    }
-    return ret;
-}
-
-void Node::updateNodeConnectionInfo() {
-    //this is meant to be run from a thread
-    for (auto &&item : activeClientConnections) {
-        auto packet = NodeInfoRequest::getNew();
-        NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
-        auto &ni = response->getNodeInfo();
-        ni.printAll();
-        auto nid = ni.getNodeId();
-        LOGGER(ni.getNetworkId());
-        const auto &val = response->getNodeInfo().getNodeId();
-        //(*(*item).nodeId) = val;
-        item->nodeId = val;
-    }
 
 
-}
 
-void Node::purgeDuplicateConnections() {
-    for (auto &&item : activeClientConnections) {
-        if (item->nodeId) {
-            //find all connections to the same id
-            activeClientConnections.remove_if([&](NodeConnectionInfoPtr it) -> bool {
-                if (it->nodeId) {
-                    return *it->nodeId == *item->nodeId && it != item;
-                } else {
-                    return false;
-                }
-            });
-            //activeClientConnections.erase(duplicate);
-        }
-    }
-}
-
-void Node::printConnections() {
-    std::cout << "[" << this->thisNodeInfo.getNodeId() << "]:" << std::to_string(acceptedConnections.size())
-              << std::endl;
-    for (auto &&item : activeClientConnections) {
-        if (!item->nodeId) {
-            std::cout << "Connection: NO ID" << std::endl;
-        } else {
-            std::cout << "Connection: " << *item->nodeId << std::endl;
-        }
-    }
-}
-
-void Node::removeAcceptedConnection(IServerConnection *c) {
-    // LOGGER("REMOVE REMOVE REMOVE");
-    std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
-    acceptedConnections.remove(c);
-}
-
-void Node::addAcceptedConnection(IServerConnection *c) {
-    std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
-    acceptedConnections.push_back(c);
-}
-
-void Node::stopAcceptedConnections() {
-    for (auto &&it : acceptedConnections) {
-        it->stop();
-    }
-    acceptedConnections.remove_if([](auto) { return true; });
-}
-
-void Node::purgeInactiveConnections() {
-    activeClientConnections.remove_if([&](NodeConnectionInfoPtr it) -> bool {
-        return it->connection == nullptr || !it->connection->isActive();
-    });
-
-}
 
 void Node::startModules() {
     forEachModule<void>(&NodeModule::start);
