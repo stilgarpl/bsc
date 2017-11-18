@@ -5,7 +5,7 @@
 #include "CommandModule.h"
 #include "BasicModule.h"
 
-CommandModule::CommandModule(INode &node) : NodeModule(node) {
+CommandModule::CommandModule(INode &node) : NodeModule(node), defaultSubModule(*this) {
 
     setRequired<BasicModule>();
 }
@@ -38,5 +38,10 @@ void CommandModule::initialize() {
     }
 }
 
-IncorrectParametersException::IncorrectParametersException(size_t requiredParameters, size_t gotParameters)
-        : requiredParameters(requiredParameters), gotParameters(gotParameters) {}
+CommandModule::CommandSubModule &CommandModule::CommandSubModule::submodule(std::string name) {
+    if (submodules.count(name) == 0) {
+        submodules[name] = std::make_shared<CommandSubModule>(parent);
+    }
+
+    return *submodules[name];
+}

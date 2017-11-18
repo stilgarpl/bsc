@@ -112,64 +112,38 @@ void test1(std::string s) {
 
 int main(int argc, char *argv[]) {
 
-    StandardCommandPack<CommandModule, int> pack = {"aaa", "bbb", &CommandModule::testingMethodInt};
-
-    StandardCommandsDirectory<CommandModule, int> directory = {
-            {"t1", "t2", &CommandModule::testingMethodInt},
-            {"t1", "t3", &CommandModule::testingMethodInt},
-            {"t1", "t4", &CommandModule::testingMethodInt},
-
-    };
-
-    std::shared_ptr<StandardCommandsDirectory<CommandModule, int>> ptr = std::make_shared<StandardCommandsDirectory<CommandModule, int>>(
-
-//            {
-//                    {"t1", "t2", &CommandModule::testingMethodInt },
-//                    {"t1", "t3", &CommandModule::testingMethodInt },
-//                    {"t1", "t4", &CommandModule::testingMethodInt },
-//
-//            }
-    );
-
-
-    *ptr = {
-            {"t1", "t2", &CommandModule::testingMethodInt},
-            {"t1", "t3", &CommandModule::testingMethodInt},
-            {"t1", "t4", &CommandModule::testingMethodInt},
-
-    };
-//    StandardCommandsHelper::init<CommandModule>({
-//                                         {"t1", "t2", &CommandModule::testingMethodInt },
-//                                         {"t1", "t3", &CommandModule::testingMethodInt },
-//                                         {"t1", "t4", &CommandModule::testingMethodInt },
-//
-//                                 });
-
-    std::string sss("lala");
-//    DependencyManaged<int> ddd;
+//    DependencyManaged<int> ddd;`
 //
 //    ddd.addRequiredDependency<float,double,std::string>();
 //    ddd.addRequiredDependency<float,float,long,long>();
 //    exit(0);
 
+
+
+
     Node xnode;
     xnode.addModule<CommandModule>();
     auto cmdM = xnode.getModule<CommandModule>();
 
-    cmdM->mapCommand("t1", "t2", &CommandModule::testingMethodInt);
-    cmdM->mapCommand("t1", "t3", &CommandModule::testingMethodIntFloat);
+    cmdM->mapCommand("t2", &CommandModule::testingMethodInt);
+    cmdM->mapCommand("t3", &CommandModule::testingMethodIntFloat);
     std::vector<std::string> arguments1;
     arguments1.push_back(std::string("7"));
-    cmdM->runCommand("t1", "t2", arguments1);
+    cmdM->runCommand("t2", arguments1);
     arguments1.push_back(std::string("2.3"));
-    cmdM->runCommand("t1", "t3", arguments1);
+    cmdM->runCommand("t3", arguments1);
+
+    auto sub = cmdM->submodule("sub");
+    sub.mapCommand("t4", &CommandModule::testingMethodInt);
+    sub.runCommand("t4", {"99"});
 
     CommandModule commandModule(xnode);
+    std::cout << std::flush;
+    // exit(0);
+//    commandModule.mapCommand( "do", &test);
+//    commandModule.mapCommand("help", &help);
 
-    commandModule.mapCommand("stuff", "do", &test);
-    commandModule.mapCommand("help", "help", &help);
-
-    commandModule.runCommand("dupa", "xx", {std::string("lalala")});
+    commandModule.runCommand("xx", {std::string("lalala")});
     //  commandModule.runCommand("stuff", "do", {"test", "test2", "test3"});
 
     std::string moduleName = "help";
@@ -211,74 +185,6 @@ int main(int argc, char *argv[]) {
 
     Roles::allowed("lala", "dupa", "test");
     //  exit(0);
-//    Dependency<int, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long, float, int, unsigned int, unsigned long, long, signed long> dep;
-//    auto before = std::chrono::steady_clock::now();
-//    auto val = dep.getDependencyIds();
-////     val = dep.getIds();
-////     val = dep.getIds();
-////     val = dep.getIds();
-//    auto after = std::chrono::steady_clock::now();
-//
-//
-//    for (auto &&item : val) {
-//        std::cout << "Val : " << item << std::endl;
-//    }
-//
-//
-//    DependencyManager::DependencyList depList;
-//    auto intD = std::make_shared<DependencyManaged<int>>();
-//    auto floatD = std::make_shared<DependencyManaged<float>>();
-//    auto doubleD = std::make_shared<DependencyManaged<double>>();
-//    intD->setRequired(std::make_shared<Dependency1>());
-//    floatD->setRequired(std::make_shared<Dependency<int>>());
-//    doubleD->setRequired(std::make_shared<Dependency<int, float>>());
-//
-//
-//    depList.push_back(doubleD);
-//    depList.push_back(intD);
-//    depList.push_back(floatD);
-//
-//    for (auto &&list : depList) {
-//        std::cout << "edek : " << list->getDependencyId() << std::endl;
-//
-//    }
-//
-//    auto redep = DependencyManager::dependencySort(depList);
-//    for (auto &&list : redep) {
-//        std::cout << "fedek : " << list->getDependencyId() << std::endl;
-//
-//    }
-//    exit(0);
-
-
-
-//    auto ptr = NodeInfoGroup::Ack::getNew();
-//        if (ptr->getStatus() == Status::ACK) {
-//            LOGGER("STATUS OK");
-//            exit(0);
-//        }
-//    NodeInfoGroup::Ack b1;
-//    NodeInfoGroup::SendFileResponse b2;
-//    auto status = NodeInfoGroup::Ack::getPacketStatus();
-//
-//    exit(0);
-//    BasePacket basePacket;
-//    PacketUtils::getNew<Status::RESPONSE>(basePacket);
-//
-//    NodeInfoRequest nReq;
-//    auto nRes = PacketUtils::getNew<Status::RESPONSE>(nReq);
-//    nRes.setId(5);
-//    nRes.getNodeInfo().printAll();
-//  //  Base::SendFileRequest::BaseType::SendFileRequest x1;
-//  //  std::cout << typeid(x1).name() << std::endl;
-//    PacketInfo<Derived,Status::REQUEST>::Type x;
-//    Base::SendFileResponse y;
-//    auto reqY = getType<Status::REQUEST>(y);
-//    reqY.print();
-//    auto resp = getType<Status::REQUEST>(x);//getResponse(x);
-//    resp.print();
-//    x.print();
-//    //PacketInfo<Base,Status::RESPONSE>::Type a;
 
 
 
@@ -339,8 +245,10 @@ int main(int argc, char *argv[]) {
 
     auto cmdN = thisNode.getModule<CommandModule>();
 
-    cmdN->mapCommand("t1", "t2", &CommandModule::testingMethodInt);
-    cmdN->mapCommand("t1", "t3", &CommandModule::testingMethodIntFloat);
+    cmdN->mapCommand("t2", &CommandModule::testingMethodInt);
+    cmdN->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
+    cmdN->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
+    cmdN->mapCommand("t3", &CommandModule::testingMethodIntFloat);
     cmdN->setInteractive(true);
 
     setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);

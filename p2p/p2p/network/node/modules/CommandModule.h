@@ -25,96 +25,79 @@ public:
     }
 };
 
-//
-//template<std::size_t... Indices>
-//struct indices {
-//    using next = indices<Indices..., sizeof...(Indices)>;
-//};
-//template<std::size_t N>
-//struct build_indices {
-//    using type = typename build_indices<N - 1>::type::next;
-//};
-//template<>
-//struct build_indices<0> {
-//    using type = indices<>;
-//};
-//template<std::size_t N>
-//using BuildIndices = typename build_indices<N>::type;
-//
-//template<typename Iterator>
-//using ValueType = typename std::iterator_traits<Iterator>::value_type;
-
 #include <p2p/network/protocol/context/NodeContext.h>
 #include <p2p/network/node/modules/command/ICommandsDirectory.h>
-
-
-class IncorrectParametersException {
-public:
-    size_t requiredParameters;
-    size_t gotParameters;
-
-    IncorrectParametersException(size_t requiredParameters, size_t gotParameters);
-
-
-};
+#include <p2p/utils/template_cast.h>
 
 
 class CommandModule : public NodeModule, public DependencyManaged<CommandModule> {
-private:
+public:
+    typedef const std::vector<std::string> &ArgumentContainerType;
+public:
 
-    template<typename T, typename RetType, typename ... Args, typename ... Strings>
-    static void runStringCast(T &t, RetType (T::*f)(Args...), Strings ... strings) {
-        (t.*f)(from_string<Args>(strings)...);
-    };
-
-
-    template<typename RetType, typename ... Args, typename ... Strings>
-    static void runStringCast(RetType (*f)(Args...), Strings ... strings) {
-        (*f)(from_string<Args>(strings)...);
-    };
-
-
-    template<size_t num_args>
-    struct unpack_caller {
-
+    class CommandSubModule {
     private:
-        template<typename T, typename RetType, typename ... Args, size_t... I>
-        void call(T &t, RetType(T::*f)(Args...), std::vector<std::string> &args, std::index_sequence<I...>) {
-            runStringCast(t, f, args[I]...);
-        }
-
-        template<typename RetType, typename ... Args, size_t... I>
-        void call(RetType(*f)(Args...), std::vector<std::string> &args, std::index_sequence<I...>) {
-            (*f)(args[I]...);
-        }
-
+        Uber<std::map> commands;
+        CommandModule &parent;
+        std::map<std::string, std::shared_ptr<CommandSubModule>> submodules;
 
     public:
-        template<typename T, typename RetType, typename ... Args>
-        void operator()(T &t, RetType(T::*f)(Args...), std::vector<std::string> &args) {
-            //assert(args.size() == num_args); // just to be sure
-            if (args.size() != num_args) {
-                throw IncorrectParametersException(num_args, args.size());
+        CommandSubModule(CommandModule &parent) : parent(parent) {}
+
+        CommandSubModule &submodule(std::string name);
+
+    protected:
+        ///template <typename ReturnType, typename ... Args>
+        bool mapCommand(std::string prefix, std::string commandName, std::function<void(ArgumentContainerType)> func) {
+            std::string key = prefix + ":::" + commandName;
+            auto &map = commands.get<std::string, std::function<void(ArgumentContainerType)>>();
+            map[key] = func;
+            return true;
+        };
+    public:
+
+        template<typename ModuleType, typename RetType, typename ... Args>
+        void mapCommand(std::string commandName, RetType (ModuleType::*f)(Args... args)) {
+            parent.addRequiredDependency<ModuleType>();
+            auto mod = parent.node.getModule<ModuleType>();
+            auto command = parent.node.getModule<CommandModule>();
+            ///long cast is sad :( to_string should have size_t overload
+            mapCommand(std::to_string((long) sizeof...(Args)), commandName,
+                       [=](CommandModule::ArgumentContainerType vals) {
+                           runMemberFunction(*mod, f, vals);
+                       });
+        };
+
+        bool runCommand(std::string commandName, ArgumentContainerType arguments) {
+            ///@todo integrate duplicate code with CommandModule somehow
+            if (submodules.count(commandName) > 0 && arguments.size() > 1) {
+                ///@todo type
+                std::vector<std::string> newArguments(arguments.begin() + 1, arguments.end());
+                std::string newCommand = (*arguments.begin());
+                return submodule(commandName).runCommand(newCommand, newArguments);
+                // return false;
+            } else {
+                std::string prefix = std::to_string(arguments.size());
+                LOGGER("Running module " + prefix + " command " + commandName);
+                std::string key = prefix + ":::" + commandName;
+                auto &map = commands.get<std::string, std::function<void(ArgumentContainerType)>>();
+                if (map.count(key) == 0) {
+                    NODECONTEXTLOGGER("FAILURE");
+                    return false;
+                } else {
+                    map[key](arguments);
+                    NODECONTEXTLOGGER("SUCCESS")
+                    return true;
+                }
             }
-            call(t, f, args, std::make_index_sequence<num_args>{});
         }
 
-        template<typename RetType, typename ... Args>
-        void operator()(RetType(*f)(Args...), std::vector<std::string> &args) {
-            //assert(args.size() == num_args); // just to be sure
-            call(f, args, std::make_index_sequence<num_args>{});
-        }
+
     };
 
+    friend class CommandSubModule;
 
-    template<typename T, typename RetType, typename ... Args>
-    void runMemberFunction(T &t, RetType (T::*f)(Args...), std::vector<std::string> values) {
-        unpack_caller<sizeof... (Args)> a;
-        a(t, f, values);
-    };
-
-
-
+private:
 
 
     /**
@@ -127,43 +110,63 @@ private:
     Uber<std::map> commands;
     bool interactive = false;
     std::list<std::shared_ptr<ICommandsDirectory>> commandsDirectory;
+
+    std::map<std::string, std::unique_ptr<CommandSubModule>> submodules;
+    CommandSubModule defaultSubModule;
+
 public:
 
 
-    typedef const std::vector<std::string> &ArgumentContainerType;
+    CommandSubModule &submodule(std::string name) {
+        if (submodules.count(name) == 0) {
+            submodules[name] = std::make_unique<CommandSubModule>(*this);
+        }
+
+        return *submodules[name];
+    }
+
+    CommandSubModule &submodule() {
+        return defaultSubModule;
+    }
+
+
 
     CommandModule(INode &node);
 
-    ///template <typename ReturnType, typename ... Args>
-    bool mapCommand(std::string moduleName, std::string commandName, std::function<void(ArgumentContainerType)> func) {
-        std::string key = moduleName + ":::" + commandName;
-        auto &map = commands.get<std::string, std::function<void(ArgumentContainerType)>>();
-        map[key] = func;
-        return true;
-    };
+protected:
+//    ///template <typename ReturnType, typename ... Args>
+//    bool mapCommand(std::string prefix, std::string commandName, std::function<void(ArgumentContainerType)> func) {
+//        std::string key = prefix + ":::" + commandName;
+//        auto &map = commands.get<std::string, std::function<void(ArgumentContainerType)>>();
+//        map[key] = func;
+//        return true;
+//    };
 public:
 
     template<typename ModuleType, typename RetType, typename ... Args>
-    void mapCommand(std::string moduleName, std::string commandName, RetType (ModuleType::*f)(Args...)) {
-        addRequiredDependency<ModuleType>();
-        auto mod = node.getModule<ModuleType>();
-        auto command = node.getModule<CommandModule>();
-        command->mapCommand(moduleName, commandName, [=](CommandModule::ArgumentContainerType vals) {
-            runMemberFunction(*mod, f, vals);
-        });
+    void mapCommand(std::string commandName, RetType (ModuleType::*f)(Args... args)) {
+
+        ///@todo check if commandName is a module name
+        ///@todo also check for collsions in creating submodules
+        if (submodules.count(commandName) > 0) {
+            ///@todo exception, return false or sth.
+            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
+        }
+
+        submodule().mapCommand(commandName, f);
+
     };
 
-    bool runCommand(std::string moduleName, std::string commandName, ArgumentContainerType arguments) {
-        LOGGER("Running module " + moduleName + " command " + commandName);
-        std::string key = moduleName + ":::" + commandName;
-        auto &map = commands.get<std::string, std::function<void(ArgumentContainerType)>>();
-        if (map.count(key) == 0) {
-            NODECONTEXTLOGGER("FAILURE");
-            return false;
+    bool runCommand(std::string commandName, ArgumentContainerType arguments) {
+
+        if (submodules.count(commandName) > 0 && arguments.size() > 1) {
+            ///@todo type
+            std::vector<std::string> newArguments(arguments.begin() + 1, arguments.end());
+            std::string newCommand = (*arguments.begin());
+            return submodule(commandName).runCommand(newCommand, newArguments);
         } else {
-            map[key](arguments);
-            NODECONTEXTLOGGER("SUCCESS")
-            return true;
+
+            return submodule().runCommand(commandName, arguments);
         }
     }
 
@@ -211,18 +214,18 @@ public:
             auto words = explode(line, ' ');
 
             std::string module = "";
-            std::string commandName = "";
+            //  std::string commandName = "";
             std::vector<std::string> data;
             if (words.size() > 0) module = words[0];
-            if (words.size() > 1) commandName = words[1];
-            if (words.size() > 2) {
-                auto b = words.begin() + 2;
+            //if (words.size() > 1) commandName = words[1];
+            if (words.size() > 1) {
+                auto b = words.begin() + 1;
                 auto e = words.end();
                 data.insert(data.end(), b, e);
             }
 
             try {
-                runCommand(module, commandName, data);
+                runCommand(module, data);
             } catch (const IncorrectParametersException &e) {
                 LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " +
                        std::to_string(e.gotParameters));

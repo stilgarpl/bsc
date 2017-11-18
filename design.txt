@@ -54,3 +54,33 @@ Command source -> command event(module, command, v<data>) -> commandmodule->run(
 
 CommandModule should have dynamic dependency
 addDependency<Module> z mappingu
+
+
+z Commnad wywalic "module", zamiast tego zrobic drzewiasty subcommanddispatcher
+
+cmd->mapCommand("opengl", &CommandModule::subCommandDispatcher) <- a ile parametrow bedzie mial subcommand dispatche???????
+
+inne rozwiazanie, zachowac module, ale dodac "using module persistence" np
+
+zeby mozna bylo w shellu uzywac
+cd DIR
+
+persist file.file
+
+define submodule -> wersja z subCommandDispatcher jest nierealna, bo nie wiadomo ile argumentow przyjdzie, a tu musialby byc alternatywny flow ktory przekazuje caly vector
+
+cmd->submodule("opengl")->mapCommand("set", &OpenGlModule::set);
+cmd->mapComannd == cmd->DefaultSubModule()->mapCommand
+
+pierwszy argument byłby sprawdzany czy jest w submodule. jesli jest, no to submodule(arg[0])->runCommand(arg[1], args...)
+jesli nie, noto submodule()->runCommand(arg[0], args...)
+
+a runCommand w submodule mogloby robic to samo, wiec mozliwe byloby
+
+cmd->submodule("remote")->submodule("opengl")->mapCommand
+
+
+Args... -> std::string, argsid - to umozliwiloby przeciazanie roznymi parametrami tej samej metody...
+na pewno trywialnie mozna zrobic liczbe argumentow, a typy... typy chyba nie, bo jak rozpoznac, co user wpisal.
+@todo THAT ^^^^
+

@@ -38,7 +38,7 @@ public:
     template<typename T>
     static TypeIdType getClassId(T *t = nullptr) {
 
-        LOGGER("Class id for type " + std::string(typeid(T).name()) + " is " + std::to_string(getTypeId<T>()));
+        //  LOGGER("Class id for type " + std::string(typeid(T).name()) + " is " + std::to_string(getTypeId<T>()));
         return getTypeId<T>();
     }
 
