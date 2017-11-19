@@ -79,6 +79,8 @@ a runCommand w submodule mogloby robic to samo, wiec mozliwe byloby
 
 cmd->submodule("remote")->submodule("opengl")->mapCommand
 
+mapRawCommand for
+
 
 Args... -> std::string, argsid - to umozliwiloby przeciazanie roznymi parametrami tej samej metody...
 na pewno trywialnie mozna zrobic liczbe argumentow, a typy... typy chyba nie, bo jak rozpoznac, co user wpisal.

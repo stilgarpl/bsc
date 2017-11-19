@@ -62,10 +62,22 @@ public:
             auto mod = parent.node.getModule<ModuleType>();
             auto command = parent.node.getModule<CommandModule>();
             ///long cast is sad :( to_string should have size_t overload
-            mapCommand(std::to_string((long) sizeof...(Args)), commandName,
+            ///std::to_string((long) sizeof...(Args))
+            ///@todo prefix or sth, problem is that size of args breaks raw functions that are random
+            mapCommand(" ", commandName,
                        [=](CommandModule::ArgumentContainerType vals) {
                            runMemberFunction(*mod, f, vals);
                        });
+        };
+
+
+        template<typename ModuleType, typename RetType>
+        void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerType)) {
+            parent.addRequiredDependency<ModuleType>();
+            auto mod = parent.node.getModule<ModuleType>();
+            mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerType vals) {
+                (mod.get()->*f)(vals);
+            });
         };
 
         bool runCommand(std::string commandName, ArgumentContainerType arguments) {
@@ -77,7 +89,7 @@ public:
                 return submodule(commandName).runCommand(newCommand, newArguments);
                 // return false;
             } else {
-                std::string prefix = std::to_string(arguments.size());
+                std::string prefix = " "; ///@todo raw pointers and this is colliding std::to_string(arguments.size());
                 LOGGER("Running module " + prefix + " command " + commandName);
                 std::string key = prefix + ":::" + commandName;
                 auto &map = commands.get<std::string, std::function<void(ArgumentContainerType)>>();
@@ -149,6 +161,20 @@ public:
 
     };
 
+    template<typename ModuleType, typename RetType>
+    void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerType)) {
+
+        ///@todo check if commandName is a module name
+        ///@todo also check for collsions in creating submodules
+        if (submodules.count(commandName) > 0) {
+            ///@todo exception, return false or sth.
+            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
+        }
+
+        submodule().mapRawCommand(commandName, f);
+
+    };
+
     bool runCommand(std::string commandName, ArgumentContainerType arguments) {
 
         if (submodules.count(commandName) > 0 && arguments.size() > 1) {
@@ -184,17 +210,7 @@ private:
 public:
 
 
-    void testingMethod(Dupa a) {
-        LOGGER("Command testing method " + std::to_string(a.getA()));
-    }
 
-    void testingMethodInt(int a) {
-        LOGGER("Command testing method INT " + std::to_string(a));
-    }
-
-    void testingMethodIntFloat(int a, float b) {
-        LOGGER("Command testing method INT FLOAT " + std::to_string(a) + " " + std::to_string(b));
-    }
 
     void runInteractive() {
         std::string line;
@@ -244,6 +260,28 @@ public:
     }
 
     void initialize() override;
+
+
+
+    ////////////////////////////////
+    /// Commands section
+    ////////////////////////////////
+
+    void testingMethod(Dupa a) {
+        LOGGER("Command testing method " + std::to_string(a.getA()));
+    }
+
+    void testingMethodInt(int a) {
+        LOGGER("Command testing method INT " + std::to_string(a));
+    }
+
+    void testingMethodIntFloat(int a, float b) {
+        LOGGER("Command testing method INT FLOAT " + std::to_string(a) + " " + std::to_string(b));
+    }
+
+
+    void sendRemoteCommand(ArgumentContainerType args);
+
 };
 
 

@@ -7,9 +7,10 @@
 
 
 #include <p2p/network/protocol/packet/info/PacketInfo.h>
+#include <p2p/utils/cereal_include.h>
 
-class CommandPacket : PacketGroup {
-
+class CommandPacket : public PacketGroup {
+public:
 
     class Request : public Packet<CommandPacket, CommandPacket::Request> {
     private:
@@ -18,15 +19,50 @@ class CommandPacket : PacketGroup {
         std::vector<std::string> data;
     public:
         void process(Context &context) override;
+
+        const std::vector<std::string> &getModules() const;
+
+        void setModules(const std::vector<std::string> &modules);
+
+        const std::string &getCommandName() const;
+
+        void setCommandName(const std::string &commandName);
+
+        const std::vector<std::string> &getData() const;
+
+        void setData(const std::vector<std::string> &data);
+
+    private:
+        template<class Archive>
+        void serialize(Archive &ar) {
+            //  ar & cereal::base_class<Packet < CommandPacket, CommandPacket::Request>>;
+
+            ar(modules, commandName, data);
+        }
+
+
+        friend class cereal::access;
     };
 
 
     class Response : public Packet<CommandPacket, CommandPacket::Response> {
     public:
         void process(Context &context) override;
+
+    private:
+        template<class Archive>
+        void serialize(Archive &ar) {
+        }
+
+
+        friend class cereal::access;
     };
 
 };
 
+CEREAL_REGISTER_TYPE(CommandPacket::Request);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, CommandPacket::Request);
+CEREAL_REGISTER_TYPE(CommandPacket::Response);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, CommandPacket::Response);
 
 #endif //BASYCO_COMMANDPACKET_H

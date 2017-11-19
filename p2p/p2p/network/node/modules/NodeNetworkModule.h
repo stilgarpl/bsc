@@ -76,6 +76,28 @@ public: // @todo should be public or shouldn't ?
     }
 
     bool isConnectedTo(const NodeInfo &nodeInfo);
+
+    ///@todo add version that uses protocol and returns future
+    bool sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet) {
+        ConnectionPtr conn = nullptr;
+        for (auto &&connection : activeClientConnections) {
+            if (connection->nodeId && connection->nodeId == nodeId) {
+                conn = connection->connection;
+            }
+        }
+        if (conn == nullptr) {
+            ///@todo connect to node
+        }
+
+        if (conn != nullptr) {
+            conn->send(packet);
+            LOGGER("sending packet to node " + nodeId)
+            return true;
+        } else {
+            return false;
+            LOGGER("unable to send packet to " + nodeId)
+        }
+    }
 };
 
 

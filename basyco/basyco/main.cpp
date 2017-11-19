@@ -105,6 +105,17 @@ void test1(std::string s) {
 }
 
 
+void setupCommands(CommandModule *cmd) {
+    cmd->mapCommand("t2", &CommandModule::testingMethodInt);
+    cmd->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
+    cmd->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
+    cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
+    cmd->mapCommand("connect", &NodeNetworkModule::connectToAddress);
+    cmd->mapCommand("print", &NodeNetworkModule::printConnections);
+    cmd->mapCommand("update", &NodeNetworkModule::updateNodeConnectionInfo);
+    cmd->mapCommand("purge", &NodeNetworkModule::purgeDuplicateConnections);
+    cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
+}
 
 
 
@@ -245,33 +256,30 @@ int main(int argc, char *argv[]) {
 
     auto cmdN = thisNode.getModule<CommandModule>();
 
-    cmdN->mapCommand("t2", &CommandModule::testingMethodInt);
-    cmdN->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
-    cmdN->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
-    cmdN->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-    cmdN->mapCommand("connect", &NodeNetworkModule::connectToAddress);
-    cmdN->mapCommand("print", &NodeNetworkModule::printConnections);
-    cmdN->mapCommand("update", &NodeNetworkModule::updateNodeConnectionInfo);
-    cmdN->mapCommand("purge", &NodeNetworkModule::purgeDuplicateConnections);
+    setupCommands(cmdN.get());
     cmdN->setInteractive(true);
 
     setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
     thisNode.start();
 
     Node otherNode(9999);
-    otherNode.getNodeInfo().setNodeId("second node");
+    otherNode.getNodeInfo().setNodeId("second");
     otherNode.addToNetwork("TheNetwork");
 
     setupModules(otherNode);
+    cmdN = otherNode.getModule<CommandModule>();
+    setupCommands(cmdN.get());
     setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
     otherNode.start();
 
     Node thirdNode(9898);
-    thirdNode.getNodeInfo().setNodeId("third node");
+    thirdNode.getNodeInfo().setNodeId("third");
     thirdNode.addToNetwork("TheNetwork");
     setupModules(thirdNode);
+    cmdN = thirdNode.getModule<CommandModule>();
+    setupCommands(cmdN.get());
     setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
-    //   thirdNode.start();
+    thirdNode.start();
 
 
     thisNode.getNodeInfo().printAll();
@@ -281,7 +289,7 @@ int main(int argc, char *argv[]) {
     bool ret = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
     LOGGER("connection was ... " + std::to_string(ret));
     otherNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9898");
-    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:100");
+    //  thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:100");
     std::this_thread::sleep_for(5s);
 
     thisNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();

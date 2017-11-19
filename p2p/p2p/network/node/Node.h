@@ -68,13 +68,6 @@ private:
     std::shared_ptr<Config> configuration;
     LogicManager logicManager;
     Context nodeContext;
-    IdType id = generateId();
-
-    IdType generateId() {
-        //@todo implement real id generation
-        static IdType i = 0;
-        return i++;
-    }
 
     virtual Context &getContext() {
         return nodeContext;
