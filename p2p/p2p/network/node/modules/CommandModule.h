@@ -232,6 +232,8 @@ public:
             }
 
         }
+
+        LOGGER("Command Module has stopped")
     }
 
     void run() {

@@ -71,6 +71,10 @@ public: // @todo should be public or shouldn't ?
 
     bool connectTo(const std::string &address);
 
+    bool connectToAddress(const std::string &add) {
+        return connectTo(add);
+    }
+
     bool isConnectedTo(const NodeInfo &nodeInfo);
 };
 

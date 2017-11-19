@@ -249,6 +249,10 @@ int main(int argc, char *argv[]) {
     cmdN->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmdN->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     cmdN->mapCommand("t3", &CommandModule::testingMethodIntFloat);
+    cmdN->mapCommand("connect", &NodeNetworkModule::connectToAddress);
+    cmdN->mapCommand("print", &NodeNetworkModule::printConnections);
+    cmdN->mapCommand("update", &NodeNetworkModule::updateNodeConnectionInfo);
+    cmdN->mapCommand("purge", &NodeNetworkModule::purgeDuplicateConnections);
     cmdN->setInteractive(true);
 
     setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
@@ -300,7 +304,7 @@ int main(int argc, char *argv[]) {
     thisNode.getModule<NodeNetworkModule>()->printConnections();
     otherNode.getModule<NodeNetworkModule>()->printConnections();
     thirdNode.getModule<NodeNetworkModule>()->printConnections();
-    std::this_thread::sleep_for(5s);
+    std::this_thread::sleep_for(9995s);
     LOGGER("stopping");
     thisNode.stop();
     otherNode.stop();
@@ -309,6 +313,7 @@ int main(int argc, char *argv[]) {
     thisNode.getModule<NodeNetworkModule>()->purgeInactiveConnections();
     otherNode.getModule<NodeNetworkModule>()->purgeInactiveConnections();
     thirdNode.getModule<NodeNetworkModule>()->purgeInactiveConnections();
+    std::this_thread::sleep_for(45s);
     thisNode.getModule<NodeNetworkModule>()->printConnections();
     otherNode.getModule<NodeNetworkModule>()->printConnections();
     thirdNode.getModule<NodeNetworkModule>()->printConnections();
