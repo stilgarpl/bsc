@@ -47,24 +47,23 @@ void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmi
 
 
 
-//    //  assigning actions
-//    if (logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
-//                                               PacketEventId::PACKET_RECEIVED)) {
-//        std::clog << "Debug: PACK RECV assignment!" << std::endl;
-//    }
-//    logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_SENT, PacketEventId::PACKET_SENT);
-//
-//    if (logicManager.assignAction<Tick>(500ms, "TransTick")) {
-//        std::clog << "Debug: Trans tick assignment!" << std::endl;
-//
-//    }
+    //  assigning actions
+    if (logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
+                                               PacketEventId::PACKET_RECEIVED)) {
+        std::clog << "Debug: PACK RECV assignment!" << std::endl;
+    }
+    logicManager.assignAction<PacketEvent>(PacketEventId::PACKET_SENT, PacketEventId::PACKET_SENT);
+
+    if (logicManager.assignAction<Tick>(500ms, "TransTick")) {
+        std::clog << "Debug: Trans tick assignment!" << std::endl;
+
+    }
 
 
+    if (logicManager.assignAction<Tick>(1500ms, "trigNodeUp")) {
+        std::clog << "Debug: TtrigNodeUp assignment!" << std::endl;
 
-//    if (logicManager.assignAction<Tick>(1500ms, "trigNodeUp")) {
-//        std::clog << "Debug: TtrigNodeUp assignment!" << std::endl;
-//
-//    }
+    }
 
 
     //both FILE and CHUNK events are assigned to the same function
@@ -259,8 +258,8 @@ int main(int argc, char *argv[]) {
     setupCommands(cmdN.get());
     cmdN->setInteractive(true);
 
-    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
     thisNode.start();
+    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
 
     Node otherNode(9999);
     otherNode.getNodeInfo().setNodeId("second");
@@ -269,8 +268,9 @@ int main(int argc, char *argv[]) {
     setupModules(otherNode);
     cmdN = otherNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
-    setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
+
     otherNode.start();
+    setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
 
     Node thirdNode(9898);
     thirdNode.getNodeInfo().setNodeId("third");
@@ -278,6 +278,7 @@ int main(int argc, char *argv[]) {
     setupModules(thirdNode);
     cmdN = thirdNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
+
     setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
     thirdNode.start();
 

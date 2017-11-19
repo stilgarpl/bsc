@@ -125,21 +125,22 @@ bool NodeNetworkModule::setupLogic(LogicManager &logicManager) {
 
 
 void NodeNetworkModule::updateNodeConnectionInfo() {
-    //this is meant to be run from a thread
-    for (auto &&item : activeClientConnections) {
+    std::thread([&]() {
+        //this is meant to be run from a thread
+        for (auto &&item : activeClientConnections) {
 
-        auto packet = NodeInfoRequest::getNew();
-        NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
-        auto &ni = response->getNodeInfo();
-        ni.printAll();
-        auto nid = ni.getNodeId();
-        LOGGER(ni.getNetworkId());
-        const auto &val = response->getNodeInfo().getNodeId();
-        //(*(*item).nodeId) = val;
-        item->nodeId = val;
-    }
+            auto packet = NodeInfoRequest::getNew();
+            NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
+            auto &ni = response->getNodeInfo();
+            ni.printAll();
+            auto nid = ni.getNodeId();
+            LOGGER(ni.getNetworkId());
+            const auto &val = response->getNodeInfo().getNodeId();
+            //(*(*item).nodeId) = val;
+            item->nodeId = val;
+        }
 
-
+    }).detach();
 }
 
 void NodeNetworkModule::purgeDuplicateConnections() {
