@@ -13,7 +13,7 @@ class CommandPacket : PacketGroup {
 
     class Request : public Packet<CommandPacket, CommandPacket::Request> {
     private:
-        std::string moduleName;
+        std::vector<std::string> modules;
         std::string commandName;
         std::vector<std::string> data;
     public:

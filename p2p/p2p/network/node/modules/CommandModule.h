@@ -133,14 +133,6 @@ public:
 
     CommandModule(INode &node);
 
-protected:
-//    ///template <typename ReturnType, typename ... Args>
-//    bool mapCommand(std::string prefix, std::string commandName, std::function<void(ArgumentContainerType)> func) {
-//        std::string key = prefix + ":::" + commandName;
-//        auto &map = commands.get<std::string, std::function<void(ArgumentContainerType)>>();
-//        map[key] = func;
-//        return true;
-//    };
 public:
 
     template<typename ModuleType, typename RetType, typename ... Args>

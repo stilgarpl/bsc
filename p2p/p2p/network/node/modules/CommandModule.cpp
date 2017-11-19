@@ -2,6 +2,8 @@
 // Created by stilgar on 14.11.17.
 //
 
+#include <p2p/command/network/logic/actions/CommandActions.h>
+#include <p2p/command/network/logic/sources/CommandSource.h>
 #include "CommandModule.h"
 #include "BasicModule.h"
 
@@ -11,15 +13,17 @@ CommandModule::CommandModule(INode &node) : NodeModule(node), defaultSubModule(*
 }
 
 void CommandModule::setupActions(LogicManager &logicManager) {
-
+    logicManager.setAction<CommandEvent>(CommandActions::RUN_COMMAND, CommandActions::runCommand);
 }
 
 bool CommandModule::assignActions(LogicManager &logicManager) {
-    return false;
+    bool ret = logicManager.assignAction<CommandEvent>(CommandEventId::EXECUTE_COMMAND, CommandActions::RUN_COMMAND);
+    return ret;
 }
 
 bool CommandModule::setupSources(LogicManager &logicManager) {
-    return false;
+    logicManager.addSource<CommandSource>();
+    return true;
 }
 
 bool CommandModule::isInteractive() const {
