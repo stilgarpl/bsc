@@ -7,6 +7,8 @@
 
 #include <memory>
 #include <list>
+#include "Executor.h"
+
 
 template<typename... Args>
 class Signal {
@@ -26,7 +28,7 @@ public:
     virtual int signal(Args... args) {
         int executed = 0;
         for (auto &&item : funcList) {
-            (*item)(args...);
+            Executor::execute([=]() { (*item)(args...); });
             executed++;
         }
         return executed;

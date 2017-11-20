@@ -21,7 +21,7 @@ public:
 
     void work(const Tick &tick) override;
 
-    std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p) override;
+    std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) override;
 };
 
 

@@ -15,6 +15,7 @@ private:
     std::unique_ptr<IProtocol> protocol = std::make_unique<GravitonProtocol>();
     std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
     std::mutex acceptedConnectionsMutex;
+    std::mutex activeConnectionsMutex;
     std::list<IServerConnection *> acceptedConnections; //server side
     std::shared_ptr<Poco::Net::ServerSocket> serverSocket;
     std::shared_ptr<Poco::Net::TCPServer> server;
@@ -94,8 +95,9 @@ public: // @todo should be public or shouldn't ?
             LOGGER("sending packet to node " + nodeId)
             return true;
         } else {
-            return false;
             LOGGER("unable to send packet to " + nodeId)
+            return false;
+
         }
     }
 };

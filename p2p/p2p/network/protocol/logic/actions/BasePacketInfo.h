@@ -18,8 +18,13 @@ private:
     BasePacketPtr packetPtr;
     Connection *connection = nullptr;
     //@todo is Tick reference necessary? maybe some global clock function? or just std::steady_clock ?
+    Status expectedStatus = Status::RESPONSE;
     Tick::clock::time_point timeSent;
     std::promise<BasePacketPtr> responsePromise;
+
+public:
+    BasePacketInfo(const BasePacketPtr &packetPtr, Connection *connection,
+                   const std::chrono::time_point<Tick::clock> &timeSent);
 
 public:
     const BasePacketPtr &getPacketPtr() const;
@@ -34,7 +39,7 @@ public:
     BasePacketInfo(const BasePacketPtr &packetPtr, const std::chrono::time_point<Tick::clock> &timeSent);
 
     BasePacketInfo(const BasePacketPtr &packetPtr, Connection *connection,
-                      const std::chrono::time_point<Tick::clock> &timeSent);
+                   const std::chrono::time_point<Tick::clock> &timeSent, Status expectedStatus);
 
     Connection *getConnection() const;
 
@@ -42,6 +47,10 @@ public:
 
     ///@todo or simply get future?
     std::promise<BasePacketPtr> &getResponsePromise();
+
+    Status getExpectedStatus() const;
+
+    void setExpectedStatus(Status expectedStatus);
 
 };
 

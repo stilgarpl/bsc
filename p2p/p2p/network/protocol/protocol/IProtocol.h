@@ -50,14 +50,17 @@ public:
     virtual void work(const Tick &tick)= 0;
     //virtual void send(Connection *conn, BasePacketPtr p)= 0;
 
-    virtual std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p) =0;
+    virtual std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) =0;
 
 
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto sendExpect(Connection *conn, NetworkPacketPointer<SendType> p) {
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
-        auto future = send(conn, p);
-        return std::static_pointer_cast<ReturnType>(future.get());
+        auto future = send(conn, p, status);
+        future.wait();
+        auto ret = future.get();
+        auto retStatus = ret->getStatus();
+        return std::static_pointer_cast<ReturnType>(ret);
     }
 
     void setupActions(LogicManager &logicManager) override;
@@ -76,7 +79,7 @@ class DummyProtocol : public IProtocol {
     void work(const Tick &tick) override;
 
 public:
-    std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p) override;
+    std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) override;
 
 
 };

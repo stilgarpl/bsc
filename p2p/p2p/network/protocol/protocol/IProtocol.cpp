@@ -27,7 +27,7 @@ void DummyProtocol::work(const Tick &tick) {
     LOGGER("on work")
 }
 
-std::future<BasePacketPtr> DummyProtocol::send(Connection *conn, BasePacketPtr p) {
+std::future<BasePacketPtr> DummyProtocol::send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) {
     conn->send(p);
     return std::future<BasePacketPtr>();
 

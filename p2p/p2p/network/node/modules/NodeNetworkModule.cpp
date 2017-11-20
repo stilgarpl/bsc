@@ -125,10 +125,13 @@ bool NodeNetworkModule::setupLogic(LogicManager &logicManager) {
 
 
 void NodeNetworkModule::updateNodeConnectionInfo() {
-    std::thread([&]() {
-        //this is meant to be run from a thread
+    std::lock_guard<std::mutex> g(activeConnectionsMutex);
+    std::lock_guard<std::mutex> g1(node.getLock());
+    // std::thread([&]() {
+    //    //this is meant to be run from a thread
+    NODECONTEXTLOGGER("update node ")
         for (auto &&item : activeClientConnections) {
-
+            NODECONTEXTLOGGER("update connection " + (item->nodeId ? *item->nodeId : " ?? "));
             auto packet = NodeInfoRequest::getNew();
             NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
             auto &ni = response->getNodeInfo();
@@ -140,10 +143,11 @@ void NodeNetworkModule::updateNodeConnectionInfo() {
             item->nodeId = val;
         }
 
-    }).detach();
+    //}).detach();
 }
 
 void NodeNetworkModule::purgeDuplicateConnections() {
+    std::lock_guard<std::mutex> g(activeConnectionsMutex);
     for (auto &&item : activeClientConnections) {
         if (item->nodeId) {
             //find all connections to the same id
@@ -160,6 +164,7 @@ void NodeNetworkModule::purgeDuplicateConnections() {
 }
 
 void NodeNetworkModule::printConnections() {
+    std::lock_guard<std::mutex> g(activeConnectionsMutex);
     std::cout << "[" << node.getNodeInfo().getNodeId() << "]:" << std::to_string(acceptedConnections.size())
               << std::endl;
     for (auto &&item : activeClientConnections) {
@@ -172,6 +177,7 @@ void NodeNetworkModule::printConnections() {
 }
 
 void NodeNetworkModule::purgeInactiveConnections() {
+    std::lock_guard<std::mutex> g(activeConnectionsMutex);
     activeClientConnections.remove_if([&](NodeConnectionInfoPtr it) -> bool {
         return it->connection == nullptr || !it->connection->isActive();
     });
@@ -179,6 +185,7 @@ void NodeNetworkModule::purgeInactiveConnections() {
 }
 
 void NodeNetworkModule::addActiveClientConnection(std::shared_ptr<Connection> c) {
+    std::lock_guard<std::mutex> g(activeConnectionsMutex);
     NodeConnectionInfoPtr info = std::make_shared<NodeConnectionInfo>();
     info->connection = c;
     info->nodeId = std::experimental::nullopt;
@@ -188,6 +195,7 @@ void NodeNetworkModule::addActiveClientConnection(std::shared_ptr<Connection> c)
 }
 
 void NodeNetworkModule::removeActiveClientConnection(NodeConnectionInfoPtr c) {
+    std::lock_guard<std::mutex> g(activeConnectionsMutex);
     //  auto el = std::find(activeClientConnections.begin(),activeClientConnections.end(),c);
     activeClientConnections.remove(c);
 

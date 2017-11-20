@@ -23,6 +23,11 @@ public:
 protected:
     virtual INodeModulePtr getModuleByDependencyId(DependencyManager::TypeIdType id) = 0;
 
+public: //@todo should it be public?
+    std::mutex &getLock() {
+        return lock;
+    }
+
 public:
 
     template<typename ModuleType>
