@@ -10,16 +10,20 @@
 #include "IProtocol.h"
 
 
+
 class GravitonProtocol : public IProtocol {
 private:
     std::mutex lock;
     std::map<BasePacket::IdType, std::shared_ptr<BasePacketInfo>> responseMap;
+    const Tick::clock::duration MAX_TIMEOUT = 1500ms;
 public:
     void onPacketSent(const PacketEvent &event) override;
 
     void onPacketReceived(const PacketEvent &event) override;
 
     void work(const Tick &tick) override;
+
+    void onConnectionEvent(const ConnectionEvent &event) override;
 
     std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) override;
 };

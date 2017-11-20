@@ -33,12 +33,18 @@ std::future<BasePacketPtr> DummyProtocol::send(Connection *conn, BasePacketPtr p
 
 }
 
+void DummyProtocol::onConnectionEvent(const ConnectionEvent &event) {
+
+}
+
 
 void IProtocol::setupActions(LogicManager &logicManager) {
     logicManager.setAction<PacketEvent>(Actions::onPacketSent, std::bind(&IProtocol::onPacketSent, this, _1));
     logicManager.setAction<PacketEvent>(Actions::onPacketReceived,
                                         std::bind(&IProtocol::onPacketReceived, this, _1));
     logicManager.setAction<Tick>(Actions::onWork, std::bind(&IProtocol::work, this, _1));
+    logicManager.setAction<ConnectionEvent>("protocolConnectionClosed",
+                                            std::bind(&IProtocol::onConnectionEvent, this, _1));
 
 }
 
@@ -47,6 +53,8 @@ bool IProtocol::assignActions(LogicManager &logicManager) {
     result &= logicManager.assignAction<PacketEvent>(PacketEvent::IdType::PACKET_SENT, Actions::onPacketSent);
     result &= logicManager.assignAction<PacketEvent>(PacketEvent::IdType::PACKET_RECEIVED, Actions::onPacketReceived);
     result &= logicManager.assignAction<Tick>(800ms, Actions::onWork);
+    result &= logicManager.assignAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED,
+                                                         "protocolConnectionClosed");
     return result;
 }
 

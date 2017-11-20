@@ -28,6 +28,8 @@ public:
     virtual ~ServerConnection();
 
     void stop() override;
+
+    void shutdown() override;
 };
 
 

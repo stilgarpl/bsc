@@ -30,6 +30,12 @@ public:
     ConnectionSource();
 
     void connectionEstablished(Connection *c);
+
+    void connectionClosed(Connection *c);
+
+    void connectionClosedServer(Connection *c);
+
+    void connectionClosedClient(Connection *c);
 };
 
 

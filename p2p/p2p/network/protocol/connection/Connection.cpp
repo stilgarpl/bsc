@@ -47,31 +47,46 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
     while (sending) {
-        //  std::cout << "sending " << socket.address().port() << std::endl;
-        //check the queue
-        std::unique_lock<std::mutex> g(sendQueueLock);
-        while (sendQueue.empty() && sending) {
-            // std::cout << "work::send waiting" << std::endl;
-            //sendReady.wait_for(g, 1s);
-            sendReady.wait_for(g, 1s);
-        }
-        while (!sendQueue.empty()) {
-            //  std::cout << "work::send found packet to send" << std::endl;
-            BasePacketPtr v;
-            {
-                v = sendQueue.front();
-                {
-                    cereal::BinaryOutputArchive oa(os);
-                    oa << v;
-                }
-                if (connectionSourcePtr != nullptr) {
-                    connectionSourcePtr->sentPacket(v, this);
-                }
-                sendQueue.pop();
+        try {
+            //  std::cout << "sending " << socket.address().port() << std::endl;
+            //check the queue
+            std::unique_lock<std::mutex> g(sendQueueLock);
+            while (sendQueue.empty() && sending) {
+                // std::cout << "work::send waiting" << std::endl;
+                //sendReady.wait_for(g, 1s);
+                sendReady.wait_for(g, 1s);
             }
+            while (!sendQueue.empty()) {
+                //  std::cout << "work::send found packet to send" << std::endl;
+                BasePacketPtr v;
+                {
+                    v = sendQueue.front();
+                    {
+                        cereal::BinaryOutputArchive oa(os);
+                        oa << v;
+                    }
+                    if (connectionSourcePtr != nullptr) {
+                        connectionSourcePtr->sentPacket(v, this);
+                    }
+                    sendQueue.pop();
+                }
+
+            }
+            os.flush();
+        } catch (cereal::Exception e) {
+            //socket.close();
+            stopReceiving();
+            stopSending();
+            //cprocessor.stop();
+            // if not receiving, then it's ok!
+        }
+        catch (Poco::Net::NetException e) {
+            //processor.stop();
+            stopReceiving();
+            stopSending();
+            e.displayText();
 
         }
-        os.flush();
         //  std::this_thread::sleep_for(400ms);
     }
 
@@ -97,7 +112,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                     ///@todo not like this
                     std::this_thread::sleep_for(1ms);
                 }
-                if (receiving) {
+                if (receiving && socket.available()) {
                     ia >> v;
                     {
                         std::lock_guard<std::mutex> g(receiveQueueLock);
@@ -116,6 +131,14 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
                     }
                 }
+
+//                if (!socket.poll(Poco::Timespan(1, 1), Poco::Net::Socket::SELECT_READ)) {
+//                    //socket is in a bad state, probably connection was closed.
+//                    LOGGER("TIMEOUT! CLOSING CONNECTION!")
+//                    stopReceiving();
+//                    stopSending();
+//                    ///@todo trigger event?
+//                }
             }
             catch (cereal::Exception e) {
                 //socket.close();
@@ -129,12 +152,14 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                 stopReceiving();
                 stopSending();
                 e.displayText();
+
             }
         }
         // std::this_thread::sleep_for(1ms);
 
     }
     processor.stop();
+    connectionSourcePtr->connectionClosed(this);
 }
 
 
@@ -187,17 +212,22 @@ Context &Connection::getConnectionContext() {
 Connection::~Connection() {
 
     //   LOGGER("Closing connection")
+    shutdown();
+
+
+}
+
+void Connection::shutdown() {
     stopReceiving();
     stopSending();
-    if (receiveThread != nullptr) {
+    if (receiveThread != nullptr && receiveThread->joinable()) {
         receiveThread->join();
+
     }
-    if (sendThread != nullptr) {
+    if (sendThread != nullptr && sendThread->joinable()) {
         sendThread->join();
     }
     processor.stop();
     processor.join();
-
-
 }
 

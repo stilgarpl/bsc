@@ -10,6 +10,7 @@
 #include <p2p/network/protocol/connection/Connection.h>
 #include <p2p/network/protocol/logic/events/PacketEvent.h>
 #include <p2p/logic/ILogicModule.h>
+#include <p2p/network/protocol/logic/events/ConnectionEvent.h>
 
 #include "p2p/logic/events/Tick.h"
 #include "p2p/logic/LogicManager.h"
@@ -47,6 +48,8 @@ public:
 
     virtual void onPacketReceived(const PacketEvent &event)= 0;
 
+    virtual void onConnectionEvent(const ConnectionEvent &event) =0;
+
     virtual void work(const Tick &tick)= 0;
     //virtual void send(Connection *conn, BasePacketPtr p)= 0;
 
@@ -57,10 +60,17 @@ public:
     auto sendExpect(Connection *conn, NetworkPacketPointer<SendType> p) {
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
         auto future = send(conn, p, status);
-        future.wait();
-        auto ret = future.get();
-        auto retStatus = ret->getStatus();
-        return std::static_pointer_cast<ReturnType>(ret);
+        //future.wait();
+        ///@todo check if there is a way to do it without exceptions, maybe .valid() ?
+        try {
+            auto ret = future.get();
+
+            // auto retStatus = ret->getStatus(); //debug value
+            return std::static_pointer_cast<ReturnType>(ret);
+        } catch (const std::future_error &e) {
+            //broken promise
+            return std::shared_ptr<ReturnType>(nullptr);
+        }
     }
 
     void setupActions(LogicManager &logicManager) override;
@@ -81,6 +91,7 @@ class DummyProtocol : public IProtocol {
 public:
     std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) override;
 
+    void onConnectionEvent(const ConnectionEvent &event) override;
 
 };
 

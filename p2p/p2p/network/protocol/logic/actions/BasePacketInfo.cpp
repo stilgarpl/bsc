@@ -27,8 +27,8 @@ void BasePacketInfo::setTimeSent(const std::chrono::time_point<Tick::clock> &tim
 BasePacketInfo::BasePacketInfo(const BasePacketPtr &packetPtr, Connection *connection,
                                const std::chrono::time_point<Tick::clock> &timeSent, Status expectedStatus)
         : packetPtr(packetPtr),
-          connection(connection),
-          timeSent(timeSent), expectedStatus(expectedStatus) {}
+          connection(connection), expectedStatus(expectedStatus),
+          timeSent(timeSent) {}
 
 Connection *BasePacketInfo::getConnection() const {
     return connection;

@@ -26,7 +26,7 @@ void ThreadExecutor::executeTask(const std::function<void(void)> task) {
             }
     ).detach();
     //delay to prevent stack smashing, the error is probably somewhere else
-    std::this_thread::sleep_for(1ms);
+    // std::this_thread::sleep_for(1ms);
 //    if (t.joinable()) {
 //        t.detach();
 //    }

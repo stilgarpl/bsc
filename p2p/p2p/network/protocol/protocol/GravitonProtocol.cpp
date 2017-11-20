@@ -26,6 +26,12 @@ void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
 
 void GravitonProtocol::work(const Tick &tick) {
     std::lock_guard<std::mutex> g(lock);
+    for (auto &&item : responseMap) {
+        if (tick.getNow() - item.second->getTimeSent() > MAX_TIMEOUT) {
+            responseMap.erase(item.first);
+        }
+    }
+
     //  LOGGER("onWork");
 }
 
@@ -39,4 +45,24 @@ std::future<BasePacketPtr> GravitonProtocol::send(Connection *conn, BasePacketPt
     this->responseMap[p->getId()] = ptr;
     conn->send(p);
     return ptr->getResponsePromise().get_future();
+}
+
+void GravitonProtocol::onConnectionEvent(const ConnectionEvent &event) {
+
+    //remove all waiting packets for broken connections
+    if (event.getEventId() == ConnectionEvent::IdType::CONNECTION_CLOSED) {
+//        for (auto &&item : responseMap) {
+//            item.second->getResponsePromise().
+//        }
+
+        for (auto &&item : responseMap) {
+            if (item.second->getConnection() == event.getConnection()) {
+                responseMap.erase(item.first);
+            }
+        }
+//        responseMap.erase(std::remove_if(responseMap.begin(),responseMap.end(),[&](auto& i)->bool{
+//            return (i.second->getConnection == event.getConnection());
+//        }),responseMap.end());
+    }
+
 }

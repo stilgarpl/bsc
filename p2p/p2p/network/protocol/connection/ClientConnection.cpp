@@ -5,6 +5,7 @@
 #include <Poco/Net/SocketStream.h>
 #include <p2p/network/protocol/context/LogicContext.h>
 #include <p2p/network/protocol/logic/sources/ConnectionSource.h>
+#include <Poco/Net/NetException.h>
 #include "ClientConnection.h"
 
 
@@ -34,6 +35,37 @@ void ClientConnection::startSending() {
 
 ClientConnection::~ClientConnection() {
 
-    socket.shutdown();
+    ///@todo this socket is closed twice when client connection is destroyed. do something about it.
+    try {
+        socket.shutdown();
+    } catch (const Poco::Net::NetException &e) {
+        LOGGER("net exception")
+        LOGGER(e.displayText());
+        auto nested = e.nested();
+        while (nested != nullptr) {
+            LOGGER(nested->displayText());
+            nested = nested->nested();
+        }
+    }
+
+}
+
+void ClientConnection::shutdown() {
+    Connection::shutdown();
+    try {
+        socket.shutdown();
+    } catch (const Poco::Net::NetException &e) {
+        LOGGER("net exception")
+        e.displayText();
+        auto nested = e.nested();
+        while (nested != nullptr) {
+            nested->displayText();
+            nested = nested->nested();
+        }
+    }
+    auto lc = getConnectionContext().get<LogicContext>();
+    auto &logicManager = lc->getLogicManager();
+    auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
+    connectionSourcePtr->connectionClosedClient(this);
 
 }

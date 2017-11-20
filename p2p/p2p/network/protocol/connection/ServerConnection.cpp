@@ -16,6 +16,9 @@ void ServerConnection::run() {
     // std::cout << "opening server connection" << std::endl;
     // LOGGER("Opening server connection");
     //run is already in a separate thread, so there is no need to start a new one
+    socket().setReceiveTimeout(Poco::Timespan(5, 1));
+    socket().setSendTimeout(Poco::Timespan(5, 1));
+    socket().setKeepAlive(true);
     startSending(socket());
     workReceive(socket());
 
@@ -46,18 +49,27 @@ void ServerConnection::stopReceiving() {
 
 ServerConnection::~ServerConnection() {
     //  LOGGER("Server conn dest");
+    ///@todo remove this, we have an event for this now
     serverNode.getModule<NodeNetworkModule>()->removeAcceptedConnection(this);
     stop();
 }
 
 void ServerConnection::stop() {
     //  LOGGER("stop");
+    shutdown();
+}
+
+void ServerConnection::shutdown() {
+    Connection::shutdown();
     try {
-        stopSending();
-        stopReceiving();
         socket().shutdown();
+//        auto lc = getConnectionContext().get<LogicContext>();
+//        auto &logicManager = lc->getLogicManager();
+//        auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
+//        connectionSourcePtr->connectionClosedServer(this);
     }
     catch (const Poco::Net::NetException &e) {
+        LOGGER("net exception")
         e.displayText();
         auto nested = e.nested();
         while (nested != nullptr) {

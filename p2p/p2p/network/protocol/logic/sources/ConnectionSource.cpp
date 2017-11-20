@@ -83,3 +83,24 @@ void ConnectionSource::connectionEstablished(Connection *c) {
     connSource.queueEvent(event);
     newConnection(c);
 }
+
+void ConnectionSource::connectionClosed(Connection *c) {
+    auto event = std::make_shared<ConnectionEvent>();
+    event->setEventId(ConnectionEvent::IdType::CONNECTION_CLOSED);
+    event->setConnection(c);
+    connSource.queueEvent(event);
+}
+
+void ConnectionSource::connectionClosedServer(Connection *c) {
+    auto event = std::make_shared<ConnectionEvent>();
+    event->setEventId(ConnectionEvent::IdType::CONNECTION_CLOSED_CLIENT);
+    event->setConnection(c);
+    connSource.queueEvent(event);
+}
+
+void ConnectionSource::connectionClosedClient(Connection *c) {
+    auto event = std::make_shared<ConnectionEvent>();
+    event->setEventId(ConnectionEvent::IdType::CONNECTION_CLOSED_SERVER);
+    event->setConnection(c);
+    connSource.queueEvent(event);
+}

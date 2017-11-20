@@ -20,6 +20,16 @@ public:
 
     bool setupSources(LogicManager &logicManager) override;
 
+public:
+    ////////////////////////////////
+    /// Commands section
+    ////////////////////////////////
+
+    void shutdown() {
+        node.stop();
+    }
+
+
 };
 
 

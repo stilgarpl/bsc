@@ -39,6 +39,17 @@ void NodeNetworkModule::setupActions(LogicManager &logicManager) {
     logicManager.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent &event) {
         // std::clog << "Debug: connection event!" << std::endl;
     });
+
+
+    logicManager.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_CLIENT,
+                                            [&](const ConnectionEvent &event) {
+                                                this->removeActiveClientConnection(event.getConnection());
+                                            });
+
+//    logicManager.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_SERVER, [&](const ConnectionEvent &event) {
+//        ///@todo do something about this dynamic cast
+//        this->removeAcceptedConnection(dynamic_cast<IServerConnection *>(event.getConnection()));
+//    });
 ///@todo reenable
 //    logicManager.setAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
 //                                        [&transmissionControl](
@@ -81,6 +92,13 @@ bool NodeNetworkModule::assignActions(LogicManager &logicManager) {
         std::clog << "Debug: reqNeI assignment!" << std::endl;
 
     }
+
+    if (logicManager.assignAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_CLIENT,
+                                                   ConnectionEventId::CONNECTION_CLOSED_CLIENT)) {
+        std::clog << "Debug: CONNECTION_CLOSED assignment!" << std::endl;
+
+    }
+
 
     if (logicManager.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "upNoI")) {
         std::clog << "Debug: upNoI assignment!" << std::endl;
@@ -126,7 +144,7 @@ bool NodeNetworkModule::setupLogic(LogicManager &logicManager) {
 
 void NodeNetworkModule::updateNodeConnectionInfo() {
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    std::lock_guard<std::mutex> g1(node.getLock());
+    //   std::lock_guard<std::mutex> g1(node.getLock());
     // std::thread([&]() {
     //    //this is meant to be run from a thread
     NODECONTEXTLOGGER("update node ")
@@ -134,20 +152,26 @@ void NodeNetworkModule::updateNodeConnectionInfo() {
             NODECONTEXTLOGGER("update connection " + (item->nodeId ? *item->nodeId : " ?? "));
             auto packet = NodeInfoRequest::getNew();
             NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
-            auto &ni = response->getNodeInfo();
-            ni.printAll();
-            auto nid = ni.getNodeId();
-            LOGGER(ni.getNetworkId());
-            const auto &val = response->getNodeInfo().getNodeId();
-            //(*(*item).nodeId) = val;
-            item->nodeId = val;
+            if (response != nullptr) {
+                auto &ni = response->getNodeInfo();
+                ni.printAll();
+                auto nid = ni.getNodeId();
+                LOGGER(ni.getNetworkId());
+                const auto &val = response->getNodeInfo().getNodeId();
+                //(*(*item).nodeId) = val;
+                item->nodeId = val;
+            } else {
+                //response not received, connection probably is down
+                ///@todo decide what do to, disconnecting for now
+                item->connection->shutdown();
+            }
         }
 
     //}).detach();
 }
 
 void NodeNetworkModule::purgeDuplicateConnections() {
-    std::lock_guard<std::mutex> g(activeConnectionsMutex);
+//    std::lock_guard<std::mutex> g(activeConnectionsMutex);
     for (auto &&item : activeClientConnections) {
         if (item->nodeId) {
             //find all connections to the same id
@@ -198,6 +222,16 @@ void NodeNetworkModule::removeActiveClientConnection(NodeConnectionInfoPtr c) {
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
     //  auto el = std::find(activeClientConnections.begin(),activeClientConnections.end(),c);
     activeClientConnections.remove(c);
+
+}
+
+void NodeNetworkModule::removeActiveClientConnection(Connection *c) {
+    std::lock_guard<std::mutex> g(activeConnectionsMutex);
+    //  auto el = std::find(activeClientConnections.begin(),activeClientConnections.end(),c);
+    activeClientConnections.erase(std::remove_if(activeClientConnections.begin(), activeClientConnections.end(),
+                                                 [&](NodeConnectionInfoPtr &i) -> bool {
+                                                     return (i->connection.get() == c);
+                                                 }), activeClientConnections.end());
 
 }
 
@@ -267,7 +301,8 @@ bool NodeNetworkModule::connectTo(const NodeInfo &nodeInfo) {
 
 void NodeNetworkModule::onStop() {
 
-    //  stopListening();
+    stopListening();
+    disconnectAll();
 }
 
 bool NodeNetworkModule::connectTo(const SocketAddress &address) {
@@ -277,6 +312,7 @@ bool NodeNetworkModule::connectTo(const SocketAddress &address) {
     try {
         std::shared_ptr<ClientConnection> connection = std::make_shared<ClientConnection>(address,
                                                                                           std::ref(node.getContext()));
+        ///@todo maybe this should be a reacting to an CONNECTION_ESTABLISHED event?
         addActiveClientConnection(connection);
         connection->startSending();
         connection->startReceiving();
@@ -306,5 +342,59 @@ bool NodeNetworkModule::isConnectedTo(const NodeInfo &nodeInfo) {
         }
     }
     return ret;
+}
+
+void NodeNetworkModule::run() {
+    NodeModule::run();
+
+    ///@todo find a bettter way to trigger onStop after run
+    while (!isStopping()) {
+        std::this_thread::sleep_for(400ms);
+    }
+}
+
+bool NodeNetworkModule::sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet) {
+    ConnectionPtr conn = nullptr;
+    for (auto &&connection : activeClientConnections) {
+        if (connection->nodeId && connection->nodeId == nodeId) {
+            conn = connection->connection;
+        }
+    }
+    if (conn == nullptr) {
+        ///@todo connect to node
+    }
+
+    if (conn != nullptr) {
+        conn->send(packet);
+        LOGGER("sending packet to node " + nodeId)
+        return true;
+    } else {
+        LOGGER("unable to send packet to " + nodeId)
+        return false;
+
+    }
+}
+
+bool NodeNetworkModule::connectToAddress(const std::string &add) {
+    return connectTo(add);
+}
+
+void NodeNetworkModule::disconnect(const NodeIdType id) {
+    {
+        std::lock_guard<std::mutex> g(activeConnectionsMutex);
+        for (auto &&item : activeClientConnections) {
+            if (item->nodeId && item->nodeId == id && item->connection != nullptr) {
+                item->connection->shutdown();
+                // activeClientConnections.remove(item);
+            }
+        }
+    }
+    purgeInactiveConnections();
+}
+
+void NodeNetworkModule::disconnectAll() {
+    std::lock_guard<std::mutex> g(activeConnectionsMutex);
+    activeClientConnections.remove_if([](auto i) { return true; });
+
 }
 

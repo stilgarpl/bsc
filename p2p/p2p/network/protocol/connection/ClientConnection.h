@@ -24,6 +24,8 @@ public:
 
     virtual ~ClientConnection();
 
+    void shutdown() override;
+
 
 };
 

@@ -42,6 +42,8 @@ public:
 
     void removeActiveClientConnection(NodeConnectionInfoPtr c);
 
+    void removeActiveClientConnection(Connection *c);
+
 public:
 
     //@todo this should not be public
@@ -72,34 +74,18 @@ public: // @todo should be public or shouldn't ?
 
     bool connectTo(const std::string &address);
 
-    bool connectToAddress(const std::string &add) {
-        return connectTo(add);
-    }
+    bool connectToAddress(const std::string &add);
 
     bool isConnectedTo(const NodeInfo &nodeInfo);
 
+    void disconnect(const NodeIdType id);
+
+    void disconnectAll();
+
     ///@todo add version that uses protocol and returns future
-    bool sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet) {
-        ConnectionPtr conn = nullptr;
-        for (auto &&connection : activeClientConnections) {
-            if (connection->nodeId && connection->nodeId == nodeId) {
-                conn = connection->connection;
-            }
-        }
-        if (conn == nullptr) {
-            ///@todo connect to node
-        }
+    bool sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet);
 
-        if (conn != nullptr) {
-            conn->send(packet);
-            LOGGER("sending packet to node " + nodeId)
-            return true;
-        } else {
-            LOGGER("unable to send packet to " + nodeId)
-            return false;
-
-        }
-    }
+    void run() override;
 };
 
 

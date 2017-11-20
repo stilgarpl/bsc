@@ -71,6 +71,8 @@ public:
 
     virtual ~Connection();
 
+    virtual void shutdown();
+
 
 };
 
