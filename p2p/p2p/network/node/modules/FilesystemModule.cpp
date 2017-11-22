@@ -16,6 +16,8 @@ FilesystemModule::FilesystemModule(INode &node) : NodeModule(node) {
 void FilesystemModule::setupActions(LogicManager &logicManager) {
     logicManager.setAction<FileRequestEvent>("fileReq", FileActions::sendFile);
     logicManager.setAction<FileResponseEvent>("fileRes", FileActions::receivedFile);
+    logicManager.setAction<FileAttributesEvent>("fileAtrS", FileActions::sendAttributes);
+    logicManager.setAction<FileAttributesEvent>("fileAtrR", FileActions::receivedAttributes);
 
 }
 
@@ -23,7 +25,10 @@ bool FilesystemModule::assignActions(LogicManager &logicManager) {
     if (logicManager.assignAction<FileRequestEvent>(FileRequestEvent::IdType::GET_FILE, "fileReq") &&
         logicManager.assignAction<FileRequestEvent>(FileRequestEvent::IdType::GET_CHUNK, "fileReq") &&
         logicManager.assignAction<FileResponseEvent>(FileResponseEvent::IdType::FILE_RECEIVED, "fileRes") &&
-        logicManager.assignAction<FileResponseEvent>(FileResponseEvent::IdType::CHUNK_RECEIVED, "fileRes")) {
+        logicManager.assignAction<FileResponseEvent>(FileResponseEvent::IdType::CHUNK_RECEIVED, "fileRes") &&
+        logicManager.assignAction<FileAttributesEvent>("fileAtrS")
+
+            ) {
         std::clog << "Debug: File assignment!" << std::endl;
 
 
@@ -50,4 +55,8 @@ bool FilesystemModule::assignActions(LogicManager &logicManager) {
 bool FilesystemModule::setupSources(LogicManager &logicManager) {
     logicManager.addSource<FileSource>();
     return true;
+}
+
+const std::experimental::filesystem::path &FilesystemModule::getCurrentPath() const {
+    return currentPath;
 }

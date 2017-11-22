@@ -30,8 +30,8 @@ public:
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            ar & cereal::base_class<Packet < SendFile, SendFile::Request>>
-            (this) & filePath & begin & end;
+            ar & cereal::base_class<Packet<SendFile, SendFile::Request>>(this) &
+            filePath & begin & end;
 
 
         }
@@ -60,8 +60,7 @@ public:
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            ar & cereal::base_class<Packet < SendFile, SendFile::Response>>
-            (this)
+            ar & cereal::base_class<Packet<SendFile, SendFile::Response>>(this)
             & filePath
             & data & begin & end;
 

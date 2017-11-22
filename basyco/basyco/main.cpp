@@ -30,6 +30,7 @@ using namespace std::chrono_literals;
 #include <p2p/network/protocol/role/Roles.h>
 #include <p2p/network/node/modules/CommandModule.h>
 #include <p2p/network/node/modules/command/StandardCommandsDirectory.h>
+#include <p2p/filesystem/transfer/FileTransferControl.h>
 
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -120,13 +121,37 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("cd", &FilesystemModule::changeDirectory);
     cmd->mapCommand("pwd", &FilesystemModule::printWorkingDirectory);
     cmd->mapCommand("ls", &FilesystemModule::listCurrentDirectory);
+    cmd->mapCommand("scp", &FilesystemModule::remoteGetFile);
 }
 
+
+
+//class Const {
+//public:
+//
+//    Const() {};
+//    Const(const Const& c) {
+//        LOGGER("copy const")
+//    }
+//
+//    template<typename ... Args>
+//    Const(Args... args) {
+//        LOGGER("variadic")
+//    }
+//};
 
 
 
 
 int main(int argc, char *argv[]) {
+
+    LOGGER(std::to_string(fs::file_size("/tmp/journal.xml")));
+
+//    Const cons;
+//    Const cons2 = cons;
+//    Const cons3(cons);
+
+    //  exit(0);
 
 //    DependencyManaged<int> ddd;`
 //
@@ -292,11 +317,18 @@ int main(int argc, char *argv[]) {
     thisNode.getNodeInfo().printAll();
     otherNode.getNodeInfo().printAll();
     thirdNode.getNodeInfo().printAll();
+    bool ret = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+    thisNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
+    otherNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
+    thirdNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
+
+    std::this_thread::sleep_for(4s);
+    auto fdes = FileTransferControl::initiateTransfer(thisNode, "second", "/tmp/zsh", "/tmp/copied_zsh");
     thisNode.waitToFinish();
     otherNode.waitToFinish();
     thirdNode.waitToFinish();
-//    std::this_thread::sleep_for(2s);
-//    bool ret = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+
+
 //    LOGGER("connection was ... " + std::to_string(ret));
 //    otherNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9898");
     //  thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:100");

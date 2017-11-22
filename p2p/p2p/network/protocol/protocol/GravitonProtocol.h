@@ -15,7 +15,7 @@ class GravitonProtocol : public IProtocol {
 private:
     std::mutex lock;
     std::map<BasePacket::IdType, std::shared_ptr<BasePacketInfo>> responseMap;
-    const Tick::clock::duration MAX_TIMEOUT = 1500ms;
+    const Tick::clock::duration MAX_TIMEOUT = 9500ms;
 public:
     void onPacketSent(const PacketEvent &event) override;
 

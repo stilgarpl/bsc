@@ -18,6 +18,10 @@ public:
 
     static void receivedFile(const FileResponseEvent &event);
 
+    static void sendAttributes(const FileAttributesEvent &event);
+
+    static void receivedAttributes(const FileAttributesEvent &event);
+
 };
 
 

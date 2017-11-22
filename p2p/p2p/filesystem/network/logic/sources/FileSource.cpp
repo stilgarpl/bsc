@@ -32,12 +32,14 @@ void FileSource::requestFile(SendFile::Request *request) {
 void FileSource::work() {
     requestSource.work();
     responseSource.work();
+    attributesSource.work();
 
 }
 
 void FileSource::registerProviders(SourceManager *manager) {
     requestSource.registerProviders(manager);
     responseSource.registerProviders(manager);
+    attributesSource.registerProviders(manager);
 }
 
 void FileSource::fileReceived(SendFile::Response::Ptr response) {

@@ -10,6 +10,7 @@
 #include <p2p/dependency/DependencyManaged.h>
 
 #include <experimental/filesystem>
+#include <p2p/filesystem/transfer/FileTransferDescriptor.h>
 #include "NodeNetworkModule.h"
 
 namespace fs = std::experimental::filesystem;
@@ -27,6 +28,7 @@ public:
 
     bool setupSources(LogicManager &logicManager) override;
 
+    const std::experimental::filesystem::path &getCurrentPath() const;
 
 public:
     ////////////////////////////////
@@ -60,16 +62,23 @@ public:
         }
     }
 
-    void remoteGetFile(const NodeIdType &nodeId, fs::path from, fs::path to) {
-        SendFile::Request::Ptr sendFileRequest = SendFile::Request::getNew();
-        // SendFile::Request* sendFileRequest;
-        sendFileRequest->setFilePath(from);
-        auto netnode = node.getModule<NodeNetworkModule>();
-        auto response = netnode->sendPacketToNode(nodeId, sendFileRequest);
 
-        // SendFile::Response* response;
-        response->setFilePath(to);
-        response->save_file();
+    /**
+     * @todo possible upgrades
+     * this method could return download descriptor
+     * with file size
+     * downloaded size
+     * status - download started, finished, error occured etc.
+     * wait() function to finish dowloading
+     * stop() function to interrupt download
+     *
+     * if the file is big enough it should download it in chunks in other thread.
+     *
+     *
+     */
+    FileTransferDescriptorPtr remoteGetFile(const NodeIdType &nodeId, fs::path from, fs::path to) {
+
+        return nullptr;
     }
 
 };
