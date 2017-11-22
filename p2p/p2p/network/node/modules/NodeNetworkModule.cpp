@@ -318,6 +318,9 @@ bool NodeNetworkModule::connectTo(const SocketAddress &address) {
         connection->startReceiving();
         return true;
     } catch (Poco::Net::ConnectionRefusedException) {
+        ///@todo connection refused in connectionSource
+        return false;
+    } catch (Poco::InvalidArgumentException) {
         return false;
     }
 }
@@ -329,8 +332,15 @@ void NodeNetworkModule::onStart() {
 
 
 bool NodeNetworkModule::connectTo(const std::string &a) {
-    Poco::Net::SocketAddress address(a);
-    return connectTo(address);
+    try {
+        Poco::Net::SocketAddress address(a);
+        return connectTo(address);
+    }
+    catch (Poco::InvalidArgumentException) {
+        ///@todo bad address from connection source
+        return false;
+    }
+
 }
 
 
@@ -352,28 +362,28 @@ void NodeNetworkModule::run() {
         std::this_thread::sleep_for(400ms);
     }
 }
-
-bool NodeNetworkModule::sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet) {
-    ConnectionPtr conn = nullptr;
-    for (auto &&connection : activeClientConnections) {
-        if (connection->nodeId && connection->nodeId == nodeId) {
-            conn = connection->connection;
-        }
-    }
-    if (conn == nullptr) {
-        ///@todo connect to node
-    }
-
-    if (conn != nullptr) {
-        conn->send(packet);
-        LOGGER("sending packet to node " + nodeId)
-        return true;
-    } else {
-        LOGGER("unable to send packet to " + nodeId)
-        return false;
-
-    }
-}
+//
+//bool NodeNetworkModule::sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet) {
+//    ConnectionPtr conn = nullptr;
+//    for (auto &&connection : activeClientConnections) {
+//        if (connection->nodeId && connection->nodeId == nodeId) {
+//            conn = connection->connection;
+//        }
+//    }
+//    if (conn == nullptr) {
+//        ///@todo connect to node
+//    }
+//
+//    if (conn != nullptr) {
+//        conn->send(packet);
+//        LOGGER("sending packet to node " + nodeId)
+//        return true;
+//    } else {
+//        LOGGER("unable to send packet to " + nodeId)
+//        return false;
+//
+//    }
+//}
 
 bool NodeNetworkModule::connectToAddress(const std::string &add) {
     return connectTo(add);
@@ -396,5 +406,9 @@ void NodeNetworkModule::disconnectAll() {
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
     activeClientConnections.remove_if([](auto i) { return true; });
 
+}
+
+const std::unique_ptr<IProtocol> &NodeNetworkModule::getProtocol() const {
+    return protocol;
 }
 

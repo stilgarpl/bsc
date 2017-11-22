@@ -128,7 +128,7 @@ protected:
 public:
 
 
-
+    void waitToFinish() override;
 
     void start();
     void stop();

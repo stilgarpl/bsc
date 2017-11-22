@@ -82,10 +82,37 @@ public: // @todo should be public or shouldn't ?
 
     void disconnectAll();
 
-    ///@todo add version that uses protocol and returns future
-    bool sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet);
+//    ///@todo add version that uses protocol and returns future
+//    bool sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet);
+
+    template<enum Status status = Status::RESPONSE, typename SendType>
+    auto sendPacketToNode(const NodeIdType &nodeId, NetworkPacketPointer<SendType> p) {
+        typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
+        ConnectionPtr conn = nullptr;
+        for (auto &&connection : activeClientConnections) {
+            if (connection->nodeId && connection->nodeId == nodeId) {
+                conn = connection->connection;
+            }
+        }
+        if (conn == nullptr) {
+            ///@todo connect to node
+        }
+
+        if (conn != nullptr) {
+
+            LOGGER("sending packet to node " + nodeId)
+            return protocol->sendExpect(conn.get(), p);
+
+        } else {
+            LOGGER("unable to send packet to " + nodeId)
+            return std::shared_ptr<ReturnType>(nullptr);
+
+        }
+    };
 
     void run() override;
+
+    const std::unique_ptr<IProtocol> &getProtocol() const;
 };
 
 

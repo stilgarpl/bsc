@@ -46,6 +46,8 @@ public:
 
     virtual void stop()=0;
 
+    virtual void waitToFinish() = 0;
+
 };
 
 #endif //BASYCO_INODE_H

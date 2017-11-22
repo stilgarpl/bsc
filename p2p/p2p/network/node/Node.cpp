@@ -146,3 +146,10 @@ INodeModulePtr Node::getModuleByDependencyId(DependencyManager::TypeIdType id) {
     return result;
 }
 
+void Node::waitToFinish() {
+    logicManager.join();
+    ///@todo replace this with waiting for modules
+    std::this_thread::sleep_for(1s);
+
+}
+
