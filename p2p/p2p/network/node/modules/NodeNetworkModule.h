@@ -10,6 +10,17 @@
 #include <p2p/dependency/DependencyManaged.h>
 #include <Poco/Net/ServerSocket.h>
 #include <Poco/Net/TCPServer.h>
+
+#include <p2p/network/protocol/protocol/GravitonProtocol.h>
+#include <p2p/network/protocol/connection/IServerConnection.h>
+
+struct NodeConnectionInfo {
+    ConnectionPtr connection;
+    std::experimental::optional<NodeIdType> nodeId;
+};
+
+typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
+
 class NodeNetworkModule : public NodeModule, public DependencyManaged<NodeNetworkModule> {
 private:
     std::unique_ptr<IProtocol> protocol = std::make_unique<GravitonProtocol>();
@@ -100,7 +111,7 @@ public: // @todo should be public or shouldn't ?
 
         if (conn != nullptr) {
 
-            LOGGER("sending packet to node " + nodeId)
+//            LOGGER("sending packet to node " + nodeId)
             return protocol->sendExpect(conn.get(), p);
 
         } else {

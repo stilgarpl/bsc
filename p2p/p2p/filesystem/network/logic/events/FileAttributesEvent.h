@@ -13,7 +13,13 @@
 
 namespace fs = std::experimental::filesystem;
 
-class FileAttributesEvent : public NetworkingEvent<int> {
+enum class FileAttributesEventId {
+    ATTRIBUTES_REQUESTED,
+    ATTRIBUTES_RECEIVED,
+};
+
+
+class FileAttributesEvent : public NetworkingEvent<FileAttributesEventId> {
 
     fs::path path;
 

@@ -18,7 +18,7 @@ private:
 public:
     const RepoIdType &getRepositoryId() const;
 
-    const Journal &getJournal() const;
+    Journal &getJournal();
 
     void setJournal(const Journal &journal);
 
@@ -28,5 +28,6 @@ public:
 
 };
 
+typedef std::shared_ptr<Repository> RepositoryPtr;
 
 #endif //BASYCO_REPOSITORY_H

@@ -122,6 +122,11 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("pwd", &FilesystemModule::printWorkingDirectory);
     cmd->mapCommand("ls", &FilesystemModule::listCurrentDirectory);
     cmd->mapCommand("scp", &FilesystemModule::remoteGetFile);
+    cmd->mapCommand("lscp", &FilesystemModule::printCurrentTransfers);
+
+    cmd->mapCommand("createRep", &RepoModule::createRepository);
+    cmd->mapCommand("selectRep", &RepoModule::selectRepository);
+    cmd->mapCommand("persist", &RepoModule::persistFile);
 }
 
 
@@ -145,7 +150,7 @@ void setupCommands(CommandModule *cmd) {
 
 int main(int argc, char *argv[]) {
 
-    LOGGER(std::to_string(fs::file_size("/tmp/journal.xml")));
+    //LOGGER(std::to_string(fs::file_size("/tmp/journal.xml")));
 
 //    Const cons;
 //    Const cons2 = cons;
@@ -323,7 +328,7 @@ int main(int argc, char *argv[]) {
     thirdNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 
     std::this_thread::sleep_for(4s);
-    auto fdes = FileTransferControl::initiateTransfer(thisNode, "second", "/tmp/zsh", "/tmp/copied_zsh");
+    //auto fdes = FileTransferControl::initiateTransfer(thisNode, "second", "/tmp/zsh", "/tmp/copied_zsh");
     thisNode.waitToFinish();
     otherNode.waitToFinish();
     thirdNode.waitToFinish();

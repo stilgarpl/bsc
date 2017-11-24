@@ -10,14 +10,20 @@
 
 class RepositoryManager {
 
-    std::list<Repository> repositories;
+    std::list<RepositoryPtr> repositories;
 
 public:
-    Repository &getRepository(Repository::RepoIdType id) {
+    RepositoryPtr &getRepository(Repository::RepoIdType id) {
         auto it = std::find_if(repositories.begin(), repositories.end(),
-                               [&](const Repository &rep) -> bool { return rep.getRepositoryId() == id; });
+                               [&](const RepositoryPtr &rep) -> bool { return rep->getRepositoryId() == id; });
         ///@todo error checking.
         return *it;
+    }
+
+    void addRepository(RepositoryPtr ptr) {
+        if (getRepository(ptr->getRepositoryId()) == nullptr) {
+            repositories.push_back(ptr);
+        }
     }
 };
 

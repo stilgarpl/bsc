@@ -8,7 +8,7 @@ const Repository::RepoIdType &Repository::getRepositoryId() const {
     return repositoryId;
 }
 
-const Journal &Repository::getJournal() const {
+Journal &Repository::getJournal() {
     return journal;
 }
 

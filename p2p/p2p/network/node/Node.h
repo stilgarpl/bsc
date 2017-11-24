@@ -28,12 +28,7 @@
 
 class NodeActions;
 
-struct NodeConnectionInfo {
-    ConnectionPtr connection;
-    std::experimental::optional<NodeIdType> nodeId;
-};
 
-typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
 
 class Node : public INode, public RoleScope {
 public:

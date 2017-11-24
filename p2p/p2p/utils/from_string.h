@@ -11,8 +11,8 @@
 
 
 template<typename T, typename S>
-inline T from_string(const S &s) {
-    return T(s);
+inline typename std::remove_reference<T>::type from_string(const S &s) {
+    return typename std::remove_reference<T>::type(s);
 }
 
 template<>

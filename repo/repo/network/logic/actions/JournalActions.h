@@ -33,9 +33,9 @@ public:
 
             auto repoModule = node.getModule<RepoModule>();
 
-            auto &repository = repoModule->findRepository(event.getRepoId());
+            auto repository = repoModule->findRepository(event.getRepoId());
 
-            response->setJournal(repository.getJournal());
+            response->setJournal(repository->getJournal());
 
         }
 

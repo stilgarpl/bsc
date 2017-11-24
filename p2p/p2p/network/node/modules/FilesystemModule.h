@@ -11,13 +11,15 @@
 
 #include <experimental/filesystem>
 #include <p2p/filesystem/transfer/FileTransferDescriptor.h>
+
 #include "NodeNetworkModule.h"
 
 namespace fs = std::experimental::filesystem;
 
 class FilesystemModule : public NodeModule, public DependencyManaged<FilesystemModule> {
 
-    fs::path currentPath = ".";
+    fs::path currentPath = fs::current_path();
+    std::list<FileTransferDescriptorPtr> currentTransfers;
 
 public:
     FilesystemModule(INode &node);
@@ -76,11 +78,41 @@ public:
      *
      *
      */
-    FileTransferDescriptorPtr remoteGetFile(const NodeIdType &nodeId, fs::path from, fs::path to) {
+    FileTransferDescriptorPtr remoteGetFile(const NodeIdType &nodeId, fs::path from, fs::path to);
 
-        return nullptr;
+
+    void printCurrentTransfers() {
+        std::cout << "Current transfers" << std::endl;
+        for (auto &&item : currentTransfers) {
+            std::cout << "Transfer from : " << item->getSourcePath() << " " << item->getDestinationPath() << std::endl;
+            switch (item->getStatus()) {
+                case FileTransferStatus::NOT_STARTED :
+                    std::cout << "NOT STARTED" << std::endl;
+
+                    break;
+                case FileTransferStatus::STARTED:
+                    std::cout << "STARTED" << std::endl;
+                    break;
+                case FileTransferStatus::ATTRIBUTES_ACCQUIRED:
+                    std::cout << "ATTRIBUTES_ACCQUIRED" << std::endl;
+                    break;
+                case FileTransferStatus::DOWNLOADING:
+                    std::cout << "DOWNLOADING" << std::endl;
+                    break;
+                case FileTransferStatus::FINISHED:
+                    std::cout << "FINISHED" << std::endl;
+                    break;
+                case FileTransferStatus::ERROR:
+                    std::cout << "ERROR" << std::endl;
+                    break;
+            }
+
+            std::cout << "Size "
+                      << std::to_string(item->getTransferredSize()) + " / " + std::to_string(item->getFileSize())
+                      << " (" << std::to_string(100 * item->getTransferredSize() / item->getFileSize()) << "%)"
+                      << std::endl;
+        }
     }
-
 };
 
 

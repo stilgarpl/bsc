@@ -14,6 +14,7 @@
 class RepoModule : public NodeModule, public DependencyManaged<RepoModule> {
 private:
     RepositoryManager repositoryManager;
+    RepositoryPtr selectedRepository = nullptr;
 public:
     RepoModule(INode &node);
 
@@ -23,8 +24,37 @@ public:
 
     bool setupSources(LogicManager &logicManager) override;
 
-    Repository &findRepository(std::string repoId) {
+    RepositoryPtr findRepository(const Repository::RepoIdType &repoId) {
         return repositoryManager.getRepository(repoId);
+    }
+
+
+
+    ////////////////////////////////
+    /// Commands section
+    ////////////////////////////////
+
+    void persistFile(const fs::path &path) {
+        if (selectedRepository != nullptr) {
+            selectedRepository->getJournal().append(JournalMethod::ADDED, path);
+            selectedRepository->getJournal().
+        }
+    }
+
+    void persistFile2(const Repository::RepoIdType &repoId, const fs::path &path) {
+
+    }
+
+
+    void selectRepository(const Repository::RepoIdType &repoId) {
+        selectedRepository = findRepository(repoId);
+
+    }
+
+    void createRepository(const Repository::RepoIdType &repoId) {
+        RepositoryPtr ptr = std::make_shared<Repository>();
+        ptr->setRepositoryId(repoId);
+        repositoryManager.addRepository(ptr);
     }
 };
 

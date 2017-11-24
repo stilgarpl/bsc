@@ -35,7 +35,7 @@ public:
                 i->work();
             }
         }
-        std::this_thread::sleep_for(10ms);
+        std::this_thread::sleep_for(1ms);
     }
 
     template<typename SourceType, typename... Args>
