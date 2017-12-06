@@ -35,10 +35,10 @@ void JournalGroup::Response::setRepoId(const std::string &repoId) {
     Response::repoId = repoId;
 }
 
-const Journal &JournalGroup::Response::getJournal() const {
+const JournalPtr JournalGroup::Response::getJournal() const {
     return journal;
 }
 
-void JournalGroup::Response::setJournal(const Journal &journal) {
+void JournalGroup::Response::setJournal(const JournalPtr journal) {
     Response::journal = journal;
 }

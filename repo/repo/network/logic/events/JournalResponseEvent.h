@@ -6,18 +6,18 @@
 #define BASYCO_JOURNALRESPONSEEVENT_H
 
 
-#include <repo/journal/Journal.h>
+#include <repo/journal/SimpleJournal.h>
 #include <p2p/network/logic/events/NetworkingEvent.h>
 
 class JournalResponseEvent : public NetworkingEvent<int> {
 private:
 
-    Journal journal;
+    JournalPtr journal;
     std::string repoId;
 public:
-    const Journal &getJournal() const;
+    const JournalPtr &getJournal() const;
 
-    void setJournal(const Journal &journal);
+    void setJournal(const JournalPtr journal);
 
     const std::string &getRepoId() const;
 

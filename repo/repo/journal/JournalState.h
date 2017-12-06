@@ -57,6 +57,8 @@ public:
         update();
     };
 
+    JournalStateData() = default;
+
     JournalMethod getMethod() const {
         return method;
     }
@@ -93,11 +95,12 @@ class JournalState {
     JournalChecksumType checksum;
     std::list<JournalStateData> dataList;
     std::chrono::system_clock::time_point commitTime;
+    std::shared_ptr<JournalState> previousState = nullptr;
 
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(CEREAL_NVP(checksum), CEREAL_NVP(dataList), CEREAL_NVP(commitTime));
+        ar(CEREAL_NVP(checksum), CEREAL_NVP(dataList), CEREAL_NVP(commitTime), CEREAL_NVP(previousState));
     }
 
 
@@ -114,6 +117,10 @@ public:
     std::string calculateChecksum();
 
     void commit();
+
+    const std::shared_ptr<JournalState> &getPreviousState() const;
+
+    void setPreviousState(const std::shared_ptr<JournalState> &previousState);
 
 };
 

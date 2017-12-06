@@ -36,8 +36,8 @@ public:
 
     void persistFile(const fs::path &path) {
         if (selectedRepository != nullptr) {
-            selectedRepository->getJournal().append(JournalMethod::ADDED, path);
-            selectedRepository->getJournal().
+            selectedRepository->getJournal()->append(JournalMethod::ADDED, path);
+
         }
     }
 
@@ -55,6 +55,35 @@ public:
         RepositoryPtr ptr = std::make_shared<Repository>();
         ptr->setRepositoryId(repoId);
         repositoryManager.addRepository(ptr);
+    }
+
+    void saveRepository(const Repository::RepoIdType &repoId) {
+        auto rep = findRepository(repoId);
+        rep->getJournal()->commitState();
+
+        fs::path savePath = fs::temp_directory_path() / (repoId + ".xml");
+
+        {
+            std::ofstream os(savePath);
+            cereal::XMLOutputArchive oa(os);
+            oa << rep->getJournal();
+        }
+
+    }
+
+    void loadRepository(const Repository::RepoIdType &repoId, fs::path path) {
+        RepositoryPtr ptr = std::make_shared<Repository>();
+        ptr->setRepositoryId(repoId);
+        repositoryManager.addRepository(ptr);
+        {
+            std::ifstream is(path);
+            cereal::XMLInputArchive ia(is);
+            ia >> *ptr->getJournal();
+        }
+    }
+
+    void printHistory() {
+        selectedRepository->getJournal()->printHistory();
     }
 };
 

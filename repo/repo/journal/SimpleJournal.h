@@ -10,21 +10,21 @@
 #include "JournalState.h"
 #include "IJournal.h"
 #include "JournalTypes.h"
-#include <cereal/types/memory.hpp>
-#include <cereal/types/vector.hpp>
 
-class Journal : public IJournal {
+
+class SimpleJournal : public IJournal {
 
 private:
     JournalChecksumType checksum;
     std::shared_ptr<JournalState> currentState = nullptr;
-    std::vector<JournalState> journalHistory;
+    std::vector<std::shared_ptr<JournalState>> journalHistory;
 
     FuncMap funcMap;
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(CEREAL_NVP(checksum), CEREAL_NVP(journalHistory));
+
+        ar(cereal::base_class<IJournal>(this), CEREAL_NVP(checksum), CEREAL_NVP(journalHistory));
         //currentState is not serialized
     }
 
@@ -63,7 +63,18 @@ public:
         return checksum;
     }
 
+    void printHistory() {
+        for (auto &&item : journalHistory) {
+            std::cout << "SimpleJournal id " << item->calculateChecksum() << std::endl;
+            std::cout << "SimpleJournal prev "
+                      << (item->getPreviousState() ? item->getPreviousState()->calculateChecksum() : "0") << std::endl;
+        }
+    }
+
 };
 
+CEREAL_REGISTER_TYPE(Journal)
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(IJournal, Journal);
 
 #endif //BASYCO_JOURNAL_H

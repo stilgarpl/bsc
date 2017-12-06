@@ -23,7 +23,7 @@ public:
         requestSource.queueEvent(event);
     };
 
-    void journalReceived(std::string repoId, const Journal &journal) {
+    void journalReceived(std::string repoId, const JournalPtr journal) {
         auto event = responseSource.newEvent();
         event->setRepoId(repoId);
         event->setJournal(journal);

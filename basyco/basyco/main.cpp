@@ -21,7 +21,7 @@ using namespace std::chrono_literals;
 #include <p2p/filesystem/network/logic/sources/FileSource.h>
 #include <p2p/filesystem/network/logic/actions/FileActions.h>
 #include <p2p/configuration/ConfigurationManager.h>
-#include <repo/journal/Journal.h>
+#include <repo/journal/SimpleJournal.h>
 #include <repo/node/RepoModule.h>
 #include <p2p/network/node/modules/BasicModule.h>
 #include <p2p/network/node/modules/FilesystemModule.h>
@@ -127,6 +127,9 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("createRep", &RepoModule::createRepository);
     cmd->mapCommand("selectRep", &RepoModule::selectRepository);
     cmd->mapCommand("persist", &RepoModule::persistFile);
+    cmd->mapCommand("saveRep", &RepoModule::saveRepository);
+    cmd->mapCommand("loadRep", &RepoModule::loadRepository);
+    cmd->mapCommand("printRep", &RepoModule::printHistory);
 }
 
 
@@ -239,7 +242,7 @@ int main(int argc, char *argv[]) {
     staticTest.get<float>() = "lala float";
     staticTest.forEach([](std::string &s) { LOGGER(s); });
 
-    Journal journal;
+    SimpleJournal journal;
 
     journal.append(JournalMethod::ADDED, "/tmp/dupa.txt");
     journal.append(JournalMethod::DELETED, "/tmp/to_remove.txt");
@@ -254,9 +257,9 @@ int main(int argc, char *argv[]) {
         oa << journal;
     }
 
-    LOGGER(journal.calculateChecksum());
-    LOGGER(journal.calculateChecksum());
-    LOGGER(journal.calculateChecksum());
+//    LOGGER(journal.calculateChecksum());
+//    LOGGER(journal.calculateChecksum());
+//    LOGGER(journal.calculateChecksum());
     //  exit(0);
 //    SendFile::Response sfRes;
 //    fs::path tmpPath = "/tmp/basyco/testfile.txt";
@@ -322,7 +325,7 @@ int main(int argc, char *argv[]) {
     thisNode.getNodeInfo().printAll();
     otherNode.getNodeInfo().printAll();
     thirdNode.getNodeInfo().printAll();
-    bool ret = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
     thisNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
     otherNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
     thirdNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();

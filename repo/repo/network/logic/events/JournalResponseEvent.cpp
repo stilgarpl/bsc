@@ -4,11 +4,11 @@
 
 #include "JournalResponseEvent.h"
 
-const Journal &JournalResponseEvent::getJournal() const {
+const JournalPtr &JournalResponseEvent::getJournal() const {
     return journal;
 }
 
-void JournalResponseEvent::setJournal(const Journal &journal) {
+void JournalResponseEvent::setJournal(const JournalPtr journal) {
     JournalResponseEvent::journal = journal;
 }
 

@@ -6,21 +6,21 @@
 #define BASYCO_REPOSITORY_H
 
 
-#include <repo/journal/Journal.h>
+#include <repo/journal/SimpleJournal.h>
 
 class Repository {
 public:
     typedef std::string RepoIdType;
 private:
-    Journal journal;
+    JournalPtr journal = std::make_shared<SimpleJournal>();
     RepoIdType repositoryId;
 
 public:
     const RepoIdType &getRepositoryId() const;
 
-    Journal &getJournal();
+    const JournalPtr &getJournal() const;
 
-    void setJournal(const Journal &journal);
+    void setJournal(const JournalPtr &journal);
 
     void setRepositoryId(const RepoIdType &repositoryId);
 

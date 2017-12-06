@@ -40,3 +40,11 @@ std::string JournalState::calculateChecksum() {
                            new CryptoPP::HashFilter(sha1, new CryptoPP::HexEncoder(new CryptoPP::StringSink(hash))));
     return hash;
 }
+
+const std::shared_ptr<JournalState> &JournalState::getPreviousState() const {
+    return previousState;
+}
+
+void JournalState::setPreviousState(const std::shared_ptr<JournalState> &previousState) {
+    JournalState::previousState = previousState;
+}

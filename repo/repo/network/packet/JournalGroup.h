@@ -7,7 +7,7 @@
 
 
 #include <p2p/network/protocol/packet/info/PacketInfo.h>
-#include <repo/journal/Journal.h>
+#include <repo/journal/SimpleJournal.h>
 
 
 class JournalGroup : public PacketGroup {
@@ -30,7 +30,7 @@ public:
 
     class Response : public Packet<JournalGroup, Response> {
         std::string repoId;
-        Journal journal;
+        JournalPtr journal;
 
     private:
         template<class Archive>
@@ -43,9 +43,9 @@ public:
 
         void setRepoId(const std::string &repoId);
 
-        const Journal &getJournal() const;
+        const JournalPtr getJournal() const;
 
-        void setJournal(const Journal &journal);
+        void setJournal(const JournalPtr journal);
 
     private:
         friend class cereal::access;

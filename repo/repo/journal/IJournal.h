@@ -11,6 +11,9 @@
 #include "JournalState.h"
 #include <map>
 #include <experimental/optional>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/vector.hpp>
+
 
 class IJournal {
 public:
@@ -26,8 +29,23 @@ public:
     ///@todo add parameters, commit range or sth
     virtual void replay() = 0;
 
+private:
+    template<class Archive>
+    void serialize(Archive &ar) {
+    }
+
+
+    friend class cereal::access;
+
+public:
+    virtual void append(JournalMethod method, JournalStateData::PathType path) = 0;
+
+    virtual void printHistory()=0;
 
 };
 
+typedef std::shared_ptr<IJournal> JournalPtr;
+
+CEREAL_REGISTER_TYPE(IJournal);
 
 #endif //BASYCO_IJOURNAL_H

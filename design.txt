@@ -86,3 +86,9 @@ Args... -> std::string, argsid - to umozliwiloby przeciazanie roznymi parametram
 na pewno trywialnie mozna zrobic liczbe argumentow, a typy... typy chyba nie, bo jak rozpoznac, co user wpisal.
 @todo THAT ^^^^
 
+
+
+zastanawiam sie czy nie zmienic typu kroniki na directed acyclic graph... chociaz nie wiem czy by sie dalo zrobic tak, zeby po syncu wszystkie nody mialy ta sama kronike
+
+
+
