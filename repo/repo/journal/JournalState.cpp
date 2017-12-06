@@ -48,3 +48,7 @@ const std::shared_ptr<JournalState> &JournalState::getPreviousState() const {
 void JournalState::setPreviousState(const std::shared_ptr<JournalState> &previousState) {
     JournalState::previousState = previousState;
 }
+
+const std::chrono::system_clock::time_point &JournalState::getCommitTime() const {
+    return commitTime;
+}

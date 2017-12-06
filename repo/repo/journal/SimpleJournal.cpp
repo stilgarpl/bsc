@@ -12,6 +12,7 @@ JournalChecksumType SimpleJournal::getChecksum() {
 
 void SimpleJournal::commitState() {
 
+    checkCurrentState();
     if (currentState != nullptr) {
         currentState->commit();
         currentState->calculateChecksum();
@@ -50,5 +51,6 @@ void SimpleJournal::prepareState() {
 //        if (journalHistory.size() > 0) {
 //            currentState->setPreviousState(journalHistory.back());
 //        }
+        currentState->setPreviousState(findLastState());
     }
 }

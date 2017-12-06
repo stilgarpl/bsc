@@ -133,6 +133,23 @@ void setupCommands(CommandModule *cmd) {
 }
 
 
+#include <cereal/archives/xml.hpp>
+#include <cereal/types/memory.hpp>
+
+struct PtrTest {
+    int a = 9999;
+    std::shared_ptr<PtrTest> ptr = nullptr;
+private:
+    template<class Archive>
+    void serialize(Archive &ar) {
+        ar(CEREAL_NVP(ptr), CEREAL_NVP(a));
+    }
+
+
+    friend class cereal::access;
+};
+
+//CEREAL_REGISTER_TYPE(PtrTest);
 
 //class Const {
 //public:
@@ -153,6 +170,46 @@ void setupCommands(CommandModule *cmd) {
 
 int main(int argc, char *argv[]) {
 
+    std::shared_ptr<PtrTest> p1, p2, p3, p4, p5, p6, p7;
+
+    p1 = std::make_shared<PtrTest>();
+    p2 = std::make_shared<PtrTest>();
+    p3 = std::make_shared<PtrTest>();
+    p4 = std::make_shared<PtrTest>();
+    p5 = std::make_shared<PtrTest>();
+
+    p1->ptr = p2;
+    p2->ptr = p3;
+    p3->ptr = p1;
+    p4->ptr = p1;
+    p5->ptr = p1;
+    p1->a = 1;
+    p2->a = 2;
+    p3->a = 3;
+    p4->a = 4;
+    p5->a = 5;
+
+
+    {
+        std::ofstream os("/tmp/ptrtest.xml");
+        cereal::XMLOutputArchive oa(os);
+        oa << p1;
+        oa << p4;
+        //  os << p5;
+    }
+
+    {
+        std::ifstream is("/tmp/ptrtest.xml");
+        cereal::XMLInputArchive ia(is);
+        ia >> p5;
+        ia >> p6;
+
+        LOGGER(std::to_string(p5->ptr->ptr->a));
+        LOGGER(std::to_string(p6->ptr->a));
+    }
+
+
+    // exit(0);
     //LOGGER(std::to_string(fs::file_size("/tmp/journal.xml")));
 
 //    Const cons;

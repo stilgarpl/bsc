@@ -122,6 +122,8 @@ public:
 
     void setPreviousState(const std::shared_ptr<JournalState> &previousState);
 
+    const std::chrono::system_clock::time_point &getCommitTime() const;
+
 };
 
 

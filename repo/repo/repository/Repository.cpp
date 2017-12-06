@@ -13,7 +13,7 @@ void Repository::setRepositoryId(const Repository::RepoIdType &repositoryId) {
     Repository::repositoryId = repositoryId;
 }
 
-const JournalPtr &Repository::getJournal() const {
+JournalPtr &Repository::getJournal() {
     return journal;
 }
 

@@ -36,6 +36,22 @@ public:
 
     void commitState() override;
 
+    void checkCurrentState() {
+        if (currentState == nullptr && journalHistory.size() > 0) {
+            currentState = findLastState();
+        }
+    }
+
+    std::shared_ptr<JournalState> findLastState() {
+        if (journalHistory.size() > 0) {
+            return *std::max_element(journalHistory.begin(), journalHistory.end(),
+                                     [&](auto a, auto b) -> bool { return (a->getCommitTime() < b->getCommitTime()); });
+        } else {
+            return nullptr;
+        }
+    }
+
+
     void prepareState();
 
     ///@todo hmm hmm variadic template?
@@ -73,8 +89,8 @@ public:
 
 };
 
-CEREAL_REGISTER_TYPE(Journal)
+CEREAL_REGISTER_TYPE(SimpleJournal)
 
-CEREAL_REGISTER_POLYMORPHIC_RELATION(IJournal, Journal);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(IJournal, SimpleJournal);
 
 #endif //BASYCO_JOURNAL_H

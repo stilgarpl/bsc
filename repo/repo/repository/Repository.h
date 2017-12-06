@@ -18,7 +18,7 @@ private:
 public:
     const RepoIdType &getRepositoryId() const;
 
-    const JournalPtr &getJournal() const;
+    JournalPtr &getJournal();
 
     void setJournal(const JournalPtr &journal);
 

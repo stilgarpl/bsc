@@ -48,6 +48,9 @@ public:
 
     void selectRepository(const Repository::RepoIdType &repoId) {
         selectedRepository = findRepository(repoId);
+        if (selectedRepository == nullptr) {
+            LOGGER("SELECTED NULL REPOSITORY!")
+        }
 
     }
 
@@ -78,7 +81,7 @@ public:
         {
             std::ifstream is(path);
             cereal::XMLInputArchive ia(is);
-            ia >> *ptr->getJournal();
+            ia >> ptr->getJournal();
         }
     }
 
