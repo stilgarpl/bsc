@@ -404,7 +404,14 @@ void NodeNetworkModule::disconnect(const NodeIdType id) {
 
 void NodeNetworkModule::disconnectAll() {
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    activeClientConnections.remove_if([](auto i) { return true; });
+    //activeClientConnections.remove_if([](auto i) { return true; });
+    for (auto &&item : activeClientConnections) {
+        if (item->connection != nullptr) {
+            item->connection->shutdown();
+        }
+
+    }
+    activeClientConnections.clear();
 
 }
 

@@ -19,10 +19,13 @@ void CommandActions::runCommand(const CommandEvent &commandEvent) {
                     pSubModule = &pSubModule->submodule(commandEvent.getModules()[i]);
                 }
                 pSubModule->runCommand(commandEvent.getCommandName(), commandEvent.getData());
+                ///@todo send response
 
             }
         }
 
+    } else {
+        LOGGER("NO NODE CONTEXT")
     }
 
 }

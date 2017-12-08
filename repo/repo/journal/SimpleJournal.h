@@ -6,7 +6,7 @@
 #define BASYCO_JOURNAL_H
 
 
-#include <vector>
+
 #include "JournalState.h"
 #include "IJournal.h"
 #include "JournalTypes.h"
@@ -16,8 +16,8 @@ class SimpleJournal : public IJournal {
 
 private:
     JournalChecksumType checksum;
-    std::shared_ptr<JournalState> currentState = nullptr;
-    std::vector<std::shared_ptr<JournalState>> journalHistory;
+    JournalStatePtr currentState = nullptr;
+    JournalHistory journalHistory;
 
     FuncMap funcMap;
 private:
@@ -86,6 +86,20 @@ public:
                       << (item->getPreviousState() ? item->getPreviousState()->calculateChecksum() : "0") << std::endl;
         }
     }
+
+    JournalStatePtr findRoot() const {
+        for (auto &&item : journalHistory) {
+            if (item->getPreviousState() == nullptr) {
+                return item;
+            }
+            return nullptr;
+        }
+    }
+
+
+    bool merge(const std::shared_ptr<SimpleJournal> other);
+
+    bool merge(const JournalPtr &other) override;
 
 };
 

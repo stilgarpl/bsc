@@ -3,7 +3,7 @@
 //
 
 #include "SimpleJournal.h"
-#include "../../../p2p/p2p/log/Logger.h"
+#include <p2p/log/Logger.h>
 
 JournalChecksumType SimpleJournal::getChecksum() {
     ///@todo calculate checksum?
@@ -53,4 +53,50 @@ void SimpleJournal::prepareState() {
 //        }
         currentState->setPreviousState(findLastState());
     }
+}
+
+bool SimpleJournal::merge(const std::shared_ptr<SimpleJournal> other) {
+    JournalHistory thisCopy = journalHistory;
+    JournalHistory otherCopy;
+    auto thisRoot = this->findRoot();
+    auto otherRoot = other->findRoot();
+
+    if (thisRoot != nullptr && otherRoot != nullptr && *thisRoot == *otherRoot) {
+
+        //copy other history
+        for (auto &&item : other->journalHistory) {
+            otherCopy.push_back(std::make_shared<JournalState>(*item));
+        }
+        //validate other history
+        otherCopy.erase(std::remove_if(otherCopy.begin(), otherCopy.end(), [](auto i) -> bool {
+            auto checksum = i->getChecksum();
+            return checksum != i->calculateChecksum();
+        }), otherCopy.end());
+        ///@todo check signature (when I add it)
+
+
+        //copy all elements to thisCopy
+
+        thisCopy.reserve(thisCopy.size() + otherCopy.size());
+        thisCopy.insert(thisCopy.end(), otherCopy.begin(), otherCopy.end());
+        std::sort(thisCopy.begin(), thisCopy.end(), [](auto a, auto b) {
+            return a->getCommitTime() < b->getCommitTime();
+        });
+
+        thisCopy.erase(std::unique(thisCopy.begin(), thisCopy.end(), [](auto i, auto j) {
+            return (i->getCommitTime() == j->getCommitTime() && i->getChecksum() == j->getChecksum());
+        }), thisCopy.end());
+        journalHistory = thisCopy;
+
+
+    } else {
+        //no common root
+        return false;
+    }
+
+
+}
+
+bool SimpleJournal::merge(const JournalPtr &other) {
+    merge(std::static_pointer_cast<SimpleJournal>(other));
 }

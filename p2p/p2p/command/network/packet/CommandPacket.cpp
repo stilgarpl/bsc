@@ -12,7 +12,7 @@ void CommandPacket::Request::process(Context &context) {
     auto lc = context.get<LogicContext>();
     if (lc != nullptr) {
         auto commnandSource = lc->getLogicManager().getSource<CommandSource>();
-        commnandSource->commandReceived(this->modules, this->commandName, this->data);
+        commnandSource->commandReceived(this->getId(), this->modules, this->commandName, this->data);
     }
 }
 

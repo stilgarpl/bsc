@@ -7,6 +7,7 @@
 #include <p2p/network/protocol/context/LogicContext.h>
 
 void JournalGroup::Request::process(Context &context) {
+    LOGGER("journal request process")
     BasePacket::process(context);
     auto lc = context.get<LogicContext>();
     if (lc != nullptr) {
@@ -14,6 +15,14 @@ void JournalGroup::Request::process(Context &context) {
         journalSource->journalRequested(repoId, this->getId());
 
     }
+}
+
+const std::string &JournalGroup::Request::getRepoId() const {
+    return repoId;
+}
+
+void JournalGroup::Request::setRepoId(const std::string &repoId) {
+    Request::repoId = repoId;
 }
 
 void JournalGroup::Response::process(Context &context) {

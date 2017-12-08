@@ -124,6 +124,21 @@ public:
 
     const std::chrono::system_clock::time_point &getCommitTime() const;
 
+    bool operator==(const JournalState &rhs) const;
+
+    bool operator!=(const JournalState &rhs) const;
+
+    const JournalChecksumType &getChecksum() const;
+
+    JournalState(const JournalState &other) {
+        checksum = other.checksum;
+        dataList = other.dataList;
+        commitTime = other.commitTime;
+        previousState = other.previousState;
+    }
+
+    JournalState() = default;
+
 };
 
 

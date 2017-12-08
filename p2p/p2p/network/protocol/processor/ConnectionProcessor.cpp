@@ -29,7 +29,7 @@ void ConnectionProcessor::run() {
     while (!this->isStopping()) {
         auto np = connection.receive();
         if (np != nullptr) {
-
+//            LOGGER("processing packet " );
             processorContext->setThisPacket(np);
             np->process(context);
         } else {

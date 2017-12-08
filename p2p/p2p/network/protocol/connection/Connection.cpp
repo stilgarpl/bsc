@@ -60,20 +60,27 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
                 //  std::cout << "work::send found packet to send" << std::endl;
                 BasePacketPtr v;
                 {
+                    std::stringstream ss;
+                    ss << std::this_thread::get_id();
+//                    LOGGER("sending packet " + ss.str());
                     v = sendQueue.front();
                     {
                         cereal::BinaryOutputArchive oa(os);
                         oa << v;
                     }
+//                    LOGGER("packet sent")
                     if (connectionSourcePtr != nullptr) {
                         connectionSourcePtr->sentPacket(v, this);
                     }
+//                    LOGGER("packet sent.")
                     sendQueue.pop();
                 }
 
             }
             os.flush();
         } catch (cereal::Exception e) {
+            LOGGER(" C EXCEPTION")
+            LOGGER(e.what());
             //socket.close();
             stopReceiving();
             stopSending();
@@ -81,6 +88,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
             // if not receiving, then it's ok!
         }
         catch (Poco::Net::NetException e) {
+            LOGGER(" P EXCEPTION")
             //processor.stop();
             stopReceiving();
             stopSending();
@@ -113,7 +121,9 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                     std::this_thread::sleep_for(1ms);
                 }
                 if (receiving && socket.available()) {
+//                    LOGGER("receiving packet")
                     ia >> v;
+//                    LOGGER("packet received")
                     {
                         std::lock_guard<std::mutex> g(receiveQueueLock);
                         receiveQueue.push(v);

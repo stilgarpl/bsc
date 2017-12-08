@@ -12,12 +12,14 @@
 class CommandSource : public EventQueueSource<CommandEvent> {
 public:
 
-    void commandReceived(const std::vector<std::string> &modules, const std::string &commandName,
+    void commandReceived(const BasePacket::IdType &id, const std::vector<std::string> &modules,
+                         const std::string &commandName,
                          const std::vector<std::string> &data) {
         auto event = newEvent();
         event->setCommandName(commandName);
         event->setModules(modules);
         event->setData(data);
+        event->setRequestId(id);
 
         queueEvent(event);
     }

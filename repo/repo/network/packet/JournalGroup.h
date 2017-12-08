@@ -18,10 +18,16 @@ public:
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            ar(repoId);
+
+            ar(cereal::base_class<Packet<JournalGroup, JournalGroup::Request> >(this), repoId);
         }
 
+    public:
+        const std::string &getRepoId() const;
 
+        void setRepoId(const std::string &repoId);
+
+    private:
         friend class cereal::access;
 
     public:
@@ -35,7 +41,7 @@ public:
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            ar(journal);
+            ar(cereal::base_class<Packet<JournalGroup, JournalGroup::Response> >(this), journal);
         }
 
     public:
@@ -55,6 +61,11 @@ public:
     };
 
 };
+
+CEREAL_REGISTER_TYPE(JournalGroup::Request);
+CEREAL_REGISTER_TYPE(JournalGroup::Response);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, JournalGroup::Request);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, JournalGroup::Response);
 
 
 #endif //BASYCO_JOURNALGROUP_H

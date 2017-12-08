@@ -2,6 +2,7 @@
 // Created by stilgar on 17.10.17.
 //
 
+#include <p2p/log/Logger.h>
 #include "JournalState.h"
 
 void JournalState::add(const JournalStateData &data) {
@@ -29,15 +30,18 @@ void JournalState::commit() {
 }
 
 std::string JournalState::calculateChecksum() {
+    checksum = "";
     std::stringstream ss;
     std::string hash;
     {
-        cereal::BinaryOutputArchive oa(ss);
+        cereal::PortableBinaryOutputArchive oa(ss);
         oa << *this;
     }
     CryptoPP::SHA1 sha1;
     CryptoPP::StringSource(ss.str(), true,
                            new CryptoPP::HashFilter(sha1, new CryptoPP::HexEncoder(new CryptoPP::StringSink(hash))));
+    // LOGGER("calculated hash " + hash);
+    checksum = hash;
     return hash;
 }
 
@@ -51,4 +55,17 @@ void JournalState::setPreviousState(const std::shared_ptr<JournalState> &previou
 
 const std::chrono::system_clock::time_point &JournalState::getCommitTime() const {
     return commitTime;
+}
+
+bool JournalState::operator==(const JournalState &rhs) const {
+    return checksum == rhs.checksum &&
+           commitTime == rhs.commitTime;
+}
+
+bool JournalState::operator!=(const JournalState &rhs) const {
+    return !(rhs == *this);
+}
+
+const JournalChecksumType &JournalState::getChecksum() const {
+    return checksum;
 }

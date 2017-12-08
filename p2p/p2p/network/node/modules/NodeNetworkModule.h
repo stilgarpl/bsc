@@ -111,7 +111,7 @@ public: // @todo should be public or shouldn't ?
 
         if (conn != nullptr) {
 
-//            LOGGER("sending packet to node " + nodeId)
+            LOGGER("sending packet to node " + nodeId)
             return protocol->sendExpect(conn.get(), p);
 
         } else {

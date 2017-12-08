@@ -130,6 +130,7 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("saveRep", &RepoModule::saveRepository);
     cmd->mapCommand("loadRep", &RepoModule::loadRepository);
     cmd->mapCommand("printRep", &RepoModule::printHistory);
+    cmd->mapCommand("downRep", &RepoModule::downloadRemoteRepository);
 }
 
 
@@ -209,74 +210,6 @@ int main(int argc, char *argv[]) {
     }
 
 
-    // exit(0);
-    //LOGGER(std::to_string(fs::file_size("/tmp/journal.xml")));
-
-//    Const cons;
-//    Const cons2 = cons;
-//    Const cons3(cons);
-
-    //  exit(0);
-
-//    DependencyManaged<int> ddd;`
-//
-//    ddd.addRequiredDependency<float,double,std::string>();
-//    ddd.addRequiredDependency<float,float,long,long>();
-//    exit(0);
-
-
-//
-//
-//   // Node xnode;
-//    xnode.addModule<CommandModule>();
-//    auto cmdM = xnode.getModule<CommandModule>();
-//
-//    cmdM->mapCommand("t2", &CommandModule::testingMethodInt);
-//    cmdM->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-//    std::vector<std::string> arguments1;
-//    arguments1.push_back(std::string("7"));
-//    cmdM->runCommand("t2", arguments1);
-//    arguments1.push_back(std::string("2.3"));
-//    cmdM->runCommand("t3", arguments1);
-//
-//    auto sub = cmdM->submodule("sub");
-//    sub.mapCommand("t4", &CommandModule::testingMethodInt);
-//    sub.runCommand("t4", {"99"});
-//
-//    CommandModule commandModule(xnode);
-//    std::cout << std::flush;
-//    // exit(0);
-////    commandModule.mapCommand( "do", &test);
-////    commandModule.mapCommand("help", &help);
-//
-//    commandModule.runCommand("xx", {std::string("lalala")});
-//    //  commandModule.runCommand("stuff", "do", {"test", "test2", "test3"});
-//
-//    std::string moduleName = "help";
-//    std::string commandName = "help";
-//    std::vector<std::string> arguments;
-//
-//    if (argc > 1) {
-//        moduleName = argv[1];
-//        if (argc > 2) {
-//            commandName = argv[2];
-//            arguments.resize(static_cast<unsigned long>(argc - 2));
-//            for (int i = 3; i < argc; ++i) {
-//                arguments[i - 3] = argv[i];
-//            }
-//        }
-//    }
-//
-
-
-//    runMemberFunction(&TempTest::test, arguments1);
-//    runMemberFunction(&TempTest::test, arguments);
-//    runMemberFunction(&TempTest::test, arguments1);
-
-//
-//    LOGGER("pre")
-//    test(arguments);
-//    LOGGER("Post")
 
     //  commandModule.runCommand(moduleName, commandName, arguments);
 
@@ -293,38 +226,22 @@ int main(int argc, char *argv[]) {
     //  exit(0);
 
 
+    JournalGroup::Request::Ptr jgr = JournalGroup::Request::getNew();
+    jgr->setRepoId("second");
+
+
+    {
+        std::ofstream os("/tmp/jgr.xml");
+        cereal::XMLOutputArchive oa(os);
+        oa << jgr;
+        //  os << p5;
+    }
 
     StaticUber<std::string> staticTest;
     staticTest.get<int>() = "lala int";
     staticTest.get<float>() = "lala float";
     staticTest.forEach([](std::string &s) { LOGGER(s); });
 
-    SimpleJournal journal;
-
-    journal.append(JournalMethod::ADDED, "/tmp/dupa.txt");
-    journal.append(JournalMethod::DELETED, "/tmp/to_remove.txt");
-    journal.commitState();
-    journal.append(JournalMethod::UPDATED, "/tmp/dupa.txt");
-    journal.replay();
-    journal.commitState();
-
-    {
-        std::ofstream os("/tmp/journal.xml");
-        cereal::XMLOutputArchive oa(os);
-        oa << journal;
-    }
-
-//    LOGGER(journal.calculateChecksum());
-//    LOGGER(journal.calculateChecksum());
-//    LOGGER(journal.calculateChecksum());
-    //  exit(0);
-//    SendFile::Response sfRes;
-//    fs::path tmpPath = "/tmp/basyco/testfile.txt";
-//    fs::path tmpPath2 = "/tmp/basyco/testfile2.txt";
-//
-//    sfRes.load_file(tmpPath);
-//    sfRes.setFilePath(tmpPath2);
-//    sfRes.save_file();
 ////exit(0);
 
     //LOGGER("dupa");
@@ -337,12 +254,12 @@ int main(int argc, char *argv[]) {
 
 
 
-    Context context;
-    TransmissionControl transmissionControl;
-    context.setKey<std::string>(
-            "test", "wartosc");
-    std::clog << "Test context : " << *(context.get<std::string>("test")) << std::endl;
-    context.set<int>(0);
+//    Context context;
+//    TransmissionControl transmissionControl;
+//    context.setKey<std::string>(
+//            "test", "wartosc");
+//    std::clog << "Test context : " << *(context.get<std::string>("test")) << std::endl;
+//    context.set<int>(0);
     Node thisNode(9191);
     thisNode.addToNetwork("TheNetwork");
     thisNode.getNodeInfo().setNodeId("first Node");
@@ -355,7 +272,7 @@ int main(int argc, char *argv[]) {
     cmdN->setInteractive(true);
 
     thisNode.start();
-    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
+//    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
 
     Node otherNode(9999);
     otherNode.getNodeInfo().setNodeId("second");
@@ -366,7 +283,7 @@ int main(int argc, char *argv[]) {
     setupCommands(cmdN.get());
 
     otherNode.start();
-    setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
+//    setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
 
     Node thirdNode(9898);
     thirdNode.getNodeInfo().setNodeId("third");
@@ -375,7 +292,7 @@ int main(int argc, char *argv[]) {
     cmdN = thirdNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
 
-    setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
+//    setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
     thirdNode.start();
 
 

@@ -10,6 +10,7 @@
 #include "JournalTypes.h"
 #include "JournalState.h"
 #include <map>
+#include <vector>
 #include <experimental/optional>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/vector.hpp>
@@ -21,6 +22,10 @@ public:
 public:
     typedef std::function<void(const JournalStateData &)> Func;
     typedef std::map<JournalMethod, std::experimental::optional<Func>> FuncMap;
+    ///@todo I'm not sure this should be in the interface...
+    typedef std::shared_ptr<JournalState> JournalStatePtr;
+    typedef std::vector<std::shared_ptr<JournalState>> JournalHistory;
+    typedef std::shared_ptr<IJournal> JournalPtr;
 public:
     virtual JournalChecksumType getChecksum() =0;
 
@@ -41,6 +46,8 @@ public:
     virtual void append(JournalMethod method, JournalStateData::PathType path) = 0;
 
     virtual void printHistory()=0;
+
+    virtual bool merge(const JournalPtr &other) =0;
 
 };
 
