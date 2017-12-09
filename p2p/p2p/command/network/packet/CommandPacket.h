@@ -35,7 +35,7 @@ public:
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            //  ar & cereal::base_class<Packet < CommandPacket, CommandPacket::Request>>;
+            ar & cereal::base_class<Packet<CommandPacket, CommandPacket::Request>>(this);
 
             ar(modules, commandName, data);
         }
@@ -46,12 +46,19 @@ public:
 
 
     class Response : public Packet<CommandPacket, CommandPacket::Response> {
+        bool runStatus;
     public:
         void process(Context &context) override;
+
+        bool isRunStatus() const;
+
+        void setRunStatus(bool runStatus);
 
     private:
         template<class Archive>
         void serialize(Archive &ar) {
+            ar & cereal::base_class<Packet<CommandPacket, CommandPacket::Response>>(this);
+            ar & runStatus;
         }
 
 

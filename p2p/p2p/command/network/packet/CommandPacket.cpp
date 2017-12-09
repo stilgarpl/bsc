@@ -42,4 +42,13 @@ void CommandPacket::Request::setData(const std::vector<std::string> &data) {
 
 void CommandPacket::Response::process(Context &context) {
     BasePacket::process(context);
+    LOGGER("command response received")
+}
+
+bool CommandPacket::Response::isRunStatus() const {
+    return runStatus;
+}
+
+void CommandPacket::Response::setRunStatus(bool runStatus) {
+    Response::runStatus = runStatus;
 }

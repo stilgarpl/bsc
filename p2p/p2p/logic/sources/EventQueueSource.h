@@ -33,6 +33,7 @@ protected:
     template<typename ... Args>
     EventTypePtr newEvent(Args... args) {
         auto ret = std::make_shared<EventType_>(args...);
+        ///@todo shouldn't this be in the EventType (IEvent) constructor?
         setupOrigin<typename EventType::OriginType>::setup(ret->origin());
         return ret;
     }
