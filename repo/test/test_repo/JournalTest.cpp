@@ -10,7 +10,7 @@ TEST_CASE("Journal merge test") {
     journal.append(JournalMethod::ADDED, "/tmp/dupa.txt");
     journal.append(JournalMethod::DELETED, "/tmp/to_remove.txt");
     journal.commitState();
-    journal.append(JournalMethod::UPDATED, "/tmp/dupa.txt");
+    journal.append(JournalMethod::MODIFIED, "/tmp/dupa.txt");
     journal.replay();
     journal.commitState();
     {

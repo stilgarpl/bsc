@@ -9,10 +9,6 @@ const Repository::RepoIdType &Repository::getRepositoryId() const {
 }
 
 
-void Repository::setRepositoryId(const Repository::RepoIdType &repositoryId) {
-    Repository::repositoryId = repositoryId;
-}
-
 JournalPtr &Repository::getJournal() {
     return journal;
 }
@@ -20,3 +16,7 @@ JournalPtr &Repository::getJournal() {
 void Repository::setJournal(const JournalPtr &journal) {
     Repository::journal = journal;
 }
+
+Repository::Repository(const Repository::RepoIdType &repositoryId) : repositoryId(repositoryId),
+                                                                     storage(std::make_shared<InternalStorage>(
+                                                                             repositoryId)) {}

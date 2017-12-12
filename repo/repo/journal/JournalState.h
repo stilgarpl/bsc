@@ -26,7 +26,7 @@
 #include <cereal/types/list.hpp>
 #include <cereal/types/chrono.hpp>
 #include <cereal/types/string.hpp>
-#include <crypto++/files.h>
+#include <cryptopp/files.h>
 
 #include <experimental/filesystem>
 
@@ -36,13 +36,11 @@ class JournalStateData {
 private:
     JournalMethod method;
 
-    ///@todo path serialization doesn't work, so it's string
-public:
-    typedef std::string PathType;
+
 private:
     PathType path;
     uintmax_t size = 0;
-    std::string checksum; //checksum of the file.
+    JournalChecksumType checksum; //checksum of the file.
 private:
     template<class Archive>
     void serialize(Archive &ar) {
@@ -87,6 +85,10 @@ public:
                     new CryptoPP::StringSink(digest))));
             checksum = std::move(digest);
         }
+    }
+
+    const JournalChecksumType &getChecksum() const {
+        return checksum;
     }
 };
 

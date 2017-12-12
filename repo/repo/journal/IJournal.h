@@ -43,11 +43,13 @@ private:
     friend class cereal::access;
 
 public:
-    virtual void append(JournalMethod method, JournalStateData::PathType path) = 0;
+    virtual void append(JournalMethod method, PathType path) = 0;
 
     virtual void printHistory()=0;
 
     virtual bool merge(const JournalPtr &other) =0;
+
+    virtual void setFunc(const JournalMethod &method, Func func) =0;
 
 };
 

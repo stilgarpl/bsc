@@ -7,6 +7,10 @@
 
 
 #include <repo/journal/SimpleJournal.h>
+#include <p2p/log/Logger.h>
+#include <repo/storage/IStorage.h>
+#include <repo/storage/InternalStorage.h>
+#include <p2p/utils/crypto.h>
 
 class Repository {
 public:
@@ -14,6 +18,11 @@ public:
 private:
     JournalPtr journal = std::make_shared<SimpleJournal>();
     RepoIdType repositoryId;
+    std::shared_ptr<IStorage> storage;
+
+
+    ///@todo maybe some class instead of just PathType?
+    std::map<PathType, JournalChecksumType> fileMap;
 
 public:
     const RepoIdType &getRepositoryId() const;
@@ -22,9 +31,32 @@ public:
 
     void setJournal(const JournalPtr &journal);
 
-    void setRepositoryId(const RepoIdType &repositoryId);
+
+    void buildFileMap() {
+        journal->setFunc(JournalMethod::ADDED, [&](auto &i) {
+            fileMap[i.getPath()] = i.getChecksum();
+            LOGGER(i.getChecksum() + " ::: " + i.getPath());
+        });
+
+        journal->setFunc(JournalMethod::MOVED, [&](auto &i) {
+            fileMap[i.getPath()] = i.getChecksum();
+            LOGGER(i.getChecksum() + " ::: " + i.getPath());
+        });
+
+
+        journal->replay();
+    }
 
 public:
+
+
+    void persist(fs::path path) {
+        journal->append(JournalMethod::ADDED, path);
+        ///@todo take values from journal, or, even better, replay journal state during commit and do the store in that
+        storage->store(calculateSha1OfFile(path), fs::file_size(path), path);
+    }
+
+    Repository(const RepoIdType &repositoryId);
 
 };
 

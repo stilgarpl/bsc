@@ -40,7 +40,7 @@ void SimpleJournal::replay() {
 
 }
 
-void SimpleJournal::append(JournalMethod method, JournalStateData::PathType path) {
+void SimpleJournal::append(JournalMethod method, PathType path) {
     prepareState();
     currentState->add(JournalStateData(method, path));
 }
@@ -86,8 +86,14 @@ bool SimpleJournal::merge(const std::shared_ptr<SimpleJournal> other) {
         thisCopy.erase(std::unique(thisCopy.begin(), thisCopy.end(), [](auto i, auto j) {
             return (i->getCommitTime() == j->getCommitTime() && i->getChecksum() == j->getChecksum());
         }), thisCopy.end());
-        journalHistory = thisCopy;
 
+
+        journalHistory = thisCopy;
+        //@todo what if uncommited changes are not compatible with merged last stage? what if we are modyfing file that was deleted in last state?
+        //@todo maybe we should add something to verify integrity and validity before commiting changes?
+        if (currentState != nullptr) {
+            currentState->setPreviousState(findLastState());
+        }
 
     } else {
         //no common root

@@ -69,6 +69,7 @@ public:
                 localRepo->setJournal(remoteJournal);
 
             }
+            localRepo->buildFileMap();
         } else {
             LOGGER("no response")
         }

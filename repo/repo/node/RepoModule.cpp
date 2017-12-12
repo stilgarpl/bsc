@@ -35,8 +35,8 @@ void RepoModule::printHistory() {
 }
 
 void RepoModule::loadRepository(const Repository::RepoIdType &repoId, fs::path path) {
-    RepositoryPtr ptr = std::make_shared<Repository>();
-    ptr->setRepositoryId(repoId);
+    RepositoryPtr ptr = std::make_shared<Repository>(repoId);
+
     repositoryManager.addRepository(ptr);
     {
         std::ifstream is(path);
@@ -61,8 +61,7 @@ void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
 }
 
 RepositoryPtr RepoModule::createRepository(const Repository::RepoIdType &repoId) {
-    RepositoryPtr ptr = std::make_shared<Repository>();
-    ptr->setRepositoryId(repoId);
+    RepositoryPtr ptr = std::make_shared<Repository>(repoId);
     repositoryManager.addRepository(ptr);
     return ptr;
 
@@ -78,7 +77,7 @@ void RepoModule::selectRepository(const Repository::RepoIdType &repoId) {
 
 void RepoModule::persistFile(const fs::path &path) {
     if (selectedRepository != nullptr) {
-        selectedRepository->getJournal()->append(JournalMethod::ADDED, path);
+        selectedRepository->persist(path);//getJournal()->append(JournalMethod::ADDED, path);
 
     }
 }

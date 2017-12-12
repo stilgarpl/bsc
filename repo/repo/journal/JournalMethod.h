@@ -7,8 +7,9 @@
 
 enum JournalMethod {
     ADDED,
-    UPDATED,
+    MODIFIED,
     DELETED,
+    MOVED,
 };
 
 

@@ -37,9 +37,10 @@ public:
     void commitState() override;
 
     void checkCurrentState() {
-        if (currentState == nullptr && journalHistory.size() > 0) {
-            currentState = findLastState();
-        }
+        ///@todo this is wrong. last state is commited it should be current->setPrev(last)
+//        if (currentState == nullptr && journalHistory.size() > 0) {
+//            currentState = findLastState();
+//        }
     }
 
     std::shared_ptr<JournalState> findLastState() {
@@ -55,11 +56,11 @@ public:
     void prepareState();
 
     ///@todo hmm hmm variadic template?
-    void append(JournalMethod method, JournalStateData::PathType path);
+    void append(JournalMethod method, PathType path);
 
     void replay() override;
 
-    void setFunc(const JournalMethod &method, Func func) {
+    virtual void setFunc(const JournalMethod &method, Func func) {
         funcMap[method] = func;
     }
 

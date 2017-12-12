@@ -9,5 +9,8 @@
 
 typedef std::string JournalChecksumType;
 
+///@todo path serialization doesn't work, so it's string
+typedef std::string PathType;
+
 
 #endif //BASYCO_JOURNALTYPES_H

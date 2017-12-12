@@ -17,6 +17,11 @@ public:
     LogicContext(LogicManager &logicManager);
 
     LogicManager &getLogicManager() const;
+
+    //shortcut method for getting logic manager from active context
+    static LogicManager &getLogicManagerFromActiveContext() {
+        return Context::getActiveContext().get<LogicContext>()->getLogicManager();
+    }
 };
 
 

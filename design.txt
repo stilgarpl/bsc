@@ -92,3 +92,57 @@ zastanawiam sie czy nie zmienic typu kroniki na directed acyclic graph... chocia
 
 
 
+
+
+
+repository mapping type
+
+filesystem = pliki są na systemie
+internal_link = pliki są w wewnętrznym katalogu, i są zdeployowane na system w postaci linków
+internal_copy = pliki są w wewnętrznym katalogu, diffy są kopiowane do/z internala przy deployu/syncu (like git)
+external = plików nie ma na tym nodzie, w razie potrzeby są sciagane
+secure = all files are encrypted, and unencrypted only if valid key is provided
+
+
+
+storage raczej nie powinno robic nic sieciowego, powinno sie zajmowac tylko i wylacznie przechowywaniem plikow
+
+void store(id, path) -> zapisuje plik do repo pod wskazanym id i zapamietuje path
+
+bool restore(id) - plik jest z repo ustawiony do konkretnego path zapamietanego w store, zwraca false, kiedy nie ma takiego pliku w store
+
+Repository na to powinno chyba zrobic event, file missing in storage
+
+event uruchomiłby akcję, która odpytałaby inne nody o ten plik, jesliby go u kogos znalazl, to uruchomilby transfer pliku
+na zakonczenie wszystkich transferów wyemitowany byłby kolejny event, zeby powiadomic repo o tym, ze pliki są pobrane
+
+pobrany plik byłby zapisany do repo, byc moze z uzyciem store, albo inną funkcją, ktora przyjmowalaby
+
+z drugiej strony, to rodzi wiele komplikacji - transfer musi byc z pewnego path do innego path, a skad rzeczy poza storage mają znać takie rzeczy. moze gdyby storage byl czyms innym niż czescia repo
+
+np. osobna struktura wewnątrz repo module
+
+wtedy repository nie miałoby swojego storage, tylko odnośniki do storage.
+
+jeden storage moglby byc wspolny dla kilku repozytoriow
+
+taki storage mialby swoj id
+
+po storage id moznaby by wywołać transfer z node(x)::storage(y)::file(JKHFKDSJHF)
+
+trzeba tez pamietac, ze moze byc inne mapowanie sciezek
+
+np. D:\Photos => /home/stilgar/Photos
+
+z jednej strony niektore stage beda ograniczone do jednego katalogu, wtedy mozna dac normalnie mount point, ale inne będą jak config script, co zamienia tylko $HOME a resztę deployuje na system
+
+Repository ma faktycznie mapowanie obiektow na pliki - w systemie - i ono moze pamietac o mountpointach i takich tam
+
+wiec storage->restore(fileid, filesize, path)
+
+storage->sync(nodeId) - pobiera wszystko storage listing z nodeId, po czym pobiera te obiekty ktorych nie ma
+
+czyli
+repository->sync(nodeId) - równolegle, pobiera sobie journal i robi storage->sync(), z journala robi replay i te rzeczy ktore sie zmienili, pobiera z storage
+
+path transformer w repository do  mapowania storage na mount pointy

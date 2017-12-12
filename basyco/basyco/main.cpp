@@ -136,6 +136,8 @@ void setupCommands(CommandModule *cmd) {
 
 #include <cereal/archives/xml.hpp>
 #include <cereal/types/memory.hpp>
+#include <repo/storage/InternalStorage.h>
+#include <p2p/utils/crypto.h>
 
 struct PtrTest {
     int a = 9999;
@@ -209,6 +211,10 @@ int main(int argc, char *argv[]) {
         LOGGER(std::to_string(p6->ptr->a));
     }
 
+//    InternalStorage stor;
+//    stor.initStorage();
+//    stor.store(calculateSha1OfFile("/bin/zsh"),fs::file_size("/bin/zsh"),"/bin/zsh");
+//    stor.restore(calculateSha1OfFile("/bin/zsh"),fs::file_size("/bin/zsh"),"/tmp/zsh");
 
 
     //  commandModule.runCommand(moduleName, commandName, arguments);
