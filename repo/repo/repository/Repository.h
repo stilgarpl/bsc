@@ -58,6 +58,7 @@ public:
                 //check if the resource is in storage
                 if (!storage->hasResource(resourceId)) {
                     //download from another repo
+                    ///@todo download
                 } else {
                     //weird, maybe no space left?
                     ///@todo error handling
