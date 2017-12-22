@@ -18,7 +18,7 @@ class IStorage {
 public:
 
     typedef std::string ResourceId;
-protected:
+
     static ResourceId getResourceId(const JournalChecksumType &checksum, const size_t &size) {
         return std::to_string(size) + "_" + checksum;
     }
@@ -38,6 +38,8 @@ public:
     virtual void sync(const NodeIdType &nodeID)=0;
 
     virtual fs::path getResourcePath(const ResourceId &resourceId) =0;
+
+    virtual bool hasResource(const ResourceId &resourceId) =0;
 
     IStorage(IRepository *r) {
         this->repository = r;

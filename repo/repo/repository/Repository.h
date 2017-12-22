@@ -51,7 +51,18 @@ public:
     void restoreAll() {
         journal->setFunc(JournalMethod::ADDED, [&](auto &i) {
             ///@todo path transform
-            storage->restore(i.getChecksum(), i.getSize(), i.getPath());
+            bool ret = storage->restore(i.getChecksum(), i.getSize(), i.getPath());
+            if (!ret) {
+                //restore failed.
+                auto resourceId = storage->getResourceId(i.getChecksum(), i.getSize());
+                //check if the resource is in storage
+                if (!storage->hasResource(resourceId)) {
+                    //download from another repo
+                } else {
+                    //weird, maybe no space left?
+                    ///@todo error handling
+                }
+            }
 //            fileMap[i.getPath()] = i.getChecksum();
 //            LOGGER(i.getChecksum() + " ::: " + i.getPath());
         });

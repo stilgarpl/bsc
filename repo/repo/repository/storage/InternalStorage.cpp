@@ -77,6 +77,10 @@ fs::path InternalStorage::getResourcePath(const IStorage::ResourceId &resourceId
     return storagePath / resourceId;
 }
 
+bool InternalStorage::hasResource(const IStorage::ResourceId &resourceId) {
+    return fs::exists(getResourcePath(resourceId));
+}
+
 //InternalStorage::InternalStorage(const std::string &storageId) /*: storageId(storageId)*/ {
 //    initStorage();
 //}
