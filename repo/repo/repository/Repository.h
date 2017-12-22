@@ -8,13 +8,14 @@
 
 #include <repo/journal/SimpleJournal.h>
 #include <p2p/log/Logger.h>
-#include <repo/storage/IStorage.h>
-#include <repo/storage/InternalStorage.h>
+#include <repo/repository/storage/IStorage.h>
+#include <repo/repository/storage/InternalStorage.h>
 #include <p2p/utils/crypto.h>
+#include "IRepository.h"
 
-class Repository {
+class Repository : public IRepository {
 public:
-    typedef std::string RepoIdType;
+
 private:
     JournalPtr journal = std::make_shared<SimpleJournal>();
     RepoIdType repositoryId;
@@ -41,6 +42,23 @@ public:
         journal->setFunc(JournalMethod::MOVED, [&](auto &i) {
             fileMap[i.getPath()] = i.getChecksum();
             LOGGER(i.getChecksum() + " ::: " + i.getPath());
+        });
+
+
+        journal->replay();
+    }
+
+    void restoreAll() {
+        journal->setFunc(JournalMethod::ADDED, [&](auto &i) {
+            ///@todo path transform
+            storage->restore(i.getChecksum(), i.getSize(), i.getPath());
+//            fileMap[i.getPath()] = i.getChecksum();
+//            LOGGER(i.getChecksum() + " ::: " + i.getPath());
+        });
+
+        journal->setFunc(JournalMethod::MOVED, [&](auto &i) {
+//            fileMap[i.getPath()] = i.getChecksum();
+//            LOGGER(i.getChecksum() + " ::: " + i.getPath());
         });
 
 

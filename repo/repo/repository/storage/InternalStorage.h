@@ -15,7 +15,7 @@ namespace fs = std::experimental::filesystem;
 class InternalStorage : public IStorage {
 
 private:
-    std::string storageId;
+    // std::string storageId;
     fs::path storagePath = "/tmp/internal/";
 public:
     void store(const JournalChecksumType &checksum, const size_t &size, const PathType &sourcePath) override;
@@ -28,8 +28,12 @@ public:
 
     void initStorage();
 
+//
+//    InternalStorage(const std::string &storageId);
 
-    InternalStorage(const std::string &storageId);
+    InternalStorage(IRepository *r);
+
+    fs::path getResourcePath(const ResourceId &resourceId) override;
 };
 
 

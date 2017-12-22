@@ -8,9 +8,23 @@
 
 #include <repo/journal/JournalTypes.h>
 #include <p2p/network/node/NodeInfo.h>
+#include <repo/repository/IRepository.h>
+#include <experimental/filesystem>
+
+namespace fs = std::experimental::filesystem;
+
 
 class IStorage {
+public:
 
+    typedef std::string ResourceId;
+protected:
+    static ResourceId getResourceId(const JournalChecksumType &checksum, const size_t &size) {
+        return std::to_string(size) + "_" + checksum;
+    }
+
+protected:
+    IRepository *repository;
 
 public:
 
@@ -22,6 +36,12 @@ public:
 
     //syncs whole repository to corresponding repository from other node
     virtual void sync(const NodeIdType &nodeID)=0;
+
+    virtual fs::path getResourcePath(const ResourceId &resourceId) =0;
+
+    IStorage(IRepository *r) {
+        this->repository = r;
+    }
 
 };
 

@@ -16,7 +16,7 @@ void InternalStorage::store(const JournalChecksumType &checksum, const size_t &s
         LOGGER("CHECKSUM IS OK, COPYING TO INTERNAL STORAGE");
 
         ///@TODO handle directories
-        fs::copy(sourcePath, storagePath / (fs::path(std::to_string(size) + "_" + checksum)));
+        fs::copy(sourcePath, getResourcePath(getResourceId(checksum, size)));
     }
 
 }
@@ -36,7 +36,7 @@ InternalStorage::restore(const JournalChecksumType &checksum, const size_t &size
     ///@todo more checks, for example, if the file is in the internal storage or should be acquired from another storage
 
     if (restoreFile) {
-        fs::copy(storagePath / (fs::path(std::to_string(size) + "_" + checksum)), destinationPath);
+        fs::copy(getResourcePath(getResourceId(checksum, size)), destinationPath);
     }
 
 }
@@ -55,7 +55,7 @@ void InternalStorage::initStorage() {
 
     storagePath = "/tmp/storage";
     storagePath /= node.getNodeInfo().getNodeId();
-    storagePath /= storageId;
+    storagePath /= repository->getRepositoryId();
     storagePath /= "internal";
 
 
@@ -69,6 +69,14 @@ void InternalStorage::initStorage() {
 
 }
 
-InternalStorage::InternalStorage(const std::string &storageId) : storageId(storageId) {
+InternalStorage::InternalStorage(IRepository *r) : IStorage(r) {
     initStorage();
 }
+
+fs::path InternalStorage::getResourcePath(const IStorage::ResourceId &resourceId) {
+    return storagePath / resourceId;
+}
+
+//InternalStorage::InternalStorage(const std::string &storageId) /*: storageId(storageId)*/ {
+//    initStorage();
+//}

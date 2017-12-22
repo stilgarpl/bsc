@@ -11,7 +11,7 @@
 #include <p2p/dependency/DependencyManaged.h>
 #include <repo/repository/Repository.h>
 #include <p2p/network/node/modules/NodeNetworkModule.h>
-#include <repo/network/packet/JournalGroup.h>
+#include <repo/journal/network/packet/JournalGroup.h>
 
 class RepoModule : public NodeModule, public DependencyManaged<RepoModule> {
 private:
@@ -48,6 +48,8 @@ public:
     void saveRepository(const Repository::RepoIdType &repoId);
 
     void loadRepository(const Repository::RepoIdType &repoId, fs::path path);
+
+    void restoreRepository(const Repository::RepoIdType &repoId);
 
     void printHistory();
 

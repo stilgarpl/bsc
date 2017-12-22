@@ -93,8 +93,9 @@ public:
             if (item->getPreviousState() == nullptr) {
                 return item;
             }
-            return nullptr;
+
         }
+        return nullptr;
     }
 
 

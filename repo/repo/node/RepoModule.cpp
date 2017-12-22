@@ -3,9 +3,9 @@
 //
 
 #include <p2p/network/node/modules/BasicModule.h>
-#include <repo/network/logic/events/JournalRequestEvent.h>
-#include <repo/network/logic/actions/JournalActions.h>
-#include <repo/network/logic/sources/JournalSource.h>
+#include <repo/journal/network/logic/events/JournalRequestEvent.h>
+#include <repo/journal/network/logic/actions/JournalActions.h>
+#include <repo/journal/network/logic/sources/JournalSource.h>
 #include "RepoModule.h"
 
 void RepoModule::setupActions(LogicManager &logicManager) {
@@ -88,4 +88,8 @@ RepositoryPtr RepoModule::findRepository(const Repository::RepoIdType &repoId) {
 
 const RepositoryPtr &RepoModule::getSelectedRepository() const {
     return selectedRepository;
+}
+
+void RepoModule::restoreRepository(const Repository::RepoIdType &repoId) {
+    repositoryManager.getRepository(repoId)->restoreAll();
 }

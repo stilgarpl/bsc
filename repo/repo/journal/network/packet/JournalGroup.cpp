@@ -3,7 +3,7 @@
 //
 
 #include "JournalGroup.h"
-#include <repo/network/logic/sources/JournalSource.h>
+#include <repo/journal/network/logic/sources/JournalSource.h>
 #include <p2p/network/protocol/context/LogicContext.h>
 
 void JournalGroup::Request::process(Context &context) {

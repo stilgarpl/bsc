@@ -4,7 +4,7 @@
 
 #include "Repository.h"
 
-const Repository::RepoIdType &Repository::getRepositoryId() const {
+const IRepository::RepoIdType &Repository::getRepositoryId() const {
     return repositoryId;
 }
 
@@ -17,6 +17,6 @@ void Repository::setJournal(const JournalPtr &journal) {
     Repository::journal = journal;
 }
 
-Repository::Repository(const Repository::RepoIdType &repositoryId) : repositoryId(repositoryId),
-                                                                     storage(std::make_shared<InternalStorage>(
-                                                                             repositoryId)) {}
+Repository::Repository(const RepoIdType &repositoryId) : repositoryId(repositoryId),
+                                                         storage(std::make_shared<InternalStorage>(
+                                                                 static_cast<IRepository *>(this))) {}

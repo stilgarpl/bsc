@@ -104,5 +104,5 @@ bool SimpleJournal::merge(const std::shared_ptr<SimpleJournal> other) {
 }
 
 bool SimpleJournal::merge(const JournalPtr &other) {
-    merge(std::static_pointer_cast<SimpleJournal>(other));
+    return merge(std::static_pointer_cast<SimpleJournal>(other));
 }

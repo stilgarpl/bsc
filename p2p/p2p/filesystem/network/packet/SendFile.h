@@ -69,6 +69,7 @@ public:
         friend class cereal::access;
 
     public:
+        ///@todo really, we should move it to some other class. it's ridiculous to have load and save function in THE PACKET
         void load_file(fs::path path);
 
         void save_file() const;

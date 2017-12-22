@@ -13,7 +13,7 @@ class RepositoryManager {
     std::list<RepositoryPtr> repositories;
 
 public:
-    RepositoryPtr getRepository(Repository::RepoIdType id) {
+    RepositoryPtr getRepository(IRepository::RepoIdType id) {
         auto it = std::find_if(repositories.begin(), repositories.end(),
                                [&](const RepositoryPtr &rep) -> bool { return rep->getRepositoryId() == id; });
         if (it != repositories.end()) {

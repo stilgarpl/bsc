@@ -17,6 +17,9 @@ class FileTransferControl {
 public:
     [[nodiscard]] static FileTransferDescriptorPtr
     initiateTransfer(INode &node, const NodeIdType &nodeId, fs::path sourcePath, fs::path destinationPath);
+
+
+    ///@todo add resumeTransfer() for files that were interrupted
 };
 
 

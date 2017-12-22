@@ -131,12 +131,13 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("loadRep", &RepoModule::loadRepository);
     cmd->mapCommand("printRep", &RepoModule::printHistory);
     cmd->mapCommand("downRep", &RepoModule::downloadRemoteRepository);
+    cmd->mapCommand("resRep", &RepoModule::restoreRepository);
 }
 
 
 #include <cereal/archives/xml.hpp>
 #include <cereal/types/memory.hpp>
-#include <repo/storage/InternalStorage.h>
+#include <repo/repository/storage/InternalStorage.h>
 #include <p2p/utils/crypto.h>
 
 struct PtrTest {

@@ -90,6 +90,10 @@ public:
     const JournalChecksumType &getChecksum() const {
         return checksum;
     }
+
+    uintmax_t getSize() const {
+        return size;
+    }
 };
 
 

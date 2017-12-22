@@ -6,9 +6,9 @@
 #define BASYCO_JOURNALACTIONS_H
 
 
-#include <repo/network/logic/events/JournalRequestEvent.h>
-#include <repo/network/logic/events/JournalResponseEvent.h>
-#include <repo/network/packet/JournalGroup.h>
+#include <repo/journal/network/logic/events/JournalRequestEvent.h>
+#include <repo/journal/network/logic/events/JournalResponseEvent.h>
+#include <repo/journal/network/packet/JournalGroup.h>
 #include <p2p/network/protocol/context/NodeContext.h>
 #include <repo/node/RepoModule.h>
 
