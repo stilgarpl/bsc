@@ -11,3 +11,5 @@ const std::experimental::filesystem::path &FileAttributesEvent::getPath() const 
 void FileAttributesEvent::setPath(const std::experimental::filesystem::path &path) {
     FileAttributesEvent::path = path;
 }
+
+FileAttributesEvent::FileAttributesEvent(BasePacket::IdType requestId) : NetworkingEvent(requestId) {}

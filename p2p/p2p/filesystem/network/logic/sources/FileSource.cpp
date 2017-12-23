@@ -9,7 +9,7 @@
 void FileSource::requestFile(SendFile::Request *request) {
     // auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
 
-    auto event = requestSource.newEvent();
+    auto event = requestSource.newEvent(request->getId());
     if (request->getEnd() == 0) {
         event->setEventId(FileRequestId::GET_FILE);
     } else {
@@ -20,7 +20,7 @@ void FileSource::requestFile(SendFile::Request *request) {
     event->setEnd(request->getEnd());
     event->setFilePath(request->getFilePath());
     // event->setConnection(&connectionContext->getConnection());
-    event->setRequestId(request->getId());
+//    event->setRequestId(request->getId());
 
 //    event->setNetworkInfo(networkInfo);
 //    event->setEventId(EventType::IdType::NETWORK_INFO_RECEIVED);
@@ -45,7 +45,7 @@ void FileSource::registerProviders(SourceManager *manager) {
 void FileSource::fileReceived(SendFile::Response::Ptr response) {
     //auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
 
-    auto event = responseSource.newEvent();
+    auto event = responseSource.newEvent(response->getId());
     if (response->getEnd() == 0) {
         event->setEventId(FileResponseId::FILE_RECEIVED);
     } else {

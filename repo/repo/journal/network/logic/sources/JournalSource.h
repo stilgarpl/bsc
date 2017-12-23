@@ -17,14 +17,15 @@ private:
     EventQueueSource<JournalResponseEvent, JournalSource> responseSource;
 public:
     void journalRequested(std::string repoId, JournalGroup::Request::IdType requestId) {
-        auto event = requestSource.newEvent();
+        auto event = requestSource.newEvent(requestId);
         event->setRepoId(repoId);
-        event->setRequestId(requestId);
+//        event->setRequestId(requestId);
         requestSource.queueEvent(event);
     };
 
     void journalReceived(std::string repoId, const JournalPtr journal) {
-        auto event = responseSource.newEvent();
+        //networking event requires packet id, but no one would be respoding to this, so...
+        auto event = responseSource.newEvent(0);
         event->setRepoId(repoId);
         event->setJournal(journal);
         responseSource.queueEvent(event);

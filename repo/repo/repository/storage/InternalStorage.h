@@ -18,11 +18,11 @@ private:
     // std::string storageId;
     fs::path storagePath = "/tmp/internal/";
 public:
-    void store(const JournalChecksumType &checksum, const size_t &size, const PathType &sourcePath) override;
+    void store(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) override;
 
-    bool restore(const JournalChecksumType &checksum, const size_t &size, const PathType &destinationPath) override;
+    bool restore(const ResourceId &checksum, const size_t &size, const PathType &destinationPath) override;
 
-    void update(const JournalChecksumType &checksum, const size_t &size, const PathType &sourcePath) override;
+    void update(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) override;
 
     void sync(const NodeIdType &nodeID) override;
 

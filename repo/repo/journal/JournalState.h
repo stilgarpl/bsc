@@ -40,7 +40,7 @@ private:
 private:
     PathType path;
     uintmax_t size = 0;
-    JournalChecksumType checksum; //checksum of the file.
+    ResourceId checksum; //checksum of the file.
 private:
     template<class Archive>
     void serialize(Archive &ar) {
@@ -87,7 +87,7 @@ public:
         }
     }
 
-    const JournalChecksumType &getChecksum() const {
+    const ResourceId &getChecksum() const {
         return checksum;
     }
 
@@ -98,7 +98,7 @@ public:
 
 
 class JournalState {
-    JournalChecksumType checksum;
+    ResourceId checksum;
     std::list<JournalStateData> dataList;
     std::chrono::system_clock::time_point commitTime;
     std::shared_ptr<JournalState> previousState = nullptr;
@@ -134,7 +134,7 @@ public:
 
     bool operator!=(const JournalState &rhs) const;
 
-    const JournalChecksumType &getChecksum() const;
+    const ResourceId &getChecksum() const;
 
     JournalState(const JournalState &other) {
         checksum = other.checksum;

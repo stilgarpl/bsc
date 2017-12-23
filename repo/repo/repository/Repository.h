@@ -23,7 +23,7 @@ private:
 
 
     ///@todo maybe some class instead of just PathType?
-    std::map<PathType, JournalChecksumType> fileMap;
+    std::map<PathType, ResourceId> fileMap;
 
 public:
     const RepoIdType &getRepositoryId() const;
@@ -32,15 +32,19 @@ public:
 
     void setJournal(const JournalPtr &journal);
 
+    fs::path getStoragePath(const IStorage::ResourceId &resourceId) {
+        return storage->getResourcePath(resourceId);
+    };
+
 
     void buildFileMap() {
         journal->setFunc(JournalMethod::ADDED, [&](auto &i) {
-            fileMap[i.getPath()] = i.getChecksum();
-            LOGGER(i.getChecksum() + " ::: " + i.getPath());
+            fileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());//i.getChecksum();
+            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         journal->setFunc(JournalMethod::MOVED, [&](auto &i) {
-            fileMap[i.getPath()] = i.getChecksum();
+            fileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());
             LOGGER(i.getChecksum() + " ::: " + i.getPath());
         });
 

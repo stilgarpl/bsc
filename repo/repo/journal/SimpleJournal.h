@@ -15,7 +15,7 @@
 class SimpleJournal : public IJournal {
 
 private:
-    JournalChecksumType checksum;
+    ResourceId checksum;
     JournalStatePtr currentState = nullptr;
     JournalHistory journalHistory;
 
@@ -32,7 +32,7 @@ private:
     friend class cereal::access;
 
 public:
-    JournalChecksumType getChecksum() override;
+    ResourceId getChecksum() override;
 
     void commitState() override;
 

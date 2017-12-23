@@ -5,7 +5,7 @@
 #include "SimpleJournal.h"
 #include <p2p/log/Logger.h>
 
-JournalChecksumType SimpleJournal::getChecksum() {
+ResourceId SimpleJournal::getChecksum() {
     ///@todo calculate checksum?
     return checksum;
 }

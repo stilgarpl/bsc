@@ -48,6 +48,8 @@ public:
     void setRequestId(BasePacket::IdType requestId) {
         NetworkingEvent::requestId = requestId;
     }
+
+    NetworkingEvent(BasePacket::IdType requestId) : requestId(requestId) {}
 };
 
 #endif //BASYCO_NETWORKINGEVENT_H

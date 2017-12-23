@@ -98,6 +98,8 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
         //  std::this_thread::sleep_for(400ms);
     }
 
+    LOGGER("stopping connection workSend")
+
 }
 
 void Connection::workReceive(Poco::Net::StreamSocket &socket) {
@@ -168,6 +170,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
         // std::this_thread::sleep_for(1ms);
 
     }
+    LOGGER("stopping connection workReceive")
     processor.stop();
     connectionSourcePtr->connectionClosed(this);
 }

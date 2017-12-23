@@ -31,10 +31,10 @@ public:
     void fileReceived(SendFile::Response::Ptr response);
 
     void requestAttributes(SendAttributes::Request *request) {
-        auto event = attributesSource.newEvent();
+        auto event = attributesSource.newEvent(request->getId());
 
         event->setPath(request->getPath());
-        event->setRequestId(request->getId());
+//        event->setRequestId(request->getId());
         attributesSource.queueEvent(event);
     };
 

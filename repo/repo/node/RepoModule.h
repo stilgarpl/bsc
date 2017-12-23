@@ -12,6 +12,7 @@
 #include <repo/repository/Repository.h>
 #include <p2p/network/node/modules/NodeNetworkModule.h>
 #include <repo/journal/network/packet/JournalGroup.h>
+#include <repo/repository/storage/network/packet/StorageQuery.h>
 
 class RepoModule : public NodeModule, public DependencyManaged<RepoModule> {
 private:
@@ -79,6 +80,23 @@ public:
 
     }
 
+
+    void requestStoragePath(const NodeIdType &remoteId, const Repository::RepoIdType &repoId,
+                            const IStorage::ResourceId &resourceId) {
+        auto netModule = node.getModule<NodeNetworkModule>();
+        auto localRepo = findRepository(repoId);
+
+        StorageQuery::Request::Ptr req = StorageQuery::Request::getNew();
+        req->setRepositoryId(repoId);
+        req->setObjectId(resourceId);
+
+        StorageQuery::Response::Ptr res = netModule->sendPacketToNode(remoteId, req);
+        if (res != nullptr) {
+            LOGGER("resouce path: " + res->getPath());
+        } else {
+            LOGGER("invalid response");
+        }
+    }
     const RepositoryPtr &getSelectedRepository() const;
 
 

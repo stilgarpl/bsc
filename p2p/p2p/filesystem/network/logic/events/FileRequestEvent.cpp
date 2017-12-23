@@ -28,6 +28,8 @@ void FileRequestEvent::setEnd(size_t end) {
     FileRequestEvent::end = end;
 }
 
+FileRequestEvent::FileRequestEvent(BasePacket::IdType requestId) : NetworkingEvent(requestId) {}
+
 //Connection *FileRequestEvent::getConnection() const {
 //    return connection;
 //}

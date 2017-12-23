@@ -7,7 +7,7 @@
 
 #include <string>
 
-typedef std::string JournalChecksumType;
+typedef std::string ResourceId;
 
 ///@todo path serialization doesn't work, so it's string
 typedef std::string PathType;

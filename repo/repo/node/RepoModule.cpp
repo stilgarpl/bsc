@@ -6,21 +6,26 @@
 #include <repo/journal/network/logic/events/JournalRequestEvent.h>
 #include <repo/journal/network/logic/actions/JournalActions.h>
 #include <repo/journal/network/logic/sources/JournalSource.h>
+#include <repo/repository/storage/network/logic/sources/StorageSource.h>
+#include <repo/repository/storage/network/logic/actions/StorageActions.h>
 #include "RepoModule.h"
 
 void RepoModule::setupActions(LogicManager &logicManager) {
     logicManager.setAction<JournalRequestEvent>("journalRequest", JournalActions::journalRequested);
     logicManager.setAction<JournalResponseEvent>("journalReceive", JournalActions::journalReceived);
+    logicManager.setAction<StorageResourceRequestEvent>("storageQuery", StorageActions::resourceRequested);
 }
 
 bool RepoModule::assignActions(LogicManager &logicManager) {
     bool ret = logicManager.assignAction<JournalRequestEvent>("journalRequest");
     ret &= logicManager.assignAction<JournalResponseEvent>("journalReceive");
+    ret &= logicManager.assignAction<StorageResourceRequestEvent>("storageQuery");
     return ret;
 }
 
 bool RepoModule::setupSources(LogicManager &logicManager) {
     logicManager.addSource<JournalSource>();
+    logicManager.addSource<StorageSource>();
     return true;
 }
 

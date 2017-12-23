@@ -146,3 +146,12 @@ czyli
 repository->sync(nodeId) - równolegle, pobiera sobie journal i robi storage->sync(), z journala robi replay i te rzeczy ktore sie zmienili, pobiera z storage
 
 path transformer w repository do  mapowania storage na mount pointy
+
+
+
+
+nie podoba mi sie transfer plikow miedzy storage - najpierw klient pobiera adres pliku z serwera a potem robi scp.
+request resource powinien od razu inicjowac transfer bez podawaania sciezek, a storage powinien byc odbiorca strumienia
+
+
+OOOO, WLASNIE, MOZE TO NA STRUMIENIACH ZROBIC!

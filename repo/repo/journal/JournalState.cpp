@@ -66,6 +66,6 @@ bool JournalState::operator!=(const JournalState &rhs) const {
     return !(rhs == *this);
 }
 
-const JournalChecksumType &JournalState::getChecksum() const {
+const ResourceId &JournalState::getChecksum() const {
     return checksum;
 }

@@ -19,7 +19,7 @@ public:
 
     typedef std::string ResourceId;
 
-    static ResourceId getResourceId(const JournalChecksumType &checksum, const size_t &size) {
+    static ResourceId getResourceId(const ResourceId &checksum, const size_t &size) {
         return std::to_string(size) + "_" + checksum;
     }
 
@@ -28,11 +28,11 @@ protected:
 
 public:
 
-    virtual void store(const JournalChecksumType &checksum, const size_t &size, const PathType &path) =0;
+    virtual void store(const ResourceId &checksum, const size_t &size, const PathType &path) =0;
 
-    virtual bool restore(const JournalChecksumType &checksum, const size_t &size, const PathType &path) = 0;
+    virtual bool restore(const ResourceId &checksum, const size_t &size, const PathType &path) = 0;
 
-    virtual void update(const JournalChecksumType &checksum, const size_t &size, const PathType &path)=0;
+    virtual void update(const ResourceId &checksum, const size_t &size, const PathType &path)=0;
 
     //syncs whole repository to corresponding repository from other node
     virtual void sync(const NodeIdType &nodeID)=0;

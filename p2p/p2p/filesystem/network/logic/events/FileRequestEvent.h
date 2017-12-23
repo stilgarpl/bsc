@@ -26,6 +26,8 @@ private:
 
 
 public:
+    FileRequestEvent(BasePacket::IdType requestId);
+
     const std::experimental::filesystem::path &getFilePath() const;
 
     void setFilePath(const std::experimental::filesystem::path &filePath);

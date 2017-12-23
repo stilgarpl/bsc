@@ -248,8 +248,10 @@ void NodeNetworkModule::addAcceptedConnection(IServerConnection *c) {
 
 void NodeNetworkModule::stopAcceptedConnections() {
     std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
+    ///@todo this segfaults, why bother stopping those connections? stopping the poco server should stop them anyway.
     for (auto &&it : acceptedConnections) {
-        it->stop();
+        if (it != nullptr)
+            it->stop();
     }
     acceptedConnections.remove_if([](auto) { return true; });
 }
@@ -277,11 +279,11 @@ void NodeNetworkModule::listen() {
 
 
 void NodeNetworkModule::stopListening() {
-
+    stopAcceptedConnections();
     if (server != nullptr) {
         server->stop();
     }
-    stopAcceptedConnections();
+
 
 }
 

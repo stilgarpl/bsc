@@ -11,3 +11,5 @@ const std::string &JournalRequestEvent::getRepoId() const {
 void JournalRequestEvent::setRepoId(const std::string &repoId) {
     JournalRequestEvent::repoId = repoId;
 }
+
+JournalRequestEvent::JournalRequestEvent(BasePacket::IdType requestId) : NetworkingEvent(requestId) {}

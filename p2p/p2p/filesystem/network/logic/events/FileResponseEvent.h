@@ -14,6 +14,7 @@ enum class FileResponseId {
     CHUNK_RECEIVED,
 };
 
+///this probably don't have to be a networking event but it could be to be constistent
 class FileResponseEvent : public NetworkingEvent<FileResponseId> {
 private:
     fs::path filePath;
@@ -28,6 +29,8 @@ public:
 //    void setResponse(const SendFile::Response::Ptr r) {
 //        response = r;
 //    }
+
+    FileResponseEvent(BasePacket::IdType requestId) : NetworkingEvent(requestId) {}
 
     const std::experimental::filesystem::path &getFilePath() const {
         return filePath;

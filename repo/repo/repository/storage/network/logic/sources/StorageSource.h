@@ -7,10 +7,21 @@
 
 
 #include <p2p/logic/sources/EventQueueSource.h>
-#include <repo/repository/storage/network/logic/events/StorageEvent.h>
+#include <repo/repository/storage/network/logic/events/StorageResourceRequestEvent.h>
+#include <repo/repository/IRepository.h>
+#include <repo/journal/JournalTypes.h>
+#include <repo/repository/storage/IStorage.h>
 
-class StorageSource : public EventQueueSource<StorageEvent> {
+class StorageSource : public EventQueueSource<StorageResourceRequestEvent> {
+public:
 
+    void
+    queryResource(IRepository::RepoIdType repositoryId, IStorage::ResourceId objectId, BasePacket::IdType requestId) {
+        auto event = newEvent(requestId);
+        event->setObjectId(objectId);
+        event->setRepositoryId(repositoryId);
+        queueEvent(event);
+    };
 };
 
 

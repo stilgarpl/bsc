@@ -7,7 +7,7 @@
 #include <p2p/network/protocol/context/NodeContext.h>
 #include "InternalStorage.h"
 
-void InternalStorage::store(const JournalChecksumType &checksum, const size_t &size, const PathType &sourcePath) {
+void InternalStorage::store(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) {
 
     auto realChecksum = calculateSha1OfFile(fs::path(sourcePath));
     auto realFileSize = fs::file_size(sourcePath);
@@ -22,7 +22,7 @@ void InternalStorage::store(const JournalChecksumType &checksum, const size_t &s
 }
 
 bool
-InternalStorage::restore(const JournalChecksumType &checksum, const size_t &size, const PathType &destinationPath) {
+InternalStorage::restore(const ResourceId &checksum, const size_t &size, const PathType &destinationPath) {
 
     bool restoreFile = false;
     if (fs::exists(destinationPath)) {
@@ -41,7 +41,7 @@ InternalStorage::restore(const JournalChecksumType &checksum, const size_t &size
 
 }
 
-void InternalStorage::update(const JournalChecksumType &checksum, const size_t &size, const PathType &sourcePath) {
+void InternalStorage::update(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) {
 
 }
 

@@ -27,8 +27,9 @@ TEST_CASE("Repo module test", "[!throws]") {
 
     auto cmdN = thisNode.getModule<CommandModule>();
 
+    int secondPort = std::rand() % 9000 + 9999;
 
-    Node otherNode(9999);
+    Node otherNode(secondPort);
     otherNode.getNodeInfo().setNodeId("second");
     otherNode.addToNetwork("TheNetwork");
 
@@ -37,9 +38,13 @@ TEST_CASE("Repo module test", "[!throws]") {
 
     thisNode.start();
     otherNode.start();
-
-    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+    std::this_thread::sleep_for(2s);
+    thisNode.getModule<NodeNetworkModule>()->connectTo("localhost:" + std::to_string(secondPort));
+//    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+//    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+    std::this_thread::sleep_for(1s);
     thisNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
+    std::this_thread::sleep_for(1s);
     bool connectedToSecond = std::find_if(thisNode.getModule<NodeNetworkModule>()->getClientConnections().begin(),
                                           thisNode.getModule<NodeNetworkModule>()->getClientConnections().end(),
                                           [&](NodeConnectionInfoPtr i) {
@@ -86,7 +91,7 @@ TEST_CASE("Repo module test", "[!throws]") {
     thisNode.stop();
     otherNode.stop();
     ///@todo stop() should join all threads, including poco ones. stopping the app before it has finished crashes the app
-    std::this_thread::sleep_for(3s);
+    std::this_thread::sleep_for(5s);
 
 
 }

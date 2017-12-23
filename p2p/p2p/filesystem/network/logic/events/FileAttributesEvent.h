@@ -24,9 +24,13 @@ class FileAttributesEvent : public NetworkingEvent<FileAttributesEventId> {
     fs::path path;
 
 public:
+    FileAttributesEvent(BasePacket::IdType requestId);
+
     const std::experimental::filesystem::path &getPath() const;
 
     void setPath(const std::experimental::filesystem::path &path);
+
+
 };
 
 
