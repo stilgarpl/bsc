@@ -29,6 +29,7 @@ public:
     void initStorage();
 
 //
+    std::shared_ptr<std::iostream> getResourceStream(const ResourceId &resourceId) override;
 //    InternalStorage(const std::string &storageId);
 
     InternalStorage(IRepository *r);

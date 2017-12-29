@@ -81,6 +81,12 @@ bool InternalStorage::hasResource(const IStorage::ResourceId &resourceId) {
     return fs::exists(getResourcePath(resourceId));
 }
 
+std::shared_ptr<std::iostream> InternalStorage::getResourceStream(const ResourceId &resourceId) {
+    ///@todo make sure resource exists
+    return std::make_shared<std::fstream>(getResourcePath(resourceId),
+                                          std::ios::in | std::ios::out | std::fstream::binary);
+}
+
 //InternalStorage::InternalStorage(const std::string &storageId) /*: storageId(storageId)*/ {
 //    initStorage();
 //}
