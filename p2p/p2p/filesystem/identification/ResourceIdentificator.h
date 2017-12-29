@@ -14,9 +14,23 @@ namespace fs = std::experimental::filesystem;
 class ResourceIdentificator {
 public:
 
+    /**
+     * returns input stream of the resource
+     * @return
+     */
     virtual std::shared_ptr<std::istream> getResourceInputStream() =0;
 
+    /**
+     * returns output stream of the resource
+     * @return
+     */
     virtual std::shared_ptr<std::ostream> getResourceOutputStream() =0;
+
+    /**
+     * returns true if the resource with this identificator exists on this node.
+     * @return
+     */
+    virtual bool exists() =0;
 
 private:
     template<class Archive>

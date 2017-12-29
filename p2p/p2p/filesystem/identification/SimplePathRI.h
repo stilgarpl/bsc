@@ -33,6 +33,7 @@ public:
         construct(path);
     }
 
+    bool exists() override;
 
     friend class cereal::access;
 
