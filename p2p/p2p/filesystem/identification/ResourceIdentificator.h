@@ -44,4 +44,7 @@ private:
 
 CEREAL_REGISTER_TYPE(ResourceIdentificator);
 
+
+typedef std::shared_ptr<ResourceIdentificator> ResourceIdentificatorPtr;
+
 #endif //BASYCO_RESOURCEIDENTIFICATOR_H

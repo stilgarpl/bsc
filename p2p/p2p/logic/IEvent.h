@@ -7,6 +7,8 @@
 
 #include <cstdlib>
 
+#include "p2p/log/Logger.h"
+
 typedef std::nullptr_t NullOrigin;
 
 template<typename OriginType>
@@ -54,6 +56,10 @@ public:
     OriginType origin() const {
         return _origin;
     }
+
+    static void setup(IEvent *event) {
+        LOGGER("IEVENT SETUP");
+    };
 
 };
 

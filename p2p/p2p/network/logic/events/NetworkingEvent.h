@@ -14,6 +14,7 @@
 #include <p2p/network/protocol/connection/Connection.h>
 #include <p2p/logic/IEvent.h>
 #include <p2p/network/protocol/context/ConnectionContext.h>
+#include <p2p/network/protocol/context/ProcessorContext.h>
 
 typedef Connection *ConnectionOriginPointer;
 
@@ -49,7 +50,16 @@ public:
         NetworkingEvent::requestId = requestId;
     }
 
+    ///@todo remove this from derived classes, now that id is set from context
     NetworkingEvent(BasePacket::IdType requestId) : requestId(requestId) {}
+
+    NetworkingEvent() = default;
+
+    static void setup(NetworkingEvent *event) {
+        LOGGER("NetworkingEvent SETUP")
+        auto packet = ProcessorContext::getCurrentPacketFromActiveContext();
+        event->setRequestId(packet->getId());
+    };
 };
 
 #endif //BASYCO_NETWORKINGEVENT_H

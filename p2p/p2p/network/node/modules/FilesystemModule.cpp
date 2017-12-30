@@ -5,6 +5,7 @@
 #include <p2p/filesystem/network/logic/sources/FileSource.h>
 #include <p2p/filesystem/network/logic/actions/FileActions.h>
 #include <p2p/filesystem/transfer/FileTransferControl.h>
+#include <p2p/filesystem/network/logic/sources/TransferSource.h>
 #include "FilesystemModule.h"
 #include "BasicModule.h"
 
@@ -17,6 +18,10 @@ void FilesystemModule::setupActions(LogicManager &logicManager) {
     logicManager.setAction<FileResponseEvent>("fileRes", FileActions::receivedFile);
     logicManager.setAction<FileAttributesEvent>("fileAtrS", FileActions::sendAttributes);
     logicManager.setAction<FileAttributesEvent>("fileAtrR", FileActions::receivedAttributes);
+    using namespace std::placeholders;
+
+    logicManager.setAction<TransferEvent>("beginTransfer",
+                                          std::bind(&TransferManager::beginTransfer, &this->transferManager, _1));
 
 }
 
@@ -26,7 +31,9 @@ bool FilesystemModule::assignActions(LogicManager &logicManager) {
         logicManager.assignAction<FileResponseEvent>(FileResponseEvent::IdType::FILE_RECEIVED, "fileRes") &&
         logicManager.assignAction<FileResponseEvent>(FileResponseEvent::IdType::CHUNK_RECEIVED, "fileRes") &&
         logicManager.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_REQUESTED, "fileAtrS") &&
-        logicManager.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_RECEIVED, "fileAtrR")) {
+        logicManager.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_RECEIVED, "fileAtrR") &&
+        logicManager.assignAction<TransferEvent>(TransferEvent::IdType::REQUESTED, "beginTransfer")
+            ) {
         std::clog << "Debug: File assignment!" << std::endl;
 
 
@@ -52,6 +59,7 @@ bool FilesystemModule::assignActions(LogicManager &logicManager) {
 
 bool FilesystemModule::setupSources(LogicManager &logicManager) {
     logicManager.addSource<FileSource>();
+    logicManager.addSource<TransferSource>();
     return true;
 }
 

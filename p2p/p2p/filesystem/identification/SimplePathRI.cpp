@@ -13,11 +13,20 @@
 SimplePathRI::SimplePathRI(const fs::path &resourcePath) : resourcePath(resourcePath) {}
 
 std::shared_ptr<std::istream> SimplePathRI::getResourceInputStream() {
-    return std::make_shared<std::fstream>(resourcePath, std::ios::in | std::ios::out | std::fstream::binary);
+    if (exists()) {
+        return std::make_shared<std::ifstream>(resourcePath, std::ios::in | std::ios::out | std::fstream::binary);
+    } else {
+        return nullptr;
+    }
 }
 
 std::shared_ptr<std::ostream> SimplePathRI::getResourceOutputStream() {
-    return std::make_shared<std::fstream>(resourcePath, std::ios::in | std::ios::out | std::fstream::binary);
+    if (exists()) {
+        return std::make_shared<std::ofstream>(resourcePath, std::ios::in | std::ios::out | std::fstream::binary);
+    } else {
+        return nullptr;
+    }
+
 }
 
 bool SimplePathRI::exists() {

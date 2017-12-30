@@ -27,6 +27,7 @@ private:
     fs::path destinationPath;
     NodeIdType sourceNode;
     fs::path sourcePath;
+    //@todo size_t may be too small
     size_t fileSize;
     size_t transferredSize;
 

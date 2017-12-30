@@ -11,6 +11,7 @@
 
 #include <experimental/filesystem>
 #include <p2p/filesystem/transfer/FileTransferDescriptor.h>
+#include <p2p/filesystem/network/logic/actions/TransferManager.h>
 
 #include "NodeNetworkModule.h"
 
@@ -20,6 +21,8 @@ class FilesystemModule : public NodeModule, public DependencyManaged<FilesystemM
 
     fs::path currentPath = fs::current_path();
     std::list<FileTransferDescriptorPtr> currentTransfers;
+
+    TransferManager transferManager;
 
 public:
     FilesystemModule(INode &node);

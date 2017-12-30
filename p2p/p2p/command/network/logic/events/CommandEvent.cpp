@@ -28,4 +28,3 @@ void CommandEvent::setData(const std::vector<std::string> &data) {
     CommandEvent::data = data;
 }
 
-CommandEvent::CommandEvent(BasePacket::IdType requestId) : NetworkingEvent(requestId) {}

@@ -17,13 +17,17 @@ private:
 public:
     ConnectionProcessor &getProcessor() const;
 
-    void setProcessor(ConnectionProcessor &processor);
-
     const BasePacketPtr &getThisPacket() const;
 
     void setThisPacket(const BasePacketPtr &thisPacket);
 
     ProcessorContext(ConnectionProcessor &processor);
+
+    //shortcut method for getting current packet from active context
+    static const BasePacketPtr &getCurrentPacketFromActiveContext() {
+        //@todo not crash with no context?
+        return Context::getActiveContext().get<ProcessorContext>()->getThisPacket();
+    }
 
 };
 

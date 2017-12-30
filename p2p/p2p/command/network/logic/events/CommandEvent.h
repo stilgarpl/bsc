@@ -22,7 +22,7 @@ private:
     std::vector<std::string> data; //may also be empty, but the number of arguments have to be exactly that what is required for the command
 
 public:
-    CommandEvent(BasePacket::IdType requestId);
+//    CommandEvent() = default;
 
     const std::string &getCommandName() const;
 
