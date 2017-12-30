@@ -149,13 +149,6 @@ path transformer w repository do  mapowania storage na mount pointy
 
 
 
-process wywołuje metody z Source
-czyli w momencie wywołania newEvent istnieje packet context, mozna pobrać id pakietu i zainicjalizować tym NetworkingEvent
-///@todo: ^
-
-
-
-
 
 nie podoba mi sie transfer plikow miedzy storage - najpierw klient pobiera adres pliku z serwera a potem robi scp.
 request resource powinien od razu inicjowac transfer bez podawaania sciezek, a storage powinien byc odbiorca strumienia

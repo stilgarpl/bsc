@@ -123,6 +123,7 @@ public:
         BeginTransfer::Request::Ptr req = BeginTransfer::Request::getNew();
         req->setResourceId(std::make_shared<SimplePathRI>(from));
         auto res = node.getModule<NodeNetworkModule>()->sendPacketToNode(nodeId, req);
+        LOGGER("received begin " + std::to_string(res->getTransferId()))
     }
 };
 
