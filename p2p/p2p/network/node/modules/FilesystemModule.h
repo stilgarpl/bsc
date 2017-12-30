@@ -12,6 +12,7 @@
 #include <experimental/filesystem>
 #include <p2p/filesystem/transfer/FileTransferDescriptor.h>
 #include <p2p/filesystem/network/logic/actions/TransferManager.h>
+#include <p2p/filesystem/identification/SimplePathRI.h>
 
 #include "NodeNetworkModule.h"
 
@@ -115,6 +116,13 @@ public:
                       << " (" << std::to_string(100 * item->getTransferredSize() / item->getFileSize()) << "%)"
                       << std::endl;
         }
+    }
+
+
+    void beginTransferTest(const NodeIdType &nodeId, fs::path from) {
+        BeginTransfer::Request::Ptr req = BeginTransfer::Request::getNew();
+        req->setResourceId(std::make_shared<SimplePathRI>(from));
+        auto res = node.getModule<NodeNetworkModule>()->sendPacketToNode(nodeId, req);
     }
 };
 

@@ -23,6 +23,18 @@ public:
             ar(cereal::base_class<Packet<BeginTransfer, BeginTransfer::Request>>(this), resourceId);
         }
 
+    public:
+        const ResourceIdentificatorPtr &getResourceId() const {
+            return resourceId;
+        }
+
+        void setResourceId(const ResourceIdentificatorPtr &resourceId) {
+            Request::resourceId = resourceId;
+        }
+
+        void process(Context &context) override;
+
+    private:
 
         friend class cereal::access;
     };

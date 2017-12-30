@@ -2,6 +2,7 @@
 // Created by stilgar on 30.12.17.
 //
 
+#include <p2p/network/protocol/context/NodeContext.h>
 #include "TransferManager.h"
 
 //const ResourceIdentificatorPtr &TransferManager::TransferDescriptor::getResourceIdentificatorPtr() const {
@@ -24,7 +25,7 @@ void TransferManager::TransferDescriptor::setInputStream(const std::shared_ptr<s
 
 void TransferManager::beginTransfer(const TransferEvent &event) {
     auto connection = event.origin();
-
+    LOGGER("begin transfer")
     ///@todo find transfer by resource id?
 
     std::shared_ptr<TransferDescriptor> descriptor = std::make_shared<TransferDescriptor>();
@@ -35,7 +36,7 @@ void TransferManager::beginTransfer(const TransferEvent &event) {
         ///@todo transfer id generator
         TransferId transferId = transfers.size();
         transfers[transferId] = descriptor;
-
+        NODECONTEXTLOGGER("adding transfer " + std::to_string(transferId));
         BeginTransfer::Response::Ptr response = BeginTransfer::Response::getNew(event.getRequestId());
         response->setTransferId(transferId);
 
