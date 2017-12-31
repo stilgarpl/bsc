@@ -9,6 +9,7 @@
 typedef unsigned long TransferId;
 
 typedef int TransferSize;
+typedef std::vector<char> RawDataType;
 
 
 ///@todo think about one thing: this enum serves two purposes - as transfer status indicator and as event id type - maybe it should be separated into two enums? or not

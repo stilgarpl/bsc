@@ -22,6 +22,12 @@ void FilesystemModule::setupActions(LogicManager &logicManager) {
 
     logicManager.setAction<TransferEvent>("beginTransfer",
                                           std::bind(&TransferManager::beginTransfer, &this->transferManager, _1));
+    logicManager.setAction<TransferEvent>("finishTransfer",
+                                          std::bind(&TransferManager::finishTransfer, &this->transferManager, _1));
+    logicManager.setAction<TransferEvent>("sendData",
+                                          std::bind(&TransferManager::sendData, &this->transferManager, _1));
+    logicManager.setAction<TransferEvent>("sendProps",
+                                          std::bind(&TransferManager::transferProperties, &this->transferManager, _1));
 
 }
 
@@ -32,7 +38,10 @@ bool FilesystemModule::assignActions(LogicManager &logicManager) {
         logicManager.assignAction<FileResponseEvent>(FileResponseEvent::IdType::CHUNK_RECEIVED, "fileRes") &&
         logicManager.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_REQUESTED, "fileAtrS") &&
         logicManager.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_RECEIVED, "fileAtrR") &&
-        logicManager.assignAction<TransferEvent>(TransferEvent::IdType::REQUESTED, "beginTransfer")
+        logicManager.assignAction<TransferEvent>(TransferEvent::IdType::REQUESTED, "beginTransfer") &&
+        logicManager.assignAction<TransferEvent>(TransferEvent::IdType::SENDING, "sendData") &&
+        logicManager.assignAction<TransferEvent>(TransferEvent::IdType::GET_PROPERTIES, "sendProps") &&
+        logicManager.assignAction<TransferEvent>(TransferEvent::IdType::FINISHING, "finishTransfer") //&&
             ) {
         std::clog << "Debug: File assignment!" << std::endl;
 

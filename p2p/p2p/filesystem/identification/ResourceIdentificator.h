@@ -26,6 +26,8 @@ public:
      */
     virtual std::shared_ptr<std::ostream> getResourceOutputStream() =0;
 
+    virtual std::uintmax_t getResourceSize() = 0;
+
     /**
      * returns true if the resource with this identificator exists on this node.
      * @return

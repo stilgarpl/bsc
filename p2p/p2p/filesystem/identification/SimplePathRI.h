@@ -10,6 +10,7 @@
 
 class SimplePathRI : public ResourceIdentificator {
 
+    ///@todo c++17 implemented -> change it to path
     const std::string resourcePath;
 
 public:
@@ -41,6 +42,8 @@ public:
     std::shared_ptr<std::istream> getResourceInputStream() override;
 
     std::shared_ptr<std::ostream> getResourceOutputStream() override;
+
+    uintmax_t getResourceSize() override;
 
 };
 

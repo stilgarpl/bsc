@@ -27,7 +27,7 @@ void TransferSource::sendData(const TransferId &transferId, const TransferSize &
     queueEvent(event);
 }
 
-void TransferSource::getTransferProperties(const TransferId &transferId) {
+void TransferSource::transferProperties(const TransferId &transferId) {
     auto event = newEvent();
     event->setTransferId(transferId);
     event->setEventId(EventIdType::GET_PROPERTIES);

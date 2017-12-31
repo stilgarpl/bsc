@@ -19,7 +19,7 @@ public:
 
     void sendData(const TransferId &transferId, const TransferSize &begin, const TransferSize &end);
 
-    void getTransferProperties(const TransferId &transferId);
+    void transferProperties(const TransferId &transferId);
 
 };
 

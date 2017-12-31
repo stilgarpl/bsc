@@ -3,3 +3,10 @@
 //
 
 #include "FinishTransfer.h"
+#include <p2p/network/protocol/context/LogicContext.h>
+#include <p2p/filesystem/network/logic/sources/TransferSource.h>
+
+void FinishTransfer::Request::process(Context &context) {
+    BasePacket::process(context);
+    LogicContext::getLogicManagerFromActiveContext().getSource<TransferSource>()->finishTransfer(this->getTransferId());
+}

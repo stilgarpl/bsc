@@ -7,6 +7,8 @@
 
 
 #include <p2p/network/protocol/packet/info/PacketInfo.h>
+#include <p2p/filesystem/identification/TransferTypes.h>
+
 
 struct FinishTransfer : public PacketGroup {
 
@@ -14,14 +16,25 @@ public:
 
 
     class Request : public Packet<FinishTransfer, FinishTransfer::Request> {
-
+        TransferId transferId;
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<FinishTransfer, FinishTransfer::Request>>(this));
+            ar(cereal::base_class<Packet<FinishTransfer, FinishTransfer::Request>>(this), transferId);
         }
 
+    public:
+        TransferId getTransferId() const {
+            return transferId;
+        }
 
+        void setTransferId(TransferId transferId) {
+            Request::transferId = transferId;
+        }
+
+        void process(Context &context) override;
+
+    private:
         friend class cereal::access;
     };
 

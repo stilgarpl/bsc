@@ -32,3 +32,7 @@ std::shared_ptr<std::ostream> SimplePathRI::getResourceOutputStream() {
 bool SimplePathRI::exists() {
     return fs::exists(resourcePath);
 }
+
+uintmax_t SimplePathRI::getResourceSize() {
+    return fs::file_size(resourcePath);
+}
