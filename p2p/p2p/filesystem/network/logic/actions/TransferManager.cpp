@@ -128,8 +128,9 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
     ret->setDestination(destination);
     ret->setSourceNode(nodeId);
     ret->startThread([=](LocalTransferDescriptor &descriptorPtr) {
+        ///@todo get from config
         const TransferSize MAX_CHUNK_SIZE = 1950;
-        LOGGER("download thread started")
+//        LOGGER("download thread started")
         auto destinationStream = destination->getResourceOutputStream();
         //starting transfer
         BeginTransfer::Request::Ptr beginRequest = BeginTransfer::Request::getNew();
@@ -139,29 +140,29 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
         BeginTransfer::Response::Ptr beginResponse = networkModule->sendPacketToNode(nodeId, beginRequest);
         if (beginResponse != nullptr) {
             auto transferId = beginResponse->getTransferId();
-            LOGGER("begin res received")
+//            LOGGER("begin res received")
 
             PropertiesTransfer::Request::Ptr propertiesRequest = PropertiesTransfer::Request::getNew();
             propertiesRequest->setTransferId(transferId);
-            LOGGER("querying properties")
+//            LOGGER("querying properties")
 
             PropertiesTransfer::Response::Ptr propertiesResponse = networkModule->sendPacketToNode(nodeId,
                                                                                                    propertiesRequest);
             if (propertiesResponse != nullptr) {
-                LOGGER("got properties")
+//                LOGGER("got properties")
 
                 auto resourceSize = propertiesResponse->getSize();
                 SHOW(resourceSize);
                 TransferSize chunk_count = resourceSize / MAX_CHUNK_SIZE;
-                LOGGER("chunk count = " + std::to_string(chunk_count));
+//                LOGGER("chunk count = " + std::to_string(chunk_count));
                 for (int i = 0; i < chunk_count + 1; ++i) {
 
                     DataTransfer::Request::Ptr dataRequest = DataTransfer::Request::getNew();
                     dataRequest->setTransferId(transferId);
                     dataRequest->setBegin(i * MAX_CHUNK_SIZE);
-                    LOGGER("begin =" + std::to_string(i * MAX_CHUNK_SIZE));
+//                    LOGGER("begin =" + std::to_string(i * MAX_CHUNK_SIZE));
                     dataRequest->setEnd(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
-                    LOGGER("begin =" + std::to_string(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize)));
+//                    LOGGER("begin =" + std::to_string(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize)));
                     DataTransfer::Response::Ptr response = networkModule->sendPacketToNode(nodeId, dataRequest);
                     if (response != nullptr) {
                         // SendFile::Response* response;
@@ -181,6 +182,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
             networkModule->sendPacketToNode(nodeId, finishRequest);
         }
     });
+    LOGGER("transfer finished");
     localTransfers.push_back(ret);
     return ret;
 }
