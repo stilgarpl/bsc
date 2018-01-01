@@ -54,7 +54,7 @@ public:
 
     protected:
 
-        void startThread(std::function<void(FileTransferDescriptor &)> f) {
+        void startThread(std::function<void(LocalTransferDescriptor &)> f) {
             thread = std::make_unique<std::thread>(f, std::ref(*this));
             //f(*this);
         }
@@ -125,6 +125,8 @@ private:
     TransferId generateTransferId();
 
     std::map<TransferId, std::shared_ptr<RemoteTransferDescriptor>> transfers;
+    std::list<LocalTransferDescriptorPtr> localTransfers;
+
 public:
     void beginTransfer(const TransferEvent &event);
     void transferError(const TransferEvent &event) {
@@ -142,7 +144,7 @@ public:
                   const RawDataType &data);
 
 
-    [[nodiscard]] static LocalTransferDescriptorPtr
+    [[nodiscard]]  LocalTransferDescriptorPtr
     initiateTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
 
 };

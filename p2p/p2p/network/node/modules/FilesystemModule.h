@@ -84,6 +84,11 @@ public:
      */
     FileTransferDescriptorPtr remoteGetFile(const NodeIdType &nodeId, fs::path from, fs::path to);
 
+    auto remoteGetFile2(const NodeIdType &nodeId, fs::path from, fs::path to) {
+        return transferManager.initiateTransfer(nodeId, std::make_shared<SimplePathRI>(from),
+                                                std::make_shared<SimplePathRI>(to));
+    }
+
 
     void printCurrentTransfers() {
         std::cout << "Current transfers" << std::endl;

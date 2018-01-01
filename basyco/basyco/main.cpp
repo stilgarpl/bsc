@@ -122,6 +122,7 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("pwd", &FilesystemModule::printWorkingDirectory);
     cmd->mapCommand("ls", &FilesystemModule::listCurrentDirectory);
     cmd->mapCommand("scp", &FilesystemModule::remoteGetFile);
+    cmd->mapCommand("scp2", &FilesystemModule::remoteGetFile2);
     cmd->mapCommand("lscp", &FilesystemModule::printCurrentTransfers);
 
     cmd->mapCommand("createRep", &RepoModule::createRepository);

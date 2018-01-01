@@ -8,7 +8,7 @@
 
 typedef unsigned long TransferId;
 
-typedef int TransferSize;
+typedef uintmax_t TransferSize;
 typedef std::vector<char> RawDataType;
 
 
