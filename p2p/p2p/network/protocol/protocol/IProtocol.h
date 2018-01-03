@@ -65,13 +65,48 @@ public:
         try {
             auto ret = future.get();
 
-            // auto retStatus = ret->getStatus(); //debug value
-            return std::static_pointer_cast<ReturnType>(ret);
+            // auto retStatus = ret->getStatus(); //debug
+            if (ret->getStatus() == status) {
+                return std::static_pointer_cast<ReturnType>(ret);
+            } else {
+                return std::shared_ptr<ReturnType>(nullptr);
+            }
         } catch (const std::future_error &e) {
             //broken promise
             return std::shared_ptr<ReturnType>(nullptr);
         }
     }
+
+
+    template<typename SendType>
+    auto sendExpectExtended(Connection *conn, NetworkPacketPointer<SendType> p) {
+        typedef typename PacketInfo<typename SendType::BaseType, Status::RESPONSE>::Type ResponseType;
+        typedef typename PacketInfo<typename SendType::BaseType, Status::ERROR>::Type ErrorType;
+        struct ReturnValue {
+            std::shared_ptr<ResponseType> response = nullptr;
+            std::shared_ptr<ErrorType> error = nullptr;
+        };
+        ReturnValue returnValue;
+        auto future = send(conn, p, Status::RESPONSE);
+        //future.wait();
+        ///@todo check if there is a way to do it without exceptions, maybe .valid() ?
+        try {
+            auto ret = future.get();
+
+            // auto retStatus = ret->getStatus(); //debug
+            if (ret->getStatus() == Status::RESPONSE) {
+                returnValue.response = std::static_pointer_cast<ResponseType>(ret);
+            } else {
+                returnValue.error = std::static_pointer_cast<ErrorType>(ret);
+            }
+            return returnValue;
+        } catch (const std::future_error &e) {
+            //broken promise
+            returnValue.error = nullptr;
+            return returnValue;
+        }
+    }
+
 
     void setupActions(LogicManager &logicManager) override;
 

@@ -14,15 +14,19 @@ void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
     std::lock_guard<std::mutex> g(lock);
     //  LOGGER("onPacketReceived");
     if (responseMap.count(event.getPacket()->getId()) > 0) {
-        if (event.getPacket()->getStatus() == responseMap[event.getPacket()->getId()]->getExpectedStatus()) {
-            auto &ptr = responseMap[event.getPacket()->getId()];
-            if (ptr != nullptr) { //not all packets are from this protocol...
+        auto &ptr = responseMap[event.getPacket()->getId()];
+        if (ptr != nullptr) { //not all packets are from this protocol...
+            if (event.getPacket()->getStatus() == ptr->getExpectedStatus()) {
+                ptr->getResponsePromise().set_value(event.getPacket());
+                responseMap.erase(event.getPacket()->getId());
+            } else if (event.getPacket()->getStatus() == Status::ERROR) {
                 ptr->getResponsePromise().set_value(event.getPacket());
                 responseMap.erase(event.getPacket()->getId());
             }
         }
     }
 }
+
 
 void GravitonProtocol::work(const Tick &tick) {
     std::lock_guard<std::mutex> g(lock);
@@ -46,6 +50,19 @@ std::future<BasePacketPtr> GravitonProtocol::send(Connection *conn, BasePacketPt
     conn->send(p);
     return ptr->getResponsePromise().get_future();
 }
+
+
+//std::future<BasePacketPtr> GravitonProtocol::send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) {
+//    std::lock_guard<std::mutex> g(lock);
+//    //  LOGGER("send");
+//    std::shared_ptr<BasePacketInfo> ptr = std::make_shared<BasePacketInfo>(p, conn,
+//                                                                           std::chrono::steady_clock::now(),
+//                                                                           expectedStatus);
+//
+//    this->responseMap[p->getId()] = ptr;
+//    conn->send(p);
+//    return ptr->getResponsePromise().get_future();
+//}
 
 void GravitonProtocol::onConnectionEvent(const ConnectionEvent &event) {
 
