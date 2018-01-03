@@ -69,3 +69,22 @@ bool JournalState::operator!=(const JournalState &rhs) const {
 const ResourceId &JournalState::getChecksum() const {
     return checksum;
 }
+
+void JournalStateData::update() {
+
+    if (fs::exists(path)) {
+        CryptoPP::SHA256 hash;
+        std::string digest;
+        size = fs::file_size(fs::path(path));
+        modificationTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
+        permissions = fs::status(path).permissions();
+
+        CryptoPP::FileSource f(path.c_str(), true, new CryptoPP::HashFilter(hash, new CryptoPP::HexEncoder(
+                new CryptoPP::StringSink(digest))));
+        checksum = std::move(digest);
+    }
+}
+
+fs::perms JournalStateData::getPermissions() const {
+    return permissions;
+}

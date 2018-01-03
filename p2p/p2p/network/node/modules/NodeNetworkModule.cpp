@@ -143,6 +143,7 @@ bool NodeNetworkModule::setupLogic(LogicManager &logicManager) {
 
 
 void NodeNetworkModule::updateNodeConnectionInfo() {
+    ///@todo this is wrong, it blocks connections until its done.
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
     //   std::lock_guard<std::mutex> g1(node.getLock());
     // std::thread([&]() {

@@ -35,7 +35,7 @@ protected:
     EventTypePtr newEvent(Args... args) {
         auto ret = std::make_shared<EventType_>(args...);
         ///@todo think about setup method and make it better and cleaner? I'm not fond of the interface
-        LOGGER(typeid(EventType_).name())
+//        LOGGER(typeid(EventType_).name())
         EventType::setup(ret.get());
         ///@todo shouldn't this be in the EventType (IEvent) constructor?
         setupOrigin<typename EventType::OriginType>::setup(ret->origin());

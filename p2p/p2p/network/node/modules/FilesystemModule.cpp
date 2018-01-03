@@ -76,13 +76,13 @@ const std::experimental::filesystem::path &FilesystemModule::getCurrentPath() co
     return currentPath;
 }
 
-FileTransferDescriptorPtr FilesystemModule::remoteGetFile(const NodeIdType &nodeId, fs::path from, fs::path to) {
-
-    if (to.is_relative()) {
-        to = currentPath / to;
-    }
-    auto ret = FileTransferControl::initiateTransfer(node, nodeId, from, to);
-
-    currentTransfers.push_back(ret);
-    return ret;
-}
+//FileTransferDescriptorPtr FilesystemModule::remoteGetFile(const NodeIdType &nodeId, fs::path from, fs::path to) {
+//
+//    if (to.is_relative()) {
+//        to = currentPath / to;
+//    }
+//    auto ret = FileTransferControl::initiateTransfer(node, nodeId, from, to);
+//
+//    currentTransfers.push_back(ret);
+//    return ret;
+//}

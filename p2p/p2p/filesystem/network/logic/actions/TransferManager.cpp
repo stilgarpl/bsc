@@ -124,12 +124,17 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
     auto networkModule = node.getModule<NodeNetworkModule>();
     LocalTransferDescriptorPtr ret = std::make_shared<LocalTransferDescriptor>();
 
+    Context *activeContext = &Context::getActiveContext();
+
     ret->setSource(source);
     ret->setDestination(destination);
     ret->setSourceNode(nodeId);
     ret->startThread([=](LocalTransferDescriptor &descriptorPtr) {
+        //before anything, set active context
+        Context::setActiveContext(activeContext);
+
         ///@todo get from config
-        const TransferSize MAX_CHUNK_SIZE = 1950;
+        const TransferSize MAX_CHUNK_SIZE = 19500;
 //        LOGGER("download thread started")
         auto destinationStream = destination->getResourceOutputStream();
         //starting transfer
@@ -166,6 +171,8 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
                     DataTransfer::Response::Ptr response = networkModule->sendPacketToNode(nodeId, dataRequest);
                     if (response != nullptr) {
                         // SendFile::Response* response;
+                        LOGGER(std::to_string(response->getEnd()) + "/" + std::to_string(resourceSize) + " : " +
+                               std::to_string(100 * response->getEnd() / resourceSize) + "%");
                         TransferManager::saveDataChunk(destinationStream, response->getBegin(), response->getEnd(),
                                                        response->getData());
                         ret->setTransferredSize(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
@@ -179,10 +186,12 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
 
             destinationStream->flush();
             FinishTransfer::Request::Ptr finishRequest = FinishTransfer::Request::getNew();
+            LOGGER("finishing transfer");
             networkModule->sendPacketToNode(nodeId, finishRequest);
         }
+        LOGGER("transfer finished");
     });
-    LOGGER("transfer finished");
+
     localTransfers.push_back(ret);
     return ret;
 }

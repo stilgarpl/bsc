@@ -121,8 +121,8 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("cd", &FilesystemModule::changeDirectory);
     cmd->mapCommand("pwd", &FilesystemModule::printWorkingDirectory);
     cmd->mapCommand("ls", &FilesystemModule::listCurrentDirectory);
+//    cmd->mapCommand("scp", &FilesystemModule::remoteGetFile);
     cmd->mapCommand("scp", &FilesystemModule::remoteGetFile);
-    cmd->mapCommand("scp2", &FilesystemModule::remoteGetFile2);
     cmd->mapCommand("lscp", &FilesystemModule::printCurrentTransfers);
 
     cmd->mapCommand("createRep", &RepoModule::createRepository);
@@ -133,7 +133,7 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("printRep", &RepoModule::printHistory);
     cmd->mapCommand("downRep", &RepoModule::downloadRemoteRepository);
     cmd->mapCommand("resRep", &RepoModule::restoreRepository);
-    cmd->mapCommand("requestResource", &RepoModule::requestStoragePath);
+//    cmd->mapCommand("requestResource", &RepoModule::requestStoragePath);
     cmd->mapCommand("beginTransfer", &FilesystemModule::beginTransferTest);
 
 }

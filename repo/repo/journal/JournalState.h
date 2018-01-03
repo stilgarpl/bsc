@@ -35,16 +35,19 @@ namespace fs = std::experimental::filesystem;
 class JournalStateData {
 private:
     JournalMethod method;
+    fs::perms permissions;
 
 
 private:
     PathType path;
     uintmax_t size = 0;
+    std::time_t modificationTime;
     ResourceId checksum; //checksum of the file.
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(CEREAL_NVP(method), CEREAL_NVP(path), CEREAL_NVP(size), CEREAL_NVP(checksum));
+        ar(CEREAL_NVP(method), CEREAL_NVP(path), CEREAL_NVP(size), CEREAL_NVP(checksum), CEREAL_NVP(modificationTime),
+           CEREAL_NVP(permissions));
     }
 
 
@@ -61,6 +64,12 @@ public:
         return method;
     }
 
+    fs::perms getPermissions() const;
+
+    time_t getModificationTime() const {
+        return modificationTime;
+    }
+
     void setMethod(JournalMethod method) {
         JournalStateData::method = method;
     }
@@ -74,18 +83,7 @@ public:
         update();
     }
 
-    void update() {
-
-        ///@todo string -> path
-        if (fs::exists(fs::path(path))) {
-            CryptoPP::SHA256 hash;
-            std::string digest;
-            size = fs::file_size(fs::path(path));
-            CryptoPP::FileSource f(path.c_str(), true, new CryptoPP::HashFilter(hash, new CryptoPP::HexEncoder(
-                    new CryptoPP::StringSink(digest))));
-            checksum = std::move(digest);
-        }
-    }
+    void update();
 
     const ResourceId &getChecksum() const {
         return checksum;

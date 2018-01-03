@@ -21,9 +21,12 @@ public:
         auto repoMod = node.getModule<RepoModule>();
 
         auto repo = repoMod->findRepository(event.getRepositoryId());
-
-        response->setPath(repo->getStoragePath(event.getObjectId()));
-
+        if (repo != nullptr) {
+            response->setExists(repo->getStorage()->hasResource(event.getObjectId()));
+        } else {
+            ///@todo maybe add another response? repository not found?
+            response->setExists(false);
+        }
         connection->send(response);
     }
 };

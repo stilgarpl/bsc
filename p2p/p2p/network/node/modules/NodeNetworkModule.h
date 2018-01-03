@@ -13,6 +13,7 @@
 
 #include <p2p/network/protocol/protocol/GravitonProtocol.h>
 #include <p2p/network/protocol/connection/IServerConnection.h>
+#include <p2p/network/node/modules/broadcast/BroadcastScope.h>
 
 struct NodeConnectionInfo {
     ConnectionPtr connection;
@@ -111,7 +112,7 @@ public: // @todo should be public or shouldn't ?
 
         if (conn != nullptr) {
 
-            LOGGER("sending packet to node " + nodeId)
+//            LOGGER("sending packet to node " + nodeId)
             return protocol->sendExpect(conn.get(), p);
 
         } else {
@@ -119,6 +120,41 @@ public: // @todo should be public or shouldn't ?
             return std::shared_ptr<ReturnType>(nullptr);
 
         }
+    };
+
+    template<enum Status status = Status::RESPONSE, typename SendType>
+    auto broadcastPacket(NetworkPacketPointer<SendType> p, const BroadcastScope &scope = BroadcastScope::CONNECTED) {
+        typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
+
+        std::map<NodeIdType, NetworkPacketPointer<ReturnType>> ret;
+        auto MAX_WAIT_TIME = 2s;
+
+        std::lock_guard<std::mutex> g(activeConnectionsMutex);
+
+        for (auto &&item : activeClientConnections) {
+            if (item->nodeId) {
+                ret[*item->nodeId] = protocol->sendExpect(item->connection.get(), p);
+            }
+        }
+        ///@todo maybe return some class, not just a map?
+        return ret;
+
+        ///@todo implement faster broadcast, like below. I'm too sleepy to do it now
+//        //@todo other scopes than connected
+//        std::map<NodeIdType, std::future<BasePacketPtr>> responses;
+//        {
+//            std::lock_guard<std::mutex> g(activeConnectionsMutex);
+//
+//            for (auto &&item : activeClientConnections) {
+//                if (item->nodeId) {
+//                    responses[*item->nodeId] = protocol->send(item->connection.get(), p, status);
+//                }
+//            }
+//        }
+//
+//        for (auto && item/*[key, item]*/ : responses) {
+//            if (item.second.wait_for(0) == std::future_status::ready)
+//        }
     };
 
     void run() override;

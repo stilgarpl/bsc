@@ -116,6 +116,12 @@ public:
                 thread->join();
             }
         }
+
+        void wait() {
+            if (thread != nullptr && thread->joinable()) {
+                thread->join();
+            }
+        }
     };
 
 public:

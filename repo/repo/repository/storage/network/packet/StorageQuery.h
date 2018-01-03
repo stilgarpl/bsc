@@ -63,23 +63,23 @@ public:
     class Response : public Packet<StorageQuery, StorageQuery::Response> {
     private:
         //@todo C++17 path when cereal is ready
-        std::string path;
+        bool exists;
 
         template<class Archive>
         void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<StorageQuery, StorageQuery::Response>>(this), path);
+            ar(cereal::base_class<Packet<StorageQuery, StorageQuery::Response>>(this), exists);
         }
 
 
         friend class cereal::access;
 
     public:
-        const std::string &getPath() const {
-            return path;
+        bool isExists() const {
+            return exists;
         }
 
-        void setPath(const std::string &path) {
-            Response::path = path;
+        void setExists(bool exists) {
+            Response::exists = exists;
         }
     };
 

@@ -58,7 +58,7 @@ public:
     }
 
     static void setup(IEvent *event) {
-        LOGGER("IEVENT SETUP");
+//        LOGGER("IEVENT SETUP");
     };
 
 };

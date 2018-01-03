@@ -56,7 +56,7 @@ public:
     NetworkingEvent() = default;
 
     static void setup(NetworkingEvent *event) {
-        LOGGER("NetworkingEvent SETUP")
+//        LOGGER("NetworkingEvent SETUP")
         auto packet = ProcessorContext::getCurrentPacketFromActiveContext();
         event->setRequestId(packet->getId());
     };

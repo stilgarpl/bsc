@@ -34,9 +34,9 @@ public:
 
     InternalStorage(IRepository *r);
 
-    fs::path getResourcePath(const ResourceId &resourceId) override;
+    fs::path getResourcePath(const ResourceId &resourceId) const override;
 
-    bool hasResource(const ResourceId &resourceId) override;
+    bool hasResource(const ResourceId &resourceId) const override;
 };
 
 

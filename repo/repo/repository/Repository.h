@@ -30,65 +30,23 @@ public:
 
     JournalPtr &getJournal();
 
+    const std::shared_ptr<IStorage> &getStorage() const;
+
     void setJournal(const JournalPtr &journal);
 
-    fs::path getStoragePath(const IStorage::ResourceId &resourceId) {
-        return storage->getResourcePath(resourceId);
-    };
+//    fs::path getStoragePath(const IStorage::ResourceId &resourceId) {
+//        return storage->getResourcePath(resourceId);
+//    };
 
 
-    void buildFileMap() {
-        journal->setFunc(JournalMethod::ADDED, [&](auto &i) {
-            fileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());//i.getChecksum();
-            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-        });
+    void buildFileMap();
 
-        journal->setFunc(JournalMethod::MOVED, [&](auto &i) {
-            fileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());
-            LOGGER(i.getChecksum() + " ::: " + i.getPath());
-        });
-
-
-        journal->replay();
-    }
-
-    void restoreAll() {
-        journal->setFunc(JournalMethod::ADDED, [&](auto &i) {
-            ///@todo path transform
-            bool ret = storage->restore(i.getChecksum(), i.getSize(), i.getPath());
-            if (!ret) {
-                //restore failed.
-                auto resourceId = storage->getResourceId(i.getChecksum(), i.getSize());
-                //check if the resource is in storage
-                if (!storage->hasResource(resourceId)) {
-                    //download from another repo
-                    ///@todo download
-                } else {
-                    //weird, maybe no space left?
-                    ///@todo error handling
-                }
-            }
-//            fileMap[i.getPath()] = i.getChecksum();
-//            LOGGER(i.getChecksum() + " ::: " + i.getPath());
-        });
-
-        journal->setFunc(JournalMethod::MOVED, [&](auto &i) {
-//            fileMap[i.getPath()] = i.getChecksum();
-//            LOGGER(i.getChecksum() + " ::: " + i.getPath());
-        });
-
-
-        journal->replay();
-    }
+    void restoreAll();
 
 public:
 
 
-    void persist(fs::path path) {
-        journal->append(JournalMethod::ADDED, path);
-        ///@todo take values from journal, or, even better, replay journal state during commit and do the store in that
-        storage->store(calculateSha1OfFile(path), fs::file_size(path), path);
-    }
+    void persist(fs::path path);
 
     Repository(const RepoIdType &repositoryId);
 
