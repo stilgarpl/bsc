@@ -102,7 +102,6 @@ public:
             return returnValue;
         } catch (const std::future_error &e) {
             //broken promise
-            returnValue.error = nullptr;
             return returnValue;
         }
     }
