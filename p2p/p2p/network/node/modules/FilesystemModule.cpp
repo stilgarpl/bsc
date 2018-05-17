@@ -9,7 +9,7 @@
 #include "FilesystemModule.h"
 #include "BasicModule.h"
 
-FilesystemModule::FilesystemModule(INode &node) : NodeModule(node) {
+FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent(node) {
     setRequired<BasicModule, NodeNetworkModule>();
 }
 

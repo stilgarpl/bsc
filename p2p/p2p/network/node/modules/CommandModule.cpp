@@ -10,7 +10,7 @@
 #include "BasicModule.h"
 #include "NodeNetworkModule.h"
 
-CommandModule::CommandModule(INode &node) : NodeModule(node), defaultSubModule(*this) {
+CommandModule::CommandModule(INode &node) : NodeModuleDependent(node), defaultSubModule(*this) {
 
     setRequired<BasicModule>();
 }

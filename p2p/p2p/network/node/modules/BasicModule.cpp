@@ -6,7 +6,7 @@
 #include <p2p/network/node/protocol/logic/actions/NodeActions.h>
 #include "BasicModule.h"
 
-BasicModule::BasicModule(INode &node) : NodeModule(node) {
+BasicModule::BasicModule(INode &node) : NodeModuleDependent(node) {
 
 }
 

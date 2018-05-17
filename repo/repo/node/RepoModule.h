@@ -14,7 +14,7 @@
 #include <repo/journal/network/packet/JournalGroup.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>
 
-class RepoModule : public NodeModule, public DependencyManaged<RepoModule> {
+class RepoModule : public NodeModuleDependent<RepoModule> {
 private:
     RepositoryManager repositoryManager;
     RepositoryPtr selectedRepository = nullptr;

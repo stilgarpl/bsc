@@ -29,7 +29,7 @@ bool RepoModule::setupSources(LogicManager &logicManager) {
     return true;
 }
 
-RepoModule::RepoModule(INode &node) : NodeModule(node) {
+RepoModule::RepoModule(INode &node) : NodeModuleDependent(node) {
     setRequired<BasicModule>();
 }
 

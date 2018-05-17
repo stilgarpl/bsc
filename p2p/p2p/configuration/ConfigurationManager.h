@@ -11,6 +11,7 @@ namespace fs = std::experimental::filesystem;
 
 #include "IConfig.h"
 
+//@todo should this be a singleton? nah, it should be per node
 class ConfigurationManager {
     typedef std::string IdType;
     fs::path configPath;
@@ -25,6 +26,7 @@ protected:
 public:
     void save(const IdType &id, std::shared_ptr<IConfig> config);
 
+    ///@todo why not IConfig
     template<typename T>
     std::shared_ptr<T> load(const IdType &id) {
         return std::static_pointer_cast<T>(load_void(id));
@@ -32,6 +34,13 @@ public:
 protected:
     std::shared_ptr<void> load_void(const IdType &id);
 
+private:
+    void initializeManager() {
+        configPath = "/tmp/basyco/";
+        //create directory if not exist
+        fs::create_directories(configPath);
+
+    }
 public:
     ConfigurationManager();
 };

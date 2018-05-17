@@ -22,7 +22,7 @@
 
 using namespace Poco::Net;
 
-NodeNetworkModule::NodeNetworkModule(INode &node) : NodeModule(node) {
+NodeNetworkModule::NodeNetworkModule(INode &node) : NodeModuleDependent(node) {
     setRequired<BasicModule>();
 }
 

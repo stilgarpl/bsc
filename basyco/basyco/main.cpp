@@ -135,6 +135,7 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("resRep", &RepoModule::restoreRepository);
 //    cmd->mapCommand("requestResource", &RepoModule::requestStoragePath);
     cmd->mapCommand("beginTransfer", &FilesystemModule::beginTransferTest);
+//    cmd->submodule("help").mapCommand("cmdList",&CommandModule::listCommands);
 
 }
 

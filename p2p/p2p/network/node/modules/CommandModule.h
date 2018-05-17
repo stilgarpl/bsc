@@ -30,7 +30,7 @@ public:
 #include <p2p/utils/template_cast.h>
 
 
-class CommandModule : public NodeModule, public DependencyManaged<CommandModule> {
+class CommandModule : public NodeModuleDependent<CommandModule> {
 public:
     typedef const std::vector<std::string> &ArgumentContainerType;
 public:
@@ -41,6 +41,11 @@ public:
         CommandModule &parent;
         std::map<std::string, std::shared_ptr<CommandSubModule>> submodules;
 
+    private:
+        auto &getCommandMap() {
+            return commands.get<std::string, std::function<void(ArgumentContainerType)>>();
+        }
+
     public:
         CommandSubModule(CommandModule &parent) : parent(parent) {}
 
@@ -50,7 +55,7 @@ public:
         ///template <typename ReturnType, typename ... Args>
         bool mapCommand(std::string prefix, std::string commandName, std::function<void(ArgumentContainerType)> func) {
             std::string key = prefix + ":::" + commandName;
-            auto &map = commands.get<std::string, std::function<void(ArgumentContainerType)>>();
+            auto &map = getCommandMap();//commands.get<std::string, std::function<void(ArgumentContainerType)>>();
             map[key] = func;
             return true;
         };
@@ -83,16 +88,18 @@ public:
         bool runCommand(std::string commandName, ArgumentContainerType arguments) {
             ///@todo integrate duplicate code with CommandModule somehow
             if (submodules.count(commandName) > 0 && arguments.size() > 1) {
+                //command is a submodule, redirecting
                 ///@todo type
                 std::vector<std::string> newArguments(arguments.begin() + 1, arguments.end());
                 std::string newCommand = (*arguments.begin());
                 return submodule(commandName).runCommand(newCommand, newArguments);
                 // return false;
             } else {
+                //command is mapped to this module, execute
                 std::string prefix = " "; ///@todo raw pointers and this is colliding std::to_string(arguments.size());
                 LOGGER("Running module " + prefix + " command " + commandName);
                 std::string key = prefix + ":::" + commandName;
-                auto &map = commands.get<std::string, std::function<void(ArgumentContainerType)>>();
+                auto &map = getCommandMap();
                 if (map.count(key) == 0) {
                     NODECONTEXTLOGGER("FAILURE");
                     return false;
@@ -101,6 +108,14 @@ public:
                     NODECONTEXTLOGGER("SUCCESS")
                     return true;
                 }
+            }
+        }
+
+        auto getCommands() {
+            std::list<std::string> retVal;
+            auto &map = getCommandMap();
+            for (auto &&[key, value] : map) {
+                retVal.push_back(key);
             }
         }
 
@@ -281,6 +296,10 @@ public:
 
 
     void sendRemoteCommand(ArgumentContainerType args);
+
+    void listCommands() {
+
+    }
 
 };
 

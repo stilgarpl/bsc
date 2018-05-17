@@ -18,7 +18,7 @@
 
 namespace fs = std::experimental::filesystem;
 
-class FilesystemModule : public NodeModule, public DependencyManaged<FilesystemModule> {
+class FilesystemModule : public NodeModuleDependent<FilesystemModule> {
 
     fs::path currentPath = fs::current_path();
     std::list<FileTransferDescriptorPtr> currentTransfers;

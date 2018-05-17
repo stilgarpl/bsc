@@ -10,7 +10,7 @@
 #include <p2p/dependency/DependencyManaged.h>
 
 
-class BasicModule : public NodeModule, public DependencyManaged<BasicModule> {
+class BasicModule : public NodeModuleDependent<BasicModule> {
 public:
     BasicModule(INode &node);
 

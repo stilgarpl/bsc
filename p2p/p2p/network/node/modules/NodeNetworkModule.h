@@ -22,7 +22,7 @@ struct NodeConnectionInfo {
 
 typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
 
-class NodeNetworkModule : public NodeModule, public DependencyManaged<NodeNetworkModule> {
+class NodeNetworkModule : public NodeModuleDependent<NodeNetworkModule> {
 private:
     std::unique_ptr<IProtocol> protocol = std::make_unique<GravitonProtocol>();
     std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
