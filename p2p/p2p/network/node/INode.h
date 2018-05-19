@@ -20,9 +20,6 @@ public:
 
     virtual void setNodeContextActive() =0;
 
-protected:
-    virtual INodeModulePtr getModuleByDependencyId(DependencyManager::TypeIdType id) = 0;
-
 //    virtual void runModuleMod(std::function<void()> method,INodeModulePtr module) = 0;
 
 public: //@todo should it be public?
@@ -30,22 +27,57 @@ public: //@todo should it be public?
         return lock;
     }
 
+private:
+protected:
+    StaticUber<INodeModulePtr> modules;
+
 public:
 
     template<typename ModuleType>
-    ModuleTypePtr<ModuleType> getModule() {
-        //  std::lock_guard<std::mutex> g(lock);
-        auto id = DependencyManager::getClassId<ModuleType>();
-        //possible to cast, we know exactly what type this pointer has (it has either good type or it's null
-        return std::static_pointer_cast<ModuleType>(getModuleByDependencyId(id));
+    void addModule() {
+        ///@todo check if module exist before overwriting?
+        if (modules.get<ModuleType>() == nullptr) {
+            modules.get<ModuleType>() = std::make_shared<ModuleType>(std::ref(*this));
+        } else {
+            LOGGER(std::string("Module ") + typeid(ModuleType).name() + " already added!")
+        }
     }
+
+//    template<typename ModuleType>
+//    ModuleTypePtr getModulePtr() {
+//        return modules.get<ModuleType>();
+//    }
+
 
     template<typename ModuleType>
     bool hasModule() {
-        return getModule<ModuleType>() != nullptr;
+        return modules.get<ModuleType>() != nullptr;
+        //return modules.get<ModuleType>();
 
-//        runModuleMod([&](){}, nullptr);
     }
+
+
+    template<typename ModuleType>
+    ModuleTypePtr<ModuleType> getModule() {
+        return std::static_pointer_cast<ModuleType>(modules.get<ModuleType>());
+        //return modules.get<ModuleType>();
+
+    }
+
+//    template<typename ModuleType>
+//    ModuleTypePtr<ModuleType> getModule() {
+//        //  std::lock_guard<std::mutex> g(lock);
+//        auto id = DependencyManager::getClassId<ModuleType>();
+//        //possible to cast, we know exactly what type this pointer has (it has either good type or it's null
+//        return std::static_pointer_cast<ModuleType>(getModuleByDependencyId(id));
+//    }
+//
+//    template<typename ModuleType>
+//    bool hasModule() {
+//        return getModule<ModuleType>() != nullptr;
+//
+////        runModuleMod([&](){}, nullptr);
+//    }
 
     virtual NodeInfo &getNodeInfo() =0;
 

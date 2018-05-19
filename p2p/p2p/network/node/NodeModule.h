@@ -36,16 +36,23 @@ template<typename T, typename ... Args>
 class NodeModuleDependent : public NodeModule, public DependencyManaged<T> {
 
 private:
-//    template<typename T1, typename... Args1>
-//    void checkAndAddModules() {
-//        if (!node.hasModule<T1>()) {
-//            node.addM
-//        }
-//    }
+    template<typename T1, typename... Args1>
+    void checkAndAddModules() {
+        if (!node.hasModule<T1>()) {
+            node.addModule<T1>();
+            LOGGER(std::string("MODULE NOT FOUND, ADDING MODULE") + typeid(T1).name());
+        }
+        if constexpr (sizeof...(Args1) > 0) {
+            checkAndAddModules<Args1...>();
+        }
+    }
 
 public:
     NodeModuleDependent(INode &node) : NodeModule(node) {
         this->template setRequired<Args...>();
+        if constexpr (sizeof...(Args) > 0) {
+            checkAndAddModules<Args...>();
+        }
     };
 };
 

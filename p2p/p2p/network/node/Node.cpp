@@ -138,17 +138,6 @@ void Node::joinModules() {
 
 }
 
-INodeModulePtr Node::getModuleByDependencyId(DependencyManager::TypeIdType id) {
-    INodeModulePtr result = nullptr;
-    modules.forEach([&](auto i) {
-        if (i->getDependencyId() == id) {
-            result = i;
-            return;
-        }
-    });
-    return result;
-}
-
 void Node::waitToFinish() {
     logicManager.join();
     ///@todo replace this with waiting for modules

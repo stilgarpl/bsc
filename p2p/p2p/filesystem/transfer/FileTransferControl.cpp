@@ -53,7 +53,7 @@ FileTransferControl::initiateTransfer(INode &node, const NodeIdType &nodeId, fs:
             } else {
                 size_t chunk_count = file_size / MAX_CHUNK_SIZE;
 //                LOGGER("chunk count = " + std::to_string(chunk_count));
-                for (int i = 0; i < chunk_count + 1; ++i) {
+                for (unsigned int i = 0; i < chunk_count + 1; ++i) {
                     sendFileRequest->setBegin(i * MAX_CHUNK_SIZE);
 //                    LOGGER("begin =" + std::to_string(i * MAX_CHUNK_SIZE));
                     sendFileRequest->setEnd(std::min((i + 1) * MAX_CHUNK_SIZE, file_size));

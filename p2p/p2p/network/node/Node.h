@@ -87,38 +87,13 @@ private:
 
 
     // typedef std::shared_ptr<INodeModule> INodeModulePtr;
-    StaticUber<INodeModulePtr> modules;
+
 
 
 
 public:
 
-    template<typename ModuleType>
-    void addModule() {
-        ///@todo check if module exist before overwriting?
-        modules.get<ModuleType>() = std::make_shared<ModuleType>(std::ref(*this));
-    }
 
-//    template<typename ModuleType>
-//    ModuleTypePtr getModulePtr() {
-//        return modules.get<ModuleType>();
-//    }
-
-
-    template<typename ModuleType>
-    bool hasModule() {
-        return modules.get<ModuleType>() != nullptr;
-        //return modules.get<ModuleType>();
-
-    }
-
-
-    template<typename ModuleType>
-    ModuleTypePtr<ModuleType> getModule() {
-        return std::static_pointer_cast<ModuleType>(modules.get<ModuleType>());
-        //return modules.get<ModuleType>();
-
-    }
 
 
 
@@ -194,7 +169,6 @@ protected:
         }
     }
 
-    INodeModulePtr getModuleByDependencyId(DependencyManager::TypeIdType id) override;
 };
 
 //CEREAL_REGISTER_TYPE(Node::Config)
