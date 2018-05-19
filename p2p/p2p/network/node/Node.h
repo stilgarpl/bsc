@@ -10,7 +10,7 @@
 
 #include "NetworkInfo.h"
 
-#include "p2p/configuration/IConfig.h"
+#include "p2p/modules/configuration/IConfig.h"
 #include "p2p/logic/SourceManager.h"
 #include "p2p/logic/LogicManager.h"
 #include "NodeModule.h"
@@ -35,32 +35,32 @@ public:
     typedef unsigned int IdType; ///@todo replace it with a real id, hash or something
 
 public:
-    class Config : public IConfig {
-    private:
-        unsigned short port;
-    private:
-        template<class Archive>
-        void serialize(Archive &ar) {
-            ar & cereal::base_class<IConfig>(this);
-            ar & port;
-        }
-
-
-        friend class cereal::access;
-
-    public:
-        unsigned short getPort() const {
-            return port;
-        }
-
-        void setPort(unsigned short port) {
-            Config::port = port;
-        }
-    };
+//    class Config : public IConfig {
+//    private:
+//        unsigned short port;
+//    private:
+//        template<class Archive>
+//        void serialize(Archive &ar) {
+//            ar & cereal::base_class<IConfig>(this);
+//            ar & port;
+//        }
+//
+//
+//        friend class cereal::access;
+//
+//    public:
+//        unsigned short getPort() const {
+//            return port;
+//        }
+//
+//        void setPort(unsigned short port) {
+//            Config::port = port;
+//        }
+//    };
 
 private:
 
-    std::shared_ptr<Config> configuration;
+//    std::shared_ptr<Config> configuration;
     LogicManager logicManager;
     Context nodeContext;
 
@@ -75,9 +75,9 @@ public:
     }
 
 public:
-    const std::shared_ptr<Config> &getConfiguration() const;
-
-    void setConfiguration(const std::shared_ptr<Config> &configuration);
+//    const std::shared_ptr<Config> &getConfiguration() const;
+//
+//    void setConfiguration(const std::shared_ptr<Config> &configuration);
 
 private:
 
@@ -95,6 +95,7 @@ public:
 
     template<typename ModuleType>
     void addModule() {
+        ///@todo check if module exist before overwriting?
         modules.get<ModuleType>() = std::make_shared<ModuleType>(std::ref(*this));
     }
 
@@ -102,6 +103,15 @@ public:
 //    ModuleTypePtr getModulePtr() {
 //        return modules.get<ModuleType>();
 //    }
+
+
+    template<typename ModuleType>
+    bool hasModule() {
+        return modules.get<ModuleType>() != nullptr;
+        //return modules.get<ModuleType>();
+
+    }
+
 
     template<typename ModuleType>
     ModuleTypePtr<ModuleType> getModule() {
@@ -187,7 +197,7 @@ protected:
     INodeModulePtr getModuleByDependencyId(DependencyManager::TypeIdType id) override;
 };
 
-CEREAL_REGISTER_TYPE(Node::Config)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig, Node::Config)
+//CEREAL_REGISTER_TYPE(Node::Config)
+//CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig, Node::Config)
 
 #endif //BASYCO_NODE_H

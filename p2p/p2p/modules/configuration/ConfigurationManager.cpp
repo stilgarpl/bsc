@@ -14,7 +14,7 @@ void ConfigurationManager::save(const ConfigurationManager::IdType &id, std::sha
 
     fs::path fname;//("test");
     fname = this->filenameFromId(id);
-    fs::path filePath = configPath / fname;
+    fs::path filePath = getConfigPath() / fname;
     fs::create_directories(filePath.parent_path());
     LOGGER(filePath);
     std::ofstream os(filePath);
@@ -26,7 +26,7 @@ void ConfigurationManager::save(const ConfigurationManager::IdType &id, std::sha
 std::shared_ptr<void> ConfigurationManager::load_void(const ConfigurationManager::IdType &id) {
     std::shared_ptr<IConfig> config;
     fs::path fname = this->filenameFromId(id);
-    fs::path filePath = configPath / fname;
+    fs::path filePath = getConfigPath() / fname;
     if (fs::exists(filePath)) {
         std::ifstream is(filePath);
         cereal::XMLInputArchive archive(is);
@@ -38,7 +38,15 @@ std::shared_ptr<void> ConfigurationManager::load_void(const ConfigurationManager
 
 }
 
-ConfigurationManager::ConfigurationManager() : configPath("/tmp/basyco") {
+ConfigurationManager::ConfigurationManager(const std::experimental::filesystem::path &rootPath) : rootPath(rootPath) {}
 
+ConfigurationManager::ConfigurationManager() {}
 
+const std::experimental::filesystem::path &ConfigurationManager::getRootPath() const {
+    return rootPath;
+}
+
+void ConfigurationManager::setRootPath(const std::experimental::filesystem::path &rootPath) {
+    ConfigurationManager::rootPath = rootPath;
+    initializeRootPath();
 }

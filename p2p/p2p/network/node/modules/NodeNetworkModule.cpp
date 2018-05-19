@@ -18,12 +18,13 @@
 #include "BasicModule.h"
 #include <Poco/Net/SocketStream.h>
 #include <p2p/network/protocol/connection/ServerConnection.h>
+#include <p2p/modules/configuration/ConfigurationModule.h>
 
 
 using namespace Poco::Net;
 
 NodeNetworkModule::NodeNetworkModule(INode &node) : NodeModuleDependent(node) {
-    setRequired<BasicModule>();
+//    setRequired<BasicModule>();
 }
 
 void NodeNetworkModule::setupActions(LogicManager &logicManager) {
@@ -265,10 +266,16 @@ void NodeNetworkModule::listen() {
         //@TODO numer portu dac z configuracji
         //@todo FIX THAT CAST
         ////@todo sprawdzanie bledow z bindowania socketa
-        if (((Node *) &node)->getConfiguration() != nullptr) {
-            port = ((Node *) &node)->getConfiguration()->getPort();
-        }
+        ///@todo ConfigurationModule
+//        if (((Node *) &node)->getConfiguration() != nullptr) {
+//            port = ((Node *) &node)->getConfiguration()->getPort();
+//        }
+
+        auto config = node.getModule<ConfigurationModule>()->load<Config>("network");
+        port = config->getPort();
         serverSocket = std::make_shared<ServerSocket>(port);
+        ///@todo debug
+        node.getModule<ConfigurationModule>()->save("network", config);
     }
 
     server = std::make_shared<TCPServer>(
@@ -421,4 +428,3 @@ void NodeNetworkModule::disconnectAll() {
 const std::unique_ptr<IProtocol> &NodeNetworkModule::getProtocol() const {
     return protocol;
 }
-

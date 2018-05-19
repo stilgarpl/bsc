@@ -11,9 +11,8 @@
 #include <p2p/network/protocol/connection/ClientConnection.h>
 #include <p2p/network/protocol/context/NodeContext.h>
 #include <p2p/network/protocol/context/LogicContext.h>
-#include <p2p/configuration/ConfigurationManager.h>
-
-
+#include <p2p/modules/configuration/ConfigurationManager.h>
+#include <p2p/modules/configuration/ConfigurationModule.h>
 
 
 Node::~Node() {
@@ -54,13 +53,13 @@ void Node::work() {
 
 }
 
-const std::shared_ptr<Node::Config> &Node::getConfiguration() const {
-    return configuration;
-}
-
-void Node::setConfiguration(const std::shared_ptr<Node::Config> &configuration) {
-    Node::configuration = configuration;
-}
+//const std::shared_ptr<Node::Config> &Node::getConfiguration() const {
+//    return configuration;
+//}
+//
+//void Node::setConfiguration(const std::shared_ptr<Node::Config> &configuration) {
+//    Node::configuration = configuration;
+//}
 
 Node::Node() {
 
@@ -74,15 +73,19 @@ Node::Node() {
 }
 
 Node::Node(int port) : Node() {
-    std::shared_ptr<Node::Config> config = std::make_shared<Node::Config>();
-    config->setPort(port);
-    setConfiguration(config);
+//    std::shared_ptr<Node::Config> config = std::make_shared<Node::Config>();
+//    config->setPort(port);
+//    setConfiguration(config);
 
     ///@todo debug remove
-    ConfigurationManager manager;
-    manager.save("Node", config);
+//    ConfigurationManager manager;
+//    manager.save("Node", config);
 
-    thisNodeInfo.addKnownAddress("127.0.0.1:" + std::to_string(getConfiguration()->getPort()));
+//    ConfigurationModule
+
+
+
+//    thisNodeInfo.addKnownAddress("127.0.0.1:" + std::to_string(getConfiguration()->getPort()));
 
 
 }

@@ -114,7 +114,7 @@ public:
         auto getCommands() {
             std::list<std::string> retVal;
             auto &map = getCommandMap();
-            for (auto &&[key, value] : map) {
+            for ([[maybe_unused]]auto &&[key, value] : map) {
                 retVal.push_back(key);
             }
         }

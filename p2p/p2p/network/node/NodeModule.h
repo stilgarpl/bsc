@@ -27,11 +27,26 @@ public:
     }
 };
 
-template<typename T>
+/**
+ * NodeModule with automatic dependency management
+ * @tparam T actual module type, i.e. class SomeModule : public NodeModuleDependent<SomeModule>
+ * @tparam Args optional dependent classes. it could also be set by using setRequired<> method or addRequiredDependency<>
+ */
+template<typename T, typename ... Args>
 class NodeModuleDependent : public NodeModule, public DependencyManaged<T> {
 
+private:
+//    template<typename T1, typename... Args1>
+//    void checkAndAddModules() {
+//        if (!node.hasModule<T1>()) {
+//            node.addM
+//        }
+//    }
+
 public:
-    NodeModuleDependent(INode &node) : NodeModule(node) {};
+    NodeModuleDependent(INode &node) : NodeModule(node) {
+        this->template setRequired<Args...>();
+    };
 };
 
 

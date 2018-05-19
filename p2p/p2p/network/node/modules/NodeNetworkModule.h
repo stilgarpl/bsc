@@ -15,6 +15,9 @@
 #include <p2p/network/protocol/connection/IServerConnection.h>
 #include <p2p/network/node/modules/broadcast/BroadcastScope.h>
 
+#include <p2p/modules/configuration/IConfig.h>
+#include <p2p/modules/configuration/ConfigurationModule.h>
+
 struct NodeConnectionInfo {
     ConnectionPtr connection;
     std::experimental::optional<NodeIdType> nodeId;
@@ -22,7 +25,31 @@ struct NodeConnectionInfo {
 
 typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
 
-class NodeNetworkModule : public NodeModuleDependent<NodeNetworkModule> {
+class NodeNetworkModule : public NodeModuleDependent<NodeNetworkModule, ConfigurationModule> {
+protected:
+public:
+    class Config : public IConfig {
+    private:
+        unsigned short port = 6667;
+    public:
+        unsigned short getPort() const {
+            return port;
+        }
+
+        void setPort(unsigned short port) {
+            Config::port = port;
+        }
+
+    private:
+        template<class Archive>
+        void serialize(Archive &ar) {
+            ar & cereal::base_class<IConfig>(this) & port;
+        }
+
+
+        friend class cereal::access;
+    };
+
 private:
     std::unique_ptr<IProtocol> protocol = std::make_unique<GravitonProtocol>();
     std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
@@ -163,5 +190,8 @@ public: // @todo should be public or shouldn't ?
     const std::unique_ptr<IProtocol> &getProtocol() const;
 };
 
+
+CEREAL_REGISTER_TYPE(NodeNetworkModule::Config);
+//CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig,NodeNetworkModule::Config);
 
 #endif //BASYCO_NODENETWORKMODULE_H

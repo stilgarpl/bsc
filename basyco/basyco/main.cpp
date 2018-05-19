@@ -20,7 +20,7 @@ using namespace std::chrono_literals;
 #include <fstream>
 #include <p2p/filesystem/network/logic/sources/FileSource.h>
 #include <p2p/filesystem/network/logic/actions/FileActions.h>
-#include <p2p/configuration/ConfigurationManager.h>
+#include <p2p/modules/configuration/ConfigurationManager.h>
 #include <repo/journal/SimpleJournal.h>
 #include <repo/node/RepoModule.h>
 #include <p2p/network/node/modules/BasicModule.h>
@@ -31,7 +31,8 @@ using namespace std::chrono_literals;
 #include <p2p/network/node/modules/CommandModule.h>
 #include <p2p/network/node/modules/command/StandardCommandsDirectory.h>
 #include <p2p/filesystem/transfer/FileTransferControl.h>
-
+#include <p2p/modules/configuration/ConfigurationModule.h>
+#include <variant>
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
     //adding sources
@@ -86,6 +87,7 @@ void setupModules(Node &node) {
     node.addModule<NodeNetworkModule>();
     node.addModule<RepoModule>();
     node.addModule<CommandModule>();
+    node.addModule<ConfigurationModule>();
 }
 
 
@@ -258,12 +260,10 @@ int main(int argc, char *argv[]) {
 
     //LOGGER("dupa");
 
-    ConfigurationManager cfg;
-
-    auto ptrC = std::make_shared<IConfig>();
-    cfg.save("dupa", ptrC);
-
-
+//    ConfigurationManager cfg;
+//
+//    auto ptrC = std::make_shared<IConfig>();
+//    cfg.save("dupa", ptrC);
 
 
 //    Context context;
