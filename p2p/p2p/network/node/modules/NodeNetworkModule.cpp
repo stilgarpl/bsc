@@ -23,7 +23,7 @@
 
 using namespace Poco::Net;
 
-NodeNetworkModule::NodeNetworkModule(INode &node) : NodeModuleDependent(node) {
+NodeNetworkModule::NodeNetworkModule(INode &node) : NodeModuleConfigDependent(node) {
 //    setRequired<BasicModule>();
 }
 
@@ -262,7 +262,7 @@ void NodeNetworkModule::stopAcceptedConnections() {
 void NodeNetworkModule::listen() {
     //SocketAddress address("127.0.0.1:6777");
     if (serverSocket == nullptr) {
-        unsigned short port = 6777;
+//        unsigned short port = 6777;
         //@TODO numer portu dac z configuracji
         //@todo FIX THAT CAST
         ////@todo sprawdzanie bledow z bindowania socketa
@@ -271,12 +271,18 @@ void NodeNetworkModule::listen() {
 //            port = ((Node *) &node)->getConfiguration()->getPort();
 //        }
 
-        auto config = node.getModule<ConfigurationModule>()->load<Config>("network");
-        port = config->getPort();
-        serverSocket = std::make_shared<ServerSocket>(port);
-        ///@todo debug
-        node.getModule<ConfigurationModule>()->save("network", config);
+        ///@todo configuration should be loaded on demand, not here
+//        auto loadedConfig = node.getModule<ConfigurationModule>()->load<Config>("network");
+//        if (loadedConfig != nullptr) {
+//            configuration() = *loadedConfig;
+//        }
+
+//        ///@todo debug
+//        node.getModule<ConfigurationModule>()->save("network", loadedConfig);
+        serverSocket = std::make_shared<ServerSocket>(configuration().getPort());
+        LOGGER(std::string("Opening port") + std::to_string(configuration().getPort()));
     }
+
 
     server = std::make_shared<TCPServer>(
             new ServerConnectionFactory(static_cast<Node &>(this->node), this->node.getContext()),

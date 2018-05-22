@@ -25,30 +25,39 @@ struct NodeConnectionInfo {
 
 typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
 
-class NodeNetworkModule : public NodeModuleDependent<NodeNetworkModule, ConfigurationModule> {
+class NodeNetworkModuleConfig : public IConfig {
+private:
+    unsigned short port = 6667;
+public:
+    unsigned short getPort() const {
+        return port;
+    }
+
+    void setPort(unsigned short port) {
+        NodeNetworkModuleConfig::port = port;
+    }
+
+private:
+    template<class Archive>
+    void serialize(Archive &ar) {
+        ar & cereal::base_class<IConfig>(this) & port;
+    }
+
+
+private:
+
+
+    friend class cereal::access;
+};
+
+
+CONFIG_NAME(NodeNetworkModuleConfig, "network");
+
+class NodeNetworkModule
+        : public NodeModuleConfigDependent<NodeNetworkModule, NodeNetworkModuleConfig, ConfigurationModule> {
 protected:
 public:
-    class Config : public IConfig {
-    private:
-        unsigned short port = 6667;
-    public:
-        unsigned short getPort() const {
-            return port;
-        }
 
-        void setPort(unsigned short port) {
-            Config::port = port;
-        }
-
-    private:
-        template<class Archive>
-        void serialize(Archive &ar) {
-            ar & cereal::base_class<IConfig>(this) & port;
-        }
-
-
-        friend class cereal::access;
-    };
 
 private:
     std::unique_ptr<IProtocol> protocol = std::make_unique<GravitonProtocol>();
@@ -59,7 +68,7 @@ private:
     std::shared_ptr<Poco::Net::ServerSocket> serverSocket;
     std::shared_ptr<Poco::Net::TCPServer> server;
 public:
-    NodeNetworkModule(INode &node);
+    explicit NodeNetworkModule(INode &node);
 
     bool setupLogic(LogicManager &logicManager) override;
 
@@ -191,7 +200,7 @@ public: // @todo should be public or shouldn't ?
 };
 
 
-CEREAL_REGISTER_TYPE(NodeNetworkModule::Config);
+CEREAL_REGISTER_TYPE(NodeNetworkModuleConfig);
 //CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig,NodeNetworkModule::Config);
 
 #endif //BASYCO_NODENETWORKMODULE_H

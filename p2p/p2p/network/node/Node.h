@@ -23,6 +23,7 @@
 #include <p2p/network/protocol/connection/IServerConnection.h>
 #include <p2p/dependency/DependencyManager.h>
 #include <p2p/network/protocol/role/RoleScope.h>
+#include <p2p/modules/configuration/ConfigurationManager.h>
 
 ///@todo separate interface so NodeInfo can include INode, and Node can include NodeInfo
 
@@ -35,32 +36,9 @@ public:
     typedef unsigned int IdType; ///@todo replace it with a real id, hash or something
 
 public:
-//    class Config : public IConfig {
-//    private:
-//        unsigned short port;
-//    private:
-//        template<class Archive>
-//        void serialize(Archive &ar) {
-//            ar & cereal::base_class<IConfig>(this);
-//            ar & port;
-//        }
-//
-//
-//        friend class cereal::access;
-//
-//    public:
-//        unsigned short getPort() const {
-//            return port;
-//        }
-//
-//        void setPort(unsigned short port) {
-//            Config::port = port;
-//        }
-//    };
-
 private:
 
-//    std::shared_ptr<Config> configuration;
+    ConfigurationManager configurationManager;
     LogicManager logicManager;
     Context nodeContext;
 
@@ -93,7 +71,9 @@ private:
 
 public:
 
-
+    ConfigurationManager &getConfigurationManager() {
+        return configurationManager;
+    }
 
 
 
@@ -110,18 +90,19 @@ public:
 
     void waitToFinish() override;
 
-    void start();
-    void stop();
+    void start() override;
+
+    void stop() override;
     
     virtual ~Node();
 
 
     Node();
 
-    Node(int port);
+    explicit Node(int port);
 
     ///@todo remove this function
-    LogicManager &getLogicManager() {
+    LogicManager &getLogicManager() override {
         return logicManager;
     }
 
@@ -129,7 +110,7 @@ public:
         return thisNodeInfo;
     }
 
-    void addToNetwork(NetworkIdType networkId) {
+    void addToNetwork(const NetworkIdType &networkId) {
         networkInfo = std::make_shared<NetworkInfo>();
         networkInfo->setNetworkId(networkId);
         ///@todo this shouldn't be set twice... or should it?
@@ -168,6 +149,26 @@ protected:
             ((*item).*f)(args...);
         }
     }
+
+//    template<typename Ret, typename ... Args>
+//    void forEachModule(std::function<Ret(Args...)> f, Args... args) {
+//        std::list<INodeModulePtr> modulesList;
+//        modules.forEach(
+//                [&](INodeModulePtr ptr) {
+//                    if (ptr != nullptr) {
+//                        //ptr->initialize();
+//                        //ptr->setupLogic(logicManager);
+//                        modulesList.push_back(ptr);
+//                    };
+//                });
+//        auto sortedList = DependencyManager::dependencySort(modulesList);
+//
+//        for (auto &&item : sortedList) {
+//            ((*item).*f)(args...);
+//        }
+//    }
+
+//    friend class NodeModule;
 
 };
 

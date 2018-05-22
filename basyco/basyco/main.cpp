@@ -277,6 +277,7 @@ int main(int argc, char *argv[]) {
     thisNode.getNodeInfo().setNodeId("first Node");
 
     setupModules(thisNode);
+    thisNode.getModule<NodeNetworkModule>()->configuration().setPort(9191);
 
     auto cmdN = thisNode.getModule<CommandModule>();
 
@@ -291,6 +292,7 @@ int main(int argc, char *argv[]) {
     otherNode.addToNetwork("TheNetwork");
 
     setupModules(otherNode);
+    otherNode.getModule<NodeNetworkModule>()->configuration().setPort(9999);
     cmdN = otherNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
 
@@ -301,6 +303,7 @@ int main(int argc, char *argv[]) {
     thirdNode.getNodeInfo().setNodeId("third");
     thirdNode.addToNetwork("TheNetwork");
     setupModules(thirdNode);
+    thirdNode.getModule<NodeNetworkModule>()->configuration().setPort(9898);
     cmdN = thirdNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
 

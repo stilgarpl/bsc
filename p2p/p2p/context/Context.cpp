@@ -2,6 +2,7 @@
 // Created by stilg on 15.09.2017.
 //
 
+#include <p2p/log/Logger.h>
 #include "Context.h"
 
 
@@ -18,6 +19,7 @@ void Context::setParentContext(Context *parentContext) {
 Context &Context::getActiveContext() {
     thread_local static Context defaultContext;
     if (activeContext == nullptr) {
+        LOGGER("WARNING: returning default context")
         return defaultContext;
     } else {
         return *activeContext;

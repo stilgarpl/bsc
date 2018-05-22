@@ -10,6 +10,7 @@
 #include "INodeModule.h"
 #include <p2p/network/node/NodeInfo.h>
 #include <p2p/context/Context.h>
+#include <p2p/modules/configuration/ConfigurationManager.h>
 
 class INode {
 protected:
@@ -17,6 +18,8 @@ protected:
 public:
     //is this necessary?
     virtual LogicManager &getLogicManager() =0;
+
+    virtual ConfigurationManager &getConfigurationManager() =0;
 
     virtual void setNodeContextActive() =0;
 

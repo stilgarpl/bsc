@@ -14,7 +14,7 @@ namespace fs = std::experimental::filesystem;
 
 class ConfigurationManager {
 public:
-    typedef std::string IdType;
+    typedef IConfig::IdType IdType;
 private:
     fs::path rootPath;
 

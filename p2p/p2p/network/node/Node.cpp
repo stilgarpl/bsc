@@ -120,9 +120,17 @@ void Node::initialize() {
 //        item->setupLogic(logicManager);
 //    }
 
+//    ///@todo debug values
+    configurationManager.setRootPath(fs::path("/tmp/basyco") / this->getNodeInfo().getNodeId());
+//
+//    modules.forEach([&](INodeModulePtr ptr){
+//        ptr->configuration() = *configurationManager.load(ptr->configuration().getConfigId());
+//    });
+
     //this slightly changed the order of execution - instead of being initialized and setupLogic module by module,
     //now all modules are initialized and then all modules are setupLogiced
     //hope it doesn't break anything
+    forEachModule(&INodeModule::initializeConfiguration);
     forEachModule(&INodeModule::initialize);
     forEachModule<bool, ILogicModule, LogicManager &>(&ILogicModule::setupLogic, logicManager);
 

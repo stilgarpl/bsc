@@ -17,6 +17,7 @@ class Context {
     typedef unsigned int KeyType;
     typedef unsigned int TypeIdType;
 private:
+    //initialized to nullptr in .cpp file
     thread_local static Context* activeContext;
     //@todo add thread safety - mutex, lock and locking of the parent before accessing it
     Context *parentContext = nullptr;

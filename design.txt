@@ -155,3 +155,8 @@ request resource powinien od razu inicjowac transfer bez podawaania sciezek, a s
 
 
 OOOO, WLASNIE, MOZE TO NA STRUMIENIACH ZROBIC!
+
+
+configuration module jest chyba do wyrzucenia, a wlasciwie do zintegrowania z Nodem, zwłaszcza, żę configuration() jest elementem każdego modułu teraz
+
+przed initialize() mogłoby być wywoływane configure ładujące dla każdego modułu jego konfigurację, jeśli istnieje, w razie potrzeby node miałby też kontrolę nad zapisem konfiguracji (tylko jak wykryć zmiany? zapisywać za każdym razem?)

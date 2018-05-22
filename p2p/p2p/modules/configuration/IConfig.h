@@ -12,22 +12,46 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/xml.hpp>
 #include <cereal/types/base_class.hpp>
+#include <utility>
+#include <ostream>
+
+
+template<typename ConfigType>
+inline constexpr const auto getConfigName() {
+    return "null";
+}
+
+#define CONFIG_NAME(TYPE, NAME)  template<> inline constexpr const auto getConfigName<TYPE>() { return NAME; }
+
 
 class IConfig {
-private:
-    std::string testField = "dupa";
+public:
+    typedef std::string IdType;
+    const std::string _name = "null";
+
+    IConfig() = default;
+
+    explicit IConfig(std::string _name) : _name(std::move(_name)) {}
+
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar & testField;
+
     }
 
 
     friend class cereal::access;
 
 public:
-    virtual ~IConfig() {
+    virtual ~IConfig() = default;
 
+    IConfig &operator=(const IConfig &other) {
+
+        return *this;
+    }
+
+    const std::string &getConfigId() const {
+        return _name;
     }
 };
 
