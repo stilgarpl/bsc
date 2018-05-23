@@ -11,6 +11,7 @@
 #include <p2p/network/protocol/logic/events/PacketEvent.h>
 #include <p2p/logic/ILogicModule.h>
 #include <p2p/network/protocol/logic/events/ConnectionEvent.h>
+#include <p2p/network/protocol/logic/events/ConnectionEvent.h>
 
 #include "p2p/logic/events/Tick.h"
 #include "p2p/logic/LogicManager.h"
@@ -73,6 +74,7 @@ public:
             }
         } catch (const std::future_error &e) {
             //broken promise
+            LOGGER(std::string("broken promise! ") + e.what());
             return std::shared_ptr<ReturnType>(nullptr);
         }
     }

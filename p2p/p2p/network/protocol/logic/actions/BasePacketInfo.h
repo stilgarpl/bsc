@@ -15,6 +15,7 @@
 
 class BasePacketInfo {
 private:
+    unsigned int retry = 0;
     BasePacketPtr packetPtr;
     Connection *connection = nullptr;
     //@todo is Tick reference necessary? maybe some global clock function? or just std::steady_clock ?
@@ -51,6 +52,10 @@ public:
     Status getExpectedStatus() const;
 
     void setExpectedStatus(Status expectedStatus);
+
+    unsigned int getRetry() const;
+
+    void setRetry(unsigned int retry);
 
 };
 

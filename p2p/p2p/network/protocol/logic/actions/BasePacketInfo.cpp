@@ -55,4 +55,12 @@ BasePacketInfo::BasePacketInfo(const BasePacketPtr &packetPtr, Connection *conne
                                                                                        connection(connection),
                                                                                        timeSent(timeSent) {}
 
+unsigned int BasePacketInfo::getRetry() const {
+    return retry;
+}
+
+void BasePacketInfo::setRetry(unsigned int retry) {
+    BasePacketInfo::retry = retry;
+}
+
 

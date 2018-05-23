@@ -61,7 +61,7 @@ void CommandModule::sendRemoteCommand(const std::vector<std::string> &args) {
         LOGGER("sending packet ")
         auto res = netModule->sendPacketToNode(nodeId, packet);
 
-        if (res->isRunStatus()) {
+        if (res && res->isRunStatus()) {
             LOGGER("remote run successful")
         } else {
             LOGGER("remote run failure")

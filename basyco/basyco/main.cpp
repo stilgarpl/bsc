@@ -315,9 +315,10 @@ int main(int argc, char *argv[]) {
     otherNode.getNodeInfo().printAll();
     thirdNode.getNodeInfo().printAll();
     thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
-    thisNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
-    otherNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
-    thirdNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
+    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9898");
+//    thisNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
+//    otherNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
+//    thirdNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 
     std::this_thread::sleep_for(4s);
     //auto fdes = FileTransferControl::initiateTransfer(thisNode, "second", "/tmp/zsh", "/tmp/copied_zsh");
