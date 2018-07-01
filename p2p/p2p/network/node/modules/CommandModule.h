@@ -47,7 +47,7 @@ public:
         }
 
     public:
-        CommandSubModule(CommandModule &parent) : parent(parent) {}
+        explicit CommandSubModule(CommandModule &parent) : parent(parent) {}
 
         CommandSubModule &submodule(std::string name);
 

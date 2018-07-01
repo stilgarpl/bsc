@@ -44,7 +44,7 @@ protected:
         return ret;
     }
 public:
-    EventQueueSource(SourceManager &sourceManager) : ISource(sourceManager) {}
+    explicit EventQueueSource(SourceManager &sourceManager) : ISource(sourceManager) {}
 
     void work() override {
         //std::lock_guard<std::mutex> g(queueLock);

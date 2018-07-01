@@ -16,15 +16,15 @@ void ClockSource::work() {
     auto now = clock::now();
     tick.setNow(now);
 
-    ///@todo signalfix
-//    for (auto &&it : getSignalMap<Tick>()) {
-//        duration d = it.first;
-//        if (getLastTick(d) < now - d) {
-//            tick.setEventId(it.first);
-//            setLastTick(d, now);
-//            event<Tick>(tick);
-//        }
-//    }
+
+    for (auto &&it : sourceManager.getSignalMap<Tick>()) {
+        duration d = it.first;
+        if (getLastTick(d) < now - d) {
+            tick.setEventId(it.first);
+            setLastTick(d, now);
+            event<Tick>(tick);
+        }
+    }
 
     std::this_thread::sleep_for(1ms);
 

@@ -118,6 +118,7 @@ private:
     Uber<Type> sourcesByType;
     StaticUber<ProviderList> providers;
     std::shared_ptr<ISource> lastProvider = nullptr;
+    ///@todo maybe this should just be a reference to node context?
     Context commonContext;
 public:
 
@@ -203,6 +204,7 @@ public:
 //            it->setContext(context);
 //        }
 //    }
+    void setContext(const Context &context);
 };
 
 

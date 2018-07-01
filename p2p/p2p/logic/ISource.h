@@ -15,10 +15,10 @@
 
 class ISource {
 private:
-
+protected:
     SourceManager &sourceManager;
 public:
-    ISource(SourceManager &sourceManager);
+    explicit ISource(SourceManager &sourceManager);
 
 protected:
 

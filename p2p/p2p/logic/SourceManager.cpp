@@ -21,3 +21,7 @@ void SourceManager::work() {
     }
     std::this_thread::sleep_for(1ms);
 }
+
+void SourceManager::setContext(const Context &context) {
+    commonContext += context;
+}
