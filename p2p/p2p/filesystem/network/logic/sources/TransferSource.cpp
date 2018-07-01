@@ -33,3 +33,5 @@ void TransferSource::transferProperties(const TransferId &transferId) {
     event->setEventId(EventIdType::GET_PROPERTIES);
     queueEvent(event);
 }
+
+TransferSource::TransferSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}

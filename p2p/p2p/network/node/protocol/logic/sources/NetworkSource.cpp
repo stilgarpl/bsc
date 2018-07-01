@@ -13,3 +13,5 @@ void NetworkSource::networkInfoReceived(const NetworkInfo &networkInfo) {
     queueEvent(event);
 
 }
+
+NetworkSource::NetworkSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}

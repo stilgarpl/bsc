@@ -6,10 +6,13 @@
 #define BASYCO_SOURCEMANAGER_H
 
 
-#include "ISource.h"
+
 #include <list>
 #include <memory>
 #include <thread>
+#include <p2p/signal/Signal.h>
+#include <p2p/context/Context.h>
+#include <p2p/uber/Uber.h>
 
 using namespace std::chrono_literals;
 
@@ -21,6 +24,94 @@ public:
     typedef std::list<SourcePtr> SourceList;
     typedef ISource *ProviderPtr;
     typedef std::list<ISource *> ProviderList;
+
+    template<typename T, typename... Args>
+    using SignalType = Signal<const T &, Args...>;
+
+    ///@todo dlaczego właściwie te sygnały w mapie są jako pointery?
+    /// jeśli mogą być niezdefiniowane, no to trzeba robic std::optional
+    ///ale ja zwracam referki i tak, więc moze lepiej w mapie przechowywac te sygnaly tak po prostu?
+    template<typename T, typename... Args>
+    using SignalTypePtr = std::shared_ptr<SignalType<T, Args...>>;
+
+    template<typename T, typename... Args>
+    using SignalMapType = std::map<typename T::IdType, SignalTypePtr<T, Args...>>;
+
+protected:
+
+private:
+    Uber<std::map> signalMap;
+    Uber<Type> globalSignal;
+public:
+
+    template<typename T, typename... Args>
+    void event(const T &event, Args... args) {
+
+        ///@todo pass to executor
+        Context::setActiveContext(&commonContext);
+        /*int a =*/ this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
+        /*int b =*/ this->getSignal<T, Args...>().signal(event, args...);
+        // LOGGER("event : a "+ std::to_string(a)+ " b:" + std::to_string(b));
+    }
+
+
+    template<typename T, typename... Args>
+    SignalMapType<T, Args...> &getSignalMap() {
+        return signalMap.get<typename T::IdType, SignalTypePtr<T, Args...>>();
+    }
+
+
+    template<typename T, typename... Args>
+    SignalType<T, Args...> &getSignal(const typename T::IdType &id) {
+        // typedef Signal<Context&, const GroupType&> SignalType;
+        //   typedef std::shared_ptr<SignalType> SignalTypePtr;
+        auto &map = getSignalMap<T, Args...>();//signalMap.get<typename GroupType::IdType,SignalTypePtr<GroupType>>();
+        if (map[id] == nullptr) {
+            map[id] = std::make_shared<SignalType<T, Args...>>();
+        }
+
+        return *(map[id]);
+
+    }
+
+    template<typename T, typename... Args>
+    SignalType<T, Args...> &getSignal() {
+        return globalSignal.get<SignalType<T, Args...>>();
+    }
+
+
+    template<typename T, typename... Args>
+    SignalType<T, Args...> &
+    assignSignal(const typename T::IdType &id, typename SignalType<T, Args...>::FuncPtr funcPtr) {
+        this->getSignal<T, Args...>(id).assign(funcPtr);
+    };
+
+    template<typename T, typename... Args>
+    SignalType<T, Args...> &
+    assignSignal(const typename T::IdType &id, const typename SignalType<T, Args...>::Func &funcPtr) {
+        this->getSignal<T, Args...>(id).assign(funcPtr);
+    };
+
+
+    template<typename T, typename... Args>
+    SignalType<T, Args...> &
+    assignSignal(typename SignalType<T, Args...>::FuncPtr funcPtr) {
+        this->getSignal<T, Args...>().assign(funcPtr);
+    }
+
+    template<typename T, typename... Args>
+    SignalType<T, Args...> &
+    assignSignal(const typename SignalType<T, Args...>::Func &funcPtr) {
+        this->getSignal<T, Args...>().assign(funcPtr);
+    }
+
+
+
+
+
+
+
+//
 private:
     SourceList sources;
     ///@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
@@ -30,19 +121,11 @@ private:
     Context commonContext;
 public:
 
-    void work() {
-        ///@todo cos wymyslec, zebyt to nie zżerało 100% cpu
-        for (auto &&i : sources) {
-            if (i != nullptr) {
-                i->work();
-            }
-        }
-        std::this_thread::sleep_for(1ms);
-    }
+    void work();
 
     template<typename SourceType, typename... Args>
     void addSource(Args... args) {
-        std::shared_ptr<SourceType> sourcePtr = std::make_shared<SourceType>(args...);
+        std::shared_ptr<SourceType> sourcePtr = std::make_shared<SourceType>(*this, args...);
         addSource(sourcePtr);
         auto &sbt = sourcesByType.get<std::shared_ptr<SourceType>>();
         sbt = sourcePtr;
@@ -92,34 +175,34 @@ public:
     };
 
     template<typename EventType, typename... Args>
-    int registerTrigger(const typename ISource::SignalType<EventType>::Func &func) {
-        int assigned = 0;
-        for (auto &&it : getProviders<EventType, Args...>()) {
-            it->template getSignal<EventType, Args...>().assign(func);
-            assigned++;
-        }
+    int registerTrigger(const typename SignalType<EventType>::Func &func) {
+        int assigned = 1;
+//        for (auto &&it : getProviders<EventType, Args...>()) {
+        getSignal<EventType, Args...>().assign(func);
+//            assigned++;
+//        }
         return assigned;
     }
 
     template<typename EventType, typename... Args>
     int
     registerTrigger(const typename EventType::IdType &id,
-                    const typename ISource::SignalType<EventType, Args...>::Func &func) {
-        int assigned = 0;
-        for (auto &&it : getProviders<EventType, Args...>()) {
-            it->template getSignal<EventType, Args...>(id).assign(func);
-            assigned++;
+                    const typename SignalType<EventType, Args...>::Func &func) {
+        int assigned = 1;
+//        for (auto &&it : getProviders<EventType, Args...>()) {
+        getSignal<EventType, Args...>(id).assign(func);
+//            assigned++;
 
-        }
+//        }
         return assigned;
     }
 
-    void setContexts(const Context &context) {
-        commonContext += context;
-        for (auto &&it : sources) {
-            it->setContext(context);
-        }
-    }
+//    void setContexts(const Context &context) {
+//        commonContext += context;
+//        for (auto &&it : sources) {
+//            it->setContext(context);
+//        }
+//    }
 };
 
 

@@ -25,7 +25,9 @@ private:
     EventQueueSource<FileResponseEvent, FileSource> responseSource;
     EventQueueSource<FileAttributesEvent, FileSource> attributesSource;
 public:
-    //@todo * -> ::Ptr
+    FileSource(SourceManager &sourceManager);
+
+//@todo * -> ::Ptr
     void requestFile(SendFile::Request *request);
 
     void fileReceived(SendFile::Response::Ptr response);

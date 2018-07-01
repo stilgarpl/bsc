@@ -52,19 +52,11 @@ void ConnectionSource::registerProviders(SourceManager *manager) {
     connSource.registerProviders(manager);
     packetSource.registerProviders(manager);
     ///@todo context settings not here...
-    connSource.setContext(context);
-    packetSource.setContext(context);
+//    connSource.setContext(context);
+//    packetSource.setContext(context);
 }
 
-ConnectionSource::ConnectionSource() {
 
-    //@todo ugly mapping, reimplement some other way
-//    connSource.assignSignal<ConnectionEvent>(
-//            [&, this](const ConnectionEvent &connectionEvent) { this->event(connectionEvent); });
-//    packetSource.assignSignal<PacketEvent>(
-//            [&, this](const PacketEvent &packetEvent) { this->event(packetEvent); });
-
-}
 
 void ConnectionSource::connectionAccepted(Connection *c) {
 
@@ -104,3 +96,8 @@ void ConnectionSource::connectionClosedClient(Connection *c) {
     event->setConnection(c);
     connSource.queueEvent(event);
 }
+
+ConnectionSource::ConnectionSource(SourceManager &sourceManager) : ISource(sourceManager), connSource(sourceManager),
+                                                                   packetSource(sourceManager) {}
+
+

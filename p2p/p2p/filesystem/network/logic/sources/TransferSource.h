@@ -13,6 +13,8 @@ class TransferSource : public EventQueueSource<TransferEvent> {
 
 public:
 
+    TransferSource(SourceManager &sourceManager);
+
     void beginTransfer(const ResourceIdentificatorPtr resourceIdentificatorPtr);
 
     void finishTransfer(const TransferId &transferId);

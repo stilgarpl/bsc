@@ -63,3 +63,6 @@ void FileSource::fileReceived(SendFile::Response::Ptr response) {
 
     responseSource.queueEvent(event);
 }
+
+FileSource::FileSource(SourceManager &sourceManager) : ISource(sourceManager), requestSource(sourceManager),
+                                                       responseSource(sourceManager), attributesSource(sourceManager) {}

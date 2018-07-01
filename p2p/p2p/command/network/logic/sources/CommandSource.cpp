@@ -14,3 +14,5 @@ void CommandSource::commandReceived(const BasePacket::IdType &id, const std::vec
 
     queueEvent(event);
 }
+
+CommandSource::CommandSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}

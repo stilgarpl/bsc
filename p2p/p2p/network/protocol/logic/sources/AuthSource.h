@@ -14,6 +14,8 @@
 class AuthSource : public EventQueueSource<AuthEvent> {
 public:
 
+    AuthSource(SourceManager &sourceManager);
+
     void auth(std::string login, std::string password);
 };
 

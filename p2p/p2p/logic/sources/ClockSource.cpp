@@ -15,14 +15,16 @@ void ClockSource::work() {
     //ticks
     auto now = clock::now();
     tick.setNow(now);
-    for (auto &&it : getSignalMap<Tick>()) {
-        duration d = it.first;
-        if (getLastTick(d) < now - d) {
-            tick.setEventId(it.first);
-            setLastTick(d, now);
-            event<Tick>(tick);
-        }
-    }
+
+    ///@todo signalfix
+//    for (auto &&it : getSignalMap<Tick>()) {
+//        duration d = it.first;
+//        if (getLastTick(d) < now - d) {
+//            tick.setEventId(it.first);
+//            setLastTick(d, now);
+//            event<Tick>(tick);
+//        }
+//    }
 
     std::this_thread::sleep_for(1ms);
 
@@ -42,3 +44,5 @@ void ClockSource::setLastTick(ClockSource::duration d, ClockSource::time_point t
 void ClockSource::registerProviders(SourceManager *manager) {
     manager->registerProvider<Tick>();
 }
+
+ClockSource::ClockSource(SourceManager &sourceManager) : ISource(sourceManager) {}

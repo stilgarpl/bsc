@@ -15,6 +15,10 @@ private:
     EventQueueSource<ConnectionEvent, ConnectionSource> connSource;
     EventQueueSource<PacketEvent, ConnectionSource> packetSource;
 public:
+
+
+    ConnectionSource(SourceManager &sourceManager);
+
     void newConnection(Connection *con);
 
     void sentPacket(std::shared_ptr<BasePacket> p, Connection *connection);
@@ -27,7 +31,6 @@ public:
 
     void connectionAccepted(Connection *c);
 
-    ConnectionSource();
 
     void connectionEstablished(Connection *c);
 

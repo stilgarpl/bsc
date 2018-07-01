@@ -21,6 +21,8 @@ protected:
     void setLastTick(duration d, time_point t);
 
 public:
+    ClockSource(SourceManager &sourceManager);
+
     void work() override;
 
     void registerProviders(SourceManager *manager) override;

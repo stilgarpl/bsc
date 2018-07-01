@@ -10,3 +10,5 @@ void AuthSource::auth(std::string login, std::string password) {
     event->setPassword(password);
     queueEvent(event);
 }
+
+AuthSource::AuthSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}

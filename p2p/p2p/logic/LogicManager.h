@@ -107,7 +107,7 @@ public:
     }
 
     void setContexts(const Context &context) {
-        sourceManager.setContexts(context);
+//        sourceManager.setContexts(context);
     }
 
     virtual ~LogicManager() {

@@ -7,8 +7,10 @@
 
 
 #include <queue>
+#include <p2p/logic/ISource.h>
 #include "p2p/log/Logger.h"
 #include "p2p/network/protocol/context/NodeContext.h"
+
 
 class NullClass {
 };
@@ -42,6 +44,8 @@ protected:
         return ret;
     }
 public:
+    EventQueueSource(SourceManager &sourceManager) : ISource(sourceManager) {}
+
     void work() override {
         //std::lock_guard<std::mutex> g(queueLock);
         queueLock.lock();
@@ -74,7 +78,6 @@ public:
     auto queueSize() {
         return eventQueue.size();
     }
-    EventQueueSource() = default;
 
 
 };

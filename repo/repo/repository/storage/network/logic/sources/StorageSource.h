@@ -15,6 +15,8 @@
 class StorageSource : public EventQueueSource<StorageResourceRequestEvent> {
 public:
 
+    StorageSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}
+
     void
     queryResource(IRepository::RepoIdType repositoryId, IStorage::ResourceId objectId, BasePacket::IdType requestId) {
         auto event = newEvent(requestId);

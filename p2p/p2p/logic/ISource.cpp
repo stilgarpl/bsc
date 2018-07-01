@@ -3,15 +3,10 @@
 //
 
 #include "SourceManager.h"
+#include "ISource.h"
 
 
-Context &ISource::getContext() {
-    return context;
-}
-
-void ISource::setContext(const Context &context) {
-    ISource::context += context;
-}
+ISource::ISource(SourceManager &sourceManager) : sourceManager(sourceManager) {}
 
 //void ISource::registerProviders(SourceManager *sourceManager) {
 ////implement in derived classes as

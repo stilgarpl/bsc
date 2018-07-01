@@ -14,6 +14,8 @@
 class NetworkSource : public EventQueueSource<NetworkInfoEvent> {
 
 public:
+    NetworkSource(SourceManager &sourceManager);
+
     void networkInfoReceived(const NetworkInfo &networkInfo);
 };
 

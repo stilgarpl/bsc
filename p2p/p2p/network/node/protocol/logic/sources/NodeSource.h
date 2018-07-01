@@ -12,6 +12,8 @@
 class NodeSource : public EventQueueSource<NodeInfoEvent> {
 public:
 
+    NodeSource(SourceManager &sourceManager);
+
     void nodeInfoReceived(const NodeInfo &nodeInfo);
 
     void nodeDiscovered(const NodeInfo &nodeInfo);

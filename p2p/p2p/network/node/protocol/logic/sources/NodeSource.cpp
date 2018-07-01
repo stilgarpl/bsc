@@ -19,3 +19,5 @@ void NodeSource::nodeDiscovered(const NodeInfo &nodeInfo) {
 
     queueEvent(event);
 }
+
+NodeSource::NodeSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}

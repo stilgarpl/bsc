@@ -12,7 +12,7 @@ void JournalSource::work() {
 void JournalSource::registerProviders(SourceManager *manager) {
     requestSource.registerProviders(manager);
     responseSource.registerProviders(manager);
-    ///@todo context settings not here...
-    requestSource.setContext(context);
-    responseSource.setContext(context);
 }
+
+JournalSource::JournalSource(SourceManager &sourceManager) : ISource(sourceManager), requestSource(sourceManager),
+                                                             responseSource(sourceManager) {}
