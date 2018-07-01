@@ -214,7 +214,7 @@ void NodeNetworkModule::addActiveClientConnection(std::shared_ptr<Connection> c)
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
     NodeConnectionInfoPtr info = std::make_shared<NodeConnectionInfo>();
     info->connection = c;
-    info->nodeId = std::experimental::nullopt;
+    info->nodeId = std::nullopt;
 
     activeClientConnections.push_back(info);
 

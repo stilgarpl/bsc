@@ -13,6 +13,8 @@
 
 using namespace std::chrono_literals;
 
+class ISource;
+
 class SourceManager {
 public:
     typedef std::shared_ptr<ISource> SourcePtr;

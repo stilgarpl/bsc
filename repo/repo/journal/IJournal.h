@@ -21,7 +21,7 @@ public:
 
 public:
     typedef std::function<void(const JournalStateData &)> Func;
-    typedef std::map<JournalMethod, std::experimental::optional<Func>> FuncMap;
+    typedef std::map<JournalMethod, std::optional<Func>> FuncMap;
     ///@todo I'm not sure this should be in the interface...
     typedef std::shared_ptr<JournalState> JournalStatePtr;
     typedef std::vector<std::shared_ptr<JournalState>> JournalHistory;

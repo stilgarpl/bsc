@@ -134,6 +134,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                         //   std::cout << "work::receive qs " << receiveQueue.size() << std::endl;
                         // logic.processPacket(v);
                         ///@todo maybe move this to processor?
+                        //@todo remove dependency on connectionSource, add generic observers instead, connectionSource should be an observer
                         if (connectionSourcePtr != nullptr) {
                             //   LOGGER("CONNECTION SOURCE ISNT NULL")
 

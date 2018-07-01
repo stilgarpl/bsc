@@ -160,3 +160,26 @@ OOOO, WLASNIE, MOZE TO NA STRUMIENIACH ZROBIC!
 configuration module jest chyba do wyrzucenia, a wlasciwie do zintegrowania z Nodem, zwłaszcza, żę configuration() jest elementem każdego modułu teraz
 
 przed initialize() mogłoby być wywoływane configure ładujące dla każdego modułu jego konfigurację, jeśli istnieje, w razie potrzeby node miałby też kontrolę nad zapisem konfiguracji (tylko jak wykryć zmiany? zapisywać za każdym razem?)
+
+
+
+pomysł na high level logic:
+
+high level source, logic event.
+high lvl logic by sie ustalalo na zasadzie reakcji na eventy low level i generowaniu high level, po czym high levele by indukowaly konkrete operacje low level
+czyli np. event CONNECTION_ESTABLISHED by generowal LogicEvent(CONNECTED), co by z kolei robilo -> UPDATE NODE, etc.
+jedyny problem, to jak w tym przechowywac dodatkowe informacje. bo np. to connection powinno miec info kto z kim sie polaczyl.
+i żadnych TTarget czy void*, ma byc porządnie.
+
+
+MIXED SIGNALS! @TODO THINK ABOUT IT
+a co jesli sygnały nie byłyby per source tylko globalne, per logic manager? wtedy odpadłaby potrzeba rejestrowania providerów. source mogłyby generować takie eventy jakie chcą, a sygnały byłyby połączone. dla konkretnego eventa byłby konkretny sygnał a nie zbiór sygnałów per source
+a logic manager i tak wszystkie te sygnały odpala jednocześnie.
+z drugiej strony w tym momencie eventy są generowane tylko przez source, w dodatku clock source przegląda listę swoich sygnałów... może lepiej zostawić to tak jak jest, póki co.
+
+zamiast assignActions, setupActions, setupSources przyjmujących logicManager, powinny przyjmować klasy helperów, które robią tylko tą jedną akcję. teraz nic nie stoi na przeszkodzie robic coś innego w tych metodach
+
+
+AssignActionHelper ah
+
+ah<Tick>(SOME_EVENT);

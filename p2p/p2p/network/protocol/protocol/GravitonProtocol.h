@@ -15,6 +15,7 @@ class GravitonProtocol : public IProtocol {
 private:
     std::mutex lock;
     std::map<BasePacket::IdType, std::shared_ptr<BasePacketInfo>> responseMap;
+    //todo dynamic timeout
     const Tick::clock::duration MAX_TIMEOUT = 500ms;
     const unsigned int MAX_RETRY = 5;
 public:

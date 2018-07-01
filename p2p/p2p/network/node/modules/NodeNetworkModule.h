@@ -20,7 +20,7 @@
 
 struct NodeConnectionInfo {
     ConnectionPtr connection;
-    std::experimental::optional<NodeIdType> nodeId;
+    std::optional<NodeIdType> nodeId;
 };
 
 typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
