@@ -47,16 +47,6 @@ void ConnectionSource::work() {
 
 }
 
-void ConnectionSource::registerProviders(SourceManager *manager) {
-//    ISource::registerProviders(manager);
-    connSource.registerProviders(manager);
-    packetSource.registerProviders(manager);
-    ///@todo context settings not here...
-//    connSource.setContext(context);
-//    packetSource.setContext(context);
-}
-
-
 
 void ConnectionSource::connectionAccepted(Connection *c) {
 

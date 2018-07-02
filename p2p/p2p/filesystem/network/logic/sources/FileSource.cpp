@@ -36,12 +36,6 @@ void FileSource::work() {
 
 }
 
-void FileSource::registerProviders(SourceManager *manager) {
-    requestSource.registerProviders(manager);
-    responseSource.registerProviders(manager);
-    attributesSource.registerProviders(manager);
-}
-
 void FileSource::fileReceived(SendFile::Response::Ptr response) {
     //auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
 

@@ -45,11 +45,6 @@ public:
 
     virtual void work() =0;
 
-
-    //@todo make pure virtual
-    virtual void registerProviders(SourceManager *)=0;
-
-
     void setContext(Context &context) {};
 
 };

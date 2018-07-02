@@ -16,7 +16,7 @@ private:
     EventQueueSource<JournalRequestEvent, JournalSource> requestSource;
     EventQueueSource<JournalResponseEvent, JournalSource> responseSource;
 public:
-    JournalSource(SourceManager &sourceManager);
+    explicit JournalSource(SourceManager &sourceManager);
 
     void journalRequested(std::string repoId, JournalGroup::Request::IdType requestId) {
         auto event = requestSource.newEvent(requestId);
@@ -35,7 +35,6 @@ public:
 
     void work() override;
 
-    void registerProviders(SourceManager *manager) override;
 };
 
 

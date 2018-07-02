@@ -41,8 +41,4 @@ void ClockSource::setLastTick(ClockSource::duration d, ClockSource::time_point t
     lastTick[d] = t;
 }
 
-void ClockSource::registerProviders(SourceManager *manager) {
-    manager->registerProvider<Tick>();
-}
-
 ClockSource::ClockSource(SourceManager &sourceManager) : ISource(sourceManager) {}

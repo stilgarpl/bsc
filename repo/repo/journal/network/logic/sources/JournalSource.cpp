@@ -9,10 +9,6 @@ void JournalSource::work() {
     responseSource.work();
 }
 
-void JournalSource::registerProviders(SourceManager *manager) {
-    requestSource.registerProviders(manager);
-    responseSource.registerProviders(manager);
-}
 
 JournalSource::JournalSource(SourceManager &sourceManager) : ISource(sourceManager), requestSource(sourceManager),
                                                              responseSource(sourceManager) {}

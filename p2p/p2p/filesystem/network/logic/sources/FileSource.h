@@ -47,8 +47,6 @@ public:
 public:
     void work() override;
 
-    void registerProviders(SourceManager *manager) override;
-
 };
 
 

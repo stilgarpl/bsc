@@ -28,10 +28,10 @@ public:
 
     template<typename EventType, typename... Args, typename ActionId>
     bool assignAction(typename EventType::IdType eventId, ActionId actionId) {
-        if (!sourceManager.hasProvider<EventType, Args...>()) {
-            std::cerr << "Provider doesn't exist: " << typeid(EventType).name() << std::endl;
-            return false;
-        }
+//        if (!sourceManager.hasProvider<EventType, Args...>()) {
+//            std::cerr << "Provider doesn't exist: " << typeid(EventType).name() << std::endl;
+//            return false;
+//        }
         auto &&action = actionManager.getAction<EventType, Args...>(actionId);
         if (action) {
             auto ret = sourceManager.registerTrigger<EventType, Args...>(eventId, *action);
@@ -45,9 +45,9 @@ public:
     template<typename EventType, typename ActionId>
     bool assignAction(ActionId actionId) {
         auto &&action = actionManager.getAction<EventType>(actionId);
-        if (!sourceManager.hasProvider<EventType>()) {
-            std::cerr << "Provider doesn't exist: " << typeid(EventType).name() << std::endl;
-        }
+//        if (!sourceManager.hasProvider<EventType>()) {
+//            std::cerr << "Provider doesn't exist: " << typeid(EventType).name() << std::endl;
+//        }
         if (action) {
             sourceManager.registerTrigger<EventType>(*action);
             return true;

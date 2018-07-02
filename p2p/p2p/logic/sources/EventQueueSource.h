@@ -70,11 +70,6 @@ public:
 
     }
 
-    void registerProviders(SourceManager *manager) override {
-        manager->registerProvider<EventType_>(this);
-    }
-
-
     auto queueSize() {
         return eventQueue.size();
     }

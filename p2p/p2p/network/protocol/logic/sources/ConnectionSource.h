@@ -27,10 +27,7 @@ public:
 
     void work() override;
 
-    void registerProviders(SourceManager *manager) override;
-
     void connectionAccepted(Connection *c);
-
 
     void connectionEstablished(Connection *c);
 
