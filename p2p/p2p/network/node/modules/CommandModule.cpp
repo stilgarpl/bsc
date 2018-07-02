@@ -20,8 +20,10 @@ void CommandModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) 
 }
 
 bool CommandModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
-    bool ret = actionHelper.assignAction<CommandEvent>(CommandEventId::EXECUTE_COMMAND, CommandActions::RUN_COMMAND);
-    return ret;
+//    bool ret = actionHelper.assignAction<CommandEvent>(CommandEventId::EXECUTE_COMMAND, CommandActions::RUN_COMMAND);
+    when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).fireAction(CommandActions::RUN_COMMAND);
+    return true;
+//    return ret;
 }
 
 bool CommandModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {

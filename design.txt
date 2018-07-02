@@ -162,6 +162,8 @@ configuration module jest chyba do wyrzucenia, a wlasciwie do zintegrowania z No
 przed initialize() mogłoby być wywoływane configure ładujące dla każdego modułu jego konfigurację, jeśli istnieje, w razie potrzeby node miałby też kontrolę nad zapisem konfiguracji (tylko jak wykryć zmiany? zapisywać za każdym razem?)
 
 
+when(event<A>()).emit(event<B>())
+
 
 pomysł na high level logic:
 

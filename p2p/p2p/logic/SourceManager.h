@@ -22,8 +22,6 @@ class SourceManager {
 public:
     typedef std::shared_ptr<ISource> SourcePtr;
     typedef std::list<SourcePtr> SourceList;
-    typedef ISource *ProviderPtr;
-    typedef std::list<ISource *> ProviderList;
 
     template<typename T, typename... Args>
     using SignalType = Signal<const T &, Args...>;
@@ -116,8 +114,6 @@ private:
     SourceList sources;
     ///@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
     Uber<Type> sourcesByType;
-//    StaticUber<ProviderList> providers;
-//    std::shared_ptr<ISource> lastProvider = nullptr;
     ///@todo maybe this should just be a reference to node context?
     Context commonContext;
 public:
@@ -151,30 +147,7 @@ protected:
         sources.remove(source);
     }
 
-protected:
-
-//    template<typename EventType, typename... Args>
-//    ProviderList &getProviders() {
-//        return providers.get<EventType, Args...>();
-//    }
-
 public:
-//    template<typename EventType, typename... Args>
-//    void registerProvider(ProviderPtr p) {
-//        providers.get<EventType, Args...>().push_back(p);
-//    }
-//
-//
-//    template<typename EventType, typename... Args>
-//    void registerProvider() {
-//        providers.get<EventType, Args...>().push_back(lastProvider.get());
-//    }
-
-//    template<typename EventType, typename... Args>
-//    bool hasProvider() {
-//        return providers.get<EventType, Args...>().size() > 0;
-//    };
-
     template<typename EventType, typename... Args>
     int registerTrigger(const typename SignalType<EventType>::Func &func) {
         int assigned = 1;

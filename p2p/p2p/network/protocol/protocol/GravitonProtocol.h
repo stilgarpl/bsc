@@ -19,6 +19,8 @@ private:
     const Tick::clock::duration MAX_TIMEOUT = 500ms;
     const unsigned int MAX_RETRY = 5;
 public:
+    GravitonProtocol(LogicManager &logicManager);
+
     void onPacketSent(const PacketEvent &event) override;
 
     void onPacketReceived(const PacketEvent &event) override;

@@ -135,10 +135,10 @@ bool NodeNetworkModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelp
     return true;
 }
 
-bool NodeNetworkModule::setupLogic(LogicManager &logicManager) {
+bool NodeNetworkModule::setupLogic() {
 
-    bool ret = ILogicModule::setupLogic(logicManager);
-    ret &= protocol->setupLogic(logicManager);
+    bool ret = ILogicModule::setupLogic();
+    ret &= protocol->setupLogic();
     return ret;
 }
 

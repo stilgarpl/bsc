@@ -16,6 +16,9 @@ class INodeModule : public ILogicModule, public virtual IDependencyManaged, publ
 
 public:
     typedef IConfig Config;
+
+    explicit INodeModule(LogicManager &logicManager) : ILogicModule(logicManager) {}
+
     virtual void initialize()=0;
 
     virtual IConfig &configuration()=0;

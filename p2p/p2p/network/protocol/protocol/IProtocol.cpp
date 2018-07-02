@@ -37,6 +37,8 @@ void DummyProtocol::onConnectionEvent(const ConnectionEvent &event) {
 
 }
 
+DummyProtocol::DummyProtocol(LogicManager &logicManager) : IProtocol(logicManager) {}
+
 
 void IProtocol::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
     actionHelper.setAction<PacketEvent>(Actions::onPacketSent, std::bind(&IProtocol::onPacketSent, this, _1));
@@ -63,3 +65,5 @@ bool IProtocol::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
     sourceHelper.requireSource<ConnectionSource>();
     return true;
 }
+
+IProtocol::IProtocol(LogicManager &logicManager) : ILogicModule(logicManager) {}

@@ -21,7 +21,7 @@ public:
     ///@todo pure or not?
     virtual void initialize() {};
 
-    NodeModule(INode &node) : node(node) {}
+    explicit NodeModule(INode &node) : INodeModule(node.getLogicManager()), node(node) {}
 
     void run() override {
         //do nothing, just so modules do not have to implement this if they don't want to

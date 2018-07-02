@@ -93,3 +93,5 @@ void GravitonProtocol::onConnectionEvent(const ConnectionEvent &event) {
     }
 
 }
+
+GravitonProtocol::GravitonProtocol(LogicManager &logicManager) : IProtocol(logicManager) {}

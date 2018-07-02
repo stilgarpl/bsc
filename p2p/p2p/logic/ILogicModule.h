@@ -9,6 +9,10 @@
 #include "LogicManager.h"
 
 class ILogicModule {
+protected:
+    LogicManager &logicManager;
+public:
+    explicit ILogicModule(LogicManager &logicManager) : logicManager(logicManager) {}
 
 public:
 
@@ -32,12 +36,12 @@ public:
     public:
         template<typename EventType, typename... Args, typename ActionId>
         bool assignAction(typename EventType::IdType eventId, ActionId actionId) {
-            return logicManager.assignAction<EventType, Args..., ActionId>(eventId, actionId);
+            return logicManager.assignAction<EventType, Args...>(eventId, actionId);
         }
 
-        template<typename EventType, typename ActionId>
+        template<typename EventType, typename... Args, typename ActionId>
         bool assignAction(ActionId actionId) {
-            return logicManager.assignAction<EventType, ActionId>(actionId);
+            return logicManager.assignAction<EventType, Args...>(actionId);
         }
     };
 
@@ -53,9 +57,68 @@ public:
         }
     };
 
+    template<typename EventType>
+    class LogicChainHelper;
+
+    template<typename eventType>
+    class EventHelper {
+    public:
+        typedef eventType EventType;
+        typedef typename EventType::IdType EventId;
+
+    private:
+        std::optional<EventId> eventId;
+    public:
+        EventHelper<EventType> &withId(EventId id) {
+            eventId = id;
+            return *this;
+        }
+
+        friend class LogicChainHelper<eventType>;
+    };
+
+    template<typename EventType>
+    class LogicChainHelper {
+    public:
+        typedef typename EventType::IdType EventId;
+        typedef LogicChainHelper<EventType> ThisType;
+    private:
+        std::optional<EventId> eventId;
+        LogicManager &logicManager;
+    public:
+        explicit LogicChainHelper(const EventHelper<EventType> &eventHelper, LogicManager &l) : logicManager(l) {
+            eventId = eventHelper.eventId;
+        }
+
+        template<typename ActionId>
+        ThisType &fireAction(ActionId actionId) {
+            if (eventId) {
+                logicManager.assignAction<EventType>(*eventId, actionId);
+            } else {
+                logicManager.assignAction<EventType>(actionId);
+            }
+            return *this;
+        }
+    };
+
+
+    template<typename EventType>
+    EventHelper<EventType> event() {
+        return EventHelper<EventType>();
+    }
+
+    template<typename EventType>
+    LogicChainHelper<EventType> when(const EventHelper<EventType> eventHelper) {
+        return LogicChainHelper<EventType>(eventHelper, logicManager);
+    }
+
+
+protected:
+
+    //when(event<CommandEvent>().withId(CommandId::EXECUTE_COMMAND)).fireAction(RUN_COMMAND);d
 
 public:
-    virtual bool setupLogic(LogicManager &logicManager) {
+    virtual bool setupLogic() {
         bool ret = true;
         SetupSourceHelper setupSourceHelper(logicManager);
         SetupActionHelper setupActionHelper(logicManager);
@@ -72,6 +135,8 @@ public:
     virtual bool assignActions(AssignActionHelper &actionHelper)=0;
 
     virtual bool setupSources(SetupSourceHelper &sourceHelper)=0;
+
+
 };
 
 

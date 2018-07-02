@@ -60,7 +60,7 @@ public:
 
 
 private:
-    std::unique_ptr<IProtocol> protocol = std::make_unique<GravitonProtocol>();
+    std::unique_ptr<IProtocol> protocol = std::make_unique<GravitonProtocol>(logicManager);
     std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
     std::mutex acceptedConnectionsMutex;
     std::mutex activeConnectionsMutex;
@@ -70,7 +70,7 @@ private:
 public:
     explicit NodeNetworkModule(INode &node);
 
-    bool setupLogic(LogicManager &logicManager) override;
+    bool setupLogic() override;
 
     void setupActions(ILogicModule::SetupActionHelper &actionHelper) override;
 

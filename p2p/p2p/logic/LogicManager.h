@@ -42,14 +42,14 @@ public:
         }
     }
 
-    template<typename EventType, typename ActionId>
+    template<typename EventType, typename... Args, typename ActionId>
     bool assignAction(ActionId actionId) {
-        auto &&action = actionManager.getAction<EventType>(actionId);
+        auto &&action = actionManager.getAction<EventType, Args...>(actionId);
 //        if (!sourceManager.hasProvider<EventType>()) {
 //            std::cerr << "Provider doesn't exist: " << typeid(EventType).name() << std::endl;
 //        }
         if (action) {
-            sourceManager.registerTrigger<EventType>(*action);
+            sourceManager.registerTrigger<EventType, Args...>(*action);
             return true;
         } else {
             return false;

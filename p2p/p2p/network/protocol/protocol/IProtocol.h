@@ -41,6 +41,8 @@ public:
         onWork,
     };
 
+    IProtocol(LogicManager &logicManager);
+
     ProtocolWrapper wrap(ConnectionPtr conn) {
         return ProtocolWrapper(conn, this);
     }
@@ -125,6 +127,8 @@ class DummyProtocol : public IProtocol {
     void work(const Tick &tick) override;
 
 public:
+    DummyProtocol(LogicManager &logicManager);
+
     std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) override;
 
     void onConnectionEvent(const ConnectionEvent &event) override;
