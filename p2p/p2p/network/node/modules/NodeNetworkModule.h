@@ -72,11 +72,11 @@ public:
 
     bool setupLogic(LogicManager &logicManager) override;
 
-    void setupActions(LogicManager &logicManager) override;
+    void setupActions(ILogicModule::SetupActionHelper &actionHelper) override;
 
-    bool assignActions(LogicManager &logicManager) override;
+    bool assignActions(ILogicModule::AssignActionHelper &actionHelper) override;
 
-    bool setupSources(LogicManager &logicManager) override;
+    bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
 
     void updateNodeConnectionInfo();
 

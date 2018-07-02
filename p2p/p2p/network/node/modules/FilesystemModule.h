@@ -28,11 +28,11 @@ class FilesystemModule : public NodeModuleDependent<FilesystemModule> {
 public:
     FilesystemModule(INode &node);
 
-    void setupActions(LogicManager &logicManager) override;
+    void setupActions(ILogicModule::SetupActionHelper &actionHelper) override;
 
-    bool assignActions(LogicManager &logicManager) override;
+    bool assignActions(ILogicModule::AssignActionHelper &actionHelper) override;
 
-    bool setupSources(LogicManager &logicManager) override;
+    bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
 
     const std::experimental::filesystem::path &getCurrentPath() const;
 

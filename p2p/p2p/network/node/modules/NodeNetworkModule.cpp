@@ -27,97 +27,97 @@ NodeNetworkModule::NodeNetworkModule(INode &node) : NodeModuleConfigDependent(no
 //    setRequired<BasicModule>();
 }
 
-void NodeNetworkModule::setupActions(LogicManager &logicManager) {
-    logicManager.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
-    logicManager.setAction<ConnectionEvent>("reqNeI", NodeActions::sendNetworkInfoRequest);
-    logicManager.setAction<NodeInfoEvent>("upNoI", NodeActions::updateNodeInfo);
-    logicManager.setAction<NetworkInfoEvent>("upNeI", NetworkActions::updateNetworkInfo);
-    logicManager.setAction<NodeInfoEvent>("addKnownNode", NodeActions::addKnownNode);
-    logicManager.setAction<Tick>("trigNodeUp", NodeActions::triggerUpdateNode);
-    logicManager.setAction<NodeInfoEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
+void NodeNetworkModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
+    actionHelper.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
+    actionHelper.setAction<ConnectionEvent>("reqNeI", NodeActions::sendNetworkInfoRequest);
+    actionHelper.setAction<NodeInfoEvent>("upNoI", NodeActions::updateNodeInfo);
+    actionHelper.setAction<NetworkInfoEvent>("upNeI", NetworkActions::updateNetworkInfo);
+    actionHelper.setAction<NodeInfoEvent>("addKnownNode", NodeActions::addKnownNode);
+    actionHelper.setAction<Tick>("trigNodeUp", NodeActions::triggerUpdateNode);
+    actionHelper.setAction<NodeInfoEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
 
 
-    logicManager.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent &event) {
+    actionHelper.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent &event) {
         // std::clog << "Debug: connection event!" << std::endl;
     });
 
 
-    logicManager.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_CLIENT,
+    actionHelper.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_CLIENT,
                                             [&](const ConnectionEvent &event) {
                                                 this->removeActiveClientConnection(event.getConnection());
                                             });
 
-//    logicManager.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_SERVER, [&](const ConnectionEvent &event) {
+//    actionHelper.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_SERVER, [&](const ConnectionEvent &event) {
 //        ///@todo do something about this dynamic cast
 //        this->removeAcceptedConnection(dynamic_cast<IServerConnection *>(event.getConnection()));
 //    });
 ///@todo reenable
-//    logicManager.setAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
+//    actionHelper.setAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
 //                                        [&transmissionControl](
 //                                                const PacketEvent &packetEvent) {
 //                                            return transmissionControl.onPacketReceived(packetEvent);
 //                                        });
-//    logicManager.setAction<PacketEvent>(PacketEventId::PACKET_SENT,
+//    actionHelper.setAction<PacketEvent>(PacketEventId::PACKET_SENT,
 //                                        [&transmissionControl](const PacketEvent &packetEvent) {
 //                                            return transmissionControl.onPacketSent(packetEvent);
 //                                        });
 //
-//    logicManager.setAction<Tick>("TransTick", [&transmissionControl](const Tick &tick) {
+//    actionHelper.setAction<Tick>("TransTick", [&transmissionControl](const Tick &tick) {
 //        return transmissionControl.work(tick);
 //    });
 
 
-    logicManager.setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
+    actionHelper.setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
 
 
 }
 
-bool NodeNetworkModule::assignActions(LogicManager &logicManager) {
-    if (logicManager.assignAction<ConnectionEvent>("connDebug")) {
+bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
+    if (actionHelper.assignAction<ConnectionEvent>("connDebug")) {
         std::clog << "Debug: ConEv assignment!" << std::endl;
 
     }
 
 
-//    if (logicManager.assignAction<ConnectionEvent>("onConnect")) {
+//    if (actionHelper.assignAction<ConnectionEvent>("onConnect")) {
 //        std::clog << "Debug: onConn assignment!" << std::endl;
 //
 //    }
 
-    if (logicManager.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNoI")) {
+    if (actionHelper.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNoI")) {
         std::clog << "Debug: reqNoI assignment!" << std::endl;
 
     }
 
-    if (logicManager.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNeI")) {
+    if (actionHelper.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNeI")) {
         std::clog << "Debug: reqNeI assignment!" << std::endl;
 
     }
 
-    if (logicManager.assignAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_CLIENT,
+    if (actionHelper.assignAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_CLIENT,
                                                    ConnectionEventId::CONNECTION_CLOSED_CLIENT)) {
         std::clog << "Debug: CONNECTION_CLOSED assignment!" << std::endl;
 
     }
 
 
-    if (logicManager.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "upNoI")) {
+    if (actionHelper.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "upNoI")) {
         std::clog << "Debug: upNoI assignment!" << std::endl;
 
     }
 
-    if (logicManager.assignAction<NetworkInfoEvent>(NetworkInfoEvent::IdType::NETWORK_INFO_RECEIVED, "upNeI")) {
+    if (actionHelper.assignAction<NetworkInfoEvent>(NetworkInfoEvent::IdType::NETWORK_INFO_RECEIVED, "upNeI")) {
         std::clog << "Debug: upNoI assignment!" << std::endl;
 
     }
 
     ///@todo upNoI powinno cos takiego robic, addKnownNode powinien byc wywolany tylko w przypadku
-    if (logicManager.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "addKnownNode")) {
+    if (actionHelper.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "addKnownNode")) {
         std::clog << "Debug: addKnownNode assignment!" << std::endl;
 
     }
 
-    if (logicManager.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NEW_NODE_DISCOVERED, "nodeDiscovered")) {
+    if (actionHelper.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NEW_NODE_DISCOVERED, "nodeDiscovered")) {
         std::clog << "Debug: addKnownNode assignment!" << std::endl;
 
     }
@@ -126,12 +126,12 @@ bool NodeNetworkModule::assignActions(LogicManager &logicManager) {
     return true;
 }
 
-bool NodeNetworkModule::setupSources(LogicManager &logicManager) {
-    logicManager.addSource<AuthSource>();
+bool NodeNetworkModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
+    sourceHelper.requireSource<AuthSource>();
 
-    logicManager.addSource<ConnectionSource>();
-    logicManager.addSource<NetworkSource>();
-    logicManager.addSource<NodeSource>();
+    sourceHelper.requireSource<ConnectionSource>();
+    sourceHelper.requireSource<NetworkSource>();
+    sourceHelper.requireSource<NodeSource>();
     return true;
 }
 

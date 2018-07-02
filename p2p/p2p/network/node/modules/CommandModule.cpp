@@ -15,17 +15,17 @@ CommandModule::CommandModule(INode &node) : NodeModuleDependent(node), defaultSu
     setRequired<BasicModule>();
 }
 
-void CommandModule::setupActions(LogicManager &logicManager) {
-    logicManager.setAction<CommandEvent>(CommandActions::RUN_COMMAND, CommandActions::runCommand);
+void CommandModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
+    actionHelper.setAction<CommandEvent>(CommandActions::RUN_COMMAND, CommandActions::runCommand);
 }
 
-bool CommandModule::assignActions(LogicManager &logicManager) {
-    bool ret = logicManager.assignAction<CommandEvent>(CommandEventId::EXECUTE_COMMAND, CommandActions::RUN_COMMAND);
+bool CommandModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
+    bool ret = actionHelper.assignAction<CommandEvent>(CommandEventId::EXECUTE_COMMAND, CommandActions::RUN_COMMAND);
     return ret;
 }
 
-bool CommandModule::setupSources(LogicManager &logicManager) {
-    logicManager.addSource<CommandSource>();
+bool CommandModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
+    sourceHelper.requireSource<CommandSource>();
     return true;
 }
 
@@ -70,6 +70,7 @@ void CommandModule::sendRemoteCommand(const std::vector<std::string> &args) {
 
     }
 }
+
 
 CommandModule::CommandSubModule &CommandModule::CommandSubModule::submodule(std::string name) {
     if (submodules.count(name) == 0) {

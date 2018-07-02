@@ -16,14 +16,14 @@ void ConfigurationModule::initialize() {
     manager.setRootPath(fs::path("/tmp/basyco") / node.getNodeInfo().getNodeId());
 }
 
-void ConfigurationModule::setupActions(LogicManager &logicManager) {
+void ConfigurationModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
 
 }
 
-bool ConfigurationModule::assignActions(LogicManager &logicManager) {
+bool ConfigurationModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     return true;
 }
 
-bool ConfigurationModule::setupSources(LogicManager &logicManager) {
+bool ConfigurationModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
     return true;
 }

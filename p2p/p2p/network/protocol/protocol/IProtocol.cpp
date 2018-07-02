@@ -38,28 +38,28 @@ void DummyProtocol::onConnectionEvent(const ConnectionEvent &event) {
 }
 
 
-void IProtocol::setupActions(LogicManager &logicManager) {
-    logicManager.setAction<PacketEvent>(Actions::onPacketSent, std::bind(&IProtocol::onPacketSent, this, _1));
-    logicManager.setAction<PacketEvent>(Actions::onPacketReceived,
+void IProtocol::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
+    actionHelper.setAction<PacketEvent>(Actions::onPacketSent, std::bind(&IProtocol::onPacketSent, this, _1));
+    actionHelper.setAction<PacketEvent>(Actions::onPacketReceived,
                                         std::bind(&IProtocol::onPacketReceived, this, _1));
-    logicManager.setAction<Tick>(Actions::onWork, std::bind(&IProtocol::work, this, _1));
-    logicManager.setAction<ConnectionEvent>("protocolConnectionClosed",
+    actionHelper.setAction<Tick>(Actions::onWork, std::bind(&IProtocol::work, this, _1));
+    actionHelper.setAction<ConnectionEvent>("protocolConnectionClosed",
                                             std::bind(&IProtocol::onConnectionEvent, this, _1));
 
 }
 
-bool IProtocol::assignActions(LogicManager &logicManager) {
+bool IProtocol::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     bool result = true;
-    result &= logicManager.assignAction<PacketEvent>(PacketEvent::IdType::PACKET_SENT, Actions::onPacketSent);
-    result &= logicManager.assignAction<PacketEvent>(PacketEvent::IdType::PACKET_RECEIVED, Actions::onPacketReceived);
-    result &= logicManager.assignAction<Tick>(800ms, Actions::onWork);
-    result &= logicManager.assignAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED,
+    result &= actionHelper.assignAction<PacketEvent>(PacketEvent::IdType::PACKET_SENT, Actions::onPacketSent);
+    result &= actionHelper.assignAction<PacketEvent>(PacketEvent::IdType::PACKET_RECEIVED, Actions::onPacketReceived);
+    result &= actionHelper.assignAction<Tick>(800ms, Actions::onWork);
+    result &= actionHelper.assignAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED,
                                                          "protocolConnectionClosed");
     return result;
 }
 
-bool IProtocol::setupSources(LogicManager &logicManager) {
-    logicManager.requireSource<ClockSource>();
-    logicManager.requireSource<ConnectionSource>();
+bool IProtocol::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
+    sourceHelper.requireSource<ClockSource>();
+    sourceHelper.requireSource<ConnectionSource>();
     return true;
 }

@@ -10,16 +10,16 @@ BasicModule::BasicModule(INode &node) : NodeModuleDependent(node) {
 
 }
 
-void BasicModule::setupActions(LogicManager &logicManager) {
+void BasicModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
 
 
 }
 
-bool BasicModule::assignActions(LogicManager &logicManager) {
+bool BasicModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     return false;
 }
 
-bool BasicModule::setupSources(LogicManager &logicManager) {
-    logicManager.addSource<ClockSource>();
+bool BasicModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
+    sourceHelper.requireSource<ClockSource>();
     return true;
 }

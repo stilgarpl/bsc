@@ -13,42 +13,42 @@ FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent(node) {
     setRequired<BasicModule, NodeNetworkModule>();
 }
 
-void FilesystemModule::setupActions(LogicManager &logicManager) {
-    logicManager.setAction<FileRequestEvent>("fileReq", FileActions::sendFile);
-    logicManager.setAction<FileResponseEvent>("fileRes", FileActions::receivedFile);
-    logicManager.setAction<FileAttributesEvent>("fileAtrS", FileActions::sendAttributes);
-    logicManager.setAction<FileAttributesEvent>("fileAtrR", FileActions::receivedAttributes);
+void FilesystemModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
+    actionHelper.setAction<FileRequestEvent>("fileReq", FileActions::sendFile);
+    actionHelper.setAction<FileResponseEvent>("fileRes", FileActions::receivedFile);
+    actionHelper.setAction<FileAttributesEvent>("fileAtrS", FileActions::sendAttributes);
+    actionHelper.setAction<FileAttributesEvent>("fileAtrR", FileActions::receivedAttributes);
     using namespace std::placeholders;
 
-    logicManager.setAction<TransferEvent>("beginTransfer",
+    actionHelper.setAction<TransferEvent>("beginTransfer",
                                           std::bind(&TransferManager::beginTransfer, &this->transferManager, _1));
-    logicManager.setAction<TransferEvent>("finishTransfer",
+    actionHelper.setAction<TransferEvent>("finishTransfer",
                                           std::bind(&TransferManager::finishTransfer, &this->transferManager, _1));
-    logicManager.setAction<TransferEvent>("sendData",
+    actionHelper.setAction<TransferEvent>("sendData",
                                           std::bind(&TransferManager::sendData, &this->transferManager, _1));
-    logicManager.setAction<TransferEvent>("sendProps",
+    actionHelper.setAction<TransferEvent>("sendProps",
                                           std::bind(&TransferManager::transferProperties, &this->transferManager, _1));
 
 }
 
-bool FilesystemModule::assignActions(LogicManager &logicManager) {
-    if (logicManager.assignAction<FileRequestEvent>(FileRequestEvent::IdType::GET_FILE, "fileReq") &&
-        logicManager.assignAction<FileRequestEvent>(FileRequestEvent::IdType::GET_CHUNK, "fileReq") &&
-        logicManager.assignAction<FileResponseEvent>(FileResponseEvent::IdType::FILE_RECEIVED, "fileRes") &&
-        logicManager.assignAction<FileResponseEvent>(FileResponseEvent::IdType::CHUNK_RECEIVED, "fileRes") &&
-        logicManager.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_REQUESTED, "fileAtrS") &&
-        logicManager.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_RECEIVED, "fileAtrR") &&
-        logicManager.assignAction<TransferEvent>(TransferEvent::IdType::REQUESTED, "beginTransfer") &&
-        logicManager.assignAction<TransferEvent>(TransferEvent::IdType::SENDING, "sendData") &&
-        logicManager.assignAction<TransferEvent>(TransferEvent::IdType::GET_PROPERTIES, "sendProps") &&
-        logicManager.assignAction<TransferEvent>(TransferEvent::IdType::FINISHING, "finishTransfer") //&&
+bool FilesystemModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
+    if (actionHelper.assignAction<FileRequestEvent>(FileRequestEvent::IdType::GET_FILE, "fileReq") &&
+        actionHelper.assignAction<FileRequestEvent>(FileRequestEvent::IdType::GET_CHUNK, "fileReq") &&
+        actionHelper.assignAction<FileResponseEvent>(FileResponseEvent::IdType::FILE_RECEIVED, "fileRes") &&
+        actionHelper.assignAction<FileResponseEvent>(FileResponseEvent::IdType::CHUNK_RECEIVED, "fileRes") &&
+        actionHelper.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_REQUESTED, "fileAtrS") &&
+        actionHelper.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_RECEIVED, "fileAtrR") &&
+        actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::REQUESTED, "beginTransfer") &&
+        actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::SENDING, "sendData") &&
+        actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::GET_PROPERTIES, "sendProps") &&
+        actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::FINISHING, "finishTransfer") //&&
             ) {
         std::clog << "Debug: File assignment!" << std::endl;
 
 
         ///@todo remove this debug:
 
-//        logicManager.setAction<ConnectionEvent>("fileSendDebug", [](const ConnectionEvent &event) {
+//        actionHelper.setAction<ConnectionEvent>("fileSendDebug", [](const ConnectionEvent &event) {
 //
 //            SendFile::Request::Ptr req = SendFile::Request::getNew();
 //            req->setFilePath("/tmp/basyco/testfile.txt");
@@ -57,7 +57,7 @@ bool FilesystemModule::assignActions(LogicManager &logicManager) {
 //            event.getConnection()->send(req);
 //        });
 //
-//        if (logicManager.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED,
+//        if (actionHelper.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED,
 //                                                       "fileSendDebug")) {
 //            std::clog << "Debug: File DEBUG assignment!" << std::endl;
 //        }
@@ -66,9 +66,9 @@ bool FilesystemModule::assignActions(LogicManager &logicManager) {
     return false;
 }
 
-bool FilesystemModule::setupSources(LogicManager &logicManager) {
-    logicManager.addSource<FileSource>();
-    logicManager.addSource<TransferSource>();
+bool FilesystemModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
+    sourceHelper.requireSource<FileSource>();
+    sourceHelper.requireSource<TransferSource>();
     return true;
 }
 

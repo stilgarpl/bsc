@@ -21,11 +21,11 @@ private:
 public:
     RepoModule(INode &node);
 
-    void setupActions(LogicManager &logicManager) override;
+    void setupActions(ILogicModule::SetupActionHelper &actionHelper) override;
 
-    bool assignActions(LogicManager &logicManager) override;
+    bool assignActions(ILogicModule::AssignActionHelper &actionHelper) override;
 
-    bool setupSources(LogicManager &logicManager) override;
+    bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
 
     RepositoryPtr findRepository(const Repository::RepoIdType &repoId);
 

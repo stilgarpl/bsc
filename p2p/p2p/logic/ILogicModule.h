@@ -19,29 +19,59 @@ public:
 
     public:
         template<typename... Args, typename ActionIdType>
-        void operator()(ActionIdType id, ActionManager::ActionType<Args...> action) {
+        void setAction(ActionIdType id, ActionManager::ActionType<Args...> action) {
             logicManager.setAction<Args...>(id, action);
         };
+    };
+
+    class AssignActionHelper {
+        LogicManager &logicManager;
+    public:
+        explicit AssignActionHelper(LogicManager &logicManager) : logicManager(logicManager) {}
+
+    public:
+        template<typename EventType, typename... Args, typename ActionId>
+        bool assignAction(typename EventType::IdType eventId, ActionId actionId) {
+            return logicManager.assignAction<EventType, Args..., ActionId>(eventId, actionId);
+        }
+
+        template<typename EventType, typename ActionId>
+        bool assignAction(ActionId actionId) {
+            return logicManager.assignAction<EventType, ActionId>(actionId);
+        }
+    };
+
+    class SetupSourceHelper {
+        LogicManager &logicManager;
+    public:
+        explicit SetupSourceHelper(LogicManager &logicManager) : logicManager(logicManager) {}
+
+    public:
+        template<typename SourceType, typename... Args>
+        void requireSource(Args... args) {
+            logicManager.requireSource<SourceType, Args...>(args...);
+        }
     };
 
 
 public:
     virtual bool setupLogic(LogicManager &logicManager) {
         bool ret = true;
-        ret &= setupSources(logicManager);
-        SetupActionHelper actionHelper(logicManager);
-        setupActions(logicManager);
-//        setupActions(actionHelper);
-        ret &= assignActions(logicManager);
+        SetupSourceHelper setupSourceHelper(logicManager);
+        SetupActionHelper setupActionHelper(logicManager);
+        AssignActionHelper assignActionHelper(logicManager);
+        ret &= setupSources(setupSourceHelper);
+        setupActions(setupActionHelper);
+        ret &= assignActions(assignActionHelper);
         return ret;
     };
 
-    virtual void setupActions(LogicManager &logicManager) = 0;
+    virtual void setupActions(SetupActionHelper &actionHelper) = 0;
 //    virtual void setupActions(SetupActionHelper& actionHelper) = 0;
+//    virtual bool assignActions(ILogicModule::AssignActionHelper &actionHelper)=0;
+    virtual bool assignActions(AssignActionHelper &actionHelper)=0;
 
-    virtual bool assignActions(LogicManager &logicManager)=0;
-
-    virtual bool setupSources(LogicManager &logicManager)=0;
+    virtual bool setupSources(SetupSourceHelper &sourceHelper)=0;
 };
 
 

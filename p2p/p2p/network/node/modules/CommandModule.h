@@ -203,11 +203,11 @@ public:
         }
     }
 
-    void setupActions(LogicManager &logicManager) override;
+    void setupActions(ILogicModule::SetupActionHelper &actionHelper) override;
 
-    bool assignActions(LogicManager &logicManager) override;
+    bool assignActions(ILogicModule::AssignActionHelper &actionHelper) override;
 
-    bool setupSources(LogicManager &logicManager) override;
+    bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
 
 private:
     std::vector<std::string> explode(std::string const &s, char delim) {

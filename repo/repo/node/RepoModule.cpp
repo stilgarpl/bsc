@@ -10,22 +10,22 @@
 #include <repo/repository/storage/network/logic/actions/StorageActions.h>
 #include "RepoModule.h"
 
-void RepoModule::setupActions(LogicManager &logicManager) {
-    logicManager.setAction<JournalRequestEvent>("journalRequest", JournalActions::journalRequested);
-    logicManager.setAction<JournalResponseEvent>("journalReceive", JournalActions::journalReceived);
-    logicManager.setAction<StorageResourceRequestEvent>("storageQuery", StorageActions::resourceRequested);
+void RepoModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
+    actionHelper.setAction<JournalRequestEvent>("journalRequest", JournalActions::journalRequested);
+    actionHelper.setAction<JournalResponseEvent>("journalReceive", JournalActions::journalReceived);
+    actionHelper.setAction<StorageResourceRequestEvent>("storageQuery", StorageActions::resourceRequested);
 }
 
-bool RepoModule::assignActions(LogicManager &logicManager) {
-    bool ret = logicManager.assignAction<JournalRequestEvent>("journalRequest");
-    ret &= logicManager.assignAction<JournalResponseEvent>("journalReceive");
-    ret &= logicManager.assignAction<StorageResourceRequestEvent>("storageQuery");
+bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
+    bool ret = actionHelper.assignAction<JournalRequestEvent>("journalRequest");
+    ret &= actionHelper.assignAction<JournalResponseEvent>("journalReceive");
+    ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
     return ret;
 }
 
-bool RepoModule::setupSources(LogicManager &logicManager) {
-    logicManager.addSource<JournalSource>();
-    logicManager.addSource<StorageSource>();
+bool RepoModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
+    sourceHelper.requireSource<JournalSource>();
+    sourceHelper.requireSource<StorageSource>();
     return true;
 }
 

@@ -60,12 +60,13 @@ public:
 //        sourceManager.addSource(source);
 //    }
 
-
+protected:
     template<typename SourceType, typename... Args>
     void addSource(Args... args) {
         sourceManager.addSource<SourceType>(args...);
     }
 
+public:
     template<typename SourceType>
     std::shared_ptr<SourceType> getSource() {
         return sourceManager.getSource<SourceType>();
