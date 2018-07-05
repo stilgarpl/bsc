@@ -7,6 +7,7 @@
 
 
 #include <p2p/network/protocol/logic/events/ConnectionEvent.h>
+#include <p2p/network/protocol/logic/events/PacketEvent.h>
 #include "p2p/logic/sources/EventQueueSource.h"
 
 class ConnectionSource : public ISource {

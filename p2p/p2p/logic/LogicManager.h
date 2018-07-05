@@ -79,10 +79,11 @@ public:
 
 
     template<typename SourceType, typename... Args>
-    void requireSource(Args... args) {
+    SourceType &requireSource(Args... args) {
         if (getSource<SourceType>() == nullptr) {
             sourceManager.addSource<SourceType>(args...);
         }
+        return *getSource<SourceType>();
     }
 
     void work() {
@@ -115,6 +116,15 @@ public:
         stop();
         join();
     }
+
+
+    ///@todo think about it -> I'm not convinced event generation should be here (events should be fired from sources), but it's required by ILogicModule smart logic setup (I could make a separate source just for that... )
+    template<typename T, typename... Args>
+    void event(const T &event, Args... args) {
+
+        sourceManager.event<T, Args...>(event, args...);
+    }
+
 };
 
 

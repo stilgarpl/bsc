@@ -8,8 +8,9 @@
 
 #include <queue>
 #include <p2p/logic/ISource.h>
+#include <p2p/logic/IEvent.h>
 #include "p2p/log/Logger.h"
-#include "p2p/network/protocol/context/NodeContext.h"
+//#include "p2p/network/protocol/context/NodeContext.h"
 
 
 class NullClass {

@@ -19,6 +19,9 @@
 #include <Poco/Net/SocketStream.h>
 #include <p2p/network/protocol/connection/ServerConnection.h>
 #include <p2p/modules/configuration/ConfigurationModule.h>
+#include <p2p/network/protocol/context/NodeContext.h>
+
+
 
 
 using namespace Poco::Net;

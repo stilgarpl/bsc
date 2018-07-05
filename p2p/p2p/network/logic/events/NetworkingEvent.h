@@ -24,9 +24,11 @@ template<>
 struct setupOrigin<ConnectionOriginPointer> {
     static ConnectionOriginPointer &setup(ConnectionOriginPointer &origin) {
         auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
-
-        origin = &connectionContext->getConnection();
-
+        if (connectionContext != nullptr) {
+            origin = &connectionContext->getConnection();
+        } else {
+            LOGGER("ERROR: NO CONNECTION CONTEXT!")
+        }
         return origin;
     }
 };
@@ -58,7 +60,11 @@ public:
     static void setup(NetworkingEvent *event) {
 //        LOGGER("NetworkingEvent SETUP")
         auto packet = ProcessorContext::getCurrentPacketFromActiveContext();
-        event->setRequestId(packet->getId());
+        if (packet != nullptr) {
+            event->setRequestId(packet->getId());
+        } else {
+            LOGGER("ERROR: NO PACKET IN CONTEXT!")
+        }
     };
 };
 

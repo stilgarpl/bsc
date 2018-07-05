@@ -22,6 +22,12 @@ void CommandModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) 
 bool CommandModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
 //    bool ret = actionHelper.assignAction<CommandEvent>(CommandEventId::EXECUTE_COMMAND, CommandActions::RUN_COMMAND);
     when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).fireAction(CommandActions::RUN_COMMAND);
+//    when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).fireNewAction([](auto e){ std::cout << "EXECUTING COMMAND!" << std::endl;});
+//    when(event<CommandEvent>().withId(CommandEvent::IdType::DUMMY_COMMAND)).fireNewAction([](auto e){std::cout << "EXECUTING DUMMY INT COMMAND! "  << std::to_string(33)<< std::endl;});
+//    CommandEvent dummyCommand;
+//    dummyCommand.setEventId(CommandEvent::IdType::DUMMY_COMMAND);
+//    when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).emit(event<CommandEvent>().withId(CommandEvent::IdType::DUMMY_COMMAND));
+//    when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).fireNewAction(CommandActions::runCommand);
     return true;
 //    return ret;
 }

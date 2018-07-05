@@ -9,6 +9,7 @@
 #include <repo/repository/storage/network/logic/events/StorageResourceRequestEvent.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>
 #include <repo/node/RepoModule.h>
+#include <p2p/network/protocol/context/NodeContext.h>
 
 class StorageActions {
 public:

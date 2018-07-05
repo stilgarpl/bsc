@@ -47,8 +47,9 @@ public:
 
         ///@todo pass to executor
         Context::setActiveContext(&commonContext);
-        /*int a =*/ this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
+
         /*int b =*/ this->getSignal<T, Args...>().signal(event, args...);
+        /*int a =*/ this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
         // LOGGER("event : a "+ std::to_string(a)+ " b:" + std::to_string(b));
     }
 
@@ -149,7 +150,7 @@ protected:
 
 public:
     template<typename EventType, typename... Args>
-    int registerTrigger(const typename SignalType<EventType>::Func &func) {
+    int registerTrigger(const typename SignalType<EventType, Args...>::Func &func) {
         int assigned = 1;
 //        for (auto &&it : getProviders<EventType, Args...>()) {
         getSignal<EventType, Args...>().assign(func);

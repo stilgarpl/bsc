@@ -7,8 +7,11 @@
 
 #include <vector>
 #include <memory>
+#include <mutex>
 
 class BaseUber {
+private:
+    mutable std::mutex idLock;
 protected:
     typedef unsigned int TypeIdType;
     std::vector<std::shared_ptr<void>> containers;
@@ -20,7 +23,9 @@ protected:
 
     template<typename...>
     const TypeIdType getTypeId() const {
+        idLock.lock();
         const static auto typeId = getNextTypeId();
+        idLock.unlock();
         return typeId;
     };
 
@@ -28,29 +33,51 @@ protected:
 
 };
 
-
+/**
+ * Uber implementation where containers are templates, with real parameters passed in get<>()
+ * @tparam container
+ */
 template<template<typename...> typename container>
 class Uber : public BaseUber {
 public:
 
-    template<typename... Args>
-    container<Args...> &get() {
+    template<typename... Args, typename ... ConstructorArgs>
+    container<Args...> &get(ConstructorArgs ... constructorArgs) {
         typedef container<Args...> ContainerType;
         const static auto typeId = getTypeId<Args...>();
         if (containers.size() <= typeId) {
-            containers.resize(typeId + 2);
+            containers.resize(10 * typeId + 20);
         }
         auto &ref = containers[typeId];
         if (ref == nullptr) {
-            ref = std::make_shared<ContainerType>();
+            ref = std::make_shared<ContainerType>(constructorArgs...);
 
         }
         ContainerType &result = *std::static_pointer_cast<ContainerType>(ref);
         return result;
 
     }
+
+    /**
+     * this method will only work if all containers have the same base class
+     * @tparam BaseClass
+     * @param func
+     */
+    template<typename BaseClass>
+    void forEach(std::function<void(BaseClass &)> func) {
+        for (auto &&it : containers) {
+            if (it != nullptr) {
+                BaseClass &result = *std::static_pointer_cast<BaseClass>(it);
+                func(result);
+            }
+        }
+    }
 };
 
+/**
+ * Uber implementation where container is always the same, predefined type
+ * @tparam container
+ */
 template<typename container>
 class StaticUber : BaseUber {
 public:

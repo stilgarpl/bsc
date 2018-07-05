@@ -11,6 +11,10 @@
 #include <p2p/network/node/Node.h>
 #include <p2p/utils/from_string.h>
 
+class DummyCommandEvent : public IEvent<int> {
+
+};
+
 ///@todo remove class
 class Dupa {
 private:

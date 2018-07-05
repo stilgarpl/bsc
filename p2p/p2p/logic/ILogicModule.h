@@ -6,6 +6,7 @@
 #define BASYCO_ILOGICMODULE_H
 
 
+#include <p2p/logic/sources/AutoSource.h>
 #include "LogicManager.h"
 
 class ILogicModule {
@@ -57,10 +58,10 @@ public:
         }
     };
 
-    template<typename EventType>
+    template<typename EventType, typename ... Args>
     class LogicChainHelper;
 
-    template<typename eventType>
+    template<typename eventType, typename ... Args>
     class EventHelper {
     public:
         typedef eventType EventType;
@@ -69,53 +70,108 @@ public:
     private:
         std::optional<EventId> eventId;
     public:
-        EventHelper<EventType> &withId(EventId id) {
+        EventHelper<EventType, Args...> &withId(EventId id) {
             eventId = id;
             return *this;
         }
 
-        friend class LogicChainHelper<eventType>;
+        EventType makeEvent() {
+            EventType event;
+            if (eventId) {
+                event.setEventId(*eventId);
+            }
+            return event;
+        }
+
+        friend class LogicChainHelper<EventType, Args...>;
     };
 
-    template<typename EventType>
+    template<typename EventType, typename ... Args>
     class LogicChainHelper {
     public:
         typedef typename EventType::IdType EventId;
-        typedef LogicChainHelper<EventType> ThisType;
+        typedef LogicChainHelper<EventType, Args...> ThisType;
     private:
         std::optional<EventId> eventId;
         LogicManager &logicManager;
     public:
-        explicit LogicChainHelper(const EventHelper<EventType> &eventHelper, LogicManager &l) : logicManager(l) {
+        explicit LogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l) : logicManager(
+                l) {
             eventId = eventHelper.eventId;
         }
 
         template<typename ActionId>
         ThisType &fireAction(ActionId actionId) {
+            std::cout << "assigning action ... " << std::endl;
             if (eventId) {
-                logicManager.assignAction<EventType>(*eventId, actionId);
+
+                logicManager.assignAction<EventType, Args...>(*eventId, actionId);
             } else {
-                logicManager.assignAction<EventType>(actionId);
+
+                logicManager.assignAction<EventType, Args...>(actionId);
             }
             return *this;
         }
+
+
+        ///@todo maybe add Args.. for actions with many arguments... maybe to whole helper class.
+        ThisType &fireNewAction(ActionManager::ActionType<EventType, Args...> action) {
+
+            static unsigned long generatedActionId = 1;
+            std::cout << "assigning action with generated id " << std::to_string(generatedActionId) << std::endl;
+            logicManager.setAction<EventType, Args...>(generatedActionId, action);
+            fireAction(generatedActionId);
+            generatedActionId++;
+            return *this;
+        }
+
+        template<typename NewEventType, typename ... NewArgs>
+        ThisType &emit() {
+            ///@todo initialize some actual values.
+//            logicManager.event<NewEventType,NewArgs...>(NewEventType(),NewArgs()...);
+            auto &autoSource = logicManager.requireSource<AutoSource>();
+            fireNewAction([&](EventType e, Args...) {
+                autoSource.generateEvent<NewEventType>();
+            });
+
+
+            return *this;
+        };
+
+        template<typename NewEventType, typename ... NewArgs>
+        ThisType &emit(NewEventType newEventType) {
+            ///@todo initialize some actual values.
+//            logicManager.event<NewEventType,NewArgs...>(NewEventType(),NewArgs()...);
+            auto &autoSource = logicManager.requireSource<AutoSource>();
+            fireNewAction([&, newEventType](EventType e, Args...) {
+                autoSource.generateEvent<NewEventType>(newEventType);
+            });
+
+            return *this;
+        };
+
+        template<typename NewEventType>
+        ThisType &emit(EventHelper<NewEventType> eventHelper) {
+            emit(eventHelper.makeEvent());
+        }
+
     };
 
 
-    template<typename EventType>
-    EventHelper<EventType> event() {
-        return EventHelper<EventType>();
+    template<typename EventType, typename ... Args>
+    EventHelper<EventType, Args...> event() {
+        return EventHelper<EventType, Args...>();
     }
 
-    template<typename EventType>
-    LogicChainHelper<EventType> when(const EventHelper<EventType> eventHelper) {
-        return LogicChainHelper<EventType>(eventHelper, logicManager);
+    template<typename EventType, typename ... Args>
+    LogicChainHelper<EventType, Args...> when(const EventHelper<EventType, Args...> eventHelper) {
+        return LogicChainHelper<EventType, Args...>(eventHelper, logicManager);
     }
 
 
 protected:
 
-    //when(event<CommandEvent>().withId(CommandId::EXECUTE_COMMAND)).fireAction(RUN_COMMAND);d
+    //when(event<CommandEvent>().withId(CommandId::EXECUTE_COMMAND)).fireNewAction(RUN_COMMAND);d
 
 public:
     virtual bool setupLogic() {

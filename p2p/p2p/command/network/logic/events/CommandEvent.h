@@ -12,6 +12,7 @@
 
 enum class CommandEventId {
     EXECUTE_COMMAND,
+    DUMMY_COMMAND,
 };
 
 class CommandEvent : public NetworkingEvent<CommandEventId> {

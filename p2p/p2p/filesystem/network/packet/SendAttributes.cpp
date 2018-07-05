@@ -4,7 +4,9 @@
 
 #include <p2p/filesystem/network/logic/sources/FileSource.h>
 #include <p2p/network/protocol/context/LogicContext.h>
+#include <p2p/network/protocol/context/NodeContext.h>
 #include "SendAttributes.h"
+
 
 void SendAttributes::Request::process(Context &context) {
     BasePacket::process(context);
