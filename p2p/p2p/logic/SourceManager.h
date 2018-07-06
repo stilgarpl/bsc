@@ -46,7 +46,8 @@ public:
     void event(const T &event, Args... args) {
 
         ///@todo pass to executor
-        Context::setActiveContext(&commonContext);
+//        Context::setActiveContext(&commonContext);
+        Context::setActiveContext(const_cast<Context *>(event.context()));
 
         /*int b =*/ this->getSignal<T, Args...>().signal(event, args...);
         /*int a =*/ this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
@@ -179,6 +180,8 @@ public:
 //        }
 //    }
     void setContext(const Context &context);
+
+
 };
 
 

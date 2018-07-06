@@ -9,6 +9,8 @@
 #include <map>
 #include <memory>
 #include <iostream>
+#include <mutex>
+
 
 
 class Context {
@@ -17,6 +19,8 @@ class Context {
     typedef unsigned int KeyType;
     typedef unsigned int TypeIdType;
 private:
+    bool defaultContext = false;
+    mutable std::recursive_mutex contextLock;
     //initialized to nullptr in .cpp file
     thread_local static Context* activeContext;
     //@todo add thread safety - mutex, lock and locking of the parent before accessing it
@@ -68,6 +72,7 @@ public:
      */
     template<typename T, typename CustomKeyType>
     std::shared_ptr<T> get(const CustomKeyType &id) {
+        std::lock_guard<std::recursive_mutex> guard(contextLock);
         static auto typeId = getTypeId<T>();
         auto ret = std::static_pointer_cast<T>(data[typeId][getKey(id)]);
         if (ret == nullptr && parentContext != nullptr) {
@@ -79,6 +84,7 @@ public:
 
     template<typename T>
     std::shared_ptr<T> get() {
+        std::lock_guard<std::recursive_mutex> guard(contextLock);
         static auto typeId = getTypeId<T>();
         auto ret = std::static_pointer_cast<T>(data[typeId][getKey(0)]);
         if (ret == nullptr && parentContext != nullptr) {
@@ -99,12 +105,14 @@ public:
 
     template<typename T, typename CustomKeyType, typename... Vals>
     void setKey(CustomKeyType id, Vals... values) {
+        std::lock_guard<std::recursive_mutex> guard(contextLock);
         static auto typeId = getTypeId<T>();
         data[typeId][getKey(id)] = std::make_shared<T>(values...);
     }
 
     template<typename T, typename... Vals>
     auto set(Vals... values) {
+        std::lock_guard<std::recursive_mutex> guard(contextLock);
         static auto typeId = getTypeId<T>();
         //std::clog << "Context::set type id " << typeId << std::endl;
         auto ret = std::make_shared<T>(values...);
@@ -112,7 +120,7 @@ public:
         return ret;
     }
 
-
+    ///@todo non-const context does set parent but const doesn't. WHY?
     Context &operator+=(const Context &other);
 
     Context &operator+=(Context &other);

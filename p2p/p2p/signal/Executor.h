@@ -19,17 +19,17 @@ public:
     }
 
 protected:
-    virtual void executeTask(const std::function<void(void)> task) =0;
+    virtual void executeTask(std::function<void(void)> task) =0;
 };
 
 class SimpleExecutor : public Executor {
 protected:
-    void executeTask(const std::function<void(void)> task) override;
+    void executeTask(std::function<void(void)> task) override;
 };
 
 class ThreadExecutor : public Executor {
 protected:
-    void executeTask(const std::function<void(void)> task) override;
+    void executeTask(std::function<void(void)> task) override;
 };
 
 ///@todo add ThreadPoolExecutor

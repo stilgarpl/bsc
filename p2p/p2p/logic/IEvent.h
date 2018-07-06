@@ -42,7 +42,7 @@ public:
 private:
     IdType eventId;
     OriginType _origin;
-    Context context;
+    mutable Context *_context;
 public:
     IdType getEventId() const {
         return eventId;
@@ -64,6 +64,24 @@ public:
 //        LOGGER("IEVENT SETUP");
     };
 
+    IEvent();
+
+
+    Context *context() {
+        return _context;
+    }
+
+    Context *context() const {
+        return _context;
+    }
+
 };
+
+template<typename idType, typename originType>
+IEvent<idType, originType>::IEvent() {
+
+    _context = &Context::getActiveContext();
+
+}
 
 #endif //BASYCO_IEVENT_H

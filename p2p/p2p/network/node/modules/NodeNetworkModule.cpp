@@ -331,6 +331,7 @@ bool NodeNetworkModule::connectTo(const SocketAddress &address) {
     //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
     //@todo check for problems and handle them
     try {
+        Context::setActiveContext(&node.getContext());
         std::shared_ptr<ClientConnection> connection = std::make_shared<ClientConnection>(address,
                                                                                           std::ref(node.getContext()));
         ///@todo maybe this should be a reacting to an CONNECTION_ESTABLISHED event?

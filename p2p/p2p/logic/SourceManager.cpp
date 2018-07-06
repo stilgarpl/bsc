@@ -11,6 +11,7 @@ void SourceManager::addSource(std::shared_ptr<ISource> source) {
 }
 
 void SourceManager::work() {
+    Context::setActiveContext(&commonContext);
     ///@todo cos wymyslec, zebyt to nie zżerało 100% cpu
     for (auto &&i : sources) {
         if (i != nullptr) {

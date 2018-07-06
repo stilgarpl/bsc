@@ -224,3 +224,9 @@ event() z Logic Managera może ustawiać w activeContext EventContext. executor 
 
 w przypadku eventów generowanych poza RN to nic nie zmieni (activeContext bedzie global, eventContext bedzie jego kopią, więc active bedzie kopią globala z parentem do niego)
 w przypadku eventów generowanych z eventów RN, kontekst RN powinien być zachowany
+
+
+executor nie moze ustawic event contextu na active context, bo... jest do sygnałow a nie do eventów!
+trzeba wymyslic jakis mechanizm do context override
+
+kolejny problem - event(const Event) - zawsze miałem założenie, żeby eventy były const. Context z definicji nie bardzo jest const.

@@ -13,6 +13,7 @@ Context *Context::getParentContext() const {
 }
 
 void Context::setParentContext(Context *parentContext) {
+    std::lock_guard<std::recursive_mutex> guard(contextLock);
     Context::parentContext = parentContext;
 }
 
@@ -34,9 +35,11 @@ Context::Context(const Context &other) {
     for (auto &&item : other.data) {
         this->data[item.first] = item.second;
     }
+    this->parentContext = other.parentContext;
 }
 
 Context &Context::operator+=(const Context &other) {
+    std::lock_guard<std::recursive_mutex> guard(contextLock);
     for (auto &&item : other.data) {
         // std::clog << "Context::+= copying id " << item.first << std::endl;
         this->data[item.first] = item.second;
@@ -46,6 +49,8 @@ Context &Context::operator+=(const Context &other) {
 }
 
 Context &Context::operator+=(Context &other) {
+    std::lock_guard<std::recursive_mutex> guard(contextLock);
+
     for (auto &&item : other.data) {
         //std::clog << "Context::+= copying id " << item.first << std::endl;
         this->data[item.first] = item.second;
