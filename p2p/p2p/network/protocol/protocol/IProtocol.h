@@ -32,7 +32,7 @@ public:
 };
 
 
-class IProtocol : public ILogicModule {
+class IProtocol : public LogicObject {
 public:
 
     enum class Actions {

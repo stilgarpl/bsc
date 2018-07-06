@@ -3,3 +3,5 @@
 //
 
 #include "ILogicModule.h"
+
+#warning move this class to node modules

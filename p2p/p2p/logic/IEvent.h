@@ -7,6 +7,8 @@
 
 #include <cstdlib>
 
+#include <p2p/context/Context.h>
+
 #include "p2p/log/Logger.h"
 
 typedef std::nullptr_t NullOrigin;
@@ -40,6 +42,7 @@ public:
 private:
     IdType eventId;
     OriginType _origin;
+    Context context;
 public:
     IdType getEventId() const {
         return eventId;

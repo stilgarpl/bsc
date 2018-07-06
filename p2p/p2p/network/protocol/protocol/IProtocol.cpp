@@ -66,4 +66,4 @@ bool IProtocol::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
     return true;
 }
 
-IProtocol::IProtocol(LogicManager &logicManager) : ILogicModule(logicManager) {}
+IProtocol::IProtocol(LogicManager &logicManager) : LogicObject(logicManager) {}

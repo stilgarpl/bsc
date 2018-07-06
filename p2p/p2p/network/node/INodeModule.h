@@ -11,27 +11,27 @@
 #include <p2p/logic/ILogicModule.h>
 ///@todo this is interface for configuration, it shouldn't have dependencies on modules
 #include <p2p/modules/configuration/IConfig.h>
+#include "INode.h"
 
-class INodeModule : public ILogicModule, public virtual IDependencyManaged, public Runnable {
-
+class INodeModule : public virtual IDependencyManaged, public Runnable {
+protected:
+    INode &node;
 public:
     typedef IConfig Config;
 
-    explicit INodeModule(LogicManager &logicManager) : ILogicModule(logicManager) {}
+    INodeModule(INode &node) : node(node) {}
 
     virtual void initialize()=0;
 
     virtual IConfig &configuration()=0;
 
+    virtual bool setupLogic()=0;
     virtual void initializeConfiguration()=0;
 
 };
 
 //typedef std::shared_ptr<INodeModule> INodeModulePtr;
 
-template<typename ModuleType>
-using ModuleTypePtr = std::shared_ptr<ModuleType>;
 
-typedef ModuleTypePtr<INodeModule> INodeModulePtr;
 
 #endif //BASYCO_INODEMODULE_H

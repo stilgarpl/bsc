@@ -26,6 +26,9 @@ void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
     auto nodeContext = context.get<NodeContext>();
     if (nodeContext != nullptr) {
         //  NODECONTEXTLOGGER("received node info: " + event.getNodeInfo().getNodeId());
+        auto &node = nodeContext->getNode();
+        auto netModule = node.getModule<NodeNetworkModule>();
+
     }
 }
 

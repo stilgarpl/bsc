@@ -185,3 +185,42 @@ zamiast assignActions, setupActions, setupSources przyjmujących logicManager, p
 AssignActionHelper ah
 
 ah<Tick>(SOME_EVENT);
+
+
+
+Myślałem sporo na temat eventów i to jak tracą kontekst. event, że przyszło NodeInfo jest dosć bezużyteczny, bo nie wiadomo skąd to przyszło. z drugiej strony, nawet jeśli się zrobi poprawną logikę
+by zawsze w NodeNetwork było poprawne powiązanie nodeId <-> connection, to zmusza wszystkie eventy, żeby przechowywały nodeId.
+
+NetworkingEvent rozwiązuje ten problem przez ustawianie origina na Connection, ale od początku mi się ten pomysł nie do końca podobał. w różnych miejscach origin() może zwracać różne rzeczy, mimo, że to jest bezpieczne jeśli chodzi o typy, to nie do końca jest czytelne
+i w dodatku przy emitowaniu czegoś co dziedziczy po NetworkingEvencie nie ma możliwości ustawienia origina i pakietu
+
+więc, w tym momencie wymyśliłem coś takiego:
+
+jak najlepiej jest odwoływać się do innych nodów? obiektowo. czyli powinien być obiekt reprezentujący node, bo w tym momencie system logiki jest zupełnie nieobiektowy, a bardziej przypomina C, gdzie do funkcji trzeba zawsze przekazywać obiekt na którym sie operuje
+tak powstała klasa RemoteNode, która dobrze by było, jakby miała wspólny interfejs z Node, ale tego chyba się nie da osiągnąć bez podwójnej implementacji każdego modułu.
+
+z kolei eventy mogą mieć Scope. domyślnie, każdy event ma ustawiony scope na local node. ale operując w kontekscie w którym scope już jest ustawiony na jakiś RemoteNode, wszystkie eventy by ten scope też łapały
+
+NodeNetworkMod by przy połączeniu robił RemoteNode z pustym node id - połączenie byłoby w tym scopie, wiec wszystkie eventy miałyby refke do tego RN i przychodzący event z node info łatwo przypisać do RN.
+
+
+
+RN@Context:
+
+
+RemoteNode{ Context context; }
+
+NodeNetworkMod przy połączeniach tworzy RN które próbuje zestawić połączenie. RN->connect(); RN->connectTo(). RNy mogą być zapisywane w całości, więc jak chcemy się połączyć do znanego kiedys RN, wystarczy go wczytać i zrobić connect() bez podawania adresów.
+
+connection jest tworzone przez RN, więc jest tworzone na bazie jego kontekstu, a nie tylko kontekstu Node. ma ustawione RemoteNodeContext.
+
+Event ma własny Context, tworzony na bazie activeContext. eventy utworzone w wątkach powiązanych z RN będą miały ustawione RNC automatycznie.
+
+teraz pytanie, co z eventami tworzonymi na bazie innych eventów, np. z emit()
+emit() może skopiować kontekst z przekazanego eventu, jak każda inna akcja. UWAGA: dodać nową formę kopiowania kontekstow, żeby nie robić nieskończonych łańcuszków parent->parent->parent.
+newEvent w EventQueueSource ma tylko activeContext dostępny.
+
+event() z Logic Managera może ustawiać w activeContext EventContext. executor może ustawiać activeContext z eventu, zamiast globalny.
+
+w przypadku eventów generowanych poza RN to nic nie zmieni (activeContext bedzie global, eventContext bedzie jego kopią, więc active bedzie kopią globala z parentem do niego)
+w przypadku eventów generowanych z eventów RN, kontekst RN powinien być zachowany

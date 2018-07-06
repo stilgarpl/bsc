@@ -81,12 +81,6 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     }
 
-
-//    if (actionHelper.assignAction<ConnectionEvent>("onConnect")) {
-//        std::clog << "Debug: onConn assignment!" << std::endl;
-//
-//    }
-
     if (actionHelper.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNoI")) {
         std::clog << "Debug: reqNoI assignment!" << std::endl;
 
@@ -124,6 +118,14 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
         std::clog << "Debug: addKnownNode assignment!" << std::endl;
 
     }
+
+
+
+
+    //high level logic:
+
+//    when(event<ConnectionEvent>().withId(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).
+
 
     ///@todo real value
     return true;

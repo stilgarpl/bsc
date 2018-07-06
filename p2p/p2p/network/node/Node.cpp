@@ -132,7 +132,7 @@ void Node::initialize() {
     //hope it doesn't break anything
     forEachModule(&INodeModule::initializeConfiguration);
     forEachModule(&INodeModule::initialize);
-    forEachModule<bool, ILogicModule>(&ILogicModule::setupLogic);
+    forEachModule<bool, INodeModule>(&INodeModule::setupLogic);
 
 }
 

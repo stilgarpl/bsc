@@ -13,15 +13,14 @@
 #include "INode.h"
 #include "INodeModule.h"
 
-class NodeModule : public INodeModule {
+class NodeModule : public ILogicModule {
 
-protected:
-    INode &node;
+
 public:
     ///@todo pure or not?
     virtual void initialize() {};
 
-    explicit NodeModule(INode &node) : INodeModule(node.getLogicManager()), node(node) {}
+    explicit NodeModule(INode &node) : ILogicModule(node) {}
 
     void run() override {
         //do nothing, just so modules do not have to implement this if they don't want to

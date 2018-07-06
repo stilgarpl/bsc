@@ -7,10 +7,17 @@
 
 
 #include <p2p/dependency/DependencyManager.h>
-#include "INodeModule.h"
 #include <p2p/network/node/NodeInfo.h>
 #include <p2p/context/Context.h>
 #include <p2p/modules/configuration/ConfigurationManager.h>
+#include <p2p/logic/LogicManager.h>
+
+class INodeModule;
+
+template<typename ModuleType>
+using ModuleTypePtr = std::shared_ptr<ModuleType>;
+
+typedef ModuleTypePtr<INodeModule> INodeModulePtr;
 
 class INode {
 protected:
