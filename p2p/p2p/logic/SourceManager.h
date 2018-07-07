@@ -47,11 +47,14 @@ public:
 
         ///@todo pass to executor
 //        Context::setActiveContext(&commonContext);
+        Context *previousContext = &Context::getActiveContext();
         Context::setActiveContext(const_cast<Context *>(event.context()));
 
         /*int b =*/ this->getSignal<T, Args...>().signal(event, args...);
         /*int a =*/ this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
-        // LOGGER("event : a "+ std::to_string(a)+ " b:" + std::to_string(b));
+
+        //restore previous context
+        Context::setActiveContext(previousContext);
     }
 
 

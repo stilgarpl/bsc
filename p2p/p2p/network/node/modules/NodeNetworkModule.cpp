@@ -334,7 +334,7 @@ bool NodeNetworkModule::connectTo(const SocketAddress &address) {
         Context::setActiveContext(&node.getContext());
         std::shared_ptr<ClientConnection> connection = std::make_shared<ClientConnection>(address,
                                                                                           std::ref(node.getContext()));
-        ///@todo maybe this should be a reacting to an CONNECTION_ESTABLISHED event?
+        ///@todo maybe this should be a reaction to an CONNECTION_ESTABLISHED event?
         addActiveClientConnection(connection);
         connection->startSending();
         connection->startReceiving();

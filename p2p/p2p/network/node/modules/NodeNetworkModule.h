@@ -17,6 +17,8 @@
 
 #include <p2p/modules/configuration/IConfig.h>
 #include <p2p/modules/configuration/ConfigurationModule.h>
+#include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
+#include "RemoteNodeNotFoundException.h"
 
 struct NodeConnectionInfo {
     ConnectionPtr connection;
@@ -67,6 +69,9 @@ private:
     std::list<IServerConnection *> acceptedConnections; //server side
     std::shared_ptr<Poco::Net::ServerSocket> serverSocket;
     std::shared_ptr<Poco::Net::TCPServer> server;
+
+
+    std::list<std::shared_ptr<RemoteNode>> remoteNodes;
 public:
     explicit NodeNetworkModule(INode &node);
 
@@ -122,6 +127,12 @@ public: // @todo should be public or shouldn't ?
 
     bool connectTo(const std::string &address);
 
+    RemoteNode &connectToRemoteNode(const std::string &address) {
+        RemoteNode &remoteNode = getRemoteNode();
+        remoteNode.connectTo(address);
+        return remoteNode;
+    }
+
     bool connectToAddress(const std::string &add);
 
     bool isConnectedTo(const NodeInfo &nodeInfo);
@@ -163,6 +174,7 @@ public: // @todo should be public or shouldn't ?
     auto broadcastPacket(NetworkPacketPointer<SendType> p, const BroadcastScope &scope = BroadcastScope::CONNECTED) {
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
 
+        //@todo can I actually send one packet multiple times ? doesn't that confuse protocol waiting for specific ids?
         std::map<NodeIdType, NetworkPacketPointer<ReturnType>> ret;
         auto MAX_WAIT_TIME = 2s;
 
@@ -197,6 +209,30 @@ public: // @todo should be public or shouldn't ?
     void run() override;
 
     const std::unique_ptr<IProtocol> &getProtocol() const;
+
+
+    /**
+     * this method creates new remote nodes
+     * @todo remove inactive nodes older than...
+     * @return new remote node that is added to the list
+     */
+    RemoteNode &getRemoteNode() {
+        std::shared_ptr<RemoteNode> remoteNode = std::make_shared<RemoteNode>();
+        remoteNode->context().setParentContext(&node.getContext());
+        remoteNodes.push_back(remoteNode);
+        return *remoteNode;
+    }
+
+    RemoteNode &getRemoteNode(const NodeIdType &nodeId) {
+        auto iter = std::find_if(remoteNodes.begin(), remoteNodes.end(), [&](const std::shared_ptr<RemoteNode> obj) {
+            return (obj->getNodeId() && obj->getNodeId() == nodeId);
+        });
+        if (iter != remoteNodes.end()) {
+            return **iter;
+        } else {
+            throw RemoteNodeNotFoundException();
+        }
+    }
 };
 
 

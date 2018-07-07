@@ -225,8 +225,20 @@ event() z Logic Managera może ustawiać w activeContext EventContext. executor 
 w przypadku eventów generowanych poza RN to nic nie zmieni (activeContext bedzie global, eventContext bedzie jego kopią, więc active bedzie kopią globala z parentem do niego)
 w przypadku eventów generowanych z eventów RN, kontekst RN powinien być zachowany
 
+pytanie techniczne - czy remote node powinny się pojawiać po obu stronach połączenia, czy tylko u klienta? z jednej strony wystarczy jak będą tylko u klienta, z drugiej, fajnie by było jakby się pojawiały, przez co widać by było wszystkie połączone nody
 
-executor nie moze ustawic event contextu na active context, bo... jest do sygnałow a nie do eventów!
-trzeba wymyslic jakis mechanizm do context override
+TODO:
 
-kolejny problem - event(const Event) - zawsze miałem założenie, żeby eventy były const. Context z definicji nie bardzo jest const.
+Context w IEvent - DONE
+setActiveContext(eventContext) - DONE
+RemoteNode- DONE
+RemoteNodeContext
+przenieść zarządzanie połączeniem z activeConnections do RemoteNode:
+Poprawić metody z NodeNetModule, zeby uniknąć poprawiania większośći kodu, niech od teraz korzystają z RemoteNodes a nie z activeConnections
+    * connectTo
+    * sendPacketToNode
+    * broadcastPacket
+    * disconnect
+
+
+here's an idea: CONTEXT STACK! pushActiveContext, popActiveContext @todo think about it

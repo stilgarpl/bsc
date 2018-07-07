@@ -32,6 +32,7 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &
           IServerConnection(context), serverNode(serverNode) {
 
     Context::setActiveContext(&getConnectionContext());
+    ///@todo observer pattern?
     serverNode.getModule<NodeNetworkModule>()->addAcceptedConnection(this);
     auto lc = getConnectionContext().get<LogicContext>();
     auto &logicManager = lc->getLogicManager();

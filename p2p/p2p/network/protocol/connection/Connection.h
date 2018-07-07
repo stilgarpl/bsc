@@ -63,7 +63,7 @@ public:
 
     BasePacketPtr receive();
 
-    Connection(Context &context);
+    explicit Connection(Context &context);
 
     ConnectionProcessor &getProcessor();
 
