@@ -62,7 +62,7 @@ public:
 
 
 private:
-    std::unique_ptr<IProtocol> protocol = std::make_unique<GravitonProtocol>(logicManager);
+    std::shared_ptr<IProtocol> protocol = std::make_shared<GravitonProtocol>(logicManager);
     std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
     std::mutex acceptedConnectionsMutex;
     std::mutex activeConnectionsMutex;
@@ -99,10 +99,10 @@ public:
 
 public:
 
-    //@todo this should not be public
-    decltype(activeClientConnections) &getClientConnections() {
-        return activeClientConnections;
-    }
+//    //@todo this should not be public
+//    decltype(activeClientConnections) &getClientConnections() {
+//        return activeClientConnections;
+//    }
 
 
 private:
@@ -208,7 +208,7 @@ public: // @todo should be public or shouldn't ?
 
     void run() override;
 
-    const std::unique_ptr<IProtocol> &getProtocol() const;
+    const std::shared_ptr<IProtocol> &getProtocol() const;
 
 
     /**
@@ -217,7 +217,7 @@ public: // @todo should be public or shouldn't ?
      * @return new remote node that is added to the list
      */
     RemoteNode &getRemoteNode() {
-        std::shared_ptr<RemoteNode> remoteNode = std::make_shared<RemoteNode>();
+        std::shared_ptr<RemoteNode> remoteNode = std::make_shared<RemoteNode>(protocol);
         remoteNode->context().setParentContext(&node.getContext());
         remoteNodes.push_back(remoteNode);
         return *remoteNode;

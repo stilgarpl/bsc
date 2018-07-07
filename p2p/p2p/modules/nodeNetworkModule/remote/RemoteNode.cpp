@@ -8,6 +8,7 @@
 #include "RemoteNodeContext.h"
 #include <Poco/Net/NetException.h>
 
+
 const std::optional<NodeIdType> RemoteNode::getNodeId() const {
     if (nodeInfo) {
         return nodeInfo->getNodeId();
@@ -25,7 +26,6 @@ bool RemoteNode::connectTo(const std::string &address) {
         Context::setActiveContext(&_context);
         connection = std::make_shared<ClientConnection>(socketAddress,
                                                         std::ref(_context));
-        ///@todo maybe this should be a reaction to an CONNECTION_ESTABLISHED event?
 
         connection->startSending();
         connection->startReceiving();
@@ -38,8 +38,12 @@ bool RemoteNode::connectTo(const std::string &address) {
     }
 }
 
-RemoteNode::RemoteNode() {
+RemoteNode::RemoteNode() : RemoteNode(nullptr) {
 
+
+}
+
+RemoteNode::RemoteNode(const std::shared_ptr<IProtocol> &protocol) : protocol(protocol) {
     context().set<RemoteNodeContext, RemoteNode &>(*this);
 }
 

@@ -12,7 +12,7 @@ class RemoteNodeContext {
 private:
     RemoteNode &_remoteNode;
 public:
-    RemoteNode &remoteNode() {
+    RemoteNode &getRemoteNode() {
         return _remoteNode;
     }
 

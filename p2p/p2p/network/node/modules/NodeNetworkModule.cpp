@@ -437,6 +437,6 @@ void NodeNetworkModule::disconnectAll() {
 
 }
 
-const std::unique_ptr<IProtocol> &NodeNetworkModule::getProtocol() const {
+const std::shared_ptr<IProtocol> &NodeNetworkModule::getProtocol() const {
     return protocol;
 }

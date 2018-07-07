@@ -6,6 +6,7 @@
 #include <p2p/network/node/protocol/packet/NodeInfoRequest.h>
 #include <p2p/network/node/protocol/packet/NetworkInfoRequest.h>
 #include <p2p/network/node/modules/NodeNetworkModule.h>
+#include <p2p/modules/nodeNetworkModule/remote/RemoteNodeContext.h>
 #include "NodeActions.h"
 
 
@@ -23,13 +24,20 @@ void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
 
 void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
     Context &context = Context::getActiveContext();
-    auto nodeContext = context.get<NodeContext>();
-    if (nodeContext != nullptr) {
-        //  NODECONTEXTLOGGER("received node info: " + event.getNodeInfo().getNodeId());
-        auto &node = nodeContext->getNode();
-        auto netModule = node.getModule<NodeNetworkModule>();
-
+    auto remoteNodeContext = context.get<RemoteNodeContext>();
+    if (remoteNodeContext) {
+        auto &remoteNode = remoteNodeContext->getRemoteNode();
+        remoteNode.setNodeInfo(event.getNodeInfo());
+    } else {
+        LOGGER("ERROR: no remote node context!")
     }
+//    auto nodeContext = context.get<NodeContext>();
+//    if (nodeContext != nullptr) {
+//        //  NODECONTEXTLOGGER("received node info: " + event.getNodeInfo().getNodeId());
+//        auto &node = nodeContext->getNode();
+//        auto netModule = node.getModule<NodeNetworkModule>();
+//
+//    }
 }
 
 void NodeActions::addKnownNode(const NodeInfoEvent &event) {
@@ -49,16 +57,17 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
 void NodeActions::triggerUpdateNode(const Tick &tick) {
     Context &context = Context::getActiveContext();
     auto nodeContext = context.get<NodeContext>();
-    if (nodeContext != nullptr) {
-        auto &node = nodeContext->getNode();
-
-        for (auto &&it :node.getModule<NodeNetworkModule>()->getClientConnections()) {
-            BasePacketPtr req = NodeInfoRequest::getNew();
-            it->connection->send(req);
-            req = std::make_shared<NetworkInfoRequest>();
-            it->connection->send(req);
-        }
-    }
+    ///@todo imp[lement with RemoteNodes
+//    if (nodeContext != nullptr) {
+//        auto &node = nodeContext->getNode();
+//
+//        for (auto &&it :node.getModule<NodeNetworkModule>()->getClientConnections()) {
+//            BasePacketPtr req = NodeInfoRequest::getNew();
+//            it->connection->send(req);
+//            req = std::make_shared<NetworkInfoRequest>();
+//            it->connection->send(req);
+//        }
+//    }
 }
 
 void NodeActions::sendNetworkInfoRequest(ConnectionEvent connectionEvent) {
