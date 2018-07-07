@@ -91,12 +91,6 @@ public:
 
     void printConnections();
 
-    void addActiveClientConnection(std::shared_ptr<Connection> c);
-
-    void removeActiveClientConnection(NodeConnectionInfoPtr c);
-
-    void removeActiveClientConnection(Connection *c);
-
 public:
 
 //    //@todo this should not be public
@@ -117,25 +111,15 @@ public: // @todo should be public or shouldn't ?
 
     void stopListening();
 
-    bool connectTo(const NodeInfo &nodeInfo);
-
-    void onStop() override;
-
-    bool connectTo(const Poco::Net::SocketAddress &address);;
+    void onStop() override;;
 
     void onStart() override;
 
-    bool connectTo(const std::string &address);
-
-    RemoteNode &connectToRemoteNode(const std::string &address) {
+    RemoteNode &connectTo(const std::string &address) {
         RemoteNode &remoteNode = getRemoteNode();
         remoteNode.connectTo(address);
         return remoteNode;
     }
-
-    bool connectToAddress(const std::string &add);
-
-    bool isConnectedTo(const NodeInfo &nodeInfo);
 
     void disconnect(const NodeIdType id);
 
@@ -146,29 +130,35 @@ public: // @todo should be public or shouldn't ?
 
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto sendPacketToNode(const NodeIdType &nodeId, NetworkPacketPointer<SendType> p) {
-        typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
-        ConnectionPtr conn = nullptr;
-        for (auto &&connection : activeClientConnections) {
-            if (connection->nodeId && connection->nodeId == nodeId) {
-                conn = connection->connection;
-            }
-        }
-        if (conn == nullptr) {
-            ///@todo connect to node
-        }
-
-        if (conn != nullptr) {
-
-//            LOGGER("sending packet to node " + nodeId)
-            auto[response, error] = protocol->sendExpectExtended(conn.get(), p);
-            return response;
-
-        } else {
-            LOGGER("unable to send packet to " + nodeId)
-            return std::shared_ptr<ReturnType>(nullptr);
-
-        }
+        return getRemoteNode(nodeId).sendPacketToNode(p);
     };
+
+//
+//    template<enum Status status = Status::RESPONSE, typename SendType>
+//    auto sendPacketToNode(const NodeIdType &nodeId, NetworkPacketPointer<SendType> p) {
+//        typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
+//        ConnectionPtr conn = nullptr;
+//        for (auto &&connection : activeClientConnections) {
+//            if (connection->nodeId && connection->nodeId == nodeId) {
+//                conn = connection->connection;
+//            }
+//        }
+//        if (conn == nullptr) {
+//            ///@todo connect to node
+//        }
+//
+//        if (conn != nullptr) {
+//
+////            LOGGER("sending packet to node " + nodeId)
+//            auto[response, error] = protocol->sendExpectExtended(conn.get(), p);
+//            return response;
+//
+//        } else {
+//            LOGGER("unable to send packet to " + nodeId)
+//            return std::shared_ptr<ReturnType>(nullptr);
+//
+//        }
+//    };
 
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto broadcastPacket(NetworkPacketPointer<SendType> p, const BroadcastScope &scope = BroadcastScope::CONNECTED) {

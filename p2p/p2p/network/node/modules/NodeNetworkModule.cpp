@@ -45,10 +45,10 @@ void NodeNetworkModule::setupActions(ILogicModule::SetupActionHelper &actionHelp
     });
 
 
-    actionHelper.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_CLIENT,
-                                            [&](const ConnectionEvent &event) {
-                                                this->removeActiveClientConnection(event.getConnection());
-                                            });
+//    actionHelper.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_CLIENT,
+//                                            [&](const ConnectionEvent &event) {
+//                                                this->removeActiveClientConnection(event.getConnection());
+//                                            });
 
 //    actionHelper.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_SERVER, [&](const ConnectionEvent &event) {
 //        ///@todo do something about this dynamic cast
@@ -154,93 +154,67 @@ void NodeNetworkModule::updateNodeConnectionInfo() {
     //   std::lock_guard<std::mutex> g1(node.getLock());
     // std::thread([&]() {
     //    //this is meant to be run from a thread
-    NODECONTEXTLOGGER("update node ")
-        for (auto &&item : activeClientConnections) {
-            NODECONTEXTLOGGER("update connection " + (item->nodeId ? *item->nodeId : " ?? "));
-            auto packet = NodeInfoRequest::getNew();
-            NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
-            if (response != nullptr) {
-                auto &ni = response->getNodeInfo();
-                ni.printAll();
-                auto nid = ni.getNodeId();
-                LOGGER(ni.getNetworkId());
-                const auto &val = response->getNodeInfo().getNodeId();
-                //(*(*item).nodeId) = val;
-                item->nodeId = val;
-            } else {
-                //response not received, connection probably is down
-                ///@todo decide what do to, disconnecting for now
-                item->connection->shutdown();
-            }
-        }
+//    NODECONTEXTLOGGER("update node ")
+//        for (auto &&item : activeClientConnections) {
+//            NODECONTEXTLOGGER("update connection " + (item->nodeId ? *item->nodeId : " ?? "));
+//            auto packet = NodeInfoRequest::getNew();
+//            NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
+//            if (response != nullptr) {
+//                auto &ni = response->getNodeInfo();
+//                ni.printAll();
+//                auto nid = ni.getNodeId();
+//                LOGGER(ni.getNetworkId());
+//                const auto &val = response->getNodeInfo().getNodeId();
+//                //(*(*item).nodeId) = val;
+//                item->nodeId = val;
+//            } else {
+//                //response not received, connection probably is down
+//                ///@todo decide what do to, disconnecting for now
+//                item->connection->shutdown();
+//            }
+//        }
 
     //}).detach();
 }
 
 void NodeNetworkModule::purgeDuplicateConnections() {
 //    std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    for (auto &&item : activeClientConnections) {
-        if (item->nodeId) {
-            //find all connections to the same id
-            activeClientConnections.remove_if([&](NodeConnectionInfoPtr it) -> bool {
-                if (it->nodeId) {
-                    return *it->nodeId == *item->nodeId && it != item;
-                } else {
-                    return false;
-                }
-            });
-            //activeClientConnections.erase(duplicate);
-        }
-    }
+//    for (auto &&item : activeClientConnections) {
+//        if (item->nodeId) {
+//            //find all connections to the same id
+//            activeClientConnections.remove_if([&](NodeConnectionInfoPtr it) -> bool {
+//                if (it->nodeId) {
+//                    return *it->nodeId == *item->nodeId && it != item;
+//                } else {
+//                    return false;
+//                }
+//            });
+//            //activeClientConnections.erase(duplicate);
+//        }
+//    }
 }
 
 void NodeNetworkModule::printConnections() {
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
     std::cout << "[" << node.getNodeInfo().getNodeId() << "]:" << std::to_string(acceptedConnections.size())
               << std::endl;
-    for (auto &&item : activeClientConnections) {
-        if (!item->nodeId) {
+    for (auto &&item : remoteNodes) {
+        if (!item->getNodeId()) {
             std::cout << "Connection: NO ID" << std::endl;
         } else {
-            std::cout << "Connection: " << *item->nodeId << std::endl;
+            std::cout << "Connection: " << *item->getNodeId() << std::endl;
         }
     }
 }
 
 void NodeNetworkModule::purgeInactiveConnections() {
-    std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    activeClientConnections.remove_if([&](NodeConnectionInfoPtr it) -> bool {
-        return it->connection == nullptr || !it->connection->isActive();
-    });
+//    std::lock_guard<std::mutex> g(activeConnectionsMutex);
+//    activeClientConnections.remove_if([&](NodeConnectionInfoPtr it) -> bool {
+//        return it->connection == nullptr || !it->connection->isActive();
+//    });
 
 }
 
-void NodeNetworkModule::addActiveClientConnection(std::shared_ptr<Connection> c) {
-    std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    NodeConnectionInfoPtr info = std::make_shared<NodeConnectionInfo>();
-    info->connection = c;
-    info->nodeId = std::nullopt;
-
-    activeClientConnections.push_back(info);
-
-}
-
-void NodeNetworkModule::removeActiveClientConnection(NodeConnectionInfoPtr c) {
-    std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    //  auto el = std::find(activeClientConnections.begin(),activeClientConnections.end(),c);
-    activeClientConnections.remove(c);
-
-}
-
-void NodeNetworkModule::removeActiveClientConnection(Connection *c) {
-    std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    //  auto el = std::find(activeClientConnections.begin(),activeClientConnections.end(),c);
-    activeClientConnections.erase(std::remove_if(activeClientConnections.begin(), activeClientConnections.end(),
-                                                 [&](NodeConnectionInfoPtr &i) -> bool {
-                                                     return (i->connection.get() == c);
-                                                 }), activeClientConnections.end());
-
-}
 
 void NodeNetworkModule::removeAcceptedConnection(IServerConnection *c) {
     // LOGGER("REMOVE REMOVE REMOVE");
@@ -306,45 +280,10 @@ void NodeNetworkModule::stopListening() {
 
 }
 
-bool NodeNetworkModule::connectTo(const NodeInfo &nodeInfo) {
-
-    for (auto i : nodeInfo.getKnownAddresses()) {
-
-        //try to connect
-        if (connectTo(i)) {
-
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void NodeNetworkModule::onStop() {
 
     stopListening();
     disconnectAll();
-}
-
-bool NodeNetworkModule::connectTo(const SocketAddress &address) {
-
-    //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
-    //@todo check for problems and handle them
-    try {
-        Context::setActiveContext(&node.getContext());
-        std::shared_ptr<ClientConnection> connection = std::make_shared<ClientConnection>(address,
-                                                                                          std::ref(node.getContext()));
-        ///@todo maybe this should be a reaction to an CONNECTION_ESTABLISHED event?
-        addActiveClientConnection(connection);
-        connection->startSending();
-        connection->startReceiving();
-        return true;
-    } catch (Poco::Net::ConnectionRefusedException) {
-        ///@todo connection refused in connectionSource
-        return false;
-    } catch (Poco::InvalidArgumentException) {
-        return false;
-    }
 }
 
 void NodeNetworkModule::onStart() {
@@ -352,29 +291,6 @@ void NodeNetworkModule::onStart() {
     listen();
 }
 
-
-bool NodeNetworkModule::connectTo(const std::string &a) {
-    try {
-        Poco::Net::SocketAddress address(a);
-        return connectTo(address);
-    }
-    catch (Poco::InvalidArgumentException) {
-        ///@todo bad address from connection source
-        return false;
-    }
-
-}
-
-
-bool NodeNetworkModule::isConnectedTo(const NodeInfo &nodeInfo) {
-    bool ret = false;
-    for (auto &&it : activeClientConnections) {
-        if (it->nodeId) {
-            ret |= nodeInfo.getNodeId() == (*it->nodeId);
-        }
-    }
-    return ret;
-}
 
 void NodeNetworkModule::run() {
     NodeModule::run();
@@ -407,33 +323,29 @@ void NodeNetworkModule::run() {
 //    }
 //}
 
-bool NodeNetworkModule::connectToAddress(const std::string &add) {
-    return connectTo(add);
-}
-
 void NodeNetworkModule::disconnect(const NodeIdType id) {
     {
-        std::lock_guard<std::mutex> g(activeConnectionsMutex);
-        for (auto &&item : activeClientConnections) {
-            if (item->nodeId && item->nodeId == id && item->connection != nullptr) {
-                item->connection->shutdown();
-                // activeClientConnections.remove(item);
-            }
-        }
+//        std::lock_guard<std::mutex> g(activeConnectionsMutex);
+//        for (auto &&item : activeClientConnections) {
+//            if (item->nodeId && item->nodeId == id && item->connection != nullptr) {
+//                item->connection->shutdown();
+//                // activeClientConnections.remove(item);
+//            }
+//        }
     }
-    purgeInactiveConnections();
+//    purgeInactiveConnections();
 }
 
 void NodeNetworkModule::disconnectAll() {
-    std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    //activeClientConnections.remove_if([](auto i) { return true; });
-    for (auto &&item : activeClientConnections) {
-        if (item->connection != nullptr) {
-            item->connection->shutdown();
-        }
-
-    }
-    activeClientConnections.clear();
+//    std::lock_guard<std::mutex> g(activeConnectionsMutex);
+//    //activeClientConnections.remove_if([](auto i) { return true; });
+//    for (auto &&item : activeClientConnections) {
+//        if (item->connection != nullptr) {
+//            item->connection->shutdown();
+//        }
+//
+//    }
+//    activeClientConnections.clear();
 
 }
 

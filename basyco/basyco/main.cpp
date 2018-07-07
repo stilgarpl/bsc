@@ -112,12 +112,12 @@ void setupCommands(CommandModule *cmd) {
     cmd->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-    cmd->mapCommand("connect", &NodeNetworkModule::connectToAddress);
+    cmd->mapCommand("connect", &NodeNetworkModule::connectTo);
     cmd->mapCommand("disconnect", &NodeNetworkModule::disconnect);
     cmd->mapCommand("print", &NodeNetworkModule::printConnections);
-    cmd->mapCommand("update", &NodeNetworkModule::updateNodeConnectionInfo);
-    cmd->mapCommand("purgeD", &NodeNetworkModule::purgeDuplicateConnections);
-    cmd->mapCommand("purgeI", &NodeNetworkModule::purgeInactiveConnections);
+//    cmd->mapCommand("update", &NodeNetworkModule::updateNodeConnectionInfo);
+//    cmd->mapCommand("purgeD", &NodeNetworkModule::purgeDuplicateConnections);
+//    cmd->mapCommand("purgeI", &NodeNetworkModule::purgeInactiveConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
     cmd->mapCommand("shutdown", &BasicModule::shutdown);
     cmd->mapCommand("cd", &FilesystemModule::changeDirectory);
