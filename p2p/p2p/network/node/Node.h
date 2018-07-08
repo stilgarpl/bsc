@@ -17,10 +17,6 @@
 #include "INode.h"
 
 #include <memory>
-#include <p2p/network/protocol/connection/Connection.h>
-#include <p2p/network/protocol/protocol/IProtocol.h>
-#include <p2p/network/protocol/protocol/GravitonProtocol.h>
-#include <p2p/network/protocol/connection/IServerConnection.h>
 #include <p2p/dependency/DependencyManager.h>
 #include <p2p/network/protocol/role/RoleScope.h>
 #include <p2p/modules/configuration/ConfigurationManager.h>

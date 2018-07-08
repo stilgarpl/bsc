@@ -36,7 +36,7 @@ public:
 class ServerConnectionFactory : public Poco::Net::TCPServerConnectionFactory {
 private:
     Node &serverNode;
-    Context::OwnPtr context;
+    Context::OwnPtr context = nullptr; //initialized from the constructor
 public:
 
     ServerConnectionFactory(Node &serverNode, Context::Ptr context);

@@ -52,7 +52,7 @@ void ServerConnection::stopReceiving() {
 
 ServerConnection::~ServerConnection() {
     //  LOGGER("Server conn dest");
-    ///@todo remove this, we have an event for this now
+    ///@todo remove this, we have an event for this now -- this would also remove ServerConnection dependency on Node. it would make things much simpler
     serverNode.getModule<NodeNetworkModule>()->removeAcceptedConnection(this);
     stop();
 }

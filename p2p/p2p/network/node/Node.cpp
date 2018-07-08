@@ -6,9 +6,6 @@
 #include "Node.h"
 #include "p2p/network/node/protocol/packet/NodeInfoRequest.h"
 #include "p2p/network/node/protocol/packet/NodeInfoResponse.h"
-#include <Poco/Net/NetException.h>
-#include <p2p/network/protocol/connection/ServerConnection.h>
-#include <p2p/network/protocol/connection/ClientConnection.h>
 #include <p2p/network/protocol/context/NodeContext.h>
 #include <p2p/network/protocol/context/LogicContext.h>
 #include <p2p/modules/configuration/ConfigurationManager.h>

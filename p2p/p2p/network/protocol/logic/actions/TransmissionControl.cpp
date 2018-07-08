@@ -3,6 +3,7 @@
 //
 
 #include <p2p/network/protocol/context/NodeContext.h>
+#include <p2p/network/protocol/packet/info/PacketInfo.h>
 #include "TransmissionControl.h"
 
 
