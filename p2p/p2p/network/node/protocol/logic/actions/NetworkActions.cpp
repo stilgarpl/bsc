@@ -6,8 +6,8 @@
 #include "NetworkActions.h"
 
 void NetworkActions::updateNetworkInfo(const NetworkInfoEvent &event) {
-    Context &context = Context::getActiveContext();
-    auto nodeContext = context.get<NodeContext>();
+    Context::Ptr context = Context::getActiveContext();
+    auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
         auto &node = nodeContext->getNode();
         if (node.getNetworkInfo() != nullptr &&

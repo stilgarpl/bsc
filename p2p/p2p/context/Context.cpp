@@ -6,28 +6,28 @@
 #include "Context.h"
 
 
-thread_local Context* Context::activeContext = nullptr;
+thread_local Context::Ptr Context::activeContext = nullptr;
 
-Context *Context::getParentContext() const {
+Context::Ptr Context::getParentContext() const {
     return parentContext;
 }
 
-void Context::setParentContext(Context *parentContext) {
+void Context::setParentContext(Context::Ptr parentContext) {
     std::lock_guard<std::recursive_mutex> guard(contextLock);
     Context::parentContext = parentContext;
 }
 
-Context &Context::getActiveContext() {
-    thread_local static Context defaultContext;
+Context::Ptr Context::getActiveContext() {
+    thread_local static Context::Ptr defaultContext = std::make_shared<Context>();
     if (activeContext == nullptr) {
         LOGGER("WARNING: returning default context")
         return defaultContext;
     } else {
-        return *activeContext;
+        return activeContext;
     }
 }
 
-void Context::setActiveContext(Context *ctx) {
+void Context::setActiveContext(Context::Ptr ctx) {
     activeContext = ctx;
 }
 
@@ -38,25 +38,31 @@ Context::Context(const Context &other) {
     this->parentContext = other.parentContext;
 }
 
-Context &Context::operator+=(const Context &other) {
+//Context &Context::operator+=(const Context::Ptr other) {
+//    std::lock_guard<std::recursive_mutex> guard(contextLock);
+//    for (auto &&item : other->data) {
+//        // std::clog << "Context::+= copying id " << item.first << std::endl;
+//        this->data[item.first] = item.second;
+//    }
+//
+//    return *this;
+//}
+
+Context &Context::operator+=(Context::Ptr other) {
     std::lock_guard<std::recursive_mutex> guard(contextLock);
-    for (auto &&item : other.data) {
-        // std::clog << "Context::+= copying id " << item.first << std::endl;
-        this->data[item.first] = item.second;
-    }
 
-    return *this;
-}
-
-Context &Context::operator+=(Context &other) {
-    std::lock_guard<std::recursive_mutex> guard(contextLock);
-
-    for (auto &&item : other.data) {
+    for (auto &&item : other->data) {
         //std::clog << "Context::+= copying id " << item.first << std::endl;
         this->data[item.first] = item.second;
     }
 
     //@todo think about this:
-    setParentContext(&other);
+    setParentContext(other);
     return *this;
+}
+
+Context::Context(const Context::Ptr &ptr) : Context(*ptr) {}
+
+Context::ContextPtr Context::makeContext() {
+    return std::make_shared<Context>();
 }

@@ -4,7 +4,7 @@
 
 #include "StorageQuery.h"
 
-void StorageQuery::Request::process(Context &context) {
+void StorageQuery::Request::process(Context::Ptr context) {
     BasePacket::process(context);
 
     auto storageSource = LogicContext::getLogicManagerFromActiveContext().getSource<StorageSource>();

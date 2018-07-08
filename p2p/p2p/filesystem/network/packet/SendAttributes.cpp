@@ -8,10 +8,10 @@
 #include "SendAttributes.h"
 
 
-void SendAttributes::Request::process(Context &context) {
+void SendAttributes::Request::process(Context::Ptr context) {
     BasePacket::process(context);
     NODECONTEXTLOGGER("processing attr request for " + this->path);
-    auto lc = context.get<LogicContext>();
+    auto lc = context->get<LogicContext>();
     if (lc != nullptr) {
         auto fileSource = lc->getLogicManager().getSource<FileSource>();
         fileSource->requestAttributes(this);
@@ -26,7 +26,7 @@ void SendAttributes::Request::setPath(const std::string &path) {
     Request::path = path;
 }
 
-void SendAttributes::Response::process(Context &context) {
+void SendAttributes::Response::process(Context::Ptr context) {
     BasePacket::process(context);
 }
 

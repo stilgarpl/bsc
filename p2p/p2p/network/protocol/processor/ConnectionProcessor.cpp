@@ -17,14 +17,14 @@ ConnectionProcessor::ConnectionProcessor(Connection &connection) : connection(co
 void ConnectionProcessor::run() {
     logger.info("ConnectionProcessor start");
     //set up context
-    Context &context = connection.getConnectionContext();
-    Context::setActiveContext(&context);
+    Context::Ptr context = connection.getConnectionContext();
+    Context::setActiveContext(context);
 
-    auto lc = context.get<LogicContext>();
+    auto lc = context->get<LogicContext>();
     //auto &logicManager = lc->getLogicManager();
     //auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
-    auto processorContext = context.set<ProcessorContext, ConnectionProcessor &>(*this);
+    auto processorContext = context->set<ProcessorContext, ConnectionProcessor &>(*this);
     Roles::setActiveScope(&connection);
     while (!this->isStopping()) {
         auto np = connection.receive();

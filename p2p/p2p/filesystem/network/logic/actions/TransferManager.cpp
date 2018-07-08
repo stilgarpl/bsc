@@ -124,7 +124,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
     auto networkModule = node.getModule<NodeNetworkModule>();
     LocalTransferDescriptorPtr ret = std::make_shared<LocalTransferDescriptor>();
 
-    Context *activeContext = &Context::getActiveContext();
+    Context::Ptr activeContext = Context::getActiveContext();
 
     ret->setSource(source);
     ret->setDestination(destination);
@@ -160,7 +160,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
                 SHOW(resourceSize);
                 TransferSize chunk_count = resourceSize / MAX_CHUNK_SIZE;
 //                LOGGER("chunk count = " + std::to_string(chunk_count));
-                for (int i = 0; i < chunk_count + 1; ++i) {
+                for (TransferSize i = 0; i < chunk_count + 1; ++i) {
 
                     DataTransfer::Request::Ptr dataRequest = DataTransfer::Request::getNew();
                     dataRequest->setTransferId(transferId);

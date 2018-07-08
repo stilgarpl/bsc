@@ -28,7 +28,7 @@ private:
     std::queue<std::shared_ptr<BasePacket>> receiveQueue;
     std::condition_variable sendReady;
     std::condition_variable receiveReady;
-    Context connectionContext;
+    Context::OwnPtr connectionContext = nullptr; //initialized from node context in constructor
 private:
 
     std::unique_ptr<std::thread> sendThread;
@@ -63,11 +63,11 @@ public:
 
     BasePacketPtr receive();
 
-    explicit Connection(Context &context);
+    explicit Connection(Context::Ptr context);
 
     ConnectionProcessor &getProcessor();
 
-    Context &getConnectionContext();
+    Context::Ptr getConnectionContext();
 
     virtual ~Connection();
 

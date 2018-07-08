@@ -6,10 +6,10 @@
 #include <p2p/network/protocol/context/LogicContext.h>
 #include "CommandPacket.h"
 
-void CommandPacket::Request::process(Context &context) {
+void CommandPacket::Request::process(Context::Ptr context) {
     BasePacket::process(context);
     LOGGER("processing command request")
-    auto lc = context.get<LogicContext>();
+    auto lc = context->get<LogicContext>();
     if (lc != nullptr) {
         auto commnandSource = lc->getLogicManager().getSource<CommandSource>();
         commnandSource->commandReceived(this->getId(), this->modules, this->commandName, this->data);
@@ -40,7 +40,7 @@ void CommandPacket::Request::setData(const std::vector<std::string> &data) {
     Request::data = data;
 }
 
-void CommandPacket::Response::process(Context &context) {
+void CommandPacket::Response::process(Context::Ptr context) {
     BasePacket::process(context);
     LOGGER("command response received")
 }

@@ -11,8 +11,8 @@
 
 
 void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
-    Context &context = Context::getActiveContext();
-    auto nodeContext = context.get<NodeContext>();
+    Context::Ptr context = Context::getActiveContext();
+    auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
         //  NODECONTEXTLOGGER("Node discovered (connecting): " + event.getNodeInfo().getNodeId())
         auto &node = nodeContext->getNode();
@@ -23,15 +23,15 @@ void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
 }
 
 void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
-    Context &context = Context::getActiveContext();
-    auto remoteNodeContext = context.get<RemoteNodeContext>();
+    Context::Ptr context = Context::getActiveContext();
+    auto remoteNodeContext = context->get<RemoteNodeContext>();
     if (remoteNodeContext) {
         auto &remoteNode = remoteNodeContext->getRemoteNode();
         remoteNode.setNodeInfo(event.getNodeInfo());
     } else {
         LOGGER("ERROR: no remote node context!")
     }
-//    auto nodeContext = context.get<NodeContext>();
+//    auto nodeContext = context->get<NodeContext>();
 //    if (nodeContext != nullptr) {
 //        //  NODECONTEXTLOGGER("received node info: " + event.getNodeInfo().getNodeId());
 //        auto &node = nodeContext->getNode();
@@ -41,8 +41,8 @@ void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
 }
 
 void NodeActions::addKnownNode(const NodeInfoEvent &event) {
-    Context &context = Context::getActiveContext();
-    auto nodeContext = context.get<NodeContext>();
+    Context::Ptr context = Context::getActiveContext();
+    auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
         // NODECONTEXTLOGGER(                "Adding known node " + event.getNodeInfo().getNodeId() + " ... " + event.getNodeInfo().getNetworkId())
         auto &node = nodeContext->getNode();
@@ -55,8 +55,8 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
 }
 
 void NodeActions::triggerUpdateNode(const Tick &tick) {
-    Context &context = Context::getActiveContext();
-    auto nodeContext = context.get<NodeContext>();
+    Context::Ptr context = Context::getActiveContext();
+    auto nodeContext = context->get<NodeContext>();
     ///@todo imp[lement with RemoteNodes
 //    if (nodeContext != nullptr) {
 //        auto &node = nodeContext->getNode();

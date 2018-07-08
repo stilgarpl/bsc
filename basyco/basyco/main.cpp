@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) {
 //    TransmissionControl transmissionControl;
 //    context.setKey<std::string>(
 //            "test", "wartosc");
-//    std::clog << "Test context : " << *(context.get<std::string>("test")) << std::endl;
+//    std::clog << "Test context : " << *(context->get<std::string>("test")) << std::endl;
 //    context.set<int>(0);
     Node thisNode(9191);
     thisNode.addToNetwork("TheNetwork");

@@ -91,7 +91,7 @@ public:
 
     virtual NodeInfo &getNodeInfo() =0;
 
-    virtual Context &getContext() =0;
+    virtual Context::Ptr getContext() =0;
 
     virtual void start()=0;
 

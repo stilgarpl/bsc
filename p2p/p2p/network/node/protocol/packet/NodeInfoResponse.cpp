@@ -14,10 +14,10 @@ void NodeInfoResponse::setNodeInfo(const NodeInfo &nodeInfo) {
     NodeInfoResponse::nodeInfo = nodeInfo;
 }
 
-void NodeInfoResponse::process(Context &context) {
+void NodeInfoResponse::process(Context::Ptr context) {
     BasePacket::process(context);
 
-    auto lc = context.get<LogicContext>();
+    auto lc = context->get<LogicContext>();
     if (lc != nullptr) {
         auto nodeSource = lc->getLogicManager().getSource<NodeSource>();
         nodeSource->nodeInfoReceived(this->getNodeInfo());

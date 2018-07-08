@@ -11,7 +11,7 @@
 
 #define LOGGER(x) Logger(__FILE__).debug(__LINE__, x);
 #define SHOW(x) LOGGER(std::string(#x) +"="+std::to_string(x))
-#define NODECONTEXTLOGGER(x) if (Context::getActiveContext().get<NodeContext>()) Logger("["+Context::getActiveContext().get<NodeContext>()->getNodeInfo().getNodeId() + "] " + __FILE__).debug(__LINE__,x);
+#define NODECONTEXTLOGGER(x) if (Context::getActiveContext()->get<NodeContext>()) Logger("["+Context::getActiveContext()->get<NodeContext>()->getNodeInfo().getNodeId() + "] " + __FILE__).debug(__LINE__,x);
 
 class Logger {
 private:

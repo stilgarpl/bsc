@@ -5,7 +5,7 @@
 #include "p2p/context/Context.h"
 #include "BasePacket.h"
 
-void BasePacket::process(Context &context) {
+void BasePacket::process(Context::Ptr context) {
     // std::cout << "Network packet process ";
 
 

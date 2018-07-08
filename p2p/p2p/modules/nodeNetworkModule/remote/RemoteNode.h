@@ -18,7 +18,7 @@ class RemoteNode {
 private:
     std::optional<NodeInfo> nodeInfo;
     std::shared_ptr<ClientConnection> connection;
-    Context _context;
+    Context::OwnPtr _context = Context::makeContext();
     std::shared_ptr<IProtocol> protocol;
 
 public:
@@ -26,7 +26,7 @@ public:
 
     bool connectTo(const std::string &address);
 
-    Context &context() { return _context; };
+    Context::Ptr context() { return _context; };
 protected:
     RemoteNode();
 
@@ -38,7 +38,7 @@ public:
         connection = nullptr;
     }
 
-    RemoteNode(const std::shared_ptr<IProtocol> &protocol);
+    explicit RemoteNode(const std::shared_ptr<IProtocol> &protocol);
 
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto sendPacketToNode(NetworkPacketPointer<SendType> p) {

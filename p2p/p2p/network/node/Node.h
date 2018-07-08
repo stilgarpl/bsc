@@ -40,16 +40,16 @@ private:
 
     ConfigurationManager configurationManager;
     LogicManager logicManager;
-    Context nodeContext;
+    Context::Ptr nodeContext = Context::makeContext();
 
-    virtual Context &getContext() {
+    virtual Context::Ptr getContext() {
         return nodeContext;
     }
 
 public:
     ///@todo testing...
     void setNodeContextActive() {
-        Context::setActiveContext(&nodeContext);
+        Context::setActiveContext(nodeContext);
     }
 
 public:

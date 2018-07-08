@@ -23,7 +23,7 @@ typedef Connection *ConnectionOriginPointer;
 template<>
 struct setupOrigin<ConnectionOriginPointer> {
     static ConnectionOriginPointer &setup(ConnectionOriginPointer &origin) {
-        auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
+        auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
         if (connectionContext != nullptr) {
             origin = &connectionContext->getConnection();
         } else {

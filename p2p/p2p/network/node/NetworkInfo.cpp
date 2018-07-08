@@ -19,14 +19,14 @@ void NetworkInfo::setNetworkId(const NetworkIdType &networkId) {
 
 void NetworkInfo::addKnownNode(const NodeInfo &nodeInfo) {
 
-    Context &context = Context::getActiveContext();
-    auto nodeContext = context.get<NodeContext>();
+    Context::Ptr context = Context::getActiveContext();
+    auto nodeContext = context->get<NodeContext>();
     auto &node = nodeContext->getNode();
     //  NODECONTEXTLOGGER(node.getNetworkInfo()->getNetworkId());
     //  NODECONTEXTLOGGER(nodeInfo.getNetworkId());
     if (node.getNetworkInfo()->getNetworkId() == nodeInfo.getNetworkId() && !isNodeKnown(nodeInfo.getNodeId())) {
 
-        auto lc = context.get<LogicContext>();
+        auto lc = context->get<LogicContext>();
         if (lc != nullptr) {
             lc->getLogicManager().getSource<NodeSource>()->nodeDiscovered(nodeInfo);
 

@@ -42,7 +42,7 @@ private:
 public:
 
     ///@todo pure virtual perhaps? or maybe that would mess up ACK? I can create AckPacket...
-    virtual void process(Context &context);
+    virtual void process(Context::Ptr context);
 
     Status getStatus() const;
 

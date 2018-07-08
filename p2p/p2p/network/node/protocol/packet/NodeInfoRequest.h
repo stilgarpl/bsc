@@ -22,7 +22,7 @@ private:
     friend class cereal::access;
 
 public:
-    void process(Context &context) override;
+    void process(Context::Ptr context) override;
 
 };
 

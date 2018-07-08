@@ -7,7 +7,7 @@
 #include <p2p/filesystem/network/packet/SendFile.h>
 
 void FileSource::requestFile(SendFile::Request *request) {
-    // auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
+    // auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
 
     auto event = requestSource.newEvent(request->getId());
     if (request->getEnd() == 0) {
@@ -37,7 +37,7 @@ void FileSource::work() {
 }
 
 void FileSource::fileReceived(SendFile::Response::Ptr response) {
-    //auto connectionContext = Context::getActiveContext().get<ConnectionContext>();
+    //auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
 
     auto event = responseSource.newEvent(response->getId());
     if (response->getEnd() == 0) {

@@ -21,7 +21,7 @@ public:
         size_t begin = 0, end = 0;
 
     public:
-        void process(Context &context) override;
+        void process(Context::Ptr context) override;
 
         const std::string &getFilePath() const;
 
@@ -55,7 +55,7 @@ public:
         std::vector<char> data;
         size_t begin = 0, end = 0;
     public:
-        void process(Context &context) override;
+        void process(Context::Ptr context) override;
 
     private:
         template<class Archive>

@@ -25,7 +25,7 @@ public:
         }
 
     public:
-        void process(Context &context) override;
+        void process(Context::Ptr context) override;
 
     private:
         friend class cereal::access;

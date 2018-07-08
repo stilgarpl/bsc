@@ -19,7 +19,7 @@ private:
 public:
     void run() override;
 
-    ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode, Context &context);
+    ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode, Context::Ptr context);
 
     void startReceiving(Poco::Net::StreamSocket &socket) override;
 
@@ -36,10 +36,10 @@ public:
 class ServerConnectionFactory : public Poco::Net::TCPServerConnectionFactory {
 private:
     Node &serverNode;
-    Context context;
+    Context::OwnPtr context;
 public:
 
-    ServerConnectionFactory(Node &serverNode, Context &context);
+    ServerConnectionFactory(Node &serverNode, Context::Ptr context);
 
     Poco::Net::TCPServerConnection *createConnection(const Poco::Net::StreamSocket &socket) override;
 

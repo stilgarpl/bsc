@@ -6,13 +6,15 @@
 #include <p2p/network/protocol/context/LogicContext.h>
 #include <p2p/network/protocol/logic/sources/ConnectionSource.h>
 #include <Poco/Net/NetException.h>
+#include <utility>
 #include "ClientConnection.h"
 
 
-ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context &context) : Connection(context),
+ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context::Ptr context) : Connection(
+        std::move(context)),
                                                                                           socket(a) {
 
-    auto lm = getConnectionContext().get<LogicContext>();
+    auto lm = getConnectionContext()->get<LogicContext>();
     if (lm != nullptr) {
         std::clog << __func__ << " adding new connection!!!!!!!!!!!!!1 " << std::endl;
 
@@ -63,7 +65,7 @@ void ClientConnection::shutdown() {
             nested = nested->nested();
         }
     }
-    auto lc = getConnectionContext().get<LogicContext>();
+    auto lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
     connectionSourcePtr->connectionClosedClient(this);

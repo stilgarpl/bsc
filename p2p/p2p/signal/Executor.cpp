@@ -17,7 +17,7 @@ void SimpleExecutor::executeTask(const std::function<void(void)> task) {
 
 void ThreadExecutor::executeTask(const std::function<void(void)> task) {
 
-    Context *origContext = &Context::getActiveContext();
+    Context::Ptr origContext = Context::getActiveContext();
     std::thread(
             [=]() {
 

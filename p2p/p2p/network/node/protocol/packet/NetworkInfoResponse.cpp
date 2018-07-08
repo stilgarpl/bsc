@@ -8,11 +8,11 @@
 #include "NetworkInfoResponse.h"
 
 
-void NetworkInfoResponse::process(Context &context) {
+void NetworkInfoResponse::process(Context::Ptr context) {
     BasePacket::process(context);
 
 
-    auto lc = context.get<LogicContext>();
+    auto lc = context->get<LogicContext>();
     if (lc != nullptr) {
         auto nodeSource = lc->getLogicManager().getSource<NetworkSource>();
         if (this->getNetworkInfo() != nullptr) {

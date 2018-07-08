@@ -42,7 +42,7 @@ public:
 private:
     IdType eventId;
     OriginType _origin;
-    mutable Context *_context;
+    mutable Context::Ptr _context;
 public:
     IdType getEventId() const {
         return eventId;
@@ -67,11 +67,11 @@ public:
     IEvent();
 
 
-    Context *context() {
+    Context::Ptr context() {
         return _context;
     }
 
-    Context *context() const {
+    Context::Ptr context() const {
         return _context;
     }
 
@@ -80,7 +80,7 @@ public:
 template<typename idType, typename originType>
 IEvent<idType, originType>::IEvent() {
 
-    _context = &Context::getActiveContext();
+    _context = Context::getActiveContext();
 
 }
 

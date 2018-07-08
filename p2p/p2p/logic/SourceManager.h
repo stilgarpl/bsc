@@ -47,8 +47,8 @@ public:
 
         ///@todo pass to executor
 //        Context::setActiveContext(&commonContext);
-        Context *previousContext = &Context::getActiveContext();
-        Context::setActiveContext(const_cast<Context *>(event.context()));
+        Context::Ptr previousContext = Context::getActiveContext();
+        Context::setActiveContext(event.context());
 
         /*int b =*/ this->getSignal<T, Args...>().signal(event, args...);
         /*int a =*/ this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
@@ -120,7 +120,7 @@ private:
     ///@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
     Uber<Type> sourcesByType;
     ///@todo maybe this should just be a reference to node context?
-    Context commonContext;
+    Context::OwnPtr commonContext = Context::makeContext();
 public:
 
     void work();
@@ -182,7 +182,7 @@ public:
 //            it->setContext(context);
 //        }
 //    }
-    void setContext(const Context &context);
+    void setContext(const Context::Ptr context);
 
 
 };

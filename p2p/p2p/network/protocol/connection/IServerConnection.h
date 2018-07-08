@@ -11,7 +11,7 @@
 class IServerConnection : public Connection {
 
 public:
-    IServerConnection(Context &context) : Connection(context) {}
+    IServerConnection(Context::Ptr context) : Connection(context) {}
 
     virtual void stop() = 0;
 

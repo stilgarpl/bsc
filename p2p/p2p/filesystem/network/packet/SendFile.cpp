@@ -8,9 +8,9 @@
 #include <p2p/network/protocol/context/ProcessorContext.h>
 #include "SendFile.h"
 
-void SendFile::Request::process(Context &context) {
+void SendFile::Request::process(Context::Ptr context) {
     BasePacket::process(context);
-    auto lc = context.get<LogicContext>();
+    auto lc = context->get<LogicContext>();
     if (lc != nullptr) {
         auto fileSource = lc->getLogicManager().getSource<FileSource>();
         fileSource->requestFile(this);
@@ -41,12 +41,12 @@ void SendFile::Request::setEnd(size_t end) {
     Request::end = end;
 }
 
-void SendFile::Response::process(Context &context) {
+void SendFile::Response::process(Context::Ptr context) {
     BasePacket::process(context);
-    auto lc = context.get<LogicContext>();
+    auto lc = context->get<LogicContext>();
     if (lc != nullptr) {
         auto fileSource = lc->getLogicManager().getSource<FileSource>();
-        auto processorContext = context.get<ProcessorContext>();
+        auto processorContext = context->get<ProcessorContext>();
         fileSource->fileReceived(std::static_pointer_cast<Response>(processorContext->getThisPacket()));
     }
 }

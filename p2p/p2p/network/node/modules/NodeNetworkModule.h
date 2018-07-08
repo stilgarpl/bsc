@@ -208,7 +208,7 @@ public: // @todo should be public or shouldn't ?
      */
     RemoteNode &getRemoteNode() {
         std::shared_ptr<RemoteNode> remoteNode = std::make_shared<RemoteNode>(protocol);
-        remoteNode->context().setParentContext(&node.getContext());
+        remoteNode->context()->setParentContext(node.getContext());
         remoteNodes.push_back(remoteNode);
         return *remoteNode;
     }

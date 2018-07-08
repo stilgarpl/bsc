@@ -10,21 +10,23 @@
 #include <memory>
 #include <iostream>
 #include <mutex>
-
-
+#include <p2p/log/Logger.h>
 
 class Context {
-
-
+public:
+    typedef std::shared_ptr<Context> ContextPtr;
+    typedef ContextPtr Ptr;
+    typedef const ContextPtr OwnPtr;
+private:
     typedef unsigned int KeyType;
     typedef unsigned int TypeIdType;
 private:
     bool defaultContext = false;
     mutable std::recursive_mutex contextLock;
     //initialized to nullptr in .cpp file
-    thread_local static Context* activeContext;
+    thread_local static Context::Ptr activeContext;
     //@todo add thread safety - mutex, lock and locking of the parent before accessing it
-    Context *parentContext = nullptr;
+    Context::Ptr parentContext = nullptr;
 
     const TypeIdType getNextTypeId() const {
         static TypeIdType val = 0;
@@ -121,22 +123,37 @@ public:
     }
 
     ///@todo non-const context does set parent but const doesn't. WHY?
-    Context &operator+=(const Context &other);
+//    Context &operator+=(const Context::Ptr other);
 
-    Context &operator+=(Context &other);
+    Context &operator+=(Context::Ptr other);
 
     Context(const Context &other);
 
+    explicit Context(const Ptr &ptr);;
     Context() = default;
 
 public:
-    static Context &getActiveContext();
+    static Context::Ptr getActiveContext();
 
-    static void setActiveContext(Context *ctx);
+    static void setActiveContext(Context::Ptr ctx);
 
-    Context *getParentContext() const;
+    Context::Ptr getParentContext() const;
 
-    void setParentContext(Context *parentContext);
+    void setParentContext(Context::Ptr parentContext);
+
+    static ContextPtr makeContext();
+
+    static ContextPtr makeContext(Context::Ptr ptr) {
+        if (ptr != nullptr) {
+            auto ret = std::make_shared<Context>(*ptr);
+            ret->setParentContext(ptr);
+            return ret;
+        } else {
+            ///@todo throw exception??
+            LOGGER("ERROR: NULL CONTEXT PASSED")
+            return makeContext();
+        }
+    };
 };
 
 

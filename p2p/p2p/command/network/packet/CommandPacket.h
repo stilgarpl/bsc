@@ -18,7 +18,7 @@ public:
         std::string commandName;
         std::vector<std::string> data;
     public:
-        void process(Context &context) override;
+        void process(Context::Ptr context) override;
 
         const std::vector<std::string> &getModules() const;
 
@@ -48,7 +48,7 @@ public:
     class Response : public Packet<CommandPacket, CommandPacket::Response> {
         bool runStatus;
     public:
-        void process(Context &context) override;
+        void process(Context::Ptr context) override;
 
         bool isRunStatus() const;
 

@@ -7,11 +7,11 @@
 #include "NodeInfoResponse.h"
 #include "NodeInfoRequest.h"
 
-void NodeInfoRequest::process(Context &context) {
+void NodeInfoRequest::process(Context::Ptr context) {
     BasePacket::process(context);
 
-    auto nodeContext = context.get<NodeContext>();
-    auto connectionContext = context.get<ConnectionContext>();
+    auto nodeContext = context->get<NodeContext>();
+    auto connectionContext = context->get<ConnectionContext>();
 
     if (nodeContext != nullptr && connectionContext != nullptr) {
         // NODECONTEXTLOGGER("processing info request id" + std::to_string(this->getId()));

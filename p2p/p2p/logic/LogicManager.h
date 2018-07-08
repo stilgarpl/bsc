@@ -108,7 +108,7 @@ public:
 
     }
 
-    void setContexts(const Context &context) {
+    void setContexts(Context::Ptr context) {
         sourceManager.setContext(context);
     }
 

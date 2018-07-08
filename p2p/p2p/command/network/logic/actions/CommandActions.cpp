@@ -10,7 +10,7 @@
 void CommandActions::runCommand(const CommandEvent &commandEvent) {
     LOGGER("remote command!")
     Connection *connection = commandEvent.origin();
-    auto nc = Context::getActiveContext().get<NodeContext>();
+    auto nc = Context::getActiveContext()->get<NodeContext>();
     if (nc != nullptr) {
         auto commandModule = nc->getNode().getModule<CommandModule>();
         if (commandModule != nullptr) {

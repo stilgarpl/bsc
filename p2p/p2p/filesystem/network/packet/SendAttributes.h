@@ -27,7 +27,7 @@ public:
         void setPath(const std::string &path);
 
     public:
-        void process(Context &context) override;
+        void process(Context::Ptr context) override;
 
     private:
         template<class Archive>
@@ -55,7 +55,7 @@ public:
         void setSize(size_t size);
 
     public:
-        void process(Context &context) override;
+        void process(Context::Ptr context) override;
 
     private:
         template<class Archive>

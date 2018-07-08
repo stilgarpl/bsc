@@ -7,6 +7,7 @@
 #include <p2p/network/protocol/context/LogicContext.h>
 #include <p2p/network/protocol/context/ConnectionContext.h>
 #include <Poco/Net/NetException.h>
+#include <utility>
 
 using namespace std::chrono_literals;
 
@@ -41,8 +42,8 @@ BasePacketPtr Connection::receive() {
 
 void Connection::workSend(Poco::Net::StreamSocket &socket) {
     Poco::Net::SocketOutputStream os(socket);
-    Context::setActiveContext(&getConnectionContext());
-    auto lc = getConnectionContext().get<LogicContext>();
+    Context::setActiveContext(getConnectionContext());
+    auto lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
@@ -105,8 +106,8 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
 
 void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
-    Context::setActiveContext(&getConnectionContext());
-    auto lc = getConnectionContext().get<LogicContext>();
+    Context::setActiveContext(getConnectionContext());
+    auto lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
     ///@todo totally replace all connection source references here with observer pattern
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
@@ -213,16 +214,16 @@ void Connection::stopReceiving() {
     //  processor.stop();
 }
 
-Connection::Connection(Context &context) : processor(*this), connectionContext(context) {
+Connection::Connection(Context::Ptr context) : processor(*this), connectionContext(Context::makeContext(context)) {
 
-    connectionContext.set<ConnectionContext, Connection &>(*this);
+    connectionContext->set<ConnectionContext, Connection &>(*this);
 }
 
 ConnectionProcessor &Connection::getProcessor() {
     return processor;
 }
 
-Context &Connection::getConnectionContext() {
+Context::Ptr Connection::getConnectionContext() {
     return connectionContext;
 }
 

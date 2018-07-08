@@ -6,7 +6,7 @@
 #include <p2p/network/protocol/context/LogicContext.h>
 #include "DataTransfer.h"
 
-void DataTransfer::Request::process(Context &context) {
+void DataTransfer::Request::process(Context::Ptr context) {
     BasePacket::process(context);
     LogicContext::getLogicManagerFromActiveContext().getSource<TransferSource>()->sendData(this->getTransferId(),
                                                                                            this->getBegin(),

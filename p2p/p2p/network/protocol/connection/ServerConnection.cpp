@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <iostream>
+#include <utility>
 #include <Poco/Net/NetException.h>
 #include <p2p/network/protocol/logic/sources/ConnectionSource.h>
 #include <p2p/network/protocol/context/LogicContext.h>
@@ -26,15 +27,15 @@ void ServerConnection::run() {
 
 }
 
-ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode, Context &context)
+ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode, Context::Ptr context)
         : TCPServerConnection(
         socket),
-          IServerConnection(context), serverNode(serverNode) {
+          IServerConnection(std::move(context)), serverNode(serverNode) {
 
-    Context::setActiveContext(&getConnectionContext());
+    Context::setActiveContext(getConnectionContext());
     ///@todo observer pattern?
     serverNode.getModule<NodeNetworkModule>()->addAcceptedConnection(this);
-    auto lc = getConnectionContext().get<LogicContext>();
+    auto lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
     connectionSourcePtr->connectionAccepted(this);
@@ -87,5 +88,5 @@ Poco::Net::TCPServerConnection *ServerConnectionFactory::createConnection(const 
     return connection;
 }
 
-ServerConnectionFactory::ServerConnectionFactory(Node &serverNode, Context &context)
-        : serverNode(serverNode), context(context) {}
+ServerConnectionFactory::ServerConnectionFactory(Node &serverNode, Context::Ptr context)
+        : serverNode(serverNode), context(Context::makeContext(context)) {}

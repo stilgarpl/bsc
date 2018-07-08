@@ -29,7 +29,7 @@ public:
     static Node &getNodeFromActiveContext() {
 
         //@todo throw exeption if no NodeContext in context
-        auto ptr = Context::getActiveContext().get<NodeContext>();
+        auto ptr = Context::getActiveContext()->get<NodeContext>();
         if (ptr != nullptr) {
             return ptr->getNode();
         } else {
