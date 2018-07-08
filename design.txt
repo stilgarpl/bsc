@@ -242,3 +242,5 @@ Poprawić metody z NodeNetModule, zeby uniknąć poprawiania większośći kodu,
 
 
 here's an idea: CONTEXT STACK! pushActiveContext, popActiveContext @todo think about it
+
+mysle, ze trzeba context przeniesc na shared_ptr. w tym momencie event trzyma context* i w przypadku gdy remote node zostanie usuniety, eventy z kolejek mogą zaliczyć segfaulty

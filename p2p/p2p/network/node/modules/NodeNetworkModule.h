@@ -63,7 +63,7 @@ public:
 
 private:
     std::shared_ptr<IProtocol> protocol = std::make_shared<GravitonProtocol>(logicManager);
-    std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
+//    std::list<NodeConnectionInfoPtr> activeClientConnections; //client side
     std::mutex acceptedConnectionsMutex;
     std::mutex activeConnectionsMutex;
     std::list<IServerConnection *> acceptedConnections; //server side
@@ -170,9 +170,9 @@ public: // @todo should be public or shouldn't ?
 
         std::lock_guard<std::mutex> g(activeConnectionsMutex);
 
-        for (auto &&item : activeClientConnections) {
-            if (item->nodeId) {
-                ret[*item->nodeId] = protocol->sendExpect(item->connection.get(), p);
+        for (auto &&item : remoteNodes) {
+            if (item->getNodeId()) {
+                ret[*item->getNodeId()] = item->sendPacketToNode(p);
             }
         }
         ///@todo maybe return some class, not just a map?
