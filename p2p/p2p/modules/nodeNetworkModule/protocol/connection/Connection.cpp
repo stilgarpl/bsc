@@ -110,7 +110,6 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
 
 void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
-    badSocket = &socket;
     Context::setActiveContext(getConnectionContext());
     auto lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
@@ -225,11 +224,7 @@ void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
 void Connection::stopReceiving() {
     receiving = false;
     try {
-        if (badSocket) {
-            badSocket->setBlocking(false);
-            badSocket->shutdown();
-            badSocket = nullptr;
-        }
+        getSocket().shutdown();
     } catch (Poco::Net::NetException e) {
         e.what();
     }
@@ -254,7 +249,7 @@ Context::Ptr Connection::getConnectionContext() {
 Connection::~Connection() {
 
     //   LOGGER("Closing connection")
-    shutdown();
+//    shutdown();
 
 
 }

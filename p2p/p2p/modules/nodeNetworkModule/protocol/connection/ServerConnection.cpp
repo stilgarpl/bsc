@@ -93,6 +93,10 @@ void ServerConnection::shutdown() {
     }
 }
 
+Poco::Net::StreamSocket &ServerConnection::getSocket() {
+    return socket();
+}
+
 
 Poco::Net::TCPServerConnection *ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket &socket) {
     ServerConnection *connection = new ServerConnection(socket, serverNode, context);

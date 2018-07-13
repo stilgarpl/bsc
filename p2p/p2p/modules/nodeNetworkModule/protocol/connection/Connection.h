@@ -36,14 +36,13 @@ private:
     bool sending = true;
     bool receiving = true;
 
-    //@todo refactor Connection to use this socket:
-    Poco::Net::StreamSocket *badSocket;
-
 protected:
 
     void workSend(Poco::Net::StreamSocket &socket);
 
     void workReceive(Poco::Net::StreamSocket &socket);
+
+    virtual Poco::Net::StreamSocket &getSocket()=0;
 
 public:
     //@todo why do those methods need socket as parameter?
@@ -54,6 +53,7 @@ public:
     virtual void startReceiving(Poco::Net::StreamSocket &socket);
 
     virtual void stopReceiving();
+
 
     bool isActive() {
         return sending && receiving;

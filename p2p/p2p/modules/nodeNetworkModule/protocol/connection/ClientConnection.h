@@ -26,6 +26,8 @@ public:
 
     void shutdown() override;
 
+protected:
+    Poco::Net::StreamSocket &getSocket() override;
 
 };
 

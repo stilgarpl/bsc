@@ -30,6 +30,9 @@ public:
     void stop() override;
 
     void shutdown() override;
+
+protected:
+    Poco::Net::StreamSocket &getSocket() override;
 };
 
 
