@@ -3,17 +3,17 @@
 //
 
 
-#include <p2p/network/node/protocol/logic/sources/NodeSource.h>
-#include <p2p/network/node/protocol/logic/sources/NetworkSource.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/sources/NetworkSource.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/AuthSource.h>
-#include <p2p/network/node/protocol/logic/actions/NodeActions.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/actions/NodeActions.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/actions/ProtocolActions.h>
-#include <p2p/network/node/protocol/logic/actions/NetworkActions.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/actions/NetworkActions.h>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/ClientConnection.h>
 #include <Poco/Net/NetException.h>
 #include "NodeNetworkModule.h"
-#include "p2p/network/node/modules/BasicModule.h"
+#include "p2p/modules/basic/BasicModule.h"
 #include <Poco/Net/SocketStream.h>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/ServerConnection.h>
 #include <p2p/modules/configuration/ConfigurationModule.h>

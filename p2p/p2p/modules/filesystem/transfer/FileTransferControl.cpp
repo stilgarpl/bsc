@@ -9,7 +9,7 @@
 #include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
 
 #include <p2p/modules/filesystem/network/packet/SendFile.h>
-#include <p2p/network/node/modules/FilesystemModule.h>
+#include <p2p/modules/filesystem/FilesystemModule.h>
 
 FileTransferDescriptorPtr
 FileTransferControl::initiateTransfer(INode &node, const NodeIdType &nodeId, fs::path sourcePath,

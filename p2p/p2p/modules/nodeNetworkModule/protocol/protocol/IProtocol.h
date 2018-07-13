@@ -9,7 +9,7 @@
 #include <future>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/Connection.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/PacketEvent.h>
-#include <p2p/logic/ILogicModule.h>
+#include <p2p/modules/logic/ILogicModule.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/ConnectionEvent.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/ConnectionEvent.h>
 

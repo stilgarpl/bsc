@@ -7,7 +7,7 @@
 #include <p2p/modules/command/network/packet/CommandPacket.h>
 
 #include "CommandModule.h"
-#include "p2p/network/node/modules/BasicModule.h"
+#include "p2p/modules/basic/BasicModule.h"
 #include "p2p/modules/nodeNetworkModule/NodeNetworkModule.h"
 
 CommandModule::CommandModule(INode &node) : NodeModuleDependent(node), defaultSubModule(*this) {

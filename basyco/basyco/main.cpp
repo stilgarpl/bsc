@@ -8,10 +8,10 @@
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/actions/TransmissionControl.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/actions/ProtocolActions.h"
-#include "p2p/network/node/protocol/logic/sources/NodeSource.h"
-#include "p2p/network/node/protocol/logic/actions/NodeActions.h"
-#include "p2p/network/node/protocol/logic/sources/NetworkSource.h"
-#include "p2p/network/node/protocol/logic/actions/NetworkActions.h"
+#include "p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h"
+#include "p2p/modules/nodeNetworkModule/protocol/logic/actions/NodeActions.h"
+#include "p2p/modules/nodeNetworkModule/protocol/logic/sources/NetworkSource.h"
+#include "p2p/modules/nodeNetworkModule/protocol/logic/actions/NetworkActions.h"
 
 
 
@@ -23,13 +23,13 @@ using namespace std::chrono_literals;
 #include <p2p/modules/configuration/ConfigurationManager.h>
 #include <repo/journal/SimpleJournal.h>
 #include <repo/node/RepoModule.h>
-#include <p2p/network/node/modules/BasicModule.h>
-#include <p2p/network/node/modules/FilesystemModule.h>
+#include <p2p/modules/basic/BasicModule.h>
+#include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/dependency/Dependency.h>
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include <p2p/role/Roles.h>
 #include <p2p/modules/command/CommandModule.h>
-#include <p2p/network/node/modules/command/StandardCommandsDirectory.h>
+#include <p2p/modules/command/StandardCommandsDirectory.h>
 #include <p2p/modules/filesystem/transfer/FileTransferControl.h>
 #include <p2p/modules/configuration/ConfigurationModule.h>
 #include <variant>
@@ -146,8 +146,8 @@ void setupCommands(CommandModule *cmd) {
 #include <cereal/types/memory.hpp>
 #include <repo/repository/storage/InternalStorage.h>
 #include <p2p/utils/crypto.h>
-#include <p2p/network/node/protocol/packet/NodeInfoGroup.h>
-#include <p2p/network/node/protocol/packet/NetworkInfoRequest.h>
+#include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
+#include <p2p/modules/nodeNetworkModule/protocol/packet/NetworkInfoRequest.h>
 
 struct PtrTest {
     int a = 9999;

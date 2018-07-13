@@ -7,7 +7,7 @@
 
 
 #include <repo/journal/SimpleJournal.h>
-#include <p2p/network/logic/events/NetworkingEvent.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkingEvent.h>
 
 class JournalResponseEvent : public NetworkingEvent<int> {
 private:

@@ -9,8 +9,8 @@
 #include <p2p/logic/sources/AutoSource.h>
 #include <p2p/node/INodeModule.h>
 #include <p2p/node/INode.h>
-#include "LogicManager.h"
-#include "LogicObject.h"
+#include "p2p/logic/LogicManager.h"
+#include "p2p/logic/LogicObject.h"
 
 //@todo #warning move this class to node modules
 class ILogicModule : public INodeModule, public LogicObject {

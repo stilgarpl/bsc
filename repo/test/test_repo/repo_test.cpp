@@ -5,8 +5,8 @@
 #include <catch/catch.hpp>
 #include <p2p/modules/command/CommandModule.h>
 #include <repo/node/RepoModule.h>
-#include <p2p/network/node/modules/FilesystemModule.h>
-#include <p2p/network/node/modules/BasicModule.h>
+#include <p2p/modules/filesystem/FilesystemModule.h>
+#include <p2p/modules/basic/BasicModule.h>
 
 void setupModules(Node &node) {
     node.addModule<BasicModule>();

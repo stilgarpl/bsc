@@ -6,7 +6,7 @@
 #include "NetworkInfo.h"
 #include "p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h"
 #include "p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h"
-#include "p2p/network/node/protocol/logic/sources/NodeSource.h"
+#include "p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h"
 
 
 const NetworkIdType &NetworkInfo::getNetworkId() const {

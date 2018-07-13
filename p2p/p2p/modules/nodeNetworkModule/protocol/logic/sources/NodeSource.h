@@ -6,7 +6,7 @@
 #define BASYCO_NODESOURCE_H
 
 
-#include <p2p/network/node/protocol/logic/events/NodeInfoEvent.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/events/NodeInfoEvent.h>
 #include "p2p/logic/sources/EventQueueSource.h"
 
 class NodeSource : public EventQueueSource<NodeInfoEvent> {

@@ -7,7 +7,7 @@
 #include <p2p/modules/filesystem/transfer/FileTransferControl.h>
 #include <p2p/modules/filesystem/network/logic/sources/TransferSource.h>
 #include "FilesystemModule.h"
-#include "BasicModule.h"
+#include "p2p/modules/basic/BasicModule.h"
 
 FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent(node) {
     setRequired<BasicModule, NodeNetworkModule>();

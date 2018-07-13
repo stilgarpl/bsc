@@ -8,7 +8,7 @@
 
 #include <p2p/thread/Runnable.h>
 #include <p2p/dependency/IDependencyManaged.h>
-#include <p2p/logic/ILogicModule.h>
+#include <p2p/modules/logic/ILogicModule.h>
 ///@todo this is interface for configuration, it shouldn't have dependencies on modules
 #include <p2p/modules/configuration/IConfig.h>
 #include "INode.h"

@@ -8,7 +8,7 @@
 
 #include <p2p/logic/IEvent.h>
 #include <repo/repository/Repository.h>
-#include <p2p/network/logic/events/NetworkingEvent.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkingEvent.h>
 
 
 enum class JournalEventId {

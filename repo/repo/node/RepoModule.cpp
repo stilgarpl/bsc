@@ -2,7 +2,7 @@
 // Created by stilgar on 05.11.17.
 //
 
-#include <p2p/network/node/modules/BasicModule.h>
+#include <p2p/modules/basic/BasicModule.h>
 #include <repo/journal/network/logic/events/JournalRequestEvent.h>
 #include <repo/journal/network/logic/actions/JournalActions.h>
 #include <repo/journal/network/logic/sources/JournalSource.h>

@@ -13,12 +13,12 @@
 
 #include <p2p/modules/nodeNetworkModule/protocol/protocol/GravitonProtocol.h>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/IServerConnection.h>
-#include <p2p/network/node/modules/broadcast/BroadcastScope.h>
+#include <p2p/modules/nodeNetworkModule/protocol/broadcast/BroadcastScope.h>
 
 #include <p2p/modules/configuration/IConfig.h>
 #include <p2p/modules/configuration/ConfigurationModule.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
-#include "p2p/network/node/modules/RemoteNodeNotFoundException.h"
+#include "p2p/modules/nodeNetworkModule/remote/exception/RemoteNodeNotFoundException.h"
 
 struct NodeConnectionInfo {
     ConnectionPtr connection;

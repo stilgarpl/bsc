@@ -7,7 +7,7 @@
 
 
 #include <p2p/node/NodeModule.h>
-#include <p2p/network/node/modules/BasicModule.h>
+#include <p2p/modules/basic/BasicModule.h>
 #include "ConfigurationManager.h"
 
 class ConfigurationModule : public NodeModuleDependent<ConfigurationModule, BasicModule> {

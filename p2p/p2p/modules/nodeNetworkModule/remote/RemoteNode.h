@@ -9,7 +9,7 @@
 #include <Poco/Net/SocketAddress.h>
 #include <p2p/node/NodeInfo.h>
 #include <p2p/modules/nodeNetworkModule/protocol/protocol/IProtocol.h>
-#include "NotRequestException.h"
+#include "p2p/modules/nodeNetworkModule/remote/exception/NotRequestException.h"
 
 /**
  * a representation of remote nodes.

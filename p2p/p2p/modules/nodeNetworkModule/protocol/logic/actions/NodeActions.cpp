@@ -3,11 +3,11 @@
 //
 
 #include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
-#include <p2p/network/node/protocol/packet/NetworkInfoRequest.h>
+#include <p2p/modules/nodeNetworkModule/protocol/packet/NetworkInfoRequest.h>
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNodeContext.h>
 #include "NodeActions.h"
-#include <p2p/network/node/protocol/packet/NodeInfoGroup.h>
+#include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
 
 void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
     Context::Ptr context = Context::getActiveContext();
