@@ -3,7 +3,7 @@
 //
 
 #include <optional>
-#include <p2p/network/node/NodeInfo.h>
+#include <p2p/node/NodeInfo.h>
 #include "RemoteNode.h"
 #include "RemoteNodeContext.h"
 #include <Poco/Net/NetException.h>
@@ -24,11 +24,12 @@ bool RemoteNode::connectTo(const std::string &address) {
     //@todo check for problems and handle them
     try {
         Context::setActiveContext(_context);
-        connection = std::make_shared<ClientConnection>(socketAddress,
-                                                        _context);
+        auto conn = std::make_shared<ClientConnection>(socketAddress,
+                                                       _context);
 
-        connection->startSending();
-        connection->startReceiving();
+        conn->startSending();
+        conn->startReceiving();
+        connection = conn;
         return true;
     } catch (const Poco::Net::ConnectionRefusedException &) {
         ///@todo connection refused in connectionSource

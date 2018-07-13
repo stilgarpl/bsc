@@ -2,12 +2,12 @@
 #include <thread>
 
 //#define CEREAL_THREAD_SAFE 1
-#include "p2p/network/node/Node.h"
+#include "p2p/node/Node.h"
 #include "p2p/logic/sources/ClockSource.h"
-#include "p2p/network/protocol/logic/sources/AuthSource.h"
-#include "p2p/network/protocol/logic/sources/ConnectionSource.h"
-#include "p2p/network/protocol/logic/actions/TransmissionControl.h"
-#include "p2p/network/protocol/logic/actions/ProtocolActions.h"
+#include "p2p/modules/nodeNetworkModule/protocol/logic/sources/AuthSource.h"
+#include "p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h"
+#include "p2p/modules/nodeNetworkModule/protocol/logic/actions/TransmissionControl.h"
+#include "p2p/modules/nodeNetworkModule/protocol/logic/actions/ProtocolActions.h"
 #include "p2p/network/node/protocol/logic/sources/NodeSource.h"
 #include "p2p/network/node/protocol/logic/actions/NodeActions.h"
 #include "p2p/network/node/protocol/logic/sources/NetworkSource.h"
@@ -18,19 +18,19 @@
 using namespace std::chrono_literals;
 
 #include <fstream>
-#include <p2p/filesystem/network/logic/sources/FileSource.h>
-#include <p2p/filesystem/network/logic/actions/FileActions.h>
+#include <p2p/modules/filesystem/network/logic/sources/FileSource.h>
+#include <p2p/modules/filesystem/network/logic/actions/FileActions.h>
 #include <p2p/modules/configuration/ConfigurationManager.h>
 #include <repo/journal/SimpleJournal.h>
 #include <repo/node/RepoModule.h>
 #include <p2p/network/node/modules/BasicModule.h>
 #include <p2p/network/node/modules/FilesystemModule.h>
 #include <p2p/dependency/Dependency.h>
-#include <p2p/network/node/modules/NodeNetworkModule.h>
-#include <p2p/network/protocol/role/Roles.h>
-#include <p2p/network/node/modules/CommandModule.h>
+#include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
+#include <p2p/role/Roles.h>
+#include <p2p/modules/command/CommandModule.h>
 #include <p2p/network/node/modules/command/StandardCommandsDirectory.h>
-#include <p2p/filesystem/transfer/FileTransferControl.h>
+#include <p2p/modules/filesystem/transfer/FileTransferControl.h>
 #include <p2p/modules/configuration/ConfigurationModule.h>
 #include <variant>
 
@@ -146,6 +146,8 @@ void setupCommands(CommandModule *cmd) {
 #include <cereal/types/memory.hpp>
 #include <repo/repository/storage/InternalStorage.h>
 #include <p2p/utils/crypto.h>
+#include <p2p/network/node/protocol/packet/NodeInfoGroup.h>
+#include <p2p/network/node/protocol/packet/NetworkInfoRequest.h>
 
 struct PtrTest {
     int a = 9999;
@@ -176,10 +178,155 @@ private:
 //    }
 //};
 
+//class outbuf : public std::streambuf
+//{
+//protected:
+//    /* central output function
+//     * - print characters in uppercase mode
+//     */
+//    virtual int_type overflow (int_type c) {
+//        if (c != EOF) {
+//            // convert lowercase to uppercase
+//            c = std::toupper(static_cast<char>(c),getloc());
+//
+//            // and write the character to the standard output
+//            if (putchar(c) == EOF) {
+//                return EOF;
+//            }
+//        }
+//        return c;
+//    }
+//};
+
+class InputBuffer : public std::streambuf {
+    std::string buffer;
+    std::streambuf &source;
+
+public:
+    explicit InputBuffer(std::streambuf &d) : source(d) {}
+
+
+protected:
+    int underflow() override {
+        int result(EOF);
+        if (gptr() < egptr())
+            result = *gptr();
+        else {
+            long value = 0;
+            for (unsigned int i = 0; i < sizeof(buffer.size()); ++i) {
+                value += source.sbumpc() << i * 8;
+                auto c = static_cast<char>((buffer.size() & 0xFF << i * 8) >> i * 8);
+            }
+            LOGGER("value read is " + std::to_string(value));
+            //now read n bytes from the source
+            for (int j = 0; j < value; ++j) {
+                buffer += source.sbumpc();
+            }
+            setg(buffer.begin().base(), buffer.begin().base(), buffer.end().base());
+            return static_cast<int>(value);
+        }
+        return result;
+    }
+
+};
+
+class OutputBuffer : public std::streambuf {
+private:
+    std::string buffer;
+    std::ostream &dst;
+public:
+
+    explicit OutputBuffer(std::ostream &dst) : dst(dst) {}
+
+protected:
+    int overflow(int_type c) override {
+//        LOGGER( + (unsigned char)c);
+        std::clog << "overflow: " << (char) c << std::endl;
+        if (c != EOF) {
+            buffer += (char) c;
+        } else {
+            flush();
+        }
+        return c;
+    }
+
+public:
+    void flush() {
+        ///@todo the size of this parameter should be constant, so no sizeof but 4 or 8 bytes ALWAYS
+        for (unsigned int i = 0; i < sizeof(buffer.size()); ++i) {
+            auto c = static_cast<char>((buffer.size() & 0xFF << i * 8) >> i * 8);
+            dst << c;
+
+        }
+        dst << buffer;
+        buffer.clear();
+        //sputn(result.c_str(),result.size());
+//        dst << result;
+    }
+};
 
 
 
 int main(int argc, char *argv[]) {
+//    {
+
+
+//        // create special output buffer
+////        OutputBuffer ob(std::cout);
+//        std::stringstream ss;
+////
+////        ss << 0x1 << "test" << "dupa";
+////        std::string x;
+////        ss >> x;
+////        std::cout << x ;
+//        OutputBuffer ob(ss);
+//        // initialize output stream with that output buffer
+//
+//        std::ostream out(&ob);
+////std::cout << "what?";
+//        out << "test of test";
+//        out << "aaaa";
+//        ob.flush();
+//        out << "bb";
+//        out.flush();
+//        ob.flush();
+//        std::string s1 = ss.str();
+//        auto cs = s1.c_str();
+//        std::cout << cs << std::endl;
+//
+//        InputBuffer ib(*ss.rdbuf());
+//        std::istream iss(&ib);
+//        std::string x1,x2;
+//        iss >> x1;
+//        iss >> x2;
+//        iss >> x2;
+//        iss >> x2;
+//
+//        std::cout << " X1 : " << x1 << "X2: " << x2 << std::endl;
+//    }
+//
+//    ///cereal test
+//
+//    std::stringstream io;
+//    cereal::BinaryOutputArchive oa(io);
+//    NodeInfoGroup::Request::Ptr nodeReq = NodeInfoGroup::Request::getNew();
+//    NetworkInfoRequest::Ptr netReq = NetworkInfoRequest::getNew();
+//
+//    oa << nodeReq;
+//    oa << netReq;
+//    NodeInfoGroup::Request::Ptr nodeReq2;
+//    NetworkInfoRequest::Ptr netReq2;
+//
+//    cereal::BinaryInputArchive ia(io);
+//
+//    ia >>nodeReq2;
+//    ia >> netReq2;
+//
+//    LOGGER(std::string("nR2 : ") + typeid(nodeReq2).name() + "netR2 " + typeid(netReq2).name());
+//
+//
+//
+//    return 0;
 
     std::shared_ptr<PtrTest> p1, p2, p3, p4, p5, p6, p7;
 
@@ -310,12 +457,14 @@ int main(int argc, char *argv[]) {
 //    setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
     thirdNode.start();
 
+    ///@todo this is required so logic is set up before connecting. change it so start wait until the end of the initialization phase
+    // std::this_thread::sleep_for(1000ms);
 
     thisNode.getNodeInfo().printAll();
     otherNode.getNodeInfo().printAll();
     thirdNode.getNodeInfo().printAll();
     thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
-    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9898");
+//    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9898");
 //    thisNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 //    otherNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 //    thirdNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();

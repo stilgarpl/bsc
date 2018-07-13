@@ -2,13 +2,12 @@
 // Created by stilgar on 08.09.17.
 //
 
-#include <p2p/network/protocol/context/NodeContext.h>
-#include <p2p/network/node/protocol/packet/NodeInfoRequest.h>
+#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
 #include <p2p/network/node/protocol/packet/NetworkInfoRequest.h>
-#include <p2p/network/node/modules/NodeNetworkModule.h>
+#include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNodeContext.h>
 #include "NodeActions.h"
-
+#include <p2p/network/node/protocol/packet/NodeInfoGroup.h>
 
 void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
     Context::Ptr context = Context::getActiveContext();
@@ -23,6 +22,7 @@ void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
 }
 
 void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
+    LOGGER("update node info")
     Context::Ptr context = Context::getActiveContext();
     auto remoteNodeContext = context->get<RemoteNodeContext>();
     if (remoteNodeContext) {
@@ -71,13 +71,15 @@ void NodeActions::triggerUpdateNode(const Tick &tick) {
 }
 
 void NodeActions::sendNetworkInfoRequest(ConnectionEvent connectionEvent) {
-
+    LOGGER("send network info request")
     auto req = std::make_shared<NetworkInfoRequest>();
     connectionEvent.getConnection()->send(req);
 }
 
 void NodeActions::sendNodeInfoRequest(ConnectionEvent connectionEvent) {
 
-    auto req = std::make_shared<NodeInfoRequest>();
+    LOGGER("send node info request")
+    NodeInfoRequest::Ptr req = NodeInfoRequest::getNew();
     connectionEvent.getConnection()->send(req);
+    //        connectionEvent.context()->get<RemoteNodeContext>()->getRemoteNode().sendRequestToNode(req);
 }

@@ -4,7 +4,8 @@
 
 #include <p2p/log/Logger.h>
 #include <p2p/network/node/protocol/logic/sources/NetworkSource.h>
-#include <p2p/network/protocol/context/LogicContext.h>
+#include <p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h>
+#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
 #include "NetworkInfoResponse.h"
 
 
@@ -23,8 +24,8 @@ void NetworkInfoResponse::process(Context::Ptr context) {
     }
 
 
-//    NODECONTEXTLOGGER("Network response received " + std::to_string(this->getId()) + " " +
-//                      this->getNetworkInfo()->getNetworkId());
+    NODECONTEXTLOGGER("Network response received " + std::to_string(this->getId()) + " " +
+                      this->getNetworkInfo()->getNetworkId());
 
 
 }

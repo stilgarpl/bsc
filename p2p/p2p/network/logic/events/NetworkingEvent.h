@@ -11,10 +11,10 @@
 //};
 
 
-#include <p2p/network/protocol/connection/Connection.h>
+#include <p2p/modules/nodeNetworkModule/protocol/connection/Connection.h>
 #include <p2p/logic/IEvent.h>
-#include <p2p/network/protocol/context/ConnectionContext.h>
-#include <p2p/network/protocol/context/ProcessorContext.h>
+#include <p2p/modules/nodeNetworkModule/protocol/context/ConnectionContext.h>
+#include <p2p/modules/nodeNetworkModule/protocol/context/ProcessorContext.h>
 
 typedef Connection *ConnectionOriginPointer;
 

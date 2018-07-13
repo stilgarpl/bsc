@@ -9,7 +9,7 @@
 #include <repo/journal/network/logic/events/JournalRequestEvent.h>
 #include <repo/journal/network/logic/events/JournalResponseEvent.h>
 #include <repo/journal/network/packet/JournalGroup.h>
-#include <p2p/network/protocol/context/NodeContext.h>
+#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
 #include <repo/node/RepoModule.h>
 
 class JournalActions {

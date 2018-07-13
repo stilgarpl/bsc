@@ -6,7 +6,7 @@
 #define BASYCO_STORAGERESOURCEIDENTIFICATOR_H
 
 
-#include <p2p/filesystem/identification/ResourceIdentificator.h>
+#include <p2p/modules/filesystem/identification/ResourceIdentificator.h>
 #include <repo/repository/Repository.h>
 
 class StorageResourceIdentificator : public ResourceIdentificator {

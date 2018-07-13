@@ -2,7 +2,7 @@
 // Created by stilgar on 07.10.17.
 //
 
-#include <p2p/network/protocol/context/NodeContext.h>
+#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
 #include "NetworkActions.h"
 
 void NetworkActions::updateNetworkInfo(const NetworkInfoEvent &event) {

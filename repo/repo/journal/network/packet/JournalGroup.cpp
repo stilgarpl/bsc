@@ -4,7 +4,7 @@
 
 #include "JournalGroup.h"
 #include <repo/journal/network/logic/sources/JournalSource.h>
-#include <p2p/network/protocol/context/LogicContext.h>
+#include <p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h>
 
 void JournalGroup::Request::process(Context::Ptr context) {
     LOGGER("journal request process")

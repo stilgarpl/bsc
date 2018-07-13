@@ -3,7 +3,7 @@
 //
 
 #include <catch/catch.hpp>
-#include <p2p/network/node/modules/CommandModule.h>
+#include <p2p/modules/command/CommandModule.h>
 #include <repo/node/RepoModule.h>
 #include <p2p/network/node/modules/FilesystemModule.h>
 #include <p2p/network/node/modules/BasicModule.h>

@@ -85,6 +85,10 @@ public:
             return event;
         }
 
+        EventHelper() {}
+
+        EventHelper(const std::optional<EventId> &eventId) : eventId(eventId) {}
+
         friend class LogicChainHelper<EventType, Args...>;
     };
 
@@ -168,6 +172,11 @@ public:
     template<typename EventType, typename ... Args>
     EventHelper<EventType, Args...> event() {
         return EventHelper<EventType, Args...>();
+    }
+
+    template<typename EventType, typename ... Args>
+    EventHelper<EventType, Args...> event(typename EventType::IdType id) {
+        return EventHelper<EventType, Args...>(id);
     }
 
     template<typename EventType, typename ... Args>

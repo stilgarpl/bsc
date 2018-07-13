@@ -6,15 +6,15 @@
 #define BASYCO_FILESYSTEMMODULE_H
 
 
-#include <p2p/network/node/NodeModule.h>
+#include <p2p/node/NodeModule.h>
 #include <p2p/dependency/DependencyManaged.h>
 
 #include <experimental/filesystem>
-#include <p2p/filesystem/transfer/FileTransferDescriptor.h>
-#include <p2p/filesystem/network/logic/actions/TransferManager.h>
-#include <p2p/filesystem/identification/SimplePathRI.h>
+#include <p2p/modules/filesystem/transfer/FileTransferDescriptor.h>
+#include <p2p/modules/filesystem/network/logic/actions/TransferManager.h>
+#include <p2p/modules/filesystem/identification/SimplePathRI.h>
 
-#include "NodeNetworkModule.h"
+#include "p2p/modules/nodeNetworkModule/NodeNetworkModule.h"
 
 namespace fs = std::experimental::filesystem;
 

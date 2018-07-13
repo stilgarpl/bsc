@@ -2,10 +2,10 @@
 // Created by stilgar on 07.11.17.
 //
 
-#include <p2p/filesystem/network/logic/sources/FileSource.h>
-#include <p2p/filesystem/network/logic/actions/FileActions.h>
-#include <p2p/filesystem/transfer/FileTransferControl.h>
-#include <p2p/filesystem/network/logic/sources/TransferSource.h>
+#include <p2p/modules/filesystem/network/logic/sources/FileSource.h>
+#include <p2p/modules/filesystem/network/logic/actions/FileActions.h>
+#include <p2p/modules/filesystem/transfer/FileTransferControl.h>
+#include <p2p/modules/filesystem/network/logic/sources/TransferSource.h>
 #include "FilesystemModule.h"
 #include "BasicModule.h"
 

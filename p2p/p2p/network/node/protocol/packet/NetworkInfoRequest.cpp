@@ -4,10 +4,10 @@
 
 #include <p2p/context/Context.h>
 
-#include <p2p/network/protocol/packet/BasePacket.h>
+#include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
 #include "NetworkInfoResponse.h"
-#include <p2p/network/protocol/context/NodeContext.h>
-#include <p2p/network/protocol/context/ConnectionContext.h>
+#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/modules/nodeNetworkModule/protocol/context/ConnectionContext.h>
 
 #include "NetworkInfoRequest.h"
 

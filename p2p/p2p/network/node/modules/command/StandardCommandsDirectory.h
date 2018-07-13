@@ -8,7 +8,7 @@
 
 #include "ICommandsDirectory.h"
 #include <string>
-#include <p2p/network/node/modules/CommandModule.h>
+#include <p2p/modules/command/CommandModule.h>
 
 
 //@todo return type relevant?

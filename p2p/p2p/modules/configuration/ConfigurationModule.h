@@ -6,7 +6,7 @@
 #define BASYCO_CONFIGURATIONMODULE_H
 
 
-#include <p2p/network/node/NodeModule.h>
+#include <p2p/node/NodeModule.h>
 #include <p2p/network/node/modules/BasicModule.h>
 #include "ConfigurationManager.h"
 

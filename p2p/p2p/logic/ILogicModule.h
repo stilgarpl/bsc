@@ -7,8 +7,8 @@
 
 
 #include <p2p/logic/sources/AutoSource.h>
-#include <p2p/network/node/INodeModule.h>
-#include <p2p/network/node/INode.h>
+#include <p2p/node/INodeModule.h>
+#include <p2p/node/INode.h>
 #include "LogicManager.h"
 #include "LogicObject.h"
 

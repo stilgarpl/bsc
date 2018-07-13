@@ -5,10 +5,11 @@
 #ifndef BASYCO_REMOTENODE_H
 #define BASYCO_REMOTENODE_H
 
-#include <p2p/network/protocol/connection/ClientConnection.h>
+#include <p2p/modules/nodeNetworkModule/protocol/connection/ClientConnection.h>
 #include <Poco/Net/SocketAddress.h>
-#include <p2p/network/node/NodeInfo.h>
-#include <p2p/network/protocol/protocol/IProtocol.h>
+#include <p2p/node/NodeInfo.h>
+#include <p2p/modules/nodeNetworkModule/protocol/protocol/IProtocol.h>
+#include "NotRequestException.h"
 
 /**
  * a representation of remote nodes.
@@ -17,7 +18,7 @@
 class RemoteNode {
 private:
     std::optional<NodeInfo> nodeInfo;
-    std::shared_ptr<ClientConnection> connection;
+    std::shared_ptr<Connection> connection = nullptr;
     Context::OwnPtr _context = Context::makeContext();
     std::shared_ptr<IProtocol> protocol;
 
@@ -38,12 +39,19 @@ public:
         connection = nullptr;
     }
 
+    bool isConnected() {
+        //@todo refine to check actual connection state if that's possible?
+        return connection != nullptr;
+    }
+
     explicit RemoteNode(const std::shared_ptr<IProtocol> &protocol);
 
     template<enum Status status = Status::RESPONSE, typename SendType>
-    auto sendPacketToNode(NetworkPacketPointer<SendType> p) {
+    auto sendRequestToNode(NetworkPacketPointer<SendType> p) {
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
-
+        if (p->getStatus() != Status::REQUEST) {
+            throw NotRequestException();
+        }
         if (connection != nullptr) {
 
 //            LOGGER("sending packet to node " + nodeId)

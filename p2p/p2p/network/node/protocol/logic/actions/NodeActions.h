@@ -6,7 +6,7 @@
 #define BASYCO_NODEACTIONS_H
 
 
-#include <p2p/network/protocol/logic/events/ConnectionEvent.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/events/ConnectionEvent.h>
 #include <p2p/network/node/protocol/logic/events/NodeInfoEvent.h>
 #include <p2p/logic/events/Tick.h>
 #include "p2p/context/Context.h"

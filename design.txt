@@ -232,8 +232,8 @@ TODO:
 Context w IEvent - DONE
 setActiveContext(eventContext) - DONE
 RemoteNode- DONE
-RemoteNodeContext
-przenieść zarządzanie połączeniem z activeConnections do RemoteNode:
+RemoteNodeContext- DONE
+przenieść zarządzanie połączeniem z activeConnections do RemoteNode - DONE
 Poprawić metody z NodeNetModule, zeby uniknąć poprawiania większośći kodu, niech od teraz korzystają z RemoteNodes a nie z activeConnections
     * connectTo
     * sendPacketToNode
@@ -244,3 +244,9 @@ Poprawić metody z NodeNetModule, zeby uniknąć poprawiania większośći kodu,
 here's an idea: CONTEXT STACK! pushActiveContext, popActiveContext @todo think about it
 
 mysle, ze trzeba context przeniesc na shared_ptr. w tym momencie event trzyma context* i w przypadku gdy remote node zostanie usuniety, eventy z kolejek mogą zaliczyć segfaulty
+
+
+
+@todo really think about server side remote nodes.
+mam trochę taką niespójność - z jednej strony ConnectionContext daje dostęp do połączenia, z drugiej strony teraz mam Remote node które z grubsza dają to samo...
+z trzeciej strony mam jeszcze origin(), który w kolejny sposób duplikuje tę funkcjonalność.

@@ -6,7 +6,7 @@
 #define BASYCO_BASICMODULE_H
 
 
-#include <p2p/network/node/NodeModule.h>
+#include <p2p/node/NodeModule.h>
 #include <p2p/dependency/DependencyManaged.h>
 
 
