@@ -90,7 +90,7 @@ void setupModules(Node &node) {
 ////    WARN("closing");
 //    thisNode.stop();
 //    otherNode.stop();
-//    ///@todo stop() should join all threads, including poco ones. stopping the app before it has finished crashes the app
+//    //@todo stop() should join all threads, including poco ones. stopping the app before it has finished crashes the app
 //    std::this_thread::sleep_for(5s);
 //
 //

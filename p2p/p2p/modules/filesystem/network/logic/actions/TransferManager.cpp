@@ -39,7 +39,7 @@ void TransferManager::RemoteTransferDescriptor::setSize(TransferSize size) {
 void TransferManager::beginTransfer(const TransferEvent &event) {
     auto connection = event.origin();
     LOGGER("begin transfer")
-    ///@todo find transfer by resource id?
+    //@todo find transfer by resource id?
 
     std::shared_ptr<RemoteTransferDescriptor> descriptor = std::make_shared<RemoteTransferDescriptor>();
 
@@ -66,7 +66,7 @@ void TransferManager::beginTransfer(const TransferEvent &event) {
 }
 
 void TransferManager::finishTransfer(const TransferEvent &event) {
-    ///@todo some checking if valid?
+    //@todo some checking if valid?
     transfers.erase(event.getTransferId());
 
     //send response
@@ -98,21 +98,21 @@ void TransferManager::finishTransfer(const TransferEvent &event) {
 void TransferManager::sendData(const TransferEvent &event) {
     auto connection = event.origin();
     DataTransfer::Response::Ptr response = DataTransfer::Response::getNew(event.getRequestId());
-    ///@todo error on bad transfer id
+    //@todo error on bad transfer id
     auto transferDescriptor = transfers[event.getTransferId()];
 
     std::vector<char> fileContents;
-    ///@todo data are copied twice here, isn't there a better way? optimize when we have time
+    //@todo data are copied twice here, isn't there a better way? optimize when we have time
     if (transferDescriptor != nullptr && transferDescriptor->getInputStream() != nullptr) {
         transferDescriptor->getInputStream()->seekg(event.getBegin());
         char rawData[event.getEnd() - event.getBegin()];
         transferDescriptor->getInputStream()->read(rawData, event.getEnd() - event.getBegin());
         fileContents.assign(rawData, rawData + sizeof rawData / sizeof rawData[0]);
 
-        ///@todo insert ACTUAL begin and end read from stream (in case stream in shorter than requested)
+        //@todo insert ACTUAL begin and end read from stream (in case stream in shorter than requested)
         response->setBegin(event.getBegin());
         response->setEnd(event.getEnd());
-        ///@todo make sure this isn't copying the data for the third time
+        //@todo make sure this isn't copying the data for the third time
         response->setData(std::move(fileContents));
         connection->send(response);
     }
@@ -159,7 +159,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
         //before anything, set active context
         Context::setActiveContext(activeContext);
 
-        ///@todo get from config
+        //@todo get from config
         const TransferSize MAX_CHUNK_SIZE = 19500;
 //        LOGGER("download thread started")
         auto destinationStream = destination->getResourceOutputStream();

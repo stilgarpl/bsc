@@ -46,7 +46,7 @@ FileTransferControl::initiateTransfer(INode &node, const NodeIdType &nodeId, fs:
                 auto response = netnode->sendPacketToNode(nodeId, sendFileRequest);
 
                 // SendFile::Response* response;
-                ///@todo really, move it to some other class
+                //@todo really, move it to some other class
                 response->setFilePath(to);
                 response->save_file();
                 ret->setTransferredSize(file_size);

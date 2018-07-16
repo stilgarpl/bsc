@@ -16,7 +16,7 @@ typedef std::nullptr_t NullOrigin;
 template<typename OriginType>
 struct setupOrigin {
     static OriginType &setup(OriginType &origin) {
-        ///@todo log some error of unimplemented origin setup
+        //@todo log some error of unimplemented origin setup
 
         return origin;
     }

@@ -48,7 +48,7 @@ void TransmissionControl::onPacketSent(const PacketEvent &event) {
                 if (!packetPtr->isRetry()) {
                     //  NODECONTEXTLOGGER("S-REQUEST " + std::to_string(packetPtr->getId()));
 
-                    ///@todo pointer or something else
+                    //@todo pointer or something else
                     packetsWaitingForAck[packetPtr->getId()] = std::make_shared<BasePacketInfo>(packetPtr,
                                                                                                 event.getConnection(),
 
@@ -77,7 +77,7 @@ void TransmissionControl::work(const Tick &tick) {
 
 
     for (auto &&it : packetsWaitingForAck) {
-        ///@todo segfault here, probably from second/it being deleted in another event
+        //@todo segfault here, probably from second/it being deleted in another event
         if (tick.getNow() - it.second->getTimeSent() > MAX_TIMEOUT) {
             if (it.second->getConnection() != nullptr) {
                 LOGGER("Resending packet " + std::to_string(it.second->getPacketPtr()->getId()))

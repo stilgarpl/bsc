@@ -10,7 +10,7 @@
 
 class SimplePathRI : public ResourceIdentificator {
 
-    ///@todo c++17 implemented -> change it to path
+    //@todo c++17 implemented -> change it to path
     const std::string resourcePath;
 
 public:
@@ -26,7 +26,7 @@ public:
         ar(cereal::base_class<ResourceIdentificator>(this), resourcePath);
     }
 
-    ///@todo if this gives problems, just remove it and add default constructor
+    //@todo if this gives problems, just remove it and add default constructor
     template<class Archive>
     static void load_and_construct(Archive &ar, cereal::construct<SimplePathRI> &construct) {
         std::string path;

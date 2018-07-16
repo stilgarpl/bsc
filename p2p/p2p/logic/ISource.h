@@ -28,7 +28,7 @@ protected:
 
         sourceManager.event(event, args...);
 
-//        ///@todo pass to executor
+//        //@todo pass to executor
 //        Context::setActiveContext(&context);
 //        /*int a =*/ this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
 //        /*int b =*/ this->getSignal<T, Args...>().signal(event, args...);

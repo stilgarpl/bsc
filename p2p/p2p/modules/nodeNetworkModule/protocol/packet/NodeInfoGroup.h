@@ -17,7 +17,7 @@ struct NodeInfoGroup : public PacketGroup {
 
 
     class Request : public Packet<NodeInfoGroup, NodeInfoGroup::Request> {
-        ///@todo add optional id field - if empty, request is for this packet, if not, request is for node info for other known node
+        //@todo add optional id field - if empty, request is for this packet, if not, request is for node info for other known node
     private:
         template<class Archive>
         void serialize(Archive &ar) {

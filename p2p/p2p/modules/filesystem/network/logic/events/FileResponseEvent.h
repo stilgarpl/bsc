@@ -64,7 +64,7 @@ public:
         FileResponseEvent::data = data;
     }
 
-    ///@todo move saveFile from there and SendFile::Response to some other class.
+    //@todo move saveFile from there and SendFile::Response to some other class.
     void saveFile() const {
         if (!fs::exists(filePath)) {
             std::fstream f(filePath, std::ios_base::out | std::ofstream::binary);

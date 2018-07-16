@@ -46,7 +46,7 @@ bool FilesystemModule::assignActions(ILogicModule::AssignActionHelper &actionHel
         std::clog << "Debug: File assignment!" << std::endl;
 
 
-        ///@todo remove this debug:
+        //@todo remove this debug:
 
 //        actionHelper.setAction<ConnectionEvent>("fileSendDebug", [](const ConnectionEvent &event) {
 //

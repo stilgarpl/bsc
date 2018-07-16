@@ -25,7 +25,7 @@ public:
         if (repo != nullptr) {
             response->setExists(repo->getStorage()->hasResource(event.getObjectId()));
         } else {
-            ///@todo maybe add another response? repository not found?
+            //@todo maybe add another response? repository not found?
             response->setExists(false);
         }
         connection->send(response);

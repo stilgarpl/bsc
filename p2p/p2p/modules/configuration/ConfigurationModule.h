@@ -19,10 +19,10 @@ public:
     void save(const ConfigurationManager::IdType &id, std::shared_ptr<IConfig> config);
 
 
-    ///@todo Concepts: T extends IConfig
+    //@todo Concepts: T extends IConfig
     template<typename T>
     std::shared_ptr<T> load(const ConfigurationManager::IdType &id) {
-        ///@todo make new or ...
+        //@todo make new or ...
         ///if load failed, create defaults
 
         auto ret = manager.load<T>(id);

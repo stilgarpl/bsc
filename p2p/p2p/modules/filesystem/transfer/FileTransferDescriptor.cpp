@@ -54,7 +54,7 @@ void FileTransferDescriptor::setTransferredSize(size_t transferredSize) {
 
 FileTransferDescriptor::~FileTransferDescriptor() {
 
-    ///@todo kill the thread or something.
+    //@todo kill the thread or something.
     if (thread != nullptr && thread->joinable()) {
         thread->join();
     }

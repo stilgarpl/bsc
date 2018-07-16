@@ -72,7 +72,7 @@ Node::Node(int port) : Node() {
 //    config->setPort(port);
 //    setConfiguration(config);
 
-    ///@todo debug remove
+    //@todo debug remove
 //    ConfigurationManager manager;
 //    manager.save("Node", config);
 
@@ -115,7 +115,7 @@ void Node::initialize() {
 //        item->setupLogic(logicManager);
 //    }
 
-//    ///@todo debug values
+//    //@todo debug values
     configurationManager.setRootPath(fs::path("/tmp/basyco") / this->getNodeInfo().getNodeId());
 //
 //    modules.forEach([&](INodeModulePtr ptr){
@@ -143,7 +143,7 @@ void Node::joinModules() {
 
 void Node::waitToFinish() {
     logicManager.join();
-    ///@todo replace this with waiting for modules
+    //@todo replace this with waiting for modules
     std::this_thread::sleep_for(1s);
 
 }

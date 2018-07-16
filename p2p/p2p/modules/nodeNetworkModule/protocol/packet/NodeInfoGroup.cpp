@@ -25,7 +25,7 @@ void NodeInfoGroup::Request::process(Context::Ptr context) {
         response->setNodeInfo(nodeInfo);
         connectionContext->getConnection().send(response);
     } else {
-        ///@todo error level
+        //@todo error level
         LOGGER("ERROR: Node Context not found!");
     }
 }

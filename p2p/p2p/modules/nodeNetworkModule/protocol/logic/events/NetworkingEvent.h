@@ -18,7 +18,7 @@
 
 typedef Connection *ConnectionOriginPointer;
 
-///@todo I'm thinking about removing setupOrigin and just make NetworkingEvent as a separate class and set it up in the constructor
+//@todo I'm thinking about removing setupOrigin and just make NetworkingEvent as a separate class and set it up in the constructor
 ///it will work the same for the rest of the lib, so it's not a problem, I can change it later
 template<>
 struct setupOrigin<ConnectionOriginPointer> {
@@ -52,7 +52,7 @@ public:
         NetworkingEvent::requestId = requestId;
     }
 
-    ///@todo remove this from derived classes, now that id is set from context
+    //@todo remove this from derived classes, now that id is set from context
     NetworkingEvent(BasePacket::IdType requestId) : requestId(requestId) {}
 
     NetworkingEvent() = default;

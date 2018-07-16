@@ -44,7 +44,7 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Node &
           IServerConnection(std::move(context)), serverNode(serverNode) {
 
     Context::setActiveContext(getConnectionContext());
-    ///@todo observer pattern?
+    //@todo observer pattern?
     serverNode.getModule<NodeNetworkModule>()->addAcceptedConnection(this);
     auto lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
@@ -63,7 +63,7 @@ void ServerConnection::stopReceiving() {
 
 ServerConnection::~ServerConnection() {
     //  LOGGER("Server conn dest");
-    ///@todo remove this, we have an event for this now -- this would also remove ServerConnection dependency on Node. it would make things much simpler
+    //@todo remove this, we have an event for this now -- this would also remove ServerConnection dependency on Node. it would make things much simpler
     serverNode.getModule<NodeNetworkModule>()->removeAcceptedConnection(this);
     stop();
 }

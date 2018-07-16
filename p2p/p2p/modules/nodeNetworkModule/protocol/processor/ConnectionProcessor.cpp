@@ -34,7 +34,7 @@ void ConnectionProcessor::run() {
             processorContext->setThisPacket(np);
             np->process(context);
         } else {
-            ///@todo error handling
+            //@todo error handling
         }
 
     }

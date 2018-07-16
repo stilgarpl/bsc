@@ -12,7 +12,7 @@ typedef uintmax_t TransferSize;
 typedef std::vector<char> RawDataType;
 
 
-///@todo think about one thing: this enum serves two purposes - as transfer status indicator and as event id type - maybe it should be separated into two enums? or not
+//@todo think about one thing: this enum serves two purposes - as transfer status indicator and as event id type - maybe it should be separated into two enums? or not
 enum class TransferStatus {
     REQUESTED, //transfer start has been requested
     STARTED, //transfer was started, data transfer can begin

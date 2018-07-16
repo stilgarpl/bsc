@@ -25,7 +25,7 @@ protected:
 public:
     typedef std::shared_ptr<EventType_> EventTypePtr;
 private:
-    ///@todo thread safety
+    //@todo thread safety
     std::mutex queueLock;
     std::queue<EventTypePtr> eventQueue;
 protected:
@@ -37,10 +37,10 @@ protected:
     template<typename ... Args>
     EventTypePtr newEvent(Args... args) {
         auto ret = std::make_shared<EventType_>(args...);
-        ///@todo think about setup method and make it better and cleaner? I'm not fond of the interface
+        //@todo think about setup method and make it better and cleaner? I'm not fond of the interface
 //        LOGGER(typeid(EventType_).name())
         EventType::setup(ret.get());
-        ///@todo shouldn't this be in the EventType (IEvent) constructor?
+        //@todo shouldn't this be in the EventType (IEvent) constructor?
         setupOrigin<typename EventType::OriginType>::setup(ret->origin());
         return ret;
     }
@@ -52,7 +52,7 @@ public:
         queueLock.lock();
         while (!eventQueue.empty()) {
             //  NODECONTEXTLOGGER("Processing event");
-            ///@todo better locking and unlocking of mutex
+            //@todo better locking and unlocking of mutex
 
             EventTypePtr i = eventQueue.front();
             eventQueue.pop();

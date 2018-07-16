@@ -250,3 +250,14 @@ mysle, ze trzeba context przeniesc na shared_ptr. w tym momencie event trzyma co
 @todo really think about server side remote nodes.
 mam trochę taką niespójność - z jednej strony ConnectionContext daje dostęp do połączenia, z drugiej strony teraz mam Remote node które z grubsza dają to samo...
 z trzeciej strony mam jeszcze origin(), który w kolejny sposób duplikuje tę funkcjonalność.
+======================================================================
+
+pora na auth.
+
+BasePacket powinien mieć requiredRoles(). w przypadku variadic roles mozna zrobic mechanizm, który przy dodawaniu nowego typu roli dodaje nową lambdę która po tym typie iteruje ubera
+
+Processor powinien mieć Filter, które dla przychodzącego pakietu sprawdza role i go zatwierdza lub nie, zgodnie z Rules
+
+Rules -przydałoby się ładne definiowanie jak w przypadku logic managera
+packet<NodeInfo::Request>().requiresRole("admin");
+when(packet<NodeInfo::Request>()).checkRole("admin").onFail(drop());

@@ -28,7 +28,7 @@ void NetworkInfoRequest::process(Context::Ptr context) {
         response->setNetworkInfo(node.getNetworkInfo());
         connectionContext->getConnection().send(response);
     } else {
-        ///@todo error level
+        //@todo error level
         LOGGER("Node Context not found!");
     }
 

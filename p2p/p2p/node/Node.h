@@ -21,7 +21,6 @@
 #include <p2p/role/RoleScope.h>
 #include <p2p/modules/configuration/ConfigurationManager.h>
 
-///@todo separate interface so NodeInfo can include INode, and Node can include NodeInfo
 
 class NodeActions;
 
@@ -29,7 +28,7 @@ class NodeActions;
 
 class Node : public INode, public RoleScope {
 public:
-    typedef unsigned int IdType; ///@todo replace it with a real id, hash or something
+    typedef unsigned int IdType; //@todo replace it with a real id, hash or something
 
 public:
 private:
@@ -43,7 +42,7 @@ private:
     }
 
 public:
-    ///@todo testing...
+    //@todo testing...
     void setNodeContextActive() {
         Context::setActiveContext(nodeContext);
     }
@@ -97,7 +96,6 @@ public:
 
     explicit Node(int port);
 
-    ///@todo remove this function
     LogicManager &getLogicManager() override {
         return logicManager;
     }
@@ -109,15 +107,11 @@ public:
     void addToNetwork(const NetworkIdType &networkId) {
         networkInfo = std::make_shared<NetworkInfo>();
         networkInfo->setNetworkId(networkId);
-        ///@todo this shouldn't be set twice... or should it?
+        //@todo this shouldn't be set twice... or should it?
         thisNodeInfo.setNetworkId(networkId);
     }
 
     std::shared_ptr<NetworkInfo> &getNetworkInfo();
-
-    ///@todo move those random methods somewhere else:
-
-
 
     friend class NodeActions;
 

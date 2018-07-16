@@ -85,7 +85,7 @@ public:
 };
 
 
-///@todo how to empty template?
+//@todo how to empty template?
 class Dependency1 : public IDependency {
 
 public:

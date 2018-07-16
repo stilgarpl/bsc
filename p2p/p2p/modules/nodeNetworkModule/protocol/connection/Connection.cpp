@@ -29,7 +29,7 @@ BasePacketPtr Connection::receive() {
         //receiveReady.wait(g);
     }
     if (!receiving) {
-        ///@todo error handling, maybe throw exception?
+        //@todo error handling, maybe throw exception?
         return nullptr;
     } else {
         ///clion says it's an error. clion is WRONG.
@@ -113,11 +113,11 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
     Context::setActiveContext(getConnectionContext());
     auto lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
-    ///@todo totally replace all connection source references here with observer pattern
+    //@todo totally replace all connection source references here with observer pattern
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
     Poco::Net::SocketInputStream is(socket);
-    ///@attention is it ok to start it here?
+    //@attention is it ok to start it here?
     processor.start();
     while (receiving) {
         cereal::BinaryInputArchive ia(is);
@@ -127,7 +127,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
             try {
                 while (!socket.available() && receiving /*&&
                        socket.poll(Poco::Timespan(1, 1), Poco::Net::Socket::SELECT_READ)*/) {
-                    ///@todo not like this
+                    //@todo not like this
                     std::this_thread::sleep_for(1ms);
                 }
                 if (receiving && socket.available()) {
@@ -149,7 +149,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                             receiveReady.notify_all();
                             //   std::cout << "work::receive qs " << receiveQueue.size() << std::endl;
                             // logic.processPacket(v);
-                            ///@todo maybe move this to processor?
+                            //@todo maybe move this to processor?
                             //@todo remove dependency on connectionSource, add generic observers instead, connectionSource should be an observer
                             if (connectionSourcePtr != nullptr) {
                                 //   LOGGER("CONNECTION SOURCE ISNT NULL")
@@ -168,7 +168,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 //                    LOGGER("TIMEOUT! CLOSING CONNECTION!")
 //                    stopReceiving();
 //                    stopSending();
-//                    ///@todo trigger event?
+//                    //@todo trigger event?
 //                }
             }
             catch (cereal::Exception e) {

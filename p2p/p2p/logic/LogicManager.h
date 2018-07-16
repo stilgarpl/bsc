@@ -118,7 +118,7 @@ public:
     }
 
 //
-//    ///@todo think about it -> I'm not convinced event generation should be here (events should be fired from sources), but it's required by ILogicModule smart logic setup (I could make a separate source just for that... )
+//    //@todo think about it -> I'm not convinced event generation should be here (events should be fired from sources), but it's required by ILogicModule smart logic setup (I could make a separate source just for that... )
 //    template<typename T, typename... Args>
 //    void event(const T &event, Args... args) {
 //

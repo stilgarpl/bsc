@@ -32,7 +32,7 @@ protected:
     void executeTask(std::function<void(void)> task) override;
 };
 
-///@todo add ThreadPoolExecutor
+//@todo add ThreadPoolExecutor
 
 
 #endif //BASYCO_EXECUTOR_H

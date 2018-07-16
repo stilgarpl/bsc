@@ -27,7 +27,7 @@ Runnable::~Runnable() {
 
 void Runnable::stop() {
     stopping = true;
-    ///@todo kill ? join?
+    //@todo kill ? join?
 
 }
 

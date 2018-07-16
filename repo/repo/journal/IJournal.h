@@ -22,7 +22,7 @@ public:
 public:
     typedef std::function<void(const JournalStateData &)> Func;
     typedef std::map<JournalMethod, std::optional<Func>> FuncMap;
-    ///@todo I'm not sure this should be in the interface...
+    //@todo I'm not sure this should be in the interface...
     typedef std::shared_ptr<JournalState> JournalStatePtr;
     typedef std::vector<std::shared_ptr<JournalState>> JournalHistory;
     typedef std::shared_ptr<IJournal> JournalPtr;
@@ -31,7 +31,7 @@ public:
 
     virtual void commitState() =0;
 
-    ///@todo add parameters, commit range or sth
+    //@todo add parameters, commit range or sth
     virtual void replay() = 0;
 
 private:

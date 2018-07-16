@@ -16,7 +16,7 @@ enum class PacketEventId {
 
 class PacketEvent : public IEvent<PacketEventId> {
 private:
-    ///@todo maybe merge with ConnectionEvent?
+    //@todo maybe merge with ConnectionEvent?
     BasePacketPtr packet;
     Connection *connection;
 

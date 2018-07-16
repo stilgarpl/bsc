@@ -26,7 +26,7 @@ public:
     template<typename T, typename... Args>
     using SignalType = Signal<const T &, Args...>;
 
-    ///@todo dlaczego właściwie te sygnały w mapie są jako pointery?
+    //@todo dlaczego właściwie te sygnały w mapie są jako pointery?
     /// jeśli mogą być niezdefiniowane, no to trzeba robic std::optional
     ///ale ja zwracam referki i tak, więc moze lepiej w mapie przechowywac te sygnaly tak po prostu?
     template<typename T, typename... Args>
@@ -45,7 +45,7 @@ public:
     template<typename T, typename... Args>
     void event(const T &event, Args... args) {
 
-        ///@todo pass to executor
+        //@todo pass to executor
 //        Context::setActiveContext(&commonContext);
         Context::Ptr previousContext = Context::getActiveContext();
         Context::setActiveContext(event.context());
@@ -117,9 +117,9 @@ public:
 //
 private:
     SourceList sources;
-    ///@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
+    //@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
     Uber<Type> sourcesByType;
-    ///@todo maybe this should just be a reference to node context?
+    //@todo maybe this should just be a reference to node context?
     Context::OwnPtr commonContext = Context::makeContext();
 public:
 

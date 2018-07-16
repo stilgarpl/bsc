@@ -51,7 +51,7 @@ protected:
 
     template<typename ... Args>
     void setRequired() {
-        ///@todo remove duplicates
+        //@todo remove duplicates
         if constexpr (sizeof... (Args) >= 1) {
             required = std::make_shared<Dependency<Args...>>();
         }

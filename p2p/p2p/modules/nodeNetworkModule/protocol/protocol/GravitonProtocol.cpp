@@ -8,7 +8,7 @@
 void GravitonProtocol::onPacketSent(const PacketEvent &event) {
     std::lock_guard<std::mutex> g(lock);
 //    NODECONTEXTLOGGER("onPacketSent" + std::to_string(event.getPacket()->getId()));
-    ///@todo maybe check if packet is in the response map?
+    //@todo maybe check if packet is in the response map?
 }
 
 void GravitonProtocol::onPacketReceived(const PacketEvent &event) {

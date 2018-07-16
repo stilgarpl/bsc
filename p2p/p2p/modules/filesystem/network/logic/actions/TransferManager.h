@@ -111,7 +111,7 @@ public:
         }
 
         virtual ~LocalTransferDescriptor() {
-            ///@todo kill the thread or something.
+            //@todo kill the thread or something.
             if (thread != nullptr && thread->joinable()) {
                 thread->join();
             }
@@ -136,7 +136,7 @@ private:
 public:
     void beginTransfer(const TransferEvent &event);
     void transferError(const TransferEvent &event) {
-///@todo
+//@todo
     }
 
     void finishTransfer(const TransferEvent &event);

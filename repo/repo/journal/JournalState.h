@@ -113,7 +113,7 @@ private:
 public:
     void add(const JournalStateData &data);
 
-    ///@template change it to something else? probably some kind of replay mechanism?
+    //@template change it to something else? probably some kind of replay mechanism?
     const std::list<JournalStateData> &getDataList() const;
 
     void setDataList(const std::list<JournalStateData> &dataList);

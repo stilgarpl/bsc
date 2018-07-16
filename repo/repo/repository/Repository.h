@@ -22,7 +22,7 @@ private:
     std::shared_ptr<IStorage> storage;
 
 
-    ///@todo maybe some class instead of just PathType?
+    //@todo maybe some class instead of just PathType?
     std::map<PathType, ResourceId> fileMap;
 
 public:

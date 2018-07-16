@@ -6,7 +6,7 @@
 #include <p2p/log/Logger.h>
 
 ResourceId SimpleJournal::getChecksum() {
-    ///@todo calculate checksum?
+    //@todo calculate checksum?
     return checksum;
 }
 
@@ -20,7 +20,7 @@ void SimpleJournal::commitState() {
         auto prev = currentState;
         currentState = std::make_shared<JournalState>();
         currentState->setPreviousState(prev);
-        ///@todo do it here?
+        //@todo do it here?
         this->calculateChecksum();
     }
 }
@@ -28,7 +28,7 @@ void SimpleJournal::commitState() {
 void SimpleJournal::replay() {
 
     for (auto &&it : journalHistory) {
-        ///@todo I would like to remove getDataList and just pass the Func to it somehow
+        //@todo I would like to remove getDataList and just pass the Func to it somehow
         for (auto &&jt : it->getDataList()) {
             LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath());
             auto &func = funcMap[jt.getMethod()];
@@ -72,7 +72,7 @@ bool SimpleJournal::merge(const std::shared_ptr<SimpleJournal> other) {
             auto checksum = i->getChecksum();
             return checksum != i->calculateChecksum();
         }), otherCopy.end());
-        ///@todo check signature (when I add it)
+        //@todo check signature (when I add it)
 
 
         //copy all elements to thisCopy

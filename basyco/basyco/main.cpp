@@ -252,7 +252,7 @@ protected:
 
 public:
     void flush() {
-        ///@todo the size of this parameter should be constant, so no sizeof but 4 or 8 bytes ALWAYS
+        //@todo the size of this parameter should be constant, so no sizeof but 4 or 8 bytes ALWAYS
         for (unsigned int i = 0; i < sizeof(buffer.size()); ++i) {
             auto c = static_cast<char>((buffer.size() & 0xFF << i * 8) >> i * 8);
             dst << c;
@@ -457,7 +457,7 @@ int main(int argc, char *argv[]) {
 //    setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
     thirdNode.start();
 
-    ///@todo this is required so logic is set up before connecting. change it so start wait until the end of the initialization phase
+    //@todo this is required so logic is set up before connecting. change it so start wait until the end of the initialization phase
     // std::this_thread::sleep_for(1000ms);
 
     thisNode.getNodeInfo().printAll();

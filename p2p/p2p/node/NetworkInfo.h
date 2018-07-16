@@ -36,7 +36,7 @@ public:
 
     NetworkInfo &operator+=(const NetworkInfo &other) {
         if (networkId == other.networkId) {
-            ///@todo merge known nodes
+            //@todo merge known nodes
             for (auto &&i : other.knownNodes) {
                 addKnownNode(i.second);
             }

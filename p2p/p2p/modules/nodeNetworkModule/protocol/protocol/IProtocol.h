@@ -64,7 +64,7 @@ public:
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
         auto future = send(conn, p, status);
         //future.wait();
-        ///@todo check if there is a way to do it without exceptions, maybe .valid() ?
+        //@todo check if there is a way to do it without exceptions, maybe .valid() ?
         try {
             auto ret = future.get();
 
@@ -93,7 +93,7 @@ public:
         ReturnValue returnValue;
         auto future = send(conn, p, Status::RESPONSE);
         //future.wait();
-        ///@todo check if there is a way to do it without exceptions, maybe .valid() ?
+        //@todo check if there is a way to do it without exceptions, maybe .valid() ?
         try {
             auto ret = future.get();
 

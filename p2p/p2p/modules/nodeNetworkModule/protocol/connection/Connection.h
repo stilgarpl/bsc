@@ -62,7 +62,7 @@ public:
 protected:
 
 public:
-    ///@todo @fixme there is a problem, that sometimes last packet is not being sent. flushing doesn't help. Poco is stupid. Consider replacing poco with different lib
+    //@todo @fixme there is a problem, that sometimes last packet is not being sent. flushing doesn't help. Poco is stupid. Consider replacing poco with different lib
     void send(BasePacketPtr np);
 
     BasePacketPtr receive();

@@ -19,7 +19,7 @@ public:
     initiateTransfer(INode &node, const NodeIdType &nodeId, fs::path sourcePath, fs::path destinationPath);
 
 
-    ///@todo add resumeTransfer() for files that were interrupted
+    //@todo add resumeTransfer() for files that were interrupted
 };
 
 

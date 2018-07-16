@@ -55,7 +55,7 @@ void CommandModule::initialize() {
 
 void CommandModule::sendRemoteCommand(const std::vector<std::string> &args) {
     LOGGER("send remote")
-    ///@todo add checking if the number of parameters is correct
+    //@todo add checking if the number of parameters is correct
     if (args.size() >= 2) {
         std::string nodeId = args[0];
         std::string command = args[1];

@@ -15,7 +15,7 @@ class DummyCommandEvent : public IEvent<int> {
 
 };
 
-///@todo remove class
+//@todo remove class
 class Dupa {
 private:
     int a;
@@ -72,7 +72,7 @@ public:
             auto command = parent.node.getModule<CommandModule>();
             ///long cast is sad :( to_string should have size_t overload
             ///std::to_string((long) sizeof...(Args))
-            ///@todo prefix or sth, problem is that size of args breaks raw functions that are random
+            //@todo prefix or sth, problem is that size of args breaks raw functions that are random
             mapCommand(" ", commandName,
                        [=](CommandModule::ArgumentContainerType vals) {
                            runMemberFunction(*mod, f, vals);
@@ -90,17 +90,17 @@ public:
         };
 
         bool runCommand(std::string commandName, ArgumentContainerType arguments) {
-            ///@todo integrate duplicate code with CommandModule somehow
+            //@todo integrate duplicate code with CommandModule somehow
             if (submodules.count(commandName) > 0 && arguments.size() > 1) {
                 //command is a submodule, redirecting
-                ///@todo type
+                //@todo type
                 std::vector<std::string> newArguments(arguments.begin() + 1, arguments.end());
                 std::string newCommand = (*arguments.begin());
                 return submodule(commandName).runCommand(newCommand, newArguments);
                 // return false;
             } else {
                 //command is mapped to this module, execute
-                std::string prefix = " "; ///@todo raw pointers and this is colliding std::to_string(arguments.size());
+                std::string prefix = " "; //@todo raw pointers and this is colliding std::to_string(arguments.size());
                 LOGGER("Running module " + prefix + " command " + commandName);
                 std::string key = prefix + ":::" + commandName;
                 auto &map = getCommandMap();
@@ -169,10 +169,10 @@ public:
     template<typename ModuleType, typename RetType, typename ... Args>
     void mapCommand(std::string commandName, RetType (ModuleType::*f)(Args... args)) {
 
-        ///@todo check if commandName is a module name
-        ///@todo also check for collsions in creating submodules
+        //@todo check if commandName is a module name
+        //@todo also check for collsions in creating submodules
         if (submodules.count(commandName) > 0) {
-            ///@todo exception, return false or sth.
+            //@todo exception, return false or sth.
             LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
         }
 
@@ -183,10 +183,10 @@ public:
     template<typename ModuleType, typename RetType>
     void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerType)) {
 
-        ///@todo check if commandName is a module name
-        ///@todo also check for collsions in creating submodules
+        //@todo check if commandName is a module name
+        //@todo also check for collsions in creating submodules
         if (submodules.count(commandName) > 0) {
-            ///@todo exception, return false or sth.
+            //@todo exception, return false or sth.
             LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
         }
 
@@ -197,7 +197,7 @@ public:
     bool runCommand(std::string commandName, ArgumentContainerType arguments) {
 
         if (submodules.count(commandName) > 0 && arguments.size() > 1) {
-            ///@todo type
+            //@todo type
             std::vector<std::string> newArguments(arguments.begin() + 1, arguments.end());
             std::string newCommand = (*arguments.begin());
             return submodule(commandName).runCommand(newCommand, newArguments);
@@ -264,7 +264,7 @@ public:
     }
 
     void run() {
-        ///@todo restart this if flag changes later?
+        //@todo restart this if flag changes later?
         if (interactive) {
             runInteractive();
         }

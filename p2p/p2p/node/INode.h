@@ -32,7 +32,7 @@ public:
 
 //    virtual void runModuleMod(std::function<void()> method,INodeModulePtr module) = 0;
 
-public: //@todo should it be public?
+private:
     std::mutex &getLock() {
         return lock;
     }
@@ -45,7 +45,7 @@ public:
 
     template<typename ModuleType>
     void addModule() {
-        ///@todo check if module exist before overwriting?
+        //@todo check if module exist before overwriting?
         if (modules.get<ModuleType>() == nullptr) {
             modules.get<ModuleType>() = std::make_shared<ModuleType>(std::ref(*this));
         } else {

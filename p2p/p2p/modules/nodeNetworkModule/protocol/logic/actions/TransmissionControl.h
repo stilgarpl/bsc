@@ -13,7 +13,7 @@
 
 #include "BasePacketInfo.h"
 
-///@todo move to configuration
+//@todo move to configuration
 static const Tick::clock::duration MAX_TIMEOUT = 5500ms;
 
 class TransmissionControl /*: IProtocol*/{

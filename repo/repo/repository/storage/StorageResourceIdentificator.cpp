@@ -33,7 +33,7 @@ uintmax_t StorageResourceIdentificator::getResourceSize() {
     if (repo != nullptr) {
         return fs::file_size(repo->getStorage()->getResourcePath(objectId));
     } else {
-        ///@todo throw error or sth?
+        //@todo throw error or sth?
         return 0;
     }
 }

@@ -19,7 +19,7 @@ void InternalStorage::store(const ResourceId &checksum, const size_t &size, cons
         //FILE IS OK
         LOGGER("CHECKSUM IS OK, COPYING TO INTERNAL STORAGE");
 
-        ///@TODO handle directories
+        //@TODO handle directories
         fs::copy(sourcePath, getResourcePath(getResourceId(checksum, size)));
     }
 
@@ -46,7 +46,7 @@ InternalStorage::restore(const ResourceId &checksum, const size_t &size, const P
         StorageQuery::Request::Ptr req = StorageQuery::Request::getNew();
         req->setRepositoryId(repository->getRepositoryId());
         req->setObjectId(resourceId);
-        ///@todo this will wait for response, potentially blocking Repository
+        //@todo this will wait for response, potentially blocking Repository
         auto response = netModule->broadcastPacket(req);
         TransferManager::LocalTransferDescriptorPtr transfer = nullptr;
 
@@ -70,7 +70,7 @@ InternalStorage::restore(const ResourceId &checksum, const size_t &size, const P
 
 
     if (restoreFile) {
-        ///@todo catch filesystem exceptions or use no except version
+        //@todo catch filesystem exceptions or use no except version
         fs::copy(resourcePath, destinationPath);
     }
 
@@ -119,14 +119,14 @@ bool InternalStorage::hasResource(const IStorage::ResourceId &resourceId) const 
 }
 
 std::shared_ptr<std::iostream> InternalStorage::getResourceStream(const ResourceId &resourceId) {
-    ///@todo make sure resource exists
+    //@todo make sure resource exists
 
     if (!fs::exists(getResourcePath(resourceId))) {
         std::fstream f(getResourcePath(resourceId), std::ios_base::out | std::ofstream::binary);
         f.close(); //file now always exists
     }
 
-    ///@todo separate input and output resources?
+    //@todo separate input and output resources?
     return std::make_shared<std::fstream>(getResourcePath(resourceId),
                                           std::ios::in | std::ios::out | std::fstream::binary);
 }

@@ -48,10 +48,10 @@ void NodeNetworkModule::setupActions(ILogicModule::SetupActionHelper &actionHelp
 //                                            });
 
 //    actionHelper.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_SERVER, [&](const ConnectionEvent &event) {
-//        ///@todo do something about this dynamic cast
+//        //@todo do something about this dynamic cast
 //        this->removeAcceptedConnection(dynamic_cast<IServerConnection *>(event.getConnection()));
 //    });
-///@todo reenable
+//@todo reenable
 //    actionHelper.setAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
 //                                        [&transmissionControl](
 //                                                const PacketEvent &packetEvent) {
@@ -105,7 +105,7 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     }
 
-    ///@todo upNoI powinno cos takiego robic, addKnownNode powinien byc wywolany tylko w przypadku
+    //@todo upNoI powinno cos takiego robic, addKnownNode powinien byc wywolany tylko w przypadku
     if (actionHelper.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "addKnownNode")) {
         std::clog << "Debug: addKnownNode assignment!" << std::endl;
 
@@ -126,7 +126,7 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
     //send keepalives - I tried using it to help with the packet loss, but it didn't work.
     when(event<Tick>(120s)).fireNewAction(
             [&, this](auto e) { this->broadcastPacket(KeepAlivePacket::Request::getNew()); });
-    ///@todo real value
+    //@todo real value
     return true;
 }
 
@@ -148,7 +148,7 @@ bool NodeNetworkModule::setupLogic() {
 
 
 void NodeNetworkModule::updateNodeConnectionInfo() {
-    ///@todo this is wrong, it blocks connections until its done.
+    //@todo this is wrong, it blocks connections until its done.
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
     //   std::lock_guard<std::mutex> g1(node.getLock());
     // std::thread([&]() {
@@ -168,7 +168,7 @@ void NodeNetworkModule::updateNodeConnectionInfo() {
 //                item->nodeId = val;
 //            } else {
 //                //response not received, connection probably is down
-//                ///@todo decide what do to, disconnecting for now
+//                //@todo decide what do to, disconnecting for now
 //                item->connection->shutdown();
 //            }
 //        }
@@ -232,7 +232,7 @@ void NodeNetworkModule::addAcceptedConnection(IServerConnection *c) {
 
 void NodeNetworkModule::stopAcceptedConnections() {
     std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
-    ///@todo this segfaults, why bother stopping those connections? stopping the poco server should stop them anyway.
+    //@todo this segfaults, why bother stopping those connections? stopping the poco server should stop them anyway.
     for (auto &&it : acceptedConnections) {
         if (it != nullptr)
             it->stop();
@@ -247,19 +247,19 @@ void NodeNetworkModule::listen() {
 //        unsigned short port = 6777;
         //@TODO numer portu dac z configuracji
         //@todo FIX THAT CAST
-        ////@todo sprawdzanie bledow z bindowania socketa
-        ///@todo ConfigurationModule
+        ///@todo sprawdzanie bledow z bindowania socketa
+        //@todo ConfigurationModule
 //        if (((Node *) &node)->getConfiguration() != nullptr) {
 //            port = ((Node *) &node)->getConfiguration()->getPort();
 //        }
 
-        ///@todo configuration should be loaded on demand, not here
+        //@todo configuration should be loaded on demand, not here
 //        auto loadedConfig = node.getModule<ConfigurationModule>()->load<Config>("network");
 //        if (loadedConfig != nullptr) {
 //            configuration() = *loadedConfig;
 //        }
 
-//        ///@todo debug
+//        //@todo debug
 //        node.getModule<ConfigurationModule>()->save("network", loadedConfig);
         serverSocket = std::make_shared<ServerSocket>(configuration().getPort());
         LOGGER(std::string("Opening port") + std::to_string(configuration().getPort()));
@@ -298,7 +298,7 @@ void NodeNetworkModule::onStart() {
 void NodeNetworkModule::run() {
     NodeModule::run();
 
-    ///@todo find a bettter way to trigger onStop after run
+    //@todo find a bettter way to trigger onStop after run
     while (!isStopping()) {
         std::this_thread::sleep_for(400ms);
     }
@@ -312,7 +312,7 @@ void NodeNetworkModule::run() {
 //        }
 //    }
 //    if (conn == nullptr) {
-//        ///@todo connect to node
+//        //@todo connect to node
 //    }
 //
 //    if (conn != nullptr) {

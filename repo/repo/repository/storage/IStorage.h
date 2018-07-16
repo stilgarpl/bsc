@@ -38,8 +38,8 @@ public:
     virtual void sync(const NodeIdType &nodeID)=0;
 
 
-    ///@todo remove, I think - this is required for resource transfer between nodes, but streams should do that.
-    ///@todo or not remove, but make it protected
+    //@todo remove, I think - this is required for resource transfer between nodes, but streams should do that.
+    //@todo or not remove, but make it protected
     virtual fs::path getResourcePath(const ResourceId &resourceId) const =0;
 
     virtual std::shared_ptr<std::iostream> getResourceStream(const ResourceId &resourceId) =0;

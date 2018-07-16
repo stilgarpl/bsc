@@ -17,7 +17,7 @@ class NodeModule : public ILogicModule {
 
 
 public:
-    ///@todo pure or not?
+    //@todo pure or not?
     virtual void initialize() {};
 
     explicit NodeModule(INode &node) : ILogicModule(node) {}

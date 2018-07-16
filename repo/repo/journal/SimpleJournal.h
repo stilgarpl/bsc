@@ -37,7 +37,7 @@ public:
     void commitState() override;
 
     void checkCurrentState() {
-        ///@todo this is wrong. last state is commited it should be current->setPrev(last)
+        //@todo this is wrong. last state is commited it should be current->setPrev(last)
 //        if (currentState == nullptr && journalHistory.size() > 0) {
 //            currentState = findLastState();
 //        }
@@ -55,7 +55,7 @@ public:
 
     void prepareState();
 
-    ///@todo hmm hmm variadic template?
+    //@todo hmm hmm variadic template?
     void append(JournalMethod method, PathType path);
 
     void replay() override;

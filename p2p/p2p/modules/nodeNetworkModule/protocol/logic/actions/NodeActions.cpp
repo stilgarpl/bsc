@@ -15,7 +15,7 @@ void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
     if (nodeContext != nullptr) {
         //  NODECONTEXTLOGGER("Node discovered (connecting): " + event.getNodeInfo().getNodeId())
         auto &node = nodeContext->getNode();
-        ///@todo we shouldn't connect to any node, just in certain situations
+        //@todo we shouldn't connect to any node, just in certain situations
 //        node.getModule<NodeNetworkModule>()->connectTo(event.getNodeInfo());
     }
 
@@ -57,7 +57,7 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
 void NodeActions::triggerUpdateNode(const Tick &tick) {
     Context::Ptr context = Context::getActiveContext();
     auto nodeContext = context->get<NodeContext>();
-    ///@todo imp[lement with RemoteNodes
+    //@todo imp[lement with RemoteNodes
 //    if (nodeContext != nullptr) {
 //        auto &node = nodeContext->getNode();
 //

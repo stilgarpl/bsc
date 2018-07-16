@@ -125,7 +125,7 @@ public: // @todo should be public or shouldn't ?
 
     void disconnectAll();
 
-//    ///@todo add version that uses protocol and returns future
+//    //@todo add version that uses protocol and returns future
 //    bool sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet);
 
     template<enum Status status = Status::RESPONSE, typename SendType>
@@ -144,7 +144,7 @@ public: // @todo should be public or shouldn't ?
 //            }
 //        }
 //        if (conn == nullptr) {
-//            ///@todo connect to node
+//            //@todo connect to node
 //        }
 //
 //        if (conn != nullptr) {
@@ -175,10 +175,10 @@ public: // @todo should be public or shouldn't ?
                 ret[*item->getNodeId()] = item->sendRequestToNode(p);
             }
         }
-        ///@todo maybe return some class, not just a map?
+        //@todo maybe return some class, not just a map?
         return ret;
 
-        ///@todo implement faster broadcast, like below. I'm too sleepy to do it now
+        //@todo implement faster broadcast, like below. I'm too sleepy to do it now
 //        //@todo other scopes than connected
 //        std::map<NodeIdType, std::future<BasePacketPtr>> responses;
 //        {

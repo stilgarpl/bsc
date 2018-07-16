@@ -53,7 +53,7 @@ public:
             auto &e = source.front();
 //               LOGGER("e = " + std::to_string(e->getDependencyId()) + " " + (typeid(*e).name()));
             //get its dependency list
-            ///@todo check if null?
+            //@todo check if null?
             IDependency::ArrayType eDeps;
             if (e->getRequiredDependencies() != nullptr) {
                 eDeps = e->getRequiredDependencies()->getDependencyIdents();

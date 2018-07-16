@@ -49,7 +49,7 @@ void FileSource::fileReceived(SendFile::Response::Ptr response) {
     //  event->setResponse(response);
     //  SendFile::Response* response;
     event->setFilePath(response->getFilePath());
-    ///@todo remove debug override
+    //@todo remove debug override
     event->setFilePath("/tmp/basyco/received.file");
     event->setBegin(response->getBegin());
     event->setEnd(response->getEnd());

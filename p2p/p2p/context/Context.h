@@ -38,7 +38,7 @@ private:
         return val++;
     }
 
-    ///@todo possible improvement: add key offset for different types, so for example keys "test" and 1 do not point to the same values
+    //@todo possible improvement: add key offset for different types, so for example keys "test" and 1 do not point to the same values
     template<typename T>
     const KeyType getKey(const T &t) const {
         static std::map<T, KeyType> keyMap;
@@ -122,7 +122,7 @@ public:
         return ret;
     }
 
-    ///@todo non-const context does set parent but const doesn't. WHY?
+    //@todo non-const context does set parent but const doesn't. WHY?
 //    Context &operator+=(const Context::Ptr other);
 
     Context &operator+=(Context::Ptr other);
@@ -149,7 +149,7 @@ public:
             ret->setParentContext(ptr);
             return ret;
         } else {
-            ///@todo throw exception??
+            //@todo throw exception??
             LOGGER("ERROR: NULL CONTEXT PASSED")
             return makeContext();
         }

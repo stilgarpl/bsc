@@ -37,7 +37,7 @@ void ClientConnection::startSending() {
 
 ClientConnection::~ClientConnection() {
 
-    ///@todo this socket is closed twice when client connection is destroyed. do something about it.
+    //@todo this socket is closed twice when client connection is destroyed. do something about it.
     try {
 //        socket.shutdown();
         shutdown();

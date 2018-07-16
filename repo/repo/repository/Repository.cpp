@@ -27,7 +27,7 @@ const std::shared_ptr<IStorage> &Repository::getStorage() const {
 
 void Repository::restoreAll() {
     journal->setFunc(JournalMethod::ADDED, [&](auto &i) {
-        ///@todo path transform
+        //@todo path transform
         bool ret = storage->restore(i.getChecksum(), i.getSize(), i.getPath());
         if (!ret) {
             //restore failed.
@@ -35,10 +35,10 @@ void Repository::restoreAll() {
             //check if the resource is in storage
             if (!storage->hasResource(resourceId)) {
                 //download from another repo
-                ///@todo download
+                //@todo download
             } else {
                 //weird, maybe no space left?
-                ///@todo error handling
+                //@todo error handling
             }
         } else {
             //set modification date to correct value
@@ -75,6 +75,6 @@ void Repository::buildFileMap() {
 
 void Repository::persist(fs::path path) {
     journal->append(JournalMethod::ADDED, path);
-    ///@todo take values from journal, or, even better, replay journal state during commit and do the store in that
+    //@todo take values from journal, or, even better, replay journal state during commit and do the store in that
     storage->store(calculateSha1OfFile(path), fs::file_size(path), path);
 }

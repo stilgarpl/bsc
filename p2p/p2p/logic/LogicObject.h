@@ -120,7 +120,7 @@ public:
         }
 
 
-        ///@todo maybe add Args.. for actions with many arguments... maybe to whole helper class.
+        //@todo maybe add Args.. for actions with many arguments... maybe to whole helper class.
         ThisType &fireNewAction(ActionManager::ActionType<EventType, Args...> action) {
 
             static unsigned long generatedActionId = 1;
@@ -133,7 +133,7 @@ public:
 
         template<typename NewEventType, typename ... NewArgs>
         ThisType &emit() {
-            ///@todo initialize some actual values.
+            //@todo initialize some actual values.
 //            logicManager.event<NewEventType,NewArgs...>(NewEventType(),NewArgs()...);
             auto &autoSource = logicManager.requireSource<AutoSource>();
             fireNewAction([&](EventType e, Args...) {
@@ -146,7 +146,7 @@ public:
 
         template<typename NewEventType, typename ... NewArgs>
         ThisType &emit(NewEventType newEventType) {
-            ///@todo initialize some actual values.
+            //@todo initialize some actual values.
 //            logicManager.event<NewEventType,NewArgs...>(NewEventType(),NewArgs()...);
             auto &autoSource = logicManager.requireSource<AutoSource>();
             fireNewAction([&, newEventType](EventType e, Args...) {

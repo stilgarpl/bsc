@@ -27,7 +27,7 @@ public:
 
         auto nodeContext = Context::getActiveContext()->get<NodeContext>();
 
-        ///@todo add way more error handling to the getting of the module that's not there or repo that's not there...
+        //@todo add way more error handling to the getting of the module that's not there or repo that's not there...
         if (nodeContext != nullptr) {
             auto &node = nodeContext->getNode();
             auto repoModule = node.getModule<RepoModule>();
