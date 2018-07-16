@@ -19,6 +19,7 @@
 #include <p2p/modules/configuration/ConfigurationModule.h>
 #include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/KeepAlivePacket.h>
+#include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
 
 
 using namespace Poco::Net;
@@ -126,6 +127,12 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
     //send keepalives - I tried using it to help with the packet loss, but it didn't work.
     when(event<Tick>(120s)).fireNewAction(
             [&, this](auto e) { this->broadcastPacket(KeepAlivePacket::Request::getNew()); });
+
+
+    //@todo move to more appropriate method
+//    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole");
+//    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole2");
+
     //@todo real value
     return true;
 }

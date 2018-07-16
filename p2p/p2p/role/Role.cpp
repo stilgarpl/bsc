@@ -9,3 +9,11 @@ Role::Role(const Role::IdType &roleId) : roleId(roleId) {}
 const Role::IdType &Role::getRoleId() const {
     return roleId;
 }
+
+bool Role::operator==(const Role &rhs) const {
+    return roleId == rhs.roleId;
+}
+
+bool Role::operator!=(const Role &rhs) const {
+    return !(rhs == *this);
+}

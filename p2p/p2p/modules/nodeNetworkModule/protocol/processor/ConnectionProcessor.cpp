@@ -28,13 +28,18 @@ void ConnectionProcessor::run() {
     auto processorContext = context->set<ProcessorContext, ConnectionProcessor &>(*this);
     Roles::setActiveScope(&connection);
     while (!this->isStopping()) {
-        auto np = connection.receive();
-        if (np != nullptr) {
+        auto packetToProcess = connection.receive();
+        if (packetFilter->filter(packetToProcess)) {
+            if (packetToProcess != nullptr) {
 //            LOGGER("processing packet " );
-            processorContext->setThisPacket(np);
-            np->process(context);
+                processorContext->setThisPacket(packetToProcess);
+                packetToProcess->process(context);
+            } else {
+                //@todo error handling
+            }
         } else {
-            //@todo error handling
+            LOGGER(std::string("packet ") + typeid(*packetToProcess).name() + "was filtered ");
+            //@todo add event/error response
         }
 
     }

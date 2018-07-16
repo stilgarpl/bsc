@@ -61,6 +61,9 @@ Node::Node() {
     nodeContext->set<NodeContext, Node &, NodeInfo &>(*this, this->thisNodeInfo);
     nodeContext->set<LogicContext, LogicManager &>(logicManager);
 
+    //this creates common context for role definitions across the entire node.
+    nodeContext->set<RoleDefinitionsContext>();
+
     logicManager.setContexts(nodeContext);
 
 
@@ -98,6 +101,7 @@ void Node::startModules() {
 }
 
 void Node::initialize() {
+    setNodeContextActive();
     //initialize node modules
 //    std::list<INodeModulePtr> modulesList;
 //    modules.forEach(

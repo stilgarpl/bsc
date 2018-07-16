@@ -7,6 +7,7 @@
 
 
 #include <p2p/log/Logger.h>
+#include <p2p/context/Context.h>
 #include "Role.h"
 #include "RoleInvalidException.h"
 #include "RoleScope.h"
@@ -50,6 +51,17 @@ public:
 
     static void setActiveScope(RoleScope *activeScope) {
         Roles::activeScope = activeScope;
+    }
+
+    template<typename T>
+    static void defineRequiredRole(const Role::IdType &roleId) {
+        //@todo nullptr check?
+        Context::getActiveContext()->get<RoleDefinitionsContext>()->roleDefinitionsPtr->addRole<T>(roleId);
+    }
+
+    template<typename T>
+    static const RoleList &getRequiredRolesDefinitions() {
+        return Context::getActiveContext()->get<RoleDefinitionsContext>()->roleDefinitionsPtr->getRequiredRoles<T>();
     }
 
 };

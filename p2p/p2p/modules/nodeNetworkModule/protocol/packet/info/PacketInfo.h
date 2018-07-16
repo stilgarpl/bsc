@@ -8,6 +8,7 @@
 #include <p2p/modules/nodeNetworkModule/protocol/enum/Status.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
 
+
 template<typename PacketType, enum Status s>
 struct PacketInfo {
 
@@ -136,6 +137,11 @@ private:
 
 
     friend class cereal::access;
+
+public:
+    const RoleList &requiredRoles() override {
+        return Roles::getRequiredRolesDefinitions<S>();
+    }
 
 };
 

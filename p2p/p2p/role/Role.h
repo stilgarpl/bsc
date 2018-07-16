@@ -9,6 +9,11 @@
 #include <memory>
 #include <list>
 
+class Role;
+
+typedef std::shared_ptr<Role> RolePtr;
+typedef std::list<RolePtr> RoleList;
+
 class Role {
 public:
     typedef std::string IdType;
@@ -21,10 +26,16 @@ public:
     Role(const IdType &roleId);
 
     const IdType &getRoleId() const;
+
+    static RolePtr makeRole(const IdType &id) {
+        return std::make_shared<Role>(id);
+    }
+
+    bool operator==(const Role &rhs) const;
+
+    bool operator!=(const Role &rhs) const;
 };
 
-typedef std::shared_ptr<Role> RolePtr;
-typedef std::list<RolePtr> RoleList;
 
 /**
  * ideas.... maybe inherit from Role

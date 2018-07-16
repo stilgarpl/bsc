@@ -13,6 +13,7 @@
 #include "p2p/log/Logger.h"
 
 #include "p2p/context/Context.h"
+#include <p2p/role/Roles.h>
 
 struct PacketGroup;
 
@@ -31,6 +32,7 @@ private:
     Status status;
     IdType id;
     bool retry = false;
+
 private:
     template<class Archive>
     void serialize(Archive &ar) {
@@ -60,6 +62,8 @@ public:
     bool isRetry() const;
 
     void setRetry(bool retry);
+
+    virtual const RoleList &requiredRoles() =0;
 
 };
 

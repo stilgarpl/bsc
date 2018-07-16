@@ -7,6 +7,8 @@
 
 
 #include <thread>
+#include <p2p/modules/nodeNetworkModule/protocol/filter/PacketFilter.h>
+#include <p2p/modules/nodeNetworkModule/protocol/filter/RoleFilter.h>
 #include "p2p/thread/Runnable.h"
 #include "p2p/context/Context.h"
 #include "p2p/log/Logger.h"
@@ -21,11 +23,12 @@ private:
 
 protected:
     Connection &connection;
+    std::unique_ptr<PacketFilter> packetFilter = std::make_unique<RoleFilter>();
 
     virtual void run();
 
 public:
-    ConnectionProcessor(Connection &connection);
+    explicit ConnectionProcessor(Connection &connection);
 
     virtual ~ConnectionProcessor();
 

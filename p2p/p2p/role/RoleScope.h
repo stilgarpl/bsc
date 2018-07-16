@@ -9,11 +9,13 @@
 #include <memory>
 #include <algorithm>
 #include "Role.h"
+#include "RoleDefinitions.h"
 
 class RoleScope {
 private:
 
-    std::list<std::shared_ptr<Role>> roleList;
+    RoleList roleList;
+    RoleDefinitionsPtr definitions;
 
 public:
 
@@ -22,8 +24,8 @@ public:
         roleList.push_back(std::make_shared<Role>(id));
     }
 
-    std::shared_ptr<Role> findRole(Role::IdType id) {
-        auto result = std::find_if(roleList.begin(), roleList.end(), [&](std::shared_ptr<Role> role) {
+    RolePtr findRole(Role::IdType id) {
+        auto result = std::find_if(roleList.begin(), roleList.end(), [&](RolePtr role) {
             return role->getRoleId() == id;
         });
 

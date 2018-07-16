@@ -11,9 +11,7 @@
 class PacketFilter {
 
 public:
-    void filter(BasePacketPtr packet) {
-
-    }
+    virtual bool filter(BasePacketPtr packet) =0;
 };
 
 
