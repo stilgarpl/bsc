@@ -12,6 +12,7 @@
 enum class PacketEventId {
     PACKET_SENT,
     PACKET_RECEIVED,
+    PACKET_DROPPED,
 };
 
 class PacketEvent : public IEvent<PacketEventId> {

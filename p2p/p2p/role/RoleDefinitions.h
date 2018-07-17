@@ -17,11 +17,6 @@ private:
 
 public:
 
-    RoleDefinitions() {
-        //@todo remove
-        LOGGER("ROLE DEFINITIONS CONSTRUCTOR");
-    }
-
     template<typename T>
     const RoleList &getRequiredRoles() {
         return requiredRoles.get<T>();

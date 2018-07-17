@@ -26,6 +26,8 @@ public:
 
     void receivedPacket(std::shared_ptr<BasePacket> p, Connection *connection);
 
+    void droppedPacket(std::shared_ptr<BasePacket> p, Connection *connection);
+
     void work() override;
 
     void connectionAccepted(Connection *c);

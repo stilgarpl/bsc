@@ -38,6 +38,7 @@ public:
     enum class Actions {
         onPacketSent,
         onPacketReceived,
+        onPacketDropped,
         onWork,
     };
 

@@ -22,8 +22,8 @@ void ConnectionProcessor::run() {
     Context::setActiveContext(context);
     logger.info("ConnectionProcessor start " + context->get<NodeContext>()->getNodeInfo().getNodeId());
     auto lc = context->get<LogicContext>();
-    //auto &logicManager = lc->getLogicManager();
-    //auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
+    auto &logicManager = lc->getLogicManager();
+    auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
     auto processorContext = context->set<ProcessorContext, ConnectionProcessor &>(*this);
     Roles::setActiveScope(&connection);
@@ -39,7 +39,7 @@ void ConnectionProcessor::run() {
             }
         } else {
             LOGGER(std::string("packet ") + typeid(*packetToProcess).name() + "was filtered ");
-            //@todo add event/error response
+            connectionSourcePtr->droppedPacket(packetToProcess, &connection);
         }
 
     }

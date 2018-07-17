@@ -90,4 +90,12 @@ void ConnectionSource::connectionClosedClient(Connection *c) {
 ConnectionSource::ConnectionSource(SourceManager &sourceManager) : ISource(sourceManager), connSource(sourceManager),
                                                                    packetSource(sourceManager) {}
 
+void ConnectionSource::droppedPacket(std::shared_ptr<BasePacket> p, Connection *connection) {
+    auto event = std::make_shared<PacketEvent>();
+    event->setEventId(PacketEvent::IdType::PACKET_DROPPED);
+    event->setPacket(p);
+    event->setConnection(connection);
+    packetSource.queueEvent(event);
+}
+
 
