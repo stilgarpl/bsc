@@ -11,6 +11,7 @@
 #include "InternalStorage.h"
 #include "StorageResourceIdentificator.h"
 
+
 void InternalStorage::store(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) {
 
     auto realChecksum = calculateSha1OfFile(fs::path(sourcePath));

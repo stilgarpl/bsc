@@ -27,6 +27,10 @@ public:
 
     bool connectTo(const std::string &address);
 
+    void connect(std::shared_ptr<Connection> existingConnection) {
+        connection = existingConnection;
+    }
+
     Context::Ptr context() { return _context; };
 protected:
     RemoteNode();

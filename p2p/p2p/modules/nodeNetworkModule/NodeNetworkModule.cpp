@@ -6,7 +6,6 @@
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/NetworkSource.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h>
-#include <p2p/modules/nodeNetworkModule/protocol/logic/sources/AuthSource.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/actions/NodeActions.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/actions/ProtocolActions.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/actions/NetworkActions.h>
@@ -20,6 +19,7 @@
 #include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/KeepAlivePacket.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
+#include <p2p/logic/state/LogicStateMachine.h>
 
 
 using namespace Poco::Net;
@@ -133,12 +133,20 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole");
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole2");
 
+    LogicStateMachine<int> intStateMachine;
+    intStateMachine.define(1).to(2).to(3).to(4);
+//    auto def = intStateMachine.define(1);
+//    def->(2)->(3);
+
+    intStateMachine.setState(2);
+    intStateMachine.changeState(3);
+
     //@todo real value
     return true;
 }
 
 bool NodeNetworkModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
-    sourceHelper.requireSource<AuthSource>();
+
 
     sourceHelper.requireSource<ConnectionSource>();
     sourceHelper.requireSource<NetworkSource>();
@@ -356,3 +364,4 @@ void NodeNetworkModule::disconnectAll() {
 const std::shared_ptr<IProtocol> &NodeNetworkModule::getProtocol() const {
     return protocol;
 }
+

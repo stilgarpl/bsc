@@ -21,7 +21,7 @@ FIND_LIBRARY(CPPEXPERIMENTAL_LIBRARY
              NAMES stdc++fs
              PATHS ${LIBCPPEXPERIMENTAL}/lib/
                     /usr/lib/gcc/x86_64-linux-gnu/
-                    /usr/lib64/gcc/x86_64-pc-linux-gnu/6.4.0/
+                    /usr/lib64/gcc/x86_64-pc-linux-gnu/8.2.0
                     /usr/lib/x86_64-linux-gnu/
                     /usr/local/lib64/
                     /usr/lib64/

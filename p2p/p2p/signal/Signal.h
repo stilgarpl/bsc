@@ -21,9 +21,7 @@ private:
     FuncList funcList;
 
 public:
-    //może przeciążona klasa AsyncSignal
-    //albo jakiś globalna funkcja - defaultowa by wywoływała od razu, async by robiła wątek
-    //a ta funkcja by tylko wywoływała tamtą z odpowiednimi parametrami
+
     virtual int signal(Args... args) {
         int executed = 0;
         for (auto &&item : funcList) {
@@ -43,10 +41,7 @@ public:
         return assign(funcPtr);
     }
 
-//    void assign(Func func) {
-//        FuncPtr funcPtr = std::make_shared<Func>(func);
-//        assign(funcPtr);
-//    }
+
 };
 
 

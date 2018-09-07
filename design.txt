@@ -261,3 +261,16 @@ Processor powinien mieć Filter, które dla przychodzącego pakietu sprawdza rol
 Rules -przydałoby się ładne definiowanie jak w przypadku logic managera
 packet<NodeInfo::Request>().requiresRole("admin");
 when(packet<NodeInfo::Request>()).checkRole("admin").onFail(drop());
+
+
+można wydzielić authowe rzeczy do osobnego modułu. wtedy przy niezaładowanym module wszystko bedzie open access, a załadowanie modułu
+
+trzeba koniecznie dac server side RN. jeśli jakiś node jest już do nas podłączony, to chcąc wysłać do niego pakiet nie ma sensu otwierać drugiego połączenia.
+
+
+kombinuję jak zrobić rozbudowaną logikę opartą na stanach
+
+when(state<Connection>(is(CONNECTED)).and(event<NodeEvent>()).then
+
+
+when(event<NodeEvent>()).if(state<Connetion>(CONNECTED)).then

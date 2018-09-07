@@ -8,7 +8,7 @@ add_subdirectory(test)
 
 find_package(Crypto++ REQUIRED)
 find_package(Cereal REQUIRED)
-FIND_PACKAGE(CPPexperimental REQUIRED)
+#FIND_PACKAGE(CPPexperimental REQUIRED)
 
 
 message(libs:: ${LIBS})
@@ -16,7 +16,7 @@ message(libs:: ${LIBS})
 set(INCLUDES ${Cereal_INCLUDE_DIRS} ${CRYPTO++_INCLUDE_DIR})
 message(includ:: ${INCLUDES})
 include_directories(${INCLUDES})
-set(LIBS ${LIBS} ${CPPEXPERIMENTAL_LIBRARIES} ${CRYPTO++_LIBRARIES})
+set(LIBS ${LIBS} ${CPPEXPERIMENTAL_LIBRARIES} ${CRYPTO++_LIBRARIES} -lstdc++fs)
 
 message(libs:: ${LIBS})
 

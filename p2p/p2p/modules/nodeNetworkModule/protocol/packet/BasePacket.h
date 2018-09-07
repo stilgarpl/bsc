@@ -2,8 +2,8 @@
 // Created by stilgar on 01.08.17.
 //
 
-#ifndef BASYCO_NETWORKPACKET_H
-#define BASYCO_NETWORKPACKET_H
+#ifndef BASYCO_BASEPACKET_H
+#define BASYCO_BASEPACKET_H
 //#define CEREAL_THREAD_SAFE 1
 
 
@@ -76,4 +76,4 @@ using NetworkPacketPointer = std::shared_ptr<NetworkPacketType>;
 
 CEREAL_REGISTER_TYPE(BasePacket);
 
-#endif //BASYCO_NETWORKPACKET_H
+#endif //BASYCO_BASEPACKET_H

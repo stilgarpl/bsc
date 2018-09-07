@@ -4,7 +4,6 @@
 //#define CEREAL_THREAD_SAFE 1
 #include "p2p/node/Node.h"
 #include "p2p/logic/sources/ClockSource.h"
-#include "p2p/modules/nodeNetworkModule/protocol/logic/sources/AuthSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/actions/TransmissionControl.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/actions/ProtocolActions.h"
@@ -20,18 +19,14 @@ using namespace std::chrono_literals;
 #include <fstream>
 #include <p2p/modules/filesystem/network/logic/sources/FileSource.h>
 #include <p2p/modules/filesystem/network/logic/actions/FileActions.h>
-#include <p2p/modules/configuration/ConfigurationManager.h>
 #include <repo/journal/SimpleJournal.h>
 #include <repo/node/RepoModule.h>
-#include <p2p/modules/basic/BasicModule.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/dependency/Dependency.h>
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
-#include <p2p/role/Roles.h>
 #include <p2p/modules/command/CommandModule.h>
 #include <p2p/modules/command/StandardCommandsDirectory.h>
 #include <p2p/modules/filesystem/transfer/FileTransferControl.h>
-#include <p2p/modules/configuration/ConfigurationModule.h>
 #include <variant>
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -145,7 +140,6 @@ void setupCommands(CommandModule *cmd) {
 #include <cereal/archives/xml.hpp>
 #include <cereal/types/memory.hpp>
 #include <repo/repository/storage/InternalStorage.h>
-#include <p2p/utils/crypto.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/NetworkInfoRequest.h>
 
