@@ -8,7 +8,7 @@ FileTransferStatus FileTransferDescriptor::getStatus() const {
     return status;
 }
 
-const std::experimental::filesystem::path &FileTransferDescriptor::getDestinationPath() const {
+const std::filesystem::path &FileTransferDescriptor::getDestinationPath() const {
     return destinationPath;
 }
 
@@ -16,7 +16,7 @@ const NodeIdType &FileTransferDescriptor::getSourceNode() const {
     return sourceNode;
 }
 
-const std::experimental::filesystem::path &FileTransferDescriptor::getSourcePath() const {
+const std::filesystem::path &FileTransferDescriptor::getSourcePath() const {
     return sourcePath;
 }
 
@@ -32,7 +32,7 @@ void FileTransferDescriptor::setStatus(FileTransferStatus status) {
     FileTransferDescriptor::status = status;
 }
 
-void FileTransferDescriptor::setDestinationPath(const std::experimental::filesystem::path &destinationPath) {
+void FileTransferDescriptor::setDestinationPath(const std::filesystem::path &destinationPath) {
     FileTransferDescriptor::destinationPath = destinationPath;
 }
 
@@ -40,7 +40,7 @@ void FileTransferDescriptor::setSourceNode(const NodeIdType &sourceNode) {
     FileTransferDescriptor::sourceNode = sourceNode;
 }
 
-void FileTransferDescriptor::setSourcePath(const std::experimental::filesystem::path &sourcePath) {
+void FileTransferDescriptor::setSourcePath(const std::filesystem::path &sourcePath) {
     FileTransferDescriptor::sourcePath = sourcePath;
 }
 

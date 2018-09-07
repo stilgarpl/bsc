@@ -4,11 +4,11 @@
 
 #include "FileRequestEvent.h"
 
-const std::experimental::filesystem::path &FileRequestEvent::getFilePath() const {
+const std::filesystem::path &FileRequestEvent::getFilePath() const {
     return filePath;
 }
 
-void FileRequestEvent::setFilePath(const std::experimental::filesystem::path &filePath) {
+void FileRequestEvent::setFilePath(const std::filesystem::path &filePath) {
     FileRequestEvent::filePath = filePath;
 }
 

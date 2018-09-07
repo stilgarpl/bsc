@@ -9,10 +9,10 @@
 #include <cryptopp/files.h>
 #include <cryptopp/sha.h>
 
-#include <experimental/filesystem>
+#include <filesystem>
 #include <cryptopp/hex.h>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 std::string calculateSha1OfFile(fs::path path);
 

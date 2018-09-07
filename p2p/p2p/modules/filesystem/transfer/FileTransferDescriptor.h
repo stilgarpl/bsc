@@ -5,12 +5,12 @@
 #ifndef BASYCO_FILETRANSFERDESCRIPTOR_H
 #define BASYCO_FILETRANSFERDESCRIPTOR_H
 
-#include <experimental/filesystem>
+#include <filesystem>
 #include <p2p/node/NodeInfo.h>
 
 #include <thread>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 enum class FileTransferStatus {
     NOT_STARTED,
@@ -46,11 +46,11 @@ public:
 
     FileTransferStatus getStatus() const;
 
-    const std::experimental::filesystem::path &getDestinationPath() const;
+    const std::filesystem::path &getDestinationPath() const;
 
     const NodeIdType &getSourceNode() const;
 
-    const std::experimental::filesystem::path &getSourcePath() const;
+    const std::filesystem::path &getSourcePath() const;
 
     size_t getFileSize() const;
 
@@ -61,11 +61,11 @@ protected:
 
     void setStatus(FileTransferStatus status);
 
-    void setDestinationPath(const std::experimental::filesystem::path &destinationPath);
+    void setDestinationPath(const std::filesystem::path &destinationPath);
 
     void setSourceNode(const NodeIdType &sourceNode);
 
-    void setSourcePath(const std::experimental::filesystem::path &sourcePath);
+    void setSourcePath(const std::filesystem::path &sourcePath);
 
     void setFileSize(size_t fileSize);
 

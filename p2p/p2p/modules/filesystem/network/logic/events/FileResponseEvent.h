@@ -32,11 +32,11 @@ public:
 
     FileResponseEvent(BasePacket::IdType requestId) : NetworkingEvent(requestId) {}
 
-    const std::experimental::filesystem::path &getFilePath() const {
+    const std::filesystem::path &getFilePath() const {
         return filePath;
     }
 
-    void setFilePath(const std::experimental::filesystem::path &filePath) {
+    void setFilePath(const std::filesystem::path &filePath) {
         FileResponseEvent::filePath = filePath;
     }
 

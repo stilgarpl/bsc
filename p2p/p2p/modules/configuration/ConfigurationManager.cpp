@@ -38,15 +38,15 @@ std::shared_ptr<void> ConfigurationManager::load_void(const ConfigurationManager
 
 }
 
-ConfigurationManager::ConfigurationManager(const std::experimental::filesystem::path &rootPath) : rootPath(rootPath) {}
+ConfigurationManager::ConfigurationManager(const std::filesystem::path &rootPath) : rootPath(rootPath) {}
 
 ConfigurationManager::ConfigurationManager() {}
 
-const std::experimental::filesystem::path &ConfigurationManager::getRootPath() const {
+const std::filesystem::path &ConfigurationManager::getRootPath() const {
     return rootPath;
 }
 
-void ConfigurationManager::setRootPath(const std::experimental::filesystem::path &rootPath) {
+void ConfigurationManager::setRootPath(const std::filesystem::path &rootPath) {
     ConfigurationManager::rootPath = rootPath;
     initializeRootPath();
 }

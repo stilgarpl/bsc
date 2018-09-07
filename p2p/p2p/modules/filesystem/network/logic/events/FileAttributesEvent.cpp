@@ -4,11 +4,11 @@
 
 #include "FileAttributesEvent.h"
 
-const std::experimental::filesystem::path &FileAttributesEvent::getPath() const {
+const std::filesystem::path &FileAttributesEvent::getPath() const {
     return path;
 }
 
-void FileAttributesEvent::setPath(const std::experimental::filesystem::path &path) {
+void FileAttributesEvent::setPath(const std::filesystem::path &path) {
     FileAttributesEvent::path = path;
 }
 

@@ -72,7 +72,7 @@ bool FilesystemModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelpe
     return true;
 }
 
-const std::experimental::filesystem::path &FilesystemModule::getCurrentPath() const {
+const std::filesystem::path &FilesystemModule::getCurrentPath() const {
     return currentPath;
 }
 

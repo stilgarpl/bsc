@@ -5,12 +5,12 @@
 #ifndef BASYCO_FILEREQUESTEVENT_H
 #define BASYCO_FILEREQUESTEVENT_H
 
-#include <experimental/filesystem>
+#include <filesystem>
 #include <p2p/logic/IEvent.h>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/Connection.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkingEvent.h>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 enum class FileRequestId {
     GET_FILE,
@@ -28,9 +28,9 @@ private:
 public:
     FileRequestEvent(BasePacket::IdType requestId);
 
-    const std::experimental::filesystem::path &getFilePath() const;
+    const std::filesystem::path &getFilePath() const;
 
-    void setFilePath(const std::experimental::filesystem::path &filePath);
+    void setFilePath(const std::filesystem::path &filePath);
 
     size_t getBegin() const;
 

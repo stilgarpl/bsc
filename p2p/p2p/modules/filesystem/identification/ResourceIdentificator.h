@@ -5,11 +5,11 @@
 #ifndef BASYCO_RESOURCEIDENTIFICATOR_H
 #define BASYCO_RESOURCEIDENTIFICATOR_H
 
-#include <experimental/filesystem>
+#include <filesystem>
 #include <cereal/access.hpp>
 #include <p2p/utils/cereal_include.h>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 class ResourceIdentificator {
 public:

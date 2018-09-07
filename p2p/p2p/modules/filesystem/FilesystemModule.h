@@ -9,14 +9,14 @@
 #include <p2p/node/NodeModule.h>
 #include <p2p/dependency/DependencyManaged.h>
 
-#include <experimental/filesystem>
+#include <filesystem>
 #include <p2p/modules/filesystem/transfer/FileTransferDescriptor.h>
 #include <p2p/modules/filesystem/network/logic/actions/TransferManager.h>
 #include <p2p/modules/filesystem/identification/SimplePathRI.h>
 
 #include "p2p/modules/nodeNetworkModule/NodeNetworkModule.h"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 class FilesystemModule : public NodeModuleDependent<FilesystemModule> {
 
@@ -34,7 +34,7 @@ public:
 
     bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
 
-    const std::experimental::filesystem::path &getCurrentPath() const;
+    const std::filesystem::path &getCurrentPath() const;
 
 public:
     ////////////////////////////////

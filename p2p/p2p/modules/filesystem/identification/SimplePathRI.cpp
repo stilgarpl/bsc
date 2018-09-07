@@ -6,7 +6,7 @@
 #include <fstream>
 #include "SimplePathRI.h"
 
-//std::experimental::filesystem::path SimplePathRI::getPath() {
+//std::filesystem::path SimplePathRI::getPath() {
 //    return resourcePath;
 //}
 

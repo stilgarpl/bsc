@@ -5,9 +5,9 @@
 #ifndef BASYCO_CONFIGURATIONMANAGER_H
 #define BASYCO_CONFIGURATIONMANAGER_H
 
-#include <experimental/filesystem>
+#include <filesystem>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 #include "IConfig.h"
 
@@ -49,13 +49,13 @@ private:
         fs::create_directories(rootPath);
     }
 public:
-    ConfigurationManager(const std::experimental::filesystem::path &rootPath);
+    ConfigurationManager(const std::filesystem::path &rootPath);
 
     ConfigurationManager();
 
-    const std::experimental::filesystem::path &getRootPath() const;
+    const std::filesystem::path &getRootPath() const;
 
-    void setRootPath(const std::experimental::filesystem::path &rootPath);
+    void setRootPath(const std::filesystem::path &rootPath);
 };
 
 

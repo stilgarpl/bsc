@@ -9,9 +9,9 @@
 #include <p2p/logic/IEvent.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkingEvent.h>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 enum class FileAttributesEventId {
     ATTRIBUTES_REQUESTED,
@@ -26,9 +26,9 @@ class FileAttributesEvent : public NetworkingEvent<FileAttributesEventId> {
 public:
     FileAttributesEvent(BasePacket::IdType requestId);
 
-    const std::experimental::filesystem::path &getPath() const;
+    const std::filesystem::path &getPath() const;
 
-    void setPath(const std::experimental::filesystem::path &path);
+    void setPath(const std::filesystem::path &path);
 
 
 };

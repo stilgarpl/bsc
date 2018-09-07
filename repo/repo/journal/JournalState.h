@@ -28,9 +28,9 @@
 #include <cereal/types/string.hpp>
 #include <cryptopp/files.h>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 class JournalStateData {
 private:

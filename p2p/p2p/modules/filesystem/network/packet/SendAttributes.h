@@ -9,9 +9,9 @@
 #include <p2p/modules/nodeNetworkModule/protocol/packet/info/PacketInfo.h>
 
 
-#include <experimental/filesystem>
+#include <filesystem>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 
 class SendAttributes : public PacketGroup {
