@@ -15,8 +15,11 @@ class ClientConnection : public Connection {
 private:
     Poco::Net::StreamSocket socket;
 
-public:
+protected:
     ClientConnection(const Poco::Net::SocketAddress &a, Context::Ptr);
+
+public:
+    ClientConnection(const std::string &a, Context::Ptr);
 
     void startReceiving();
 

@@ -14,6 +14,7 @@
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/list.hpp>
+#include <cereal/types/set.hpp>
 #include <cereal/types/string.hpp>
 
 #endif //BASYCO_CEREAL_INCLUDE_H_H

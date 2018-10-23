@@ -156,5 +156,18 @@ public:
     };
 };
 
+class SetLocalContext {
+    Context::Ptr prevContext;
+public:
+    SetLocalContext(Context::ContextPtr ptr) {
+        prevContext = Context::getActiveContext();
+        Context::setActiveContext(ptr);
+    }
+
+    ~SetLocalContext() {
+        Context::setActiveContext(prevContext);
+    }
+};
+
 
 #endif //BASYCO_CONTEXT_H

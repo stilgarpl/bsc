@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 06.07.18.
 //
@@ -28,7 +30,8 @@ public:
     bool connectTo(const std::string &address);
 
     void connect(std::shared_ptr<Connection> existingConnection) {
-        connection = existingConnection;
+        ///@todo what is this function for again? don't remember why I added it
+        connection = std::move(existingConnection);
     }
 
     Context::Ptr context() { return _context; };

@@ -19,12 +19,13 @@ const std::optional<NodeIdType> RemoteNode::getNodeId() const {
 
 bool RemoteNode::connectTo(const std::string &address) {
 
-    Poco::Net::SocketAddress socketAddress(address);
+//    Poco::Net::SocketAddress socketAddress(address);
     //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
     //@todo check for problems and handle them
     try {
-        Context::setActiveContext(_context);
-        auto conn = std::make_shared<ClientConnection>(socketAddress,
+//        ///@todo THIS IS BAD. It switches context for any thread that calls connect!
+//        Context::setActiveContext(_context);
+        auto conn = std::make_shared<ClientConnection>(address,
                                                        _context);
 
         conn->startSending();

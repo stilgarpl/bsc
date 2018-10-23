@@ -9,7 +9,7 @@ const std::string &NodeInfo::getNetworkId() const {
     return networkId;
 }
 
-const std::list<std::string> &NodeInfo::getKnownAddresses() const {
+const std::set<std::string> &NodeInfo::getKnownAddresses() const {
     return knownAddresses;
 }
 

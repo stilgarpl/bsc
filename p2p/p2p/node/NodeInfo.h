@@ -22,12 +22,13 @@ class NodeInfo {
 
     NodeIdType nodeId;
     NetworkIdType networkId;
-    std::list<std::string> knownAddresses;
+    ///@todo structure instead of string? we can store info like last successful connection to that address or sth
+    std::set<std::string> knownAddresses;
     //typename Node::IdType id;
 public:
     const std::string &getNetworkId() const;
 
-    const std::list<std::string> &getKnownAddresses() const;
+    const std::set<std::string> &getKnownAddresses() const;
 //
 //    Node::IdType getId() const;
 //
@@ -48,7 +49,7 @@ public:
     void setNodeId(const NodeIdType &nodeId);
 
     void addKnownAddress(std::string address) {
-        knownAddresses.push_back(address);
+        knownAddresses.insert(address);
     }
 
     void printAll() const {

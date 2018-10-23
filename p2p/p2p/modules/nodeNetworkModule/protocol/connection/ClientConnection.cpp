@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 01.08.17.
 //
@@ -12,7 +14,7 @@
 
 ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context::Ptr context) : Connection(
         std::move(context)),
-                                                                                          socket(a) {
+                                                                                              socket(a) {
 
     auto lm = getConnectionContext()->get<LogicContext>();
     if (lm != nullptr) {
@@ -75,4 +77,10 @@ void ClientConnection::shutdown() {
 
 Poco::Net::StreamSocket &ClientConnection::getSocket() {
     return socket;
+}
+
+ClientConnection::ClientConnection(const std::string &a, Context::Ptr ptr) : ClientConnection(
+        Poco::Net::SocketAddress(a),
+        std::move(ptr)) {
+
 }
