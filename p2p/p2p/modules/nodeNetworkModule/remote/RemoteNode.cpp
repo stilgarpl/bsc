@@ -31,6 +31,7 @@ bool RemoteNode::connectTo(const std::string &address) {
         conn->startSending();
         conn->startReceiving();
         connection = conn;
+        this->address = address;
         return true;
     } catch (const Poco::Net::ConnectionRefusedException &) {
         //@todo connection refused in connectionSource

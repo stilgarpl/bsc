@@ -29,18 +29,20 @@ void ConnectionProcessor::run() {
     Roles::setActiveScope(&connection);
     while (!this->isStopping()) {
         auto packetToProcess = connection.receive();
-        if (packetFilter->filter(packetToProcess)) {
-            if (packetToProcess != nullptr) {
+
+        if (packetToProcess != nullptr) {
+            if (packetFilter->filter(packetToProcess)) {
 //            LOGGER("processing packet " );
                 processorContext->setThisPacket(packetToProcess);
                 packetToProcess->process(context);
             } else {
-                //@todo error handling
+                LOGGER(std::string("packet ") + typeid(*packetToProcess).name() + "was filtered ");
+                connectionSourcePtr->droppedPacket(packetToProcess, &connection);
             }
         } else {
-            LOGGER(std::string("packet ") + typeid(*packetToProcess).name() + "was filtered ");
-            connectionSourcePtr->droppedPacket(packetToProcess, &connection);
+            //@todo error handling
         }
+
 
     }
 

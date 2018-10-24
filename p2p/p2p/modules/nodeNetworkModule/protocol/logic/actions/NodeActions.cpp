@@ -7,6 +7,7 @@
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNodeContext.h>
 #include "NodeActions.h"
+#include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
 
 void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
@@ -47,7 +48,7 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
         // NODECONTEXTLOGGER(                "Adding known node " + event.getNodeInfo().getNodeId() + " ... " + event.getNodeInfo().getNetworkId())
         auto &node = nodeContext->getNode();
         if (event.getNodeInfo().getNetworkId() == node.getNodeInfo().getNetworkId()) {
-            node.getNetworkInfo()->addKnownNode(event.getNodeInfo());
+            node.getModule<NodeNetworkModule>()->getNetworkInfo()->addKnownNode(event.getNodeInfo());
         }
 
     }

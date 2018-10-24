@@ -16,14 +16,11 @@
 
 using namespace std::chrono_literals;
 
-#include <fstream>
 #include <p2p/modules/filesystem/network/logic/sources/FileSource.h>
-#include <p2p/modules/filesystem/network/logic/actions/FileActions.h>
 #include <repo/journal/SimpleJournal.h>
 #include <repo/node/RepoModule.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/dependency/Dependency.h>
-#include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include <p2p/modules/command/CommandModule.h>
 #include <p2p/modules/command/StandardCommandsDirectory.h>
 #include <p2p/modules/filesystem/transfer/FileTransferControl.h>
@@ -141,7 +138,6 @@ void setupCommands(CommandModule *cmd) {
 #include <cereal/types/memory.hpp>
 #include <repo/repository/storage/InternalStorage.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
-#include <p2p/modules/nodeNetworkModule/protocol/packet/NetworkInfoRequest.h>
 
 struct PtrTest {
     int a = 9999;
@@ -414,10 +410,11 @@ int main(int argc, char *argv[]) {
 //    std::clog << "Test context : " << *(context->get<std::string>("test")) << std::endl;
 //    context.set<int>(0);
     Node thisNode(9191);
-    thisNode.addToNetwork("TheNetwork");
+
     thisNode.getNodeInfo().setNodeId("first Node");
 
     setupModules(thisNode);
+    thisNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
     thisNode.getModule<NodeNetworkModule>()->configuration().setPort(9191);
 
     auto cmdN = thisNode.getModule<CommandModule>();
@@ -430,9 +427,10 @@ int main(int argc, char *argv[]) {
 
     Node otherNode(9999);
     otherNode.getNodeInfo().setNodeId("second");
-    otherNode.addToNetwork("TheNetwork");
+
 
     setupModules(otherNode);
+    otherNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
     otherNode.getModule<NodeNetworkModule>()->configuration().setPort(9999);
     cmdN = otherNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
@@ -442,8 +440,9 @@ int main(int argc, char *argv[]) {
 
     Node thirdNode(9898);
     thirdNode.getNodeInfo().setNodeId("third");
-    thirdNode.addToNetwork("TheNetwork");
+
     setupModules(thirdNode);
+    thirdNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
     thirdNode.getModule<NodeNetworkModule>()->configuration().setPort(9898);
     cmdN = thirdNode.getModule<CommandModule>();
     setupCommands(cmdN.get());

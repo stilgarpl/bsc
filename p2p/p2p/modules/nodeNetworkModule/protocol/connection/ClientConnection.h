@@ -25,7 +25,7 @@ public:
 
     void startSending();
 
-    virtual ~ClientConnection();
+    ~ClientConnection() override;
 
     void shutdown() override;
 

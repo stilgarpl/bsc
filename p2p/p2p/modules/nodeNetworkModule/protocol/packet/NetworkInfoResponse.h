@@ -7,7 +7,7 @@
 
 
 #include "NetworkInfoGroup.h"
-#include "p2p/node/NetworkInfo.h"
+#include "p2p/modules/nodeNetworkModule/network/NetworkInfo.h"
 
 class NetworkInfoResponse : public Packet<NetworkInfoGroup, NetworkInfoResponse> {
 private:

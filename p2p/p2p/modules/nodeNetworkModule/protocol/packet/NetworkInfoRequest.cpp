@@ -8,6 +8,7 @@
 #include "NetworkInfoResponse.h"
 #include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/context/ConnectionContext.h>
+#include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 
 #include "NetworkInfoRequest.h"
 
@@ -22,10 +23,10 @@ void NetworkInfoRequest::process(Context::Ptr context) {
         // NODECONTEXTLOGGER("processing network info request id" + std::to_string(this->getId()));
         auto &node = nodeContext->getNode();
         auto response = getNew<Status::RESPONSE>(this);//std::make_shared<NetworkInfoResponse>();
-        if (node.getNetworkInfo() == nullptr) {
+        if (node.getModule<NodeNetworkModule>()->getNetworkInfo() == nullptr) {
             NODECONTEXTLOGGER("empty network info! ")
         }
-        response->setNetworkInfo(node.getNetworkInfo());
+        response->setNetworkInfo(node.getModule<NodeNetworkModule>()->getNetworkInfo());
         connectionContext->getConnection().send(response);
     } else {
         //@todo error level

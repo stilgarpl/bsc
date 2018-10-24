@@ -7,7 +7,6 @@
 #include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h>
 #include <p2p/modules/configuration/ConfigurationManager.h>
-#include <p2p/modules/configuration/ConfigurationModule.h>
 
 
 Node::~Node() {
@@ -87,13 +86,6 @@ Node::Node(int port) : Node() {
 
 
 }
-
-std::shared_ptr<NetworkInfo> &Node::getNetworkInfo() {
-    return networkInfo;
-}
-
-
-
 
 
 void Node::startModules() {

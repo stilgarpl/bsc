@@ -6,7 +6,7 @@
 #define BASYCO_NETWORKINFOEVENT_H
 
 
-#include <p2p/node/NetworkInfo.h>
+#include <p2p/modules/nodeNetworkModule/network/NetworkInfo.h>
 #include "p2p/logic/IEvent.h"
 
 

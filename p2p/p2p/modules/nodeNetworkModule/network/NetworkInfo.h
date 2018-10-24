@@ -7,7 +7,7 @@
 
 
 #include <list>
-#include "NodeInfo.h"
+#include "p2p/node/NodeInfo.h"
 #include "cereal/types/map.hpp"
 #include "p2p/log/Logger.h"
 #include <optional>

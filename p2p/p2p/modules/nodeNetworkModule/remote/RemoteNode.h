@@ -23,6 +23,7 @@ private:
     std::shared_ptr<Connection> connection = nullptr;
     Context::OwnPtr _context = Context::makeContext();
     std::shared_ptr<IProtocol> protocol;
+    std::optional<std::string> address;
 
 public:
     const std::optional<NodeIdType> getNodeId() const;
@@ -74,6 +75,10 @@ public:
 
     void setNodeInfo(const NodeInfo &ni) {
         nodeInfo = ni;
+        ///@todo shouldn't this be through logic actions?
+        if (address) {
+            nodeInfo->addKnownAddress(*address);
+        }
     }
 
 };

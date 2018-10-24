@@ -365,3 +365,6 @@ const std::shared_ptr<IProtocol> &NodeNetworkModule::getProtocol() const {
     return protocol;
 }
 
+std::shared_ptr<NetworkInfo> &NodeNetworkModule::getNetworkInfo() {
+    return networkInfo;
+}

@@ -14,11 +14,13 @@
 #include <p2p/modules/nodeNetworkModule/protocol/protocol/GravitonProtocol.h>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/IServerConnection.h>
 #include <p2p/modules/nodeNetworkModule/protocol/broadcast/BroadcastScope.h>
-
+#include <p2p/modules/nodeNetworkModule/network/NetworkInfo.h>
 #include <p2p/modules/configuration/IConfig.h>
 #include <p2p/modules/configuration/ConfigurationModule.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
+#include <p2p/role/RoleScope.h>
 #include "p2p/modules/nodeNetworkModule/remote/exception/RemoteNodeNotFoundException.h"
+
 
 struct NodeConnectionInfo {
     ConnectionPtr connection;
@@ -57,9 +59,19 @@ CONFIG_NAME(NodeNetworkModuleConfig, "network");
 
 class NodeNetworkModule
         : public NodeModuleConfigDependent<NodeNetworkModule, NodeNetworkModuleConfig, ConfigurationModule> {
+    std::shared_ptr<NetworkInfo> networkInfo;
 protected:
 public:
 
+
+    std::shared_ptr<NetworkInfo> &getNetworkInfo();
+
+    void addToNetwork(const NetworkIdType &networkId) {
+        networkInfo = std::make_shared<NetworkInfo>();
+        networkInfo->setNetworkId(networkId);
+        //@todo this shouldn't be set twice... or should it?
+        node.getNodeInfo().setNetworkId(networkId);
+    }
 
 private:
     std::shared_ptr<IProtocol> protocol = std::make_shared<GravitonProtocol>(logicManager);

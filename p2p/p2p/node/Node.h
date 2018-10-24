@@ -8,8 +8,6 @@
 
 #include "NodeInfo.h"
 
-#include "NetworkInfo.h"
-
 #include "p2p/modules/configuration/IConfig.h"
 #include "p2p/logic/SourceManager.h"
 #include "p2p/logic/LogicManager.h"
@@ -56,7 +54,7 @@ private:
 
 
     NodeInfo thisNodeInfo;
-    std::shared_ptr<NetworkInfo> networkInfo;// = nsm(networkInfo); //network this node belongs to @todo more than 1?
+    // = nsm(networkInfo); //network this node belongs to @todo more than 1?
 
 
     // typedef std::shared_ptr<INodeModule> INodeModulePtr;
@@ -103,15 +101,6 @@ public:
     virtual NodeInfo &getNodeInfo() {
         return thisNodeInfo;
     }
-
-    void addToNetwork(const NetworkIdType &networkId) {
-        networkInfo = std::make_shared<NetworkInfo>();
-        networkInfo->setNetworkId(networkId);
-        //@todo this shouldn't be set twice... or should it?
-        thisNodeInfo.setNetworkId(networkId);
-    }
-
-    std::shared_ptr<NetworkInfo> &getNetworkInfo();
 
     friend class NodeActions;
 

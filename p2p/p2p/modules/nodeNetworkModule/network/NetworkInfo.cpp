@@ -3,10 +3,12 @@
 //
 
 
+#include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include "NetworkInfo.h"
 #include "p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h"
 #include "p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h"
+
 
 
 const NetworkIdType &NetworkInfo::getNetworkId() const {
@@ -24,7 +26,8 @@ void NetworkInfo::addKnownNode(const NodeInfo &nodeInfo) {
     auto &node = nodeContext->getNode();
     //  NODECONTEXTLOGGER(node.getNetworkInfo()->getNetworkId());
     //  NODECONTEXTLOGGER(nodeInfo.getNetworkId());
-    if (node.getNetworkInfo()->getNetworkId() == nodeInfo.getNetworkId() && !isNodeKnown(nodeInfo.getNodeId())) {
+    if (node.getModule<NodeNetworkModule>()->getNetworkInfo()->getNetworkId() == nodeInfo.getNetworkId() &&
+        !isNodeKnown(nodeInfo.getNodeId())) {
 
         auto lc = context->get<LogicContext>();
         if (lc != nullptr) {

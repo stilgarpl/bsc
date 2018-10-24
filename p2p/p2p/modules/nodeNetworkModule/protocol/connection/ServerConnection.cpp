@@ -23,7 +23,7 @@ void ServerConnection::run() {
     startSending(socket());
     try {
         workReceive(socket());
-    } catch (Poco::Net::NetException e) {
+    } catch (const Poco::Net::NetException &e) {
         //processor.stop();
         stopReceiving();
         stopSending();
