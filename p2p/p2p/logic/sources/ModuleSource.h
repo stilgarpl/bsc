@@ -6,6 +6,8 @@
 #define BASYCO_MODULESOURCE_H
 
 
+#include <p2p/node/ModuleState.h>
+#include <p2p/logic/events/ModuleEvent.h>
 #include "AutoSource.h"
 
 class ModuleSource : public ISource {
@@ -18,6 +20,13 @@ public:
 
     explicit ModuleSource(SourceManager &sourceManager);
 
+    template<typename ModuleType>
+    void moduleStateChanged(const ModuleState &state, ModuleType &module) {
+        LOGGER(std::string("Module state changed ") + typeid(ModuleType).name())
+        ModuleEvent<ModuleType> event(module);
+        event.setEventId(state);
+        source.generateEvent<ModuleEvent<ModuleType>>(event);
+    }
 
 };
 

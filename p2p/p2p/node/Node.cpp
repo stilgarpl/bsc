@@ -122,8 +122,10 @@ void Node::initialize() {
     //now all modules are initialized and then all modules are setupLogiced
     //hope it doesn't break anything
     forEachModule(&INodeModule::initializeConfiguration);
-    forEachModule(&INodeModule::initialize);
-    forEachModule<bool, INodeModule>(&INodeModule::setupLogic);
+    forEachModule(&INodeModule::doInitialize);
+//    forEachModule<bool, INodeModule>(&INodeModule::setupLogic);
+    forEachModule(&INodeModule::doSetupLogic);
+    forEachModule(&INodeModule::doReady);
 
 }
 

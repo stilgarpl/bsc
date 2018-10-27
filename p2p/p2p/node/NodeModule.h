@@ -10,6 +10,7 @@
 #include <p2p/dependency/IDependencyManaged.h>
 #include <p2p/dependency/DependencyManaged.h>
 #include <p2p/modules/configuration/ConfigurationManager.h>
+#include <p2p/logic/sources/ModuleSource.h>
 #include "INode.h"
 #include "INodeModule.h"
 
@@ -72,6 +73,12 @@ public:
         if (loaded != nullptr)
             configuration() = *loaded;
     }
+
+protected:
+    void changeState(const ModuleState &state) override {
+        node.getLogicManager().template requireSource<ModuleSource>().
+                template moduleStateChanged<T>(state, *static_cast<T *>(this));
+    }
 };
 
 template<typename T, typename ConfigType, typename ... Args>
@@ -112,6 +119,12 @@ public:
             configuration() = *loaded;
             LOGGER("Configuration found, loading")
         }
+    }
+
+protected:
+    void changeState(const ModuleState &state) override {
+        node.getLogicManager().template requireSource<ModuleSource>().
+                template moduleStateChanged<T>(state, *static_cast<T *>(this));
     }
 
 };

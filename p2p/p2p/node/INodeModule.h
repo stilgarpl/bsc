@@ -12,6 +12,7 @@
 //@todo this is interface for configuration, it shouldn't have dependencies on modules
 #include <p2p/modules/configuration/IConfig.h>
 #include "INode.h"
+#include "ModuleState.h"
 
 class INodeModule : public virtual IDependencyManaged, public Runnable {
 protected:
@@ -19,14 +20,33 @@ protected:
 public:
     typedef IConfig Config;
 
-    INodeModule(INode &node) : node(node) {}
+    explicit INodeModule(INode &node) : node(node) {}
 
+    void doInitialize() {
+        initialize();
+        changeState(ModuleState::INITIALIZED);
+    }
+
+    void doSetupLogic() {
+        if (setupLogic()) {
+            changeState(ModuleState::LOGIC_READY);
+        }
+
+    }
+
+    void doReady() {
+        changeState(ModuleState::READY);
+    }
     virtual void initialize()=0;
 
     virtual IConfig &configuration()=0;
 
     virtual bool setupLogic()=0;
     virtual void initializeConfiguration()=0;
+
+protected:
+    //module events
+    virtual void changeState(const ModuleState &state) = 0;
 
 };
 

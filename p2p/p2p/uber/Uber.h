@@ -120,9 +120,9 @@ public:
         return t;
     }
 
-    T &operator=(const T &other) {
+    Type &operator=(const T &other) {
         t = other;
-        return t;
+        return *this;
     }
 };
 

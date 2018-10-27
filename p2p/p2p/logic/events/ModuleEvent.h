@@ -6,15 +6,25 @@
 #define BASYCO_MODULEEVENT_H
 
 #include <p2p/logic/IEvent.h>
+#include <p2p/node/ModuleState.h>
 
-enum class ModuleEventId {
-    MODULE_INITIALIZED,
-};
 
 template<typename ModuleType>
-class ModuleEvent : public IEvent<ModuleEventId> {
+class ModuleEvent : public IEvent<ModuleState> {
 public:
     typedef ModuleType Type;
+private:
+    ModuleType &module;
+public:
+    ModuleType &getModule() const {
+        return module;
+    }
+
+    explicit ModuleEvent(ModuleType &module) : module(module) {}
+
+    ModuleState getState() {
+        return getEventId();
+    }
 };
 
 
