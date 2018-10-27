@@ -274,3 +274,8 @@ when(state<Connection>(is(CONNECTED)).and(event<NodeEvent>()).then
 
 
 when(event<NodeEvent>()).if(state<Connetion>(CONNECTED)).then
+
+
+ModuleSource generates ModuleEvent<Module> z np. id = initialized or sth
+
+ModuleEvent<NetModule>::initialized -> load network info

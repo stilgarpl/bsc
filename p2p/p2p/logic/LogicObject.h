@@ -150,7 +150,7 @@ public:
 //            logicManager.event<NewEventType,NewArgs...>(NewEventType(),NewArgs()...);
             auto &autoSource = logicManager.requireSource<AutoSource>();
             fireNewAction([&, newEventType](EventType e, Args...) {
-                autoSource.generateEvent<NewEventType>(newEventType);
+                autoSource.template generateEvent<NewEventType>(newEventType);
             });
 
             return *this;

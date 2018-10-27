@@ -16,6 +16,7 @@
 class ISource {
 private:
 protected:
+    ///@todo protected or maybe private?
     SourceManager &sourceManager;
 public:
     explicit ISource(SourceManager &sourceManager);

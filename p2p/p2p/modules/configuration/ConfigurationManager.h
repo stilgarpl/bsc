@@ -6,12 +6,13 @@
 #define BASYCO_CONFIGURATIONMANAGER_H
 
 #include <filesystem>
+#include <fstream>
 
 namespace fs = std::filesystem;
 
 #include "IConfig.h"
 
-
+//@todo consider changing name to IOManager or sth like that, because it doesn't just do configuration but everything that goes into private node directory
 class ConfigurationManager {
 public:
     typedef IConfig::IdType IdType;
@@ -19,10 +20,15 @@ private:
     fs::path rootPath;
 
 
-public:
+protected:
     fs::path getConfigPath() {
         return rootPath / fs::path("config");
     }
+
+    fs::path getDataPath() {
+        return rootPath / fs::path("data");
+    }
+
 
 protected:
     fs::path filenameFromId(const IdType &id) {
@@ -34,8 +40,32 @@ protected:
 public:
     void save(const IdType &id, std::shared_ptr<IConfig> config);
 
+    template<typename DataType /* @todo Concept: DataType is serializable*/>
+    void saveData(const fs::path &fname, const DataType &data) {
+        fs::path filePath = getDataPath() / fname;
+        fs::create_directories(filePath.parent_path());
+        std::ofstream os(filePath);
+        cereal::XMLOutputArchive archive(os);
+        archive << data;
+    }
 
-    //@todo Concepts: T extends IConfig
+    template<typename DataType /* @todo Concept: DataType is serializable*/>
+    DataType loadData(const fs::path &fname) {
+        DataType data;
+        fs::path filePath = getDataPath() / fname;
+        if (fs::exists(filePath)) {
+            std::ifstream is(filePath);
+            cereal::XMLInputArchive archive(is);
+            archive >> data;
+
+        } else {
+            //@todo throw file not found exception
+        }
+        return data;
+    }
+
+
+    //@todo Concept: T extends IConfig
     template<typename T>
     std::shared_ptr<T> load(const IdType &id) {
         return std::static_pointer_cast<T>(load_void(id));

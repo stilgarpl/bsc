@@ -17,6 +17,8 @@ public:
     NetworkSource(SourceManager &sourceManager);
 
     void networkInfoReceived(const NetworkInfo &networkInfo);
+
+    void saveNetworkInfo(const NetworkInfo &networkInfo);
 };
 
 

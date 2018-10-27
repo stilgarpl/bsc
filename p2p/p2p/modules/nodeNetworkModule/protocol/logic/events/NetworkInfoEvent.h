@@ -11,7 +11,8 @@
 
 
 enum class NetworInfoEventId {
-    NETWORK_INFO_RECEIVED
+    NETWORK_INFO_RECEIVED,
+    SAVE_NETWORK_INFO,
 
 };
 

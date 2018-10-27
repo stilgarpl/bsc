@@ -11,7 +11,7 @@
 #include <p2p/logic/IEvent.h>
 
 /**
- * tickuje co int czasu
+ * tick every set amount of time
  */
 class Tick : public IEvent<std::chrono::milliseconds> {
 public:

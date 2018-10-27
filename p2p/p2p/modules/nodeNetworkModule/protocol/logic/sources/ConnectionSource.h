@@ -18,7 +18,7 @@ private:
 public:
 
 
-    ConnectionSource(SourceManager &sourceManager);
+    explicit ConnectionSource(SourceManager &sourceManager);
 
     void newConnection(Connection *con);
 

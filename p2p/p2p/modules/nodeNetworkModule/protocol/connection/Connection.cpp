@@ -136,7 +136,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                     ///possible way to fix this is to implement a low level protocol buffer, that would get the bytes from cereal serializer and put them in the socket stream with additional data, like size and maybe CRC or sth.
                     ///and in the same way, it should first read the size bytes and then the rest of the message from the stream and when cereal does >> it should only give it ONE packet from the buffer at a time.
 
-                    int safeguard = 0;
+                    //int safeguard = 0;
                     while (receiving /*&& safeguard++ < 5*/) {
                         BasePacketPtr v;
                         ia >> v;
@@ -171,14 +171,14 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 //                    //@todo trigger event?
 //                }
             }
-            catch (cereal::Exception e) {
+            catch (const cereal::Exception &e) {
                 //socket.close();
                 stopReceiving();
                 stopSending();
                 //cprocessor.stop();
                 // if not receiving, then it's ok!
             }
-            catch (Poco::Net::NetException e) {
+            catch (const Poco::Net::NetException &e) {
                 //processor.stop();
                 stopReceiving();
                 stopSending();
@@ -225,7 +225,7 @@ void Connection::stopReceiving() {
     receiving = false;
     try {
         getSocket().shutdown();
-    } catch (Poco::Net::NetException e) {
+    } catch (const Poco::Net::NetException &e) {
         e.what();
     }
     //  receiveReady.notify_all();

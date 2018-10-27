@@ -59,6 +59,7 @@ CONFIG_NAME(NodeNetworkModuleConfig, "network");
 
 class NodeNetworkModule
         : public NodeModuleConfigDependent<NodeNetworkModule, NodeNetworkModuleConfig, ConfigurationModule> {
+    //@todo why is this a pointer?
     std::shared_ptr<NetworkInfo> networkInfo;
 protected:
 public:

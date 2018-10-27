@@ -15,3 +15,11 @@ void NetworkSource::networkInfoReceived(const NetworkInfo &networkInfo) {
 }
 
 NetworkSource::NetworkSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}
+
+void NetworkSource::saveNetworkInfo(const NetworkInfo &networkInfo) {
+    auto event = newEvent();
+    event->setNetworkInfo(networkInfo);
+    event->setEventId(EventType::IdType::SAVE_NETWORK_INFO);
+
+    queueEvent(event);
+}

@@ -12,6 +12,10 @@ class NetworkActions {
 
 public:
     static void updateNetworkInfo(const NetworkInfoEvent &event);
+
+    static void saveNetworkInfo(const NetworkInfoEvent &event);
+
+    static void loadNetworkInfo();
 };
 
 
