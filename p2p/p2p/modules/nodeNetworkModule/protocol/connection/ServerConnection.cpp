@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 31.07.17.
 //
@@ -105,4 +107,4 @@ Poco::Net::TCPServerConnection *ServerConnectionFactory::createConnection(const 
 }
 
 ServerConnectionFactory::ServerConnectionFactory(Node &serverNode, Context::Ptr context)
-        : serverNode(serverNode), context(Context::makeContext(context)) {}
+        : serverNode(serverNode), context(Context::makeContext(std::move(context))) {}

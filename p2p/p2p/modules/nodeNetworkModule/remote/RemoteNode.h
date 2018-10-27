@@ -11,6 +11,7 @@
 #include <Poco/Net/SocketAddress.h>
 #include <p2p/node/NodeInfo.h>
 #include <p2p/modules/nodeNetworkModule/protocol/protocol/IProtocol.h>
+#include <p2p/modules/nodeNetworkModule/network/RemoteNodeInfo.h>
 #include "p2p/modules/nodeNetworkModule/remote/exception/NotRequestException.h"
 
 /**
@@ -19,7 +20,7 @@
  */
 class RemoteNode {
 private:
-    std::optional<NodeInfo> nodeInfo;
+    RemoteNodeInfo remoteNodeInfo;
     std::shared_ptr<Connection> connection = nullptr;
     Context::OwnPtr _context = Context::makeContext();
     std::shared_ptr<IProtocol> protocol;
@@ -67,17 +68,20 @@ public:
             return response;
 
         } else {
-            LOGGER("unable to send packet to " + (nodeInfo ? nodeInfo->getNodeId() : "remote node.") + "Not connected")
+            LOGGER("unable to send packet to " +
+                   (remoteNodeInfo.getNodeInfo() ? remoteNodeInfo.getNodeInfo()->getNodeId() : "remote node.") +
+                   "Not connected")
             return std::shared_ptr<ReturnType>(nullptr);
 
         }
     };
 
     void setNodeInfo(const NodeInfo &ni) {
-        nodeInfo = ni;
-        ///@todo shouldn't this be through logic actions?
+        //@todo if serialization supports optional, this should be changed to optional, but for now, it's shared_ptr
+        remoteNodeInfo.setNodeInfo(std::make_shared<NodeInfo>(ni));
+        //@todo shouldn't this be through logic actions? or any other way? the problem is that we have to store the connection address between creating the connection and receiving node info
         if (address) {
-            nodeInfo->addKnownAddress(*address);
+            remoteNodeInfo.addKnownAddress(*address);
         }
     }
 

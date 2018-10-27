@@ -106,7 +106,7 @@ public:
     }
 
     void initializeConfiguration() override {
-        auto loaded = node.getConfigurationManager().load<Config>(configuration().getConfigId());
+        auto loaded = node.getConfigurationManager().template load<Config>(configuration().getConfigId());
         LOGGER(std::string("Checking configuration for class: ") + typeid(T).name());
         if (loaded != nullptr) {
             configuration() = *loaded;

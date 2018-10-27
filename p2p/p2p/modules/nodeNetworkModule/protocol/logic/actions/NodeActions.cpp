@@ -15,7 +15,7 @@ void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
     auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
         //  NODECONTEXTLOGGER("Node discovered (connecting): " + event.getNodeInfo().getNodeId())
-        auto &node = nodeContext->getNode();
+//        auto &node = nodeContext->getNode();
         //@todo we shouldn't connect to any node, just in certain situations
 //        node.getModule<NodeNetworkModule>()->connectTo(event.getNodeInfo());
     }

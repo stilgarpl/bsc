@@ -10,8 +10,8 @@
 
 
 const std::optional<NodeIdType> RemoteNode::getNodeId() const {
-    if (nodeInfo) {
-        return nodeInfo->getNodeId();
+    if (remoteNodeInfo.getNodeInfo()) {
+        return remoteNodeInfo.getNodeInfo()->getNodeId();
     } else {
         return std::nullopt;
     }

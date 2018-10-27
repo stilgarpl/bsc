@@ -84,7 +84,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
             os.flush();
 //            std::this_thread::sleep_for(10ms);
 //            LOGGER("sending flushed");
-        } catch (cereal::Exception e) {
+        } catch (const cereal::Exception &e) {
             LOGGER(" C EXCEPTION")
             LOGGER(e.what());
             //socket.close();
@@ -93,7 +93,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
             //cprocessor.stop();
             // if not receiving, then it's ok!
         }
-        catch (Poco::Net::NetException e) {
+        catch (const Poco::Net::NetException &e) {
             LOGGER(" P EXCEPTION")
             //processor.stop();
             stopReceiving();

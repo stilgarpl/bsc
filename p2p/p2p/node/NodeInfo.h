@@ -22,14 +22,11 @@ class NodeInfo {
 
     NodeIdType nodeId;
     NetworkIdType networkId;
-    ///@todo structure instead of string? we can store info like last successful connection to that address or sth
-    std::set<std::string> knownAddresses;
     //typename Node::IdType id;
 public:
     const std::string &getNetworkId() const;
 
-    const std::set<std::string> &getKnownAddresses() const;
-//
+    //
 //    Node::IdType getId() const;
 //
 //    void setId(Node::IdType id);
@@ -37,7 +34,7 @@ public:
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(nodeId, networkId, knownAddresses);
+        ar(nodeId, networkId);
     }
 
 
@@ -47,10 +44,6 @@ public:
     const NodeIdType &getNodeId() const;
 
     void setNodeId(const NodeIdType &nodeId);
-
-    void addKnownAddress(std::string address) {
-        knownAddresses.insert(address);
-    }
 
     void printAll() const {
         std::cout << ":::NODE INFO:::" << std::endl
