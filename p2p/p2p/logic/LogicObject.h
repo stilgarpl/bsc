@@ -109,6 +109,7 @@ public:
         template<typename ActionId>
         ThisType &fireAction(ActionId actionId) {
             std::cout << "assigning action ... " << std::endl;
+            //@todo throw some exception or sth if action isn't found
             if (eventId) {
 
                 logicManager.assignAction<EventType, Args...>(*eventId, actionId);

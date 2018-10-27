@@ -31,6 +31,9 @@ void Node::start() {
 
 void Node::stop() {
 
+    shutdownModules();
+    //@todo wait for shutdown to complete, sleep will do for now
+    std::this_thread::sleep_for(1s);
     logicManager.stop();
     stopModules();
 
@@ -143,6 +146,12 @@ void Node::waitToFinish() {
     logicManager.join();
     //@todo replace this with waiting for modules
     std::this_thread::sleep_for(1s);
+
+}
+
+void Node::shutdownModules() {
+    forEachModule(&INodeModule::doShutdown);
+
 
 }
 

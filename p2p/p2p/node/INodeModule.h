@@ -37,6 +37,10 @@ public:
     void doReady() {
         changeState(ModuleState::READY);
     }
+
+    void doShutdown() {
+        changeState(ModuleState::SHUTDOWN);
+    }
     virtual void initialize()=0;
 
     virtual IConfig &configuration()=0;

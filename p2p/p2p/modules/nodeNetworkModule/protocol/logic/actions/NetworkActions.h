@@ -7,15 +7,16 @@
 
 
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkInfoEvent.h>
+#include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 
 class NetworkActions {
 
 public:
     static void updateNetworkInfo(const NetworkInfoEvent &event);
 
-    static void saveNetworkInfo(const NetworkInfoEvent &event);
+    static void saveNetworkInfo(const ModuleEvent<NodeNetworkModule> &event);
 
-    static void loadNetworkInfo();
+    static void loadNetworkInfo(const ModuleEvent<NodeNetworkModule> &event);
 };
 
 

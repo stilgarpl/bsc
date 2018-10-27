@@ -6,6 +6,7 @@
 
 void ModuleSource::work() {
     source.work();
+//    LOGGER("Module source work")
 
 }
 

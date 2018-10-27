@@ -23,22 +23,24 @@ void NetworkActions::updateNetworkInfo(const NetworkInfoEvent &event) {
     }
 }
 
-void NetworkActions::saveNetworkInfo(const NetworkInfoEvent &event) {
+void NetworkActions::saveNetworkInfo(const ModuleEvent<NodeNetworkModule> &event) {
     Context::Ptr context = Context::getActiveContext();
+    LOGGER("SAVE NETWORK INFO")
     auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
         auto &node = nodeContext->getNode();
-        node.getConfigurationManager().saveData<NetworkInfo>("networkInfo.dat", event.getNetworkInfo());
+        node.getConfigurationManager().saveData<NetworkInfo>("networkInfo.dat", *event.getModule().getNetworkInfo());
     }
 }
 
-void NetworkActions::loadNetworkInfo() {
+void NetworkActions::loadNetworkInfo(const ModuleEvent<NodeNetworkModule> &event) {
     Context::Ptr context = Context::getActiveContext();
+    LOGGER("LOAD NETWORK INFO")
     auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
         auto &node = nodeContext->getNode();
         //@todo handle failed load
-        node.getModule<NodeNetworkModule>()->getNetworkInfo() = std::make_shared<NetworkInfo>(
+        event.getModule().getNetworkInfo() = std::make_shared<NetworkInfo>(
                 node.getConfigurationManager().loadData<NetworkInfo>("networkInfo.dat"));
     }
 }

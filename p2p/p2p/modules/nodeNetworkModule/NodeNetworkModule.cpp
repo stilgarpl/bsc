@@ -128,6 +128,14 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
     when(event<Tick>(120s)).fireNewAction(
             [&, this](auto e) { this->broadcastPacket(KeepAlivePacket::Request::getNew()); });
 
+    when(event<ModuleEvent<NodeNetworkModule>>(ModuleState::READY)).fireNewAction(
+            NetworkActions::loadNetworkInfo);
+
+    when(event<ModuleEvent<NodeNetworkModule>>(ModuleState::SHUTDOWN)).fireNewAction(
+            NetworkActions::saveNetworkInfo);
+
+    when(event<ModuleEvent<NodeNetworkModule>>()).fireNewAction([](auto event) { LOGGER("module event NNM") });
+
 
     //@todo move to more appropriate method
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole");

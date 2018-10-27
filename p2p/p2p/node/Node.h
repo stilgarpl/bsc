@@ -148,7 +148,8 @@ protected:
 //    }
 
 //    friend class NodeModule;
-
+protected:
+    void shutdownModules();
 };
 
 //CEREAL_REGISTER_TYPE(Node::Config)

@@ -11,6 +11,7 @@ enum class ModuleState {
     INITIALIZED,
     LOGIC_READY,
     READY,
+    SHUTDOWN,
 };
 
 
