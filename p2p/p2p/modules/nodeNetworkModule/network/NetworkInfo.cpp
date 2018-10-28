@@ -70,3 +70,9 @@ NetworkInfo &NetworkInfo::operator+=(const NetworkInfo &other) {
     }
     return *this;
 }
+
+void NetworkInfo::addKnownAddress(const NodeIdType &nodeId, const NetAddressType &address) {
+
+    knownNodes[nodeId]->addKnownAddress(address);
+
+}

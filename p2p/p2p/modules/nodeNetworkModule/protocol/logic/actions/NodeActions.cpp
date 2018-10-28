@@ -49,10 +49,19 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
         auto &node = nodeContext->getNode();
         if (event.getNodeInfo().getNetworkId() == node.getNodeInfo().getNetworkId()) {
             node.getModule<NodeNetworkModule>()->getNetworkInfo()->addKnownNode(event.getNodeInfo());
+
+            //@todo do it better way, this is quick and dirty
+            auto remoteNodeContext = context->get<RemoteNodeContext>();
+            if (remoteNodeContext) {
+                auto &remoteNode = remoteNodeContext->getRemoteNode();
+                node.getModule<NodeNetworkModule>()->getNetworkInfo()->addKnownAddress(event.getNodeInfo().getNodeId(),
+                                                                                       *remoteNode.getAddress());
+
+            }
+
         }
 
     }
-
 }
 
 void NodeActions::triggerUpdateNode(const Tick &tick) {

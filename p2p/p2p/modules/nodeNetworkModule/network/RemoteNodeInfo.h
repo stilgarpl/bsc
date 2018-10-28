@@ -7,17 +7,18 @@
 
 
 #include <p2p/node/NodeInfo.h>
+#include <p2p/modules/nodeNetworkModule/network/NetAddressType.h>
 
 class RemoteNodeInfo {
 
     std::shared_ptr<NodeInfo> nodeInfo;
 ///@todo structure instead of string? we can store info like last successful connection to that address or sth
-    std::set<std::string> knownAddresses;
+    std::set<NetAddressType> knownAddresses;
 
 public:
-    const std::set<std::string> &getKnownAddresses() const;
+    const std::set<NetAddressType> &getKnownAddresses() const;
 
-    void addKnownAddress(std::string address) {
+    void addKnownAddress(const NetAddressType &address) {
         knownAddresses.insert(address);
     }
 

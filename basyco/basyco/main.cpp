@@ -105,10 +105,11 @@ void setupCommands(CommandModule *cmd) {
     cmd->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
     cmd->mapCommand("connect", &NodeNetworkModule::connectTo);
+    cmd->mapCommand("connectTo", &NodeNetworkModule::connectToNode);
     cmd->mapCommand<NodeNetworkModule, RemoteNode &, const NodeIdType &>("getnode", &NodeNetworkModule::getRemoteNode);
     cmd->mapCommand("disconnect", &NodeNetworkModule::disconnect);
     cmd->mapCommand("print", &NodeNetworkModule::printConnections);
-//    cmd->mapCommand("update", &NodeNetworkModule::updateNodeConnectionInfo);
+//    cmd->mapCommand("update", &NodeNetworkModule:prin:updateNodeConnectionInfo);
 //    cmd->mapCommand("purgeD", &NodeNetworkModule::purgeDuplicateConnections);
 //    cmd->mapCommand("purgeI", &NodeNetworkModule::purgeInactiveConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);

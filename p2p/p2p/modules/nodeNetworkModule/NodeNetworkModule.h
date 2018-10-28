@@ -128,7 +128,7 @@ public: // @todo should be public or shouldn't ?
 
     void onStart() override;
 
-    RemoteNode &connectTo(const std::string &address) {
+    RemoteNode &connectTo(const NetAddressType &address) {
         RemoteNode &remoteNode = getRemoteNode();
         remoteNode.connectTo(address);
         return remoteNode;

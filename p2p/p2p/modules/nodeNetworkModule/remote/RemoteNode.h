@@ -24,17 +24,18 @@ private:
     std::shared_ptr<Connection> connection = nullptr;
     Context::OwnPtr _context = Context::makeContext();
     std::shared_ptr<IProtocol> protocol;
-    std::optional<std::string> address;
 
 public:
     const std::optional<NodeIdType> getNodeId() const;
 
-    bool connectTo(const std::string &address);
+    bool connectTo(const NetAddressType &address);
 
     void connect(std::shared_ptr<Connection> existingConnection) {
         ///@todo what is this function for again? don't remember why I added it
         connection = std::move(existingConnection);
     }
+
+    bool connect();
 
     Context::Ptr context() { return _context; };
 protected:
@@ -76,18 +77,19 @@ public:
         }
     };
 
-    void setNodeInfo(const NodeInfo &ni) {
-        //@todo if serialization supports optional, this should be changed to optional, but for now, it's shared_ptr
-        remoteNodeInfo.setNodeInfo(std::make_shared<NodeInfo>(ni));
-        //@todo shouldn't this be through logic actions? or any other way? the problem is that we have to store the connection address between creating the connection and receiving node info
-        if (address) {
-            remoteNodeInfo.addKnownAddress(*address);
-        }
-    }
+    void setNodeInfo(const NodeInfo &ni);
 
     const RemoteNodeInfo &getRemoteNodeInfo() const;
 
     void setRemoteNodeInfo(const RemoteNodeInfo &remoteNodeInfo);
+
+    const std::optional<NetAddressType> getAddress() {
+        if (connection && connection->isActive()) {
+            return connection->getAddress();
+        } else {
+            return std::nullopt;
+        }
+    }
 
 };
 

@@ -15,6 +15,7 @@
 #include <p2p/modules/nodeNetworkModule/protocol/processor/ConnectionProcessor.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
 #include <p2p/role/RoleScope.h>
+#include <p2p/modules/nodeNetworkModule/network/NetAddressType.h>
 
 
 class Connection : public RoleScope {
@@ -42,6 +43,7 @@ protected:
 
     void workReceive(Poco::Net::StreamSocket &socket);
 
+    //@todo if possible try to remove this method. we should hide Poco
     virtual Poco::Net::StreamSocket &getSocket()=0;
 
 public:
@@ -54,6 +56,15 @@ public:
 
     virtual void stopReceiving();
 
+    virtual NetAddressType getAddress() {
+        //@todo if getSocket is removed, just make it pure virtual and implement in client and server connections
+        return getSocket().peerAddress().toString();
+    }
+
+    //most likely temporary address, not really useful
+    virtual NetAddressType getOwnAddress() {
+        return getSocket().address().toString();
+    }
 
     bool isActive() {
         return sending && receiving;

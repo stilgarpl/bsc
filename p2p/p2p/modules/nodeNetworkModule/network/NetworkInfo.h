@@ -12,6 +12,8 @@
 #include "p2p/log/Logger.h"
 #include "RemoteNodeInfo.h"
 #include <optional>
+#include "NetAddressType.h"
+
 
 //typedef std::string NetworkIdType;
 typedef std::map<NodeIdType, RemoteNodeInfo::Ptr> NodesMapType;
@@ -44,6 +46,8 @@ public:
     NodeInfo &getNodeInfo(const NodeIdType &nodeId);
 
     RemoteNodeInfo &getRemoteNodeInfo(const NodeIdType &nodeId);
+
+    void addKnownAddress(const NodeIdType &nodeId, const NetAddressType &address);
 
 
 };

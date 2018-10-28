@@ -17,7 +17,7 @@ const std::optional<NodeIdType> RemoteNode::getNodeId() const {
     }
 }
 
-bool RemoteNode::connectTo(const std::string &address) {
+bool RemoteNode::connectTo(const NetAddressType &address) {
 
 //    Poco::Net::SocketAddress socketAddress(address);
     //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
@@ -31,7 +31,6 @@ bool RemoteNode::connectTo(const std::string &address) {
         conn->startSending();
         conn->startReceiving();
         connection = conn;
-        this->address = address;
         return true;
     } catch (const Poco::Net::ConnectionRefusedException &) {
         //@todo connection refused in connectionSource
@@ -56,5 +55,24 @@ const RemoteNodeInfo &RemoteNode::getRemoteNodeInfo() const {
 
 void RemoteNode::setRemoteNodeInfo(const RemoteNodeInfo &remoteNodeInfo) {
     RemoteNode::remoteNodeInfo = remoteNodeInfo;
+}
+
+bool RemoteNode::connect() {
+    LOGGER("remote node trying to connect")
+    for (const auto &knownAddress : remoteNodeInfo.getKnownAddresses()) {
+        LOGGER("trying address  " + knownAddress);
+        bool value = connectTo(knownAddress);
+        if (value) return true;
+    }
+    return false;
+}
+
+void RemoteNode::setNodeInfo(const NodeInfo &ni) {
+    //@todo if serialization supports optional, this should be changed to optional, but for now, it's shared_ptr
+    remoteNodeInfo.setNodeInfo(std::make_shared<NodeInfo>(ni));
+//    LOGGER(std::string("setting node info, and the connection address is ") + connection->getAddress() + " but remembered adress is " + *address);
+    //@todo shouldn't this be through logic actions? or any other way? the problem is that we have to store the connection address between creating the connection and receiving node info
+    remoteNodeInfo.addKnownAddress(connection->getAddress());
+
 }
 
