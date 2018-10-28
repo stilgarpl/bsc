@@ -64,7 +64,7 @@ class NodeNetworkModule
 protected:
 public:
 
-
+    //@todo this probably shouldn't return & but ordinary shared_ptr... or just &, without the pointer.
     std::shared_ptr<NetworkInfo> &getNetworkInfo();
 
     void addToNetwork(const NetworkIdType &networkId) {
@@ -233,7 +233,15 @@ public: // @todo should be public or shouldn't ?
         if (iter != remoteNodes.end()) {
             return **iter;
         } else {
-            throw RemoteNodeNotFoundException();
+            //there is no active remote node with this id, let's see if it is known in network information
+            auto networkInfo = getNetworkInfo();
+            if (networkInfo->isNodeKnown(nodeId)) {
+                auto &remoteNode = getRemoteNode();
+                remoteNode.setRemoteNodeInfo(networkInfo->getRemoteNodeInfo(nodeId));
+                return remoteNode;
+            } else {
+                throw RemoteNodeNotFoundException();
+            }
         }
     }
 };

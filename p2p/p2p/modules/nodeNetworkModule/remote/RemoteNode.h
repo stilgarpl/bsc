@@ -85,6 +85,10 @@ public:
         }
     }
 
+    const RemoteNodeInfo &getRemoteNodeInfo() const;
+
+    void setRemoteNodeInfo(const RemoteNodeInfo &remoteNodeInfo);
+
 };
 
 

@@ -10,10 +10,11 @@
 #include "p2p/node/NodeInfo.h"
 #include "cereal/types/map.hpp"
 #include "p2p/log/Logger.h"
+#include "RemoteNodeInfo.h"
 #include <optional>
 
 //typedef std::string NetworkIdType;
-typedef std::map<NodeIdType, NodeInfo> NodesMapType;
+typedef std::map<NodeIdType, RemoteNodeInfo::Ptr> NodesMapType;
 
 class NetworkInfo {
 private:
@@ -34,22 +35,15 @@ public:
 
     void setNetworkId(const NetworkIdType &networkId);
 
-    NetworkInfo &operator+=(const NetworkInfo &other) {
-        if (networkId == other.networkId) {
-            //@todo merge known nodes
-            for (auto &&i : other.knownNodes) {
-                addKnownNode(i.second);
-            }
-        }
-        return *this;
-    }
+    NetworkInfo &operator+=(const NetworkInfo &other);
 
     void addKnownNode(const NodeInfo &nodeInfo);
 
-    bool isNodeKnown(const NodeIdType &nodeId) {
-        return knownNodes.count(nodeId) > 0;
-    }
+    bool isNodeKnown(const NodeIdType &nodeId);
 
+    NodeInfo &getNodeInfo(const NodeIdType &nodeId);
+
+    RemoteNodeInfo &getRemoteNodeInfo(const NodeIdType &nodeId);
 
 
 };

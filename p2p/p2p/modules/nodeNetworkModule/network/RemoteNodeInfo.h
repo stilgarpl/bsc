@@ -10,9 +10,10 @@
 
 class RemoteNodeInfo {
 
+    std::shared_ptr<NodeInfo> nodeInfo;
 ///@todo structure instead of string? we can store info like last successful connection to that address or sth
     std::set<std::string> knownAddresses;
-    std::shared_ptr<NodeInfo> nodeInfo;
+
 public:
     const std::set<std::string> &getKnownAddresses() const;
 
@@ -30,7 +31,22 @@ public:
 
     void setNodeInfo(const std::shared_ptr<NodeInfo> &nodeInfo);
 
+private:
+    template<class Archive>
+    void serialize(Archive &ar) {
+        ar & nodeInfo;
+        ar & knownAddresses;
+    }
+
+
+    friend class cereal::access;
+
+public:
+    typedef std::shared_ptr<RemoteNodeInfo> Ptr;
+
 };
+
+
 
 
 #endif //BASYCO_REMOTENODEINFO_H

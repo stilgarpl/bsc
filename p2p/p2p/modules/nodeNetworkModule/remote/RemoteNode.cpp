@@ -50,3 +50,11 @@ RemoteNode::RemoteNode(const std::shared_ptr<IProtocol> &protocol) : protocol(pr
     context()->set<RemoteNodeContext, RemoteNode &>(*this);
 }
 
+const RemoteNodeInfo &RemoteNode::getRemoteNodeInfo() const {
+    return remoteNodeInfo;
+}
+
+void RemoteNode::setRemoteNodeInfo(const RemoteNodeInfo &remoteNodeInfo) {
+    RemoteNode::remoteNodeInfo = remoteNodeInfo;
+}
+
