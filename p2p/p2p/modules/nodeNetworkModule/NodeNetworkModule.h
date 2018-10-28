@@ -134,6 +134,13 @@ public: // @todo should be public or shouldn't ?
         return remoteNode;
     }
 
+    RemoteNode &connectToNode(const NodeIdType& nodeId) {
+        //@todo catch exception
+        RemoteNode &remoteNode = getRemoteNode(nodeId);
+        remoteNode.connect();
+        return remoteNode;
+    }
+
     void disconnect(const NodeIdType id);
 
     void disconnectAll();
