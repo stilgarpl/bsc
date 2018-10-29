@@ -53,7 +53,7 @@ void CommandModule::initialize() {
     }
 }
 
-void CommandModule::sendRemoteCommand(const std::vector<std::string> &args) {
+void CommandModule::sendRemoteCommand(ArgumentContainerType args) {
     LOGGER("send remote")
     //@todo add checking if the number of parameters is correct
     if (args.size() >= 2) {
@@ -73,6 +73,34 @@ void CommandModule::sendRemoteCommand(const std::vector<std::string> &args) {
             LOGGER("remote run successful")
         } else {
             LOGGER("remote run failure")
+        }
+
+
+    }
+}
+
+void CommandModule::broadcastRemoteCommand(const std::vector<std::string> &args) {
+    LOGGER("send broadcast")
+    //@todo add checking if the number of parameters is correct
+    if (args.size() >= 1) {
+        std::string command = args[0];
+        std::vector<std::string> rest(args.begin() + 1, args.end());
+
+        auto netModule = node.getModule<NodeNetworkModule>();
+        CommandPacket::Request::Ptr packet = CommandPacket::Request::getNew();
+        //CommandPacket::Request* packet;
+        packet->setData(rest);
+        packet->setCommandName(command);
+        LOGGER("sending packet ")
+        auto res = netModule->broadcastRequest(packet);
+
+        for (const auto &[nodeId, response] : res) {
+            LOGGER("broadcast received from " + nodeId)
+            if (response && response->isRunStatus()) {
+                LOGGER("remote run successful")
+            } else {
+                LOGGER("remote run failure")
+            }
         }
 
 

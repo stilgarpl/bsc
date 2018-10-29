@@ -301,6 +301,8 @@ public:
 
     void sendRemoteCommand(ArgumentContainerType args);
 
+    void broadcastRemoteCommand(ArgumentContainerType args);
+
     void listCommands() {
 
     }
