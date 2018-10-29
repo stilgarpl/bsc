@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 17.10.17.
 //
@@ -54,7 +56,7 @@ private:
     friend class cereal::access;
 
 public:
-    JournalStateData(JournalMethod method, const PathType &path) : method(method), path(path) {
+    JournalStateData(JournalMethod method, PathType path) : method(method), path(std::move(path)) {
         update();
     };
 
