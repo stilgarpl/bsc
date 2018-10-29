@@ -56,6 +56,21 @@ public:
 
     explicit RemoteNode(const std::shared_ptr<IProtocol> &protocol);
 
+    template<typename SendType>
+    void sendPacketToNode(NetworkPacketPointer<SendType> p) {
+        if (connection != nullptr) {
+
+//            LOGGER("sending packet to node " + nodeId)
+            protocol->send(connection.get(), p);
+
+        } else {
+            LOGGER("unable to send packet to " +
+                   (remoteNodeInfo.getNodeInfo() ? remoteNodeInfo.getNodeInfo()->getNodeId() : "remote node.") +
+                   "Not connected")
+
+        }
+    };
+
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto sendRequestToNode(NetworkPacketPointer<SendType> p) {
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
@@ -66,6 +81,7 @@ public:
 
 //            LOGGER("sending packet to node " + nodeId)
             auto[response, error] = protocol->sendExpectExtended(connection.get(), p);
+            //@todo error handling
             return response;
 
         } else {

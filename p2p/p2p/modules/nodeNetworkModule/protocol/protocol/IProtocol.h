@@ -57,7 +57,8 @@ public:
     virtual void work(const Tick &tick)= 0;
     //virtual void send(Connection *conn, BasePacketPtr p)= 0;
 
-    virtual std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) =0;
+    virtual std::future<BasePacketPtr>
+    send(Connection *conn, BasePacketPtr p, const Status &expectedStatus = Status::RESPONSE) = 0;
 
 
     template<enum Status status = Status::RESPONSE, typename SendType>

@@ -48,7 +48,7 @@ InternalStorage::restore(const ResourceId &checksum, const size_t &size, const P
         req->setRepositoryId(repository->getRepositoryId());
         req->setObjectId(resourceId);
         //@todo this will wait for response, potentially blocking Repository
-        auto response = netModule->broadcastPacket(req);
+        auto response = netModule->broadcastRequest(req);
         TransferManager::LocalTransferDescriptorPtr transfer = nullptr;
 
         for (auto &&item : response) {

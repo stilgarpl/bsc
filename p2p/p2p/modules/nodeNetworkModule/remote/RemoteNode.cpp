@@ -19,6 +19,10 @@ const std::optional<NodeIdType> RemoteNode::getNodeId() const {
 
 bool RemoteNode::connectTo(const NetAddressType &address) {
 
+    //@todo better check
+    if (isConnected() && connection->isActive()) {
+        return true;
+    }
 //    Poco::Net::SocketAddress socketAddress(address);
     //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
     //@todo check for problems and handle them

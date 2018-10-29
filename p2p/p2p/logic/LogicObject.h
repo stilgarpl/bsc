@@ -109,13 +109,17 @@ public:
         template<typename ActionId>
         ThisType &fireAction(ActionId actionId) {
             std::cout << "assigning action ... " << std::endl;
+            bool success;
             //@todo throw some exception or sth if action isn't found
             if (eventId) {
 
-                logicManager.assignAction<EventType, Args...>(*eventId, actionId);
+                success = logicManager.assignAction<EventType, Args...>(*eventId, actionId);
             } else {
 
-                logicManager.assignAction<EventType, Args...>(actionId);
+                success = logicManager.assignAction<EventType, Args...>(actionId);
+            }
+            if (!success) {
+                throw std::string("Failed to assign action!");
             }
             return *this;
         }

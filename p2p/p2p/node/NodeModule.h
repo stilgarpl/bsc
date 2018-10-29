@@ -69,7 +69,7 @@ public:
     };
 
     void initializeConfiguration() override {
-        auto loaded = node.getConfigurationManager().load<Config>(configuration().getConfigId());
+        auto loaded = node.getConfigurationManager().template load<Config>(configuration().getConfigId());
         if (loaded != nullptr)
             configuration() = *loaded;
     }

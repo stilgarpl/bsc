@@ -26,7 +26,7 @@ private:
     std::map<PathType, ResourceId> fileMap;
 
 public:
-    const RepoIdType &getRepositoryId() const;
+    const RepoIdType &getRepositoryId() const override;
 
     JournalPtr &getJournal();
 
@@ -48,7 +48,7 @@ public:
 
     void persist(fs::path path);
 
-    Repository(const RepoIdType &repositoryId);
+    explicit Repository(const RepoIdType &repositoryId);
 
 };
 

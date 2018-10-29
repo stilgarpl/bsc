@@ -237,7 +237,7 @@ przenieść zarządzanie połączeniem z activeConnections do RemoteNode - DONE
 Poprawić metody z NodeNetModule, zeby uniknąć poprawiania większośći kodu, niech od teraz korzystają z RemoteNodes a nie z activeConnections
     * connectTo
     * sendPacketToNode
-    * broadcastPacket
+    * broadcastRequest
     * disconnect
 
 
@@ -279,3 +279,12 @@ when(event<NodeEvent>()).if(state<Connetion>(CONNECTED)).then
 ModuleSource generates ModuleEvent<Module> z np. id = initialized or sth
 
 ModuleEvent<NetModule>::initialized -> load network info
+
+maybe add IConfigurable with configuration() + save/load? but it depends on node.configurationManager()...
+
+
+rzeczy do zrobienia, żeby to zaczeło działać dobrze:
+
+1. repo restore pobiera pliki z innych nodów
+1.1 to wymaga broadcasta whoHasResouce do wszystkich znanych nodów
+1.1.1 to wymaga poprawnie działających broadcastów

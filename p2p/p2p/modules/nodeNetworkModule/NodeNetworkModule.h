@@ -180,8 +180,23 @@ public: // @todo should be public or shouldn't ?
 //        }
 //    };
 
+    template<typename SendType>
+    void broadcastPacket(NetworkPacketPointer<SendType> p, const BroadcastScope &scope = BroadcastScope::CONNECTED) {
+        //@todo can I actually send one packet multiple times ? doesn't that confuse protocol waiting for specific ids?
+        auto MAX_WAIT_TIME = 2s;
+
+        std::lock_guard<std::mutex> g(activeConnectionsMutex);
+
+        for (auto &&item : remoteNodes) {
+            if (item->getNodeId()) {
+                item->sendPacketToNode(p);
+            }
+        }
+
+    };
+
     template<enum Status status = Status::RESPONSE, typename SendType>
-    auto broadcastPacket(NetworkPacketPointer<SendType> p, const BroadcastScope &scope = BroadcastScope::CONNECTED) {
+    auto broadcastRequest(NetworkPacketPointer<SendType> p, const BroadcastScope &scope = BroadcastScope::CONNECTED) {
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
 
         //@todo can I actually send one packet multiple times ? doesn't that confuse protocol waiting for specific ids?

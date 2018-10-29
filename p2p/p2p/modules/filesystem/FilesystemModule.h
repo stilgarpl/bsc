@@ -74,8 +74,8 @@ public:
      * this method could return download descriptor
      * with file size
      * downloaded size
-     * status - download started, finished, error occured etc.
-     * wait() function to finish dowloading
+     * status - download started, finished, error occurred etc.
+     * wait() function to finish downloading
      * stop() function to interrupt download
      *
      * if the file is big enough it should download it in chunks in other thread.
