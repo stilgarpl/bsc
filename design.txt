@@ -294,3 +294,18 @@ persist/delete/etc. directory:
 przede wszystkim trzeba wywalić bezpośrednie odwołania z RepoModule do method z Journala. Najlepiej to w ogole metodę getJournal dać jako protected, jesli się da (przy pobieraniu zdalnego journala pewnie bedzie problem).
 
 Repository powinno miec takie metody jak commit i inne, Module nie powinno bezposrednio grzebac na journalu.
+
+teraz restore pobiera pliki, nie do konca ma to sens. z kolei w Repository::restoreAll jest todo na pobieranie plikow. również bez sensu.
+ewidentnie nie przemyslalem sprawy kto i co ma pobierac.
+
+w dodatku, restore wiszące na transferze jest słabe - transfery lecą pojedynczo i czekaja na siebie. bez sensu.
+
+update powinno działać w takich krokach:
+
+download journal
+merge journal
+replay journal -> create changed file map. file path -> resource (path-> null w przypadku plików do usunięcia?)
+process map. start transfers according to transfer policy (so it won't start 10000 transfers at the same time)
+once all resources are available, apply them to the filesystem with path transformation.
+
+dodatkowo, transfer może trwać dniami, więc musi być opcja przerwania tego i kontynuowania później.

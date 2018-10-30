@@ -49,6 +49,8 @@ InternalStorage::restore(const ResourceId &checksum, const size_t &size, const P
 
     auto resourceId = getResourceId(checksum, size);
     auto resourcePath = getResourcePath(resourceId);
+    //@todo move transfer out of restore
+//    LOGGER("resouce path = " + resourcePath.string() + " , destination path = " + destinationPath)
     if (!fs::exists(resourcePath) || !restoreFile) {
         //storage does not have this object, acquire
 
@@ -81,7 +83,7 @@ InternalStorage::restore(const ResourceId &checksum, const size_t &size, const P
 
     if (restoreFile) {
         //@todo catch filesystem exceptions or use no except version
-        fs::copy(resourcePath, destinationPath);
+        fs::copy(resourcePath, destinationPath, fs::copy_options::overwrite_existing);
     }
 
     return restoreFile;

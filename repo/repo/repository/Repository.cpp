@@ -56,6 +56,10 @@ void Repository::restoreAll() {
 //            LOGGER(i.getChecksum() + " ::: " + i.getPath());
     });
 
+    journal->setFunc(JournalMethod::ADDED_DIRECTORY, [&](auto &i) {
+        fs::create_directories(i.getPath());
+    });
+
 
     journal->replay();
 }
