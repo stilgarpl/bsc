@@ -9,7 +9,7 @@ void JournalState::add(const JournalStateData &data) {
     dataList.push_back(data);
 }
 
-const std::list<JournalStateData> &JournalState::getDataList() const {
+std::list<JournalStateData> &JournalState::getDataList() {
     return dataList;
 }
 
@@ -70,9 +70,24 @@ const ResourceId &JournalState::getChecksum() const {
     return checksum;
 }
 
+bool JournalState::isProcessed() const {
+    bool retVal = true;
+    for (const auto &item : dataList) {
+        retVal &= item.isProcessed();
+    }
+    return retVal;
+}
+
+void JournalState::clearProcessed() {
+    for (auto &item : dataList) {
+        item.setProcessed(false);
+    }
+
+}
+
 void JournalStateData::update() {
 
-    if (fs::exists(path)) {
+    if (fs::exists(path) && !fs::is_directory(path)) {
         CryptoPP::SHA256 hash;
         std::string digest;
         size = fs::file_size(fs::path(path));
@@ -87,4 +102,12 @@ void JournalStateData::update() {
 
 fs::perms JournalStateData::getPermissions() const {
     return permissions;
+}
+
+bool JournalStateData::isProcessed() const {
+    return processed;
+}
+
+void JournalStateData::setProcessed(bool processed) {
+    JournalStateData::processed = processed;
 }

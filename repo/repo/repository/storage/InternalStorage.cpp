@@ -19,9 +19,18 @@ void InternalStorage::store(const ResourceId &checksum, const size_t &size, cons
     if (realChecksum == checksum && realFileSize == size) {
         //FILE IS OK
         LOGGER("CHECKSUM IS OK, COPYING TO INTERNAL STORAGE");
-
-        //@TODO handle directories
-        fs::copy(sourcePath, getResourcePath(getResourceId(checksum, size)));
+        fs::copy_options options = fs::copy_options::none;
+        //check if file is already in storage
+        if (fs::exists(getResourcePath(getResourceId(checksum, size)))) {
+            auto hasChecksum = calculateSha1OfFile(getResourcePath(getResourceId(checksum, size)));
+            if (hasChecksum != checksum) {
+                //file in storage was corrupted!
+                options = fs::copy_options::overwrite_existing;
+            } else {
+                options = fs::copy_options::skip_existing;
+            }
+        }
+        fs::copy(sourcePath, getResourcePath(getResourceId(checksum, size)), options);
     }
 
 }

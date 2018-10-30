@@ -54,31 +54,7 @@ public:
 
     void printHistory();
 
-    void downloadRemoteRepository(const NodeIdType &remoteId, const Repository::RepoIdType &repoId) {
-
-        auto netModule = node.getModule<NodeNetworkModule>();
-        auto localRepo = findRepository(repoId);
-        LOGGER("downloading repo")
-        JournalGroup::Request::Ptr req = JournalGroup::Request::getNew<Status::REQUEST>();
-        req->setRepoId(repoId);
-        JournalGroup::Response::Ptr res = netModule->sendPacketToNode(remoteId, req);
-        if (res != nullptr) {
-            LOGGER("response received")
-            auto remoteJournal = res->getJournal();
-            if (localRepo != nullptr) {
-                localRepo->getJournal()->merge(remoteJournal);
-            } else {
-                localRepo = createRepository(repoId);
-                localRepo->setJournal(remoteJournal);
-
-            }
-            localRepo->buildFileMap();
-        } else {
-            LOGGER("no response")
-        }
-
-
-    }
+    void downloadRemoteRepository(const NodeIdType &remoteId, const Repository::RepoIdType &repoId);
 
 //
 //    void requestStoragePath(const NodeIdType &remoteId, const Repository::RepoIdType &repoId,

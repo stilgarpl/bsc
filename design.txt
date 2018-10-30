@@ -288,3 +288,9 @@ rzeczy do zrobienia, żeby to zaczeło działać dobrze:
 1. repo restore pobiera pliki z innych nodów
 1.1 to wymaga broadcasta whoHasResouce do wszystkich znanych nodów
 1.1.1 to wymaga poprawnie działających broadcastów
+
+
+persist/delete/etc. directory:
+przede wszystkim trzeba wywalić bezpośrednie odwołania z RepoModule do method z Journala. Najlepiej to w ogole metodę getJournal dać jako protected, jesli się da (przy pobieraniu zdalnego journala pewnie bedzie problem).
+
+Repository powinno miec takie metody jak commit i inne, Module nie powinno bezposrednio grzebac na journalu.

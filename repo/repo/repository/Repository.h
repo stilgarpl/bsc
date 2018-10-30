@@ -28,6 +28,7 @@ private:
 public:
     const RepoIdType &getRepositoryId() const override;
 
+    //@todo hide this perhaps?
     JournalPtr &getJournal();
 
     const std::shared_ptr<IStorage> &getStorage() const;
@@ -42,6 +43,8 @@ public:
     void buildFileMap();
 
     void restoreAll();
+
+    void commit();
 
 public:
 

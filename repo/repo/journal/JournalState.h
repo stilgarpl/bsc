@@ -45,6 +45,8 @@ private:
     uintmax_t size = 0;
     std::time_t modificationTime;
     ResourceId checksum; //checksum of the file.
+    //@todo think about processed indicator. maybe it should store a value instead of just being a toggle?
+    bool processed = false; //this does not go into the checksum
 private:
     template<class Archive>
     void serialize(Archive &ar) {
@@ -94,6 +96,11 @@ public:
     uintmax_t getSize() const {
         return size;
     }
+
+    bool isProcessed() const;
+
+    void setProcessed(bool processed);
+
 };
 
 
@@ -116,7 +123,7 @@ public:
     void add(const JournalStateData &data);
 
     //@template change it to something else? probably some kind of replay mechanism?
-    const std::list<JournalStateData> &getDataList() const;
+    std::list<JournalStateData> &getDataList();
 
     void setDataList(const std::list<JournalStateData> &dataList);
 
@@ -144,6 +151,10 @@ public:
     }
 
     JournalState() = default;
+
+    bool isProcessed() const;
+
+    void clearProcessed();
 
 };
 

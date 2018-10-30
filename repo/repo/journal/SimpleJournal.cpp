@@ -38,6 +38,30 @@ void SimpleJournal::replay() {
         }
     }
 
+    //@todo think if clearFunc() should not be invoked here and replay should check if any functions are set. this way, if someone changes some but not all functions, replay will not do stupid things.
+}
+
+void SimpleJournal::replayCurrentState() {
+    int processingPass = 0;
+    while (!currentState->isProcessed()) {
+        processingPass++;
+        LOGGER("processing replay pass " + std::to_string(processingPass));
+        //@todo I would like to remove getDataList and just pass the Func to it somehow
+
+        for (auto &&jt : currentState->getDataList()) {
+            if (!jt.isProcessed()) {
+                LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath());
+                auto &func = funcMap[jt.getMethod()];
+                if (func) {
+                    (*func)(jt);
+                }
+                jt.setProcessed(true);
+            }
+        }
+    }
+    //@todo I'm not very fond of this processed flag, but it's needed so changes to journal state will be in fact processed during replay.
+    currentState->clearProcessed();
+
 }
 
 void SimpleJournal::append(JournalMethod method, PathType path) {
@@ -106,4 +130,10 @@ bool SimpleJournal::merge(const std::shared_ptr<SimpleJournal> other) {
 bool SimpleJournal::merge(const JournalPtr &other) {
     //@todo error handling
     return merge(std::static_pointer_cast<SimpleJournal>(other));
+}
+
+void SimpleJournal::clearFunc() {
+
+    funcMap.clear();
+
 }

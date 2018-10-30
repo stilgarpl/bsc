@@ -30,19 +30,6 @@ private:
 
 
     friend class cereal::access;
-
-public:
-    ResourceId getChecksum() override;
-
-    void commitState() override;
-
-    void checkCurrentState() {
-        //@todo this is wrong. last state is commited it should be current->setPrev(last)
-//        if (currentState == nullptr && journalHistory.size() > 0) {
-//            currentState = findLastState();
-//        }
-    }
-
     std::shared_ptr<JournalState> findLastState() {
         if (journalHistory.size() > 0) {
             return *std::max_element(journalHistory.begin(), journalHistory.end(),
@@ -52,15 +39,27 @@ public:
         }
     }
 
+    void checkCurrentState() {
+        //@todo this is wrong. last state is commited it should be current->setPrev(last)
+//        if (currentState == nullptr && journalHistory.size() > 0) {
+//            currentState = findLastState();
+//        }
+    }
 
     void prepareState();
 
-    //@todo hmm hmm variadic template?
-    void append(JournalMethod method, PathType path);
+public:
+    ResourceId getChecksum() override;
+
+    void commitState() override;
+
+
+    //@todo hmm hmm variadic template? - moved may have two paths for example?
+    void append(JournalMethod method, PathType path) override;
 
     void replay() override;
 
-    virtual void setFunc(const JournalMethod &method, Func func) {
+    void setFunc(const JournalMethod &method, Func func) override {
         funcMap[method] = func;
     }
 
@@ -73,6 +72,7 @@ public:
             cereal::BinaryOutputArchive oa(ss);
             oa << *this;
         }
+        //@todo this crypto stuff is used in journal and in storage, it should be moved to separate crypto class so it's consistent
         CryptoPP::SHA1 sha1;
         CryptoPP::StringSource(ss.str(), true, new CryptoPP::HashFilter(sha1, new CryptoPP::HexEncoder(
                 new CryptoPP::StringSink(hash))));
@@ -80,7 +80,8 @@ public:
         return checksum;
     }
 
-    void printHistory() {
+    //@todo debug method, remove eventually
+    void printHistory() override {
         for (auto &&item : journalHistory) {
             std::cout << "SimpleJournal id " << item->calculateChecksum() << std::endl;
             std::cout << "SimpleJournal prev "
@@ -99,9 +100,13 @@ public:
     }
 
 
-    bool merge(const std::shared_ptr<SimpleJournal> other);
+    bool merge(std::shared_ptr<SimpleJournal> other);
 
     bool merge(const JournalPtr &other) override;
+
+    void clearFunc() override;
+
+    void replayCurrentState() override;
 
 };
 

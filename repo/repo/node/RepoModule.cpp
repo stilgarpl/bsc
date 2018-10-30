@@ -53,8 +53,8 @@ void RepoModule::loadRepository(const Repository::RepoIdType &repoId, fs::path p
 
 void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
     auto rep = findRepository(repoId);
-    rep->getJournal()->commitState();
-
+//    rep->getJournal()->commitState();
+    rep->commit();
     fs::path savePath = fs::temp_directory_path() / (repoId + ".xml");
 
     {
@@ -82,7 +82,7 @@ void RepoModule::selectRepository(const Repository::RepoIdType &repoId) {
 
 void RepoModule::persistFile(const fs::path &path) {
     if (selectedRepository != nullptr) {
-        selectedRepository->persist(path);//getJournal()->append(JournalMethod::ADDED, path);
+        selectedRepository->persist(path);//getJournal()->append(JournalMethod::ADDED_FILE, path);
 
     }
 }
@@ -97,4 +97,30 @@ const RepositoryPtr &RepoModule::getSelectedRepository() const {
 
 void RepoModule::restoreRepository(const Repository::RepoIdType &repoId) {
     repositoryManager.getRepository(repoId)->restoreAll();
+}
+
+void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repository::RepoIdType &repoId) {
+
+    auto netModule = node.getModule<NodeNetworkModule>();
+    auto localRepo = findRepository(repoId);
+    LOGGER("downloading repo")
+    JournalGroup::Request::Ptr req = JournalGroup::Request::getNew<Status::REQUEST>();
+    req->setRepoId(repoId);
+    JournalGroup::Response::Ptr res = netModule->sendPacketToNode(remoteId, req);
+    if (res != nullptr) {
+        LOGGER("response received")
+        auto remoteJournal = res->getJournal();
+        if (localRepo != nullptr) {
+            localRepo->getJournal()->merge(remoteJournal);
+        } else {
+            localRepo = createRepository(repoId);
+            localRepo->setJournal(remoteJournal);
+
+        }
+        localRepo->buildFileMap();
+    } else {
+        LOGGER("no response")
+    }
+
+
 }

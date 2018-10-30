@@ -34,6 +34,8 @@ public:
     //@todo add parameters, commit range or sth
     virtual void replay() = 0;
 
+    virtual void replayCurrentState() = 0;
+
 private:
     template<class Archive>
     void serialize(Archive &ar) {
@@ -50,6 +52,8 @@ public:
     virtual bool merge(const JournalPtr &other) =0;
 
     virtual void setFunc(const JournalMethod &method, Func func) =0;
+
+    virtual void clearFunc() = 0;
 
 };
 
