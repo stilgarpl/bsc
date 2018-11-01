@@ -26,42 +26,13 @@ const std::shared_ptr<IStorage> &Repository::getStorage() const {
 }
 
 void Repository::restoreAll() {
-    journal->clearFunc();
-    journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
-        //@todo path transform
-        storage->restore(storage->getResourceId(i.getChecksum(), i.getSize()), i.getPath());
-//        if (!ret) {
-//            //restore failed.
-//            auto resourceId = storage->getResourceId(i.getChecksum(), i.getSize());
-//            //check if the resource is in storage
-//            if (!storage->hasResource(resourceId)) {
-//                //download from another repo
-//                //@todo download
-//            } else {
-//                //weird, maybe no space left?
-//                //@todo error handling
-//            }
-//        } else {
-            //set modification date to correct value
 
-            fs::last_write_time(i.getPath(), std::chrono::system_clock::from_time_t(i.getModificationTime()));
-            fs::permissions(i.getPath(), i.getPermissions());
-//        }
-//            fileMap[i.getPath()] = i.getChecksum();
-//            LOGGER(i.getChecksum() + " ::: " + i.getPath());
-    });
-
-    journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
-//            fileMap[i.getPath()] = i.getChecksum();
-//            LOGGER(i.getChecksum() + " ::: " + i.getPath());
-    });
-
-    journal->setFunc(JournalMethod::ADDED_DIRECTORY, [&](auto &i) {
-        fs::create_directories(i.getPath());
-    });
-
-
-    journal->replay();
+    auto& fileMap = getFileMap();
+    for (auto &&item :fileMap) {
+        if (i.getResourceId()) {
+            storage->restore(*i.getResourceId(), i.getPath());
+        }
+    }
 }
 
 void Repository::commit() {
