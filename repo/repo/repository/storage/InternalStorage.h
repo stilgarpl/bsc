@@ -38,6 +38,10 @@ public:
     fs::path getResourcePath(const ResourceId &resourceId) const override;
 
     bool hasResource(const ResourceId &resourceId) const override;
+
+    bool acquireResource(const ResourceId &resourceId) override;
+
+    void restore(const ResourceId &resourceId, const PathType &destinationPath) override;
 };
 
 

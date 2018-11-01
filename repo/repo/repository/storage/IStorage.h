@@ -27,11 +27,16 @@ protected:
     IRepository *repository;
 
 public:
-
+//@fixme store, restore, update -> checksum is not of ResourceId type! ResourceId is generated from checksum and size.
+//@todo store should only take path and return resourceId
     virtual void store(const ResourceId &checksum, const size_t &size, const PathType &path) =0;
 
+//@todo restore should take resourceId and destinationPath.
     virtual bool restore(const ResourceId &checksum, const size_t &size, const PathType &path) = 0;
 
+    virtual void restore(const ResourceId &resourceId, const PathType &path) = 0;
+
+    //@todo I don't know if this method is actually useful. remove it if it's really not needed
     virtual void update(const ResourceId &checksum, const size_t &size, const PathType &path)=0;
 
     //syncs whole repository to corresponding repository from other node
@@ -46,7 +51,9 @@ public:
 
     virtual bool hasResource(const ResourceId &resourceId) const =0;
 
-    IStorage(IRepository *r) {
+    virtual bool acquireResource(const ResourceId &resourceId) = 0;
+
+    explicit IStorage(IRepository *r) {
         this->repository = r;
     }
 

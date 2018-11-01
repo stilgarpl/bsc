@@ -16,14 +16,79 @@
 class Repository : public IRepository {
 public:
 
+    class RepoFileMap {
+
+    private:
+        //@todo maybe some class instead of just PathType?
+        std::map<PathType, std::optional<ResourceId>> fileMap;
+        std::string journalChecksum;
+    public:
+        std::optional<ResourceId> &operator[](const PathType &path) {
+            return fileMap[path];
+        }
+
+        void clear() {
+            fileMap.clear();
+        }
+
+    public:
+        const std::string &getJournalChecksum() const {
+            return journalChecksum;
+        }
+
+        void setJournalChecksum(const std::string &journalChecksum) {
+            RepoFileMap::journalChecksum = journalChecksum;
+        }
+
+        auto begin() {
+            return fileMap.begin();
+        }
+
+        auto end() {
+            return fileMap.end();
+        }
+
+    };
 private:
     JournalPtr journal = std::make_shared<SimpleJournal>();
     RepoIdType repositoryId;
     std::shared_ptr<IStorage> storage;
 
 
-    //@todo maybe some class instead of just PathType?
-    std::map<PathType, ResourceId> fileMap;
+    RepoFileMap _repoFileMap;
+
+protected:
+
+    RepoFileMap &getFileMap() {
+        if (journal->getChecksum() != _repoFileMap.getJournalChecksum()) {
+            _repoFileMap.clear();
+            journal->clearFunc();
+            journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
+                _repoFileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());//i.getChecksum();
+                LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+            });
+
+            journal->setFunc(JournalMethod::MODIFIED_FILE, [&](auto &i) {
+                _repoFileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());//i.getChecksum();
+                LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+            });
+
+            //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
+            journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
+                _repoFileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());
+                LOGGER(i.getChecksum() + " ::: " + i.getPath());
+            });
+
+            journal->setFunc(JournalMethod::DELETED_FILE, [&](auto &i) {
+                _repoFileMap[i.getPath()] = std::nullopt;
+                LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+            });
+
+            journal->replay();
+            _repoFileMap.setJournalChecksum(journal->getChecksum());
+        }
+        return _repoFileMap;
+    }
 
 public:
     const RepoIdType &getRepositoryId() const override;
@@ -40,7 +105,8 @@ public:
 //    };
 
 
-    void buildFileMap();
+
+    void downloadStorage();
 
     void restoreAll();
 

@@ -117,7 +117,8 @@ void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repo
             localRepo->setJournal(remoteJournal);
 
         }
-        localRepo->buildFileMap();
+//        localRepo->buildFileMap();
+        localRepo->downloadStorage();
     } else {
         LOGGER("no response")
     }

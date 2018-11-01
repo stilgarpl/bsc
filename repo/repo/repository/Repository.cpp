@@ -29,24 +29,24 @@ void Repository::restoreAll() {
     journal->clearFunc();
     journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
         //@todo path transform
-        bool ret = storage->restore(i.getChecksum(), i.getSize(), i.getPath());
-        if (!ret) {
-            //restore failed.
-            auto resourceId = storage->getResourceId(i.getChecksum(), i.getSize());
-            //check if the resource is in storage
-            if (!storage->hasResource(resourceId)) {
-                //download from another repo
-                //@todo download
-            } else {
-                //weird, maybe no space left?
-                //@todo error handling
-            }
-        } else {
+        storage->restore(storage->getResourceId(i.getChecksum(), i.getSize()), i.getPath());
+//        if (!ret) {
+//            //restore failed.
+//            auto resourceId = storage->getResourceId(i.getChecksum(), i.getSize());
+//            //check if the resource is in storage
+//            if (!storage->hasResource(resourceId)) {
+//                //download from another repo
+//                //@todo download
+//            } else {
+//                //weird, maybe no space left?
+//                //@todo error handling
+//            }
+//        } else {
             //set modification date to correct value
 
             fs::last_write_time(i.getPath(), std::chrono::system_clock::from_time_t(i.getModificationTime()));
             fs::permissions(i.getPath(), i.getPermissions());
-        }
+//        }
 //            fileMap[i.getPath()] = i.getChecksum();
 //            LOGGER(i.getChecksum() + " ::: " + i.getPath());
     });
@@ -93,21 +93,6 @@ void Repository::commit() {
     journal->commitState();
 }
 
-void Repository::buildFileMap() {
-    journal->clearFunc();
-    journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
-        fileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());//i.getChecksum();
-        LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-    });
-
-    journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
-        fileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());
-        LOGGER(i.getChecksum() + " ::: " + i.getPath());
-    });
-
-    journal->replay();
-}
-
 void Repository::persist(fs::path path) {
 
     //@todo take values from journal, or, even better, replay journal state during commit and do the store in that
@@ -117,4 +102,37 @@ void Repository::persist(fs::path path) {
     } else {
         journal->append(JournalMethod::ADDED_DIRECTORY, path);
     }
+}
+
+void Repository::downloadStorage() {
+
+    auto &fileMap = getFileMap();
+    bool hasResources = true;
+    for (const auto &[path, resourceId] : fileMap) {
+        LOGGER("file " + path + " => " + (resourceId ? *resourceId : std::string(" [X] ")));
+        //@todo change this bool to actual transfer management
+
+        //check for resources.
+        if (resourceId) {
+            if (!storage->hasResource(*resourceId)) {
+                hasResources &= storage->acquireResource(*resourceId);
+            }
+        }
+
+
+    }
+//
+//    //@todo restore should not be in downloadStorage! move it to restoreAll
+//    for (const auto &[path, resourceId] : fileMap) {
+//        if (hasResources) {
+//            //@todo add transform
+//            storage->restore(*resourceId, path);
+//        } else {
+//            LOGGER("NO RESOURCES AVAILKABVLE")
+//        }
+//    }
+
+
+
+
 }

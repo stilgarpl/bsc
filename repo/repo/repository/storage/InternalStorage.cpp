@@ -143,6 +143,47 @@ std::shared_ptr<std::iostream> InternalStorage::getResourceStream(const Resource
                                           std::ios::in | std::ios::out | std::fstream::binary);
 }
 
+bool InternalStorage::acquireResource(const ResourceId &resourceId) {
+    auto netModule = NodeContext::getNodeFromActiveContext().getModule<NodeNetworkModule>();
+    StorageQuery::Request::Ptr req = StorageQuery::Request::getNew();
+    req->setRepositoryId(repository->getRepositoryId());
+    req->setObjectId(resourceId);
+    //@todo this will wait for response, potentially blocking Repository
+    auto response = netModule->broadcastRequest(req);
+    TransferManager::LocalTransferDescriptorPtr transfer = nullptr;
+
+    for (auto &&item : response) {
+        LOGGER("node " + item.first + " replied with " + std::to_string(item.second->isExists()));
+        if (item.second->isExists()) {
+            auto fileModule = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>();
+            transfer = fileModule->remoteGetStream(item.first, std::make_shared<StorageResourceIdentificator>(
+                    repository->getRepositoryId(), resourceId), std::make_shared<StorageResourceIdentificator>(
+                    repository->getRepositoryId(), resourceId));
+
+            break;
+        }
+    }
+
+    if (transfer != nullptr) {
+        //@todo in the future, change it so acquire only starts transfer, but does not wait for them... maybe it should return transfer pointer?
+        transfer->wait(); //@todo handle errors
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void InternalStorage::restore(const ResourceId &resourceId, const PathType &destinationPath) {
+    //@todo don't do restore if the target is identical or changed
+    //@todo verify checksum and size (add way to get those from resource id?)
+    auto resourcePath = getResourcePath(resourceId);
+    LOGGER("IS:restore resP " + resourcePath.string() + " desP " + destinationPath)
+    //@todo PathType should really be just path, it would save a lot of trouble.
+//    fs::path desPath(destinationPath);
+    fs::create_directories(fs::weakly_canonical(destinationPath).parent_path());
+    fs::copy(resourcePath, destinationPath, fs::copy_options::overwrite_existing);
+}
+
 //InternalStorage::InternalStorage(const std::string &storageId) /*: storageId(storageId)*/ {
 //    initStorage();
 //}
