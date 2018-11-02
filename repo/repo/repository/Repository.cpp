@@ -28,9 +28,9 @@ const std::shared_ptr<IStorage> &Repository::getStorage() const {
 void Repository::restoreAll() {
 
     auto& fileMap = getFileMap();
-    for (auto &&item :fileMap) {
-        if (i.getResourceId()) {
-            storage->restore(*i.getResourceId(), i.getPath());
+    for (auto &&[path, resourceId] :fileMap) {
+        if (resourceId) {
+            storage->restore(*resourceId, path);
         }
     }
 }
@@ -65,6 +65,10 @@ void Repository::commit() {
 }
 
 void Repository::persist(fs::path path) {
+
+    if (path.is_relative()) {
+        path = fs::canonical(fs::current_path() / path);
+    }
 
     //@todo take values from journal, or, even better, replay journal state during commit and do the store in that
     if (!fs::is_directory(path)) {

@@ -55,6 +55,7 @@ public:
         }
 
         currentPath = fs::canonical(currentPath);
+        fs::current_path(currentPath);
 
     }
 
