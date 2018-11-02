@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 17.10.17.
 //
@@ -21,7 +23,7 @@ public:
     private:
         //@todo maybe some class instead of just PathType?
         std::map<PathType, std::optional<ResourceId>> fileMap;
-        std::string journalChecksum;
+        const JournalPtrConst journal;
     public:
         std::optional<ResourceId> &operator[](const PathType &path) {
             return fileMap[path];
@@ -32,13 +34,10 @@ public:
         }
 
     public:
-        const std::string &getJournalChecksum() const {
-            return journalChecksum;
+        const std::string getJournalChecksum() const {
+            return journal->getChecksum();
         }
 
-        void setJournalChecksum(const std::string &journalChecksum) {
-            RepoFileMap::journalChecksum = journalChecksum;
-        }
 
         auto begin() {
             return fileMap.begin();
@@ -48,6 +47,8 @@ public:
             return fileMap.end();
         }
 
+        RepoFileMap(JournalPtrConst journal) : journal(std::move(journal)) {}
+
     };
 private:
     JournalPtr journal = std::make_shared<SimpleJournal>();
@@ -55,10 +56,11 @@ private:
     std::shared_ptr<IStorage> storage;
 
 
-    RepoFileMap _repoFileMap;
+    RepoFileMap _repoFileMap = RepoFileMap(journal);
 
 protected:
 
+    //@todo move this function inside RepoFileMap. Store more data in RepoFileMap - it should know modification date of each path and type (dir/file)
     RepoFileMap &getFileMap() {
         if (journal->getChecksum() != _repoFileMap.getJournalChecksum()) {
             _repoFileMap.clear();
@@ -85,7 +87,7 @@ protected:
             });
 
             journal->replay();
-            _repoFileMap.setJournalChecksum(journal->getChecksum());
+
         }
         return _repoFileMap;
     }
@@ -116,6 +118,12 @@ public:
 
 
     void persist(fs::path path);
+
+    //update one file from the repository
+    void update(fs::path path);
+
+    //update everything
+    void update();
 
     explicit Repository(const RepoIdType &repositoryId);
 

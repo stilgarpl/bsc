@@ -5,7 +5,7 @@
 #include "SimpleJournal.h"
 #include <p2p/log/Logger.h>
 
-ResourceId SimpleJournal::getChecksum() {
+ResourceId SimpleJournal::getChecksum() const {
     //@todo calculate checksum?
     return checksum;
 }
@@ -118,6 +118,8 @@ bool SimpleJournal::merge(const std::shared_ptr<SimpleJournal> other) {
         if (currentState != nullptr) {
             currentState->setPreviousState(findLastState());
         }
+        //@todo is it right?
+        return true;
 
     } else {
         //no common root

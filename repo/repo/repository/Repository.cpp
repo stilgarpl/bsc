@@ -111,3 +111,10 @@ void Repository::downloadStorage() {
 
 
 }
+
+void Repository::update(fs::path path) {
+
+    auto &fileMap = getFileMap();
+
+
+}

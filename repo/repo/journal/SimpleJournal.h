@@ -49,7 +49,7 @@ private:
     void prepareState();
 
 public:
-    ResourceId getChecksum() override;
+    ResourceId getChecksum() const override;
 
     void commitState() override;
 

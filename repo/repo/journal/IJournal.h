@@ -27,7 +27,7 @@ public:
     typedef std::vector<std::shared_ptr<JournalState>> JournalHistory;
     typedef std::shared_ptr<IJournal> JournalPtr;
 public:
-    virtual ResourceId getChecksum() =0;
+    virtual ResourceId getChecksum() const = 0;
 
     virtual void commitState() =0;
 
@@ -58,6 +58,7 @@ public:
 };
 
 typedef std::shared_ptr<IJournal> JournalPtr;
+typedef std::shared_ptr<const IJournal> JournalPtrConst;
 
 CEREAL_REGISTER_TYPE(IJournal);
 
