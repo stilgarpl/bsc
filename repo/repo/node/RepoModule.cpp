@@ -110,6 +110,7 @@ void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repo
     if (res != nullptr) {
         LOGGER("response received")
         auto remoteJournal = res->getJournal();
+        LOGGER("received journal with checksum " + res->getJournal()->getChecksum())
         if (localRepo != nullptr) {
             localRepo->getJournal()->merge(remoteJournal);
         } else {
@@ -123,5 +124,23 @@ void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repo
         LOGGER("no response")
     }
 
+
+}
+
+void RepoModule::updateFile(const fs::path &path) {
+
+    if (selectedRepository != nullptr) {
+        selectedRepository->update(path);
+
+    }
+
+}
+
+void RepoModule::updateAllFiles() {
+
+    if (selectedRepository != nullptr) {
+        selectedRepository->update();
+
+    }
 
 }

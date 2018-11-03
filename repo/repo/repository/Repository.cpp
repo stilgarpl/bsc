@@ -15,6 +15,8 @@ JournalPtr &Repository::getJournal() {
 
 void Repository::setJournal(const JournalPtr &journal) {
     Repository::journal = journal;
+    //@todo _repoFileMap should have just access to Repository's journal.
+//    _repoFileMap.setJournal(journal);
 }
 
 Repository::Repository(const RepoIdType &repositoryId) : repositoryId(repositoryId),
@@ -28,9 +30,13 @@ const std::shared_ptr<IStorage> &Repository::getStorage() const {
 void Repository::restoreAll() {
 
     auto& fileMap = getFileMap();
-    for (auto &&[path, resourceId] :fileMap) {
-        if (resourceId) {
-            storage->restore(*resourceId, path);
+    for (auto &&[path, value] :fileMap) {
+        if (value) {
+            LOGGER("restoring path " + path)
+            storage->restore(value->getResourceId(), path);
+            //@todo restore attributes
+        } else {
+            LOGGER("resAll: no value")
         }
     }
 }
@@ -69,7 +75,7 @@ void Repository::persist(fs::path path) {
     if (path.is_relative()) {
         path = fs::canonical(fs::current_path() / path);
     }
-
+//@todo check if file is in fileMap, if it is, then method is *_EDITED
     //@todo take values from journal, or, even better, replay journal state during commit and do the store in that
     if (!fs::is_directory(path)) {
         journal->append(JournalMethod::ADDED_FILE, path);
@@ -83,14 +89,14 @@ void Repository::downloadStorage() {
 
     auto &fileMap = getFileMap();
     bool hasResources = true;
-    for (const auto &[path, resourceId] : fileMap) {
-        LOGGER("file " + path + " => " + (resourceId ? *resourceId : std::string(" [X] ")));
+    for (const auto &[path, value] : fileMap) {
+        LOGGER("file " + path + " => " + (value ? value->getResourceId() : std::string(" [X] ")));
         //@todo change this bool to actual transfer management
 
         //check for resources.
-        if (resourceId) {
-            if (!storage->hasResource(*resourceId)) {
-                hasResources &= storage->acquireResource(*resourceId);
+        if (value) {
+            if (!storage->hasResource(value->getResourceId())) {
+                hasResources &= storage->acquireResource(value->getResourceId());
             }
         }
 
@@ -115,6 +121,161 @@ void Repository::downloadStorage() {
 void Repository::update(fs::path path) {
 
     auto &fileMap = getFileMap();
+    //only update if the file is in the repository
+    auto &value = fileMap[path];
+    if (value) {
+        if (fs::exists(path)) {
+            //@todo use some kind of FileUtil to get this
+            auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
+            if (currentFileTime < value->getModificationTime()) {
+                storage->restore(value->getResourceId(), path);
+                //@todo restore attributes
+            } else {
+                if (currentFileTime == value->getModificationTime()) {
+
+                } else {
+                    //@todo pull file into repository? persist()?
+                }
+            }
+        } else {
+            storage->restore(value->getResourceId(), path);
+            //@todo restore attributes
+        }
+    } else {
+        //exception or sth?
+        ;
+    };
 
 
+}
+
+void Repository::update() {
+
+    for (const auto &i : getFileMap()) {
+        update(i.first);
+    }
+
+}
+
+void Repository::RepoFileMap::prepareMap() {
+//    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum )
+
+    if (mapChecksum != journal->getChecksum()) {
+        LOGGER("checksum different, recreate file map")
+        attributesMap.clear();
+        journal->clearFunc();
+        journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
+            attributesMap[i.getPath()] = Attributes();
+            attributesMap[i.getPath()]->setResourceId(
+                    IStorage::getResourceId(i.getChecksum(), i.getSize()));//i.getChecksum();
+            //@todo do one func to set them all from a file or journal data entry
+            attributesMap[i.getPath()]->setPermissions(i.getPermissions());
+            attributesMap[i.getPath()]->setSize(i.getSize());
+            attributesMap[i.getPath()]->setModificationTime(i.getModificationTime());
+            attributesMap[i.getPath()]->setChecksum(i.getChecksum());
+            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+        });
+
+        journal->setFunc(JournalMethod::MODIFIED_FILE, [&](auto &i) {
+            attributesMap[i.getPath()] = Attributes();
+            attributesMap[i.getPath()]->setResourceId(
+                    IStorage::getResourceId(i.getChecksum(), i.getSize()));//i.getChecksum();
+            attributesMap[i.getPath()]->setPermissions(i.getPermissions());
+            attributesMap[i.getPath()]->setSize(i.getSize());
+            attributesMap[i.getPath()]->setModificationTime(i.getModificationTime());
+            attributesMap[i.getPath()]->setChecksum(i.getChecksum());
+            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+        });
+
+        //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
+        journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
+            attributesMap[i.getPath()] = Attributes();
+            attributesMap[i.getPath()]->setResourceId(
+                    IStorage::getResourceId(i.getChecksum(), i.getSize()));//i.getChecksum();
+            attributesMap[i.getPath()]->setPermissions(i.getPermissions());
+            attributesMap[i.getPath()]->setSize(i.getSize());
+            attributesMap[i.getPath()]->setModificationTime(i.getModificationTime());
+            attributesMap[i.getPath()]->setChecksum(i.getChecksum());
+            LOGGER(i.getChecksum() + " ::: " + i.getPath());
+        });
+
+        journal->setFunc(JournalMethod::DELETED_FILE, [&](auto &i) {
+            attributesMap[i.getPath()] = std::nullopt;
+//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+        });
+
+        //@todo set attributes for directories as well
+        journal->replay();
+        mapChecksum = journal->getChecksum();
+    }
+}
+
+auto Repository::RepoFileMap::operator[](const PathType &path) -> decltype(attributesMap[0]) {
+    //@todo future optimization: maybe this shouldn't be called every time? it has an if, but still...
+    prepareMap();
+    return attributesMap[path];
+}
+
+void Repository::RepoFileMap::clear() {
+    attributesMap.clear();
+    mapChecksum = "";
+}
+
+const std::string Repository::RepoFileMap::getJournalChecksum() const {
+    return journal->getChecksum();
+}
+
+auto Repository::RepoFileMap::begin() -> decltype(attributesMap.begin()) {
+    prepareMap();
+    return attributesMap.begin();
+}
+
+auto Repository::RepoFileMap::end() -> decltype(attributesMap.end()) {
+    return attributesMap.end();
+}
+
+Repository::RepoFileMap::RepoFileMap(JournalPtr &journal) : journal(journal) {}
+
+void Repository::RepoFileMap::setJournal(const JournalPtr &journal) {
+    RepoFileMap::journal = journal;
+}
+
+std::filesystem::perms Repository::RepoFileMap::Attributes::getPermissions() const {
+    return permissions;
+}
+
+void Repository::RepoFileMap::Attributes::setPermissions(std::filesystem::perms permissions) {
+    Attributes::permissions = permissions;
+}
+
+uintmax_t Repository::RepoFileMap::Attributes::getSize() const {
+    return size;
+}
+
+void Repository::RepoFileMap::Attributes::setSize(uintmax_t size) {
+    Attributes::size = size;
+}
+
+time_t Repository::RepoFileMap::Attributes::getModificationTime() const {
+    return modificationTime;
+}
+
+void Repository::RepoFileMap::Attributes::setModificationTime(time_t modificationTime) {
+    Attributes::modificationTime = modificationTime;
+}
+
+const ResourceId &Repository::RepoFileMap::Attributes::getChecksum() const {
+    return checksum;
+}
+
+void Repository::RepoFileMap::Attributes::setChecksum(const ResourceId &checksum) {
+    Attributes::checksum = checksum;
+}
+
+const ResourceId &Repository::RepoFileMap::Attributes::getResourceId() const {
+    return resourceId;
+}
+
+void Repository::RepoFileMap::Attributes::setResourceId(const ResourceId &resourceId) {
+    Attributes::resourceId = resourceId;
 }

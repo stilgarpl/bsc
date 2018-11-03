@@ -38,9 +38,6 @@ class JournalStateData {
 private:
     JournalMethod method;
     fs::perms permissions;
-
-
-private:
     PathType path;
     uintmax_t size = 0;
     std::time_t modificationTime;

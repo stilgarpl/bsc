@@ -130,6 +130,8 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("printRep", &RepoModule::printHistory);
     cmd->mapCommand("downRep", &RepoModule::downloadRemoteRepository);
     cmd->mapCommand("resRep", &RepoModule::restoreRepository);
+    cmd->mapCommand("update", &RepoModule::updateFile);
+    cmd->mapCommand("updateAll", &RepoModule::updateAllFiles);
 //    cmd->mapCommand("requestResource", &RepoModule::requestStoragePath);
     cmd->mapCommand("beginTransfer", &FilesystemModule::beginTransferTest);
 //    cmd->submodule("help").mapCommand("cmdList",&CommandModule::listCommands);

@@ -19,37 +19,83 @@ class Repository : public IRepository {
 public:
 
     class RepoFileMap {
+    private:
+        class Attributes {
+            fs::perms permissions;
+            uintmax_t size = 0;
+            std::time_t modificationTime;
+            ResourceId checksum; //checksum of the file.
 
+            ResourceId resourceId;
+        public:
+            std::filesystem::perms getPermissions() const;
+
+            void setPermissions(std::filesystem::perms permissions);
+
+            uintmax_t getSize() const;
+
+            void setSize(uintmax_t size);
+
+            time_t getModificationTime() const;
+
+            void setModificationTime(time_t modificationTime);
+
+            const ResourceId &getChecksum() const;
+
+            void setChecksum(const ResourceId &checksum);
+
+            const ResourceId &getResourceId() const;
+
+            void setResourceId(const ResourceId &resourceId);
+
+
+        };
     private:
         //@todo maybe some class instead of just PathType?
-        std::map<PathType, std::optional<ResourceId>> fileMap;
-        const JournalPtrConst journal;
+        // std::map<PathType, std::optional<ResourceId>> fileMap;
+        std::map<PathType, std::optional<Attributes>> attributesMap;
+        JournalPtr &journal;
+        decltype(journal->getChecksum()) mapChecksum;
+    private:
+        void prepareMap();
     public:
-        std::optional<ResourceId> &operator[](const PathType &path) {
-            return fileMap[path];
+        auto operator[](const PathType &path) -> decltype(attributesMap[0]);
+
+        auto getPermissions(fs::path path) {
+            return attributesMap[path]->getPermissions();
         }
 
-        void clear() {
-            fileMap.clear();
+        void setJournal(const JournalPtr &journal);
+
+        auto getSize(fs::path path) {
+            return attributesMap[path]->getSize();
         }
+
+        auto getChecksum(fs::path path) {
+            return attributesMap[path]->getChecksum();
+        }
+
+        auto getModificationTime(fs::path path) {
+            return attributesMap[path]->getModificationTime();
+        }
+
+        void clear();
 
     public:
-        const std::string getJournalChecksum() const {
-            return journal->getChecksum();
-        }
+    protected:
+        const std::string getJournalChecksum() const;
 
+    public:
 
-        auto begin() {
-            return fileMap.begin();
-        }
+        auto begin() -> decltype(attributesMap.begin());
 
-        auto end() {
-            return fileMap.end();
-        }
+        auto end() -> decltype(attributesMap.end());
 
-        RepoFileMap(JournalPtrConst journal) : journal(std::move(journal)) {}
+        RepoFileMap(JournalPtr &journal);
 
     };
+
+
 private:
     JournalPtr journal = std::make_shared<SimpleJournal>();
     RepoIdType repositoryId;
@@ -62,33 +108,6 @@ protected:
 
     //@todo move this function inside RepoFileMap. Store more data in RepoFileMap - it should know modification date of each path and type (dir/file)
     RepoFileMap &getFileMap() {
-        if (journal->getChecksum() != _repoFileMap.getJournalChecksum()) {
-            _repoFileMap.clear();
-            journal->clearFunc();
-            journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
-                _repoFileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());//i.getChecksum();
-                LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
-
-            journal->setFunc(JournalMethod::MODIFIED_FILE, [&](auto &i) {
-                _repoFileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());//i.getChecksum();
-                LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
-
-            //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
-            journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
-                _repoFileMap[i.getPath()] = IStorage::getResourceId(i.getChecksum(), i.getSize());
-                LOGGER(i.getChecksum() + " ::: " + i.getPath());
-            });
-
-            journal->setFunc(JournalMethod::DELETED_FILE, [&](auto &i) {
-                _repoFileMap[i.getPath()] = std::nullopt;
-                LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
-
-            journal->replay();
-
-        }
         return _repoFileMap;
     }
 

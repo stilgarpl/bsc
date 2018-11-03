@@ -37,6 +37,10 @@ public:
 
     void persistFile(const fs::path &path);
 
+    void updateFile(const fs::path &path);
+
+    void updateAllFiles();
+
     void persistFile2(const Repository::RepoIdType &repoId, const fs::path &path) {
 
     }
