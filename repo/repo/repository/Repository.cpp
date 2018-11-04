@@ -3,6 +3,7 @@
 //
 
 #include <repo/repository/transformer/rules/TmpRule.h>
+#include <repo/repository/transformer/rules/HomeDirRule.h>
 #include "Repository.h"
 
 using namespace std::chrono_literals;
@@ -25,6 +26,7 @@ Repository::Repository(const RepoIdType &repositoryId) : repositoryId(repository
                                                          storage(std::make_shared<InternalStorage>(
                                                                  static_cast<IRepository *>(this))) {
     pathTransformer->addRule(std::make_shared<TmpRule>());
+    pathTransformer->addRule(std::make_shared<HomeDirRule>());
 }
 
 const std::shared_ptr<IStorage> &Repository::getStorage() const {

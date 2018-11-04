@@ -10,6 +10,15 @@
 
 class HomeDirRule : public ITransformRule {
 
+private:
+    std::string HOME_DIR = getenv("HOME");
+    std::string HOME_PATTERN = "<HOME>";
+
+public:
+    std::filesystem::path transformToJournalFormat(fs::path path) override;
+
+    std::filesystem::path transformFromJournalFormat(fs::path path) override;
+
 };
 
 
