@@ -13,6 +13,8 @@
 #include <repo/repository/storage/IStorage.h>
 #include <repo/repository/storage/InternalStorage.h>
 #include <p2p/utils/crypto.h>
+#include <repo/repository/transformer/IPathTransformer.h>
+#include <repo/repository/transformer/PathTransformer.h>
 #include "IRepository.h"
 
 class Repository : public IRepository {
@@ -28,7 +30,7 @@ public:
 
             ResourceId resourceId;
         public:
-            std::filesystem::perms getPermissions() const;
+            fs::perms getPermissions() const;
 
             void setPermissions(std::filesystem::perms permissions);
 
@@ -55,6 +57,7 @@ public:
         // std::map<PathType, std::optional<ResourceId>> fileMap;
         std::map<PathType, std::optional<Attributes>> attributesMap;
         JournalPtr &journal;
+        std::shared_ptr<IPathTransformer> &pathTransformer;
         decltype(journal->getChecksum()) mapChecksum;
     private:
         void prepareMap();
@@ -91,8 +94,7 @@ public:
 
         auto end() -> decltype(attributesMap.end());
 
-        RepoFileMap(JournalPtr &journal);
-
+        RepoFileMap(JournalPtr &journal, std::shared_ptr<IPathTransformer> &pathTransformer);
     };
 
 
@@ -100,9 +102,10 @@ private:
     JournalPtr journal = std::make_shared<SimpleJournal>();
     RepoIdType repositoryId;
     std::shared_ptr<IStorage> storage;
+    std::shared_ptr<IPathTransformer> pathTransformer = std::make_shared<PathTransformer>();
 
 
-    RepoFileMap _repoFileMap = RepoFileMap(journal);
+    RepoFileMap _repoFileMap = RepoFileMap(journal, pathTransformer);
 
 protected:
 

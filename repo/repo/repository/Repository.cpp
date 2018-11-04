@@ -2,6 +2,7 @@
 // Created by stilgar on 17.10.17.
 //
 
+#include <repo/repository/transformer/rules/TmpRule.h>
 #include "Repository.h"
 
 using namespace std::chrono_literals;
@@ -22,7 +23,9 @@ void Repository::setJournal(const JournalPtr &journal) {
 
 Repository::Repository(const RepoIdType &repositoryId) : repositoryId(repositoryId),
                                                          storage(std::make_shared<InternalStorage>(
-                                                                 static_cast<IRepository *>(this))) {}
+                                                                 static_cast<IRepository *>(this))) {
+    pathTransformer->addRule(std::make_shared<TmpRule>());
+}
 
 const std::shared_ptr<IStorage> &Repository::getStorage() const {
     return storage;
@@ -45,8 +48,10 @@ void Repository::restoreAll() {
 void Repository::commit() {
     journal->clearFunc();
     journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
-        storage->store(calculateSha1OfFile(i.getPath()), fs::file_size(i.getPath()), i.getPath());
-        LOGGER("commit: added file " + i.getPath())
+        storage->store(calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
+                       fs::file_size(pathTransformer->transformFromJournalFormat(i.getPath())),
+                       pathTransformer->transformFromJournalFormat(i.getPath()));
+        LOGGER("commit: added file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())
     });
 
     journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
@@ -55,13 +60,14 @@ void Repository::commit() {
     journal->setFunc(JournalMethod::ADDED_DIRECTORY, [&](auto &i) {
         //nothing to store, but... files from the directory should be added.
         LOGGER("commit: added dir " + i.getPath())
-        for (const auto &item : fs::directory_iterator(i.getPath())) {
+        for (const auto &item : fs::directory_iterator(pathTransformer->transformFromJournalFormat(i.getPath()))) {
             if (fs::is_directory(item)) {
                 //@todo we shouldn't process that... or we should and not use recursive iterator (disabled recursive for now)
-                journal->append(ADDED_DIRECTORY, item.path());
+                journal->append(ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(item.path()));
             } else {
                 //@todo make sure this is processed by ADDED_FILE func, even though we are modifying the container
-                journal->append(ADDED_FILE, item.path());
+#error trzeba dodać trzeci parametr do appenda, ze wszysktimi danymi pliku (strukturak ktora ma rozmiar pliku, checksume i date modyfikacji, bo journal nie ma juz prawdziwego patha zeby sobie samemu to pobrac (zreszta chyba nie powinien)
+                journal->append(ADDED_FILE, pathTransformer->transformToJournalFormat(item.path()));
             }
         }
     });
@@ -79,10 +85,10 @@ void Repository::persist(fs::path path) {
 //@todo check if file is in fileMap, if it is, then method is *_EDITED
     //@todo take values from journal, or, even better, replay journal state during commit and do the store in that
     if (!fs::is_directory(path)) {
-        journal->append(JournalMethod::ADDED_FILE, path);
+        journal->append(JournalMethod::ADDED_FILE, pathTransformer->transformToJournalFormat(path));
 
     } else {
-        journal->append(JournalMethod::ADDED_DIRECTORY, path);
+        journal->append(JournalMethod::ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path));
     }
 }
 
@@ -182,42 +188,45 @@ void Repository::RepoFileMap::prepareMap() {
         attributesMap.clear();
         journal->clearFunc();
         journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
-            attributesMap[i.getPath()] = Attributes();
-            attributesMap[i.getPath()]->setResourceId(
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes();
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setResourceId(
                     IStorage::getResourceId(i.getChecksum(), i.getSize()));//i.getChecksum();
             //@todo do one func to set them all from a file or journal data entry
-            attributesMap[i.getPath()]->setPermissions(i.getPermissions());
-            attributesMap[i.getPath()]->setSize(i.getSize());
-            attributesMap[i.getPath()]->setModificationTime(i.getModificationTime());
-            attributesMap[i.getPath()]->setChecksum(i.getChecksum());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setPermissions(i.getPermissions());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setSize(i.getSize());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setModificationTime(
+                    i.getModificationTime());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setChecksum(i.getChecksum());
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         journal->setFunc(JournalMethod::MODIFIED_FILE, [&](auto &i) {
-            attributesMap[i.getPath()] = Attributes();
-            attributesMap[i.getPath()]->setResourceId(
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes();
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setResourceId(
                     IStorage::getResourceId(i.getChecksum(), i.getSize()));//i.getChecksum();
-            attributesMap[i.getPath()]->setPermissions(i.getPermissions());
-            attributesMap[i.getPath()]->setSize(i.getSize());
-            attributesMap[i.getPath()]->setModificationTime(i.getModificationTime());
-            attributesMap[i.getPath()]->setChecksum(i.getChecksum());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setPermissions(i.getPermissions());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setSize(i.getSize());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setModificationTime(
+                    i.getModificationTime());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setChecksum(i.getChecksum());
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
         journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
-            attributesMap[i.getPath()] = Attributes();
-            attributesMap[i.getPath()]->setResourceId(
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes();
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setResourceId(
                     IStorage::getResourceId(i.getChecksum(), i.getSize()));//i.getChecksum();
-            attributesMap[i.getPath()]->setPermissions(i.getPermissions());
-            attributesMap[i.getPath()]->setSize(i.getSize());
-            attributesMap[i.getPath()]->setModificationTime(i.getModificationTime());
-            attributesMap[i.getPath()]->setChecksum(i.getChecksum());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setPermissions(i.getPermissions());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setSize(i.getSize());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setModificationTime(
+                    i.getModificationTime());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setChecksum(i.getChecksum());
             LOGGER(i.getChecksum() + " ::: " + i.getPath());
         });
 
         journal->setFunc(JournalMethod::DELETED_FILE, [&](auto &i) {
-            attributesMap[i.getPath()] = std::nullopt;
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = std::nullopt;
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
@@ -251,17 +260,18 @@ auto Repository::RepoFileMap::end() -> decltype(attributesMap.end()) {
     return attributesMap.end();
 }
 
-Repository::RepoFileMap::RepoFileMap(JournalPtr &journal) : journal(journal) {}
-
 void Repository::RepoFileMap::setJournal(const JournalPtr &journal) {
     RepoFileMap::journal = journal;
 }
 
-std::filesystem::perms Repository::RepoFileMap::Attributes::getPermissions() const {
+Repository::RepoFileMap::RepoFileMap(JournalPtr &journal, std::shared_ptr<IPathTransformer> &pathTransformer) : journal(
+        journal), pathTransformer(pathTransformer) {}
+
+fs::perms Repository::RepoFileMap::Attributes::getPermissions() const {
     return permissions;
 }
 
-void Repository::RepoFileMap::Attributes::setPermissions(std::filesystem::perms permissions) {
+void Repository::RepoFileMap::Attributes::setPermissions(fs::perms permissions) {
     Attributes::permissions = permissions;
 }
 

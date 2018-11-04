@@ -42,25 +42,27 @@ void SimpleJournal::replay() {
 }
 
 void SimpleJournal::replayCurrentState() {
-    int processingPass = 0;
-    while (!currentState->isProcessed()) {
-        processingPass++;
-        LOGGER("processing replay pass " + std::to_string(processingPass));
-        //@todo I would like to remove getDataList and just pass the Func to it somehow
+    if (currentState) {
+        int processingPass = 0;
+        while (!currentState->isProcessed()) {
+            processingPass++;
+            LOGGER("processing replay pass " + std::to_string(processingPass));
+            //@todo I would like to remove getDataList and just pass the Func to it somehow
 
-        for (auto &&jt : currentState->getDataList()) {
-            if (!jt.isProcessed()) {
-                LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath());
-                auto &func = funcMap[jt.getMethod()];
-                if (func) {
-                    (*func)(jt);
+            for (auto &&jt : currentState->getDataList()) {
+                if (!jt.isProcessed()) {
+                    LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath());
+                    auto &func = funcMap[jt.getMethod()];
+                    if (func) {
+                        (*func)(jt);
+                    }
+                    jt.setProcessed(true);
                 }
-                jt.setProcessed(true);
             }
         }
+        //@todo I'm not very fond of this processed flag, but it's needed so changes to journal state will be in fact processed during replay.
+        currentState->clearProcessed();
     }
-    //@todo I'm not very fond of this processed flag, but it's needed so changes to journal state will be in fact processed during replay.
-    currentState->clearProcessed();
 
 }
 
