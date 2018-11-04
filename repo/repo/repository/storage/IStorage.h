@@ -31,9 +31,6 @@ public:
 //@todo store should only take path and return resourceId
     virtual void store(const ResourceId &checksum, const size_t &size, const PathType &path) =0;
 
-//@todo restore should take resourceId and destinationPath.
-    virtual bool restore(const ResourceId &checksum, const size_t &size, const PathType &path) = 0;
-
     virtual void restore(const ResourceId &resourceId, const PathType &path) = 0;
 
     //@todo I don't know if this method is actually useful. remove it if it's really not needed

@@ -21,8 +21,6 @@ private:
 public:
     void store(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) override;
 
-    bool restore(const ResourceId &checksum, const size_t &size, const PathType &destinationPath) override;
-
     void update(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) override;
 
     void sync(const NodeIdType &nodeID) override;

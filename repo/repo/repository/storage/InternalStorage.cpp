@@ -35,61 +35,6 @@ void InternalStorage::store(const ResourceId &checksum, const size_t &size, cons
 
 }
 
-bool
-InternalStorage::restore(const ResourceId &checksum, const size_t &size, const PathType &destinationPath) {
-
-    bool restoreFile = false;
-    if (fs::exists(destinationPath)) {
-        auto realChecksum = calculateSha1OfFile(fs::path(destinationPath));
-        auto realFileSize = fs::file_size(destinationPath);
-        restoreFile = !(realChecksum == checksum && realFileSize == size);
-    } else {
-        restoreFile = true;
-    }
-
-    auto resourceId = getResourceId(checksum, size);
-    auto resourcePath = getResourcePath(resourceId);
-    //@todo move transfer out of restore
-//    LOGGER("resouce path = " + resourcePath.string() + " , destination path = " + destinationPath)
-    if (!fs::exists(resourcePath) || !restoreFile) {
-        //storage does not have this object, acquire
-
-        auto netModule = NodeContext::getNodeFromActiveContext().getModule<NodeNetworkModule>();
-        StorageQuery::Request::Ptr req = StorageQuery::Request::getNew();
-        req->setRepositoryId(repository->getRepositoryId());
-        req->setObjectId(resourceId);
-        //@todo this will wait for response, potentially blocking Repository
-        auto response = netModule->broadcastRequest(req);
-        TransferManager::LocalTransferDescriptorPtr transfer = nullptr;
-
-        for (auto &&item : response) {
-            LOGGER("node " + item.first + " replied with " + std::to_string(item.second->isExists()));
-            if (item.second->isExists()) {
-                auto fileModule = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>();
-                transfer = fileModule->remoteGetStream(item.first, std::make_shared<StorageResourceIdentificator>(
-                        repository->getRepositoryId(), resourceId), std::make_shared<StorageResourceIdentificator>(
-                        repository->getRepositoryId(), resourceId));
-
-                break;
-            }
-        }
-        if (transfer != nullptr) {
-            transfer->wait();
-            restoreFile = true;
-        }
-    }
-
-
-
-    if (restoreFile) {
-        //@todo catch filesystem exceptions or use no except version
-        fs::copy(resourcePath, destinationPath, fs::copy_options::overwrite_existing);
-    }
-
-    return restoreFile;
-
-}
-
 void InternalStorage::update(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) {
 
 }
