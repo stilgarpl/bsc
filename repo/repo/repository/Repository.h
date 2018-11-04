@@ -138,6 +138,8 @@ public:
 
     void persist(fs::path path);
 
+    void restoreAttributes(fs::path path);
+
     //update one file from the repository
     void update(fs::path path);
 

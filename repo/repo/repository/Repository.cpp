@@ -4,6 +4,7 @@
 
 #include "Repository.h"
 
+using namespace std::chrono_literals;
 const IRepository::RepoIdType &Repository::getRepositoryId() const {
     return repositoryId;
 }
@@ -34,7 +35,7 @@ void Repository::restoreAll() {
         if (value) {
             LOGGER("restoring path " + path)
             storage->restore(value->getResourceId(), path);
-            //@todo restore attributes
+            restoreAttributes(path);
         } else {
             LOGGER("resAll: no value")
         }
@@ -127,9 +128,12 @@ void Repository::update(fs::path path) {
         if (fs::exists(path)) {
             //@todo use some kind of FileUtil to get this
             auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
+            LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
+                   std::to_string(value->getModificationTime()))
             if (currentFileTime < value->getModificationTime()) {
+                LOGGER("restoring...")
                 storage->restore(value->getResourceId(), path);
-                //@todo restore attributes
+                restoreAttributes(path);
             } else {
                 if (currentFileTime == value->getModificationTime()) {
 
@@ -138,8 +142,9 @@ void Repository::update(fs::path path) {
                 }
             }
         } else {
+            //@todo reform those ifs to combine two restore paths
             storage->restore(value->getResourceId(), path);
-            //@todo restore attributes
+            restoreAttributes(path);
         }
     } else {
         //exception or sth?
@@ -153,6 +158,18 @@ void Repository::update() {
 
     for (const auto &i : getFileMap()) {
         update(i.first);
+    }
+
+}
+
+void Repository::restoreAttributes(fs::path path) {
+
+    auto &fileMap = getFileMap();
+
+    if (fs::exists(path)) {
+        auto &attributes = fileMap[path];
+        fs::permissions(path, attributes->getPermissions());
+        fs::last_write_time(path, std::chrono::system_clock::from_time_t(attributes->getModificationTime()));
     }
 
 }
