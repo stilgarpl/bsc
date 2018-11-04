@@ -59,15 +59,18 @@ void Repository::commit() {
 
     journal->setFunc(JournalMethod::ADDED_DIRECTORY, [&](auto &i) {
         //nothing to store, but... files from the directory should be added.
-        LOGGER("commit: added dir " + i.getPath())
-        for (const auto &item : fs::directory_iterator(pathTransformer->transformFromJournalFormat(i.getPath()))) {
+        LOGGER("commit: added dir " + i.getPath() + " tt: " +
+               pathTransformer->transformFromJournalFormat(i.getPath()).string())
+        fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
+        for (const auto &item : fs::directory_iterator(dirPath)) {
             if (fs::is_directory(item)) {
                 //@todo we shouldn't process that... or we should and not use recursive iterator (disabled recursive for now)
-                journal->append(ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(item.path()));
+                journal->append(ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(item.path()),
+                                FileData(item.path()));
             } else {
                 //@todo make sure this is processed by ADDED_FILE func, even though we are modifying the container
-#error trzeba dodać trzeci parametr do appenda, ze wszysktimi danymi pliku (strukturak ktora ma rozmiar pliku, checksume i date modyfikacji, bo journal nie ma juz prawdziwego patha zeby sobie samemu to pobrac (zreszta chyba nie powinien)
-                journal->append(ADDED_FILE, pathTransformer->transformToJournalFormat(item.path()));
+                journal->append(ADDED_FILE, pathTransformer->transformToJournalFormat(item.path()),
+                                FileData(item.path()));
             }
         }
     });
@@ -85,10 +88,12 @@ void Repository::persist(fs::path path) {
 //@todo check if file is in fileMap, if it is, then method is *_EDITED
     //@todo take values from journal, or, even better, replay journal state during commit and do the store in that
     if (!fs::is_directory(path)) {
-        journal->append(JournalMethod::ADDED_FILE, pathTransformer->transformToJournalFormat(path));
+        journal->append(JournalMethod::ADDED_FILE, pathTransformer->transformToJournalFormat(path),
+                        FileData(path));
 
     } else {
-        journal->append(JournalMethod::ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path));
+        journal->append(JournalMethod::ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+                        FileData(path));
     }
 }
 

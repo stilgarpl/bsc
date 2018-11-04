@@ -66,9 +66,9 @@ void SimpleJournal::replayCurrentState() {
 
 }
 
-void SimpleJournal::append(JournalMethod method, PathType path) {
+void SimpleJournal::append(JournalMethod method, PathType path, FileData data) {
     prepareState();
-    currentState->add(JournalStateData(method, path));
+    currentState->add(JournalStateData(method, path, data));
 }
 
 void SimpleJournal::prepareState() {

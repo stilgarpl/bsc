@@ -55,7 +55,7 @@ public:
 
 
     //@todo hmm hmm variadic template? - moved may have two paths for example?
-    void append(JournalMethod method, PathType path) override;
+    void append(JournalMethod method, PathType path, FileData data) override;
 
     void replay() override;
 

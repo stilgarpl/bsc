@@ -85,18 +85,15 @@ void JournalState::clearProcessed() {
 
 }
 
-void JournalStateData::update() {
+void JournalStateData::update(FileData data) {
 
-    if (fs::exists(path) && !fs::is_directory(path)) {
+    if (!data.isIsDirectory()) {
         CryptoPP::SHA256 hash;
         std::string digest;
-        size = fs::file_size(fs::path(path));
-        modificationTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
-        permissions = fs::status(path).permissions();
-
-        CryptoPP::FileSource f(path.c_str(), true, new CryptoPP::HashFilter(hash, new CryptoPP::HexEncoder(
-                new CryptoPP::StringSink(digest))));
-        checksum = std::move(digest);
+        size = data.getSize();
+        modificationTime = data.getModificationTime();
+        permissions = data.getPermissions();
+        checksum = data.getSha256hash();
     }
 }
 

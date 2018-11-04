@@ -31,6 +31,7 @@
 #include <cryptopp/files.h>
 
 #include <filesystem>
+#include <p2p/modules/filesystem/data/FileData.h>
 
 namespace fs = std::filesystem;
 
@@ -55,8 +56,8 @@ private:
     friend class cereal::access;
 
 public:
-    JournalStateData(JournalMethod method, PathType path) : method(method), path(std::move(path)) {
-        update();
+    JournalStateData(JournalMethod method, PathType path, FileData fileData) : method(method), path(std::move(path)) {
+        update(fileData);
     };
 
     JournalStateData() = default;
@@ -71,20 +72,11 @@ public:
         return modificationTime;
     }
 
-    void setMethod(JournalMethod method) {
-        JournalStateData::method = method;
-    }
-
     const PathType &getPath() const {
         return path;
     }
 
-    void setPath(const PathType &path) {
-        JournalStateData::path = path;
-        update();
-    }
-
-    void update();
+    void update(FileData data);
 
     const ResourceId &getChecksum() const {
         return checksum;
