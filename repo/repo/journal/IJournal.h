@@ -24,7 +24,7 @@ public:
     typedef std::map<JournalMethod, std::optional<Func>> FuncMap;
     //@todo I'm not sure this should be in the interface...
     typedef std::shared_ptr<JournalState> JournalStatePtr;
-    typedef std::vector<std::shared_ptr<JournalState>> JournalHistory;
+    typedef std::vector<JournalStatePtr> JournalHistory;
     typedef std::shared_ptr<IJournal> JournalPtr;
 public:
     virtual ResourceId getChecksum() const = 0;
@@ -55,6 +55,7 @@ public:
 
     virtual void clearFunc() = 0;
 
+    virtual JournalStatePtr getState(const CommitTimeType &commitTime, const ChecksumType &checksumType) = 0;
 };
 
 typedef std::shared_ptr<IJournal> JournalPtr;

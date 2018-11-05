@@ -35,14 +35,18 @@
 
 namespace fs = std::filesystem;
 
+typedef std::chrono::system_clock::time_point CommitTimeType;
+typedef std::string ChecksumType;
+
 class JournalStateData {
 private:
     JournalMethod method;
     fs::perms permissions;
     PathType path;
     uintmax_t size = 0;
+    //@todo maybe I should use time_point instead of old time_t? but which clock?
     std::time_t modificationTime;
-    ResourceId checksum; //checksum of the file.
+    ChecksumType checksum; //checksum of the file.
     //@todo think about processed indicator. maybe it should store a value instead of just being a toggle?
     bool processed = false; //this does not go into the checksum
 private:
@@ -78,7 +82,7 @@ public:
 
     void update(FileData data);
 
-    const ResourceId &getChecksum() const {
+    const ChecksumType &getChecksum() const {
         return checksum;
     }
 
@@ -94,9 +98,10 @@ public:
 
 
 class JournalState {
-    ResourceId checksum;
+    ChecksumType checksum;
     std::list<JournalStateData> dataList;
-    std::chrono::system_clock::time_point commitTime;
+    //@todo different clock maybe? steady_clock?
+    CommitTimeType commitTime;
     std::shared_ptr<JournalState> previousState = nullptr;
 
 private:
@@ -124,13 +129,13 @@ public:
 
     void setPreviousState(const std::shared_ptr<JournalState> &previousState);
 
-    const std::chrono::system_clock::time_point &getCommitTime() const;
+    const CommitTimeType &getCommitTime() const;
 
     bool operator==(const JournalState &rhs) const;
 
     bool operator!=(const JournalState &rhs) const;
 
-    const ResourceId &getChecksum() const;
+    const ChecksumType &getChecksum() const;
 
     JournalState(const JournalState &other) {
         checksum = other.checksum;

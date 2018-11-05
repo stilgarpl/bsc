@@ -53,7 +53,7 @@ void JournalState::setPreviousState(const std::shared_ptr<JournalState> &previou
     JournalState::previousState = previousState;
 }
 
-const std::chrono::system_clock::time_point &JournalState::getCommitTime() const {
+const CommitTimeType &JournalState::getCommitTime() const {
     return commitTime;
 }
 
@@ -66,7 +66,7 @@ bool JournalState::operator!=(const JournalState &rhs) const {
     return !(rhs == *this);
 }
 
-const ResourceId &JournalState::getChecksum() const {
+const ChecksumType &JournalState::getChecksum() const {
     return checksum;
 }
 

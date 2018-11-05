@@ -50,6 +50,16 @@ public:
 
             void setResourceId(const ResourceId &resourceId);
 
+            Attributes() = default;
+
+            Attributes(const JournalStateData &data) {
+                size = data.getSize();
+                permissions = data.getPermissions();
+                modificationTime = data.getModificationTime();
+                checksum = data.getChecksum();
+                resourceId = IStorage::getResourceId(data.getChecksum(), data.getSize());
+            }
+
 
         };
     private:

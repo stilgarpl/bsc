@@ -18,8 +18,6 @@ JournalPtr &Repository::getJournal() {
 
 void Repository::setJournal(const JournalPtr &journal) {
     Repository::journal = journal;
-    //@todo _repoFileMap should have just access to Repository's journal.
-//    _repoFileMap.setJournal(journal);
 }
 
 Repository::Repository(const RepoIdType &repositoryId) : repositoryId(repositoryId),
@@ -188,48 +186,25 @@ void Repository::restoreAttributes(fs::path path) {
 }
 
 void Repository::RepoFileMap::prepareMap() {
-//    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum )
+    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
 
     if (mapChecksum != journal->getChecksum()) {
         LOGGER("checksum different, recreate file map")
         attributesMap.clear();
         journal->clearFunc();
         journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes();
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setResourceId(
-                    IStorage::getResourceId(i.getChecksum(), i.getSize()));//i.getChecksum();
-            //@todo do one func to set them all from a file or journal data entry
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setPermissions(i.getPermissions());
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setSize(i.getSize());
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setModificationTime(
-                    i.getModificationTime());
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setChecksum(i.getChecksum());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         journal->setFunc(JournalMethod::MODIFIED_FILE, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes();
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setResourceId(
-                    IStorage::getResourceId(i.getChecksum(), i.getSize()));//i.getChecksum();
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setPermissions(i.getPermissions());
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setSize(i.getSize());
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setModificationTime(
-                    i.getModificationTime());
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setChecksum(i.getChecksum());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
         journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes();
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setResourceId(
-                    IStorage::getResourceId(i.getChecksum(), i.getSize()));//i.getChecksum();
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setPermissions(i.getPermissions());
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setSize(i.getSize());
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setModificationTime(
-                    i.getModificationTime());
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())]->setChecksum(i.getChecksum());
-            LOGGER(i.getChecksum() + " ::: " + i.getPath());
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
         });
 
         journal->setFunc(JournalMethod::DELETED_FILE, [&](auto &i) {
@@ -243,7 +218,7 @@ void Repository::RepoFileMap::prepareMap() {
     }
 }
 
-auto Repository::RepoFileMap::operator[](const PathType &path) -> decltype(attributesMap[0]) {
+auto Repository::RepoFileMap::operator[](const PathType &path) -> decltype(attributesMap[nullptr]) {
     //@todo future optimization: maybe this shouldn't be called every time? it has an if, but still...
     prepareMap();
     return attributesMap[path];
@@ -313,3 +288,5 @@ const ResourceId &Repository::RepoFileMap::Attributes::getResourceId() const {
 void Repository::RepoFileMap::Attributes::setResourceId(const ResourceId &resourceId) {
     Attributes::resourceId = resourceId;
 }
+
+

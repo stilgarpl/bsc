@@ -15,7 +15,7 @@
 class SimpleJournal : public IJournal {
 
 private:
-    ResourceId checksum;
+    ChecksumType checksum;
     JournalStatePtr currentState = nullptr;
     JournalHistory journalHistory;
 
@@ -31,7 +31,7 @@ private:
 
     friend class cereal::access;
     std::shared_ptr<JournalState> findLastState() {
-        if (journalHistory.size() > 0) {
+        if (!journalHistory.empty()) {
             return *std::max_element(journalHistory.begin(), journalHistory.end(),
                                      [&](auto a, auto b) -> bool { return (a->getCommitTime() < b->getCommitTime()); });
         } else {
@@ -49,7 +49,7 @@ private:
     void prepareState();
 
 public:
-    ResourceId getChecksum() const override;
+    ChecksumType getChecksum() const override;
 
     void commitState() override;
 
@@ -107,6 +107,8 @@ public:
     void clearFunc() override;
 
     void replayCurrentState() override;
+
+    JournalStatePtr getState(const CommitTimeType &commitTime, const ChecksumType &checksumType) override;
 
 };
 

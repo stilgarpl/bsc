@@ -5,8 +5,8 @@
 #include "SimpleJournal.h"
 #include <p2p/log/Logger.h>
 
-ResourceId SimpleJournal::getChecksum() const {
-    //@todo calculate checksum?
+ChecksumType SimpleJournal::getChecksum() const {
+    //checksum is calculated at commit and always stored. no need to recalculate it.
     return checksum;
 }
 
@@ -105,16 +105,45 @@ bool SimpleJournal::merge(const std::shared_ptr<SimpleJournal> other) {
 
         thisCopy.reserve(thisCopy.size() + otherCopy.size());
         thisCopy.insert(thisCopy.end(), otherCopy.begin(), otherCopy.end());
+        //sort elements
         std::sort(thisCopy.begin(), thisCopy.end(), [](auto a, auto b) {
             return a->getCommitTime() < b->getCommitTime();
         });
 
+        //erase duplicates
         thisCopy.erase(std::unique(thisCopy.begin(), thisCopy.end(), [](auto i, auto j) {
             return (i->getCommitTime() == j->getCommitTime() && i->getChecksum() == j->getChecksum());
         }), thisCopy.end());
 
+        //fix previous state pointing to the wrong tree
+        for (auto &&item : thisCopy) {
+            if (item->getPreviousState() != nullptr) {
+                //check if previousState is in the journal
+                auto ret = std::find_if(thisCopy.begin(), thisCopy.end(), [&](const JournalStatePtr &i) {
+                    return i->getCommitTime() == item->getPreviousState()->getCommitTime() &&
+                           i->getChecksum() == item->getPreviousState()->getChecksum();
 
+
+                });
+                if (ret != thisCopy.end()) {
+                    if (item->getPreviousState() != *ret) {
+                        //different pointers
+                        //fix pointer
+                        item->setPreviousState(*ret);
+                    } else {
+                        //same pointer, ok
+                    }
+                } else {
+                    //@todo throw?
+                    LOGGER("MERGE FAILED!!!!!!")
+                    return false;
+                }
+            }
+        }
+
+        
         journalHistory = thisCopy;
+        calculateChecksum();
         //@todo what if uncommited changes are not compatible with merged last stage? what if we are modyfing file that was deleted in last state?
         //@todo maybe we should add something to verify integrity and validity before commiting changes?
         if (currentState != nullptr) {
@@ -139,5 +168,19 @@ bool SimpleJournal::merge(const JournalPtr &other) {
 void SimpleJournal::clearFunc() {
 
     funcMap.clear();
+
+}
+
+IJournal::JournalStatePtr SimpleJournal::getState(const CommitTimeType &commitTime, const ChecksumType &checksum) {
+
+    auto ret = std::find_if(journalHistory.begin(), journalHistory.end(), [&](const JournalStatePtr &i) {
+        return i->getCommitTime() == commitTime && i->getChecksum() == checksum;
+    });
+
+    if (ret == journalHistory.end()) {
+        return nullptr;
+    } else {
+        return *ret;
+    }
 
 }

@@ -2,7 +2,7 @@
 // Created by stilgar on 08.12.17.
 //
 
-#include <catch/catch.hpp>
+#include <catch2/catch.hpp>
 #include <p2p/modules/command/CommandModule.h>
 #include <repo/node/RepoModule.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
