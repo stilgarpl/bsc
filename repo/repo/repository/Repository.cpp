@@ -82,18 +82,31 @@ void Repository::commit() {
 
 void Repository::persist(fs::path path) {
 
+    auto &fileMap = getFileMap();
     if (path.is_relative()) {
         path = fs::canonical(fs::current_path() / path);
     }
-//@todo check if file is in fileMap, if it is, then method is *_EDITED
-    //@todo take values from journal, or, even better, replay journal state during commit and do the store in that
-    if (!fs::is_directory(path)) {
-        journal->append(JournalMethod::ADDED_FILE, pathTransformer->transformToJournalFormat(path),
-                        FileData(path));
 
+    if (fileMap[path]) {
+        //file exists in map! update mode
+        //@todo check if file was actually changed.
+        if (!fs::is_directory(path)) {
+            journal->append(JournalMethod::MODIFIED_FILE, pathTransformer->transformToJournalFormat(path),
+                            FileData(path));
+
+        } else {
+            journal->append(JournalMethod::MODIFIED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+                            FileData(path));
+        }
     } else {
-        journal->append(JournalMethod::ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
-                        FileData(path));
+        if (!fs::is_directory(path)) {
+            journal->append(JournalMethod::ADDED_FILE, pathTransformer->transformToJournalFormat(path),
+                            FileData(path));
+
+        } else {
+            journal->append(JournalMethod::ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+                            FileData(path));
+        }
     }
 }
 
@@ -114,19 +127,6 @@ void Repository::downloadStorage() {
 
 
     }
-//
-//    //@todo restore should not be in downloadStorage! move it to restoreAll
-//    for (const auto &[path, resourceId] : fileMap) {
-//        if (hasResources) {
-//            //@todo add transform
-//            storage->restore(*resourceId, path);
-//        } else {
-//            LOGGER("NO RESOURCES AVAILKABVLE")
-//        }
-//    }
-
-
-
 
 }
 
@@ -137,6 +137,7 @@ void Repository::update(fs::path path) {
     auto &value = fileMap[path];
     if (value) {
         if (fs::exists(path)) {
+            //@tod if fs::is_directory(path), iterate over files and directories and persist new ones.
             //@todo use some kind of FileUtil to get this
             auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
             LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
@@ -150,6 +151,7 @@ void Repository::update(fs::path path) {
 
                 } else {
                     //@todo pull file into repository? persist()?
+                    persist(path); //this should add file as modified.
                 }
             }
         } else {

@@ -18,6 +18,7 @@ class IStorage {
 public:
 
     typedef std::string ResourceId;
+    //@todo export typedefs to one file included from journal and storage.
 
     static ResourceId getResourceId(const ResourceId &checksum, const size_t &size) {
         return std::to_string(size) + "_" + checksum;
