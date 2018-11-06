@@ -27,76 +27,41 @@ public:
             uintmax_t size = 0;
             std::time_t modificationTime;
             ResourceId checksum; //checksum of the file.
-
+            bool directory = false;
             ResourceId resourceId;
         public:
             fs::perms getPermissions() const;
 
-            void setPermissions(std::filesystem::perms permissions);
-
             uintmax_t getSize() const;
-
-            void setSize(uintmax_t size);
 
             time_t getModificationTime() const;
 
-            void setModificationTime(time_t modificationTime);
-
             const ResourceId &getChecksum() const;
-
-            void setChecksum(const ResourceId &checksum);
 
             const ResourceId &getResourceId() const;
 
-            void setResourceId(const ResourceId &resourceId);
-
             Attributes() = default;
 
-            Attributes(const JournalStateData &data) {
-                size = data.getSize();
-                permissions = data.getPermissions();
-                modificationTime = data.getModificationTime();
-                checksum = data.getChecksum();
-                resourceId = IStorage::getResourceId(data.getChecksum(), data.getSize());
-            }
+            Attributes(const JournalStateData &data);
 
+            bool isDirectory() const;
 
         };
     private:
-        //@todo maybe some class instead of just PathType?
-        // std::map<PathType, std::optional<ResourceId>> fileMap;
-        std::map<PathType, std::optional<Attributes>> attributesMap;
+        std::map<fs::path, std::optional<Attributes>> attributesMap;
         JournalPtr &journal;
         std::shared_ptr<IPathTransformer> &pathTransformer;
         decltype(journal->getChecksum()) mapChecksum;
     private:
         void prepareMap();
     public:
-        auto operator[](const PathType &path) -> decltype(attributesMap[0]);
+        auto operator[](const fs::path &path) -> decltype(attributesMap[fs::current_path()]);
 
-        auto getPermissions(fs::path path) {
-            return attributesMap[path]->getPermissions();
-        }
+        auto getSize(fs::path path);
 
-        void setJournal(const JournalPtr &journal);
-
-        auto getSize(fs::path path) {
-            return attributesMap[path]->getSize();
-        }
-
-        auto getChecksum(fs::path path) {
-            return attributesMap[path]->getChecksum();
-        }
-
-        auto getModificationTime(fs::path path) {
-            return attributesMap[path]->getModificationTime();
-        }
-
-        void clear();
+        decltype(attributesMap) subMap(const fs::path root);
 
     public:
-    protected:
-        const std::string getJournalChecksum() const;
 
     public:
 
@@ -150,6 +115,10 @@ public:
 
 
     void persist(fs::path path);
+
+    void forget(fs::path path);
+
+    void ignore(fs::path path);
 
     void restoreAttributes(fs::path path);
 

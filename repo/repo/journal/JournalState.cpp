@@ -87,14 +87,13 @@ void JournalState::clearProcessed() {
 
 void JournalStateData::update(FileData data) {
 
-    if (!data.isIsDirectory()) {
-        CryptoPP::SHA256 hash;
-        std::string digest;
+    // if (!data.isIsDirectory()) {
         size = data.getSize();
         modificationTime = data.getModificationTime();
         permissions = data.getPermissions();
         checksum = data.getSha256hash();
-    }
+    directory = data.isIsDirectory();
+    //}
 }
 
 fs::perms JournalStateData::getPermissions() const {
@@ -108,3 +107,8 @@ bool JournalStateData::isProcessed() const {
 void JournalStateData::setProcessed(bool processed) {
     JournalStateData::processed = processed;
 }
+
+bool JournalStateData::isDirectory() const {
+    return directory;
+}
+

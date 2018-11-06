@@ -46,6 +46,8 @@ private:
     uintmax_t size = 0;
     //@todo maybe I should use time_point instead of old time_t? but which clock?
     std::time_t modificationTime;
+    //@todo bool or type? directory, file, socket, link...
+    bool directory = false;
     ChecksumType checksum; //checksum of the file.
     //@todo think about processed indicator. maybe it should store a value instead of just being a toggle?
     bool processed = false; //this does not go into the checksum
@@ -53,7 +55,7 @@ private:
     template<class Archive>
     void serialize(Archive &ar) {
         ar(CEREAL_NVP(method), CEREAL_NVP(path), CEREAL_NVP(size), CEREAL_NVP(checksum), CEREAL_NVP(modificationTime),
-           CEREAL_NVP(permissions));
+           CEREAL_NVP(permissions), CEREAL_NVP(directory));
     }
 
 
@@ -94,6 +96,7 @@ public:
 
     void setProcessed(bool processed);
 
+    bool isDirectory() const;
 };
 
 
