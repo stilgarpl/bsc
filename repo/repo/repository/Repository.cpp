@@ -69,11 +69,9 @@ void Repository::commit() {
         for (const auto &item : fs::directory_iterator(dirPath)) {
             fs::path path = fs::canonical(item.path());
             if (fs::is_directory(item)) {
-                //@todo we shouldn't process that... or we should and not use recursive iterator (disabled recursive for now)
                 journal->append(ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
                                 FileData(item.path()));
             } else {
-                //@todo make sure this is processed by ADDED_FILE func, even though we are modifying the container
                 journal->append(ADDED_FILE, pathTransformer->transformToJournalFormat(path),
                                 FileData(item.path()));
             }
@@ -90,7 +88,6 @@ void Repository::commit() {
             if (fs::exists(fs::canonical(item.path()))) {
                 if (!attr) {
                     if (fs::is_directory(path)) {
-                        //@todo we shouldn't process that... or we should and not use recursive iterator (disabled recursive for now)
                         journal->append(ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
                                         FileData(item.path()));
                     } else {
@@ -101,7 +98,6 @@ void Repository::commit() {
             } else {
                 if (attr) {
                     if (attr->isDirectory()) {
-                        //@todo we shouldn't process that... or we should and not use recursive iterator (disabled recursive for now)
                         journal->append(DELETED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
                                         FileData(item.path()));
                     } else {
@@ -120,8 +116,13 @@ void Repository::commit() {
         for (const auto &[subPath, value] : subMap) {
             //this will not set the isDirectory flag, but I don't think it's important.
             // @todo maybe I should split METHOD into two: METHOD and TARGET (DELETED, DIRECTORY)
-            journal->append(JournalMethod::DELETED_DIRECTORY, pathTransformer->transformToJournalFormat(subPath),
-                            FileData(subPath));
+            if (value->isDirectory()) {
+                journal->append(JournalMethod::DELETED_DIRECTORY, pathTransformer->transformToJournalFormat(subPath),
+                                FileData(subPath));
+            } else {
+                journal->append(JournalMethod::DELETED_FILE, pathTransformer->transformToJournalFormat(subPath),
+                                FileData(subPath));
+            }
         }
     });
 

@@ -8,6 +8,7 @@
 #include <repo/journal/network/logic/sources/JournalSource.h>
 #include <repo/repository/storage/network/logic/sources/StorageSource.h>
 #include <repo/repository/storage/network/logic/actions/StorageActions.h>
+#include <repo/repository/logic/sources/RepositorySource.h>
 #include "RepoModule.h"
 
 void RepoModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
@@ -26,6 +27,7 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
 bool RepoModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
     sourceHelper.requireSource<JournalSource>();
     sourceHelper.requireSource<StorageSource>();
+    sourceHelper.requireSource<RepositorySource>();
     return true;
 }
 

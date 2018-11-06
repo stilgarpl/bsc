@@ -18,20 +18,9 @@ private:
 public:
     explicit JournalSource(SourceManager &sourceManager);
 
-    void journalRequested(std::string repoId, JournalGroup::Request::IdType requestId) {
-        auto event = requestSource.newEvent(requestId);
-        event->setRepoId(repoId);
-//        event->setRequestId(requestId);
-        requestSource.queueEvent(event);
-    };
+    void journalRequested(std::string repoId, JournalGroup::Request::IdType requestId);;
 
-    void journalReceived(std::string repoId, const JournalPtr journal) {
-        //networking event requires packet id, but no one would be respoding to this, so...
-        auto event = responseSource.newEvent(0);
-        event->setRepoId(repoId);
-        event->setJournal(journal);
-        responseSource.queueEvent(event);
-    }
+    void journalReceived(std::string repoId, JournalPtr journal);
 
     void work() override;
 
