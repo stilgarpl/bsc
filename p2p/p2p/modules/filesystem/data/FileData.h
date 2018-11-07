@@ -39,6 +39,8 @@ public:
     const std::time_t &getModificationTime() const;
 
     explicit FileData(const fs::path &path);
+
+    FileData &setModificationTime(time_t modificationTime);
 };
 
 

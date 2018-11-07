@@ -88,28 +88,23 @@ void Repository::commit() {
             fs::path path = fs::canonical(item.path());
             auto &attr = fileMap[path];
             if (fs::exists(fs::canonical(item.path()))) {
+                auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
                 if (!attr) {
-                    if (fs::is_directory(path)) {
-                        journal->append(JournalMethod::ADDED, JournalTarget::DIRECTORY,
-                                        pathTransformer->transformToJournalFormat(path),
-                                        FileData(item.path()));
-                    } else {
-                        journal->append(JournalMethod::ADDED, JournalTarget::FILE,
+                    //I don't like the fact that this logic is in two places, here and update().
+                    if (!fileMap.isDeleted(fs::canonical(item.path())) ||
+                        currentFileTime > fileMap.getDeletionTime(fs::canonical(item.path()))) {
+                        journal->append(JournalMethod::ADDED,
+                                        fs::is_directory(path) ? JournalTarget::DIRECTORY : JournalTarget::FILE,
                                         pathTransformer->transformToJournalFormat(path),
                                         FileData(item.path()));
                     }
                 }
             } else {
                 if (attr) {
-                    if (attr->isDirectory()) {
-                        journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
-                                        pathTransformer->transformToJournalFormat(path),
-                                        FileData(item.path()));
-                    } else {
-                        journal->append(JournalMethod::DELETED, JournalTarget::FILE,
-                                        pathTransformer->transformToJournalFormat(path),
-                                        FileData(item.path()));
-                    }
+                    journal->append(JournalMethod::DELETED,
+                                    attr->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
+                                    pathTransformer->transformToJournalFormat(path),
+                                    FileData(item.path()).setModificationTime(attr->getModificationTime()));
                 }
 
             }
@@ -196,18 +191,21 @@ void Repository::downloadStorage() {
 
 void Repository::update(fs::path path) {
 
+    path = fs::weakly_canonical(path);
     auto &fileMap = getFileMap();
     //only update if the file is in the repository
     auto &value = fileMap[path];
     auto &attr = fileMap[path];
     if (fs::exists(path)) {
+        auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
         if (attr) {
-            auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
             LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
                    std::to_string(value->getModificationTime()))
             if (currentFileTime < value->getModificationTime()) {
                 LOGGER("restoring..." + path.string())
-                storage->restore(value->getResourceId(), path);
+                if (!attr->isDirectory()) {
+                    storage->restore(value->getResourceId(), path);
+                }
                 restoreAttributes(path);
             } else {
                 if (currentFileTime == value->getModificationTime()) {
@@ -219,7 +217,23 @@ void Repository::update(fs::path path) {
                 }
             }
         } else {
-            //no
+            LOGGER("cur fil tim " + std::to_string(currentFileTime) + " deltim " +
+                   std::to_string(fileMap.getDeletionTime(path)))
+            if (currentFileTime > fileMap.getDeletionTime(path)) {
+                //this is new file that has the same path as deleted one. persist!
+                LOGGER("new file, persisting " + path.string())
+                persist(path);
+
+            } else {
+                //@todo delete file
+                if (fileMap.isDeleted(path)) {
+                    LOGGER("deleting file " + path.string())
+                    //file should be deleted, but let's check deletion time...
+                    trash(path);
+                }
+            }
+
+            //not in the map
         }
     } else {
         //file was removed
@@ -325,8 +339,15 @@ void Repository::ignore(fs::path path) {
     }
 }
 
+void Repository::trash(fs::path path) {
+
+    //@todo implement trashing
+    fs::remove(path);
+
+}
+
 void Repository::RepoFileMap::prepareMap() {
-    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
+//    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
 
     if (mapChecksum != journal->getChecksum()) {
         LOGGER("checksum different, recreate file map")
@@ -348,7 +369,10 @@ void Repository::RepoFileMap::prepareMap() {
         });
 
         journal->setFunc(JournalMethod::DELETED, JournalTarget::FILE, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = std::nullopt;
+            auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+            attributesMap[path] = std::nullopt;
+            deleteMap[path].setDeleted(true);
+            deleteMap[path].setDeletionTime(i.getModificationTime());
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
@@ -367,8 +391,11 @@ void Repository::RepoFileMap::prepareMap() {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
         });
 
-        journal->setFunc(JournalMethod::DELETED, JournalTarget::DIRECTORY, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = std::nullopt;
+        journal->setFunc(JournalMethod::DELETED, JournalTarget::DIRECTORY, [&, this](auto &i) {
+            auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+            attributesMap[path] = std::nullopt;
+            deleteMap[path].setDeleted(true);
+            deleteMap[path].setDeletionTime(i.getModificationTime());
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
@@ -444,3 +471,18 @@ bool Repository::RepoFileMap::Attributes::isDirectory() const {
 }
 
 
+bool Repository::RepoFileMap::DeleteInfo::isDeleted() const {
+    return deleted;
+}
+
+time_t Repository::RepoFileMap::DeleteInfo::getDeletionTime() const {
+    return deletionTime;
+}
+
+void Repository::RepoFileMap::DeleteInfo::setDeletionTime(time_t deletionTime) {
+    DeleteInfo::deletionTime = deletionTime;
+}
+
+void Repository::RepoFileMap::DeleteInfo::setDeleted(bool deleted) {
+    DeleteInfo::deleted = deleted;
+}

@@ -51,3 +51,8 @@ FileData::FileData(const fs::path &path) {
         canonicalPath = fs::weakly_canonical(path);
     }
 }
+
+FileData &FileData::setModificationTime(time_t modificationTime) {
+    FileData::modificationTime = modificationTime;
+    return *this;
+}
