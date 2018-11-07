@@ -12,6 +12,7 @@
 #include <cereal/access.hpp>
 #include "JournalMethod.h"
 #include "JournalTypes.h"
+#include "JournalTarget.h"
 #include <chrono>
 #include <cryptopp/sha.h>
 #include <cryptopp/filters.h>
@@ -41,6 +42,7 @@ typedef std::string ChecksumType;
 class JournalStateData {
 private:
     JournalMethod method;
+    JournalTarget target;
     fs::perms permissions;
     PathType path;
     uintmax_t size = 0;
@@ -54,7 +56,8 @@ private:
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(CEREAL_NVP(method), CEREAL_NVP(path), CEREAL_NVP(size), CEREAL_NVP(checksum), CEREAL_NVP(modificationTime),
+        ar(CEREAL_NVP(method), CEREAL_NVP(target), CEREAL_NVP(path), CEREAL_NVP(size), CEREAL_NVP(checksum),
+           CEREAL_NVP(modificationTime),
            CEREAL_NVP(permissions), CEREAL_NVP(directory));
     }
 
@@ -62,7 +65,10 @@ private:
     friend class cereal::access;
 
 public:
-    JournalStateData(JournalMethod method, PathType path, FileData fileData) : method(method), path(std::move(path)) {
+    JournalStateData(JournalMethod method, JournalTarget target, PathType path, FileData fileData) : method(method),
+                                                                                                     target(target),
+                                                                                                     path(std::move(
+                                                                                                             path)) {
         update(fileData);
     };
 
@@ -97,6 +103,8 @@ public:
     void setProcessed(bool processed);
 
     bool isDirectory() const;
+
+    JournalTarget getTarget() const;
 };
 
 

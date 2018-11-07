@@ -112,3 +112,7 @@ bool JournalStateData::isDirectory() const {
     return directory;
 }
 
+JournalTarget JournalStateData::getTarget() const {
+    return target;
+}
+

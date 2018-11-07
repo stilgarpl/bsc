@@ -7,10 +7,10 @@
 //
 //TEST_CASE("Journal merge test") {
 //    SimpleJournal journal;
-//    journal.append(JournalMethod::ADDED_FILE, "/tmp/dupa.txt", FileData("/tmp/dupa.txt"));
-//    journal.append(JournalMethod::DELETED_FILE, "/tmp/to_remove.txt");
+//    journal.append(JournalMethod::ADDED,JournalTarget::FILE, "/tmp/dupa.txt", FileData("/tmp/dupa.txt"));
+//    journal.append(JournalMethod::DELETED,JournalTarget::FILE, "/tmp/to_remove.txt");
 //    journal.commitState();
-//    journal.append(JournalMethod::MODIFIED_FILE, "/tmp/dupa.txt");
+//    journal.append(JournalMethod::MODIFIED,JournalTarget::FILE, "/tmp/dupa.txt");
 //    journal.replay();
 //    journal.commitState();
 //    {
@@ -30,7 +30,7 @@
 //        }
 //
 //
-//        journal1->append(JournalMethod::ADDED_FILE, "/bin/zsh");
+//        journal1->append(JournalMethod::ADDED,JournalTarget::FILE, "/bin/zsh");
 //        journal1->commitState();
 //
 //
@@ -41,7 +41,7 @@
 //    SECTION("fail merge") {
 //
 //        std::shared_ptr<SimpleJournal> journal2 = std::make_shared<SimpleJournal>();
-//        journal2->append(JournalMethod::ADDED_FILE, "/tmp/journal.xml");
+//        journal2->append(JournalMethod::ADDED,JournalTarget::FILE, "/tmp/journal.xml");
 //        journal2->commitState();
 //
 //

@@ -21,7 +21,7 @@ public:
 
 public:
     typedef std::function<void(const JournalStateData &)> Func;
-    typedef std::map<JournalMethod, std::optional<Func>> FuncMap;
+    typedef std::map<std::pair<JournalMethod, JournalTarget>, std::optional<Func>> FuncMap;
     //@todo I'm not sure this should be in the interface...
     typedef std::shared_ptr<JournalState> JournalStatePtr;
     typedef std::vector<JournalStatePtr> JournalHistory;
@@ -45,13 +45,13 @@ private:
     friend class cereal::access;
 
 public:
-    virtual void append(JournalMethod method, PathType path, FileData data) = 0;
+    virtual void append(JournalMethod method, JournalTarget target, PathType path, FileData data) = 0;
 
     virtual void printHistory()=0;
 
     virtual bool merge(const JournalPtr &other) =0;
 
-    virtual void setFunc(const JournalMethod &method, Func func) =0;
+    virtual void setFunc(const JournalMethod &method, const JournalTarget &target, Func func) = 0;
 
     virtual void clearFunc() = 0;
 

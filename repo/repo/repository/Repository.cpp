@@ -51,17 +51,17 @@ void Repository::restoreAll() {
 
 void Repository::commit() {
     journal->clearFunc();
-    journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
+    journal->setFunc(JournalMethod::ADDED, JournalTarget::FILE, [&](auto &i) {
         storage->store(calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
                        fs::file_size(pathTransformer->transformFromJournalFormat(i.getPath())),
                        pathTransformer->transformFromJournalFormat(i.getPath()));
         LOGGER("commit: added file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())
     });
 
-    journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
+    journal->setFunc(JournalMethod::MOVED, JournalTarget::FILE, [&](auto &i) {
     });
 
-    journal->setFunc(JournalMethod::ADDED_DIRECTORY, [&](auto &i) {
+    journal->setFunc(JournalMethod::ADDED, JournalTarget::DIRECTORY, [&](auto &i) {
         //nothing to store, but... files from the directory should be added.
         LOGGER("commit: added dir " + i.getPath() + " tt: " +
                pathTransformer->transformFromJournalFormat(i.getPath()).string())
@@ -69,16 +69,18 @@ void Repository::commit() {
         for (const auto &item : fs::directory_iterator(dirPath)) {
             fs::path path = fs::canonical(item.path());
             if (fs::is_directory(item)) {
-                journal->append(ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+                journal->append(JournalMethod::ADDED, JournalTarget::DIRECTORY,
+                                pathTransformer->transformToJournalFormat(path),
                                 FileData(item.path()));
             } else {
-                journal->append(ADDED_FILE, pathTransformer->transformToJournalFormat(path),
+                journal->append(JournalMethod::ADDED, JournalTarget::FILE,
+                                pathTransformer->transformToJournalFormat(path),
                                 FileData(item.path()));
             }
         }
     });
 
-    journal->setFunc(JournalMethod::MODIFIED_DIRECTORY, [&](auto &i) {
+    journal->setFunc(JournalMethod::MODIFIED, JournalTarget::DIRECTORY, [&](auto &i) {
         fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
 
         auto &fileMap = getFileMap();
@@ -88,20 +90,24 @@ void Repository::commit() {
             if (fs::exists(fs::canonical(item.path()))) {
                 if (!attr) {
                     if (fs::is_directory(path)) {
-                        journal->append(ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+                        journal->append(JournalMethod::ADDED, JournalTarget::DIRECTORY,
+                                        pathTransformer->transformToJournalFormat(path),
                                         FileData(item.path()));
                     } else {
-                        journal->append(ADDED_FILE, pathTransformer->transformToJournalFormat(path),
+                        journal->append(JournalMethod::ADDED, JournalTarget::FILE,
+                                        pathTransformer->transformToJournalFormat(path),
                                         FileData(item.path()));
                     }
                 }
             } else {
                 if (attr) {
                     if (attr->isDirectory()) {
-                        journal->append(DELETED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+                        journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
+                                        pathTransformer->transformToJournalFormat(path),
                                         FileData(item.path()));
                     } else {
-                        journal->append(DELETED_FILE, pathTransformer->transformToJournalFormat(path),
+                        journal->append(JournalMethod::DELETED, JournalTarget::FILE,
+                                        pathTransformer->transformToJournalFormat(path),
                                         FileData(item.path()));
                     }
                 }
@@ -110,17 +116,19 @@ void Repository::commit() {
         }
     });
 
-    journal->setFunc(JournalMethod::DELETED_DIRECTORY, [&](auto &i) {
+    journal->setFunc(JournalMethod::DELETED, JournalTarget::DIRECTORY, [&](auto &i) {
         //@todo delete everything recursively
         auto subMap = getFileMap().subMap(pathTransformer->transformFromJournalFormat(i.getPath()));
         for (const auto &[subPath, value] : subMap) {
             //this will not set the isDirectory flag, but I don't think it's important.
             // @todo maybe I should split METHOD into two: METHOD and TARGET (DELETED, DIRECTORY)
             if (value->isDirectory()) {
-                journal->append(JournalMethod::DELETED_DIRECTORY, pathTransformer->transformToJournalFormat(subPath),
+                journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
+                                pathTransformer->transformToJournalFormat(subPath),
                                 FileData(subPath));
             } else {
-                journal->append(JournalMethod::DELETED_FILE, pathTransformer->transformToJournalFormat(subPath),
+                journal->append(JournalMethod::DELETED, JournalTarget::FILE,
+                                pathTransformer->transformToJournalFormat(subPath),
                                 FileData(subPath));
             }
         }
@@ -144,20 +152,23 @@ void Repository::persist(fs::path path) {
 
         //@todo check if file was actually changed.
         if (!attr->isDirectory()) {
-            journal->append(JournalMethod::MODIFIED_FILE, pathTransformer->transformToJournalFormat(path),
+            journal->append(JournalMethod::MODIFIED, JournalTarget::FILE,
+                            pathTransformer->transformToJournalFormat(path),
                             FileData(path));
 
         } else {
-            journal->append(JournalMethod::MODIFIED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+            journal->append(JournalMethod::MODIFIED, JournalTarget::DIRECTORY,
+                            pathTransformer->transformToJournalFormat(path),
                             FileData(path));
         }
     } else {
         if (!fs::is_directory(path)) {
-            journal->append(JournalMethod::ADDED_FILE, pathTransformer->transformToJournalFormat(path),
+            journal->append(JournalMethod::ADDED, JournalTarget::FILE, pathTransformer->transformToJournalFormat(path),
                             FileData(path));
 
         } else {
-            journal->append(JournalMethod::ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+            journal->append(JournalMethod::ADDED, JournalTarget::DIRECTORY,
+                            pathTransformer->transformToJournalFormat(path),
                             FileData(path));
         }
     }
@@ -280,11 +291,13 @@ void Repository::forget(fs::path path) {
     }
     if (fileMap[path]) {
         if (!fs::is_directory(path)) {
-            journal->append(JournalMethod::DELETED_FILE, pathTransformer->transformToJournalFormat(path),
+            journal->append(JournalMethod::DELETED, JournalTarget::FILE,
+                            pathTransformer->transformToJournalFormat(path),
                             FileData(path));
 
         } else {
-            journal->append(JournalMethod::DELETED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+            journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
+                            pathTransformer->transformToJournalFormat(path),
                             FileData(path));
             //@todo delete everything recursively ... or maybe do it in replayCurrentState?
 
@@ -301,11 +314,12 @@ void Repository::ignore(fs::path path) {
         path = fs::canonical(fs::current_path() / path);
     }
     if (!fs::is_directory(path)) {
-        journal->append(JournalMethod::IGNORED_FILE, pathTransformer->transformToJournalFormat(path),
+        journal->append(JournalMethod::IGNORED, JournalTarget::FILE, pathTransformer->transformToJournalFormat(path),
                         FileData(path));
 
     } else {
-        journal->append(JournalMethod::IGNORED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+        journal->append(JournalMethod::IGNORED, JournalTarget::DIRECTORY,
+                        pathTransformer->transformToJournalFormat(path),
                         FileData(path));
         //@todo ignore everything recursively
     }
@@ -318,42 +332,42 @@ void Repository::RepoFileMap::prepareMap() {
         LOGGER("checksum different, recreate file map")
         attributesMap.clear();
         journal->clearFunc();
-        journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
+        journal->setFunc(JournalMethod::ADDED, JournalTarget::FILE, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::MODIFIED_FILE, [&](auto &i) {
+        journal->setFunc(JournalMethod::MODIFIED, JournalTarget::FILE, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
-        journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
+        journal->setFunc(JournalMethod::MOVED, JournalTarget::FILE, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
         });
 
-        journal->setFunc(JournalMethod::DELETED_FILE, [&](auto &i) {
+        journal->setFunc(JournalMethod::DELETED, JournalTarget::FILE, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = std::nullopt;
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::ADDED_DIRECTORY, [&](auto &i) {
+        journal->setFunc(JournalMethod::ADDED, JournalTarget::DIRECTORY, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::MODIFIED_DIRECTORY, [&](auto &i) {
+        journal->setFunc(JournalMethod::MODIFIED, JournalTarget::DIRECTORY, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
-        journal->setFunc(JournalMethod::MOVED_DIRECTORY, [&](auto &i) {
+        journal->setFunc(JournalMethod::MOVED, JournalTarget::DIRECTORY, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
         });
 
-        journal->setFunc(JournalMethod::DELETED_DIRECTORY, [&](auto &i) {
+        journal->setFunc(JournalMethod::DELETED, JournalTarget::DIRECTORY, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = std::nullopt;
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });

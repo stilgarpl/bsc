@@ -84,7 +84,7 @@ void RepoModule::selectRepository(const Repository::RepoIdType &repoId) {
 
 void RepoModule::persistFile(const fs::path &path) {
     if (selectedRepository != nullptr) {
-        selectedRepository->persist(path);//getJournal()->append(JournalMethod::ADDED_FILE, path);
+        selectedRepository->persist(path);//getJournal()->append(JournalMethod::ADDED,JournalTarget::FILE, path);
 
     }
 }

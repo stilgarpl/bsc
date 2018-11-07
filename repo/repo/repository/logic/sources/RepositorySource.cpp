@@ -3,3 +3,7 @@
 //
 
 #include "RepositorySource.h"
+
+RepositorySource::RepositorySource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {
+
+}
