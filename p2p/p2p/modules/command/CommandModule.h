@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 14.11.17.
 //
@@ -60,7 +62,7 @@ public:
         bool mapCommand(std::string prefix, std::string commandName, std::function<void(ArgumentContainerType)> func) {
             std::string key = prefix + ":::" + commandName;
             auto &map = getCommandMap();//commands.get<std::string, std::function<void(ArgumentContainerType)>>();
-            map[key] = func;
+            map[key] = std::move(func);
             return true;
         };
     public:
@@ -89,7 +91,7 @@ public:
             });
         };
 
-        bool runCommand(std::string commandName, ArgumentContainerType arguments) {
+        bool runCommand(const std::string &commandName, ArgumentContainerType arguments) {
             //@todo integrate duplicate code with CommandModule somehow
             if (submodules.count(commandName) > 0 && arguments.size() > 1) {
                 //command is a submodule, redirecting
@@ -161,7 +163,6 @@ public:
     }
 
 
-
     CommandModule(INode &node);
 
 public:
@@ -229,8 +230,6 @@ private:
 public:
 
 
-
-
     void runInteractive() {
         std::string line;
         node.setNodeContextActive();
@@ -255,7 +254,7 @@ public:
                 runCommand(module, data);
             } catch (const IncorrectParametersException &e) {
                 LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " +
-                       std::to_string(e.gotParameters));
+                               std::to_string(e.gotParameters));
             }
 
         }

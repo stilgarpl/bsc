@@ -124,8 +124,13 @@ public:
             return *this;
         }
 
+        //@todo figure out how to get module pointer from this place
+//        template<typename RetType,typename ModuleType,typename... ModArgs>
+//        ThisType& fireModuleAction(RetType (ModuleType::*f)(ModArgs... args)) {
+//
+//        }
 
-        //@todo maybe add Args.. for actions with many arguments... maybe to whole helper class.
+
         ThisType &fireNewAction(ActionManager::ActionType<EventType, Args...> action) {
 
             static unsigned long generatedActionId = 1;
@@ -142,7 +147,7 @@ public:
 //            logicManager.event<NewEventType,NewArgs...>(NewEventType(),NewArgs()...);
             auto &autoSource = logicManager.requireSource<AutoSource>();
             fireNewAction([&](EventType e, Args...) {
-                autoSource.generateEvent<NewEventType>();
+                autoSource.template generateEvent<NewEventType>();
             });
 
 
