@@ -87,12 +87,12 @@ void Repository::commit() {
         for (const auto &item : fs::directory_iterator(dirPath)) {
             fs::path path = fs::canonical(item.path());
             auto &attr = fileMap[path];
-            if (fs::exists(fs::canonical(item.path()))) {
+            if (fs::exists(path)) {
                 auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
                 if (!attr) {
                     //I don't like the fact that this logic is in two places, here and update().
                     if (!fileMap.isDeleted(fs::canonical(item.path())) ||
-                        currentFileTime > fileMap.getDeletionTime(fs::canonical(item.path()))) {
+                        currentFileTime > fileMap.getDeletionTime(path)) {
                         journal->append(JournalMethod::ADDED,
                                         fs::is_directory(path) ? JournalTarget::DIRECTORY : JournalTarget::FILE,
                                         pathTransformer->transformToJournalFormat(path),
@@ -104,7 +104,7 @@ void Repository::commit() {
                     journal->append(JournalMethod::DELETED,
                                     attr->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
                                     pathTransformer->transformToJournalFormat(path),
-                                    FileData(item.path()).setModificationTime(attr->getModificationTime()));
+                                    attr->toFileData(path));
                 }
 
             }
@@ -120,11 +120,11 @@ void Repository::commit() {
             if (value->isDirectory()) {
                 journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
                                 pathTransformer->transformToJournalFormat(subPath),
-                                FileData(subPath));
+                                getFileMap()[subPath]->toFileData(subPath));
             } else {
                 journal->append(JournalMethod::DELETED, JournalTarget::FILE,
                                 pathTransformer->transformToJournalFormat(subPath),
-                                FileData(subPath));
+                                getFileMap()[subPath]->toFileData(subPath));
             }
         }
     });
@@ -303,17 +303,17 @@ void Repository::forget(fs::path path) {
         //@todo not so sure about current path, i have to make sure this is always set to the right value
         path = fs::canonical(fs::current_path() / path);
     }
-    if (fileMap[path]) {
+    auto &attr = fileMap[path];
+    if (attr) {
         if (!fs::is_directory(path)) {
             journal->append(JournalMethod::DELETED, JournalTarget::FILE,
                             pathTransformer->transformToJournalFormat(path),
-                            FileData(path).setModificationTime(fileMap[path]->getModificationTime()));
+                            attr->toFileData(path));
 
         } else {
-            //@todo add conversion from Attributes to FileData here
             journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
                             pathTransformer->transformToJournalFormat(path),
-                            FileData(path).setModificationTime(fileMap[path]->getModificationTime()));
+                            attr->toFileData(path));
             //@todo delete everything recursively ... or maybe do it in replayCurrentState?
 
         }

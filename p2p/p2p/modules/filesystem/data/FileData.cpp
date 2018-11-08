@@ -41,7 +41,7 @@ FileData::FileData(const fs::path &path) {
         CryptoPP::FileSource f(path.c_str(), true, new CryptoPP::HashFilter(hash, new CryptoPP::HexEncoder(
                 new CryptoPP::StringSink(digest))));
         sha256hash = std::move(digest);
-    } else if (fs::is_directory(path)) {
+    } else if (fs::exists(path) && fs::is_directory(path)) {
         isDirectory = true;
         canonicalPath = fs::canonical(path);
         modificationTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
@@ -52,7 +52,12 @@ FileData::FileData(const fs::path &path) {
     }
 }
 
-FileData &FileData::setModificationTime(time_t modificationTime) {
-    FileData::modificationTime = modificationTime;
-    return *this;
-}
+FileData::FileData(const std::filesystem::path &canonicalPath, const std::string &sha256hash,
+                   std::filesystem::perms permissions, uintmax_t size, time_t modificationTime, bool isDirectory)
+        : canonicalPath(canonicalPath), sha256hash(sha256hash), permissions(permissions), size(size),
+          modificationTime(modificationTime), isDirectory(isDirectory) {}
+
+FileData::FileData(const std::string &sha256hash, std::filesystem::perms permissions, uintmax_t size,
+                   time_t modificationTime, bool isDirectory) : sha256hash(sha256hash), permissions(permissions),
+                                                                size(size), modificationTime(modificationTime),
+                                                                isDirectory(isDirectory) {}

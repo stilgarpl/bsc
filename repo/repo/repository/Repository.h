@@ -46,6 +46,14 @@ public:
 
             bool isDirectory() const;
 
+            FileData toFileData() {
+                return FileData(checksum, permissions, size, modificationTime, directory);
+            }
+
+            FileData toFileData(const fs::path &path) {
+                return FileData(path, checksum, permissions, size, modificationTime, directory);
+            }
+
         };
 
         class DeleteInfo {

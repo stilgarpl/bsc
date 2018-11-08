@@ -40,7 +40,11 @@ public:
 
     explicit FileData(const fs::path &path);
 
-    FileData &setModificationTime(time_t modificationTime);
+    FileData(const std::filesystem::path &canonicalPath, const std::string &sha256hash,
+             std::filesystem::perms permissions, uintmax_t size, time_t modificationTime, bool isDirectory);
+
+    FileData(const std::string &sha256hash, std::filesystem::perms permissions, uintmax_t size, time_t modificationTime,
+             bool isDirectory);
 };
 
 
