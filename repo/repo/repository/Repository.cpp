@@ -307,12 +307,13 @@ void Repository::forget(fs::path path) {
         if (!fs::is_directory(path)) {
             journal->append(JournalMethod::DELETED, JournalTarget::FILE,
                             pathTransformer->transformToJournalFormat(path),
-                            FileData(path));
+                            FileData(path).setModificationTime(fileMap[path]->getModificationTime()));
 
         } else {
+            //@todo add conversion from Attributes to FileData here
             journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
                             pathTransformer->transformToJournalFormat(path),
-                            FileData(path));
+                            FileData(path).setModificationTime(fileMap[path]->getModificationTime()));
             //@todo delete everything recursively ... or maybe do it in replayCurrentState?
 
         }

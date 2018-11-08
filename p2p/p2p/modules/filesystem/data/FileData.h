@@ -21,7 +21,7 @@ private:
     std::string sha256hash;
     fs::perms permissions;
     uintmax_t size = 0;
-    std::time_t modificationTime;
+    std::time_t modificationTime = 0;
     bool isDirectory = false;
 
 public:
