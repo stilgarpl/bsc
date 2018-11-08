@@ -150,6 +150,8 @@ public:
 
     void forget(fs::path path);
 
+    void remove(fs::path path);
+
     void ignore(fs::path path);
 
     void restoreAttributes(fs::path path);

@@ -6,7 +6,17 @@
 #include "JournalState.h"
 
 void JournalState::add(const JournalStateData &data) {
-    dataList.push_back(data);
+    auto same = std::find_if(dataList.begin(), dataList.end(), [&](auto i) {
+        //@todo about that method and target... shouldn't this be an error if we have more than one method on one file?
+        return data.getChecksum() == i.getChecksum() && data.getSize() == i.getSize() &&
+               data.getMethod() == i.getMethod() && data.getTarget() == i.getTarget() && data.getPath() == i.getPath();
+    });
+    if (same == dataList.end()) {
+        dataList.push_back(data);
+    } else {
+        LOGGER("ERROR: trying to add same data again!")
+    }
+
 }
 
 std::list<JournalStateData> &JournalState::getDataList() {

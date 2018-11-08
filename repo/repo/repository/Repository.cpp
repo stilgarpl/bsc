@@ -130,6 +130,33 @@ void Repository::commit() {
     });
 
 
+    journal->setFunc(JournalMethod::IGNORED, JournalTarget::FILE, [&](auto &i) {
+        fs::path filePath = pathTransformer->transformFromJournalFormat(i.getPath());
+        auto &fileMap = getFileMap();
+
+        if (fileMap[filePath]) {
+            journal->append(JournalMethod::FORGOT, JournalTarget::FILE,
+                            filePath,
+                            fileMap[filePath]->toFileData(filePath));
+        }
+
+    });
+
+    journal->setFunc(JournalMethod::IGNORED, JournalTarget::DIRECTORY, [&](auto &i) {
+        fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
+        LOGGER("ignoring dir ... " + dirPath.string())
+        auto subMap = getFileMap().subMap(dirPath);
+        for (const auto &[subPath, value] : subMap) {
+            //this will not set the isDirectory flag, but I don't think it's important.
+            LOGGER("subpath " + subPath.string())
+            journal->append(JournalMethod::FORGOT,
+                            value->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
+                            pathTransformer->transformToJournalFormat(subPath),
+                            getFileMap()[subPath]->toFileData(subPath));
+        }
+
+    });
+
     journal->replayCurrentState();
     journal->commitState();
 }
@@ -227,7 +254,7 @@ void Repository::update(fs::path path) {
             } else {
                 //@todo delete file
                 if (fileMap.isDeleted(path)) {
-                    LOGGER("deleting file " + path.string())
+                    LOGGER("trashing " + path.string())
                     //file should be deleted, but let's check deletion time...
                     trash(path);
                 }
@@ -240,8 +267,8 @@ void Repository::update(fs::path path) {
 
         if (attr) {
             //file is in file map, but not on filesystem, removing
-            LOGGER("forgetting " + path.string());
-            forget(path);
+            LOGGER("deleting " + path.string());
+            remove(path); //@todo or forget?
         }
     }
 //    if (value) {
@@ -305,6 +332,23 @@ void Repository::forget(fs::path path) {
     }
     auto &attr = fileMap[path];
     if (attr) {
+        journal->append(JournalMethod::FORGOT, attr->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
+                        pathTransformer->transformToJournalFormat(path),
+                        attr->toFileData(path));
+    } else {
+        //nothing to forget!
+    }
+}
+
+void Repository::remove(fs::path path) {
+
+    auto &fileMap = getFileMap();
+    if (path.is_relative()) {
+        //@todo not so sure about current path, i have to make sure this is always set to the right value
+        path = fs::canonical(fs::current_path() / path);
+    }
+    auto &attr = fileMap[path];
+    if (attr) {
         if (!fs::is_directory(path)) {
             journal->append(JournalMethod::DELETED, JournalTarget::FILE,
                             pathTransformer->transformToJournalFormat(path),
@@ -336,7 +380,6 @@ void Repository::ignore(fs::path path) {
         journal->append(JournalMethod::IGNORED, JournalTarget::DIRECTORY,
                         pathTransformer->transformToJournalFormat(path),
                         FileData(path));
-        //@todo ignore everything recursively
     }
 }
 
@@ -377,6 +420,14 @@ void Repository::RepoFileMap::prepareMap() {
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
+        journal->setFunc(JournalMethod::FORGOT, JournalTarget::FILE, [&](auto &i) {
+            auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+            attributesMap[path] = std::nullopt;
+            deleteMap[path].setDeleted(false);
+            deleteMap[path].setDeletionTime(0);
+//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+        });
+
         journal->setFunc(JournalMethod::ADDED, JournalTarget::DIRECTORY, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
@@ -399,6 +450,15 @@ void Repository::RepoFileMap::prepareMap() {
             deleteMap[path].setDeletionTime(i.getModificationTime());
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
+
+        journal->setFunc(JournalMethod::FORGOT, JournalTarget::DIRECTORY, [&](auto &i) {
+            auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+            attributesMap[path] = std::nullopt;
+            deleteMap[path].setDeleted(false);
+            deleteMap[path].setDeletionTime(0);
+//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+        });
+
 
         //@todo set attributes for ignores.
         journal->replay();

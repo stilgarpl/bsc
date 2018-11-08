@@ -37,6 +37,8 @@ public:
 
     void persistFile(const fs::path &path);
 
+    void ignoreFile(const fs::path &path);
+
     void updateFile(const fs::path &path);
 
     void updateAllFiles();

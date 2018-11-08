@@ -146,3 +146,10 @@ void RepoModule::updateAllFiles() {
     }
 
 }
+
+void RepoModule::ignoreFile(const fs::path &path) {
+    if (selectedRepository != nullptr) {
+        selectedRepository->ignore(path);
+
+    }
+}
