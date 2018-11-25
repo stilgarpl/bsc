@@ -309,3 +309,13 @@ process map. start transfers according to transfer policy (so it won't start 100
 once all resources are available, apply them to the filesystem with path transformation.
 
 dodatkowo, transfer może trwać dniami, więc musi być opcja przerwania tego i kontynuowania później.
+
+
+Repository uruchamia kolejkę transferów do wykonania, które się wykonują w tle. jak się zakończą, trzeba poinformować repository o tym, że już ma wszystkie pliki
+
+Można podać this jako owner w TransferQueue, a potem ze wzorca observer wywołać jakąś metodę w repository.
+LogicObserver?
+
+ogólnie problem polega na tym, że kiedy TransferQueue kończy zadanie, skąd wiadomo kogo o tym powiadomić? milion rzeczy może inicjować transfery.
+
+when(state<TransferQueue>(FINISHED)).setOwnerState() ? notifyOwner()?
