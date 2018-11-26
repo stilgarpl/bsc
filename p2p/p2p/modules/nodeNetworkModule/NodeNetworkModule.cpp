@@ -141,7 +141,14 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole");
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole2");
 
-    LogicStateMachine<int> intStateMachine;
+
+    LogicStateMachine<NodeNetworkModule, int> intStateMachine(*this);
+
+    when(event < LogicStateEvent<NodeNetworkModule, int>>
+    ()).fireNewAction([](auto event) {
+        NODECONTEXTLOGGER("logic state event " + std::to_string(event.getState()) +
+                          (event.getMethod() == LogicStateMethod::ENTERED ? " ENTERED" : " LEFT"))
+    });
 //    intStateMachine.define(1).to(2).to(3).to(4);
 //    auto def = intStateMachine.define(1);
 //    def->(2)->(3);
@@ -149,6 +156,8 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
     intStateMachine.addLink(1, 2, 3, 4, 5, 6);
     intStateMachine.setState(2);
     intStateMachine.changeState(3);
+    intStateMachine.changeState(4);
+    intStateMachine.changeState(6);
 
     //@todo real value
     return true;

@@ -319,3 +319,21 @@ LogicObserver?
 ogólnie problem polega na tym, że kiedy TransferQueue kończy zadanie, skąd wiadomo kogo o tym powiadomić? milion rzeczy może inicjować transfery.
 
 when(state<TransferQueue>(FINISHED)).setOwnerState() ? notifyOwner()?
+
+idea: when(state()) moze zwracac StateHelpera zamiast EventHelpera, który mapuje eventy inaczej, zamiast prostego assignAction robi lambdę, która ze state eventu wyciąga odpowiednie pola przez co można wywołać metodę, która nic nie przyjmuje, przyjmuje target, albo target i state
+
+
+@todo StateMachine idea: separate state/link definition from state machine instance. (saves cpu time and memory)
+
+TransferQueue: LogicStateMachine<TransferQueue> ?
+
+TransferQueue {
+
+LogicStateMachine<TransferQueue>(this) ?
+
+
+//@todo enforce execution order for events
+niektóre eventy (jak state eventy) powinny się wykonywać w kolejności, inaczej nie ma to sensu.
+mozna to zrobic albo flagą w IEvent, numerem kolejki przetwarzania, execution policy albo czyms takim. wazne jest, zeby eventy z tego samego source z ustawionym tym szły sekwencyjnie.
+
+//@todo "przeciążyć" when i LogicChainHelper by móc dodać runModuleCommand()

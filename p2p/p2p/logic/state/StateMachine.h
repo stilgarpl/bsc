@@ -98,6 +98,7 @@ public:
         if (!states.count(state)) {
             invalidStateHandler(state);
         }
+        //@todo check if there is a valid link!
         if (currentState != states.end()) {
             onLeaveStateHandler(*currentState);
         }
