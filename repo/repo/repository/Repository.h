@@ -46,9 +46,33 @@ public:
 
             bool isDirectory() const;
 
+            FileData toFileData() {
+                return FileData(checksum, permissions, size, modificationTime, directory);
+            }
+
+            FileData toFileData(const fs::path &path) {
+                return FileData(path, checksum, permissions, size, modificationTime, directory);
+            }
+
+        };
+
+        class DeleteInfo {
+        private:
+            bool deleted = false;
+            std::time_t deletionTime = 0;
+
+        public:
+            bool isDeleted() const;
+
+            void setDeleted(bool deleted);
+
+            time_t getDeletionTime() const;
+
+            void setDeletionTime(time_t deletionTime);
         };
     private:
         std::map<fs::path, std::optional<Attributes>> attributesMap;
+        std::map<fs::path, DeleteInfo> deleteMap;
         JournalPtr &journal;
         std::shared_ptr<IPathTransformer> &pathTransformer;
         decltype(journal->getChecksum()) mapChecksum;
@@ -68,6 +92,14 @@ public:
         auto begin() -> decltype(attributesMap.begin());
 
         auto end() -> decltype(attributesMap.end());
+
+        std::time_t getDeletionTime(fs::path path) {
+            return deleteMap[path].getDeletionTime();
+        }
+
+        auto isDeleted(fs::path path) {
+            return deleteMap[path].isDeleted();
+        }
 
         RepoFileMap(JournalPtr &journal, std::shared_ptr<IPathTransformer> &pathTransformer);
     };
@@ -118,6 +150,8 @@ public:
 
     void forget(fs::path path);
 
+    void remove(fs::path path);
+
     void ignore(fs::path path);
 
     void restoreAttributes(fs::path path);
@@ -130,6 +164,7 @@ public:
 
     explicit Repository(const RepoIdType &repositoryId);
 
+    void trash(fs::path path);
 };
 
 typedef std::shared_ptr<Repository> RepositoryPtr;

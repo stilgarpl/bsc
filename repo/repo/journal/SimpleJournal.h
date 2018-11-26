@@ -55,12 +55,12 @@ public:
 
 
     //@todo hmm hmm variadic template? - moved may have two paths for example?
-    void append(JournalMethod method, PathType path, FileData data) override;
+    void append(JournalMethod method, JournalTarget target, PathType path, FileData data) override;
 
     void replay() override;
 
-    void setFunc(const JournalMethod &method, Func func) override {
-        funcMap[method] = func;
+    void setFunc(const JournalMethod &method, const JournalTarget &target, Func func) override {
+        funcMap[std::make_pair(method, target)] = func;
     }
 
 

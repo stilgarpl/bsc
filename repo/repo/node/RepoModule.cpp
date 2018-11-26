@@ -11,6 +11,9 @@
 #include <repo/repository/logic/sources/RepositorySource.h>
 #include "RepoModule.h"
 
+const fs::path RepoModule::repositoryDataPath = fs::path("repository");
+
+
 void RepoModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
     actionHelper.setAction<JournalRequestEvent>("journalRequest", JournalActions::journalRequested);
     actionHelper.setAction<JournalResponseEvent>("journalReceive", JournalActions::journalReceived);
@@ -41,15 +44,17 @@ void RepoModule::printHistory() {
     LOGGER("history printed")
 }
 
-void RepoModule::loadRepository(const Repository::RepoIdType &repoId, fs::path path) {
+void RepoModule::loadRepository(const Repository::RepoIdType &repoId) {
     RepositoryPtr ptr = std::make_shared<Repository>(repoId);
 
     repositoryManager.addRepository(ptr);
-    {
-        std::ifstream is(path);
-        cereal::XMLInputArchive ia(is);
-        ia >> ptr->getJournal();
-    }
+//@todo throw exception if repo does not exist
+    ptr->setJournal(node.getConfigurationManager().loadData<JournalPtr>(repositoryDataPath / (repoId + ".xml")));
+//    {
+//        std::ifstream is(path);
+//        cereal::XMLInputArchive ia(is);
+//        ia >> ptr->getJournal();
+//    }
     LOGGER(ptr->getJournal()->getChecksum());
 }
 
@@ -58,12 +63,12 @@ void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
 //    rep->getJournal()->commitState();
     rep->commit();
     fs::path savePath = fs::temp_directory_path() / (repoId + ".xml");
-
-    {
-        std::ofstream os(savePath);
-        cereal::XMLOutputArchive oa(os);
-        oa << rep->getJournal();
-    }
+    node.getConfigurationManager().saveData<JournalPtr>(repositoryDataPath / (repoId + ".xml"), rep->getJournal());
+//    {
+//        std::ofstream os(savePath);
+//        cereal::XMLOutputArchive oa(os);
+//        oa << rep->getJournal();
+//    }
 
 }
 
@@ -84,7 +89,7 @@ void RepoModule::selectRepository(const Repository::RepoIdType &repoId) {
 
 void RepoModule::persistFile(const fs::path &path) {
     if (selectedRepository != nullptr) {
-        selectedRepository->persist(path);//getJournal()->append(JournalMethod::ADDED_FILE, path);
+        selectedRepository->persist(path);//getJournal()->append(JournalMethod::ADDED,JournalTarget::FILE, path);
 
     }
 }
@@ -145,4 +150,11 @@ void RepoModule::updateAllFiles() {
 
     }
 
+}
+
+void RepoModule::ignoreFile(const fs::path &path) {
+    if (selectedRepository != nullptr) {
+        selectedRepository->ignore(path);
+
+    }
 }

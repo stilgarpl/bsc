@@ -51,17 +51,17 @@ void Repository::restoreAll() {
 
 void Repository::commit() {
     journal->clearFunc();
-    journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
+    journal->setFunc(JournalMethod::ADDED, JournalTarget::FILE, [&](auto &i) {
         storage->store(calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
                        fs::file_size(pathTransformer->transformFromJournalFormat(i.getPath())),
                        pathTransformer->transformFromJournalFormat(i.getPath()));
         LOGGER("commit: added file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())
     });
 
-    journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
+    journal->setFunc(JournalMethod::MOVED, JournalTarget::FILE, [&](auto &i) {
     });
 
-    journal->setFunc(JournalMethod::ADDED_DIRECTORY, [&](auto &i) {
+    journal->setFunc(JournalMethod::ADDED, JournalTarget::DIRECTORY, [&](auto &i) {
         //nothing to store, but... files from the directory should be added.
         LOGGER("commit: added dir " + i.getPath() + " tt: " +
                pathTransformer->transformFromJournalFormat(i.getPath()).string())
@@ -69,63 +69,93 @@ void Repository::commit() {
         for (const auto &item : fs::directory_iterator(dirPath)) {
             fs::path path = fs::canonical(item.path());
             if (fs::is_directory(item)) {
-                journal->append(ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+                journal->append(JournalMethod::ADDED, JournalTarget::DIRECTORY,
+                                pathTransformer->transformToJournalFormat(path),
                                 FileData(item.path()));
             } else {
-                journal->append(ADDED_FILE, pathTransformer->transformToJournalFormat(path),
+                journal->append(JournalMethod::ADDED, JournalTarget::FILE,
+                                pathTransformer->transformToJournalFormat(path),
                                 FileData(item.path()));
             }
         }
     });
 
-    journal->setFunc(JournalMethod::MODIFIED_DIRECTORY, [&](auto &i) {
+    journal->setFunc(JournalMethod::MODIFIED, JournalTarget::DIRECTORY, [&](auto &i) {
         fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
 
         auto &fileMap = getFileMap();
         for (const auto &item : fs::directory_iterator(dirPath)) {
             fs::path path = fs::canonical(item.path());
             auto &attr = fileMap[path];
-            if (fs::exists(fs::canonical(item.path()))) {
+            if (fs::exists(path)) {
+                auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
                 if (!attr) {
-                    if (fs::is_directory(path)) {
-                        journal->append(ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
-                                        FileData(item.path()));
-                    } else {
-                        journal->append(ADDED_FILE, pathTransformer->transformToJournalFormat(path),
+                    //I don't like the fact that this logic is in two places, here and update().
+                    if (!fileMap.isDeleted(fs::canonical(item.path())) ||
+                        currentFileTime > fileMap.getDeletionTime(path)) {
+                        journal->append(JournalMethod::ADDED,
+                                        fs::is_directory(path) ? JournalTarget::DIRECTORY : JournalTarget::FILE,
+                                        pathTransformer->transformToJournalFormat(path),
                                         FileData(item.path()));
                     }
                 }
             } else {
                 if (attr) {
-                    if (attr->isDirectory()) {
-                        journal->append(DELETED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
-                                        FileData(item.path()));
-                    } else {
-                        journal->append(DELETED_FILE, pathTransformer->transformToJournalFormat(path),
-                                        FileData(item.path()));
-                    }
+                    journal->append(JournalMethod::DELETED,
+                                    attr->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
+                                    pathTransformer->transformToJournalFormat(path),
+                                    attr->toFileData(path));
                 }
 
             }
         }
     });
 
-    journal->setFunc(JournalMethod::DELETED_DIRECTORY, [&](auto &i) {
+    journal->setFunc(JournalMethod::DELETED, JournalTarget::DIRECTORY, [&](auto &i) {
         //@todo delete everything recursively
         auto subMap = getFileMap().subMap(pathTransformer->transformFromJournalFormat(i.getPath()));
         for (const auto &[subPath, value] : subMap) {
             //this will not set the isDirectory flag, but I don't think it's important.
             // @todo maybe I should split METHOD into two: METHOD and TARGET (DELETED, DIRECTORY)
             if (value->isDirectory()) {
-                journal->append(JournalMethod::DELETED_DIRECTORY, pathTransformer->transformToJournalFormat(subPath),
-                                FileData(subPath));
+                journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
+                                pathTransformer->transformToJournalFormat(subPath),
+                                getFileMap()[subPath]->toFileData(subPath));
             } else {
-                journal->append(JournalMethod::DELETED_FILE, pathTransformer->transformToJournalFormat(subPath),
-                                FileData(subPath));
+                journal->append(JournalMethod::DELETED, JournalTarget::FILE,
+                                pathTransformer->transformToJournalFormat(subPath),
+                                getFileMap()[subPath]->toFileData(subPath));
             }
         }
     });
 
+
+    journal->setFunc(JournalMethod::IGNORED, JournalTarget::FILE, [&](auto &i) {
+        fs::path filePath = pathTransformer->transformFromJournalFormat(i.getPath());
+        auto &fileMap = getFileMap();
+
+        if (fileMap[filePath]) {
+            journal->append(JournalMethod::FORGOT, JournalTarget::FILE,
+                            filePath,
+                            fileMap[filePath]->toFileData(filePath));
+        }
+
+    });
+
+    journal->setFunc(JournalMethod::IGNORED, JournalTarget::DIRECTORY, [&](auto &i) {
+        fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
+        LOGGER("ignoring dir ... " + dirPath.string())
+        auto subMap = getFileMap().subMap(dirPath);
+        for (const auto &[subPath, value] : subMap) {
+            //this will not set the isDirectory flag, but I don't think it's important.
+            LOGGER("subpath " + subPath.string())
+            journal->append(JournalMethod::FORGOT,
+                            value->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
+                            pathTransformer->transformToJournalFormat(subPath),
+                            getFileMap()[subPath]->toFileData(subPath));
+        }
+
+    });
 
     journal->replayCurrentState();
     journal->commitState();
@@ -144,20 +174,23 @@ void Repository::persist(fs::path path) {
 
         //@todo check if file was actually changed.
         if (!attr->isDirectory()) {
-            journal->append(JournalMethod::MODIFIED_FILE, pathTransformer->transformToJournalFormat(path),
+            journal->append(JournalMethod::MODIFIED, JournalTarget::FILE,
+                            pathTransformer->transformToJournalFormat(path),
                             FileData(path));
 
         } else {
-            journal->append(JournalMethod::MODIFIED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+            journal->append(JournalMethod::MODIFIED, JournalTarget::DIRECTORY,
+                            pathTransformer->transformToJournalFormat(path),
                             FileData(path));
         }
     } else {
         if (!fs::is_directory(path)) {
-            journal->append(JournalMethod::ADDED_FILE, pathTransformer->transformToJournalFormat(path),
+            journal->append(JournalMethod::ADDED, JournalTarget::FILE, pathTransformer->transformToJournalFormat(path),
                             FileData(path));
 
         } else {
-            journal->append(JournalMethod::ADDED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+            journal->append(JournalMethod::ADDED, JournalTarget::DIRECTORY,
+                            pathTransformer->transformToJournalFormat(path),
                             FileData(path));
         }
     }
@@ -185,21 +218,25 @@ void Repository::downloadStorage() {
 
 void Repository::update(fs::path path) {
 
+    path = fs::weakly_canonical(path);
     auto &fileMap = getFileMap();
     //only update if the file is in the repository
     auto &value = fileMap[path];
     auto &attr = fileMap[path];
     if (fs::exists(path)) {
+        auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
+        auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
         if (attr) {
-            auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
             LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
                    std::to_string(value->getModificationTime()))
             if (currentFileTime < value->getModificationTime()) {
                 LOGGER("restoring..." + path.string())
-                storage->restore(value->getResourceId(), path);
+                if (!attr->isDirectory()) {
+                    storage->restore(value->getResourceId(), path);
+                }
                 restoreAttributes(path);
             } else {
-                if (currentFileTime == value->getModificationTime()) {
+                if (currentFileTime == value->getModificationTime() && currentFileSize == value->getSize()) {
                     //@todo verify other things, like size() maybe
                     LOGGER("leaving alone " + path.string())
                 } else {
@@ -208,15 +245,31 @@ void Repository::update(fs::path path) {
                 }
             }
         } else {
-            //no
+            LOGGER("cur fil tim " + std::to_string(currentFileTime) + " deltim " +
+                   std::to_string(fileMap.getDeletionTime(path)))
+            if (currentFileTime > fileMap.getDeletionTime(path)) {
+                //this is new file that has the same path as deleted one. persist!
+                LOGGER("new file, persisting " + path.string())
+                persist(path);
+
+            } else {
+                //@todo delete file
+                if (fileMap.isDeleted(path)) {
+                    LOGGER("trashing " + path.string())
+                    //file should be deleted, but let's check deletion time...
+                    trash(path);
+                }
+            }
+
+            //not in the map
         }
     } else {
         //file was removed
 
         if (attr) {
             //file is in file map, but not on filesystem, removing
-            LOGGER("forgetting " + path.string());
-            forget(path);
+            LOGGER("deleting " + path.string());
+            remove(path); //@todo or forget?
         }
     }
 //    if (value) {
@@ -278,14 +331,34 @@ void Repository::forget(fs::path path) {
         //@todo not so sure about current path, i have to make sure this is always set to the right value
         path = fs::canonical(fs::current_path() / path);
     }
-    if (fileMap[path]) {
+    auto &attr = fileMap[path];
+    if (attr) {
+        journal->append(JournalMethod::FORGOT, attr->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
+                        pathTransformer->transformToJournalFormat(path),
+                        attr->toFileData(path));
+    } else {
+        //nothing to forget!
+    }
+}
+
+void Repository::remove(fs::path path) {
+
+    auto &fileMap = getFileMap();
+    if (path.is_relative()) {
+        //@todo not so sure about current path, i have to make sure this is always set to the right value
+        path = fs::canonical(fs::current_path() / path);
+    }
+    auto &attr = fileMap[path];
+    if (attr) {
         if (!fs::is_directory(path)) {
-            journal->append(JournalMethod::DELETED_FILE, pathTransformer->transformToJournalFormat(path),
-                            FileData(path));
+            journal->append(JournalMethod::DELETED, JournalTarget::FILE,
+                            pathTransformer->transformToJournalFormat(path),
+                            attr->toFileData(path));
 
         } else {
-            journal->append(JournalMethod::DELETED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
-                            FileData(path));
+            journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
+                            pathTransformer->transformToJournalFormat(path),
+                            attr->toFileData(path));
             //@todo delete everything recursively ... or maybe do it in replayCurrentState?
 
         }
@@ -301,62 +374,92 @@ void Repository::ignore(fs::path path) {
         path = fs::canonical(fs::current_path() / path);
     }
     if (!fs::is_directory(path)) {
-        journal->append(JournalMethod::IGNORED_FILE, pathTransformer->transformToJournalFormat(path),
+        journal->append(JournalMethod::IGNORED, JournalTarget::FILE, pathTransformer->transformToJournalFormat(path),
                         FileData(path));
 
     } else {
-        journal->append(JournalMethod::IGNORED_DIRECTORY, pathTransformer->transformToJournalFormat(path),
+        journal->append(JournalMethod::IGNORED, JournalTarget::DIRECTORY,
+                        pathTransformer->transformToJournalFormat(path),
                         FileData(path));
-        //@todo ignore everything recursively
     }
 }
 
+void Repository::trash(fs::path path) {
+
+    //@todo implement trashing
+    fs::remove(path);
+
+}
+
 void Repository::RepoFileMap::prepareMap() {
-    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
+//    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
 
     if (mapChecksum != journal->getChecksum()) {
         LOGGER("checksum different, recreate file map")
         attributesMap.clear();
         journal->clearFunc();
-        journal->setFunc(JournalMethod::ADDED_FILE, [&](auto &i) {
+        journal->setFunc(JournalMethod::ADDED, JournalTarget::FILE, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::MODIFIED_FILE, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
-            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-        });
-
-        //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
-        journal->setFunc(JournalMethod::MOVED_FILE, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
-        });
-
-        journal->setFunc(JournalMethod::DELETED_FILE, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = std::nullopt;
-//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-        });
-
-        journal->setFunc(JournalMethod::ADDED_DIRECTORY, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
-            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-        });
-
-        journal->setFunc(JournalMethod::MODIFIED_DIRECTORY, [&](auto &i) {
+        journal->setFunc(JournalMethod::MODIFIED, JournalTarget::FILE, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
-        journal->setFunc(JournalMethod::MOVED_DIRECTORY, [&](auto &i) {
+        journal->setFunc(JournalMethod::MOVED, JournalTarget::FILE, [&](auto &i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
         });
 
-        journal->setFunc(JournalMethod::DELETED_DIRECTORY, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = std::nullopt;
+        journal->setFunc(JournalMethod::DELETED, JournalTarget::FILE, [&](auto &i) {
+            auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+            attributesMap[path] = std::nullopt;
+            deleteMap[path].setDeleted(true);
+            deleteMap[path].setDeletionTime(i.getModificationTime());
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
+
+        journal->setFunc(JournalMethod::FORGOT, JournalTarget::FILE, [&](auto &i) {
+            auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+            attributesMap[path] = std::nullopt;
+            deleteMap[path].setDeleted(false);
+            deleteMap[path].setDeletionTime(0);
+//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+        });
+
+        journal->setFunc(JournalMethod::ADDED, JournalTarget::DIRECTORY, [&](auto &i) {
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
+            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+        });
+
+        journal->setFunc(JournalMethod::MODIFIED, JournalTarget::DIRECTORY, [&](auto &i) {
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
+            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+        });
+
+        //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
+        journal->setFunc(JournalMethod::MOVED, JournalTarget::DIRECTORY, [&](auto &i) {
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
+        });
+
+        journal->setFunc(JournalMethod::DELETED, JournalTarget::DIRECTORY, [&, this](auto &i) {
+            auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+            attributesMap[path] = std::nullopt;
+            deleteMap[path].setDeleted(true);
+            deleteMap[path].setDeletionTime(i.getModificationTime());
+//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+        });
+
+        journal->setFunc(JournalMethod::FORGOT, JournalTarget::DIRECTORY, [&](auto &i) {
+            auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+            attributesMap[path] = std::nullopt;
+            deleteMap[path].setDeleted(false);
+            deleteMap[path].setDeletionTime(0);
+//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+        });
+
 
         //@todo set attributes for ignores.
         journal->replay();
@@ -430,3 +533,18 @@ bool Repository::RepoFileMap::Attributes::isDirectory() const {
 }
 
 
+bool Repository::RepoFileMap::DeleteInfo::isDeleted() const {
+    return deleted;
+}
+
+time_t Repository::RepoFileMap::DeleteInfo::getDeletionTime() const {
+    return deletionTime;
+}
+
+void Repository::RepoFileMap::DeleteInfo::setDeletionTime(time_t deletionTime) {
+    DeleteInfo::deletionTime = deletionTime;
+}
+
+void Repository::RepoFileMap::DeleteInfo::setDeleted(bool deleted) {
+    DeleteInfo::deleted = deleted;
+}

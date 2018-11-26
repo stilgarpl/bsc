@@ -31,7 +31,7 @@ void SimpleJournal::replay() {
         //@todo I would like to remove getDataList and just pass the Func to it somehow
         for (auto &&jt : it->getDataList()) {
             LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath());
-            auto &func = funcMap[jt.getMethod()];
+            auto &func = funcMap[std::make_pair(jt.getMethod(), jt.getTarget())];
             if (func) {
                 (*func)(jt);
             }
@@ -52,7 +52,7 @@ void SimpleJournal::replayCurrentState() {
             for (auto &&jt : currentState->getDataList()) {
                 if (!jt.isProcessed()) {
                     LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath());
-                    auto &func = funcMap[jt.getMethod()];
+                    auto &func = funcMap[std::make_pair(jt.getMethod(), jt.getTarget())];
                     if (func) {
                         (*func)(jt);
                     }
@@ -66,9 +66,9 @@ void SimpleJournal::replayCurrentState() {
 
 }
 
-void SimpleJournal::append(JournalMethod method, PathType path, FileData data) {
+void SimpleJournal::append(JournalMethod method, JournalTarget target, PathType path, FileData data) {
     prepareState();
-    currentState->add(JournalStateData(method, path, data));
+    currentState->add(JournalStateData(method, target, path, data));
 }
 
 void SimpleJournal::prepareState() {
