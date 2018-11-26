@@ -8,6 +8,7 @@
 #include <set>
 #include <map>
 #include <functional>
+#include <p2p/log/Logger.h>
 
 template<typename StateIdType>
 class StateMachine {
@@ -56,15 +57,38 @@ public:
     }
 
 protected:
+    //@todo remove
+public:
     void addState(const StateIdType &state) {
+        LOGGER("adding state" + std::to_string(state));
         states.insert(state);
     }
 
-    void addLink(const StateIdType &state1, const StateIdType &state2) {
-        //@todo check if both states exist in states set
-        links[state1].insert(state2);
+    template<typename ... StateIdTypes>
+    void addState(const StateIdTypes &... newStates) {
+        StateIdType allStates[] = {newStates...};
+        for (const auto &item : allStates) {
+            addState(item);
+        }
     }
 
+    void addLink(const StateIdType &state1, const StateIdType &state2) {
+        if (states.count(state1) > 0 && states.count(state2) > 0) {
+            LOGGER("linking " + std::to_string(state1) + " to " + std::to_string(state2));
+            links[state1].insert(state2);
+        } else {
+            //@todo exception?
+        }
+    }
+
+    template<typename ... StateIdTypes>
+    void addLink(const StateIdType &state1, const StateIdTypes &... otherStates) {
+        //@todo check if both states exist in states set
+        StateIdType allStates[] = {otherStates...};
+        for (const auto &item : allStates) {
+            addLink(state1, item);
+        }
+    }
 public:
     void setState(const StateIdType &state) {
         currentState = states.find(state);
