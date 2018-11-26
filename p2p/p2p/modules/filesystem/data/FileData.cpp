@@ -46,6 +46,7 @@ FileData::FileData(const fs::path &path) {
         canonicalPath = fs::canonical(path);
         modificationTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
         permissions = fs::status(path).permissions();
+        size = 0;
     } else {
         //@todo throw? or just leave it empty? or set an "empty flag? i think it should be left empty, it will work nicely with deleting files in JournalState
         canonicalPath = fs::weakly_canonical(path);

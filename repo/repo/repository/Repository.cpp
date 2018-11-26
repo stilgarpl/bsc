@@ -225,6 +225,7 @@ void Repository::update(fs::path path) {
     auto &attr = fileMap[path];
     if (fs::exists(path)) {
         auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
+        auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
         if (attr) {
             LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
                    std::to_string(value->getModificationTime()))
@@ -235,7 +236,7 @@ void Repository::update(fs::path path) {
                 }
                 restoreAttributes(path);
             } else {
-                if (currentFileTime == value->getModificationTime()) {
+                if (currentFileTime == value->getModificationTime() && currentFileSize == value->getSize()) {
                     //@todo verify other things, like size() maybe
                     LOGGER("leaving alone " + path.string())
                 } else {

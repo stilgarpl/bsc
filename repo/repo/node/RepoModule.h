@@ -16,10 +16,11 @@
 
 class RepoModule : public NodeModuleDependent<RepoModule> {
 private:
+    const static fs::path repositoryDataPath;
     RepositoryManager repositoryManager;
     RepositoryPtr selectedRepository = nullptr;
 public:
-    RepoModule(INode &node);
+    explicit RepoModule(INode &node);
 
     void setupActions(ILogicModule::SetupActionHelper &actionHelper) override;
 
@@ -54,7 +55,7 @@ public:
 
     void saveRepository(const Repository::RepoIdType &repoId);
 
-    void loadRepository(const Repository::RepoIdType &repoId, fs::path path);
+    void loadRepository(const Repository::RepoIdType &repoId);
 
     void restoreRepository(const Repository::RepoIdType &repoId);
 
