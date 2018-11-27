@@ -74,7 +74,7 @@ public:
 
     private:
         std::optional<EventId> eventId;
-        std::optional<ConstraintFunc> _constraint;
+        std::list<ConstraintFunc> _constraint;
     public:
         EventHelper<EventType, Args...> &withId(EventId id) {
             eventId = id;
@@ -93,9 +93,10 @@ public:
 
         explicit EventHelper(const std::optional<EventId> &eventId) : eventId(eventId) {}
 
-        //@todo add multiple constraints
+
         ThisType &constraint(const ConstraintFunc &func) {
-            _constraint = func;
+            _constraint.push_back(func);
+//            LOGGER("adding constraint, size " + std::to_string(_constraint.size()))
             return *this;
         }
 
@@ -137,8 +138,8 @@ public:
         typedef typename EventHelper<EventType, Args...>::ConstraintFunc ConstraintFunc;
     private:
         std::optional<EventId> eventId;
-        //@todo convert into a list or sth for more constraints
-        std::optional<ConstraintFunc> _constraint;
+
+        std::list<ConstraintFunc> _constraint;
         LogicManager &logicManager;
     public:
         explicit LogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l) : logicManager(
@@ -150,7 +151,7 @@ public:
 
         //@todo add multiple constraints
         ThisType &constraint(const ConstraintFunc &func) {
-            _constraint = func;
+            _constraint.push_back(func);
             return *this;
         }
 
@@ -161,7 +162,7 @@ public:
 
             //@todo if constrained then event<ConstrainedActionEvent> -> actionId; actionId = constrainedActionId
 
-            if (_constraint) {
+            if (!_constraint.empty()) {
 
                 //@todo what if no action?
                 auto action = logicManager.getAction<EventType, Args...>(actionId);
@@ -169,7 +170,12 @@ public:
                 if (action) {
                     auto generatedActionId = generateActionId<unsigned long>();
                     auto checkAction = [=, constraint = _constraint](EventType e, Args... args) {
-                        if ((*constraint)(e)) {
+                        bool result = true;
+                        for (auto &i : constraint) {
+                            result &= ((i)(e));
+                        }
+
+                        if (result) {
                             (*action)(e, args...);
                         }
                     };
@@ -272,13 +278,13 @@ public:
         return EventHelper<EventType, Args...>();
     }
 
-    template<typename ObjectType, typename StateIdType, typename ... Args>
-    auto state() {
+    template<typename ObjectType, typename StateIdType = typename ObjectType::StateIdType, typename ... Args>
+    StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...> state() {
         return StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...>();
     }
 
-    template<typename ObjectType, typename StateIdType, typename ... Args>
-    auto state(StateIdType id) {
+    template<typename ObjectType, typename StateIdType = typename ObjectType::StateIdType, typename ... Args>
+    StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...> state(StateIdType id) {
         return StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...>(id);
     }
 
