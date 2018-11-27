@@ -143,12 +143,20 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
 
     LogicStateMachine<NodeNetworkModule, int> intStateMachine(*this);
-
+//    when(event < LogicStateEvent<NodeNetworkModule, int>>
+//    ()).fireModuleAction(&NodeNetworkModule::testingMethod2);
+    when(state<NodeNetworkModule, int>(3).entered()).fireModuleAction(&NodeNetworkModule::testingMethod);
     when(event < LogicStateEvent<NodeNetworkModule, int>>
     ()).fireNewAction([](auto event) {
         NODECONTEXTLOGGER("logic state event " + std::to_string(event.getState()) +
                           (event.getMethod() == LogicStateMethod::ENTERED ? " ENTERED" : " LEFT"))
     });
+
+//    Tick tick;
+//    tick.getNow().time_since_epoch().
+    when(event < Tick > (1s)).constraint([](Tick &event) -> bool {
+        return std::chrono::duration_cast<std::chrono::seconds>(event.getNow().time_since_epoch()).count() % 7 == 0;
+    }).fireNewAction([](auto event) { LOGGER("every 5s!") });
 //    intStateMachine.define(1).to(2).to(3).to(4);
 //    auto def = intStateMachine.define(1);
 //    def->(2)->(3);

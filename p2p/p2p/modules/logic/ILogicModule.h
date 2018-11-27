@@ -25,6 +25,42 @@ public:
 
     }
 
+    template<typename EventType, typename ... Args>
+    class ModuleLogicChainHelper : public LogicChainHelper<EventType, Args...> {
+        typedef ModuleLogicChainHelper<EventType, Args...> ThisType;
+    private:
+        INode &node;
+    public:
+//        @todo figure out how to get module pointer from this place
+        template<typename RetType, typename ModuleType, typename... ModArgs>
+        ThisType &fireModuleAction(RetType (ModuleType::*f)(ModArgs... args)) {
+            std::cout << "assigning module action ... " << std::endl;
+            //@todo c++ bind_front? or sth? unpack placeholders to the sizeof ModArgs?
+            if constexpr  (sizeof...(ModArgs) == 0) {
+                LogicChainHelper<EventType, Args...>::fireNewAction(std::bind(f, node.getModule<ModuleType>()));
+            } else if constexpr (sizeof...(ModArgs) == 1) {
+                LogicChainHelper<EventType, Args...>::fireNewAction(
+                        std::bind(f, node.getModule<ModuleType>(), std::placeholders::_1));
+            } else if constexpr (sizeof...(ModArgs) == 2) {
+                LogicChainHelper<EventType, Args...>::fireNewAction(
+                        std::bind(f, node.getModule<ModuleType>(), std::placeholders::_1, std::placeholders::_2));
+            } else if constexpr (sizeof...(ModArgs) == 3) {
+                LogicChainHelper<EventType, Args...>::fireNewAction(
+                        std::bind(f, node.getModule<ModuleType>(), std::placeholders::_1, std::placeholders::_2,
+                                  std::placeholders::_3));
+            }
+            return *this;
+        }
+
+        ModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, INode &node)
+                : LogicChainHelper<EventType, Args...>(eventHelper, l), node(node) {}
+    };
+
+    template<typename EventType, typename ... Args>
+    ModuleLogicChainHelper<EventType, Args...> when(const EventHelper<EventType, Args...> eventHelper) {
+        return ModuleLogicChainHelper<EventType, Args...>(eventHelper, logicManager, node);
+    }
+
 
 
 protected:

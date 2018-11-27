@@ -43,6 +43,11 @@ public:
     }
 
     template<typename EventType, typename... Args, typename ActionId>
+    auto getAction(ActionId actionId) {
+        return actionManager.getAction<EventType, Args...>(actionId);
+    }
+
+    template<typename EventType, typename... Args, typename ActionId>
     bool assignAction(ActionId actionId) {
         auto &&action = actionManager.getAction<EventType, Args...>(actionId);
 //        if (!sourceManager.hasProvider<EventType>()) {

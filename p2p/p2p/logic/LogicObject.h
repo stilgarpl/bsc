@@ -9,6 +9,7 @@
 #include "LogicManager.h"
 
 #include <p2p/logic/sources/AutoSource.h>
+#include <p2p/logic/events/LogicStateEvent.h>
 
 class LogicObject {
 protected:
@@ -67,10 +68,13 @@ public:
     class EventHelper {
     public:
         typedef eventType EventType;
+        typedef EventHelper<eventType, Args...> ThisType;
         typedef typename EventType::IdType EventId;
+        typedef std::function<bool(EventType &)> ConstraintFunc;
 
     private:
         std::optional<EventId> eventId;
+        std::optional<ConstraintFunc> _constraint;
     public:
         EventHelper<EventType, Args...> &withId(EventId id) {
             eventId = id;
@@ -85,38 +89,109 @@ public:
             return event;
         }
 
-        EventHelper() {}
+        EventHelper() = default;
 
-        EventHelper(const std::optional<EventId> &eventId) : eventId(eventId) {}
+        explicit EventHelper(const std::optional<EventId> &eventId) : eventId(eventId) {}
+
+        //@todo add multiple constraints
+        ThisType &constraint(const ConstraintFunc &func) {
+            _constraint = func;
+            return *this;
+        }
 
         friend class LogicChainHelper<EventType, Args...>;
     };
 
+    template<typename eventType, typename ... Args>
+    class StateHelper : public EventHelper<eventType, Args...> {
+        // typedef StateHelper<eventType,Args...> ThisType;
+
+    public:
+        EventHelper<eventType, Args...> &entered() {
+            return this->constraint(
+                    [](eventType &event) -> bool { return event.getMethod() == LogicStateMethod::ENTERED; });
+        }
+
+        EventHelper<eventType, Args...> &left() {
+            return this->constraint(
+                    [](eventType &event) -> bool { return event.getMethod() == LogicStateMethod::ENTERED; });
+        }
+
+        StateHelper() = default;
+
+        explicit StateHelper(const std::optional<typename EventHelper<eventType, Args...>::EventId> &eventId)
+                : EventHelper<eventType, Args...>(eventId) {}
+    };
+
     template<typename EventType, typename ... Args>
     class LogicChainHelper {
+    private:
+        class ConstrainedActionEvent : public IEvent<unsigned long> {
+
+        };
     public:
         typedef typename EventType::IdType EventId;
         typedef LogicChainHelper<EventType, Args...> ThisType;
+        typedef typename EventHelper<EventType, Args...>::ConstraintFunc ConstraintFunc;
     private:
         std::optional<EventId> eventId;
+        //@todo convert into a list or sth for more constraints
+        std::optional<ConstraintFunc> _constraint;
         LogicManager &logicManager;
     public:
         explicit LogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l) : logicManager(
                 l) {
             eventId = eventHelper.eventId;
+            _constraint = eventHelper._constraint;
+        }
+
+        //@todo add multiple constraints
+        ThisType &constraint(const ConstraintFunc &func) {
+            _constraint = func;
+            return *this;
         }
 
         template<typename ActionId>
         ThisType &fireAction(ActionId actionId) {
             std::cout << "assigning action ... " << std::endl;
             bool success;
-            //@todo throw some exception or sth if action isn't found
-            if (eventId) {
 
-                success = logicManager.assignAction<EventType, Args...>(*eventId, actionId);
+            //@todo if constrained then event<ConstrainedActionEvent> -> actionId; actionId = constrainedActionId
+
+            if (_constraint) {
+
+                //@todo what if no action?
+                auto action = logicManager.getAction<EventType, Args...>(actionId);
+                //action is constrained, wrap it in check action
+                if (action) {
+                    auto generatedActionId = generateActionId<unsigned long>();
+                    auto checkAction = [=, constraint = _constraint](EventType e, Args... args) {
+                        if ((*constraint)(e)) {
+                            (*action)(e, args...);
+                        }
+                    };
+                    logicManager.setAction<EventType, Args...>(generatedActionId, checkAction);
+                    //@todo combine duplicated branches if possible
+                    if (eventId) {
+                        success = logicManager.assignAction<EventType, Args...>(*eventId, generatedActionId);
+                    } else {
+
+                        success = logicManager.assignAction<EventType, Args...>(generatedActionId);
+                    }
+                } else {
+                    success = false;
+                }
+
+
             } else {
 
-                success = logicManager.assignAction<EventType, Args...>(actionId);
+                //@todo throw some exception or sth if action isn't found
+                if (eventId) {
+                    success = logicManager.assignAction<EventType, Args...>(*eventId, actionId);
+                } else {
+
+                    success = logicManager.assignAction<EventType, Args...>(actionId);
+                }
             }
             if (!success) {
                 throw std::string("Failed to assign action!");
@@ -124,20 +199,30 @@ public:
             return *this;
         }
 
-        //@todo figure out how to get module pointer from this place
-//        template<typename RetType,typename ModuleType,typename... ModArgs>
-//        ThisType& fireModuleAction(RetType (ModuleType::*f)(ModArgs... args)) {
-//
-//        }
-
+        template<typename ActionId>
+        auto generateActionId() {
+            //@todo maybe create a version that will also work with strings? I have a lot of strings...
+            static ActionId generatedActionId = 1;
+            return generatedActionId++;
+        }
 
         ThisType &fireNewAction(ActionManager::ActionType<EventType, Args...> action) {
 
-            static unsigned long generatedActionId = 1;
+            auto generatedActionId = generateActionId<unsigned long>();
+
             std::cout << "assigning action with generated id " << std::to_string(generatedActionId) << std::endl;
+//            if (_constraint) {
+//                //action is constrained, wrap it in check action
+//                auto checkAction = [=,constraint=_constraint](EventType e, Args... args){
+//                    if ((*constraint)(e)) {
+//                        action(e, args...);
+//                    }
+//                };
+//                logicManager.setAction<EventType, Args...>(generatedActionId, checkAction);
+//            } else {
             logicManager.setAction<EventType, Args...>(generatedActionId, action);
+//            }
             fireAction(generatedActionId);
-            generatedActionId++;
             return *this;
         }
 
@@ -182,6 +267,16 @@ public:
     template<typename EventType, typename ... Args>
     EventHelper<EventType, Args...> event() {
         return EventHelper<EventType, Args...>();
+    }
+
+    template<typename ObjectType, typename StateIdType, typename ... Args>
+    auto state() {
+        return StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...>();
+    }
+
+    template<typename ObjectType, typename StateIdType, typename ... Args>
+    auto state(StateIdType id) {
+        return StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...>(id);
     }
 
     template<typename EventType, typename ... Args>

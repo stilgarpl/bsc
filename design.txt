@@ -337,3 +337,9 @@ niektóre eventy (jak state eventy) powinny się wykonywać w kolejności, inacz
 mozna to zrobic albo flagą w IEvent, numerem kolejki przetwarzania, execution policy albo czyms takim. wazne jest, zeby eventy z tego samego source z ustawionym tym szły sekwencyjnie.
 
 //@todo "przeciążyć" when i LogicChainHelper by móc dodać runModuleCommand()
+
+EventChainHelper - dodać optional std::function<bool(EventType)> constraint, która będzie ograniczać eventy
+
+np. state<Transfer>(STARTED).entered() ustawiłoby constraint na if (event.method == ENTERED) a samo action byloby lambdą
+
+if (constraint(event)) action(event);

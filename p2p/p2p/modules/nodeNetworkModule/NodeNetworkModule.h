@@ -19,6 +19,7 @@
 #include <p2p/modules/configuration/ConfigurationModule.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
 #include <p2p/role/RoleScope.h>
+#include <p2p/logic/events/LogicStateEvent.h>
 #include "p2p/modules/nodeNetworkModule/remote/exception/RemoteNodeNotFoundException.h"
 
 
@@ -265,6 +266,17 @@ public: // @todo should be public or shouldn't ?
                 throw RemoteNodeNotFoundException();
             }
         }
+    }
+
+    ////COMMANDS
+    void testingMethod() {
+        int a = 5;
+        LOGGER("Command testing method " + std::to_string(a));
+    }
+
+    void testingMethod2(const LogicStateEvent<NodeNetworkModule, int> &event) {
+        int a = event.getEventId();
+        LOGGER("Command testing method " + std::to_string(a));
     }
 };
 
