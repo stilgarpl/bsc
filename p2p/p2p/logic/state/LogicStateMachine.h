@@ -12,8 +12,10 @@
 #include <p2p/logic/sources/LogicStateSource.h>
 #include "StateMachine.h"
 
-template<typename Object, typename StateIdType>
-class LogicStateMachine : public StateMachine<StateIdType> {
+template<typename Object, typename stateIdType>
+class LogicStateMachine : public StateMachine<stateIdType> {
+public:
+    typedef stateIdType StateIdType;
 private:
     Object &object;
 

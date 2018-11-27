@@ -107,14 +107,16 @@ public:
         // typedef StateHelper<eventType,Args...> ThisType;
 
     public:
-        EventHelper<eventType, Args...> &entered() {
-            return this->constraint(
+        StateHelper<eventType, Args...> &entered() {
+            this->constraint(
                     [](eventType &event) -> bool { return event.getMethod() == LogicStateMethod::ENTERED; });
+            return *this;
         }
 
-        EventHelper<eventType, Args...> &left() {
-            return this->constraint(
-                    [](eventType &event) -> bool { return event.getMethod() == LogicStateMethod::ENTERED; });
+        StateHelper<eventType, Args...> &left() {
+            this->constraint(
+                    [](eventType &event) -> bool { return event.getMethod() == LogicStateMethod::LEFT; });
+            return *this;
         }
 
         StateHelper() = default;
@@ -143,6 +145,7 @@ public:
                 l) {
             eventId = eventHelper.eventId;
             _constraint = eventHelper._constraint;
+//            LOGGER("constraint ss " + std::to_string(_constraint.size()))
         }
 
         //@todo add multiple constraints
