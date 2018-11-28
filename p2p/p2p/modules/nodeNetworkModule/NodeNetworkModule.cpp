@@ -145,7 +145,10 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
     LogicStateMachine<NodeNetworkModule, int> intStateMachine(*this);
 //    when(event < LogicStateEvent<NodeNetworkModule, int>>
 //    ()).fireModuleAction(&NodeNetworkModule::testingMethod2);
-    when(state<NodeNetworkModule, int>(3).entered().left()).fireModuleAction(&NodeNetworkModule::testingMethod);
+//    when(state<NodeNetworkModule, int>(2).entered()/*.left()*/).valid();
+    when(state<NodeNetworkModule, int>(4).entered()/*.left()*/).fireStateChangeReaction([](auto &netMod, auto a) {
+        LOGGER("net mode test.. " + std::to_string(a) + "  " + netMod.testingMethod())
+    });//.fireModuleAction(&NodeNetworkModule::testingMethod);
     when(event < LogicStateEvent<NodeNetworkModule, int>>
     ()).fireNewAction([](auto event) {
         NODECONTEXTLOGGER("logic state event " + std::to_string(event.getState()) +

@@ -128,10 +128,6 @@ public:
 
     template<typename EventType, typename ... Args>
     class LogicChainHelper {
-    private:
-        class ConstrainedActionEvent : public IEvent<unsigned long> {
-
-        };
     public:
         typedef typename EventType::IdType EventId;
         typedef LogicChainHelper<EventType, Args...> ThisType;
@@ -146,10 +142,8 @@ public:
                 l) {
             eventId = eventHelper.eventId;
             _constraint = eventHelper._constraint;
-//            LOGGER("constraint ss " + std::to_string(_constraint.size()))
         }
 
-        //@todo add multiple constraints
         ThisType &constraint(const ConstraintFunc &func) {
             _constraint.push_back(func);
             return *this;
@@ -235,6 +229,17 @@ public:
             return *this;
         }
 
+//        //only when EventType == LogicStateEvent
+//        template<typename = std::enable_if<std::is_same<EventType,LogicStateEvent<typename EventType::Type, typename EventType::IdType>>::value>>
+//        ThisType& fireStateChangeReaction(std::function<void(typename EventType::Type&)> reaction) {
+//            return fireNewAction([reaction](EventType& event){reaction(event.getObject());});
+//        }
+//
+//
+//        ThisType& fireStateChangeReaction(ActionManager::ActionType<EventType, Args...> reaction) {
+//            return fireNewAction(reaction);
+//        }
+
         template<typename NewEventType, typename ... NewArgs>
         ThisType &emit() {
             //@todo initialize some actual values.
@@ -272,6 +277,36 @@ public:
 
     };
 
+    template<typename EventType, typename ... Args>
+    class SpecificLogicChainHelper : public LogicChainHelper<EventType, Args...> {
+    public:
+        explicit SpecificLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l)
+                : LogicChainHelper<EventType, Args...>(eventHelper, l) {};
+    };
+
+    template<typename Object, typename StateIdType, typename ... Args>
+    class SpecificLogicChainHelper<LogicStateEvent<Object, StateIdType>, Args...>
+            : public LogicChainHelper<LogicStateEvent<Object, StateIdType>, Args...> {
+        typedef LogicStateEvent<Object, StateIdType> LogicEventType;
+        typedef SpecificLogicChainHelper<LogicStateEvent<Object, StateIdType>> ThisType;
+    public:
+        explicit SpecificLogicChainHelper(const EventHelper<LogicEventType, Args...> &eventHelper, LogicManager &l)
+                : LogicChainHelper<LogicEventType, Args...>(eventHelper, l) {};
+
+//        void valid() {};
+        typename LogicChainHelper<LogicEventType, Args...>::ThisType &
+        fireStateChangeReaction(std::function<void(typename LogicEventType::Type &)> reaction) {
+            return LogicChainHelper<LogicEventType, Args...>::fireNewAction(
+                    [reaction](auto event) { reaction(event.getObject()); });
+        }
+
+        typename LogicChainHelper<LogicEventType, Args...>::ThisType &
+        fireStateChangeReaction(std::function<void(typename LogicEventType::Type &, const StateIdType &)> reaction) {
+            return LogicChainHelper<LogicEventType, Args...>::fireNewAction(
+                    [reaction](auto event) { reaction(event.getObject(), event.getState()); });
+        }
+    };
+
 
     template<typename EventType, typename ... Args>
     EventHelper<EventType, Args...> event() {
@@ -294,8 +329,8 @@ public:
     }
 
     template<typename EventType, typename ... Args>
-    LogicChainHelper<EventType, Args...> when(const EventHelper<EventType, Args...> eventHelper) {
-        return LogicChainHelper<EventType, Args...>(eventHelper, logicManager);
+    SpecificLogicChainHelper<EventType, Args...> when(const EventHelper<EventType, Args...> eventHelper) {
+        return SpecificLogicChainHelper<EventType, Args...>(eventHelper, logicManager);
     }
 
 

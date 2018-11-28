@@ -26,7 +26,7 @@ public:
     }
 
     template<typename EventType, typename ... Args>
-    class ModuleLogicChainHelper : public LogicChainHelper<EventType, Args...> {
+    class ModuleLogicChainHelper : public SpecificLogicChainHelper<EventType, Args...> {
         typedef ModuleLogicChainHelper<EventType, Args...> ThisType;
     private:
         INode &node;
@@ -53,13 +53,28 @@ public:
         }
 
         ModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, INode &node)
-                : LogicChainHelper<EventType, Args...>(eventHelper, l), node(node) {}
+                : SpecificLogicChainHelper<EventType, Args...>(eventHelper, l), node(node) {}
     };
+
+//    template<typename EventType, typename ... Args>
+//    class StateModuleLogicChainHelper : public ModuleLogicChainHelper<EventType, Args...> {
+//    public:
+//        typename LogicChainHelper<EventType, Args...>::ThisType& fireStateChangeReaction(std::function<void(typename EventType::Type&)> reaction) {
+//            return LogicChainHelper<EventType, Args...>::fireNewAction([reaction](auto event){reaction(event.getObject());});
+//        }
+//
+//        StateModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, INode &node) : ModuleLogicChainHelper<EventType, Args...>(eventHelper,l,node){};
+//    };
 
     template<typename EventType, typename ... Args>
     ModuleLogicChainHelper<EventType, Args...> when(const EventHelper<EventType, Args...> eventHelper) {
         return ModuleLogicChainHelper<EventType, Args...>(eventHelper, logicManager, node);
     }
+
+//    template<typename EventType, typename ... Args>
+//    StateModuleLogicChainHelper<EventType, Args...> when(const StateHelper<EventType, Args...> eventHelper) {
+//        return StateModuleLogicChainHelper<EventType, Args...>(eventHelper, logicManager, node);
+//    }
 
 
 

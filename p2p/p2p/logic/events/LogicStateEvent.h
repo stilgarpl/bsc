@@ -36,6 +36,10 @@ public :
         LogicStateEvent::method = method;
     }
 
+    Object &getObject() {
+        return object;
+    }
+
     explicit LogicStateEvent(Object &object) : object(object) {}
 };
 

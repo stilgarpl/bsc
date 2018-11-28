@@ -269,9 +269,10 @@ public: // @todo should be public or shouldn't ?
     }
 
     ////COMMANDS
-    void testingMethod() {
+    std::string testingMethod() {
         int a = 5;
         LOGGER("Command testing method " + std::to_string(a));
+        return "aaa";
     }
 
     void testingMethod2(const LogicStateEvent<NodeNetworkModule, int> &event) {
