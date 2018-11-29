@@ -41,7 +41,21 @@ protected:
 private:
     Uber<std::map> signalMap;
     Uber<Type> globalSignal;
-    std::shared_ptr<Executor> executor = std::make_shared<OrderedExecutor>();
+    StaticUber<std::shared_ptr<ExecutionPolicy>> executionPolicy;
+
+protected:
+
+    template<typename EventType>
+    std::shared_ptr<ExecutionPolicy> getExecutionPolicy() {
+        return executionPolicy.get<EventType>();
+    }
+
+public:
+    template<typename EventType>
+    void setExecutionPolicy(std::shared_ptr<ExecutionPolicy> policy) {
+        executionPolicy.get<EventType>() = policy;
+    }
+
 public:
 
     template<typename EventType, typename... Args>
@@ -52,9 +66,16 @@ public:
         Context::Ptr previousContext = Context::getActiveContext();
         Context::setActiveContext(event.context());
 
-        /*int b =*/ this->getSignal<EventType, Args...>().signal(executor, event, args...);
-        /*int a =*/ this->getSignal<EventType, Args...>(event.getEventId()).signal(executor, event, args...);
-
+        auto policy = getExecutionPolicy<EventType>();
+        if (policy != nullptr) {
+            std::shared_ptr<Executor> executor = policy->executor();
+            /*int b =*/ this->getSignal<EventType, Args...>().signal(executor, event, args...);
+            /*int a =*/ this->getSignal<EventType, Args...>(event.getEventId()).signal(executor, event, args...);
+        } else {
+            //@todo or just add default executor here somewhere...
+            /*int b =*/ this->getSignal<EventType, Args...>().signal(event, args...);
+            /*int a =*/ this->getSignal<EventType, Args...>(event.getEventId()).signal(event, args...);
+        }
         //restore previous context
         Context::setActiveContext(previousContext);
     }

@@ -16,6 +16,7 @@ template<typename Object, typename stateIdType>
 class LogicStateMachine : public StateMachine<stateIdType> {
 public:
     typedef stateIdType StateIdType;
+    typedef LogicStateEvent<Object, stateIdType> EventType;
 private:
     Object &object;
 
@@ -53,7 +54,12 @@ public:
             std::bind(&LogicStateMachine<Object, StateIdType>::onLeave, this, std::placeholders::_1),
             std::bind(&LogicStateMachine<Object, StateIdType>::onInvalidState, this, std::placeholders::_1),
             std::bind(&LogicStateMachine<Object, StateIdType>::onInvalidChange, this, std::placeholders::_1)),
-                                                 object(object) {}
+                                                 object(object) {
+
+        //@todo handle no logic manager!
+        auto &lm = LogicContext::getLogicManagerFromActiveContext();
+        lm.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
+    }
 
 };
 

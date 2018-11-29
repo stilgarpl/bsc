@@ -31,7 +31,7 @@ void OrderedExecutor::run() {
             taskReady.wait_for(g, 1s);
         }
         while (!runQueue.empty()) {
-//            LOGGER("processing task")
+            LOGGER("processing task")
             auto&[task, context_ptr] = runQueue.front();
 
             Context::setActiveContext(context_ptr);
