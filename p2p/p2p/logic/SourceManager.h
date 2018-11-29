@@ -13,6 +13,7 @@
 #include <p2p/signal/Signal.h>
 #include <p2p/context/Context.h>
 #include <p2p/uber/Uber.h>
+#include <p2p/signal/OrderedExecutionPolicy.h>
 
 using namespace std::chrono_literals;
 
@@ -40,18 +41,19 @@ protected:
 private:
     Uber<std::map> signalMap;
     Uber<Type> globalSignal;
+    std::shared_ptr<Executor> executor = std::make_shared<OrderedExecutor>();
 public:
 
-    template<typename T, typename... Args>
-    void event(const T &event, Args... args) {
+    template<typename EventType, typename... Args>
+    void event(const EventType &event, Args... args) {
 
         //@todo pass to executor
 //        Context::setActiveContext(&commonContext);
         Context::Ptr previousContext = Context::getActiveContext();
         Context::setActiveContext(event.context());
 
-        /*int b =*/ this->getSignal<T, Args...>().signal(event, args...);
-        /*int a =*/ this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
+        /*int b =*/ this->getSignal<EventType, Args...>().signal(executor, event, args...);
+        /*int a =*/ this->getSignal<EventType, Args...>(event.getEventId()).signal(executor, event, args...);
 
         //restore previous context
         Context::setActiveContext(previousContext);

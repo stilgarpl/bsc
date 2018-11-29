@@ -12,24 +12,29 @@
 class Executor {
 private:
     static std::shared_ptr<Executor> executor;
+    //@todo remove static execute, replace with virtual execute
 public:
 
-    static void execute(const std::function<void(void)> task) {
-        executor->executeTask(task);
+    static void executeDefault(const std::function<void(void)> &task) {
+        executor->execute(task);
     }
 
-protected:
-    virtual void executeTask(std::function<void(void)> task) =0;
+    static std::shared_ptr<Executor> &getDefaultExecutor() {
+        return executor;
+    }
+
+public:
+    virtual void execute(std::function<void(void)> task) = 0;
 };
 
 class SimpleExecutor : public Executor {
 protected:
-    void executeTask(std::function<void(void)> task) override;
+    void execute(std::function<void(void)> task) override;
 };
 
 class ThreadExecutor : public Executor {
 protected:
-    void executeTask(std::function<void(void)> task) override;
+    void execute(std::function<void(void)> task) override;
 };
 
 //@todo add ThreadPoolExecutor

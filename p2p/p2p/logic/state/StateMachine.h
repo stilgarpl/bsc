@@ -47,6 +47,7 @@ private:
     std::function<void(const StateIdType &)> onEnterStateHandler;
     std::function<void(const StateIdType &)> onLeaveStateHandler;
     std::function<void(const StateIdType &)> invalidStateHandler;
+    std::function<void(const StateIdType &)> invalidChangeHandler;
 
     friend class Definer;
 
@@ -97,11 +98,17 @@ public:
     void changeState(const StateIdType &state) {
         if (!states.count(state)) {
             invalidStateHandler(state);
+            return;
         }
         //@todo check if there is a valid link!
         if (currentState != states.end()) {
             onLeaveStateHandler(*currentState);
         }
+
+        if (!links.count(*currentState) || !links[*currentState].count(state)) {
+            invalidChangeHandler(state);
+        }
+
         setState(state);
         onEnterStateHandler(*currentState);
     }
@@ -110,6 +117,14 @@ public:
     StateMachine(const std::function<void(const StateIdType &)> &onEnterStateHandler,
                  const std::function<void(const StateIdType &)> &onLeaveStateHandler) : onEnterStateHandler(
             onEnterStateHandler), onLeaveStateHandler(onLeaveStateHandler) {}
+
+    StateMachine(const std::function<void(const StateIdType &)> &onEnterStateHandler,
+                 const std::function<void(const StateIdType &)> &onLeaveStateHandler,
+                 const std::function<void(const StateIdType &)> &invalidStateHandler,
+                 const std::function<void(const StateIdType &)> &invalidChangeHandler) : onEnterStateHandler(
+            onEnterStateHandler), onLeaveStateHandler(onLeaveStateHandler), invalidStateHandler(invalidStateHandler),
+                                                                                         invalidChangeHandler(
+                                                                                                 invalidChangeHandler) {}
 };
 
 

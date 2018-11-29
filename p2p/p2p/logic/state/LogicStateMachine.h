@@ -38,11 +38,21 @@ public:
         source.stateLeft(object, id);
     }
 
+    void onInvalidChange(const StateIdType &id) {
+        LOGGER("LOGIC MACHINE ON INVALID CHANGE" + std::to_string(id));
+    }
+
+    void onInvalidState(const StateIdType &id) {
+        LOGGER("LOGIC MACHINE ON INVALID STATE" + std::to_string(id));
+    }
+
 //    LogicStateMachine() : StateMachine<StateIdType>(onEnter, onLeave) {};
 
     explicit LogicStateMachine(Object &object) : StateMachine<StateIdType>(
             std::bind(&LogicStateMachine<Object, StateIdType>::onEnter, this, std::placeholders::_1),
-            std::bind(&LogicStateMachine<Object, StateIdType>::onLeave, this, std::placeholders::_1)),
+            std::bind(&LogicStateMachine<Object, StateIdType>::onLeave, this, std::placeholders::_1),
+            std::bind(&LogicStateMachine<Object, StateIdType>::onInvalidState, this, std::placeholders::_1),
+            std::bind(&LogicStateMachine<Object, StateIdType>::onInvalidChange, this, std::placeholders::_1)),
                                                  object(object) {}
 
 };

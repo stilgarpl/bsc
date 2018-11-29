@@ -10,12 +10,12 @@
 using namespace std::chrono_literals;
 
 
-void SimpleExecutor::executeTask(const std::function<void(void)> task) {
+void SimpleExecutor::execute(const std::function<void(void)> task) {
 
     task();
 }
 
-void ThreadExecutor::executeTask(const std::function<void(void)> task) {
+void ThreadExecutor::execute(const std::function<void(void)> task) {
 
     Context::Ptr origContext = Context::getActiveContext();
     std::thread(

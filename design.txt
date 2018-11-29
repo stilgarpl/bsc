@@ -343,3 +343,12 @@ EventChainHelper - dodać optional std::function<bool(EventType)> constraint, kt
 np. state<Transfer>(STARTED).entered() ustawiłoby constraint na if (event.method == ENTERED) a samo action byloby lambdą
 
 if (constraint(event)) action(event);
+
+//@todo CONTEXT STACK! przyda sie w event() i podobnych. ContextStack stack(newActiveContext); - przywraca poprzedni kontekst w destruktorze
+
+LogicManager (albo SourceManager raczej) powinien mieć ExecutionPolicy dla Eventów
+
+sm->setExecutionPolicy<EventType>(OrderedExecutionPolicy);
+sm->getExecutionPolicy<EventType>2();
+
+execution policy z kolei powinno dawać executora w jakis sposob.

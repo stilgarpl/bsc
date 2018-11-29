@@ -23,13 +23,17 @@ private:
 public:
 
     virtual int signal(Args... args) {
+        return signal(Executor::getDefaultExecutor(), args...);
+    };
+
+    virtual int signal(std::shared_ptr<Executor> executor, Args... args) {
         int executed = 0;
         for (auto &&item : funcList) {
-            Executor::execute([=]() { (*item)(args...); });
+            executor->execute([=]() { (*item)(args...); });
             executed++;
         }
         return executed;
-    };
+    }
 
     Signal<Args...> &assign(FuncPtr func) {
         funcList.push_back(func);
