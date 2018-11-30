@@ -14,6 +14,14 @@ class LogicStateSource : public ISource {
 
 private:
     AutoSource source;
+private:
+    template<typename EventType>
+    void selectExecutionPolicy() {
+        //@todo think of better way of selecting it, so it isn't run on every event.
+        //  probably the best way would be to have init metod in autosource that would run once on creation of every container.
+        //  so Uber should have that one init method.  
+        sourceManager.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
+    }
 public:
     void work() override;
 
@@ -22,6 +30,7 @@ public:
 
     template<typename Object, typename StateIdType>
     void stateEntered(Object &object, const StateIdType &state) {
+        selectExecutionPolicy<LogicStateEvent<Object, StateIdType>>();
         LogicStateEvent<Object, StateIdType> logicEvent(object);
         logicEvent.setEventId(state);
         logicEvent.setMethod(LogicStateMethod::ENTERED);
@@ -30,6 +39,7 @@ public:
 
     template<typename Object, typename StateIdType>
     void stateLeft(Object &object, const StateIdType &state) {
+        selectExecutionPolicy<LogicStateEvent<Object, StateIdType>>();
         LogicStateEvent<Object, StateIdType> logicEvent(object);
         logicEvent.setEventId(state);
         logicEvent.setMethod(LogicStateMethod::LEFT);

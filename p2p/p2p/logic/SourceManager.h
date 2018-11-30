@@ -53,7 +53,9 @@ protected:
 public:
     template<typename EventType>
     void setExecutionPolicy(std::shared_ptr<ExecutionPolicy> policy) {
-        executionPolicy.get<EventType>() = policy;
+        if (executionPolicy.get<EventType>() == nullptr) {
+            executionPolicy.get<EventType>() = policy;
+        }
     }
 
 public:

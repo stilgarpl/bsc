@@ -57,8 +57,8 @@ public:
                                                  object(object) {
 
         //@todo handle no logic manager!
-        auto &lm = LogicContext::getLogicManagerFromActiveContext();
-        lm.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
+//        auto &lm = LogicContext::getLogicManagerFromActiveContext();
+//        lm.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
     }
 
 };
