@@ -15,53 +15,25 @@ class StateMachine {
 
     typedef StateMachine<StateIdType> StateMachineType;
 
-    class Definer {
-    private:
-        StateMachineType &stateMachine;
-        const StateIdType &stateId;
-
-    public:
-        Definer(StateMachineType &stateMachine, const StateIdType &stateId) : stateMachine(stateMachine),
-                                                                              stateId(stateId) {}
-
-        Definer to(const StateIdType &otherState) {
-            stateMachine.addState(otherState);
-            stateMachine.addLink(stateId, otherState);
-            return Definer(stateMachine, otherState);
-        }
-
-//        Definer operator()(const StateIdType& otherState) {
-//            return to(otherState);
-//        }
-//
-//        Definer& operator->() {
-//            return *this;
-//        }
-
-    };
-
 private:
+    //@todo states and links should be moved to other class with defintion.
     std::set <StateIdType> states;
-    typename std::set<StateIdType>::iterator currentState;
     std::map <StateIdType, std::set<StateIdType>> links;
+    typename std::set<StateIdType>::iterator currentState;
     std::function<void(const StateIdType &)> onEnterStateHandler;
     std::function<void(const StateIdType &)> onLeaveStateHandler;
     std::function<void(const StateIdType &)> invalidStateHandler;
     std::function<void(const StateIdType &)> invalidChangeHandler;
 
-    friend class Definer;
 
 public:
-    Definer define(const StateIdType &stateId) {
-        addState(stateId);
-        return Definer(*this, stateId);
-    }
+
 
 protected:
-    //@todo remove
+
 public:
     void addState(const StateIdType &state) {
-        LOGGER("adding state" + std::to_string(state));
+//        LOGGER("adding state" + std::to_string(state));
         states.insert(state);
     }
 
@@ -75,7 +47,7 @@ public:
 
     void addLink(const StateIdType &state1, const StateIdType &state2) {
         if (states.count(state1) > 0 && states.count(state2) > 0) {
-            LOGGER("linking " + std::to_string(state1) + " to " + std::to_string(state2));
+//            LOGGER("linking " + std::to_string(state1) + " to " + std::to_string(state2));
             links[state1].insert(state2);
         } else {
             //@todo exception?
@@ -116,7 +88,9 @@ public:
 public:
     StateMachine(const std::function<void(const StateIdType &)> &onEnterStateHandler,
                  const std::function<void(const StateIdType &)> &onLeaveStateHandler) : onEnterStateHandler(
-            onEnterStateHandler), onLeaveStateHandler(onLeaveStateHandler) {}
+            onEnterStateHandler), onLeaveStateHandler(onLeaveStateHandler) {
+
+    }
 
     StateMachine(const std::function<void(const StateIdType &)> &onEnterStateHandler,
                  const std::function<void(const StateIdType &)> &onLeaveStateHandler,

@@ -46,21 +46,6 @@ bool FilesystemModule::assignActions(ILogicModule::AssignActionHelper &actionHel
         std::clog << "Debug: File assignment!" << std::endl;
 
 
-        //@todo remove this debug:
-
-//        actionHelper.setAction<ConnectionEvent>("fileSendDebug", [](const ConnectionEvent &event) {
-//
-//            SendFile::Request::Ptr req = SendFile::Request::getNew();
-//            req->setFilePath("/tmp/basyco/testfile.txt");
-//            req->setBegin(3);
-//            req->setEnd(8);
-//            event.getConnection()->send(req);
-//        });
-//
-//        if (actionHelper.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED,
-//                                                       "fileSendDebug")) {
-//            std::clog << "Debug: File DEBUG assignment!" << std::endl;
-//        }
         return true;
     }
     return false;

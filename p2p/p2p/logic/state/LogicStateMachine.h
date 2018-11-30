@@ -24,7 +24,7 @@ public:
 
 
     void onEnter(const StateIdType &id) {
-        LOGGER("LOGIC MACHINE ON ENTER" + std::to_string(id));
+//        LOGGER("LOGIC MACHINE ON ENTER" + std::to_string(id));
         //@todo handle no logic manager!
         auto &lm = LogicContext::getLogicManagerFromActiveContext();
         auto &source = lm.requireSource<LogicStateSource>();
@@ -32,7 +32,7 @@ public:
     }
 
     void onLeave(const StateIdType &id) {
-        LOGGER("LOGIC MACHINE ON LEAVE" + std::to_string(id));
+//        LOGGER("LOGIC MACHINE ON LEAVE" + std::to_string(id));
         //@todo handle no logic manager!
         auto &lm = LogicContext::getLogicManagerFromActiveContext();
         auto &source = lm.requireSource<LogicStateSource>();
@@ -40,11 +40,11 @@ public:
     }
 
     void onInvalidChange(const StateIdType &id) {
-        LOGGER("LOGIC MACHINE ON INVALID CHANGE" + std::to_string(id));
+//        LOGGER("LOGIC MACHINE ON INVALID CHANGE" + std::to_string(id));
     }
 
     void onInvalidState(const StateIdType &id) {
-        LOGGER("LOGIC MACHINE ON INVALID STATE" + std::to_string(id));
+//        LOGGER("LOGIC MACHINE ON INVALID STATE" + std::to_string(id));
     }
 
 //    LogicStateMachine() : StateMachine<StateIdType>(onEnter, onLeave) {};

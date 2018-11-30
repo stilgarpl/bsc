@@ -8,6 +8,7 @@
 
 #include <p2p/modules/filesystem/network/logic/events/TransferEvent.h>
 #include <p2p/modules/filesystem/network/packet/BeginTransfer.h>
+#include <p2p/logic/state/LogicStateMachine.h>
 
 class TransferManager {
     /**
@@ -27,21 +28,21 @@ class TransferManager {
     };
 
 public:
+
+    enum class TransferStatus {
+        NOT_STARTED,
+        STARTED,
+        ATTRIBUTES_ACCQUIRED,
+        DOWNLOADING,
+        FINISHED,
+        ERROR,
+    };
+
     /**
      * transfer descriptor on local side, with its own thread that handles the downloading of the entire source stream from the other node
      */
-    class LocalTransferDescriptor {
+    class LocalTransferDescriptor : protected LogicStateMachine<LocalTransferDescriptor, TransferStatus> {
 
-        enum class TransferStatus {
-            NOT_STARTED,
-            STARTED,
-            ATTRIBUTES_ACCQUIRED,
-            DOWNLOADING,
-            FINISHED,
-            ERROR,
-        };
-
-        TransferStatus status = TransferStatus::NOT_STARTED;
         ResourceIdentificatorPtr destination;
         ResourceIdentificatorPtr source;
         NodeIdType sourceNode;
@@ -62,14 +63,6 @@ public:
         friend class TransferManager;
 
     public:
-        TransferStatus getStatus() const {
-            return status;
-        }
-
-        void setStatus(TransferStatus status) {
-            LocalTransferDescriptor::status = status;
-        }
-
         const ResourceIdentificatorPtr &getDestination() const {
             return destination;
         }
@@ -122,6 +115,8 @@ public:
                 thread->join();
             }
         }
+
+        LocalTransferDescriptor();
     };
 
 public:

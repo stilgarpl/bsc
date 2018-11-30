@@ -159,6 +159,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
         //before anything, set active context
         Context::setActiveContext(activeContext);
 
+
         //@todo get from config
         const TransferSize MAX_CHUNK_SIZE = 19500;
 //        LOGGER("download thread started")
@@ -170,6 +171,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
 
         BeginTransfer::Response::Ptr beginResponse = networkModule->sendPacketToNode(nodeId, beginRequest);
         if (beginResponse != nullptr) {
+            descriptorPtr.changeState(TransferStatus::STARTED);
             auto transferId = beginResponse->getTransferId();
 //            LOGGER("begin res received")
 
@@ -181,11 +183,12 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
                                                                                                    propertiesRequest);
             if (propertiesResponse != nullptr) {
 //                LOGGER("got properties")
-
+                descriptorPtr.changeState(TransferStatus::ATTRIBUTES_ACCQUIRED);
                 auto resourceSize = propertiesResponse->getSize();
                 SHOW(resourceSize);
                 TransferSize chunk_count = resourceSize / MAX_CHUNK_SIZE;
 //                LOGGER("chunk count = " + std::to_string(chunk_count));
+                descriptorPtr.changeState(TransferStatus::DOWNLOADING);
                 for (TransferSize i = 0; i < chunk_count + 1; ++i) {
 
                     DataTransfer::Request::Ptr dataRequest = DataTransfer::Request::getNew();
@@ -201,10 +204,10 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
                                std::to_string(100 * response->getEnd() / resourceSize) + "%");
                         TransferManager::saveDataChunk(destinationStream, response->getBegin(), response->getEnd(),
                                                        response->getData());
-                        ret->setTransferredSize(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
+                        descriptorPtr.setTransferredSize(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
 //                         std::this_thread::sleep_for(3s);
                     } else {
-                        ret->setStatus(LocalTransferDescriptor::TransferStatus::ERROR);
+                        descriptorPtr.changeState(TransferStatus::ERROR);
                         break;
                     }
                 }
@@ -214,6 +217,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
             FinishTransfer::Request::Ptr finishRequest = FinishTransfer::Request::getNew();
             LOGGER("finishing transfer");
             networkModule->sendPacketToNode(nodeId, finishRequest);
+            descriptorPtr.changeState(TransferStatus::FINISHED);
         }
         LOGGER("transfer finished");
     });
@@ -222,3 +226,18 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
     return ret;
 }
 
+
+TransferManager::LocalTransferDescriptor::LocalTransferDescriptor()
+        : LogicStateMachine(*this) {
+
+    addState(TransferStatus::NOT_STARTED, TransferStatus::ATTRIBUTES_ACCQUIRED, TransferStatus::DOWNLOADING,
+             TransferStatus::STARTED, TransferStatus::ERROR, TransferStatus::FINISHED);
+    addLink(TransferStatus::NOT_STARTED, TransferStatus::STARTED, TransferStatus::ERROR);
+    addLink(TransferStatus::STARTED, TransferStatus::ATTRIBUTES_ACCQUIRED, TransferStatus::ERROR);
+    addLink(TransferStatus::ATTRIBUTES_ACCQUIRED, TransferStatus::DOWNLOADING, TransferStatus::ERROR);
+    addLink(TransferStatus::DOWNLOADING, TransferStatus::FINISHED, TransferStatus::ERROR);
+    addLink(TransferStatus::ERROR, TransferStatus::NOT_STARTED);
+    setState(TransferStatus::NOT_STARTED);
+
+
+}
