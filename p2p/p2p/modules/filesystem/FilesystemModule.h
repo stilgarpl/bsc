@@ -10,7 +10,6 @@
 #include <p2p/dependency/DependencyManaged.h>
 
 #include <filesystem>
-#include <p2p/modules/filesystem/transfer/FileTransferDescriptor.h>
 #include <p2p/modules/filesystem/network/logic/actions/TransferManager.h>
 #include <p2p/modules/filesystem/identification/SimplePathRI.h>
 
@@ -21,7 +20,7 @@ namespace fs = std::filesystem;
 class FilesystemModule : public NodeModuleDependent<FilesystemModule> {
 
     fs::path currentPath = fs::current_path();
-    std::list<FileTransferDescriptorPtr> currentTransfers;
+    std::list<std::shared_ptr<TransferManager::LocalTransferDescriptor>> currentTransfers;
 
     TransferManager transferManager;
 
@@ -95,46 +94,46 @@ public:
     }
 
 
-    void printCurrentTransfers() {
-        std::cout << "Current transfers" << std::endl;
-        for (auto &&item : currentTransfers) {
-            std::cout << "Transfer from : " << item->getSourcePath() << " " << item->getDestinationPath() << std::endl;
-            switch (item->getStatus()) {
-                case FileTransferStatus::NOT_STARTED :
-                    std::cout << "NOT STARTED" << std::endl;
-
-                    break;
-                case FileTransferStatus::STARTED:
-                    std::cout << "STARTED" << std::endl;
-                    break;
-                case FileTransferStatus::ATTRIBUTES_ACCQUIRED:
-                    std::cout << "ATTRIBUTES_ACCQUIRED" << std::endl;
-                    break;
-                case FileTransferStatus::DOWNLOADING:
-                    std::cout << "DOWNLOADING" << std::endl;
-                    break;
-                case FileTransferStatus::FINISHED:
-                    std::cout << "FINISHED" << std::endl;
-                    break;
-                case FileTransferStatus::ERROR:
-                    std::cout << "ERROR" << std::endl;
-                    break;
-            }
-
-            std::cout << "Size "
-                      << std::to_string(item->getTransferredSize()) + " / " + std::to_string(item->getFileSize())
-                      << " (" << std::to_string(100 * item->getTransferredSize() / item->getFileSize()) << "%)"
-                      << std::endl;
-        }
-    }
-
-
-    void beginTransferTest(const NodeIdType &nodeId, fs::path from) {
-        BeginTransfer::Request::Ptr req = BeginTransfer::Request::getNew();
-        req->setResourceId(std::make_shared<SimplePathRI>(from));
-        auto res = node.getModule<NodeNetworkModule>()->sendPacketToNode(nodeId, req);
-        LOGGER("received begin " + std::to_string(res->getTransferId()))
-    }
+//    void printCurrentTransfers() {
+//        std::cout << "Current transfers" << std::endl;
+//        for (auto &&item : currentTransfers) {
+//            std::cout << "Transfer from : " << item->getSource() << " " << item->getDestinationPath() << std::endl;
+//            switch (item->getStatus()) {
+//                case FileTransferStatus::NOT_STARTED :
+//                    std::cout << "NOT STARTED" << std::endl;
+//
+//                    break;
+//                case FileTransferStatus::STARTED:
+//                    std::cout << "STARTED" << std::endl;
+//                    break;
+//                case FileTransferStatus::ATTRIBUTES_ACCQUIRED:
+//                    std::cout << "ATTRIBUTES_ACCQUIRED" << std::endl;
+//                    break;
+//                case FileTransferStatus::DOWNLOADING:
+//                    std::cout << "DOWNLOADING" << std::endl;
+//                    break;
+//                case FileTransferStatus::FINISHED:
+//                    std::cout << "FINISHED" << std::endl;
+//                    break;
+//                case FileTransferStatus::ERROR:
+//                    std::cout << "ERROR" << std::endl;
+//                    break;
+//            }
+//
+//            std::cout << "Size "
+//                      << std::to_string(item->getTransferredSize()) + " / " + std::to_string(item->getFileSize())
+//                      << " (" << std::to_string(100 * item->getTransferredSize() / item->getFileSize()) << "%)"
+//                      << std::endl;
+//        }
+//    }
+//
+//
+//    void beginTransferTest(const NodeIdType &nodeId, fs::path from) {
+//        BeginTransfer::Request::Ptr req = BeginTransfer::Request::getNew();
+//        req->setResourceId(std::make_shared<SimplePathRI>(from));
+//        auto res = node.getModule<NodeNetworkModule>()->sendPacketToNode(nodeId, req);
+//        LOGGER("received begin " + std::to_string(res->getTransferId()))
+//    }
 };
 
 

@@ -16,14 +16,12 @@
 
 using namespace std::chrono_literals;
 
-#include <p2p/modules/filesystem/network/logic/sources/FileSource.h>
 #include <repo/journal/SimpleJournal.h>
 #include <repo/node/RepoModule.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/dependency/Dependency.h>
 #include <p2p/modules/command/CommandModule.h>
 #include <p2p/modules/command/StandardCommandsDirectory.h>
-#include <p2p/modules/filesystem/transfer/FileTransferControl.h>
 #include <variant>
 
 void setupProtocolLogic(LogicManager &logicManager, TransmissionControl &transmissionControl) {
@@ -120,7 +118,7 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("ls", &FilesystemModule::listCurrentDirectory);
 //    cmd->mapCommand("scp", &FilesystemModule::remoteGetFile);
     cmd->mapCommand("scp", &FilesystemModule::remoteGetFile);
-    cmd->mapCommand("lscp", &FilesystemModule::printCurrentTransfers);
+//    cmd->mapCommand("lscp", &FilesystemModule::printCurrentTransfers);
 
     cmd->mapCommand("createRep", &RepoModule::createRepository);
     cmd->mapCommand("selectRep", &RepoModule::selectRepository);
@@ -134,7 +132,7 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("ignore", &RepoModule::ignoreFile);
     cmd->mapCommand("updateAll", &RepoModule::updateAllFiles);
 //    cmd->mapCommand("requestResource", &RepoModule::requestStoragePath);
-    cmd->mapCommand("beginTransfer", &FilesystemModule::beginTransferTest);
+//    cmd->mapCommand("beginTransfer", &FilesystemModule::beginTransferTest);
 //    cmd->submodule("help").mapCommand("cmdList",&CommandModule::listCommands);
 
 }

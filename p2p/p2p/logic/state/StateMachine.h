@@ -70,6 +70,7 @@ public:
     void changeState(const StateIdType &state) {
         if (!states.count(state)) {
             invalidStateHandler(state);
+            LOGGER("invalid state")
             return;
         }
         //@todo check if there is a valid link!
@@ -79,6 +80,7 @@ public:
 
         if (!links.count(*currentState) || !links[*currentState].count(state)) {
             invalidChangeHandler(state);
+            LOGGER("invalid change")
         }
 
         setState(state);

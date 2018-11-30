@@ -29,7 +29,7 @@ class TransferManager {
 
 public:
 
-    enum class TransferStatus {
+    enum class TransferState {
         NOT_STARTED,
         STARTED,
         ATTRIBUTES_ACCQUIRED,
@@ -41,7 +41,7 @@ public:
     /**
      * transfer descriptor on local side, with its own thread that handles the downloading of the entire source stream from the other node
      */
-    class LocalTransferDescriptor : protected LogicStateMachine<LocalTransferDescriptor, TransferStatus> {
+    class LocalTransferDescriptor : protected LogicStateMachine<LocalTransferDescriptor, TransferState> {
 
         ResourceIdentificatorPtr destination;
         ResourceIdentificatorPtr source;

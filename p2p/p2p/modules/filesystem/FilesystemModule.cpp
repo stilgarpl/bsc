@@ -2,9 +2,6 @@
 // Created by stilgar on 07.11.17.
 //
 
-#include <p2p/modules/filesystem/network/logic/sources/FileSource.h>
-#include <p2p/modules/filesystem/network/logic/actions/FileActions.h>
-#include <p2p/modules/filesystem/transfer/FileTransferControl.h>
 #include <p2p/modules/filesystem/network/logic/sources/TransferSource.h>
 #include "FilesystemModule.h"
 #include "p2p/modules/basic/BasicModule.h"
@@ -14,10 +11,7 @@ FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent(node) {
 }
 
 void FilesystemModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
-    actionHelper.setAction<FileRequestEvent>("fileReq", FileActions::sendFile);
-    actionHelper.setAction<FileResponseEvent>("fileRes", FileActions::receivedFile);
-    actionHelper.setAction<FileAttributesEvent>("fileAtrS", FileActions::sendAttributes);
-    actionHelper.setAction<FileAttributesEvent>("fileAtrR", FileActions::receivedAttributes);
+
     using namespace std::placeholders;
 
     actionHelper.setAction<TransferEvent>("beginTransfer",
@@ -32,27 +26,23 @@ void FilesystemModule::setupActions(ILogicModule::SetupActionHelper &actionHelpe
 }
 
 bool FilesystemModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
-    if (actionHelper.assignAction<FileRequestEvent>(FileRequestEvent::IdType::GET_FILE, "fileReq") &&
-        actionHelper.assignAction<FileRequestEvent>(FileRequestEvent::IdType::GET_CHUNK, "fileReq") &&
-        actionHelper.assignAction<FileResponseEvent>(FileResponseEvent::IdType::FILE_RECEIVED, "fileRes") &&
-        actionHelper.assignAction<FileResponseEvent>(FileResponseEvent::IdType::CHUNK_RECEIVED, "fileRes") &&
-        actionHelper.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_REQUESTED, "fileAtrS") &&
-        actionHelper.assignAction<FileAttributesEvent>(FileAttributesEvent::IdType::ATTRIBUTES_RECEIVED, "fileAtrR") &&
-        actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::REQUESTED, "beginTransfer") &&
+    if (actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::REQUESTED, "beginTransfer") &&
         actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::SENDING, "sendData") &&
         actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::GET_PROPERTIES, "sendProps") &&
         actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::FINISHING, "finishTransfer") //&&
             ) {
         std::clog << "Debug: File assignment!" << std::endl;
 
-
+        when(state<TransferManager::LocalTransferDescriptor>(
+                TransferManager::TransferState::STARTED).entered()).fireStateChangeReaction(
+                [](TransferManager::LocalTransferDescriptor &descriptor) { LOGGER("transfer started!!!!...!!"); });
+//        when(event<LogicStateEvent<TransferManager::LocalTransferDescriptor,TransferStatus >>()).fireNewAction([](auto event){LOGGER("transfer state evennnnnt")});
         return true;
     }
     return false;
 }
 
 bool FilesystemModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
-    sourceHelper.requireSource<FileSource>();
     sourceHelper.requireSource<TransferSource>();
     return true;
 }
@@ -61,13 +51,3 @@ const std::filesystem::path &FilesystemModule::getCurrentPath() const {
     return currentPath;
 }
 
-//FileTransferDescriptorPtr FilesystemModule::remoteGetFile(const NodeIdType &nodeId, fs::path from, fs::path to) {
-//
-//    if (to.is_relative()) {
-//        to = currentPath / to;
-//    }
-//    auto ret = FileTransferControl::initiateTransfer(node, nodeId, from, to);
-//
-//    currentTransfers.push_back(ret);
-//    return ret;
-//}

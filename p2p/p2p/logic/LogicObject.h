@@ -297,7 +297,9 @@ public:
         typename LogicChainHelper<LogicEventType, Args...>::ThisType &
         fireStateChangeReaction(std::function<void(typename LogicEventType::Type &)> reaction) {
             return LogicChainHelper<LogicEventType, Args...>::fireNewAction(
-                    [reaction](auto event) { reaction(event.getObject()); });
+                    [reaction](auto event) {
+                        reaction(event.getObject());
+                    });
         }
 
         typename LogicChainHelper<LogicEventType, Args...>::ThisType &
