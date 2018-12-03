@@ -260,9 +260,50 @@ public:
 };
 
 
+class LogicTest : public LogicStateMachine<LogicTest, int> {
+
+public:
+    LogicTest() : LogicStateMachine<LogicTest, int>(*this) {
+        addState(1, 2, 3, 4, 5, 6);
+        addLink(1, 2, 3);
+        addLink(2, 4, 5);
+    }
+
+};
+
+class LogicTestObserver : public LogicTest::Observer {
+public:
+    void update(LogicTest &object, int type) override {
+        LOGGER("update for " + std::to_string(type));
+    }
+};
+
+
 
 int main(int argc, char *argv[]) {
 //    {
+
+//    LogicManager logicManager;
+//Context::Ptr context = Context::makeContext();
+//    context->set<LogicContext, LogicManager &>(logicManager);
+//    Context::setActiveContext(context);
+//    logicManager.start();
+//
+//LogicTest logicTest;
+//
+//LogicTestObserver observer;
+//
+//logicTest.registerStateObserver(observer);
+//logicTest.setState(1);
+//logicTest.changeState(2);
+//    logicTest.changeState(4);
+//    logicTest.changeState(1);
+//    logicTest.unregisterStateObserver(observer);
+
+
+//exit(0);
+
+
 
 
 //        // create special output buffer

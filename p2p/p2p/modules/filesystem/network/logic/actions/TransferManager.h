@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 30.12.17.
 //
@@ -20,6 +22,7 @@ class TransferManager {
 
     public:
         const std::shared_ptr<std::istream> &getInputStream() const;
+
         void setInputStream(const std::shared_ptr<std::istream> &inputStream);
 
         TransferSize getSize() const;
@@ -53,10 +56,16 @@ public:
 
         std::unique_ptr<std::thread> thread = nullptr;
 
+        std::function<void(LocalTransferDescriptor &)> payload;
+
     protected:
 
-        void startThread(std::function<void(LocalTransferDescriptor &)> f) {
-            thread = std::make_unique<std::thread>(f, std::ref(*this));
+        void setPayload(const std::function<void(LocalTransferDescriptor &)> &p) {
+            payload = p;
+        }
+
+        void startThread() {
+            thread = std::make_unique<std::thread>(payload, std::ref(*this));
             //f(*this);
         }
 
@@ -116,11 +125,38 @@ public:
             }
         }
 
+        friend class TransferQueue;
+
         LocalTransferDescriptor();
     };
 
+
 public:
     typedef std::shared_ptr<LocalTransferDescriptor> LocalTransferDescriptorPtr;
+
+    /**
+     * a collection of transfers, downloading them sequentially or more at a time
+     */
+    class TransferQueue {
+    private:
+        std::list<LocalTransferDescriptorPtr> transfers;
+        TransferManager &manager;
+
+    public:
+        TransferQueue(TransferManager &manager) : manager(manager) {}
+
+    public:
+        void
+        queueTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
+
+        void start() {
+            //@todo actual transfer policy
+            for (const auto &item : transfers) {
+                item->startThread();
+            }
+        }
+    };
+
 
 private:
     TransferId generateTransferId();
@@ -130,6 +166,7 @@ private:
 
 public:
     void beginTransfer(const TransferEvent &event);
+
     void transferError(const TransferEvent &event) {
 //@todo
     }
@@ -144,9 +181,13 @@ public:
     saveDataChunk(std::shared_ptr<std::ostream> outputStream, const TransferSize &begin, const TransferSize &end,
                   const RawDataType &data);
 
+    TransferQueue getTransferQueue() {
+        return TransferQueue(*this);
+    }
 
     [[nodiscard]]  LocalTransferDescriptorPtr
-    initiateTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
+    initiateTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination,
+                     bool start = true);
 
 };
 

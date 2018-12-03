@@ -31,6 +31,10 @@ public:
 
 protected:
 
+    auto getCurrentState() {
+        return *currentState;
+    }
+
 public:
     void addState(const StateIdType &state) {
 //        LOGGER("adding state" + std::to_string(state));
@@ -73,14 +77,16 @@ public:
             LOGGER("invalid state")
             return;
         }
-        //@todo check if there is a valid link!
-        if (currentState != states.end()) {
-            onLeaveStateHandler(*currentState);
-        }
+
 
         if (!links.count(*currentState) || !links[*currentState].count(state)) {
             invalidChangeHandler(state);
             LOGGER("invalid change")
+            return;
+        }
+
+        if (currentState != states.end()) {
+            onLeaveStateHandler(*currentState);
         }
 
         setState(state);

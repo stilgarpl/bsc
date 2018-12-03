@@ -17,10 +17,43 @@ class LogicStateMachine : public StateMachine<stateIdType> {
 public:
     typedef stateIdType StateIdType;
     typedef LogicStateEvent<Object, stateIdType> EventType;
+protected:
+    typedef LogicStateMachine<Object, StateIdType> ThisType;
+public:
+
+    class Observer {
+    private:
+        //@todo I don't like raw pointer here...
+        ThisType *observee = nullptr;
+    public:
+        virtual void update(Object &object, StateIdType) = 0;
+
+        virtual ~Observer() {
+            if (observee) {
+                observee->unregisterStateObserver(*this);
+            }
+        };
+    };
 private:
     Object &object;
+    //Observer objects have to exist.
+    std::list<std::reference_wrapper<Observer>> observers;
+
+    void notify(StateIdType state) {
+        for (const auto &observer : observers) {
+            observer.get().update(object, state);
+        }
+    }
 
 public:
+
+    void registerStateObserver(Observer &observer) {
+        observers.push_back(observer);
+    }
+
+    void unregisterStateObserver(Observer &observer) {
+        std::remove_if(observers.begin(), observers.end(), [&](auto i) -> bool { return (&i.get() == &observer); });
+    }
 
 
     void onEnter(const StateIdType &id) {
@@ -29,6 +62,7 @@ public:
         auto &lm = LogicContext::getLogicManagerFromActiveContext();
         auto &source = lm.requireSource<LogicStateSource>();
         source.stateEntered(object, id);
+        notify(id);
     }
 
     void onLeave(const StateIdType &id) {
@@ -60,6 +94,7 @@ public:
 //        auto &lm = LogicContext::getLogicManagerFromActiveContext();
 //        lm.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
     }
+
 
 };
 

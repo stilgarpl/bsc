@@ -145,7 +145,7 @@ TransferId TransferManager::generateTransferId() {
 
 TransferManager::LocalTransferDescriptorPtr
 TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source,
-                                  ResourceIdentificatorPtr destination) {
+                                  ResourceIdentificatorPtr destination, bool start) {
     INode &node = NodeContext::getNodeFromActiveContext();
     auto networkModule = node.getModule<NodeNetworkModule>();
     LocalTransferDescriptorPtr ret = std::make_shared<LocalTransferDescriptor>();
@@ -155,7 +155,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
     ret->setSource(source);
     ret->setDestination(destination);
     ret->setSourceNode(nodeId);
-    ret->startThread([=](LocalTransferDescriptor &descriptorPtr) {
+    ret->setPayload([=](LocalTransferDescriptor &descriptorPtr) {
         //before anything, set active context
         Context::setActiveContext(activeContext);
 
@@ -221,7 +221,9 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
         }
         LOGGER("transfer finished");
     });
-
+    if (start) {
+        ret->startThread();
+    }
     localTransfers.push_back(ret);
     return ret;
 }
@@ -240,4 +242,9 @@ TransferManager::LocalTransferDescriptor::LocalTransferDescriptor()
     setState(TransferState::NOT_STARTED);
 
 
+}
+
+void TransferManager::TransferQueue::queueTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source,
+                                                   ResourceIdentificatorPtr destination) {
+    transfers.push_back(manager.initiateTransfer(nodeId, source, destination, false));
 }
