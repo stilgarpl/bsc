@@ -90,32 +90,44 @@ std::shared_ptr<std::iostream> InternalStorage::getResourceStream(const Resource
 
 bool InternalStorage::acquireResource(const ResourceId &resourceId) {
     auto netModule = NodeContext::getNodeFromActiveContext().getModule<NodeNetworkModule>();
+    auto fileModule = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>();
     StorageQuery::Request::Ptr req = StorageQuery::Request::getNew();
     req->setRepositoryId(repository->getRepositoryId());
     req->setObjectId(resourceId);
     //@todo this will wait for response, potentially blocking Repository
     auto response = netModule->broadcastRequest(req);
-    TransferManager::LocalTransferDescriptorPtr transfer = nullptr;
+
+    if (transferQueue == nullptr) {
+        transferQueue = fileModule->transferQueue();
+    }
+
+//    TransferManager::LocalTransferDescriptorPtr transfer = nullptr;
 
     for (auto &&item : response) {
         LOGGER("node " + item.first + " replied with " + std::to_string(item.second->isExists()));
         if (item.second->isExists()) {
-            auto fileModule = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>();
-            transfer = fileModule->remoteGetStream(item.first, std::make_shared<StorageResourceIdentificator>(
+
+//            transfer = fileModule->remoteGetStream(item.first, std::make_shared<StorageResourceIdentificator>(
+//                    repository->getRepositoryId(), resourceId), std::make_shared<StorageResourceIdentificator>(
+//                    repository->getRepositoryId(), resourceId));
+
+            transferQueue->queueTransfer(item.first, std::make_shared<StorageResourceIdentificator>(
                     repository->getRepositoryId(), resourceId), std::make_shared<StorageResourceIdentificator>(
                     repository->getRepositoryId(), resourceId));
+            transferQueue->start();
 
             break;
         }
     }
 
-    if (transfer != nullptr) {
-        //@todo in the future, change it so acquire only starts transfer, but does not wait for them... maybe it should return transfer pointer?
-        transfer->wait(); //@todo handle errors
-        return true;
-    } else {
-        return false;
-    }
+//    if (transfer != nullptr) {
+//        //@todo in the future, change it so acquire only starts transfer, but does not wait for them... maybe it should return transfer pointer?
+//        transfer->wait(); //@todo handle errors
+//        return true;
+//    } else {
+//        return false;
+//    }
+    return true;
 }
 
 void InternalStorage::restore(const ResourceId &resourceId, const PathType &destinationPath) {

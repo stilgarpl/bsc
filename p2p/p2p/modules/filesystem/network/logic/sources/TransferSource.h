@@ -15,7 +15,7 @@ public:
 
     TransferSource(SourceManager &sourceManager);
 
-    void beginTransfer(const ResourceIdentificatorPtr resourceIdentificatorPtr);
+    void beginTransfer(ResourceIdentificatorPtr resourceIdentificatorPtr);
 
     void finishTransfer(const TransferId &transferId);
 

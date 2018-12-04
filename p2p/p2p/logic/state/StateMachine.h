@@ -69,6 +69,10 @@ public:
 public:
     void setState(const StateIdType &state) {
         currentState = states.find(state);
+        if (currentState == states.end()) {
+            //@todo erro handling
+            abort();
+        }
     }
 
     void changeState(const StateIdType &state) {

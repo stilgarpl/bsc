@@ -13,7 +13,6 @@
 #include <repo/repository/storage/IStorage.h>
 #include <repo/repository/storage/InternalStorage.h>
 #include <p2p/utils/crypto.h>
-#include <repo/repository/transformer/IPathTransformer.h>
 #include <repo/repository/transformer/PathTransformer.h>
 #include "IRepository.h"
 
@@ -23,9 +22,9 @@ public:
     class RepoFileMap {
     private:
         class Attributes {
-            fs::perms permissions;
+            fs::perms permissions = fs::perms::none;
             uintmax_t size = 0;
-            std::time_t modificationTime;
+            std::time_t modificationTime = 0;
             ResourceId checksum; //checksum of the file.
             bool directory = false;
             ResourceId resourceId;

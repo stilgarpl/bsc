@@ -21,6 +21,7 @@ enum class TransferStatus {
     FINISHING, //data transfer complete, transfer finish requested
     FINISHED, //transfer has finished
     ERROR, //error occured
+    QUEUED, //transfer queued
 };
 
 #endif //BASYCO_TRANSFERID_H

@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 30.12.17.
 //
@@ -158,6 +160,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
     ret->setPayload([=](LocalTransferDescriptor &descriptorPtr) {
         //before anything, set active context
         Context::setActiveContext(activeContext);
+        LOGGER("starting transfer...")
 
 
         //@todo get from config
@@ -201,7 +204,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
                     if (response != nullptr) {
                         // SendFile::Response* response;
                         LOGGER(std::to_string(response->getEnd()) + "/" + std::to_string(resourceSize) + " : " +
-                               std::to_string(100 * response->getEnd() / resourceSize) + "%");
+                                       std::to_string(100 * response->getEnd() / resourceSize) + "%");
                         TransferManager::saveDataChunk(destinationStream, response->getBegin(), response->getEnd(),
                                                        response->getData());
                         descriptorPtr.setTransferredSize(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
@@ -246,5 +249,111 @@ TransferManager::LocalTransferDescriptor::LocalTransferDescriptor()
 
 void TransferManager::TransferQueue::queueTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source,
                                                    ResourceIdentificatorPtr destination) {
-    transfers.push_back(manager.initiateTransfer(nodeId, source, destination, false));
+    auto transfer = manager.initiateTransfer(nodeId, std::move(source), std::move(destination), false);
+    transfer->registerStateObserver(*this);
+    transfers.push_back(transfer);
+}
+
+void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescriptor &object,
+                                            TransferManager::TransferState state) {
+
+    switch (state) {
+
+        case TransferState::NOT_STARTED:
+            //does not apply
+            break;
+        case TransferState::STARTED:
+            //if at least one transfer is started
+            changeState(TransferState::STARTED);
+            break;
+        case TransferState::ATTRIBUTES_ACCQUIRED:
+            //this does not apply to transfer queue
+            break;
+        case TransferState::DOWNLOADING:
+            //if at least one transfer is in downloading state -- and since we got update, one definitely is
+            changeState(TransferState::DOWNLOADING);
+            break;
+        case TransferState::FINISHED:
+            //when all transfers from queue are finished, the queue is finished.
+            if (countUnfinishedTransfers() == 0) {
+                changeState(TransferState::FINISHED);
+                LOGGER("transfer queue finished")
+            } else {
+                //start more transfers
+                start();
+            }
+            break;
+        case TransferState::ERROR:
+            //@todo handle error
+            break;
+    }
+
+    if (state == TransferState::FINISHED) {
+
+    }
+
+}
+
+TransferManager::TransferQueue::TransferQueue(TransferManager &manager) : LogicStateMachine(*this), manager(manager) {
+
+    addState(TransferState::NOT_STARTED, TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING,
+             TransferState::STARTED, TransferState::ERROR, TransferState::FINISHED);
+    addLink(TransferState::NOT_STARTED, TransferState::STARTED, TransferState::ERROR);
+    addLink(TransferState::STARTED, TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING,
+            TransferState::ERROR);
+    addLink(TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING, TransferState::ERROR);
+    addLink(TransferState::DOWNLOADING, TransferState::FINISHED, TransferState::ERROR);
+    addLink(TransferState::ERROR, TransferState::NOT_STARTED);
+    setState(TransferState::NOT_STARTED);
+
+}
+
+void TransferManager::TransferQueue::start() {
+//    LOGGER("transfers in not started :" + std::to_string(countTransfersNotInState(TransferState::NOT_STARTED)));
+//    LOGGER("transfers in finished :" + std::to_string(countTransfersInState(TransferState::FINISHED)));
+//    LOGGER("all transfers " + std::to_string(transfers.size()));
+//    unsigned long  transfersToStart = std::min(countTransfersNotInState(TransferState::NOT_STARTED) - countTransfersInState(TransferState::FINISHED),MAX_CONCURRENT_TRANSFERS);
+    unsigned long transfersToStart = std::min(countTransfersInState(TransferState::NOT_STARTED),
+                                              MAX_CONCURRENT_TRANSFERS);
+//    LOGGER("transfers to start " + std::to_string(transfersToStart));
+    //@todo actual transfer policy
+    for (const auto &item : transfers) {
+        if (item->getCurrentState() == TransferState::NOT_STARTED) {
+            item->startThread();
+            transfersToStart--;
+        }
+        if (transfersToStart == 0) {
+            break;
+        }
+    }
+}
+
+unsigned long TransferManager::TransferQueue::countTransfersNotInState(TransferManager::TransferState state) {
+    unsigned long result = transfers.size();
+    for (const auto &item : transfers) {
+        if (item->getCurrentState() == state) {
+            result--;
+        }
+    }
+    return result;
+}
+
+unsigned long TransferManager::TransferQueue::countTransfersInState(TransferManager::TransferState state) {
+    unsigned long result = 0;
+    for (const auto &item : transfers) {
+        if (item->getCurrentState() == state) {
+            result++;
+        }
+    }
+    return result;
+}
+
+unsigned long TransferManager::TransferQueue::countUnfinishedTransfers() {
+    unsigned long result = transfers.size();
+    for (const auto &item : transfers) {
+        if (item->getCurrentState() == TransferState::FINISHED) {
+            result--;
+        }
+    }
+    return result;
 }

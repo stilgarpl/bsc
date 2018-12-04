@@ -9,6 +9,7 @@
 #include "IStorage.h"
 
 #include <filesystem>
+#include <p2p/modules/filesystem/network/logic/actions/TransferManager.h>
 
 namespace fs = std::filesystem;
 
@@ -18,6 +19,7 @@ private:
     // std::string storageId;
     //@todo make configuration() with this value?
     fs::path storagePath = "/tmp/internal/";
+    std::shared_ptr<TransferManager::TransferQueue> transferQueue = nullptr;
 public:
     void store(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) override;
 
@@ -31,7 +33,7 @@ public:
     std::shared_ptr<std::iostream> getResourceStream(const ResourceId &resourceId) override;
 //    InternalStorage(const std::string &storageId);
 
-    InternalStorage(IRepository *r);
+    explicit InternalStorage(IRepository *r);
 
     fs::path getResourcePath(const ResourceId &resourceId) const override;
 

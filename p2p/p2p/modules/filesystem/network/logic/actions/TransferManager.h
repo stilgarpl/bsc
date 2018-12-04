@@ -11,6 +11,7 @@
 #include <p2p/modules/filesystem/network/logic/events/TransferEvent.h>
 #include <p2p/modules/filesystem/network/packet/BeginTransfer.h>
 #include <p2p/logic/state/LogicStateMachine.h>
+#include <algorithm>
 
 class TransferManager {
     /**
@@ -65,7 +66,12 @@ public:
         }
 
         void startThread() {
-            thread = std::make_unique<std::thread>(payload, std::ref(*this));
+            if (thread == nullptr) {
+                thread = std::make_unique<std::thread>(payload, std::ref(*this));
+            } else {
+                //@todo error already started
+                LOGGER("thread already started!!!")
+            }
             //f(*this);
         }
 
@@ -137,24 +143,32 @@ public:
     /**
      * a collection of transfers, downloading them sequentially or more at a time
      */
-    class TransferQueue {
+    class TransferQueue
+            : public LocalTransferDescriptor::Observer, public LogicStateMachine<TransferQueue, TransferState> {
     private:
         std::list<LocalTransferDescriptorPtr> transfers;
         TransferManager &manager;
+        unsigned long MAX_CONCURRENT_TRANSFERS = 2;
 
     public:
-        TransferQueue(TransferManager &manager) : manager(manager) {}
+        explicit TransferQueue(TransferManager &manager);
+
+        void update(LocalTransferDescriptor &object, TransferState type) override;
+
+    protected:
+
+        //@todo this method probably can be made more efficient or omitted entirely
+        unsigned long countUnfinishedTransfers();
+
+        unsigned long countTransfersInState(TransferState state);
+
+        unsigned long countTransfersNotInState(TransferState state);
 
     public:
         void
         queueTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
 
-        void start() {
-            //@todo actual transfer policy
-            for (const auto &item : transfers) {
-                item->startThread();
-            }
-        }
+        void start();
     };
 
 
@@ -181,8 +195,9 @@ public:
     saveDataChunk(std::shared_ptr<std::ostream> outputStream, const TransferSize &begin, const TransferSize &end,
                   const RawDataType &data);
 
-    TransferQueue getTransferQueue() {
-        return TransferQueue(*this);
+    std::shared_ptr<TransferQueue> transferQueue() {
+        //@todo store this transfer queue somewhere?
+        return std::make_shared<TransferQueue>(*this);
     }
 
     [[nodiscard]]  LocalTransferDescriptorPtr

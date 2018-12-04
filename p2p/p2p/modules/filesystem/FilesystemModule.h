@@ -93,6 +93,10 @@ public:
         return transferManager.initiateTransfer(nodeId, from, to);
     }
 
+    auto transferQueue() {
+        return transferManager.transferQueue();
+    }
+
 
 //    void printCurrentTransfers() {
 //        std::cout << "Current transfers" << std::endl;
