@@ -30,6 +30,11 @@ public:
         void setAction(ActionIdType id, ActionManager::ActionType<Args...> action) {
             logicManager.setAction<Args...>(id, action);
         };
+
+        template<typename... Args, typename ActionIdType, typename RetType>
+        void setActionExtended(ActionIdType id, std::function<RetType(Args...)> func) {
+            logicManager.setActionExtended(id, func);
+        }
     };
 
     class AssignActionHelper {

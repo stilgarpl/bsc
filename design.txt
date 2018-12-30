@@ -352,3 +352,16 @@ sm->setExecutionPolicy<EventType>(OrderedExecutionPolicy);
 sm->getExecutionPolicy<EventType>2();
 
 execution policy z kolei powinno dawać executora w jakis sposob.
+
+
+
+* Event Chains
+
+Pierwotną wizją logiki w tym systemie było składanie akcji w łańcuchy komunikujące się na eventach
+W tym momencie jest uproszczona wersja
+Source--event->Action
+chciałbym żeby można było zrobić
+source->action->action->action gdzie każda akcja zwraca event, który jest przekazywany jako event do następnej akcji
+Żeby to zrobić musze mieć następujące rzeczy:
+* non-void actions (akcje zwracają event który leci normalnym łańcuchem i uruchamia akcje do niego przypisane)
+* event chain definition (ograniczanie łańcuchów, na przykładzie backupa: files -> ZIP -> encrypt -> ... i zip i encrypt zwracają event z jednym plikiem, jak je rozróżnić i jak nie wywołać przypadkiem innych łańcuchów? najprościej przechowywać w evencie ptr do event chaina który będzie kontrolował jakie akcje mogą być wywołane.

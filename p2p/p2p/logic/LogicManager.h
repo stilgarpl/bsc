@@ -107,6 +107,15 @@ public:
         actionManager.setAction<Args...>(id, action);
     };
 
+    template<typename... Args, typename ActionIdType, typename RetType>
+    void setActionExtended(ActionIdType id, std::function<RetType(Args...)> func) {
+        actionManager.setAction<Args...>(id, [&](Args... args) {
+            //@todo by value?
+            RetType ret = func(args...);
+            sourceManager.event(ret);
+        });
+    };
+
     LogicManager(const LogicManager &) = delete;
 
     LogicManager() = default;

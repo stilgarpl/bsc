@@ -83,54 +83,54 @@ public:
     }
 
 
-    template<typename T, typename... Args>
-    SignalMapType<T, Args...> &getSignalMap() {
-        return signalMap.get<typename T::IdType, SignalTypePtr<T, Args...>>();
+    template<typename EventType, typename... Args>
+    SignalMapType<EventType, Args...> &getSignalMap() {
+        return signalMap.get<typename EventType::IdType, SignalTypePtr<EventType, Args...>>();
     }
 
 
-    template<typename T, typename... Args>
-    SignalType<T, Args...> &getSignal(const typename T::IdType &id) {
+    template<typename EventType, typename... Args>
+    SignalType<EventType, Args...> &getSignal(const typename EventType::IdType &id) {
         // typedef Signal<Context&, const GroupType&> SignalType;
         //   typedef std::shared_ptr<SignalType> SignalTypePtr;
-        auto &map = getSignalMap<T, Args...>();//signalMap.get<typename GroupType::IdType,SignalTypePtr<GroupType>>();
+        auto &map = getSignalMap<EventType, Args...>();//signalMap.get<typename GroupType::IdType,SignalTypePtr<GroupType>>();
         if (map[id] == nullptr) {
-            map[id] = std::make_shared<SignalType<T, Args...>>();
+            map[id] = std::make_shared<SignalType<EventType, Args...>>();
         }
 
         return *(map[id]);
 
     }
 
-    template<typename T, typename... Args>
-    SignalType<T, Args...> &getSignal() {
-        return globalSignal.get<SignalType<T, Args...>>();
+    template<typename EventType, typename... Args>
+    SignalType<EventType, Args...> &getSignal() {
+        return globalSignal.get<SignalType<EventType, Args...>>();
     }
 
 
-    template<typename T, typename... Args>
-    SignalType<T, Args...> &
-    assignSignal(const typename T::IdType &id, typename SignalType<T, Args...>::FuncPtr funcPtr) {
-        this->getSignal<T, Args...>(id).assign(funcPtr);
+    template<typename EventType, typename... Args>
+    SignalType<EventType, Args...> &
+    assignSignal(const typename EventType::IdType &id, typename SignalType<EventType, Args...>::FuncPtr funcPtr) {
+        this->getSignal<EventType, Args...>(id).assign(funcPtr);
     };
 
-    template<typename T, typename... Args>
-    SignalType<T, Args...> &
-    assignSignal(const typename T::IdType &id, const typename SignalType<T, Args...>::Func &funcPtr) {
-        this->getSignal<T, Args...>(id).assign(funcPtr);
+    template<typename EventType, typename... Args>
+    SignalType<EventType, Args...> &
+    assignSignal(const typename EventType::IdType &id, const typename SignalType<EventType, Args...>::Func &funcPtr) {
+        this->getSignal<EventType, Args...>(id).assign(funcPtr);
     };
 
 
-    template<typename T, typename... Args>
-    SignalType<T, Args...> &
-    assignSignal(typename SignalType<T, Args...>::FuncPtr funcPtr) {
-        this->getSignal<T, Args...>().assign(funcPtr);
+    template<typename EventType, typename... Args>
+    SignalType<EventType, Args...> &
+    assignSignal(typename SignalType<EventType, Args...>::FuncPtr funcPtr) {
+        this->getSignal<EventType, Args...>().assign(funcPtr);
     }
 
-    template<typename T, typename... Args>
-    SignalType<T, Args...> &
-    assignSignal(const typename SignalType<T, Args...>::Func &funcPtr) {
-        this->getSignal<T, Args...>().assign(funcPtr);
+    template<typename EventType, typename... Args>
+    SignalType<EventType, Args...> &
+    assignSignal(const typename SignalType<EventType, Args...>::Func &funcPtr) {
+        this->getSignal<EventType, Args...>().assign(funcPtr);
     }
 
 
@@ -207,7 +207,7 @@ public:
 //            it->setContext(context);
 //        }
 //    }
-    void setContext(const Context::Ptr context);
+    void setContext(Context::Ptr context);
 
 
 };
