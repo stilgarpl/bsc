@@ -5,3 +5,5 @@
 #include "LogicObject.h"
 
 LogicObject::LogicObject(LogicManager &logicManager) : logicManager(logicManager) {}
+
+

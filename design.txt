@@ -365,3 +365,24 @@ source->action->action->action gdzie każda akcja zwraca event, który jest prze
 Żeby to zrobić musze mieć następujące rzeczy:
 * non-void actions (akcje zwracają event który leci normalnym łańcuchem i uruchamia akcje do niego przypisane)
 * event chain definition (ograniczanie łańcuchów, na przykładzie backupa: files -> ZIP -> encrypt -> ... i zip i encrypt zwracają event z jednym plikiem, jak je rozróżnić i jak nie wywołać przypadkiem innych łańcuchów? najprościej przechowywać w evencie ptr do event chaina który będzie kontrolował jakie akcje mogą być wywołane.
+
+ChainEvent<ActualEventType> - przechowuje dane do chaina i kopię faktycznego eventu
+
+definicja chain: stage - generuje stage id na zasadzie (parentid.(childid++)) (np. 1.2.4.1.1.3)
+akcje stage w lambdzie sprawdzają czy chainevent.id == parentid, wywołują faktyczną akcję, po czym opakowują rezultat akcji w ChainEvent
+
+
+dobrze by było jakby dało się jakoś zrobić akcje z RetType bez konieczności opakowywania w void, ale na pewno da się obejść i bez tego.
+
+
+
+newChain<TriggerEvent>("backup",(optional triggerData)).stage(CollectFiles).stage(ZipFiles).stage(EncryptFile).stage(SplitFile).stage(MailFiles);
+
+auto stage1 = newChain<TriggerEvent>("backup",(optional triggerData)).stage(CollectFiles,FileData).stage(ZipFiles);
+
+stage1.stage(EncryptFile).stage(SplitFile).stage(MailFiles);
+stage1.stage(UploadFile);
+stage1.stage(RsyncFile);
+
+
+what if I make RetSignal? with ReturnType

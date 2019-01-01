@@ -279,6 +279,11 @@ public: // @todo should be public or shouldn't ?
         int a = event.getEventId();
         LOGGER("Command testing method " + std::to_string(a));
     }
+
+    static Tick testingMethod3(const Tick &tick) {
+        LOGGER("testing method 3!")
+        return tick;
+    }
 };
 
 

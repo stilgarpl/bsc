@@ -137,6 +137,11 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
     when(event<ModuleEvent<NodeNetworkModule>>()).fireNewAction([](auto event) { LOGGER("module event NNM") });
 
 
+    ActionChainHelper <Tick> actionChainHelper("testChain", logicManager);
+
+    actionChainHelper.stage<Tick>(testingMethod3);
+
+
     //@todo move to more appropriate method
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole");
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole2");

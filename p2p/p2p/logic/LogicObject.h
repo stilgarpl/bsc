@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 06.07.18.
 //
@@ -10,6 +12,7 @@
 
 #include <p2p/logic/sources/AutoSource.h>
 #include <p2p/logic/events/LogicStateEvent.h>
+#include <p2p/logic/events/ChainEvent.h>
 
 class LogicObject {
 protected:
@@ -131,6 +134,53 @@ public:
                 : EventHelper<eventType, Args...>(eventId) {}
     };
 
+    template<typename TriggerEventType>
+    class ActionChainHelper;
+
+    template<typename TriggerEventType, typename EventType>
+    class StageChainHelper {
+    private:
+        ActionChainHelper<TriggerEventType> &actionChainHelper;
+        ActionManager::ActionType<EventType> action;
+        LogicManager &logicManager;
+
+        void registerAction() {
+            //@todo actual ids.
+            //          logicManager.setActionExtended<EventType>("ID",action);
+//            logicManager.assignAction<EventType>("ID","ID");
+        }
+
+    public:
+        StageChainHelper(ActionChainHelper<TriggerEventType> &actionChainHelper,
+                         const ActionManager::ActionType<EventType> &action, LogicManager &logicManager)
+                : actionChainHelper(actionChainHelper),
+                  action(action), logicManager(logicManager) {
+            registerAction();
+        }
+    };
+
+    template<typename TriggerEventType>
+    class ActionChainHelper {
+    private:
+        ChainIdType chainId;
+        LogicManager &logicManager;
+
+    public:
+        explicit ActionChainHelper(ChainIdType chainId, LogicManager &logicManager) : chainId(std::move(chainId)),
+                                                                                      logicManager(logicManager) {}
+
+        template<typename EventType, typename Func, typename ...Args>
+        StageChainHelper<TriggerEventType, EventType> stage(Func func, Args ... args) {
+            std::function<std::invoke_result_t<decltype(*func), EventType>(EventType)> f1 = std::bind(func,
+                                                                                                      std::placeholders::_1,
+                                                                                                      args...);
+            StageChainHelper<TriggerEventType, EventType> stage(*this, f1, logicManager);
+
+            return stage;
+        }
+
+    };
+
     template<typename EventType, typename ... Args>
     class LogicChainHelper {
     public:
@@ -219,31 +269,31 @@ public:
             auto generatedActionId = generateActionId<unsigned long>();
 
             std::cout << "assigning action with generated id " << std::to_string(generatedActionId) << std::endl;
-//            if (_constraint) {
-//                //action is constrained, wrap it in check action
-//                auto checkAction = [=,constraint=_constraint](EventType e, Args... args){
-//                    if ((*constraint)(e)) {
-//                        action(e, args...);
-//                    }
-//                };
-//                logicManager.setAction<EventType, Args...>(generatedActionId, checkAction);
-//            } else {
             logicManager.setAction<EventType, Args...>(generatedActionId, action);
-//            }
             fireAction(generatedActionId);
             return *this;
         }
 
-//        //only when EventType == LogicStateEvent
-//        template<typename = std::enable_if<std::is_same<EventType,LogicStateEvent<typename EventType::Type, typename EventType::IdType>>::value>>
-//        ThisType& fireStateChangeReaction(std::function<void(typename EventType::Type&)> reaction) {
-//            return fireNewAction([reaction](EventType& event){reaction(event.getObject());});
-//        }
-//
-//
-//        ThisType& fireStateChangeReaction(ActionManager::ActionType<EventType, Args...> reaction) {
-//            return fireNewAction(reaction);
-//        }
+        //@todo func or std::function<RetType(EventType,Args...)> ?
+        template<typename Func>
+        ThisType &fireNewChainAction(Func func) {
+
+            using RetType = std::invoke_result_t<decltype(*func), EventType>;
+            auto generatedActionId = generateActionId<unsigned long>();
+
+            std::cout << "assigning action with generated id " << std::to_string(generatedActionId) << std::endl;
+            logicManager.setActionExtended<EventType, Args...>(generatedActionId,
+                                                               [&](ChainEvent<EventType> chainedEvent) {
+                                                                   //@todo if chained event id matched parent...
+                                                                   ChainEvent<RetType> result("stageId",
+                                                                                              func(chainedEvent.getActualEvent()));
+                                                                   return result;
+                                                               });
+            fireAction(generatedActionId);
+            //@todo return LogicChainHelper for <RetType>, but what about Args... ?
+            return *this;
+        }
+
 
         template<typename NewEventType, typename ... NewArgs>
         ThisType &emit() {
