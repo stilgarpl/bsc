@@ -12,7 +12,7 @@
 using ChainIdType = std::string;
 
 template<typename ActualEventType>
-class ChainEvent {
+class ChainEvent : public IEvent<typename ActualEventType::IdType> {
 private:
     ChainIdType stageId;
     ActualEventType actualEvent;

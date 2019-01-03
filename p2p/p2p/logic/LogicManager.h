@@ -107,8 +107,8 @@ public:
         actionManager.setAction<Args...>(id, action);
     };
 
-    template<typename... Args, typename ActionIdType, typename RetType>
-    void setActionExtended(ActionIdType id, std::function<RetType(Args...)> func) {
+    template<typename RetType, typename... Args, typename ActionIdType>
+    void setActionExtended(ActionIdType id, std::function<typename std::decay<RetType>::type(Args...)> func) {
         actionManager.setAction<Args...>(id, [&](Args... args) {
             //@todo by value?
             RetType ret = func(args...);

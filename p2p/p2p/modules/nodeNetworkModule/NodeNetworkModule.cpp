@@ -141,6 +141,8 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     actionChainHelper.stage<Tick>(testingMethod3);
 
+    when(event < Tick > (1s)).fireNewChainAction(testingMethod3);
+
 
     //@todo move to more appropriate method
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole");

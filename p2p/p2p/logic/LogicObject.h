@@ -276,22 +276,26 @@ public:
 
         //@todo func or std::function<RetType(EventType,Args...)> ?
         template<typename Func>
-        ThisType &fireNewChainAction(Func func) {
+        auto fireNewChainAction(Func func) {
 
             using RetType = std::invoke_result_t<decltype(*func), EventType>;
             auto generatedActionId = generateActionId<unsigned long>();
 
             std::cout << "assigning action with generated id " << std::to_string(generatedActionId) << std::endl;
-            logicManager.setActionExtended<EventType, Args...>(generatedActionId,
-                                                               [&](ChainEvent<EventType> chainedEvent) {
-                                                                   //@todo if chained event id matched parent...
-                                                                   ChainEvent<RetType> result("stageId",
-                                                                                              func(chainedEvent.getActualEvent()));
-                                                                   return result;
-                                                               });
-            fireAction(generatedActionId);
+            std::function<ChainEvent<RetType>(ChainEvent<EventType>)> f = [&](ChainEvent<EventType> chainedEvent) {
+                //@todo if chained event id matched parent...
+                ChainEvent<RetType> result("stageId",
+                                           func(chainedEvent.getActualEvent()));
+                return result;
+            };
+            logicManager.setActionExtended<ChainEvent<RetType>, ChainEvent<EventType>, Args...>(generatedActionId,
+                                                                                                f);
+            logicManager.assignAction<ChainEvent<EventType>, Args...>(generatedActionId);
             //@todo return LogicChainHelper for <RetType>, but what about Args... ?
-            return *this;
+            LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager);
+            return retLogicHelper;
+
+//            return *this;
         }
 
 
