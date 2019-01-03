@@ -189,6 +189,8 @@ public:
         typedef typename EventHelper<EventType, Args...>::ConstraintFunc ConstraintFunc;
     private:
         std::optional<EventId> eventId;
+        std::optional<ChainIdType> chainId = std::nullopt;
+        int childId = 0;
 
         std::list<ConstraintFunc> _constraint;
         LogicManager &logicManager;
@@ -198,6 +200,13 @@ public:
             eventId = eventHelper.eventId;
             _constraint = eventHelper._constraint;
         }
+
+        explicit LogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, ChainIdType id)
+                : LogicChainHelper(eventHelper, l) {
+            chainId = id;
+        };
+
+
 
         ThisType &constraint(const ConstraintFunc &func) {
             _constraint.push_back(func);
@@ -264,6 +273,15 @@ public:
             return generatedActionId++;
         }
 
+        auto nextChildId() {
+            return childId++;
+        }
+
+        auto nextChainId() {
+            const std::string SEPARATOR = ".";
+            return *chainId + SEPARATOR + std::to_string(nextChildId());
+        }
+
         ThisType &fireNewAction(ActionManager::ActionType<EventType, Args...> action) {
 
             auto generatedActionId = generateActionId<unsigned long>();
@@ -280,22 +298,48 @@ public:
 
             using RetType = std::invoke_result_t<decltype(*func), EventType>;
             auto generatedActionId = generateActionId<unsigned long>();
+            auto generatedChainId = nextChainId();
+            LOGGER("generated chain id " + generatedChainId);
+            std::function<ChainEvent<RetType>(ChainEvent<EventType>)> f = [=](ChainEvent<EventType> chainedEvent) {
 
-            std::cout << "assigning action with generated id " << std::to_string(generatedActionId) << std::endl;
-            std::function<ChainEvent<RetType>(ChainEvent<EventType>)> f = [&](ChainEvent<EventType> chainedEvent) {
-                //@todo if chained event id matched parent...
-                ChainEvent<RetType> result("stageId",
-                                           func(chainedEvent.getActualEvent()));
-                return result;
+                if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
+                    LOGGER("chained action" + *chainId)
+                    ChainEvent<RetType> result(generatedChainId,
+                                               func(*chainedEvent.getActualEvent()));
+                    return result;
+                } else {
+                    return ChainEvent<RetType>(); //it has empty actual event and should stop the chain.
+                }
             };
             logicManager.setActionExtended<ChainEvent<RetType>, ChainEvent<EventType>, Args...>(generatedActionId,
                                                                                                 f);
             logicManager.assignAction<ChainEvent<EventType>, Args...>(generatedActionId);
             //@todo return LogicChainHelper for <RetType>, but what about Args... ?
-            LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager);
+            LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, generatedChainId);
             return retLogicHelper;
 
 //            return *this;
+        }
+
+        ThisType &newChain(ChainIdType id) {
+            chainId = id;
+            transform<ChainEvent<EventType>>([=](auto event) {
+                LOGGER("starting chain " + id)
+                return ChainEvent(id, event);
+            });
+            return *this;
+        }
+
+        template<typename NewEventType, typename Func>
+        ThisType &transform(Func transformer) {
+            auto generatedActionId = generateActionId<unsigned long>();
+            std::function<NewEventType(EventType)> f = [&](EventType event) -> NewEventType {
+                return transformer(event);
+            };
+            std::cout << "transforming action with generated id " << std::to_string(generatedActionId) << std::endl;
+            logicManager.setActionExtended<NewEventType, EventType, Args...>(generatedActionId, f);
+            fireAction(generatedActionId);
+            return *this;
         }
 
 

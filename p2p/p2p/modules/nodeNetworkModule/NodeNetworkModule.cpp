@@ -141,7 +141,8 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     actionChainHelper.stage<Tick>(testingMethod3);
 
-    when(event < Tick > (1s)).fireNewChainAction(testingMethod3);
+    when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3).fireNewChainAction(
+            testingMethod3);
 
 
     //@todo move to more appropriate method

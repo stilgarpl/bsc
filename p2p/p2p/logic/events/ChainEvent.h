@@ -15,19 +15,21 @@ template<typename ActualEventType>
 class ChainEvent : public IEvent<typename ActualEventType::IdType> {
 private:
     ChainIdType stageId;
-    ActualEventType actualEvent;
+    std::optional<ActualEventType> actualEvent;
 
 public:
     const ChainIdType &getStageId() const {
         return stageId;
     }
 
-    ActualEventType getActualEvent() const {
+    std::optional<ActualEventType> getActualEvent() const {
         return actualEvent;
     }
 
     ChainEvent(ChainIdType stageId, ActualEventType actualEvent) : stageId(std::move(stageId)),
                                                                    actualEvent(actualEvent) {}
+
+    ChainEvent() { actualEvent = std::nullopt; }
 };
 
 

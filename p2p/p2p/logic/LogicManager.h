@@ -109,7 +109,7 @@ public:
 
     template<typename RetType, typename... Args, typename ActionIdType>
     void setActionExtended(ActionIdType id, std::function<typename std::decay<RetType>::type(Args...)> func) {
-        actionManager.setAction<Args...>(id, [&](Args... args) {
+        actionManager.setAction<Args...>(id, [=](Args... args) {
             //@todo by value?
             RetType ret = func(args...);
             sourceManager.event(ret);
