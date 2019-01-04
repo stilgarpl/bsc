@@ -285,6 +285,11 @@ public: // @todo should be public or shouldn't ?
         return tick;
     }
 
+    static Tick testingMethod3s(const Tick &tick, std::string s) {
+        LOGGER("testing method 3! " + s)
+        return tick;
+    }
+
     static IEvent<int> testingMethod4(const IEvent<std::string> &se) {
         IEvent<int> a;
         return a;

@@ -29,7 +29,10 @@ public:
     ChainEvent(ChainIdType stageId, ActualEventType actualEvent) : stageId(std::move(stageId)),
                                                                    actualEvent(actualEvent) {}
 
-    ChainEvent() { actualEvent = std::nullopt; }
+    ChainEvent() {
+        actualEvent = std::nullopt;
+        this->setEventValid(false);
+    }
 };
 
 

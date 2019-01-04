@@ -42,6 +42,7 @@ public:
 private:
     IdType eventId;
     OriginType _origin;
+    bool _eventValid = true;
     mutable Context::Ptr _context;
 public:
     IdType getEventId() const {
@@ -60,9 +61,18 @@ public:
         return _origin;
     }
 
+    bool isEventValid() const {
+        return _eventValid;
+    }
+
+    void setEventValid(bool v) {
+        _eventValid = v;
+    }
+
     static void setup(IEvent *event) {
 //        LOGGER("IEVENT SETUP");
     };
+
 
     IEvent();
 

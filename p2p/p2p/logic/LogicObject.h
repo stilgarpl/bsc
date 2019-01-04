@@ -293,19 +293,20 @@ public:
         }
 
         //@todo func or std::function<RetType(EventType,Args...)> ?
-        template<typename Func>
-        auto fireNewChainAction(Func func) {
+        template<typename Func, typename ... SetArgs>
+        auto fireNewChainAction(Func func, SetArgs... setArgs) {
 
-            using RetType = std::invoke_result_t<decltype(*func), EventType>;
+            using RetType = std::invoke_result_t<decltype(*func), EventType, SetArgs...>;
             auto generatedActionId = generateActionId<unsigned long>();
             auto generatedChainId = nextChainId();
             LOGGER("generated chain id " + generatedChainId);
-            std::function<ChainEvent<RetType>(ChainEvent<EventType>)> f = [=](ChainEvent<EventType> chainedEvent) {
-
+            std::function<ChainEvent<RetType>(ChainEvent<EventType>)> f = [=, chainId = chainId](
+                    ChainEvent<EventType> chainedEvent) {
+                LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " + chainedEvent.getStageId())
                 if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
                     LOGGER("chained action" + *chainId)
                     ChainEvent<RetType> result(generatedChainId,
-                                               func(*chainedEvent.getActualEvent()));
+                                               func(*chainedEvent.getActualEvent(), setArgs...));
                     return result;
                 } else {
                     return ChainEvent<RetType>(); //it has empty actual event and should stop the chain.
@@ -325,7 +326,8 @@ public:
             chainId = id;
             transform<ChainEvent<EventType>>([=](auto event) {
                 LOGGER("starting chain " + id)
-                return ChainEvent(id, event);
+                ChainEvent r(id, event);
+                return r;
             });
             return *this;
         }
@@ -333,7 +335,7 @@ public:
         template<typename NewEventType, typename Func>
         ThisType &transform(Func transformer) {
             auto generatedActionId = generateActionId<unsigned long>();
-            std::function<NewEventType(EventType)> f = [&](EventType event) -> NewEventType {
+            std::function<NewEventType(EventType)> f = [=](EventType event) -> NewEventType {
                 return transformer(event);
             };
             std::cout << "transforming action with generated id " << std::to_string(generatedActionId) << std::endl;

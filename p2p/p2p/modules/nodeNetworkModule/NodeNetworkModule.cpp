@@ -141,8 +141,12 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     actionChainHelper.stage<Tick>(testingMethod3);
 
-    when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3).fireNewChainAction(
-            testingMethod3);
+    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
+
+    stage1.fireNewChainAction(testingMethod3s, "2");
+    stage1.fireNewChainAction(testingMethod3s, "a").fireNewChainAction(testingMethod3s, "b").fireNewChainAction(
+            testingMethod3s, "w");
+    stage1.fireNewChainAction(testingMethod3s, "x");
 
 
     //@todo move to more appropriate method

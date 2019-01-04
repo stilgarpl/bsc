@@ -112,7 +112,9 @@ public:
         actionManager.setAction<Args...>(id, [=](Args... args) {
             //@todo by value?
             RetType ret = func(args...);
-            sourceManager.event(ret);
+            if (ret.isEventValid()) {
+                sourceManager.event(ret);
+            }
         });
     };
 
