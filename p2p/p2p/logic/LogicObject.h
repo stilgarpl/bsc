@@ -295,31 +295,37 @@ public:
         //@todo func or std::function<RetType(EventType,Args...)> ?
         template<typename Func, typename ... SetArgs>
         auto fireNewChainAction(Func func, SetArgs... setArgs) {
+            if (chainId) {
+                using RetType = std::invoke_result_t<decltype(*func), EventType, SetArgs...>;
+                auto generatedActionId = generateActionId<unsigned long>();
+                auto generatedChainId = nextChainId();
+                LOGGER("generated chain id " + generatedChainId);
+                //@todo apply constraint?
+                std::function<ChainEvent<RetType>(ChainEvent<EventType>)> f = [=, chainId = chainId](
+                        ChainEvent<EventType> chainedEvent) {
+                    LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
+                           chainedEvent.getStageId())
+                    if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
+                        LOGGER("chained action" + *chainId)
+                        ChainEvent<RetType> result(generatedChainId,
+                                                   func(*chainedEvent.getActualEvent(), setArgs...));
+                        return result;
+                    } else {
+                        return ChainEvent<RetType>(); //it has empty actual event and should stop the chain.
+                    }
+                };
+                logicManager.setActionExtended<ChainEvent<RetType>, ChainEvent<EventType>, Args...>(generatedActionId,
+                                                                                                    f);
+                logicManager.assignAction<ChainEvent<EventType>, Args...>(generatedActionId);
+                //@todo return LogicChainHelper for <RetType>, but what about Args... ?
+                LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, generatedChainId);
+                return retLogicHelper;
+            } else {
+                //@todo exception!!!
+                LOGGER("FAILURE! NO EVENT CHAIN ID SET!")
+                return *this;
+            }
 
-            using RetType = std::invoke_result_t<decltype(*func), EventType, SetArgs...>;
-            auto generatedActionId = generateActionId<unsigned long>();
-            auto generatedChainId = nextChainId();
-            LOGGER("generated chain id " + generatedChainId);
-            std::function<ChainEvent<RetType>(ChainEvent<EventType>)> f = [=, chainId = chainId](
-                    ChainEvent<EventType> chainedEvent) {
-                LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " + chainedEvent.getStageId())
-                if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
-                    LOGGER("chained action" + *chainId)
-                    ChainEvent<RetType> result(generatedChainId,
-                                               func(*chainedEvent.getActualEvent(), setArgs...));
-                    return result;
-                } else {
-                    return ChainEvent<RetType>(); //it has empty actual event and should stop the chain.
-                }
-            };
-            logicManager.setActionExtended<ChainEvent<RetType>, ChainEvent<EventType>, Args...>(generatedActionId,
-                                                                                                f);
-            logicManager.assignAction<ChainEvent<EventType>, Args...>(generatedActionId);
-            //@todo return LogicChainHelper for <RetType>, but what about Args... ?
-            LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, generatedChainId);
-            return retLogicHelper;
-
-//            return *this;
         }
 
         ThisType &newChain(ChainIdType id) {
