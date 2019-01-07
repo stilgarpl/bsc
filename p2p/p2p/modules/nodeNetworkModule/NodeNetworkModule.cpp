@@ -16,7 +16,7 @@
 #include <Poco/Net/SocketStream.h>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/ServerConnection.h>
 #include <p2p/modules/configuration/ConfigurationModule.h>
-#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/KeepAlivePacket.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
 #include <p2p/logic/state/LogicStateMachine.h>

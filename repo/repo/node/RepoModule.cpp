@@ -11,7 +11,7 @@
 #include <repo/repository/logic/sources/RepositorySource.h>
 #include "RepoModule.h"
 
-const fs::path RepoModule::repositoryDataPath = fs::path("repository");
+//const fs::path RepoModule::repositoryDataPath = fs::path("repository");
 
 
 void RepoModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
@@ -34,7 +34,7 @@ bool RepoModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
     return true;
 }
 
-RepoModule::RepoModule(INode &node) : NodeModuleDependent(node) {
+RepoModule::RepoModule(INode &node) : NodeModuleConfigDependent(node) {
     setRequired<BasicModule>();
 }
 
@@ -48,8 +48,9 @@ void RepoModule::loadRepository(const Repository::RepoIdType &repoId) {
     RepositoryPtr ptr = std::make_shared<Repository>(repoId);
 
     repositoryManager.addRepository(ptr);
+
 //@todo throw exception if repo does not exist
-    ptr->setJournal(node.getConfigurationManager().loadData<JournalPtr>(repositoryDataPath / (repoId + ".xml")));
+    ptr->setJournal(node.getConfigurationManager().loadData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml")));
 //    {
 //        std::ifstream is(path);
 //        cereal::XMLInputArchive ia(is);
@@ -63,7 +64,7 @@ void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
 //    rep->getJournal()->commitState();
     rep->commit();
     fs::path savePath = fs::temp_directory_path() / (repoId + ".xml");
-    node.getConfigurationManager().saveData<JournalPtr>(repositoryDataPath / (repoId + ".xml"), rep->getJournal());
+    node.getConfigurationManager().saveData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"), rep->getJournal());
 //    {
 //        std::ofstream os(savePath);
 //        cereal::XMLOutputArchive oa(os);
@@ -157,4 +158,12 @@ void RepoModule::ignoreFile(const fs::path &path) {
         selectedRepository->ignore(path);
 
     }
+}
+
+const std::filesystem::path &RepoModuleConfiguration::getRepositoryDataPath() const {
+    return repositoryDataPath;
+}
+
+void RepoModuleConfiguration::setRepositoryDataPath(const std::filesystem::path &repositoryDataPath) {
+    RepoModuleConfiguration::repositoryDataPath = repositoryDataPath;
 }

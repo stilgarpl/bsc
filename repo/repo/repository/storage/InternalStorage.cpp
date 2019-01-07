@@ -4,7 +4,7 @@
 
 #include <p2p/log/Logger.h>
 #include <p2p/utils/crypto.h>
-#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>

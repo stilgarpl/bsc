@@ -3,6 +3,8 @@
 //
 
 #include <p2p/log/Logger.h>
+#include <Poco/Environment.h>
+#include <p2p/node/context/NodeContext.h>
 #include "JournalState.h"
 
 void JournalState::add(const JournalStateData &data) {
@@ -124,5 +126,26 @@ bool JournalStateData::isDirectory() const {
 
 JournalTarget JournalStateData::getTarget() const {
     return target;
+}
+
+const std::string &JournalMetaData::getNodeId() const {
+    return nodeId;
+}
+
+const std::string &JournalMetaData::getUserId() const {
+    return userId;
+}
+
+const std::string &JournalMetaData::getOperatingSystem() const {
+    return operatingSystem;
+}
+
+JournalMetaData::JournalMetaData() {
+
+    Poco::Environment env;
+    operatingSystem = env.osName();
+    //@todo implement to work on all platforms
+    userId = getenv("USER");
+    nodeId = NodeContext::getNodeFromActiveContext().getNodeInfo().getNodeId();
 }
 

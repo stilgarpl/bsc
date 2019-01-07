@@ -1,5 +1,7 @@
 #include <utility>
 
+#include <utility>
+
 //
 // Created by stilgar on 17.10.17.
 //
@@ -33,6 +35,7 @@
 
 #include <filesystem>
 #include <p2p/modules/filesystem/data/FileData.h>
+#include <p2p/node/NodeInfo.h>
 
 namespace fs = std::filesystem;
 
@@ -41,13 +44,13 @@ typedef std::string ChecksumType;
 
 class JournalStateData {
 private:
-    JournalMethod method;
-    JournalTarget target;
-    fs::perms permissions;
+    JournalMethod method = JournalMethod::NONE;
+    JournalTarget target = JournalTarget::NONE;
+    fs::perms permissions = fs::perms::none;
     PathType path;
     uintmax_t size = 0;
     //@todo maybe I should use time_point instead of old time_t? but which clock?
-    std::time_t modificationTime;
+    std::time_t modificationTime{};
     //@todo bool or type? directory, file, socket, link...
     bool directory = false;
     ChecksumType checksum; //checksum of the file.
@@ -69,7 +72,7 @@ public:
                                                                                                      target(target),
                                                                                                      path(std::move(
                                                                                                              path)) {
-        update(fileData);
+        update(std::move(fileData));
     };
 
     JournalStateData() = default;
@@ -107,18 +110,46 @@ public:
     JournalTarget getTarget() const;
 };
 
+class JournalMetaData {
+private:
+    NodeIdType nodeId;
+    std::string userId;
+    std::string operatingSystem;
+
+public:
+    const NodeIdType &getNodeId() const;
+
+    const std::string &getUserId() const;
+
+    const std::string &getOperatingSystem() const;
+
+private:
+    template<class Archive>
+    void serialize(Archive &ar) {
+        ar(CEREAL_NVP(nodeId),CEREAL_NVP(userId),CEREAL_NVP(operatingSystem));
+    }
+
+public:
+    JournalMetaData();
+
+private:
+
+    friend class cereal::access;
+};
+
 
 class JournalState {
     ChecksumType checksum;
     std::list<JournalStateData> dataList;
     //@todo different clock maybe? steady_clock?
     CommitTimeType commitTime;
+    JournalMetaData metaData;
     std::shared_ptr<JournalState> previousState = nullptr;
 
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(CEREAL_NVP(checksum), CEREAL_NVP(dataList), CEREAL_NVP(commitTime), CEREAL_NVP(previousState));
+        ar(CEREAL_NVP(checksum), CEREAL_NVP(dataList), CEREAL_NVP(commitTime), CEREAL_NVP(previousState), CEREAL_NVP(metaData));
     }
 
 

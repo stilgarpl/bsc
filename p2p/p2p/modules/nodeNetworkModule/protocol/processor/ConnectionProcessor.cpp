@@ -4,11 +4,11 @@
 
 #include <iostream>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/Connection.h>
-#include <p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h>
+#include <p2p/node/context/LogicContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h>
 #include <p2p/modules/nodeNetworkModule/protocol/context/ProcessorContext.h>
 #include <p2p/role/Roles.h>
-#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/node/context/NodeContext.h>
 
 
 ConnectionProcessor::ConnectionProcessor(Connection &connection) : connection(connection) {

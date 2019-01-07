@@ -31,7 +31,7 @@ public:
     }
 };
 
-#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/command/ICommandsDirectory.h>
 #include <p2p/utils/template_cast.h>
 

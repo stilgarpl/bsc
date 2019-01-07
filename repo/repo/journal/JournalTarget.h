@@ -7,6 +7,7 @@
 
 //@todo think about splitting method into method and target.
 enum class JournalTarget {
+    NONE,
     FILE,
     DIRECTORY,
 };

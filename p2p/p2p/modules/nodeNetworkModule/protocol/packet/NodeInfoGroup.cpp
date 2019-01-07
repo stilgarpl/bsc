@@ -4,10 +4,10 @@
 
 #include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
 #include <p2p/context/Context.h>
-#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/context/ConnectionContext.h>
 #include "NodeInfoGroup.h"
-#include <p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h>
+#include <p2p/node/context/LogicContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h>
 
 void NodeInfoGroup::Request::process(Context::Ptr context) {

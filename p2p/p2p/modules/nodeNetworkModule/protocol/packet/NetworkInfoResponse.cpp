@@ -4,8 +4,8 @@
 
 #include <p2p/log/Logger.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/NetworkSource.h>
-#include <p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h>
-#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/node/context/LogicContext.h>
+#include <p2p/node/context/NodeContext.h>
 #include "NetworkInfoResponse.h"
 
 

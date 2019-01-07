@@ -3,7 +3,7 @@
 //
 
 #include <p2p/modules/filesystem/network/logic/sources/TransferSource.h>
-#include <p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h>
+#include <p2p/node/context/LogicContext.h>
 #include "DataTransfer.h"
 
 void DataTransfer::Request::process(Context::Ptr context) {

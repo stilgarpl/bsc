@@ -2,9 +2,9 @@
 // Created by stilgar on 19.07.18.
 //
 
-#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/auth/AuthModule.h>
-#include <p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h>
+#include <p2p/node/context/LogicContext.h>
 #include <p2p/modules/auth/logic/sources/AuthSource.h>
 #include "AuthHelloPacket.h"
 

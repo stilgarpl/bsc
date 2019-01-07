@@ -4,7 +4,7 @@
 // Created by stilgar on 30.12.17.
 //
 
-#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/filesystem/network/packet/DataTransfer.h>
 #include <p2p/modules/filesystem/network/packet/PropertiesTransfer.h>
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>

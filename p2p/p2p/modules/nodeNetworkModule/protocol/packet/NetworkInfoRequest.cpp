@@ -6,7 +6,7 @@
 
 #include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
 #include "NetworkInfoResponse.h"
-#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/context/ConnectionContext.h>
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 

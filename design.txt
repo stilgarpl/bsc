@@ -386,3 +386,12 @@ stage1.stage(RsyncFile);
 
 
 what if I make RetSignal? with ReturnType
+
+
+rzeczy które przydałoby się jeszcze zrobić:
+
+* Logic Builder - ładowanie logiki z plików konfiguracyjnych, najistotniejsze jak będę robił backup
+* meta info w journalu w repo (kto wrzucał, jaki system operacyjny, nazwa node)
+
+
+StorageManager - Repozytorium powinno byc oddzielone od storage. jak repo jest inicjalizowane, to szuka storage o konkretnym id. default storage id = repo id.

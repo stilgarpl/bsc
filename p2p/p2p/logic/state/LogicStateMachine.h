@@ -8,7 +8,7 @@
 
 #include <p2p/log/Logger.h>
 #include <p2p/logic/LogicManager.h>
-#include <p2p/modules/nodeNetworkModule/protocol/context/LogicContext.h>
+#include <p2p/node/context/LogicContext.h>
 #include <p2p/logic/sources/LogicStateSource.h>
 #include "StateMachine.h"
 

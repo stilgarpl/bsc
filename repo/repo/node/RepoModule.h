@@ -14,9 +14,27 @@
 #include <repo/journal/network/packet/JournalGroup.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>
 
-class RepoModule : public NodeModuleDependent<RepoModule> {
+class RepoModuleConfiguration : public IConfig {
 private:
-    const static fs::path repositoryDataPath;
+    fs::path repositoryDataPath = fs::path("repository");
+
+public:
+    const std::filesystem::path &getRepositoryDataPath() const;
+
+    void setRepositoryDataPath(const std::filesystem::path &repositoryDataPath);
+
+private:
+    template<class Archive>
+    void serialize(Archive &ar) {
+        ar(repositoryDataPath);
+    }
+
+
+    friend class cereal::access;
+};
+
+class RepoModule : public NodeModuleConfigDependent<RepoModule,RepoModuleConfiguration> {
+private:
     RepositoryManager repositoryManager;
     RepositoryPtr selectedRepository = nullptr;
 public:

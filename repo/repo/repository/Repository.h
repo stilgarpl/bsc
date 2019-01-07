@@ -41,7 +41,7 @@ public:
 
             Attributes() = default;
 
-            Attributes(const JournalStateData &data);
+            explicit Attributes(const JournalStateData &data);
 
             bool isDirectory() const;
 
@@ -129,12 +129,6 @@ public:
     const std::shared_ptr<IStorage> &getStorage() const;
 
     void setJournal(const JournalPtr &journal);
-
-//    fs::path getStoragePath(const IStorage::ResourceId &resourceId) {
-//        return storage->getResourcePath(resourceId);
-//    };
-
-
 
     void downloadStorage();
 

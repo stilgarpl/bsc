@@ -2,7 +2,7 @@
 // Created by stilgar on 07.10.17.
 //
 
-#include <p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h>
+#include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include "NetworkActions.h"
 

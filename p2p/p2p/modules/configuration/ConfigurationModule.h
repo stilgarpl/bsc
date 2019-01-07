@@ -14,7 +14,7 @@ class ConfigurationModule : public NodeModuleDependent<ConfigurationModule, Basi
 private:
     ConfigurationManager manager;
 public:
-    ConfigurationModule(INode &node);
+    explicit ConfigurationModule(INode &node);
 
     void save(const ConfigurationManager::IdType &id, std::shared_ptr<IConfig> config);
 

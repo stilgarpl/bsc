@@ -4,7 +4,7 @@
 
 #include "crypto.h"
 
-std::__cxx11::basic_string<char> calculateSha1OfFile(fs::path path) {
+std::string calculateSha1OfFile(fs::path path) {
     CryptoPP::SHA256 hash;
     std::string digest;
     auto size = fs::file_size(fs::path(path));

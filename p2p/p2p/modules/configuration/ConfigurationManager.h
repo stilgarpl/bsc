@@ -79,7 +79,7 @@ private:
         fs::create_directories(rootPath);
     }
 public:
-    ConfigurationManager(const std::filesystem::path &rootPath);
+    explicit ConfigurationManager(const std::filesystem::path &rootPath);
 
     ConfigurationManager();
 
