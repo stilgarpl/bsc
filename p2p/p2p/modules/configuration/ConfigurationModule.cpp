@@ -4,7 +4,7 @@
 
 #include "ConfigurationModule.h"
 
-ConfigurationModule::ConfigurationModule(INode &node) : NodeModuleDependent(node) {}
+ConfigurationModule::ConfigurationModule(INode &node) : NodeModuleDependent<ConfigurationModule, BasicModule>(node) {}
 
 
 void ConfigurationModule::save(const ConfigurationManager::IdType &id, std::shared_ptr<IConfig> config) {

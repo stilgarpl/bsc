@@ -16,11 +16,14 @@
 
 class NodeModule : public ILogicModule {
 
-
 public:
-    //@todo pure or not?
-    virtual void initialize() {};
 
+    //@todo pure or not?
+    void initialize() override {};
+
+    void ready() override {};
+
+    void shutdown() override {};
     explicit NodeModule(INode &node) : ILogicModule(node) {}
 
     void run() override {
@@ -33,61 +36,30 @@ protected:
     }
 };
 
-/**
- * NodeModule with automatic dependency management
- * @tparam T actual module type, i.e. class SomeModule : public NodeModuleDependent<SomeModule>
- * @tparam Args optional dependent classes. it could also be set by using setRequired<> method or addRequiredDependency<>
- */
-template<typename T, typename ... Args>
-class NodeModuleDependent : public NodeModule, public DependencyManaged<T> {
-private:
-//    typename T::Config _config;
-    Config _config;
-public:
-    IConfig &configuration() override {
-        return _config;
-    }
-
-private:
-    template<typename T1, typename... Args1>
-    void checkAndAddModules() {
-        if (!node.hasModule<T1>()) {
-            node.addModule<T1>();
-            LOGGER(std::string("MODULE NOT FOUND, ADDING MODULE") + typeid(T1).name());
-        }
-        if constexpr (sizeof...(Args1) > 0) {
-            checkAndAddModules<Args1...>();
-        }
-    }
-
-public:
-    explicit NodeModuleDependent(INode &node) : NodeModule(node) {
-        this->template setRequired<Args...>();
-        if constexpr (sizeof...(Args) > 0) {
-            checkAndAddModules<Args...>();
-        }
-    };
-
-    void initializeConfiguration() override {
-        auto loaded = node.getConfigurationManager().template load<Config>(configuration().getConfigId());
-        if (loaded != nullptr)
-            configuration() = *loaded;
-    }
-
-protected:
-    void changeState(const ModuleState &state) override {
-        node.getLogicManager().template requireSource<ModuleSource>().
-                template moduleStateChanged<T>(state, *static_cast<T *>(this));
-    }
-};
 
 template<typename T, typename ConfigType, typename ... Args>
 class NodeModuleConfigDependent : public NodeModule, public DependencyManaged<T> {
+private:
+    typedef ConfigType Config;
+    Config _config;
+    Uber<Type> submodule;
 public:
 //    typename T::Config _config;
-    typedef ConfigType Config;
-private:
-    Config _config;
+
+
+    class SubModule {
+    };
+
+    template<typename OtherModule>
+    typename OtherModule::SubModule &getSubModule() {
+
+    }
+
+    auto &getOwnSubModule() {
+        return submodule.get<typename T::SubModule>().getType();
+    }
+
+
 private:
     template<typename T1, typename... Args1>
     void checkAndAddModules() {
@@ -128,5 +100,9 @@ protected:
     }
 
 };
+
+template<typename T, typename ... Args>
+using NodeModuleDependent = NodeModuleConfigDependent<T, INodeModule::Config, Args...>;
+
 
 #endif //BASYCO_NODEMODULE_H

@@ -395,3 +395,10 @@ rzeczy które przydałoby się jeszcze zrobić:
 
 
 StorageManager - Repozytorium powinno byc oddzielone od storage. jak repo jest inicjalizowane, to szuka storage o konkretnym id. default storage id = repo id.
+
+
+Moduły mogą mieć zdefiniowane submoduły. Definicja submodułu jest konkretna, np. w przypadku Auth może zawierać definicje reguł dla pakietów.
+
+repoModule->getSubModule<AuthModule>()
+repoModule->getSubModule<NodeNetworkModule>()
+

@@ -7,7 +7,7 @@
 #include <p2p/logic/sources/ModuleSource.h>
 #include "BasicModule.h"
 
-BasicModule::BasicModule(INode &node) : NodeModuleDependent(node) {
+BasicModule::BasicModule(INode &node) : NodeModuleDependent<BasicModule>(node) {
 
 }
 

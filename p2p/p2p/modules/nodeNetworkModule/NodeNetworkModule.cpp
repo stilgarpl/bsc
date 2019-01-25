@@ -141,12 +141,12 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     actionChainHelper.stage<Tick>(testingMethod3);
 
-    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
-
-    stage1.fireNewChainAction(testingMethod3s, "2");
-    stage1.fireNewChainAction(testingMethod3s, "a").fireNewChainAction(testingMethod3s, "b").fireNewChainAction(
-            testingMethod3s, "w");
-    stage1.fireNewChainAction(testingMethod3s, "x");
+//    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
+//
+//    stage1.fireNewChainAction(testingMethod3s, "2");
+//    stage1.fireNewChainAction(testingMethod3s, "a").fireNewChainAction(testingMethod3s, "b").fireNewChainAction(
+//            testingMethod3s, "w");
+//    stage1.fireNewChainAction(testingMethod3s, "x");
 
 
     //@todo move to more appropriate method
@@ -300,20 +300,6 @@ void NodeNetworkModule::stopAcceptedConnections() {
 void NodeNetworkModule::listen() {
     //SocketAddress address("127.0.0.1:6777");
     if (serverSocket == nullptr) {
-//        unsigned short port = 6777;
-        //@TODO numer portu dac z configuracji
-        //@todo FIX THAT CAST
-        ///@todo sprawdzanie bledow z bindowania socketa
-        //@todo ConfigurationModule
-//        if (((Node *) &node)->getConfiguration() != nullptr) {
-//            port = ((Node *) &node)->getConfiguration()->getPort();
-//        }
-
-        //@todo configuration should be loaded on demand, not here
-//        auto loadedConfig = node.getModule<ConfigurationModule>()->load<Config>("network");
-//        if (loadedConfig != nullptr) {
-//            configuration() = *loadedConfig;
-//        }
 
 //        //@todo debug
 //        node.getModule<ConfigurationModule>()->save("network", loadedConfig);
@@ -323,7 +309,7 @@ void NodeNetworkModule::listen() {
 
 
     server = std::make_shared<TCPServer>(
-            new ServerConnectionFactory(static_cast<Node &>(this->node), this->node.getContext()),
+            new ServerConnectionFactory(dynamic_cast<Node &>(this->node), this->node.getContext()),
             *serverSocket);
     server->start();
 
@@ -354,7 +340,7 @@ void NodeNetworkModule::onStart() {
 void NodeNetworkModule::run() {
     NodeModule::run();
 
-    //@todo find a bettter way to trigger onStop after run
+    //@todo find a better way to trigger onStop after run
     while (!isStopping()) {
         std::this_thread::sleep_for(400ms);
     }

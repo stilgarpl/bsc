@@ -23,14 +23,15 @@ private:
 
 protected:
     Connection &connection;
+    //@todo initialize packet filter from AuthModule or configuration or sth.
     std::unique_ptr<PacketFilter> packetFilter = std::make_unique<RoleFilter>();
 
-    virtual void run();
+    void run() override;
 
 public:
     explicit ConnectionProcessor(Connection &connection);
 
-    virtual ~ConnectionProcessor();
+    ~ConnectionProcessor() override;
 
 };
 

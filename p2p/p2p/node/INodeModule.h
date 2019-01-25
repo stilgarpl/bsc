@@ -17,6 +17,7 @@
 class INodeModule : public virtual IDependencyManaged, public Runnable {
 protected:
     INode &node;
+
 public:
     typedef IConfig Config;
 
@@ -35,14 +36,19 @@ public:
     }
 
     void doReady() {
+        ready();
         changeState(ModuleState::READY);
     }
 
     void doShutdown() {
+        shutdown();
         changeState(ModuleState::SHUTDOWN);
     }
     virtual void initialize()=0;
 
+    virtual void ready() = 0;
+
+    virtual void shutdown() = 0;
     virtual IConfig &configuration()=0;
 
     virtual bool setupLogic()=0;

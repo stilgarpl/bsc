@@ -124,6 +124,10 @@ public:
         t = other;
         return *this;
     }
+
+    T &getType() {
+        return t;
+    }
 };
 
 

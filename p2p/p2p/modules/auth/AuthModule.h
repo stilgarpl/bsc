@@ -10,13 +10,22 @@
 
 class AuthModule : public NodeModuleDependent<AuthModule> {
 public:
-    AuthModule(INode &node);
+
+    class SubModule {
+    public:
+        //@todo add rules definition
+        int a;
+    };
+
+    explicit AuthModule(INode &node);
 
     void setupActions(SetupActionHelper &actionHelper) override;
 
     bool assignActions(AssignActionHelper &actionHelper) override;
 
     bool setupSources(SetupSourceHelper &sourceHelper) override;
+
+    void ready() override;
 
 };
 

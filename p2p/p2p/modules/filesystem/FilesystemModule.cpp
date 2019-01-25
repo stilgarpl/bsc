@@ -6,7 +6,7 @@
 #include "FilesystemModule.h"
 #include "p2p/modules/basic/BasicModule.h"
 
-FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent(node) {
+FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent<FilesystemModule>(node) {
     setRequired<BasicModule, NodeNetworkModule>();
 }
 

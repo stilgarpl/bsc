@@ -142,6 +142,7 @@ void setupCommands(CommandModule *cmd) {
 #include <cereal/types/memory.hpp>
 #include <repo/repository/storage/InternalStorage.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
+#include <p2p/modules/auth/AuthModule.h>
 
 struct PtrTest {
     int a = 9999;
@@ -422,6 +423,7 @@ int main(int argc, char *argv[]) {
     //  exit(0);
 
 
+
     JournalGroup::Request::Ptr jgr = JournalGroup::Request::getNew();
     jgr->setRepoId("second");
 
@@ -461,6 +463,8 @@ int main(int argc, char *argv[]) {
     setupModules(thisNode);
     thisNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
     thisNode.getModule<NodeNetworkModule>()->configuration().setPort(9191);
+    thisNode.addModule<AuthModule>();
+    thisNode.getModule<AuthModule>()->getOwnSubModule().a = 5;
 
     auto cmdN = thisNode.getModule<CommandModule>();
 
