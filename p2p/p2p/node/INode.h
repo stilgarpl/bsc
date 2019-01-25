@@ -41,6 +41,24 @@ private:
 protected:
     StaticUber<INodeModulePtr> modules;
 
+    template<typename Ret, typename ModuleType, typename ... Args>
+    void forEachModule(Ret(ModuleType::*f)(Args...), Args... args) {
+        std::list<INodeModulePtr> modulesList;
+        modules.forEach(
+                [&](INodeModulePtr ptr) {
+                    if (ptr != nullptr) {
+                        //ptr->initialize();
+                        //ptr->setupLogic(logicManager);
+                        modulesList.push_back(ptr);
+                    };
+                });
+        auto sortedList = DependencyManager::dependencySort(modulesList);
+
+        for (auto &&item : sortedList) {
+            ((*item).*f)(args...);
+        }
+    }
+
 public:
 
     template<typename ModuleType>

@@ -42,6 +42,7 @@ class NodeModuleConfigDependent : public NodeModule, public DependencyManaged<T>
 private:
     typedef ConfigType Config;
     Config _config;
+    //@todo this doesn't have to be uber, it's just ONE variable, with dynamic type
     Uber<Type> submodule;
 public:
 //    typename T::Config _config;
@@ -57,6 +58,15 @@ public:
 
     auto &getOwnSubModule() {
         return submodule.get<typename T::SubModule>().getType();
+    }
+
+protected:
+    void forEachSubmodule() {
+
+        //@todo for each module, get auth submodule if exists (maybe submodules should be shared_ptr? or optional?
+        //  apply rules from all submodules.
+//        node.forEachModule([](){});
+
     }
 
 
