@@ -53,14 +53,15 @@ public:
 
     template<typename OtherModule>
     typename OtherModule::SubModule &getSubModule() {
-
+        return submodule.get<typename OtherModule::SubModule>().getType();
     }
 
     auto &getOwnSubModule() {
-        return submodule.get<typename T::SubModule>().getType();
+        return getSubModule<T>();
     }
 
 protected:
+
     void forEachSubmodule() {
 
         //@todo for each module, get auth submodule if exists (maybe submodules should be shared_ptr? or optional?
