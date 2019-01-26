@@ -9,11 +9,12 @@
 #include <p2p/logic/sources/AutoSource.h>
 #include <p2p/node/INodeModule.h>
 #include <p2p/node/INode.h>
+#include <p2p/logic/state/LogicStateMachine.h>
 #include "p2p/logic/LogicManager.h"
 #include "p2p/logic/LogicObject.h"
 
 //@todo #warning move this class to node modules
-class ILogicModule : public INodeModule, public LogicObject {
+class ILogicModule : public INodeModule, public LogicObject, public LogicStateMachine<ILogicModule, ModuleState> {
 
 public:
 
@@ -22,6 +23,14 @@ public:
     }
 
     explicit ILogicModule(INode &node) : INodeModule(node), LogicObject(node.getLogicManager()) {
+        //@todo move to state definition when I figure it out
+        addState(ModuleState::UNINITIALIZED, ModuleState::INITIALIZED, ModuleState::LOGIC_READY, ModuleState::READY,
+                 ModuleState::SHUTDOWN);
+        addLink(ModuleState::UNINITIALIZED, ModuleState::INITIALIZED);
+        addLink(ModuleState::INITIALIZED, ModuleState::LOGIC_READY, ModuleState::SHUTDOWN);
+        addLink(ModuleState::LOGIC_READY, ModuleState::READY, ModuleState::SHUTDOWN);
+        addLink(ModuleState::READY, ModuleState::SHUTDOWN);
+        setState(ModuleState::UNINITIALIZED);
 
     }
 
@@ -82,6 +91,9 @@ protected:
 
     //when(event<CommandEvent>().withId(CommandId::EXECUTE_COMMAND)).fireNewAction(RUN_COMMAND);d
 
+    void changeModuleState(const ModuleState &state) override {
+        changeState(state);
+    }
 
 
 

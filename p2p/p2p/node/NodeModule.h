@@ -42,33 +42,15 @@ class NodeModuleConfigDependent : public NodeModule, public DependencyManaged<T>
 private:
     typedef ConfigType Config;
     Config _config;
-    //@todo this doesn't have to be uber, it's just ONE variable, with dynamic type
-    Uber<Type> submodule;
 public:
 //    typename T::Config _config;
 
 
-    class SubModule {
-    };
-
-    template<typename OtherModule>
-    typename OtherModule::SubModule &getSubModule() {
-        return submodule.get<typename OtherModule::SubModule>().getType();
-    }
 
     auto &getOwnSubModule() {
         return getSubModule<T>();
     }
 
-protected:
-
-    void forEachSubmodule() {
-
-        //@todo for each module, get auth submodule if exists (maybe submodules should be shared_ptr? or optional?
-        //  apply rules from all submodules.
-//        node.forEachModule([](){});
-
-    }
 
 
 private:
@@ -105,7 +87,8 @@ public:
     }
 
 protected:
-    void changeState(const ModuleState &state) override {
+    void changeModuleState(const ModuleState &state) override {
+        ILogicModule::changeModuleState(state);
         node.getLogicManager().template requireSource<ModuleSource>().
                 template moduleStateChanged<T>(state, *static_cast<T *>(this));
     }

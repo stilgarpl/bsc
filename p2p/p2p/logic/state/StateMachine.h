@@ -70,7 +70,7 @@ public:
     void setState(const StateIdType &state) {
         currentState = states.find(state);
         if (currentState == states.end()) {
-            //@todo erro handling
+            //@todo error handling
             abort();
         }
     }

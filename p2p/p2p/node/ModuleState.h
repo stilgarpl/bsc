@@ -7,7 +7,7 @@
 
 
 enum class ModuleState {
-
+    UNINITIALIZED,
     INITIALIZED,
     LOGIC_READY,
     READY,

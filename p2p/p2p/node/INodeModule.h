@@ -15,34 +15,45 @@
 #include "ModuleState.h"
 
 class INodeModule : public virtual IDependencyManaged, public Runnable {
+private:
+    Uber<Type> submodule;
 protected:
     INode &node;
 
 public:
     typedef IConfig Config;
 
+
+    class SubModule {
+    };
+
+    template<typename OtherModule>
+    typename OtherModule::SubModule &getSubModule() {
+        return submodule.get<typename OtherModule::SubModule>().getType();
+    }
+
     explicit INodeModule(INode &node) : node(node) {}
 
     void doInitialize() {
         initialize();
-        changeState(ModuleState::INITIALIZED);
+        changeModuleState(ModuleState::INITIALIZED);
     }
 
     void doSetupLogic() {
         if (setupLogic()) {
-            changeState(ModuleState::LOGIC_READY);
+            changeModuleState(ModuleState::LOGIC_READY);
         }
 
     }
 
     void doReady() {
         ready();
-        changeState(ModuleState::READY);
+        changeModuleState(ModuleState::READY);
     }
 
     void doShutdown() {
         shutdown();
-        changeState(ModuleState::SHUTDOWN);
+        changeModuleState(ModuleState::SHUTDOWN);
     }
     virtual void initialize()=0;
 
@@ -56,7 +67,8 @@ public:
 
 protected:
     //module events
-    virtual void changeState(const ModuleState &state) = 0;
+    //@todo maybe integrate somehow changeModuleState with changeState? the problem is, changeModuleState generated event with real module type. changeState just does this type
+    virtual void changeModuleState(const ModuleState &state) = 0;
 
 };
 
