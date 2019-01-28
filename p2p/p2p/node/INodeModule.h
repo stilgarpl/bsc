@@ -55,11 +55,19 @@ public:
         shutdown();
         changeModuleState(ModuleState::SHUTDOWN);
     }
+
+    void doPrepareSubmodules() {
+        prepareSubModules();
+        changeModuleState(ModuleState::SUBMODULES_PREPARED);
+    }
+
     virtual void initialize()=0;
 
     virtual void ready() = 0;
 
     virtual void shutdown() = 0;
+
+    virtual void prepareSubModules() {};
     virtual IConfig &configuration()=0;
 
     virtual bool setupLogic()=0;

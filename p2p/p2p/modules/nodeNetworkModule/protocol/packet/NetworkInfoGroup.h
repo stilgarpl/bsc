@@ -7,8 +7,9 @@
 
 #include <p2p/modules/nodeNetworkModule/protocol/packet/info/PacketInfo.h>
 
-struct NetworkInfoRequest;
-struct NetworkInfoResponse;
+class NetworkInfoRequest;
+
+class NetworkInfoResponse;
 
 struct NetworkInfoGroup : public PacketGroup {
 

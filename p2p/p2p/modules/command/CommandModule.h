@@ -59,7 +59,8 @@ public:
 
     protected:
         ///template <typename ReturnType, typename ... Args>
-        bool mapCommand(std::string prefix, std::string commandName, std::function<void(ArgumentContainerType)> func) {
+        bool mapCommand(const std::string &prefix, const std::string &commandName,
+                        std::function<void(ArgumentContainerType)> func) {
             std::string key = prefix + ":::" + commandName;
             auto &map = getCommandMap();//commands.get<std::string, std::function<void(ArgumentContainerType)>>();
             map[key] = std::move(func);

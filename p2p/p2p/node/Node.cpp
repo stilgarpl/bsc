@@ -128,6 +128,7 @@ void Node::initialize() {
     forEachModule(&INodeModule::doInitialize);
 //    forEachModule<bool, INodeModule>(&INodeModule::setupLogic);
     forEachModule(&INodeModule::doSetupLogic);
+    forEachModule(&INodeModule::doPrepareSubmodules);
     forEachModule(&INodeModule::doReady);
 
 }

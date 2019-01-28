@@ -175,12 +175,12 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 //    intStateMachine.define(1).to(2).to(3).to(4);
 //    auto def = intStateMachine.define(1);
 //    def->(2)->(3);
-    intStateMachine.addState(1, 2, 3, 4, 5, 6);
-    intStateMachine.addLink(1, 2, 3, 4, 5, 6);
-    intStateMachine.setState(2);
-    intStateMachine.changeState(3);
-    intStateMachine.changeState(4);
-    intStateMachine.changeState(6);
+//    intStateMachine.addState(1, 2, 3, 4, 5, 6);
+//    intStateMachine.addLink(1, 2, 3, 4, 5, 6);
+//    intStateMachine.setState(2);
+//    intStateMachine.changeState(3);
+//    intStateMachine.changeState(4);
+//    intStateMachine.changeState(6);
 
     //@todo real value
     return true;

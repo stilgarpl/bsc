@@ -22,13 +22,16 @@ public:
         return LogicObject::setupLogic();
     }
 
-    explicit ILogicModule(INode &node) : INodeModule(node), LogicObject(node.getLogicManager()) {
+    explicit ILogicModule(INode &node) : INodeModule(node), LogicObject(node.getLogicManager()),
+                                         LogicStateMachine(*this) {
         //@todo move to state definition when I figure it out
-        addState(ModuleState::UNINITIALIZED, ModuleState::INITIALIZED, ModuleState::LOGIC_READY, ModuleState::READY,
+        addState(ModuleState::UNINITIALIZED, ModuleState::INITIALIZED, ModuleState::LOGIC_READY,
+                 ModuleState::SUBMODULES_PREPARED, ModuleState::READY,
                  ModuleState::SHUTDOWN);
         addLink(ModuleState::UNINITIALIZED, ModuleState::INITIALIZED);
         addLink(ModuleState::INITIALIZED, ModuleState::LOGIC_READY, ModuleState::SHUTDOWN);
-        addLink(ModuleState::LOGIC_READY, ModuleState::READY, ModuleState::SHUTDOWN);
+        addLink(ModuleState::LOGIC_READY, ModuleState::SUBMODULES_PREPARED, ModuleState::SHUTDOWN);
+        addLink(ModuleState::SUBMODULES_PREPARED, ModuleState::READY);
         addLink(ModuleState::READY, ModuleState::SHUTDOWN);
         setState(ModuleState::UNINITIALIZED);
 

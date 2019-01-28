@@ -10,6 +10,7 @@ enum class ModuleState {
     UNINITIALIZED,
     INITIALIZED,
     LOGIC_READY,
+    SUBMODULES_PREPARED,
     READY,
     SHUTDOWN,
 };

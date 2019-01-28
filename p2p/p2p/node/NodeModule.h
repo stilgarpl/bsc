@@ -45,8 +45,6 @@ private:
 public:
 //    typename T::Config _config;
 
-
-
     auto &getOwnSubModule() {
         return getSubModule<T>();
     }

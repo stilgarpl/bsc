@@ -464,7 +464,7 @@ int main(int argc, char *argv[]) {
     thisNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
     thisNode.getModule<NodeNetworkModule>()->configuration().setPort(9191);
     thisNode.addModule<AuthModule>();
-    thisNode.getModule<AuthModule>()->getOwnSubModule().a = 5;
+    thisNode.getModule<AuthModule>()->getSubModule<AuthModule>().a = 5;
     thisNode.getModule<CommandModule>()->getSubModule<AuthModule>().a = 2;
 
     auto cmdN = thisNode.getModule<CommandModule>();
