@@ -292,6 +292,11 @@ public:
             return *this;
         }
 
+        template<typename Func>
+        auto fireNewGenericAction(Func func) {
+            //@todo generic actions wrapped in EventWrapper.
+        }
+
         //@todo func or std::function<RetType(EventType,Args...)> ?
         template<typename Func, typename ... SetArgs>
         auto fireNewChainAction(Func func, SetArgs... setArgs) {

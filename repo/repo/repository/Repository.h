@@ -82,7 +82,7 @@ public:
 
         auto getSize(fs::path path);
 
-        decltype(attributesMap) subMap(const fs::path root);
+        decltype(attributesMap) subMap(fs::path root);
 
     public:
 
@@ -92,11 +92,11 @@ public:
 
         auto end() -> decltype(attributesMap.end());
 
-        std::time_t getDeletionTime(fs::path path) {
+        std::time_t getDeletionTime(const fs::path &path) {
             return deleteMap[path].getDeletionTime();
         }
 
-        auto isDeleted(fs::path path) {
+        auto isDeleted(const fs::path &path) {
             return deleteMap[path].isDeleted();
         }
 
@@ -137,7 +137,6 @@ public:
     void commit();
 
 public:
-
 
     void persist(fs::path path);
 

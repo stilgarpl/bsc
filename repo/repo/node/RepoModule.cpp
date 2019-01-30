@@ -25,6 +25,8 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     bool ret = actionHelper.assignAction<JournalRequestEvent>("journalRequest");
     ret &= actionHelper.assignAction<JournalResponseEvent>("journalReceive");
     ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
+
+
     return ret;
 }
 

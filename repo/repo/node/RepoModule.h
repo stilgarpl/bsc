@@ -79,23 +79,14 @@ public:
 
     void downloadRemoteRepository(const NodeIdType &remoteId, const Repository::RepoIdType &repoId);
 
-//
-//    void requestStoragePath(const NodeIdType &remoteId, const Repository::RepoIdType &repoId,
-//                            const IStorage::ResourceId &resourceId) {
-//        auto netModule = node.getModule<NodeNetworkModule>();
-//        auto localRepo = findRepository(repoId);
-//
-//        StorageQuery::Request::Ptr req = StorageQuery::Request::getNew();
-//        req->setRepositoryId(repoId);
-//        req->setObjectId(resourceId);
-//
-//        StorageQuery::Response::Ptr res = netModule->sendPacketToNode(remoteId, req);
-//        if (res != nullptr) {
-//            LOGGER("resouce path: " + res->getPath());
-//        } else {
-//            LOGGER("invalid response");
-//        }
-//    }
+    void findNewestRepositoryInTheNetwork(const Repository::RepoIdType &repoId) {
+        //broadcast to every node get repo info packet
+        //for every response:
+        //  check if it has something this node hasn't
+        //  if it does, download repo -> update repo
+    }
+
+
     const RepositoryPtr &getSelectedRepository() const;
 
 
