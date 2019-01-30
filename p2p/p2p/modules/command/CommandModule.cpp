@@ -17,6 +17,16 @@ CommandModule::CommandModule(INode &node) : NodeModuleDependent<CommandModule>(n
 
 void CommandModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
     actionHelper.setAction<CommandEvent>(CommandActions::RUN_COMMAND, CommandActions::runCommand);
+
+    when(state<ILogicModule>(ModuleState::SUBMODULES_PREPARED).entered()).fireStateChangeReaction(
+            [&](ILogicModule &module) {
+                //@todo move this mechanism to NodeModule to auto collect all submodules from other modules.
+                //  submodules probably have to be optional or sth.
+                LOGGER("command submodule!")
+                auto &commandSub = module.getSubModule<CommandModule>();
+                commandSub.applyCommands(*this);
+            });
+
 }
 
 bool CommandModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
@@ -114,4 +124,10 @@ CommandModule::CommandSubModule &CommandModule::CommandSubModule::submodule(std:
     }
 
     return *submodules[name];
+}
+
+CommandModule::SubModule::CommandData::CommandData(const std::string &commandName) : commandName(commandName) {}
+
+const std::string &CommandModule::SubModule::CommandData::getCommandName() const {
+    return commandName;
 }

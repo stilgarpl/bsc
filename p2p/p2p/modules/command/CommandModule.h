@@ -41,6 +41,56 @@ public:
     typedef const std::vector<std::string> &ArgumentContainerType;
 public:
 
+    class SubModule {
+    private:
+        class CommandData {
+        protected:
+            std::string commandName;
+
+        public:
+            explicit CommandData(const std::string &commandName);
+
+            virtual void applyCommand(CommandModule &commandModule) = 0;
+
+            const std::string &getCommandName() const;
+
+        };
+
+        template<typename ModuleType, typename RetType, typename ... Args>
+        class SpecificCommandData : public CommandData {
+        private:
+            RetType (ModuleType::*func)(Args... args);
+
+        public:
+            SpecificCommandData(const std::string &commandName, RetType (ModuleType::*func)(Args...)) : CommandData(
+                    commandName),
+                                                                                                        func(func) {}
+
+            void applyCommand(CommandModule &commandModule) override {
+                commandModule.mapCommand(commandName, func);
+            }
+        };
+
+
+        std::list<std::shared_ptr<CommandData>> commands;
+
+
+    public:
+        template<typename ModuleType, typename RetType, typename ... Args>
+        void mapCommand(const std::string &commandName, RetType (ModuleType::*f)(Args... args)) {
+            auto command = std::make_shared<SpecificCommandData<ModuleType, RetType, Args...>>(commandName, f);
+            commands.push_back(command);
+            LOGGER("MAPPING COMMAND " + command->getCommandName());
+        }
+
+        void applyCommands(CommandModule &commandModule) {
+            for (const auto &item : commands) {
+                LOGGER("APPLYING COMMAND " + item->getCommandName())
+                item->applyCommand(commandModule);
+            }
+        }
+    };
+
     class CommandSubModule {
     private:
         Uber<std::map> commands;

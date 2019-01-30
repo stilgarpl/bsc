@@ -41,7 +41,7 @@ protected:
 
 public:
     class SubModule {
-    public:
+    private:
         std::list<std::shared_ptr<AuthRuleData>> rules;
     public:
         //@todo add rules definition

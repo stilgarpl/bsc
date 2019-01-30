@@ -9,6 +9,7 @@
 #include <repo/repository/storage/network/logic/sources/StorageSource.h>
 #include <repo/repository/storage/network/logic/actions/StorageActions.h>
 #include <repo/repository/logic/sources/RepositorySource.h>
+#include <p2p/modules/command/CommandModule.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
@@ -158,6 +159,17 @@ void RepoModule::ignoreFile(const fs::path &path) {
         selectedRepository->ignore(path);
 
     }
+}
+
+void RepoModule::persistFile(const Repository::RepoIdType &repoId, const fs::path &path) {
+    //@todo error handling
+    findRepository(repoId)->persist(path);
+}
+
+void RepoModule::prepareSubModules() {
+    auto &commandSub = getSubModule<CommandModule>();
+    commandSub.mapCommand("turbo", &RepoModule::selectRepository);
+
 }
 
 const std::filesystem::path &RepoModuleConfiguration::getRepositoryDataPath() const {

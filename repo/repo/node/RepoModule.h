@@ -62,9 +62,7 @@ public:
 
     void updateAllFiles();
 
-    void persistFile2(const Repository::RepoIdType &repoId, const fs::path &path) {
-
-    }
+    void persistFile(const Repository::RepoIdType &repoId, const fs::path &path);
 
 
     void selectRepository(const Repository::RepoIdType &repoId);
@@ -100,6 +98,8 @@ public:
 //    }
     const RepositoryPtr &getSelectedRepository() const;
 
+
+    void prepareSubModules() override;
 
 };
 
