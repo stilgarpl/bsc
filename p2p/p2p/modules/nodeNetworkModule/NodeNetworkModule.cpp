@@ -141,7 +141,14 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     actionChainHelper.stage<Tick>(testingMethod3);
 
-//    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
+    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
+//    stage1.
+    stage1.fireNewGenericChainAction(testingMethod1s, [](Tick tick) -> std::string {
+        static int rr = 0;
+        rr++;
+        return std::string("lala " + std::to_string(rr));
+    });
+//        stage1.fireNewChainAction([](Tick tick){return IEvent<int>(51);}).fireNewChainAction([](IEvent<int> e, std::string w){LOGGER("lwlwl " +std::to_string(e.getEventId())); return e;}, "7");
 //
 //    stage1.fireNewChainAction(testingMethod3s, "2");
 //    stage1.fireNewChainAction(testingMethod3s, "a").fireNewChainAction(testingMethod3s, "b").fireNewChainAction(

@@ -13,6 +13,7 @@
 #include <p2p/logic/sources/AutoSource.h>
 #include <p2p/logic/events/LogicStateEvent.h>
 #include <p2p/logic/events/ChainEvent.h>
+#include <p2p/logic/events/EventWrapper.h>
 
 class LogicObject {
 protected:
@@ -292,16 +293,27 @@ public:
             return *this;
         }
 
-        template<typename Func>
-        auto fireNewGenericAction(Func func) {
+        template<typename GenericFunc, typename ... Evaluators>
+        auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators... evaluators) {
             //@todo generic actions wrapped in EventWrapper.
+            using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators, EventType, Args...>...>;
+            auto generatedActionId = generateActionId<unsigned long>();
+            auto generatedChainId = nextChainId();
+//            std::function<EventWrapper<RetType>(EventType,Args...)> f =  [=](EventType e, Args... args) -> EventWrapper<RetType> {
+//                return EventWrapper<RetType>(genericFunc(evaluators(e,args...)...));
+//            };
+
+            return fireNewChainAction([=](EventType e) {
+                return EventWrapper<RetType>(genericFunc(evaluators(e)...));
+            });
+
         }
 
         //@todo func or std::function<RetType(EventType,Args...)> ?
         template<typename Func, typename ... SetArgs>
         auto fireNewChainAction(Func func, SetArgs... setArgs) {
+            using RetType = std::invoke_result_t<Func, EventType, SetArgs...>;
             if (chainId) {
-                using RetType = std::invoke_result_t<decltype(*func), EventType, SetArgs...>;
                 auto generatedActionId = generateActionId<unsigned long>();
                 auto generatedChainId = nextChainId();
                 LOGGER("generated chain id " + generatedChainId);
@@ -328,7 +340,10 @@ public:
             } else {
                 //@todo exception!!!
                 LOGGER("FAILURE! NO EVENT CHAIN ID SET!")
-                return *this;
+                //@todo generated chain if no chain set! fix!
+                auto generatedChainId = nextChainId();
+                LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, generatedChainId);
+                return retLogicHelper;
             }
 
         }

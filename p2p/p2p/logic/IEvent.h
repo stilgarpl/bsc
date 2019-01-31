@@ -76,6 +76,10 @@ public:
 
     IEvent();
 
+    explicit IEvent(IdType e) : IEvent() {
+        eventId = e;
+    }
+
 
     Context::Ptr context() {
         return _context;
