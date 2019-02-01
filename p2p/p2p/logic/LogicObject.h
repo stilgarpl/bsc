@@ -347,6 +347,7 @@ public:
                         return ChainEvent<RetType>(); //it has empty actual event and should stop the chain.
                     }
                 };
+                //@todo if RetType == void, then setAction, not ActionExtended.
                 logicManager.setActionExtended<ChainEvent<RetType>, ChainEvent<EventType>, Args...>(generatedActionId,
                                                                                                     f);
                 logicManager.assignAction<ChainEvent<EventType>, Args...>(generatedActionId);
