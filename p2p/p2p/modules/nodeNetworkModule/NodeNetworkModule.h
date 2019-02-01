@@ -299,6 +299,11 @@ public: // @todo should be public or shouldn't ?
         IEvent<int> a;
         return a;
     }
+
+    template <typename EvenType>
+    static EvenType evaluatorTest(const EvenType& e) {
+        return e;
+    }
 };
 
 

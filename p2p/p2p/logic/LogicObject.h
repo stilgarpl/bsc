@@ -293,6 +293,22 @@ public:
             return *this;
         }
 
+        template<typename GenericFunc,template<typename E> typename ... Evaluators>
+        auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators<EventType>... evaluators) {
+            //@todo generic actions wrapped in EventWrapper.
+            using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators<EventType>, EventType, Args...>...>;
+            auto generatedActionId = generateActionId<unsigned long>();
+            auto generatedChainId = nextChainId();
+//            std::function<EventWrapper<RetType>(EventType,Args...)> f =  [=](EventType e, Args... args) -> EventWrapper<RetType> {
+//                return EventWrapper<RetType>(genericFunc(evaluators(e,args...)...));
+//            };
+
+            return fireNewChainAction([=](EventType e) {
+                return EventWrapper<RetType>(genericFunc(evaluators(e)...));
+            });
+
+        }
+
         template<typename GenericFunc, typename ... Evaluators>
         auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators... evaluators) {
             //@todo generic actions wrapped in EventWrapper.
