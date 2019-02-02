@@ -10,6 +10,7 @@
 #include <repo/repository/storage/network/logic/actions/StorageActions.h>
 #include <repo/repository/logic/sources/RepositorySource.h>
 #include <p2p/modules/command/CommandModule.h>
+#include <p2p/logic/evaluators/CommonEvaluators.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
@@ -26,6 +27,9 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     ret &= actionHelper.assignAction<JournalResponseEvent>("journalReceive");
     ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
 
+    //@todo implements all those required methods.
+//    every(1s).fireNewGenericAction(NetworkActions::broadcastPacket,CommonEvaluators::variable(RepoQuery::getNew(Status::REQUEST)));
+//    when(NetworkConditions::packetReceived<RepoQuery>(Status::RESPONSE)).newChain("repoUpdateChain").fireNewGenericChainAction(RepoActions::checkIfUpdateRequired).fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
 
     return ret;
 }

@@ -20,6 +20,13 @@ struct CommonEvaluators {
         return e;
     };
 
+    template<typename T>
+    static auto variable(T var) {
+        return [var](auto e) {
+            return var;
+        };
+    }
+
 //    static auto unwrapEvent();
 
 };

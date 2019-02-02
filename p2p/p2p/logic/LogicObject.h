@@ -14,6 +14,7 @@
 #include <p2p/logic/events/LogicStateEvent.h>
 #include <p2p/logic/events/ChainEvent.h>
 #include <p2p/logic/events/EventWrapper.h>
+#include <p2p/logic/events/Tick.h>
 
 class LogicObject {
 protected:
@@ -247,17 +248,20 @@ public:
             return *this;
         }
 
+        template<typename GenericFunc, typename ... Evaluators>
+        auto fireNewGenericAction(GenericFunc genericFunc, Evaluators... evaluators) {
+            LOGGER("fireNewGenericAction - normal")
+            return fireNewAction([=](EventType e) {
+                genericFunc(evaluators(e)...);
+            });
+
+        }
+
         template<typename GenericFunc,template<typename E> typename ... Evaluators>
         auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators<EventType>... evaluators) {
             LOGGER("fireNewGenericChainAction - template")
-            //@todo generic actions wrapped in EventWrapper.
+            //@todo check if RetType is void or already an event type
             using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators<EventType>, EventType, Args...>...>;
-            auto generatedActionId = generateActionId<unsigned long>();
-            auto generatedChainId = nextChainId();
-//            std::function<EventWrapper<RetType>(EventType,Args...)> f =  [=](EventType e, Args... args) -> EventWrapper<RetType> {
-//                return EventWrapper<RetType>(genericFunc(evaluators(e,args...)...));
-//            };
-
             return fireNewChainAction([=](EventType e) {
                 return EventWrapper<RetType>(genericFunc(evaluators(e)...));
             });
@@ -266,18 +270,18 @@ public:
 
         template<typename GenericFunc, typename ... Evaluators>
         auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators... evaluators) {
-            //@todo generic actions wrapped in EventWrapper.
             LOGGER("fireNewGenericChainAction - normal")
+            //@todo check if RetType is void or already an event type
             using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators, EventType, Args...>...>;
-            auto generatedActionId = generateActionId<unsigned long>();
-            auto generatedChainId = nextChainId();
-//            std::function<EventWrapper<RetType>(EventType,Args...)> f =  [=](EventType e, Args... args) -> EventWrapper<RetType> {
-//                return EventWrapper<RetType>(genericFunc(evaluators(e,args...)...));
-//            };
-
-            return fireNewChainAction([=](EventType e) {
-                return EventWrapper<RetType>(genericFunc(evaluators(e)...));
-            });
+            if constexpr (std::is_same<void, RetType>::value) {
+                return fireNewChainAction([=](EventType e) {
+                    genericFunc(evaluators(e)...);
+                });
+            } else {
+                return fireNewChainAction([=](EventType e) {
+                    return EventWrapper<RetType>(genericFunc(evaluators(e)...));
+                });
+            }
 
         }
 
@@ -288,35 +292,64 @@ public:
             if (chainId) {
                 auto generatedActionId = generateActionId<unsigned long>();
                 auto generatedChainId = nextChainId();
-                LOGGER("generated chain id " + generatedChainId);
                 //@todo apply constraint?
-                std::function<ChainEvent<RetType>(ChainEvent<EventType>)> f = [=, chainId = chainId](
-                        ChainEvent<EventType> chainedEvent) {
-                    LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
-                           chainedEvent.getStageId())
-                    if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
-                        LOGGER("chained action" + *chainId)
-                        ChainEvent<RetType> result(generatedChainId,
-                                                   func(*chainedEvent.getActualEvent(), setArgs...));
-                        return result;
-                    } else {
-                        return ChainEvent<RetType>(); //it has empty actual event and should stop the chain.
-                    }
-                };
-                //@todo if RetType == void, then setAction, not ActionExtended.
-                logicManager.setActionExtended<ChainEvent<RetType>, ChainEvent<EventType>, Args...>(generatedActionId,
-                                                                                                    f);
-                logicManager.assignAction<ChainEvent<EventType>, Args...>(generatedActionId);
-                //@todo return LogicChainHelper for <RetType>, but what about Args... ?
-                LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, generatedChainId);
-                return retLogicHelper;
+                if constexpr (!std::is_same<void, RetType>::value) {
+                    std::function<ChainEvent<RetType>(ChainEvent<EventType>)> f = [=, chainId = chainId](
+                            ChainEvent<EventType> chainedEvent) {
+                        LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
+                               chainedEvent.getStageId())
+
+                        if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
+                            LOGGER("chained action" + *chainId)
+                            ChainEvent<RetType> result(generatedChainId,
+                                                       func(*chainedEvent.getActualEvent(), setArgs...));
+                            return result;
+                        } else {
+                            return ChainEvent<RetType>(); //it has empty actual event and should stop the chain.
+                        }
+
+                    };
+                    LOGGER("generated chain id " + generatedChainId);
+                    //@todo if RetType == void, then setAction, not ActionExtended.
+                    logicManager.setActionExtended<ChainEvent<RetType>, ChainEvent<EventType>, Args...>(
+                            generatedActionId,
+                            f);
+                    logicManager.assignAction<ChainEvent<EventType>, Args...>(generatedActionId);
+                    //@todo return LogicChainHelper for <RetType>, but what about Args... ?
+                    LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, generatedChainId);
+                    return retLogicHelper;
+                } else {
+
+                    std::function<void(ChainEvent<EventType>)> f = [=, chainId = chainId](
+                            ChainEvent<EventType> chainedEvent) {
+                        LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
+                               chainedEvent.getStageId())
+
+                        if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
+                            func(*chainedEvent.getActualEvent(), setArgs...);
+                        }
+
+                    };
+
+
+                    logicManager.setAction<ChainEvent<EventType>, Args...>(
+                            generatedActionId, f);
+                    logicManager.assignAction<ChainEvent<EventType>, Args...>(generatedActionId);
+                    return *this;
+                }
+
             } else {
+
                 //@todo exception!!!
                 LOGGER("FAILURE! NO EVENT CHAIN ID SET!")
                 //@todo generated chain if no chain set! fix!
                 auto generatedChainId = nextChainId();
-                LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, generatedChainId);
-                return retLogicHelper;
+                if constexpr (!std::is_same<void, RetType>::value) {
+                    LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, generatedChainId);
+                    return retLogicHelper;
+                } else {
+                    return *this;
+                }
             }
 
         }
@@ -437,6 +470,14 @@ public:
     template<typename EventType, typename ... Args>
     SpecificLogicChainHelper<EventType, Args...> when(const EventHelper<EventType, Args...> eventHelper) {
         return SpecificLogicChainHelper<EventType, Args...>(eventHelper, logicManager);
+    }
+
+
+    ////some stuff to make life easier.
+    //@todo if possible, export it somewhere else, so we don't have dependency on Tick and others from here.
+
+    auto every(Tick::IdType time) {
+        return when(event<Tick>(time));
     }
 
 
