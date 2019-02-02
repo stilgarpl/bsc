@@ -19,6 +19,14 @@ public:
     Type &getPayload() {
         return payload;
     }
+
+    operator Type &() {
+        return payload;
+    }
+
+    operator Type() {
+        return payload;
+    }
 };
 
 

@@ -138,10 +138,6 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
     when(event<ModuleEvent<NodeNetworkModule>>()).fireNewAction([](auto event) { LOGGER("module event NNM") });
 
 
-    ActionChainHelper <Tick> actionChainHelper("testChain", logicManager);
-
-    actionChainHelper.stage<Tick>(testingMethod3);
-
     auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
 //    stage1.
     auto glam = [](auto e) {

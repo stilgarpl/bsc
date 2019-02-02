@@ -15,6 +15,13 @@ struct CommonEvaluators {
         return e.getPayload();
     };
 
+    static constexpr auto passthrough = [](auto e) {
+        LOGGER("forwarding event")
+        return e;
+    };
+
+//    static auto unwrapEvent();
+
 };
 
 

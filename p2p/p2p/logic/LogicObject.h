@@ -135,52 +135,6 @@ public:
                 : EventHelper<eventType, Args...>(eventId) {}
     };
 
-    template<typename TriggerEventType>
-    class ActionChainHelper;
-
-    template<typename TriggerEventType, typename EventType>
-    class StageChainHelper {
-    private:
-        ActionChainHelper<TriggerEventType> &actionChainHelper;
-        ActionManager::ActionType<EventType> action;
-        LogicManager &logicManager;
-
-        void registerAction() {
-            //@todo actual ids.
-            //          logicManager.setActionExtended<EventType>("ID",action);
-//            logicManager.assignAction<EventType>("ID","ID");
-        }
-
-    public:
-        StageChainHelper(ActionChainHelper<TriggerEventType> &actionChainHelper,
-                         const ActionManager::ActionType<EventType> &action, LogicManager &logicManager)
-                : actionChainHelper(actionChainHelper),
-                  action(action), logicManager(logicManager) {
-            registerAction();
-        }
-    };
-
-    template<typename TriggerEventType>
-    class ActionChainHelper {
-    private:
-        ChainIdType chainId;
-        LogicManager &logicManager;
-
-    public:
-        explicit ActionChainHelper(ChainIdType chainId, LogicManager &logicManager) : chainId(std::move(chainId)),
-                                                                                      logicManager(logicManager) {}
-
-        template<typename EventType, typename Func, typename ...Args>
-        StageChainHelper<TriggerEventType, EventType> stage(Func func, Args ... args) {
-            std::function<std::invoke_result_t<decltype(*func), EventType>(EventType)> f1 = std::bind(func,
-                                                                                                      std::placeholders::_1,
-                                                                                                      args...);
-            StageChainHelper<TriggerEventType, EventType> stage(*this, f1, logicManager);
-
-            return stage;
-        }
-
-    };
 
     template<typename EventType, typename ... Args>
     class LogicChainHelper {
@@ -295,6 +249,7 @@ public:
 
         template<typename GenericFunc,template<typename E> typename ... Evaluators>
         auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators<EventType>... evaluators) {
+            LOGGER("fireNewGenericChainAction - template")
             //@todo generic actions wrapped in EventWrapper.
             using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators<EventType>, EventType, Args...>...>;
             auto generatedActionId = generateActionId<unsigned long>();
@@ -312,6 +267,7 @@ public:
         template<typename GenericFunc, typename ... Evaluators>
         auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators... evaluators) {
             //@todo generic actions wrapped in EventWrapper.
+            LOGGER("fireNewGenericChainAction - normal")
             using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators, EventType, Args...>...>;
             auto generatedActionId = generateActionId<unsigned long>();
             auto generatedChainId = nextChainId();
