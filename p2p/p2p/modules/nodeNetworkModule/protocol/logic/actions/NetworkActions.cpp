@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 07.10.17.
 //
@@ -44,3 +46,16 @@ void NetworkActions::loadNetworkInfo(const ModuleEvent<NodeNetworkModule> &event
                 node.getConfigurationManager().loadData<NetworkInfo>("networkInfo.dat"));
     }
 }
+
+void NetworkActions::broadcastPacket(BasePacketPtr packet) {
+    Context::Ptr context = Context::getActiveContext();
+    LOGGER("LOAD NETWORK INFO")
+    auto nodeContext = context->get<NodeContext>();
+    if (nodeContext != nullptr) {
+        auto &node = nodeContext->getNode();
+        //@todo null handle
+        node.getModule<NodeNetworkModule>()->broadcastPacket(std::move(packet));
+    }
+
+}
+

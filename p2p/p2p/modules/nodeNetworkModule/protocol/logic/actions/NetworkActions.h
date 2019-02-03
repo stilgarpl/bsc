@@ -17,6 +17,8 @@ public:
     static void saveNetworkInfo(const ModuleEvent<NodeNetworkModule> &event);
 
     static void loadNetworkInfo(const ModuleEvent<NodeNetworkModule> &event);
+
+    static void broadcastPacket(BasePacketPtr packet);
 };
 
 
