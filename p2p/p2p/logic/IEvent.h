@@ -94,7 +94,9 @@ public:
 template<typename idType, typename originType>
 IEvent<idType, originType>::IEvent() {
 
-    _context = Context::getActiveContext();
+    //@todo make new context so events have isolated environment. it may slow down the app
+    _context = Context::makeContext(Context::getActiveContext());
+//    _context = Context::getActiveContext();
 
 }
 
