@@ -10,32 +10,41 @@
 
 struct NetworkConditions {
 
+    static auto packet(PacketEventId id) {
+        return LogicObject::EventHelper<PacketEvent>(id);
+    }
+
+    template<typename PacketType>
+    static auto packet(typename SpecificPacketEvent<PacketType>::IdType id) {
+        return LogicObject::EventHelper<SpecificPacketEvent<PacketType>>(id);
+    }
+
 
     static auto packetReceived() {
-        return LogicObject::EventHelper<PacketEvent>(PacketEventId::PACKET_RECEIVED);
+        return packet(PacketEventId::PACKET_RECEIVED);
     }
 
     template<typename PacketType>
     static auto packetReceived() {
-        return LogicObject::EventHelper<SpecificPacketEvent<PacketType>>(PacketEventId::PACKET_RECEIVED);
+        return packet<SpecificPacketEvent<PacketType>>(PacketEventId::PACKET_RECEIVED);
     }
 
     static auto packetSent() {
-        return LogicObject::EventHelper<PacketEvent>(PacketEventId::PACKET_SENT);
+        return packet(PacketEventId::PACKET_SENT);
     }
 
     template<typename PacketType>
     static auto packetSent() {
-        return LogicObject::EventHelper<SpecificPacketEvent<PacketType>>(PacketEventId::PACKET_SENT);
+        return packet<SpecificPacketEvent<PacketType>>(PacketEventId::PACKET_SENT);
     }
 
     static auto packetDropped() {
-        return LogicObject::EventHelper<PacketEvent>(PacketEventId::PACKET_DROPPED);
+        return packet(PacketEventId::PACKET_DROPPED);
     }
 
     template<typename PacketType>
     static auto packetDropped() {
-        return LogicObject::EventHelper<SpecificPacketEvent<PacketType>>(PacketEventId::PACKET_DROPPED);
+        return packet<SpecificPacketEvent<PacketType>>(PacketEventId::PACKET_DROPPED);
     }
 
 };
