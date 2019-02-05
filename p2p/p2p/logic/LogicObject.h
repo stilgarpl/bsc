@@ -448,7 +448,7 @@ public:
 
 
     template<typename EventType, typename ... Args>
-    EventHelper<EventType, Args...> event() {
+    static EventHelper<EventType, Args...> event() {
         return EventHelper<EventType, Args...>();
     }
 
@@ -463,21 +463,13 @@ public:
     }
 
     template<typename EventType, typename ... Args>
-    EventHelper<EventType, Args...> event(typename EventType::IdType id) {
+    static EventHelper<EventType, Args...> event(typename EventType::IdType id) {
         return EventHelper<EventType, Args...>(id);
     }
 
     template<typename EventType, typename ... Args>
     SpecificLogicChainHelper<EventType, Args...> when(const EventHelper<EventType, Args...> eventHelper) {
         return SpecificLogicChainHelper<EventType, Args...>(eventHelper, logicManager);
-    }
-
-
-    ////some stuff to make life easier.
-    //@todo if possible, export it somewhere else, so we don't have dependency on Tick and others from here. and make it return EventHelper.
-
-    auto every(Tick::IdType time) {
-        return when(event<Tick>(time));
     }
 
 
