@@ -32,5 +32,20 @@ public:
 
 };
 
+template<typename PacketType>
+class SpecificPacketEvent : public IEvent<PacketEventId> {
+private:
+    NetworkPacketPointer<PacketType> packet;
+
+public:
+    const NetworkPacketPointer<PacketType> &getPacket() const {
+        return packet;
+    }
+
+    void setPacket(const NetworkPacketPointer<PacketType> &packet) {
+        SpecificPacketEvent::packet = packet;
+    }
+};
+
 
 #endif //BASYCO_PACKETEVENT_H

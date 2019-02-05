@@ -7,6 +7,7 @@
 
 #include <p2p/modules/nodeNetworkModule/protocol/enum/Status.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h>
 
 
 template<typename PacketType, enum Status s>
@@ -141,6 +142,11 @@ private:
 public:
     const RoleList &requiredRoles() override {
         return Roles::getRequiredRolesDefinitions<S>();
+    }
+
+protected:
+    void _operate(PacketSourceWorker &f, std::shared_ptr<BasePacket> ptr) override {
+        f.operate<S>(std::static_pointer_cast<S>(ptr));
     }
 
 };

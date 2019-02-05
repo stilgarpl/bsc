@@ -3,6 +3,7 @@
 //
 
 #include "StorageQuery.h"
+#include <p2p/node/context/LogicContext.h>
 
 void StorageQuery::Request::process(Context::Ptr context) {
     BasePacket::process(context);

@@ -17,6 +17,13 @@
 
 struct PacketGroup;
 
+class PacketSourceWorker;
+
+class BasePacket;
+
+template<typename NetworkPacketType = BasePacket>
+using NetworkPacketPointer = std::shared_ptr<NetworkPacketType>;
+
 class BasePacket {
 public:
     typedef unsigned int IdType;
@@ -65,13 +72,31 @@ public:
 
     virtual const RoleList &requiredRoles() =0;
 
-};
 
+protected:
+
+    virtual void _operate(PacketSourceWorker &f, std::shared_ptr<BasePacket>) = 0;
+
+    friend class ConnectionSource;
+};
 
 typedef std::shared_ptr<BasePacket> BasePacketPtr;
 
-template<typename NetworkPacketType = BasePacket>
-using NetworkPacketPointer = std::shared_ptr<NetworkPacketType>;
+
+template<typename... T1>
+using Fu = std::function<void(T1 &...)>;
+
+class TypeOperator {
+
+    template<typename T>
+    void operate(NetworkPacketPointer<T> ptr) {
+        LOGGER("do shit")
+        //@todo somehow invoke logic engine. preferably without including logic manager here.
+        //  if only somehow I could pass a lambda or sth that would be invoked here.
+
+    }
+};
+
 
 
 CEREAL_REGISTER_TYPE(BasePacket);

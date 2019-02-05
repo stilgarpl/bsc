@@ -9,7 +9,6 @@
 #include <p2p/modules/nodeNetworkModule/protocol/packet/info/PacketInfo.h>
 #include <repo/repository/IRepository.h>
 #include <repo/journal/JournalTypes.h>
-#include <p2p/node/context/LogicContext.h>
 #include <repo/repository/storage/network/logic/sources/StorageSource.h>
 
 

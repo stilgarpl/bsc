@@ -150,6 +150,11 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
             fireNewGenericChainAction(testingMethod1i, CommonEvaluators::value(66)).
             fireNewGenericChainAction(CommonActions::foreachAction(testingMethod1i, list),
                                       CommonEvaluators::foreachValue<int>());
+
+    when(event < SpecificPacketEvent<KeepAlivePacket::Response>>
+    (PacketEventId::PACKET_RECEIVED)).fireNewAction([](auto event) {
+        LOGGER("SPECIFIC EVENT: keepalive received!");
+    });
 //        stage1.fireNewChainAction([](Tick tick){return IEvent<int>(51);}).fireNewChainAction([](IEvent<int> e, std::string w){LOGGER("lwlwl " +std::to_string(e.getEventId())); return e;}, "7");
 //
 //    stage1.fireNewChainAction(testingMethod3s, "2");

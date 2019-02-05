@@ -23,6 +23,8 @@ void ConnectionSource::sentPacket(std::shared_ptr<BasePacket> p, Connection *con
     event->setPacket(p);
     event->setConnection(connection);
     packetSource.queueEvent(event);
+    PacketSourceWorker packetSourceWorker(*this, PacketEventId::PACKET_SENT);
+    p->_operate(packetSourceWorker, p);
 }
 
 void ConnectionSource::receivedPacket(std::shared_ptr<BasePacket> p, Connection *connection) {
@@ -34,6 +36,8 @@ void ConnectionSource::receivedPacket(std::shared_ptr<BasePacket> p, Connection 
     event->setConnection(connection);
     packetSource.queueEvent(event);
     // LOGGER("packet source: packet queue size " + std::to_string(packetSource.queueSize()))
+    PacketSourceWorker packetSourceWorker(*this, PacketEventId::PACKET_RECEIVED);
+    p->_operate(packetSourceWorker, p);
 }
 
 void ConnectionSource::work() {
@@ -42,6 +46,7 @@ void ConnectionSource::work() {
     /*   auto qs =*/ //packetSource.queueSize();
     // if (qs) LOGGER("before packet work")
     packetSource.work();
+    advancedPacketSource.work();
     // if (qs) LOGGER("after packet work")
 
 
@@ -88,7 +93,8 @@ void ConnectionSource::connectionClosedClient(Connection *c) {
 }
 
 ConnectionSource::ConnectionSource(SourceManager &sourceManager) : ISource(sourceManager), connSource(sourceManager),
-                                                                   packetSource(sourceManager) {}
+                                                                   packetSource(sourceManager),
+                                                                   advancedPacketSource(sourceManager) {}
 
 void ConnectionSource::droppedPacket(std::shared_ptr<BasePacket> p, Connection *connection) {
     auto event = std::make_shared<PacketEvent>();
@@ -96,6 +102,8 @@ void ConnectionSource::droppedPacket(std::shared_ptr<BasePacket> p, Connection *
     event->setPacket(p);
     event->setConnection(connection);
     packetSource.queueEvent(event);
+    PacketSourceWorker packetSourceWorker(*this, PacketEventId::PACKET_DROPPED);
+    p->_operate(packetSourceWorker, p);
 }
 
 
