@@ -8,10 +8,13 @@
 
 #include <p2p/logic/sources/EventQueueSource.h>
 #include <repo/repository/logic/events/RepositoryEvent.h>
+#include <repo/repository/IRepository.h>
 
 class RepositorySource : public EventQueueSource<RepositoryEvent> {
 public:
     explicit RepositorySource(SourceManager &sourceManager);
+
+    void requestRepositoryInfo(IRepository::RepoIdType id);
 };
 
 

@@ -7,3 +7,9 @@
 RepositorySource::RepositorySource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {
 
 }
+
+void RepositorySource::requestRepositoryInfo(IRepository::RepoIdType id) {
+    auto event = newEvent();
+//        event->setRequestId(requestId);
+    queueEvent(event);
+}

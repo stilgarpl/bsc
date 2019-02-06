@@ -5,7 +5,8 @@
 #include "StorageActions.h"
 
 void StorageActions::resourceRequested(const StorageResourceRequestEvent &event) {
-    Connection *connection = event.origin();
+    auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
+    Connection &connection = connectionContext->getConnection();
 
     StorageQuery::Response::Ptr response = StorageQuery::Response::getNew<Status::RESPONSE>(event.getRequestId());
     auto &node = NodeContext::getNodeFromActiveContext();
@@ -18,5 +19,5 @@ void StorageActions::resourceRequested(const StorageResourceRequestEvent &event)
         //@todo maybe add another response? repository not found?
         response->setExists(false);
     }
-    connection->send(response);
+    connection.send(response);
 }

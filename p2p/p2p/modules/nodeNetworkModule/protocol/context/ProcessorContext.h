@@ -21,7 +21,7 @@ public:
 
     void setThisPacket(const BasePacketPtr &thisPacket);
 
-    ProcessorContext(ConnectionProcessor &processor);
+    explicit ProcessorContext(ConnectionProcessor &processor);
 
     //shortcut method for getting current packet from active context
     static const BasePacketPtr getCurrentPacketFromActiveContext() {

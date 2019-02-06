@@ -32,8 +32,8 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
 
     //@todo implements all those required methods.
-    when(TimeConditions::every(1s)).fireNewGenericAction(NetworkActions::broadcastPacket,
-                                                         CommonEvaluators::value(RepoQuery::Request::getNew()));
+    when(TimeConditions::every(1000s)).fireNewGenericAction(NetworkActions::broadcastPacket,
+                                                            CommonEvaluators::value(RepoQuery::Request::getNew()));
     when(NetworkConditions::packetReceived<RepoQuery::Response>()).newChain(
             "repoUpdateChain");//.fireNewGenericChainAction(RepoActions::checkIfUpdateRequired).fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
 

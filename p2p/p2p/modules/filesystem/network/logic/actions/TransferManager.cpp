@@ -39,7 +39,8 @@ void TransferManager::RemoteTransferDescriptor::setSize(TransferSize size) {
 
 
 void TransferManager::beginTransfer(const TransferEvent &event) {
-    auto connection = event.origin();
+    auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
+    Connection &connection = connectionContext->getConnection();
     LOGGER("begin transfer")
     //@todo find transfer by resource id?
 
@@ -56,7 +57,7 @@ void TransferManager::beginTransfer(const TransferEvent &event) {
         BeginTransfer::Response::Ptr response = BeginTransfer::Response::getNew(event.getRequestId());
         response->setTransferId(transferId);
 
-        connection->send(response);
+        connection.send(response);
 
 
     } else {
@@ -93,12 +94,15 @@ void TransferManager::finishTransfer(const TransferEvent &event) {
 //    }
 
     FinishTransfer::Response::Ptr res = FinishTransfer::Response::getNew(event.getRequestId());
-    event.origin()->send(res);
+    auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
+    Connection &connection = connectionContext->getConnection();
+    connection.send(res);
 }
 
 
 void TransferManager::sendData(const TransferEvent &event) {
-    auto connection = event.origin();
+    auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
+    Connection &connection = connectionContext->getConnection();
     DataTransfer::Response::Ptr response = DataTransfer::Response::getNew(event.getRequestId());
     //@todo error on bad transfer id
     auto transferDescriptor = transfers[event.getTransferId()];
@@ -116,7 +120,7 @@ void TransferManager::sendData(const TransferEvent &event) {
         response->setEnd(event.getEnd());
         //@todo make sure this isn't copying the data for the third time
         response->setData(std::move(fileContents));
-        connection->send(response);
+        connection.send(response);
     }
 }
 
@@ -131,13 +135,14 @@ void TransferManager::saveDataChunk(std::shared_ptr<std::ostream> outputStream, 
 }
 
 void TransferManager::transferProperties(const TransferEvent &event) {
-    auto connection = event.origin();
+    auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
+    Connection &connection = connectionContext->getConnection();
     PropertiesTransfer::Response::Ptr response = PropertiesTransfer::Response::getNew(event.getRequestId());
     auto transfer = transfers[event.getTransferId()];
     if (transfer != nullptr) {
         response->setSize(transfer->getSize());
     }
-    connection->send(response);
+    connection.send(response);
 }
 
 TransferId TransferManager::generateTransferId() {

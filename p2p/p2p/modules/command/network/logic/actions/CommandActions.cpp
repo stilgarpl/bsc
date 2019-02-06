@@ -9,17 +9,18 @@
 
 void CommandActions::runCommand(const CommandEvent &commandEvent) {
     LOGGER("remote command!")
-    Connection *connection = commandEvent.origin();
+    auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
     auto nc = Context::getActiveContext()->get<NodeContext>();
-    if (nc != nullptr) {
+    if (nc != nullptr && connectionContext != nullptr) {
+        Connection &connection = connectionContext->getConnection();//commandEvent.origin();
         auto commandModule = nc->getNode().getModule<CommandModule>();
         if (commandModule != nullptr) {
             bool runStatus = false;
-            if (commandEvent.getModules().size() == 0) {
+            if (commandEvent.getModules().empty()) {
                 runStatus = commandModule->runCommand(commandEvent.getCommandName(), commandEvent.getData());
             } else {
                 CommandModule::CommandSubModule *pSubModule = &commandModule->submodule(commandEvent.getModules()[0]);
-                for (unsigned int i = 1/* 1, we already have the 0 */; i < commandEvent.getModules().size(); ++i) {
+                for (unsigned int i = 1/* 1, we already have the 0th */; i < commandEvent.getModules().size(); ++i) {
                     pSubModule = &pSubModule->submodule(commandEvent.getModules()[i]);
                 }
                 runStatus = pSubModule->runCommand(commandEvent.getCommandName(), commandEvent.getData());
@@ -27,7 +28,7 @@ void CommandActions::runCommand(const CommandEvent &commandEvent) {
             }
             CommandPacket::Response::Ptr res = CommandPacket::Response::getNew(commandEvent.getRequestId());
             res->setRunStatus(runStatus);
-            connection->send(res);
+            connection.send(res);
         }
 
     } else {

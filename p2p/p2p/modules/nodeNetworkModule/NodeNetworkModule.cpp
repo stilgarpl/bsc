@@ -138,23 +138,23 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     when(event<ModuleEvent<NodeNetworkModule>>()).fireNewAction([](auto event) { LOGGER("module event NNM") });
 
-    auto list = {88, 77, 44, 101};
-    auto list2 = {99, 10};
-    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
-//    stage1.
-    stage1.fireNewGenericChainAction(testingMethod1s, [](auto tick) -> std::string {
-        static int rr = 0;
-        rr++;
-        return std::string("lala " + std::to_string(rr));
-    }).fireNewGenericChainAction(testingMethod1s, CommonEvaluators::unwrapEvent).
-            fireNewGenericChainAction(testingMethod1i, CommonEvaluators::value(66)).
-            fireNewGenericChainAction(CommonActions::foreachAction(testingMethod1i, list),
-                                      CommonEvaluators::foreachValue<int>());
-
-    when(event < SpecificPacketEvent<KeepAlivePacket::Response>>
-    (PacketEventId::PACKET_RECEIVED)).fireNewAction([](auto event) {
-        LOGGER("SPECIFIC EVENT: keepalive received!");
-    });
+//    auto list = {88, 77, 44, 101};
+//    auto list2 = {99, 10};
+//    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
+////    stage1.
+//    stage1.fireNewGenericChainAction(testingMethod1s, [](auto tick) -> std::string {
+//        static int rr = 0;
+//        rr++;
+//        return std::string("lala " + std::to_string(rr));
+//    }).fireNewGenericChainAction(testingMethod1s, CommonEvaluators::unwrapEvent).
+//            fireNewGenericChainAction(testingMethod1i, CommonEvaluators::value(66)).
+//            fireNewGenericChainAction(CommonActions::foreachAction(testingMethod1i, list),
+//                                      CommonEvaluators::foreachValue<int>());
+//
+//    when(event < SpecificPacketEvent<KeepAlivePacket::Response>>
+//    (PacketEventId::PACKET_RECEIVED)).fireNewAction([](auto event) {
+//        LOGGER("SPECIFIC EVENT: keepalive received!");
+//    });
 //        stage1.fireNewChainAction([](Tick tick){return IEvent<int>(51);}).fireNewChainAction([](IEvent<int> e, std::string w){LOGGER("lwlwl " +std::to_string(e.getEventId())); return e;}, "7");
 //
 //    stage1.fireNewChainAction(testingMethod3s, "2");

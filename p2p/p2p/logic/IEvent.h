@@ -11,37 +11,13 @@
 
 #include "p2p/log/Logger.h"
 
-typedef std::nullptr_t NullOrigin;
-
-template<typename OriginType>
-struct setupOrigin {
-    static OriginType &setup(OriginType &origin) {
-        //@todo log some error of unimplemented origin setup
-
-        return origin;
-    }
-};
-
-
-template<>
-struct setupOrigin<NullOrigin> {
-
-    static NullOrigin &setup(NullOrigin &origin) {
-        //null origin means no origin is set, so no setup is required.
-        return origin;
-    }
-
-};
-
-template<typename idType, typename originType = NullOrigin>
+template<typename idType>
 class IEvent {
 public:
     typedef idType IdType;
-    typedef originType OriginType;
     //static const bool OriginDefined = constexpr if (originType)
 private:
     IdType eventId;
-    OriginType _origin;
     bool _eventValid = true;
     mutable Context::Ptr _context;
 public:
@@ -53,13 +29,6 @@ public:
         IEvent::eventId = eventId;
     }
 
-    OriginType &origin() {
-        return _origin;
-    }
-
-    OriginType origin() const {
-        return _origin;
-    }
 
     bool isEventValid() const {
         return _eventValid;
@@ -91,10 +60,9 @@ public:
 
 };
 
-template<typename idType, typename originType>
-IEvent<idType, originType>::IEvent() {
+template<typename idType>
+IEvent<idType>::IEvent() {
 
-    //@todo make new context so events have isolated environment. it may slow down the app
     _context = Context::makeContext(Context::getActiveContext());
 //    _context = Context::getActiveContext();
 

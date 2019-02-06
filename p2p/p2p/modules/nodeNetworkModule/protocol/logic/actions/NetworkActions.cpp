@@ -49,7 +49,7 @@ void NetworkActions::loadNetworkInfo(const ModuleEvent<NodeNetworkModule> &event
 
 void NetworkActions::broadcastPacket(BasePacketPtr packet) {
     Context::Ptr context = Context::getActiveContext();
-    LOGGER("LOAD NETWORK INFO")
+    LOGGER("BROADCAST PACKET")
     auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
         auto &node = nodeContext->getNode();

@@ -16,31 +16,7 @@ class JournalActions {
 
 public:
 
-    static void journalRequested(const JournalRequestEvent &event) {
-        Connection *connection = event.origin();
-
-        JournalGroup::Response::Ptr response = JournalGroup::Response::getNew<Status::RESPONSE>(event.getRequestId());
-
-        // JournalGroup::Response* response;
-        response->setRepoId(event.getRepoId());
-        LOGGER("requested repo " + event.getRepoId());
-
-        auto nodeContext = Context::getActiveContext()->get<NodeContext>();
-
-        //@todo add way more error handling to the getting of the module that's not there or repo that's not there...
-        if (nodeContext != nullptr) {
-            auto &node = nodeContext->getNode();
-            auto repoModule = node.getModule<RepoModule>();
-            auto repository = repoModule->findRepository(event.getRepoId());
-            response->setJournal(repository->getJournal());
-
-        } else {
-            LOGGER("no node context")
-        }
-
-        connection->send(response);
-
-    }
+    static void journalRequested(const JournalRequestEvent &event);
 
     static void journalReceived(const JournalResponseEvent &event) {
 

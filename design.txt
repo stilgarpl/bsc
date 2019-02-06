@@ -410,3 +410,7 @@ trzeba pomyslec nad interfejsem
 
 w modułach mamy operacje do wykonania w kolejnych stanach. nie wykonują się jesli nie uda sie zainicjowac logiki, a mimo to initialize probuje wymuszac przejscia do kolejnych stanow.
 
+
+
+teraz jak mam packetReceived<T> to zastanawiam sie, czy packet->process() jeszcze czemuś służy. można to usunąć i całą low-level logic dać na when(packetReceived)
+//@todo a propos, packetReceived powinien byc triggerowany w processorze, nie w connection, bo przez filtr nie przechodzi
