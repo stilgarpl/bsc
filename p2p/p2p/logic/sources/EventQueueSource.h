@@ -12,11 +12,7 @@
 #include "p2p/log/Logger.h"
 //#include "p2p/modules/nodeNetworkModule/protocol/context/NodeContext.h"
 
-
-class NullClass {
-};
-
-template<typename EventType_, typename FriendClass=NullClass>
+template<typename EventType_, typename FriendClass=std::nullptr_t>
 class EventQueueSource : public ISource {
     friend FriendClass;
 protected:
@@ -36,11 +32,7 @@ protected:
 
     template<typename ... Args>
     EventTypePtr newEvent(Args... args) {
-        auto ret = std::make_shared<EventType_>(args...);
-        //@todo think about setup method and make it better and cleaner? I'm not fond of the interface
-//        LOGGER(typeid(EventType_).name())
-        EventType::setup(ret.get());
-        return ret;
+        return std::make_shared<EventType_>(args...);
     }
 public:
     explicit EventQueueSource(SourceManager &sourceManager) : ISource(sourceManager) {}
