@@ -25,7 +25,7 @@
 template<typename idType>
 class NetworkingEvent : public IEvent<idType> {
 private:
-    BasePacket::IdType requestId;
+    BasePacket::IdType requestId{};
 
 public:
     BasePacket::IdType getRequestId() const {
@@ -36,20 +36,19 @@ public:
         NetworkingEvent::requestId = requestId;
     }
 
-    //@todo remove this from derived classes, now that id is set from context
+    //this is required for responses unless I find a way to also set it from context
     explicit NetworkingEvent(BasePacket::IdType requestId) : requestId(requestId) {}
 
-    NetworkingEvent() = default;
-
-    static void setup(NetworkingEvent *event) {
+    NetworkingEvent() {
         LOGGER("NetworkingEvent SETUP")
         auto packet = ProcessorContext::getCurrentPacketFromActiveContext();
         if (packet != nullptr) {
-            event->setRequestId(packet->getId());
+            this->setRequestId(packet->getId());
         } else {
             LOGGER("ERROR: NO PACKET IN CONTEXT!")
         }
-    };
+    }
+
 };
 
 #endif //BASYCO_NETWORKINGEVENT_H

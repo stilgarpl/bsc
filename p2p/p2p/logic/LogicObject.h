@@ -268,6 +268,32 @@ public:
 
         }
 
+        /*
+         * works like generic func, but return value should be bool or convertible to bool
+         */
+        template<typename ConditionalFunc, template<typename E> typename ... Evaluators>
+        auto conditional(ConditionalFunc conditionalFunc, bool value, Evaluators<EventType>... evaluators) {
+            //@todo check if RetType is void or already an event type
+            using RetType = std::invoke_result_t<ConditionalFunc, std::invoke_result_t<Evaluators<EventType>, EventType, Args...>...>;
+            return fireNewChainAction([=](EventType e) {
+                EventWrapper<RetType> ret(conditionalFunc(evaluators(e)...));
+                if (ret != value) {
+                    ret.setEventValid(false);
+                }
+                return ret;
+            });
+        }
+
+        template<typename ConditionalFunc, template<typename E> typename ... Evaluators>
+        auto ifTrue(ConditionalFunc conditionalFunc, bool value, Evaluators<EventType>... evaluators) {
+            return conditional(conditionalFunc, true, evaluators...);
+        }
+
+        template<typename ConditionalFunc, template<typename E> typename ... Evaluators>
+        auto ifFalse(ConditionalFunc conditionalFunc, bool value, Evaluators<EventType>... evaluators) {
+            return conditional(conditionalFunc, false, evaluators...);
+        }
+
         template<typename GenericFunc, typename ... Evaluators>
         auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators... evaluators) {
             LOGGER("fireNewGenericChainAction - normal")
