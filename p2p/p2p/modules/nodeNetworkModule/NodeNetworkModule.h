@@ -295,6 +295,11 @@ public: // @todo should be public or shouldn't ?
         return s;
     }
 
+    static std::string testingMethod1xs(std::string s) {
+        LOGGER("ret testin XXXXXXXXX 1s ! " + s)
+        return s;
+    }
+
     static void testingMethod1i(int a) {
         LOGGER("testing method 1i ! " + std::to_string(a));
     }

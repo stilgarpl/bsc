@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 20.08.17.
 //
@@ -130,6 +132,7 @@ public:
     Context(const Context &other);
 
     explicit Context(const Ptr &ptr);;
+
     Context() = default;
 
 public:
@@ -143,9 +146,9 @@ public:
 
     static ContextPtr makeContext();
 
-    static ContextPtr makeContext(Context::Ptr ptr) {
+    static ContextPtr makeContext(const Context::Ptr &ptr) {
         if (ptr != nullptr) {
-            auto ret = std::make_shared<Context>(*ptr);
+            ContextPtr ret = std::make_shared<Context>(*ptr);
             ret->setParentContext(ptr);
             return ret;
         } else {
@@ -159,9 +162,9 @@ public:
 class SetLocalContext {
     Context::Ptr prevContext;
 public:
-    SetLocalContext(Context::ContextPtr ptr) {
+    explicit SetLocalContext(Context::ContextPtr ptr) {
         prevContext = Context::getActiveContext();
-        Context::setActiveContext(ptr);
+        Context::setActiveContext(std::move(ptr));
     }
 
     ~SetLocalContext() {

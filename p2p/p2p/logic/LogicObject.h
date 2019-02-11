@@ -12,9 +12,10 @@
 
 #include <p2p/logic/sources/AutoSource.h>
 #include <p2p/logic/events/LogicStateEvent.h>
-#include <p2p/logic/events/ChainEvent.h>
+#include <p2p/logic/chain/ChainEvent.h>
 #include <p2p/logic/events/EventWrapper.h>
 #include <p2p/logic/events/Tick.h>
+#include <p2p/logic/chain/ChainContext.h>
 
 class LogicObject {
 protected:
@@ -146,6 +147,13 @@ public:
     private:
         std::optional<EventId> eventId;
         std::optional<ChainIdType> chainId = std::nullopt;
+    public:
+        const ChainIdType &getChainId() const {
+            //@todo return this or optional?
+            return *chainId;
+        }
+
+    private:
         int childId = 0;
 
         std::list<ConstraintFunc> _constraint;
@@ -327,8 +335,10 @@ public:
 
                         if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
                             LOGGER("chained action" + *chainId)
-                            ChainEvent<RetType> result(generatedChainId,
-                                                       func(*chainedEvent.getActualEvent(), setArgs...));
+                            auto value = func(*chainedEvent.getActualEvent(), setArgs...);
+                            ChainEvent<RetType> result(generatedChainId, value);
+                            Context::getActiveContext()->get<ChainContext>()->storeChainResult<RetType>(
+                                    generatedChainId, value);
                             return result;
                         } else {
                             return ChainEvent<RetType>(); //it has empty actual event and should stop the chain.
@@ -336,7 +346,6 @@ public:
 
                     };
                     LOGGER("generated chain id " + generatedChainId);
-                    //@todo if RetType == void, then setAction, not ActionExtended.
                     logicManager.setActionExtended<ChainEvent<RetType>, ChainEvent<EventType>, Args...>(
                             generatedActionId,
                             f);
@@ -384,6 +393,7 @@ public:
             chainId = id;
             transform<ChainEvent<EventType>>([=](auto event) {
                 LOGGER("starting chain " + id)
+                Context::getActiveContext()->set<ChainContext>(id);
                 ChainEvent r(id, event);
                 return r;
             });

@@ -8,25 +8,25 @@
 
 Logger::Logger(std::string name) : logger(Poco::Logger::get(name)), loggerName(name) {
 
-    Poco::ConsoleChannel *consoleChannel = new Poco::ConsoleChannel();
+//    Poco::ConsoleChannel *consoleChannel = new Poco::ConsoleChannel();
     // logger.setLevel(Poco::Message::Priority::PRIO_DEBUG);
-    logger.setChannel(consoleChannel);
+//    logger.setChannel(consoleChannel);
 
 }
 
 void Logger::error(std::string txt) {
 
-    logger.error(txt);
+//    logger.error(txt);
 }
 
 void Logger::debug(std::string txt) {
     std::lock_guard<std::mutex> g(getLock());
-    logger.debug(txt);
+//    logger.debug(txt);
     std::clog << loggerName << " : " << txt << std::endl;
 }
 
 void Logger::info(std::string txt) {
-    logger.information(txt);
+//    logger.information(txt);
 }
 
 void Logger::debug(int line, std::string txt) {

@@ -25,6 +25,8 @@ public:
     const std::chrono::time_point<clock> &getNow() const;
 
     void setNow(const std::chrono::time_point<clock> &now);
+
+    Tick();
 };
 
 

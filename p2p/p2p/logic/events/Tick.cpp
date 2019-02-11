@@ -12,3 +12,5 @@ const std::chrono::time_point<typename Tick::clock> &Tick::getNow() const {
 void Tick::setNow(const std::chrono::time_point<typename Tick::clock> &now) {
     Tick::now = now;
 }
+
+Tick::Tick() {}

@@ -22,6 +22,7 @@
 #include <p2p/logic/state/LogicStateMachine.h>
 #include <p2p/logic/evaluators/CommonEvaluators.h>
 #include <p2p/logic/actions/CommonActions.h>
+#include <p2p/logic/chain/ChainEvaluators.h>
 
 
 using namespace Poco::Net;
@@ -138,19 +139,21 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     when(event<ModuleEvent<NodeNetworkModule>>()).fireNewAction([](auto event) { LOGGER("module event NNM") });
 
-//    auto list = {88, 77, 44, 101};
-//    auto list2 = {99, 10};
-//    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
-////    stage1.
-//    stage1.fireNewGenericChainAction(testingMethod1s, [](auto tick) -> std::string {
-//        static int rr = 0;
-//        rr++;
-//        return std::string("lala " + std::to_string(rr));
-//    }).fireNewGenericChainAction(testingMethod1s, CommonEvaluators::unwrapEvent).
-//            fireNewGenericChainAction(testingMethod1i, CommonEvaluators::value(66)).
+    auto list = {88, 77, 44, 101};
+    auto list2 = {99, 10};
+    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
+//    stage1.
+    auto stage2 = stage1.fireNewGenericChainAction(testingMethod1s, [](auto tick) -> std::string {
+        static int rr = 0;
+        rr++;
+        return std::string("lala " + std::to_string(rr));
+    }).fireNewGenericChainAction(testingMethod1s, CommonEvaluators::unwrapEvent);
+
+    stage2.fireNewGenericChainAction(testingMethod1xs,
+                                     ChainEvaluators::genericChainResult<std::string>(stage2.getChainId()));
 //            fireNewGenericChainAction(CommonActions::foreachAction(testingMethod1i, list),
 //                                      CommonEvaluators::foreachValue<int>());
-//
+
 //    when(event < SpecificPacketEvent<KeepAlivePacket::Response>>
 //    (PacketEventId::PACKET_RECEIVED)).fireNewAction([](auto event) {
 //        LOGGER("SPECIFIC EVENT: keepalive received!");

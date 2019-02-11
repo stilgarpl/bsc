@@ -8,8 +8,8 @@
 #define BASYCO_CHAINEVENT_H
 
 #include <string>
+#include "ChainDefinitions.h"
 
-using ChainIdType = std::string;
 
 template<typename ActualEventType>
 class ChainEvent : public IEvent<typename ActualEventType::IdType> {

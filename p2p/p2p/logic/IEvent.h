@@ -19,7 +19,7 @@ public:
 private:
     IdType eventId;
     bool _eventValid = true;
-    mutable Context::Ptr _context;
+    Context::OwnPtr _context;
 public:
     IdType getEventId() const {
         return eventId;
@@ -61,9 +61,9 @@ public:
 };
 
 template<typename idType>
-IEvent<idType>::IEvent() {
+IEvent<idType>::IEvent() : _context(Context::makeContext(Context::getActiveContext())) {
 
-    _context = Context::makeContext(Context::getActiveContext());
+//    _context = Context::makeContext(Context::getActiveContext());
 //    _context = Context::getActiveContext();
 
 }
