@@ -150,7 +150,7 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
     }).fireNewGenericChainAction(testingMethod1s, CommonEvaluators::unwrapEvent);
 
     stage2.fireNewGenericChainAction(testingMethod1xs,
-                                     ChainEvaluators::genericChainResult<std::string>(stage2.getChainId()));
+                                     ChainEvaluators::genericChainResult<std::string>(stage2));
 //            fireNewGenericChainAction(CommonActions::foreachAction(testingMethod1i, list),
 //                                      CommonEvaluators::foreachValue<int>());
 

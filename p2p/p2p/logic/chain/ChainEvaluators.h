@@ -27,10 +27,13 @@ struct ChainEvaluators {
         };
     }
 
+
+    //@todo if possible, guess T from Stage type
     template<typename T, typename Stage>
     static auto genericChainResult(const Stage &stage) {
         auto id = stage.getChainId();
         return [id](auto e, auto ... args) {
+            //@todo maybe wait if no result in context (if result is from another branch, but don't wait for too long!)
             return Context::getActiveContext()->get<ChainContext>()->getChainResult<EventWrapper<T>>(id).getPayload();
         };
     }
