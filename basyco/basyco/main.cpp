@@ -112,7 +112,7 @@ void setupCommands(CommandModule *cmd) {
 //    cmd->mapCommand("purgeI", &NodeNetworkModule::purgeInactiveConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
     cmd->mapRawCommand("broadcast", &CommandModule::broadcastRemoteCommand);
-    cmd->mapCommand("shutdown", &BasicModule::shutdown);
+    cmd->mapCommand("shutdown", &BasicModule::shutdownNode);
     cmd->mapCommand("cd", &FilesystemModule::changeDirectory);
     cmd->mapCommand("pwd", &FilesystemModule::printWorkingDirectory);
     cmd->mapCommand("ls", &FilesystemModule::listCurrentDirectory);

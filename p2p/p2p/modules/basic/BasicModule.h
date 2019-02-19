@@ -25,7 +25,7 @@ public:
     /// Commands section
     ////////////////////////////////
 
-    void shutdown() {
+    void shutdownNode() {
         node.stop();
     }
 
