@@ -16,7 +16,7 @@ message(libs:: ${LIBS})
 set(INCLUDES ${Cereal_INCLUDE_DIRS} ${CRYPTO++_INCLUDE_DIR})
 message(includ:: ${INCLUDES})
 include_directories(${INCLUDES})
-set(LIBS ${LIBS} ${CPPEXPERIMENTAL_LIBRARIES} ${CRYPTO++_LIBRARIES} -lstdc++fs)
+set(LIBS ${LIBS} ${CRYPTO++_LIBRARIES} -lstdc++fs)
 
 message(libs:: ${LIBS})
 

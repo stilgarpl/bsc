@@ -19,7 +19,7 @@ message(libs:: ${LIBS})
 set(INCLUDES ${Poco_INCLUDE_DIRS} ${Cereal_INCLUDE_DIRS})
 message(includ:: ${INCLUDES})
 include_directories(${INCLUDES})
-set(LIBS ${LIBS} ${Poco_LIBRARIES} ${CPPEXPERIMENTAL_LIBRARIES} ${CONAN_LIBS})
+set(LIBS ${LIBS} ${Poco_LIBRARIES})
 
 message(libs:: ${LIBS})
 

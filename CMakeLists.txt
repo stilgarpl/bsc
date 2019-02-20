@@ -9,6 +9,7 @@ conan_cmake_run(CONANFILE conan/conanfile.txt
         INSTALL_FOLDER ${CMAKE_BINARY_DIR}
         BASIC_SETUP
         BUILD missing)
+set(LIBS ${LIBS} ${CONAN_LIBS})
 endif()
 
 #if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
