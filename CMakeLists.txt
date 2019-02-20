@@ -4,7 +4,8 @@ find_program(conan conan)
 if(EXISTS ${conan})
 message("CONAN EXISTS")
 include(${CMAKE_SOURCE_DIR}/conan/conan.cmake)
-
+conan_add_remote(NAME bincrafters INDEX 1
+        URL https://api.bintray.com/conan/bincrafters/public-conan)
 conan_cmake_run(CONANFILE conan/conanfile.txt
         INSTALL_FOLDER ${CMAKE_BINARY_DIR}
         BASIC_SETUP
