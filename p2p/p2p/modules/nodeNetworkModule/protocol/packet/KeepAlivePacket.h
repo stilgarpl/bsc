@@ -51,11 +51,10 @@ public:
     };
 };
 
-
-CEREAL_REGISTER_TYPE(KeepAlivePacket::Request);
-CEREAL_REGISTER_TYPE(KeepAlivePacket::Response);
+CEREAL_REGISTER_TYPE(KeepAlivePacket::Request)
+CEREAL_REGISTER_TYPE(KeepAlivePacket::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, KeepAlivePacket::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, KeepAlivePacket::Response);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, KeepAlivePacket::Response)
 
 #endif //BASYCO_KEEPALIVEPACKET_H

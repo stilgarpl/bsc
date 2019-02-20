@@ -35,7 +35,7 @@ private:
     IdType nextId() {
         static IdType val = 0;
         return val++;
-    };
+    }
     Status status;
     IdType id;
     bool retry = false;
@@ -99,6 +99,6 @@ class TypeOperator {
 
 
 
-CEREAL_REGISTER_TYPE(BasePacket);
+CEREAL_REGISTER_TYPE(BasePacket)
 
 #endif //BASYCO_BASEPACKET_H

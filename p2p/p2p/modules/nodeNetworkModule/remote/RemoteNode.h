@@ -69,7 +69,7 @@ public:
                    "Not connected")
 
         }
-    };
+    }
 
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto sendRequestToNode(NetworkPacketPointer<SendType> p) {
@@ -91,7 +91,7 @@ public:
             return std::shared_ptr<ReturnType>(nullptr);
 
         }
-    };
+    }
 
     void setNodeInfo(const NodeInfo &ni);
 

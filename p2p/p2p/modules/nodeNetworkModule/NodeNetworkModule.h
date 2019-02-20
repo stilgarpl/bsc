@@ -56,7 +56,7 @@ private:
 };
 
 
-CONFIG_NAME(NodeNetworkModuleConfig, "network");
+CONFIG_NAME(NodeNetworkModuleConfig, "network")
 
 class NodeNetworkModule
         : public NodeModuleConfigDependent<NodeNetworkModule, NodeNetworkModuleConfig, ConfigurationModule> {
@@ -125,7 +125,7 @@ public: // @todo should be public or shouldn't ?
 
     void stopListening();
 
-    void onStop() override;;
+    void onStop() override;
 
     void onStart() override;
 
@@ -152,7 +152,7 @@ public: // @todo should be public or shouldn't ?
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto sendPacketToNode(const NodeIdType &nodeId, NetworkPacketPointer<SendType> p) {
         return getRemoteNode(nodeId).sendRequestToNode(p);
-    };
+    }
 
 //
 //    template<enum Status status = Status::RESPONSE, typename SendType>
@@ -194,7 +194,7 @@ public: // @todo should be public or shouldn't ?
             }
         }
 
-    };
+    }
 
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto broadcastRequest(NetworkPacketPointer<SendType> p, const BroadcastScope &scope = BroadcastScope::CONNECTED) {
@@ -230,7 +230,7 @@ public: // @todo should be public or shouldn't ?
 //        for (auto && item/*[key, item]*/ : responses) {
 //            if (item.second.wait_for(0) == std::future_status::ready)
 //        }
-    };
+    }
 
     void run() override;
 
@@ -316,7 +316,7 @@ public: // @todo should be public or shouldn't ?
 };
 
 
-CEREAL_REGISTER_TYPE(NodeNetworkModuleConfig);
+CEREAL_REGISTER_TYPE(NodeNetworkModuleConfig)
 //CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig,NodeNetworkModule::Config);
 
 #endif //BASYCO_NODENETWORKMODULE_H

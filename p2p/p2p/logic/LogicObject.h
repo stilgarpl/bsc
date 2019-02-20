@@ -35,7 +35,7 @@ public:
         template<typename... Args, typename ActionIdType>
         void setAction(ActionIdType id, ActionManager::ActionType<Args...> action) {
             logicManager.setAction<Args...>(id, action);
-        };
+        }
 
         template<typename... Args, typename ActionIdType, typename RetType>
         void setActionExtended(ActionIdType id, std::function<RetType(Args...)> func) {
@@ -171,7 +171,6 @@ public:
         };
 
 
-
         ThisType &constraint(const ConstraintFunc &func) {
             _constraint.push_back(func);
             return *this;
@@ -265,7 +264,7 @@ public:
 
         }
 
-        template<typename GenericFunc,template<typename E> typename ... Evaluators>
+        template<typename GenericFunc, template<typename E> typename ... Evaluators>
         auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators<EventType>... evaluators) {
             LOGGER("fireNewGenericChainAction - template")
             //@todo check if RetType is void or already an event type
@@ -424,7 +423,7 @@ public:
 
 
             return *this;
-        };
+        }
 
         template<typename NewEventType, typename ... NewArgs>
         ThisType &emit(NewEventType newEventType) {
@@ -436,7 +435,7 @@ public:
             });
 
             return *this;
-        };
+        }
 
         template<typename NewEventType>
         ThisType &emit(EventHelper<NewEventType> eventHelper) {
@@ -523,9 +522,9 @@ public:
 
     virtual void setupActions(SetupActionHelper &actionHelper) = 0;
 
-    virtual bool assignActions(AssignActionHelper &actionHelper)=0;
+    virtual bool assignActions(AssignActionHelper &actionHelper) = 0;
 
-    virtual bool setupSources(SetupSourceHelper &sourceHelper)=0;
+    virtual bool setupSources(SetupSourceHelper &sourceHelper) = 0;
 
 };
 

@@ -105,7 +105,7 @@ public:
     template<typename... Args, typename ActionIdType>
     void setAction(ActionIdType id, ActionManager::ActionType<Args...> action) {
         actionManager.setAction<Args...>(id, action);
-    };
+    }
 
     template<typename RetType, typename... Args, typename ActionIdType>
     void setActionExtended(ActionIdType id, std::function<typename std::decay<RetType>::type(Args...)> func) {
@@ -116,7 +116,7 @@ public:
                 sourceManager.event(ret);
             }
         });
-    };
+    }
 
     LogicManager(const LogicManager &) = delete;
 

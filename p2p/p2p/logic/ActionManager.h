@@ -38,7 +38,7 @@ public:
     void setAction(ActionIdType id, ActionType<Args...> action) {
         auto &map = actionMap.get<ActionIdType, ActionType<Args...>>();
         map[id] = action;
-    };
+    }
 
 
 };

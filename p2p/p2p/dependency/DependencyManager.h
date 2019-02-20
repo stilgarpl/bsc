@@ -31,7 +31,7 @@ protected:
     static const TypeIdType getTypeId() {
         const static auto typeId = getNextTypeId();
         return typeId;
-    };
+    }
 
 public:
 

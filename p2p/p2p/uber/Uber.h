@@ -28,7 +28,7 @@ protected:
         const static auto typeId = getNextTypeId();
         idLock.unlock();
         return typeId;
-    };
+    }
 
     //BaseUber() : containers(1) {}
 

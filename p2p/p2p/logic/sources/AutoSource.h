@@ -25,7 +25,7 @@ public:
         auto &source = eventQueueSources.get<EventType, AutoSource>(std::ref(sourceManager));
         auto newEvent = source.newEvent(args...);
         source.queueEvent(newEvent);
-    };
+    }
 
 };
 

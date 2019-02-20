@@ -75,7 +75,7 @@ protected:
 
     void work();
 
-    void initialize();;
+    void initialize();
 
 
 public:

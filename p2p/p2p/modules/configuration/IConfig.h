@@ -55,6 +55,6 @@ public:
     }
 };
 
-CEREAL_REGISTER_TYPE(IConfig);
+CEREAL_REGISTER_TYPE(IConfig)
 
 #endif //BASYCO_ICONFIG_H

@@ -61,7 +61,7 @@ private:
     const TypeIdType getTypeId() const {
         static auto typeId = getNextTypeId();
         return typeId;
-    };
+    }
     std::map<TypeIdType, std::map<KeyType, std::shared_ptr<void>>> data;
 public:
 
@@ -131,7 +131,7 @@ public:
 
     Context(const Context &other);
 
-    explicit Context(const Ptr &ptr);;
+    explicit Context(const Ptr &ptr);
 
     Context() = default;
 

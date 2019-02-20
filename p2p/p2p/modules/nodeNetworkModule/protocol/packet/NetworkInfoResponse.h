@@ -40,6 +40,6 @@ public:
     void process(Context::Ptr context) override;
 };
 
-CEREAL_REGISTER_TYPE(NetworkInfoResponse);
+CEREAL_REGISTER_TYPE(NetworkInfoResponse)
 
 #endif //BASYCO_NETWORKINFORESPONSE_H

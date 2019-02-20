@@ -69,7 +69,7 @@ public:
     template<typename T>
     std::shared_ptr<T> load(const IdType &id) {
         return std::static_pointer_cast<T>(load_void(id));
-    };
+    }
 protected:
     //@todo why not IConfig
     std::shared_ptr<void> load_void(const IdType &id);

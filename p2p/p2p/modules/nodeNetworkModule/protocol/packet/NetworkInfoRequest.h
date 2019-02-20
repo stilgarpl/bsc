@@ -24,6 +24,6 @@ public:
     void process(Context::Ptr context) override;
 };
 
-CEREAL_REGISTER_TYPE(NetworkInfoRequest);
+CEREAL_REGISTER_TYPE(NetworkInfoRequest)
 
 #endif //BASYCO_NETWORKINFOREQUEST_H

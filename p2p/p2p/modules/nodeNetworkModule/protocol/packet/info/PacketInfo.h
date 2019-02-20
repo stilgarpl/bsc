@@ -53,14 +53,14 @@ struct PacketUtils {
         auto ptr = getNewPtr<s, PacketType>();
         ptr->setId(t->getId());
         return ptr;
-    };
+    }
 
     //used for shared_ptr<Packet>
     template<enum Status s, typename PacketTypePtr>
     static auto getNewPtr(const PacketTypePtr &t) {
 
         return getNewPtr<s>(t.get());
-    };
+    }
 
     template<enum Status s, typename PacketType>
     static auto getNewPtr() {
@@ -68,7 +68,7 @@ struct PacketUtils {
         ret->setStatus(s);
         // ret->setId(t->getId());
         return ret;
-    };
+    }
 
     template<enum Status s, typename T>
     static auto getNewPtr(const BasePacket::IdType &id) {
@@ -76,7 +76,7 @@ struct PacketUtils {
         ret->setStatus(s);
         ret->setId(id);
         return ret;
-    };
+    }
 };
 
 /**

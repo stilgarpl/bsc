@@ -18,7 +18,7 @@ public:
     StorageSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}
 
     void
-    queryResource(IRepository::RepoIdType repositoryId, IStorage::ResourceId objectId, BasePacket::IdType requestId);;
+    queryResource(IRepository::RepoIdType repositoryId, IStorage::ResourceId objectId, BasePacket::IdType requestId);
 };
 
 

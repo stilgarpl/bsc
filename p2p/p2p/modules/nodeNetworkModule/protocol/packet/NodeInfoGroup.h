@@ -63,9 +63,9 @@ struct NodeInfoGroup : public PacketGroup {
 typedef NodeInfoGroup::Request NodeInfoRequest;
 typedef NodeInfoGroup::Response NodeInfoResponse;
 
-CEREAL_REGISTER_TYPE(NodeInfoGroup::Request);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, NodeInfoGroup::Request);
-CEREAL_REGISTER_TYPE(NodeInfoGroup::Response);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, NodeInfoGroup::Response);
+CEREAL_REGISTER_TYPE(NodeInfoGroup::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, NodeInfoGroup::Request)
+CEREAL_REGISTER_TYPE(NodeInfoGroup::Response)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, NodeInfoGroup::Response)
 
 #endif //BASYCO_NODEINFOGROUP_H

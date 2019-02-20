@@ -112,13 +112,13 @@ public:
     SignalType<EventType, Args...> &
     assignSignal(const typename EventType::IdType &id, typename SignalType<EventType, Args...>::FuncPtr funcPtr) {
         this->getSignal<EventType, Args...>(id).assign(funcPtr);
-    };
+    }
 
     template<typename EventType, typename... Args>
     SignalType<EventType, Args...> &
     assignSignal(const typename EventType::IdType &id, const typename SignalType<EventType, Args...>::Func &funcPtr) {
         this->getSignal<EventType, Args...>(id).assign(funcPtr);
-    };
+    }
 
 
     template<typename EventType, typename... Args>
