@@ -44,7 +44,7 @@ private:
 };
 
 
-CEREAL_REGISTER_TYPE(ResourceIdentificator);
+CEREAL_REGISTER_TYPE(ResourceIdentificator)
 
 
 typedef std::shared_ptr<ResourceIdentificator> ResourceIdentificatorPtr;

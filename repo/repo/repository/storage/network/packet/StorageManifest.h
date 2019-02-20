@@ -52,10 +52,10 @@ public:
 };
 
 
-CEREAL_REGISTER_TYPE(StorageManifest::Request);
-CEREAL_REGISTER_TYPE(StorageManifest::Response);
+CEREAL_REGISTER_TYPE(StorageManifest::Request)
+CEREAL_REGISTER_TYPE(StorageManifest::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageManifest::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageManifest::Response);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageManifest::Response)
 
 #endif //BASYCO_STORAGEMANIFEST_H

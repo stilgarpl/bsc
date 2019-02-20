@@ -61,6 +61,6 @@ public:
 typedef std::shared_ptr<IJournal> JournalPtr;
 typedef std::shared_ptr<const IJournal> JournalPtrConst;
 
-CEREAL_REGISTER_TYPE(IJournal);
+CEREAL_REGISTER_TYPE(IJournal)
 
 #endif //BASYCO_IJOURNAL_H

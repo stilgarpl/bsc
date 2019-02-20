@@ -84,12 +84,9 @@ public:
 
 };
 
-CEREAL_REGISTER_TYPE(StorageQuery::Request);
-
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageQuery::Request);
-
-CEREAL_REGISTER_TYPE(StorageQuery::Response);
-
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageQuery::Response);
+CEREAL_REGISTER_TYPE(StorageQuery::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageQuery::Request)
+CEREAL_REGISTER_TYPE(StorageQuery::Response)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageQuery::Response)
 
 #endif //BASYCO_STORAGESYNC_H

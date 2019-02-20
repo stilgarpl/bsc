@@ -85,13 +85,11 @@ public:
 };
 
 
-CEREAL_REGISTER_TYPE(DataTransfer::Request);
-CEREAL_REGISTER_TYPE(DataTransfer::Response);
+CEREAL_REGISTER_TYPE(DataTransfer::Request)
+CEREAL_REGISTER_TYPE(DataTransfer::Response)
 
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, DataTransfer::Request
-)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, DataTransfer::Response
-);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, DataTransfer::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, DataTransfer::Response)
 
 
 #endif //BASYCO_DATATRANSFER_H

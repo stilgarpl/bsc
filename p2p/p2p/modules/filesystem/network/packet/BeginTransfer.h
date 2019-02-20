@@ -64,10 +64,10 @@ public:
 };
 
 
-CEREAL_REGISTER_TYPE(BeginTransfer::Request);
-CEREAL_REGISTER_TYPE(BeginTransfer::Response);
+CEREAL_REGISTER_TYPE(BeginTransfer::Request)
+CEREAL_REGISTER_TYPE(BeginTransfer::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, BeginTransfer::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, BeginTransfer::Response);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, BeginTransfer::Response)
 
 #endif //BASYCO_BEGINTRANSFER_H

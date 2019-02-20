@@ -67,9 +67,9 @@ public:
 
 };
 
-CEREAL_REGISTER_TYPE(CommandPacket::Request);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, CommandPacket::Request);
-CEREAL_REGISTER_TYPE(CommandPacket::Response);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, CommandPacket::Response);
+CEREAL_REGISTER_TYPE(CommandPacket::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, CommandPacket::Request)
+CEREAL_REGISTER_TYPE(CommandPacket::Response)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, CommandPacket::Response)
 
 #endif //BASYCO_COMMANDPACKET_H

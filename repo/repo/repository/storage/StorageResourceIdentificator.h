@@ -41,7 +41,7 @@ private:
     friend class cereal::access;
 };
 
-CEREAL_REGISTER_TYPE(StorageResourceIdentificator);
+CEREAL_REGISTER_TYPE(StorageResourceIdentificator)
 
 
 #endif //BASYCO_STORAGERESOURCEIDENTIFICATOR_H

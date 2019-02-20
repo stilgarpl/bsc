@@ -47,10 +47,10 @@ public:
 };
 
 
-CEREAL_REGISTER_TYPE(RepoQuery::Request);
-CEREAL_REGISTER_TYPE(RepoQuery::Response);
+CEREAL_REGISTER_TYPE(RepoQuery::Request)
+CEREAL_REGISTER_TYPE(RepoQuery::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, RepoQuery::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, RepoQuery::Response);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, RepoQuery::Response)
 
 #endif //BASYCO_REPOQUERY_H

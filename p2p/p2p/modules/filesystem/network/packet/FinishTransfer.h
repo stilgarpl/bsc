@@ -52,10 +52,10 @@ public:
 };
 
 
-CEREAL_REGISTER_TYPE(FinishTransfer::Request);
-CEREAL_REGISTER_TYPE(FinishTransfer::Response);
+CEREAL_REGISTER_TYPE(FinishTransfer::Request)
+CEREAL_REGISTER_TYPE(FinishTransfer::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, FinishTransfer::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, FinishTransfer::Response);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, FinishTransfer::Response)
 
 #endif //BASYCO_FINISHTRANSFER_H

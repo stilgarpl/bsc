@@ -115,7 +115,7 @@ public:
             auto &map = getCommandMap();//commands.get<std::string, std::function<void(ArgumentContainerType)>>();
             map[key] = std::move(func);
             return true;
-        };
+        }
     public:
 
         template<typename ModuleType, typename RetType, typename ... Args>
@@ -130,7 +130,7 @@ public:
                        [=](CommandModule::ArgumentContainerType vals) {
                            runMemberFunction(*mod, f, vals);
                        });
-        };
+        }
 
 
         template<typename ModuleType, typename RetType>
@@ -140,7 +140,7 @@ public:
             mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerType vals) {
                 (mod.get()->*f)(vals);
             });
-        };
+        }
 
         bool runCommand(const std::string &commandName, ArgumentContainerType arguments) {
             //@todo integrate duplicate code with CommandModule somehow
@@ -230,7 +230,7 @@ public:
 
         submodule().mapCommand(commandName, f);
 
-    };
+    }
 
     template<typename ModuleType, typename RetType>
     void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerType)) {
@@ -244,7 +244,7 @@ public:
 
         submodule().mapRawCommand(commandName, f);
 
-    };
+    }
 
     bool runCommand(std::string commandName, ArgumentContainerType arguments) {
 

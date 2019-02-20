@@ -55,7 +55,7 @@ public:
                 r->addRole(i);
             }
             rules.push_back(r);
-        };
+        }
 
         void applyRules() {
             for (const auto &item : rules) {

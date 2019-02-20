@@ -59,11 +59,11 @@ public:
 };
 
 
-CEREAL_REGISTER_TYPE(PropertiesTransfer::Request);
-CEREAL_REGISTER_TYPE(PropertiesTransfer::Response);
+CEREAL_REGISTER_TYPE(PropertiesTransfer::Request)
+CEREAL_REGISTER_TYPE(PropertiesTransfer::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, PropertiesTransfer::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, PropertiesTransfer::Response);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, PropertiesTransfer::Response)
 
 
 #endif //BASYCO_PROPERTIESTRANSFER_H

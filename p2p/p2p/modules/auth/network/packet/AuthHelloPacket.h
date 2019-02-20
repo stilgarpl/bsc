@@ -55,9 +55,9 @@ public:
 };
 
 
-CEREAL_REGISTER_TYPE(AuthHelloPacket::Request);
-CEREAL_REGISTER_TYPE(AuthHelloPacket::Response);
+CEREAL_REGISTER_TYPE(AuthHelloPacket::Request)
+CEREAL_REGISTER_TYPE(AuthHelloPacket::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, AuthHelloPacket::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, AuthHelloPacket::Response);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, AuthHelloPacket::Response)
 #endif //BASYCO_AUTHHELLOPACKET_H

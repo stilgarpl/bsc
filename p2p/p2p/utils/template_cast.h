@@ -24,13 +24,13 @@ public:
 template<typename T, typename RetType, typename ... Args, typename ... Strings>
 static void runStringCast(T &t, RetType (T::*f)(Args...), Strings ... strings) {
     (t.*f)(from_string<Args>(strings)...);
-};
+}
 
 
 template<typename RetType, typename ... Args, typename ... Strings>
 static void runStringCast(RetType (*f)(Args...), Strings ... strings) {
     (*f)(from_string<Args>(strings)...);
-};
+}
 
 
 template<size_t num_args>
@@ -70,7 +70,7 @@ template<typename T, typename RetType, typename ... Args>
 void runMemberFunction(T &t, RetType (T::*f)(Args...), std::vector<std::string> values) {
     unpack_caller<sizeof... (Args)> a;
     a(t, f, values);
-};
+}
 
 
 #endif //BASYCO_TEMPLATE_CAST_H

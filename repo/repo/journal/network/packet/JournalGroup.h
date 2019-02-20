@@ -62,10 +62,10 @@ public:
 
 };
 
-CEREAL_REGISTER_TYPE(JournalGroup::Request);
-CEREAL_REGISTER_TYPE(JournalGroup::Response);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, JournalGroup::Request);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, JournalGroup::Response);
+CEREAL_REGISTER_TYPE(JournalGroup::Request)
+CEREAL_REGISTER_TYPE(JournalGroup::Response)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, JournalGroup::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, JournalGroup::Response)
 
 
 #endif //BASYCO_JOURNALGROUP_H

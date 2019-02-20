@@ -368,7 +368,7 @@ void Repository::remove(fs::path path) {
 }
 
 void Repository::ignore(fs::path path) {
-    auto &fileMap = getFileMap();
+//    auto &fileMap = getFileMap();
     if (path.is_relative()) {
         //@todo not so sure about current path, i have to make sure this is always set to the right value
         path = fs::canonical(fs::current_path() / path);
