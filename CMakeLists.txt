@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.7)
 project(basyco)
-
-message(cmake binary ::: ->  ${CMAKE_BINARY_DIR})
-
+find_program(conan conan)
+if(EXISTS ${conan})
+message("CONAN EXISTS")
 include(${CMAKE_SOURCE_DIR}/conan/conan.cmake)
 
 conan_cmake_run(CONANFILE conan/conanfile.txt
         INSTALL_FOLDER ${CMAKE_BINARY_DIR}
         BASIC_SETUP
         BUILD missing)
-
+endif()
 
 #if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 #    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
