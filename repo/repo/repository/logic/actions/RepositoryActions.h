@@ -6,8 +6,13 @@
 #define BASYCO_REPOACTIONS_H
 
 
-class RepositoryActions {
+struct RepositoryActions {
 
+
+    //@todo implement
+    static bool checkIfUpdateRequired() {
+        return false;
+    }
 };
 
 

@@ -15,6 +15,7 @@
 #include <repo/repository/network/RepoQuery.h>
 #include <p2p/logic/conditions/TimeConditions.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/conditions/NetworkConditions.h>
+#include <repo/repository/logic/actions/RepositoryActions.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
@@ -35,7 +36,8 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     when(TimeConditions::every(1000s)).fireNewGenericAction(NetworkActions::broadcastPacket,
                                                             CommonEvaluators::value(RepoQuery::Request::getNew()));
     when(NetworkConditions::packetReceived<RepoQuery::Response>()).newChain(
-            "repoUpdateChain");//.fireNewGenericChainAction(RepoActions::checkIfUpdateRequired).fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
+            "repoUpdateChain").ifTrue(
+            RepositoryActions::checkIfUpdateRequired);//.fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
 
     return ret;
 }

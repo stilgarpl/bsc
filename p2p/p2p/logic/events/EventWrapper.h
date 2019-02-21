@@ -10,6 +10,8 @@
 
 template<typename Type>
 class EventWrapper : public IEvent<int> {
+public:
+    using PayloadType = Type;
 private:
     Type payload;
 

@@ -138,9 +138,10 @@ public:
     };
 
 
-    template<typename EventType, typename ... Args>
+    template<typename eventType, typename ... Args>
     class LogicChainHelper {
     public:
+        using EventType = eventType;
         typedef typename EventType::IdType EventId;
         typedef LogicChainHelper<EventType, Args...> ThisType;
         typedef typename EventHelper<EventType, Args...>::ConstraintFunc ConstraintFunc;
@@ -148,9 +149,9 @@ public:
         std::optional<EventId> eventId;
         std::optional<ChainIdType> chainId = std::nullopt;
     public:
-        const ChainIdType &getChainId() const {
+        const std::optional<ChainIdType> &getChainId() const {
             //@todo return this or optional?
-            return *chainId;
+            return chainId;
         }
 
     private:
@@ -270,6 +271,7 @@ public:
             //@todo check if RetType is void or already an event type
             using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators<EventType>, EventType, Args...>...>;
             return fireNewChainAction([=](EventType e) {
+                //@todo should I set eventWrapper ID to something? I don't think it's ever fired as a standalone event, not wrapped in chainEvent...
                 return EventWrapper<RetType>(genericFunc(evaluators(e)...));
             });
 
@@ -279,12 +281,13 @@ public:
          * works like generic func, but return value should be bool or convertible to bool
          */
         template<typename ConditionalFunc, template<typename E> typename ... Evaluators>
-        auto conditional(ConditionalFunc conditionalFunc, bool value, Evaluators<EventType>... evaluators) {
+        auto conditionalChain(ConditionalFunc conditionalFunc, bool value, Evaluators<EventType>... evaluators) {
             //@todo check if RetType is void or already an event type
             using RetType = std::invoke_result_t<ConditionalFunc, std::invoke_result_t<Evaluators<EventType>, EventType, Args...>...>;
             return fireNewChainAction([=](EventType e) {
                 EventWrapper<RetType> ret(conditionalFunc(evaluators(e)...));
-                if (ret != value) {
+                if (ret.getPayload() != value) {
+                    //terminates the chain
                     ret.setEventValid(false);
                 }
                 return ret;
@@ -292,13 +295,13 @@ public:
         }
 
         template<typename ConditionalFunc, template<typename E> typename ... Evaluators>
-        auto ifTrue(ConditionalFunc conditionalFunc, bool value, Evaluators<EventType>... evaluators) {
-            return conditional(conditionalFunc, true, evaluators...);
+        auto ifTrue(ConditionalFunc conditionalFunc, Evaluators<EventType>... evaluators) {
+            return conditionalChain(conditionalFunc, true, evaluators...);
         }
 
         template<typename ConditionalFunc, template<typename E> typename ... Evaluators>
-        auto ifFalse(ConditionalFunc conditionalFunc, bool value, Evaluators<EventType>... evaluators) {
-            return conditional(conditionalFunc, false, evaluators...);
+        auto ifFalse(ConditionalFunc conditionalFunc, Evaluators<EventType>... evaluators) {
+            return conditionalChain(conditionalFunc, false, evaluators...);
         }
 
         template<typename GenericFunc, typename ... Evaluators>
