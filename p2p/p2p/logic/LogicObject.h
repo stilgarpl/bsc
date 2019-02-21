@@ -393,13 +393,13 @@ public:
 
         ThisType &newChain(ChainIdType id) {
             chainId = id;
-            transform<ChainEvent<EventType>>([=](auto event) {
+            return transform<ChainEvent<EventType>>([=](auto event) {
                 LOGGER("starting chain " + id)
                 Context::getActiveContext()->set<ChainContext>(id);
                 ChainEvent r(id, event);
                 return r;
             });
-            return *this;
+
         }
 
         template<typename NewEventType, typename Func>
@@ -417,8 +417,6 @@ public:
 
         template<typename NewEventType, typename ... NewArgs>
         ThisType &emit() {
-            //@todo initialize some actual values.
-//            logicManager.event<NewEventType,NewArgs...>(NewEventType(),NewArgs()...);
             auto &autoSource = logicManager.requireSource<AutoSource>();
             fireNewAction([&](EventType e, Args...) {
                 autoSource.template generateEvent<NewEventType>();
@@ -430,8 +428,6 @@ public:
 
         template<typename NewEventType, typename ... NewArgs>
         ThisType &emit(NewEventType newEventType) {
-            //@todo initialize some actual values.
-//            logicManager.event<NewEventType,NewArgs...>(NewEventType(),NewArgs()...);
             auto &autoSource = logicManager.requireSource<AutoSource>();
             fireNewAction([&, newEventType](EventType e, Args...) {
                 autoSource.template generateEvent<NewEventType>(newEventType);
@@ -442,13 +438,9 @@ public:
 
         template<typename NewEventType>
         ThisType &emit(EventHelper<NewEventType> eventHelper) {
-            emit(eventHelper.makeEvent());
+            return emit(eventHelper.makeEvent());
         }
 
-//        template<typename ModuleType, typename ... Args>
-//        ThisType& runModuleMethod() {
-//
-//        };
 
     };
 
