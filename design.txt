@@ -414,3 +414,6 @@ w modułach mamy operacje do wykonania w kolejnych stanach. nie wykonują się j
 
 teraz jak mam packetReceived<T> to zastanawiam sie, czy packet->process() jeszcze czemuś służy. można to usunąć i całą low-level logic dać na when(packetReceived)
 //@todo a propos, packetReceived powinien byc triggerowany w processorze, nie w connection, bo przez filtr nie przechodzi
+
+
+logic chain moze w chain context trzymać id konkretnego wykonania chaina, generowany przy start chain. mozna tez dodać end chain. wtedy wiadomo czy dana iteracja chaina jeszcze pracuje i czy trzeba czekać na evaluator ktory pobiera wynik innego brancha

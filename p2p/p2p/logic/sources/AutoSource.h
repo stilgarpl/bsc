@@ -22,6 +22,7 @@ public:
 
     template<typename EventType, typename ... Args>
     void generateEvent(Args... args) {
+        LOGGER("generating event for type " + std::string(typeid(EventType).name()))
         auto &source = eventQueueSources.get<EventType, AutoSource>(std::ref(sourceManager));
         auto newEvent = source.newEvent(args...);
         source.queueEvent(newEvent);

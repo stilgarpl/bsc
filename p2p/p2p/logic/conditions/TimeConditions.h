@@ -12,7 +12,7 @@ struct TimeConditions {
 
 
     static auto every(typename Tick::IdType id) {
-        return LogicObject::EventHelper<Tick>(id);
+        return LogicObject::event<Tick>(id);
     }
 
 };

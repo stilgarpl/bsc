@@ -25,17 +25,26 @@ void RepoModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
     actionHelper.setAction<JournalRequestEvent>("journalRequest", JournalActions::journalRequested);
     actionHelper.setAction<JournalResponseEvent>("journalReceive", JournalActions::journalReceived);
     actionHelper.setAction<StorageResourceRequestEvent>("storageQuery", StorageActions::resourceRequested);
+    actionHelper.setAction<RepositoryEvent>("repoInfo", RepositoryActions::getRepositoryInformation);
 }
 
 bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     bool ret = actionHelper.assignAction<JournalRequestEvent>("journalRequest");
     ret &= actionHelper.assignAction<JournalResponseEvent>("journalReceive");
     ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
+    ret &= actionHelper.assignAction<RepositoryEvent>(RepositoryEventId::REQUEST_REPO_INFO, "repoInfo");
 
     //@todo implements all those required methods.
-    when(TimeConditions::every(1000s)).fireNewGenericAction(NetworkActions::broadcastPacket,
-                                                            CommonEvaluators::value(RepoQuery::Request::getNew()));
-    when(NetworkConditions::packetReceived<RepoQuery::Response>()).newChain(
+    when(TimeConditions::every(3s)).fireNewGenericAction(NetworkActions::broadcastPacket,
+                                                         CommonEvaluators::value(RepoQuery::Request::getNew()));
+    when(event<SpecificPacketEvent<RepoQuery::Response>>(PacketEventId::PACKET_RECEIVED)).fireNewAction(
+            [](auto e) { LOGGER("GOT REPO RESPONSE AAAAAAA") });
+//@todo Network Conditions do not work. NO IDEA WHY. INVESTIGATE
+    when(NetworkConditions::packetReceived<RepoQuery::Response>()).fireNewAction(
+            [](auto e) { LOGGER("GOT REPO RESPONSE QQQQQQQ") });
+
+
+    when(event<SpecificPacketEvent<RepoQuery::Response>>(PacketEventId::PACKET_RECEIVED)).newChain(
             "repoUpdateChain").ifTrue(
             RepositoryActions::checkIfUpdateRequired);//.fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
 

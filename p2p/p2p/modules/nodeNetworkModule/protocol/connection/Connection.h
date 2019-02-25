@@ -6,7 +6,6 @@
 #define BASYCO_CONNECTION_H
 
 
-#include <sys/socket.h>
 #include <Poco/Net/SocketStream.h>
 #include <queue>
 #include <mutex>

@@ -11,12 +11,14 @@
 struct NetworkConditions {
 
     static auto packet(PacketEventId id) {
-        return LogicObject::EventHelper<PacketEvent>(id);
+//        return LogicObject::EventHelper<PacketEvent>(id);
+        return LogicObject::event<PacketEvent>(id);
     }
 
     template<typename PacketType>
     static auto packet(typename SpecificPacketEvent<PacketType>::IdType id) {
-        return LogicObject::EventHelper<SpecificPacketEvent<PacketType>>(id);
+//        return LogicObject::EventHelper<SpecificPacketEvent<PacketType>>(id);
+        return LogicObject::event<SpecificPacketEvent<PacketType>>(id);
     }
 
 

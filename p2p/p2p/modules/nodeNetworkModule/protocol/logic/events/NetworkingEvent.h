@@ -32,10 +32,12 @@ public:
         return requestId;
     }
 
+private:
     void setRequestId(BasePacket::IdType requestId) {
         NetworkingEvent::requestId = requestId;
     }
 
+public:
     //this is required for responses unless I find a way to also set it from context
     explicit NetworkingEvent(BasePacket::IdType requestId) : requestId(requestId) {}
 

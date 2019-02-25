@@ -63,7 +63,7 @@ public:
 public:
     template<typename T>
     void operate(NetworkPacketPointer<T> ptr) {
-//        LOGGER(std::string("operating o ") + typeid(T).name());
+        LOGGER(std::string("operating o ") + typeid(T).name());
         SpecificPacketEvent<T> packetEvent;
         packetEvent.setPacket(ptr);
         packetEvent.setEventId(eventId);

@@ -7,8 +7,21 @@
 
 
 #include <p2p/logic/IEvent.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkingEvent.h>
+#include <repo/repository/IRepository.h>
 
-class RepositoryEvent : public IEvent<int> {
+enum class RepositoryEventId {
+    REQUEST_REPO_INFO,
+};
+
+class RepositoryEvent : public NetworkingEvent<RepositoryEventId> {
+private:
+    IRepository::RepoIdType repoId;
+
+public:
+    const IRepository::RepoIdType &getRepoId() const;
+
+    void setRepoId(const IRepository::RepoIdType &repoId);
 
 };
 
