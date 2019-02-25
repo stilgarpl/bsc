@@ -20,7 +20,8 @@ public:
 private:
     // ArrayType dependency;
 public:
-    constexpr static ArrayType getDependencyIds() {
+    //@todo constexpr?
+    static ArrayType getDependencyIds() {
         ArrayType ret;
         ret.reserve(1 + sizeof...(Args));
         ret.push_back(DependencyManager::getClassId<T>());
@@ -41,7 +42,8 @@ class Dependency<T> : public IDependency {
 public:
     typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
 
-    constexpr static ArrayType getDependencyIds() {
+    //@todo constexpr?
+     static ArrayType getDependencyIds() {
         ArrayType ret;
         ret.push_back(DependencyManager::getClassId<T>());
         return ret;
