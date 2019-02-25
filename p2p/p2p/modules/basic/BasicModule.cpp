@@ -17,7 +17,7 @@ void BasicModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
 }
 
 bool BasicModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
-    return false;
+    return true;
 }
 
 bool BasicModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {

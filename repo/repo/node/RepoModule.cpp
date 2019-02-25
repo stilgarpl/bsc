@@ -37,14 +37,8 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     //@todo implements all those required methods.
     when(TimeConditions::every(3s)).fireNewGenericAction(NetworkActions::broadcastPacket,
                                                          CommonEvaluators::value(RepoQuery::Request::getNew()));
-    when(event<SpecificPacketEvent<RepoQuery::Response>>(PacketEventId::PACKET_RECEIVED)).fireNewAction(
-            [](auto e) { LOGGER("GOT REPO RESPONSE AAAAAAA") });
-//@todo Network Conditions do not work. NO IDEA WHY. INVESTIGATE
-    when(NetworkConditions::packetReceived<RepoQuery::Response>()).fireNewAction(
-            [](auto e) { LOGGER("GOT REPO RESPONSE QQQQQQQ") });
 
-
-    when(event<SpecificPacketEvent<RepoQuery::Response>>(PacketEventId::PACKET_RECEIVED)).newChain(
+    when(NetworkConditions::packetReceived<RepoQuery::Response>()).newChain(
             "repoUpdateChain").ifTrue(
             RepositoryActions::checkIfUpdateRequired);//.fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
 

@@ -75,7 +75,17 @@ public:
         }
     }
 
+    //@todo maybe return bool if change state was successful?
+    //@todo maybe add method to check if changing state to other is valid and then run some code and do the change...
     void changeState(const StateIdType &state) {
+
+        //already in that state, do nothing.
+        //@todo error handling if currentState points to wrong state or uninitialized?
+        if (state == *currentState) {
+            //@todo think about it. Allow chaning state to itself?
+            return;
+        }
+
         if (!states.count(state)) {
             invalidStateHandler(state);
             LOGGER("invalid state")

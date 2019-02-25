@@ -11,13 +11,11 @@
 struct NetworkConditions {
 
     static auto packet(PacketEventId id) {
-//        return LogicObject::EventHelper<PacketEvent>(id);
         return LogicObject::event<PacketEvent>(id);
     }
 
     template<typename PacketType>
     static auto packet(typename SpecificPacketEvent<PacketType>::IdType id) {
-//        return LogicObject::EventHelper<SpecificPacketEvent<PacketType>>(id);
         return LogicObject::event<SpecificPacketEvent<PacketType>>(id);
     }
 
@@ -28,7 +26,7 @@ struct NetworkConditions {
 
     template<typename PacketType>
     static auto packetReceived() {
-        return packet<SpecificPacketEvent<PacketType>>(PacketEventId::PACKET_RECEIVED);
+        return packet<std::decay_t<PacketType>>(PacketEventId::PACKET_RECEIVED);
     }
 
     static auto packetSent() {
@@ -37,7 +35,7 @@ struct NetworkConditions {
 
     template<typename PacketType>
     static auto packetSent() {
-        return packet<SpecificPacketEvent<PacketType>>(PacketEventId::PACKET_SENT);
+        return packet<std::decay_t<PacketType>>(PacketEventId::PACKET_SENT);
     }
 
     static auto packetDropped() {
@@ -46,7 +44,7 @@ struct NetworkConditions {
 
     template<typename PacketType>
     static auto packetDropped() {
-        return packet<SpecificPacketEvent<PacketType>>(PacketEventId::PACKET_DROPPED);
+        return packet<std::decay_t<PacketType>>(PacketEventId::PACKET_DROPPED);
     }
 
 };

@@ -9,7 +9,6 @@
 
 
 #include "LogicManager.h"
-
 #include <p2p/logic/sources/AutoSource.h>
 #include <p2p/logic/events/LogicStateEvent.h>
 #include <p2p/logic/chain/ChainEvent.h>
@@ -249,7 +248,10 @@ public:
         ThisType &fireNewAction(ActionManager::ActionType<EventType, Args...> action) {
 
             auto generatedActionId = generateActionId<unsigned long>();
+//            int status;
+//            auto realname = abi::__cxa_demangle(typeid(EventType).name(), 0, 0, &status);
 
+//            LOGGER("fire new action for type " + std::string(typeid(EventType).name()) + " .... " + realname )
             std::cout << "assigning action with generated id " << std::to_string(generatedActionId) << std::endl;
             logicManager.setAction<EventType, Args...>(generatedActionId, action);
             fireAction(generatedActionId);
