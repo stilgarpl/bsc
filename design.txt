@@ -417,3 +417,7 @@ teraz jak mam packetReceived<T> to zastanawiam sie, czy packet->process() jeszcz
 
 
 logic chain moze w chain context trzymać id konkretnego wykonania chaina, generowany przy start chain. mozna tez dodać end chain. wtedy wiadomo czy dana iteracja chaina jeszcze pracuje i czy trzeba czekać na evaluator ktory pobiera wynik innego brancha
+//@todo ^^
+
+po przemysleniu usunalem zwracanie default context z getActiveContext. default context jest bez sensu, to znaczy, ze ktos gdzies nie ustawil kontekstu. Kontekst zawsze powinien byc ustawiony. brak kontekstu to błąd.
+zwracam nulla jak nie ma ustawionego, przynajmniej jakis segfault poleci.

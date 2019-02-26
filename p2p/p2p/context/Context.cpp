@@ -23,12 +23,12 @@ void Context::setParentContext(Context::Ptr parentContext) {
 
 Context::Ptr Context::getActiveContext() {
     thread_local static Context::Ptr defaultContext = std::make_shared<Context>(true);
-    if (activeContext == nullptr) {
-        LOGGER("WARNING: returning default context")
-        return defaultContext;
-    } else {
+//    if (activeContext == nullptr) {
+//        LOGGER("WARNING: returning default context")
+//        return defaultContext;
+//    } else {
         return activeContext;
-    }
+//    }
 }
 
 void Context::setActiveContext(Context::Ptr ctx) {

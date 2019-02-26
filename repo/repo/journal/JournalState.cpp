@@ -146,6 +146,8 @@ JournalMetaData::JournalMetaData() {
     operatingSystem = env.osName();
     //@todo implement to work on all platforms
     userId = getenv("USER");
-    nodeId = NodeContext::getNodeFromActiveContext().getNodeInfo().getNodeId();
+    if (Context::getActiveContext() != nullptr) {
+        nodeId = NodeContext::getNodeFromActiveContext().getNodeInfo().getNodeId();
+    }
 }
 
