@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
-project(basyco)
+project(basyco VERSION 0.1 LANGUAGES CXX)
 
 #conan setup
 find_program(conan conan)
@@ -23,7 +23,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -lstdc++fs -Wall -Wno-unused-local-typedefs -pedantic")
+    add_compile_options(-pthread -lstdc++fs -Wall -Wno-unused-local-typedefs -pedantic)
+#    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -lstdc++fs -Wall -Wno-unused-local-typedefs -pedantic")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     if (MSVC_VERSION GREATER_EQUAL "1900")
         include(CheckCXXCompilerFlag)
