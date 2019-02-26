@@ -23,6 +23,8 @@ public:
     int getPriority() const {
         return priority;
     }
+
+    virtual ~ITransformRule() = default;
 };
 
 typedef std::shared_ptr<ITransformRule> ITransformRulePtr;

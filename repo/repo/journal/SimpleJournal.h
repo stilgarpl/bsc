@@ -110,6 +110,8 @@ public:
 
     JournalStatePtr getState(const CommitTimeType &commitTime, const ChecksumType &checksumType) override;
 
+    ~SimpleJournal() override = default;
+
 };
 
 CEREAL_REGISTER_TYPE(SimpleJournal)

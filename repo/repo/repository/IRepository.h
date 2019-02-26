@@ -14,6 +14,7 @@ public:
     typedef std::string RepoIdType;
 
     virtual const RepoIdType &getRepositoryId() const =0;
+    virtual ~IRepository() = default;
 };
 
 

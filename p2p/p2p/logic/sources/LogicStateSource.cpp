@@ -12,3 +12,7 @@ void LogicStateSource::work() {
 LogicStateSource::LogicStateSource(SourceManager &sourceManager) : ISource(sourceManager), source(sourceManager) {
 
 }
+
+LogicStateSource::~LogicStateSource() {
+
+}

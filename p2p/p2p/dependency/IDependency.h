@@ -13,6 +13,8 @@ public:
     typedef std::vector<TypeIdType> ArrayType;
 
     virtual ArrayType getDependencyIdents() =0;
+
+    virtual ~IDependency() = default;
 };
 
 

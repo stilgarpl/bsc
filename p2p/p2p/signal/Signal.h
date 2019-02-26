@@ -45,6 +45,8 @@ public:
         return assign(funcPtr);
     }
 
+    virtual ~Signal() = default;
+
 
 };
 

@@ -45,6 +45,8 @@ public:
         logicEvent.setMethod(LogicStateMethod::LEFT);
         source.generateEvent<LogicStateEvent<Object, StateIdType>>(logicEvent);
     }
+
+    virtual ~LogicStateSource();
 };
 
 

@@ -12,6 +12,7 @@ class RoleFilter : public PacketFilter {
 public:
     bool filter(BasePacketPtr packet) override;
 
+    ~RoleFilter() override = default;
 };
 
 

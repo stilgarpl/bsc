@@ -21,9 +21,11 @@ protected:
     void setLastTick(duration d, time_point t);
 
 public:
-    ClockSource(SourceManager &sourceManager);
+    explicit ClockSource(SourceManager &sourceManager);
 
     void work() override;
+
+
 
 };
 

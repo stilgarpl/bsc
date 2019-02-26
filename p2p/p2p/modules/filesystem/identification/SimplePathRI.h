@@ -45,6 +45,8 @@ public:
 
     uintmax_t getResourceSize() override;
 
+    ~SimplePathRI() override = default;
+
 };
 
 CEREAL_REGISTER_TYPE(SimplePathRI)

@@ -25,11 +25,14 @@ public:
         friend class AuthModule;
 
         friend class SubModule;
+        virtual ~AuthRuleData() = default;
     };
 
 protected:
     template<typename PacketType>
     class SpecificAuthRuleData : public AuthRuleData {
+    public:
+        ~SpecificAuthRuleData() override = default;
     protected:
         void applyRule() override {
             for (const auto &item : requiredRoles) {

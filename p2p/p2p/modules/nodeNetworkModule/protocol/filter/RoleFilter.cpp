@@ -14,3 +14,4 @@ bool RoleFilter::filter(BasePacketPtr packet) {
     return roleValid;
 //    packet
 }
+

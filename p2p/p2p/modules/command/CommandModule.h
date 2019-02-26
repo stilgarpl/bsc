@@ -53,6 +53,7 @@ public:
             virtual void applyCommand(CommandModule &commandModule) = 0;
 
             const std::string &getCommandName() const;
+            virtual ~CommandData() = default;
 
         };
 
@@ -69,6 +70,7 @@ public:
             void applyCommand(CommandModule &commandModule) override {
                 commandModule.mapCommand(commandName, func);
             }
+            ~SpecificCommandData() override = default;
         };
 
 
@@ -313,7 +315,7 @@ public:
         LOGGER("Command Module has stopped")
     }
 
-    void run() {
+    void run() override {
         //@todo restart this if flag changes later?
         if (interactive) {
             runInteractive();

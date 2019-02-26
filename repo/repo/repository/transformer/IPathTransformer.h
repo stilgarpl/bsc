@@ -39,6 +39,8 @@ public:
     virtual void removeRule(ITransformRulePtr rule) = 0;
 
     virtual RuleSet getRules() = 0;
+
+    virtual ~IPathTransformer() = default;
 };
 
 

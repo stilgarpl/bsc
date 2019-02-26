@@ -1,3 +1,7 @@
+#include <utility>
+
+#include <utility>
+
 //
 // Created by stilg on 15.09.2017.
 //
@@ -14,11 +18,11 @@ Context::Ptr Context::getParentContext() const {
 
 void Context::setParentContext(Context::Ptr parentContext) {
     std::lock_guard<std::recursive_mutex> guard(contextLock);
-    Context::parentContext = parentContext;
+    Context::parentContext = std::move(parentContext);
 }
 
 Context::Ptr Context::getActiveContext() {
-    thread_local static Context::Ptr defaultContext = std::make_shared<Context>();
+    thread_local static Context::Ptr defaultContext = std::make_shared<Context>(true);
     if (activeContext == nullptr) {
         LOGGER("WARNING: returning default context")
         return defaultContext;
@@ -28,7 +32,7 @@ Context::Ptr Context::getActiveContext() {
 }
 
 void Context::setActiveContext(Context::Ptr ctx) {
-    activeContext = ctx;
+    activeContext = std::move(ctx);
 }
 
 Context::Context(const Context &other) {
@@ -66,3 +70,9 @@ Context::Context(const Context::Ptr &ptr) : Context(*ptr) {}
 Context::ContextPtr Context::makeContext() {
     return std::make_shared<Context>();
 }
+
+bool Context::isDefaultContext() const {
+    return defaultContext;
+}
+
+Context::Context(bool defaultContext) : defaultContext(defaultContext) {}

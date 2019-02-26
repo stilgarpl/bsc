@@ -30,6 +30,11 @@ private:
     //@todo add thread safety - mutex, lock and locking of the parent before accessing it
     Context::Ptr parentContext = nullptr;
 
+public:
+    bool isDefaultContext() const;
+
+private:
+
     const TypeIdType getNextTypeId() const {
         static TypeIdType val = 0;
         return val++;
@@ -130,6 +135,8 @@ public:
     Context &operator+=(Context::Ptr other);
 
     Context(const Context &other);
+
+    Context(bool defaultContext);
 
     explicit Context(const Ptr &ptr);
 

@@ -12,6 +12,8 @@ class PacketFilter {
 
 public:
     virtual bool filter(BasePacketPtr packet) =0;
+
+    virtual ~PacketFilter() = default;
 };
 
 

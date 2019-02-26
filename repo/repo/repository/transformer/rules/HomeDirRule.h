@@ -19,6 +19,8 @@ public:
 
     std::filesystem::path transformFromJournalFormat(fs::path path) override;
 
+    ~HomeDirRule() override = default;
+
 };
 
 

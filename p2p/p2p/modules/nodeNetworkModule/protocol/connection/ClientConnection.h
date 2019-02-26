@@ -21,9 +21,9 @@ protected:
 public:
     ClientConnection(const std::string &a, Context::Ptr);
 
-    void startReceiving();
-
-    void startSending();
+    //@todo think about the Connection interface and those method names.
+    void startReceivingImpl();
+    void startSendingImpl();
 
     ~ClientConnection() override;
 

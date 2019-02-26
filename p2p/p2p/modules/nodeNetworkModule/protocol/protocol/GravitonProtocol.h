@@ -30,6 +30,8 @@ public:
     void onConnectionEvent(const ConnectionEvent &event) override;
 
     std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) override;
+
+
 };
 
 

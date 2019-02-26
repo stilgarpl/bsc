@@ -35,13 +35,13 @@ private:
     LogicManager logicManager;
     Context::Ptr nodeContext = Context::makeContext();
 
-    virtual Context::Ptr getContext() {
+    Context::Ptr getContext() override {
         return nodeContext;
     }
 
 public:
     //@todo testing...
-    void setNodeContextActive() {
+    void setNodeContextActive() override {
         Context::setActiveContext(nodeContext);
     }
 
@@ -64,7 +64,7 @@ private:
 
 public:
 
-    ConfigurationManager &getConfigurationManager() {
+    ConfigurationManager &getConfigurationManager() override {
         return configurationManager;
     }
 
@@ -98,7 +98,7 @@ public:
         return logicManager;
     }
 
-    virtual NodeInfo &getNodeInfo() {
+    NodeInfo &getNodeInfo() override {
         return thisNodeInfo;
     }
 

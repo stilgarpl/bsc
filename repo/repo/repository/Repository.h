@@ -157,6 +157,8 @@ public:
     explicit Repository(const RepoIdType &repositoryId);
 
     void trash(fs::path path);
+
+    ~Repository() override = default;
 };
 
 typedef std::shared_ptr<Repository> RepositoryPtr;

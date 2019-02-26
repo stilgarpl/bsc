@@ -24,6 +24,8 @@ private:
     void removeRule(ITransformRulePtr rule) override;
 
     RuleSet getRules() override;
+public:
+    ~PathTransformer() override = default;
 
 
 };

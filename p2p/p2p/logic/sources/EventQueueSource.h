@@ -65,7 +65,7 @@ public:
         return eventQueue.size();
     }
 
-
+    virtual ~EventQueueSource() = default;
 };
 
 

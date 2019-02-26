@@ -20,6 +20,7 @@ public:
     std::filesystem::path transformToJournalFormat(fs::path path) override;
 
     std::filesystem::path transformFromJournalFormat(fs::path path) override;
+    ~CustomRule() override = default;
 };
 
 

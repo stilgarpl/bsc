@@ -56,6 +56,8 @@ public:
     virtual void clearFunc() = 0;
 
     virtual JournalStatePtr getState(const CommitTimeType &commitTime, const ChecksumType &checksumType) = 0;
+
+    virtual ~IJournal() = default;
 };
 
 typedef std::shared_ptr<IJournal> JournalPtr;

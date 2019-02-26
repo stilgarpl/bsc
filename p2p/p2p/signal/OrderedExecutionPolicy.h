@@ -37,6 +37,8 @@ private:
     std::shared_ptr<Executor> _executor = std::make_shared<OrderedExecutor>();
 public:
     std::shared_ptr<Executor> executor() override;
+
+    virtual ~OrderedExecutionPolicy() = default;
 };
 
 

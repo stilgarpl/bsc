@@ -48,6 +48,8 @@ public:
 
     void setContext(Context &context) {};
 
+    virtual ~ISource() = default;
+
 };
 
 

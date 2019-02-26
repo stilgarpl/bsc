@@ -78,6 +78,8 @@ protected:
     virtual void _operate(PacketSourceWorker &f, std::shared_ptr<BasePacket>) = 0;
 
     friend class ConnectionSource;
+
+    virtual ~BasePacket() = default;
 };
 
 typedef std::shared_ptr<BasePacket> BasePacketPtr;

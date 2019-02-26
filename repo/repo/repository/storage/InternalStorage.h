@@ -42,6 +42,7 @@ public:
     bool acquireResource(const ResourceId &resourceId) override;
 
     void restore(const ResourceId &resourceId, const PathType &destinationPath) override;
+    ~InternalStorage() override = default;
 };
 
 

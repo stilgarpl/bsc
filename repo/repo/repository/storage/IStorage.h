@@ -55,6 +55,8 @@ public:
         this->repository = r;
     }
 
+    virtual ~IStorage() = default;
+
 };
 
 

@@ -144,6 +144,8 @@ public:
         return Roles::getRequiredRolesDefinitions<S>();
     }
 
+    ~Packet() override = default;
+
 protected:
     void _operate(PacketSourceWorker &f, std::shared_ptr<BasePacket> ptr) override {
         f.operate<S>(std::static_pointer_cast<S>(ptr));

@@ -11,7 +11,7 @@ ProtocolWrapper::ProtocolWrapper(ConnectionPtr connection, IProtocol *protocol) 
                                                                                   protocol(protocol) {}
 
 std::future<BasePacketPtr> ProtocolWrapper::send(BasePacketPtr p) {
-    //return protocol->send(connection,p);
+    return protocol->send(connection.get(),p);
     return std::future<BasePacketPtr>();
 }
 
@@ -67,3 +67,7 @@ bool IProtocol::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
 }
 
 IProtocol::IProtocol(LogicManager &logicManager) : LogicObject(logicManager) {}
+
+std::future<BasePacketPtr> IProtocol::send(Connection *conn, BasePacketPtr p) {
+    return this->send(conn, std::move(p),Status::RESPONSE);
+}

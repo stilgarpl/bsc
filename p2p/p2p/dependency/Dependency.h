@@ -34,6 +34,8 @@ public:
     ArrayType getDependencyIdents() override {
         return getDependencyIds();
     }
+
+    ~Dependency() override = default;
 };
 
 template<typename T>

@@ -40,7 +40,11 @@ private:
     }
 
 
+
+
     friend class cereal::access;
+public:
+    virtual ~ResourceIdentificator() = default;
 };
 
 

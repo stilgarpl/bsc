@@ -25,16 +25,21 @@ public:
 
 public:
     virtual void execute(std::function<void(void)> task) = 0;
+    virtual ~Executor() = default;
 };
 
 class SimpleExecutor : public Executor {
 protected:
     void execute(std::function<void(void)> task) override;
+public:
+    ~SimpleExecutor() override = default;
 };
 
 class ThreadExecutor : public Executor {
 protected:
     void execute(std::function<void(void)> task) override;
+public:
+    ~ThreadExecutor() override = default;
 };
 
 //@todo add ThreadPoolExecutor

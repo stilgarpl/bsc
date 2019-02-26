@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 05.09.17.
 //
@@ -23,6 +25,7 @@ using namespace std::placeholders;
 class ProtocolWrapper {
 private:
     ConnectionPtr connection;
+    //@todo make a &reference?
     IProtocol *protocol;
 
 public:
@@ -42,10 +45,10 @@ public:
         onWork,
     };
 
-    IProtocol(LogicManager &logicManager);
+    explicit IProtocol(LogicManager &logicManager);
 
     ProtocolWrapper wrap(ConnectionPtr conn) {
-        return ProtocolWrapper(conn, this);
+        return ProtocolWrapper(std::move(conn), this);
     }
 
     virtual void onPacketSent(const PacketEvent &event)= 0;
@@ -58,8 +61,9 @@ public:
     //virtual void send(Connection *conn, BasePacketPtr p)= 0;
 
     virtual std::future<BasePacketPtr>
-    send(Connection *conn, BasePacketPtr p, const Status &expectedStatus = Status::RESPONSE) = 0;
+    send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) = 0;
 
+    std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p);
 
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto sendExpect(Connection *conn, NetworkPacketPointer<SendType> p) {
@@ -119,6 +123,8 @@ public:
 
     bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
 
+    virtual ~IProtocol() = default;
+
 };
 
 class DummyProtocol : public IProtocol {
@@ -129,7 +135,7 @@ class DummyProtocol : public IProtocol {
     void work(const Tick &tick) override;
 
 public:
-    DummyProtocol(LogicManager &logicManager);
+    explicit DummyProtocol(LogicManager &logicManager);
 
     std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) override;
 

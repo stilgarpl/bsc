@@ -17,6 +17,8 @@ public:
 
     std::filesystem::path transformFromJournalFormat(fs::path path) override;
 
+    ~TmpRule() override = default;
+
 };
 
 

@@ -32,8 +32,8 @@ bool RemoteNode::connectTo(const NetAddressType &address) {
         auto conn = std::make_shared<ClientConnection>(address,
                                                        _context);
 
-        conn->startSending();
-        conn->startReceiving();
+        conn->startSendingImpl();
+        conn->startReceivingImpl();
         connection = conn;
         return true;
     } catch (const Poco::Net::ConnectionRefusedException &) {
