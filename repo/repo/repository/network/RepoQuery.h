@@ -27,6 +27,12 @@ public:
             ar(repoId);
         }
 
+    public:
+        const IRepository::RepoIdType &getRepoId() const;
+
+        void setRepoId(const IRepository::RepoIdType &repoId);
+
+    private:
 
         friend class cereal::access;
 

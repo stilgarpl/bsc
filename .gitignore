@@ -128,3 +128,5 @@ fabric.properties
 /CMakeFiles/
 .idea/
 /.conan/
+
+conan/*.junk

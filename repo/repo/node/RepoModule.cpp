@@ -37,14 +37,17 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     ret &= actionHelper.assignAction<RepositoryEvent>(RepositoryEventId::REQUEST_REPO_INFO, "repoInfo");
 
     //@todo implements all those required methods.
-    when(TimeConditions::every(3s)).fireNewGenericAction(
-            CommonActions::foreachAction(NetworkActions::broadcastPacket, this->repositoryManager.getRepositories()),
-            CommonEvaluators::value(RepoQuery::Request::getNew()));
+    when(TimeConditions::every(5s)).fireNewGenericAction(
+            CommonActions::foreachActionGetter(NetworkActions::broadcastPacket,
+                    [this](){ return this->repositoryManager.getRepositories();},
+                    [](RepositoryPtr rep) ->BasePacketPtr {auto p = RepoQuery::Request::getNew();p->setRepoId(rep->getRepositoryId());return p;} ),
+            CommonEvaluators::foreachValue<BasePacketPtr>());
 
-    when(NetworkConditions::packetReceived<RepoQuery::Response>()).newChain(
-            "repoUpdateChain").ifTrue(
-            RepositoryActions::checkIfUpdateRequired, RepoEvaluators::currentJournalFromRepoQueryResponse,
-            RepoEvaluators::newJournalFromRepoQueryResponse);//.fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
+
+    when(NetworkConditions::packetReceived<RepoQuery::Response>())
+    .newChain("repoUpdateChain")
+    .ifTrue(RepositoryActions::checkIfUpdateRequired, RepoEvaluators::currentJournalFromRepoQueryResponse,RepoEvaluators::newJournalFromRepoQueryResponse);
+    //.fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
 
     return ret;
 }

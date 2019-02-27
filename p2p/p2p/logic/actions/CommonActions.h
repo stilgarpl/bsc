@@ -11,23 +11,27 @@
 
 struct CommonActions {
 
+    constexpr static auto passthroughTransformer = [](const auto& e) {return e;};
+
 //    every(1s).fireC(foreachAction(broadcast),bulkEval({1,2,3}),bulkEval(getRepoIds()));
     template<typename Func, typename Container>
     static constexpr auto foreachAction(Func func, Container &container) {
-        return [container, func](auto &... param) {
+        //don't even think about making &container. it won't work.
+        return [container, func](const auto &... param) {
             for (const auto &it : container) {
-                //@todo replace all that context stuff by ContextStack
-//#error "problem z tym, że bulkEval jest uruchomiony przed wejściem tutaj, więc nie może ustawiać po kolei rzeczy"
-//#error "więc pomysł jest taki, żeby bulkEval zwrócił referkę do ForeachContext::value, a potem ta petla by zmieniala wartosc tej zmiennej. w razie czego mozna zwracac tez pointer czy cos"
-//                auto context = Context::makeContext();
-//                context->setParentContext(Context::getActiveContext());
-//                auto cur = Context::getActiveContext();
-//                Context::setActiveContext(context);
                 Context::getActiveContext()->get<ForeachContext<std::decay_t<decltype(it)>>>()->setValue(it);
-
                 func(param...);
+            }
+        };
+    }
 
-//                Context::setActiveContext(Context::getActiveContext()->getParentContext());
+    template<typename Func, typename ContainerGetter, typename Transformer=decltype(passthroughTransformer)>
+    static constexpr auto foreachActionGetter(Func func, ContainerGetter containerGetter, Transformer transformer = passthroughTransformer) {
+        return [containerGetter, func, transformer](const auto &... param) {
+            for (const auto &it : containerGetter()) {
+                const auto& transformIt = transformer(it);
+                Context::getActiveContext()->get<ForeachContext<std::decay_t<decltype(transformIt)>>>()->setValue(transformIt);
+                func(param...);
             }
         };
     }

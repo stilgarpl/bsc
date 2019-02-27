@@ -138,7 +138,7 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
             NetworkActions::saveNetworkInfo);
 
     when(event<ModuleEvent<NodeNetworkModule>>()).fireNewAction([](auto event) { LOGGER("module event NNM") });
-
+//
 //    auto list = {88, 77, 44, 101};
 //    auto list2 = {99, 10};
 //    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
@@ -151,7 +151,7 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 //
 //    stage2.fireNewGenericChainAction(testingMethod1xs,
 //                                     ChainEvaluators::genericChainResult(stage2));
-////            fireNewGenericChainAction(CommonActions::foreachAction(testingMethod1i, list),
+//            stage2.fireNewGenericChainAction(CommonActions::foreachAction(testingMethod1i, list),
 //                                      CommonEvaluators::foreachValue<int>());
 
 //    when(event < SpecificPacketEvent<KeepAlivePacket::Response>>

@@ -8,7 +8,7 @@
 #include "RepositoryActions.h"
 
 void RepositoryActions::getRepositoryInformation(const RepositoryEvent &repositoryEvent) {
-    LOGGER("GET REPO INFO")
+    LOGGER("GET REPO INFO " + repositoryEvent.getRepoId())
     auto &node = NodeContext::getNodeFromActiveContext();
     auto repo = node.getModule<RepoModule>()->findRepository(repositoryEvent.getRepoId());
     RepoQuery::Response::Ptr res = RepoQuery::Response::getNew(repositoryEvent.getRequestId());

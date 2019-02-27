@@ -103,6 +103,24 @@ public:
         }
     }
 
+    template<typename T>
+    std::shared_ptr<T> getSafe() {
+        std::lock_guard<std::recursive_mutex> guard(contextLock);
+        static auto typeId = getTypeId<T>();
+        auto ret = std::static_pointer_cast<T>(data[typeId][getKey(0)]);
+        if (ret == nullptr && parentContext != nullptr) {
+            ret = parentContext->get<T>();
+
+        }
+
+        if (ret == nullptr) {
+            return set<T>();
+        } else {
+            return ret;
+        }
+
+    }
+
     /**
      * sets context value
      * it disconnects all previous pointers got from get<>

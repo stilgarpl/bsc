@@ -34,13 +34,13 @@ struct CommonEvaluators {
     static auto foreachValue() {
         return [](auto e, auto ... args) -> T & {
             //@todo error handling
-            //@todo this modifies ForeachContext in active context. what if this is node context and more than one thread is trying to do it? it should have it's own context
             //@todo ^^ I made a fix for that, each event have separate context. should fix this, but... think about it.
-            return Context::getActiveContext()->set<ForeachContext<T>>()->getValue();
+            return Context::getActiveContext()->getSafe<ForeachContext<T>>()->getValue();
         };
     }
 
-//    static auto unwrapEvent();
+
+
 
 };
 

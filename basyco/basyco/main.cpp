@@ -512,7 +512,7 @@ int main(int argc, char *argv[]) {
 //    otherNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 //    thirdNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 
-    std::this_thread::sleep_for(5s);
+    std::this_thread::sleep_for(599s);
     //auto fdes = FileTransferControl::initiateTransfer(thisNode, "second", "/tmp/zsh", "/tmp/copied_zsh");
     thisNode.stop();
     thisNode.waitToFinish();

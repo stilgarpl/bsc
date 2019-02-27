@@ -421,3 +421,14 @@ logic chain moze w chain context trzymać id konkretnego wykonania chaina, gener
 
 po przemysleniu usunalem zwracanie default context z getActiveContext. default context jest bez sensu, to znaczy, ze ktos gdzies nie ustawil kontekstu. Kontekst zawsze powinien byc ustawiony. brak kontekstu to błąd.
 zwracam nulla jak nie ma ustawionego, przynajmniej jakis segfault poleci.
+
+
+na spacerze przyszedł mi do głowy pomysł jak na zawsze rozwiązać kwestię processorów, networking eventów, originów i tego wszystkiego. znika 80% source. znika potrzeba tworzenia bezsensownego kodu process->source->event->action->connection. znika potrzeba ręcznego ustawiania packet id i pilnowania tego. setter do packet id wręcz może być private (friendować cos co w network module sie tym zajmie)
+
+NetworkModule może to wszystko owinąć w logikę
+
+dla kazdego pakietu można zdefiniować metodę-rurę Request -> Response. triggerowaną przez SpecificPacketEvent<T> każdy module ktory chce mieć pakiety tworzylby NetworkModule::Submodule z definicjami <T> => m(Req->Res)
+
+to byłoby opakowane w generic function albo nawet zwykłą action, która bierze pakiet ze specificpacketeventu, przepuszcza go przez tą metodę, bierze odpowiedź, ustawia packet id i wysyła ją do connection wziętą z kontekstu.
+
+//@todo Networking processors. ^^^
