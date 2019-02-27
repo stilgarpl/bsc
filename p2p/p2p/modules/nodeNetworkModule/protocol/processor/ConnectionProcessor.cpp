@@ -33,6 +33,7 @@ void ConnectionProcessor::run() {
         if (packetToProcess != nullptr) {
             if (packetFilter->filter(packetToProcess)) {
 //            LOGGER("processing packet " );
+                connectionSourcePtr->receivedPacket(packetToProcess, &connection);
                 processorContext->setThisPacket(packetToProcess);
                 packetToProcess->process(context);
             } else {
