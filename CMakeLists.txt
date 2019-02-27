@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.7)
 project(basyco VERSION 0.1 LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
 #conan setup
 find_program(conan conan)
 if (EXISTS ${conan})
@@ -17,10 +22,6 @@ if (EXISTS ${conan})
 endif ()
 #end of conan setup
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options(-pthread -lstdc++fs -Wall -Wno-unused-local-typedefs -pedantic)

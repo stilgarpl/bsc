@@ -29,6 +29,10 @@ public:
             repositories.push_back(ptr);
         }
     }
+
+    const std::list<RepositoryPtr> &getRepositories() const {
+        return repositories;
+    }
 };
 
 

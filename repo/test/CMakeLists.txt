@@ -21,6 +21,7 @@ message(libs::test ${LIBS})
 
 set(SOURCE_FILES test_repo/test_main.cpp test_repo/JournalTest.cpp test_repo/repo_test.cpp)
 add_executable(test_repo ${SOURCE_FILES})
+add_test(NAME test_repo COMMAND test_repo)
 target_include_directories(test_repo PUBLIC test_repo)
 #message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(test_repo p2p repo ${LIBS})

@@ -29,6 +29,7 @@ struct CommonEvaluators {
         };
     }
 
+    //@todo add override of foreach with parameter that transforms value to something else.
     template<typename T>
     static auto foreachValue() {
         return [](auto e, auto ... args) -> T & {

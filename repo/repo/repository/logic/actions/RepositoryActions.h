@@ -12,7 +12,7 @@ struct RepositoryActions {
 
 
     //@todo implement
-    static bool checkIfUpdateRequired() {
+    static bool checkIfUpdateRequired(const JournalPtr &currentJournal, const JournalPtr &newJournal) {
         LOGGER("REPO CHECK IF U")
         return false;
     }

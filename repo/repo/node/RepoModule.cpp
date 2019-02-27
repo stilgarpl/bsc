@@ -16,6 +16,8 @@
 #include <p2p/logic/conditions/TimeConditions.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/conditions/NetworkConditions.h>
 #include <repo/repository/logic/actions/RepositoryActions.h>
+#include <repo/repository/logic/evaluators/RepoEvaluators.h>
+#include <p2p/logic/actions/CommonActions.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
@@ -35,12 +37,14 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     ret &= actionHelper.assignAction<RepositoryEvent>(RepositoryEventId::REQUEST_REPO_INFO, "repoInfo");
 
     //@todo implements all those required methods.
-    when(TimeConditions::every(3s)).fireNewGenericAction(NetworkActions::broadcastPacket,
-                                                         CommonEvaluators::value(RepoQuery::Request::getNew()));
+    when(TimeConditions::every(3s)).fireNewGenericAction(
+            CommonActions::foreachAction(NetworkActions::broadcastPacket, this->repositoryManager.getRepositories()),
+            CommonEvaluators::value(RepoQuery::Request::getNew()));
 
     when(NetworkConditions::packetReceived<RepoQuery::Response>()).newChain(
             "repoUpdateChain").ifTrue(
-            RepositoryActions::checkIfUpdateRequired);//.fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
+            RepositoryActions::checkIfUpdateRequired, RepoEvaluators::currentJournalFromRepoQueryResponse,
+            RepoEvaluators::newJournalFromRepoQueryResponse);//.fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
 
     return ret;
 }

@@ -282,10 +282,10 @@ public:
         /*
          * works like generic func, but return value should be bool or convertible to bool
          */
-        template<typename ConditionalFunc, template<typename E> typename ... Evaluators>
-        auto conditionalChain(ConditionalFunc conditionalFunc, bool value, Evaluators<EventType>... evaluators) {
+        template<typename ConditionalFunc, typename ... Evaluators>
+        auto conditionalChain(ConditionalFunc conditionalFunc, bool value, Evaluators... evaluators) {
             //@todo check if RetType is void or already an event type
-            using RetType = std::invoke_result_t<ConditionalFunc, std::invoke_result_t<Evaluators<EventType>, EventType, Args...>...>;
+            using RetType = std::invoke_result_t<ConditionalFunc, std::invoke_result_t<Evaluators, EventType, Args...>...>;
             return fireNewChainAction([=](EventType e) {
                 EventWrapper<RetType> ret(conditionalFunc(evaluators(e)...));
                 if (ret.getPayload() != value) {
@@ -296,13 +296,13 @@ public:
             });
         }
 
-        template<typename ConditionalFunc, template<typename E> typename ... Evaluators>
-        auto ifTrue(ConditionalFunc conditionalFunc, Evaluators<EventType>... evaluators) {
+        template<typename ConditionalFunc, typename ... Evaluators>
+        auto ifTrue(ConditionalFunc conditionalFunc, Evaluators... evaluators) {
             return conditionalChain(conditionalFunc, true, evaluators...);
         }
 
-        template<typename ConditionalFunc, template<typename E> typename ... Evaluators>
-        auto ifFalse(ConditionalFunc conditionalFunc, Evaluators<EventType>... evaluators) {
+        template<typename ConditionalFunc, typename ... Evaluators>
+        auto ifFalse(ConditionalFunc conditionalFunc, Evaluators... evaluators) {
             return conditionalChain(conditionalFunc, false, evaluators...);
         }
 
