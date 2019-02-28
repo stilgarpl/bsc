@@ -82,10 +82,11 @@ public:
         ProcessorType<PacketType> processor;
 
         void registerPacketProcessor(NodeNetworkModule &node) override {
-            node.when(NetworkConditions::packetReceived<PacketType::Request>()).fireNewAction(
-                    [processor = processor](const SpecificPacketEvent<typename PacketType::Request> packet) {
-                        auto response = processor(packet);
-                        packet->getConnection()->send(response);
+            node.when(NetworkConditions::packetReceived<typename PacketType::Request>()).fireNewAction(
+                    [processor = processor](const SpecificPacketEvent<typename PacketType::Request> packetEvent) {
+                        auto response = processor(packetEvent.getPacket());
+                        response->setId(packetEvent.getPacket()->getId());
+                        packetEvent.getConnection()->send(response);
                     });
         }
 

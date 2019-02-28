@@ -107,6 +107,11 @@ struct Packet : public BasePacket {
         return getNew<getPacketStatus()>();
     }
 
+    template<typename Type>
+    static auto getNew(Type *t) {
+        return getNew<getPacketStatus()>(t);
+    }
+
     template<enum Status ss>
     static auto getNew(const BasePacket::IdType &id) {
         return PacketUtils::getNewPtr<ss, typename PacketInfo<GroupType, ss>::Type>(id);

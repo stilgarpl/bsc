@@ -27,14 +27,14 @@ void RepoModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
     actionHelper.setAction<JournalRequestEvent>("journalRequest", JournalActions::journalRequested);
     actionHelper.setAction<JournalResponseEvent>("journalReceive", JournalActions::journalReceived);
     actionHelper.setAction<StorageResourceRequestEvent>("storageQuery", StorageActions::resourceRequested);
-    actionHelper.setAction<RepositoryEvent>("repoInfo", RepositoryActions::getRepositoryInformation);
+//    actionHelper.setAction<RepositoryEvent>("repoInfo", RepositoryActions::getRepositoryInformation);
 }
 
 bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     bool ret = actionHelper.assignAction<JournalRequestEvent>("journalRequest");
     ret &= actionHelper.assignAction<JournalResponseEvent>("journalReceive");
     ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
-    ret &= actionHelper.assignAction<RepositoryEvent>(RepositoryEventId::REQUEST_REPO_INFO, "repoInfo");
+//    ret &= actionHelper.assignAction<RepositoryEvent>(RepositoryEventId::REQUEST_REPO_INFO, "repoInfo");
 
     //@todo implements all those required methods.
     when(TimeConditions::every(5s)).fireNewGenericAction(
@@ -193,6 +193,23 @@ void RepoModule::persistFile(const Repository::RepoIdType &repoId, const fs::pat
 void RepoModule::prepareSubModules() {
     auto &commandSub = getSubModule<CommandModule>();
     commandSub.mapCommand("turbo", &RepoModule::selectRepository);
+
+    auto &networkSub = getSubModule<NodeNetworkModule>();
+    networkSub.registerPacketProcessor<RepoQuery>([this](RepoQuery::Request::Ptr ptr) {
+        LOGGER("Repo Query Processor")
+        auto repo = this->findRepository(ptr->getRepoId());
+        RepoQuery::Response::Ptr res = RepoQuery::Response::getNew();
+        res->setRepoId(ptr->getRepoId());
+        if (repo != nullptr) {
+            LOGGER("repo isn't null")
+            res->setExists(true);
+            res->setJournal(repo->getJournal());
+        } else {
+            res->setExists(false);
+            LOGGER("repo is null")
+        }
+        return res;
+    });
 
 }
 

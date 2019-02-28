@@ -9,13 +9,13 @@
 void RepoQuery::Request::process(Context::Ptr context) {
     BasePacket::process(context);
     LOGGER("processing repo request")
-
-    auto lc = context->get<LogicContext>();
-    if (lc != nullptr) {
-        auto repoSource = lc->getLogicManager().getSource<RepositorySource>();
-        repoSource->requestRepositoryInfo(repoId);
-
-    }
+//
+//    auto lc = context->get<LogicContext>();
+//    if (lc != nullptr) {
+//        auto repoSource = lc->getLogicManager().getSource<RepositorySource>();
+//        repoSource->requestRepositoryInfo(repoId);
+//
+//    }
 
 }
 

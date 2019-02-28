@@ -77,7 +77,7 @@ public:
 //                std::cout << "bedep : " << item << " "<< typeid(*e).name()<< std::endl;
 //            }
             //if all dependencies are met, add it to result, remove from source
-            if (eDeps.size() == 0) {
+            if (eDeps.empty()) {
                 result.push_back(e);
                 source.pop_front();
             } else {
