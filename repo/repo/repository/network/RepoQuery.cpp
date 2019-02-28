@@ -3,7 +3,6 @@
 //
 
 #include <p2p/node/context/LogicContext.h>
-#include <repo/repository/logic/sources/RepositorySource.h>
 #include "RepoQuery.h"
 
 void RepoQuery::Request::process(Context::Ptr context) {

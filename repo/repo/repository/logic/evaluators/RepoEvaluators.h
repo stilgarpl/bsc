@@ -7,7 +7,6 @@
 
 
 #include <p2p/log/Logger.h>
-#include <repo/repository/logic/events/RepositoryEvent.h>
 #include <repo/repository/network/RepoQuery.h>
 #include <p2p/node/context/NodeContext.h>
 #include <repo/node/RepoModule.h>

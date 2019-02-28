@@ -8,7 +8,6 @@
 #include <repo/journal/network/logic/sources/JournalSource.h>
 #include <repo/repository/storage/network/logic/sources/StorageSource.h>
 #include <repo/repository/storage/network/logic/actions/StorageActions.h>
-#include <repo/repository/logic/sources/RepositorySource.h>
 #include <p2p/modules/command/CommandModule.h>
 #include <p2p/logic/evaluators/CommonEvaluators.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/actions/NetworkActions.h>
@@ -18,6 +17,7 @@
 #include <repo/repository/logic/actions/RepositoryActions.h>
 #include <repo/repository/logic/evaluators/RepoEvaluators.h>
 #include <p2p/logic/actions/CommonActions.h>
+#include <repo/repository/network/RepoProcessors.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
@@ -27,14 +27,12 @@ void RepoModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
     actionHelper.setAction<JournalRequestEvent>("journalRequest", JournalActions::journalRequested);
     actionHelper.setAction<JournalResponseEvent>("journalReceive", JournalActions::journalReceived);
     actionHelper.setAction<StorageResourceRequestEvent>("storageQuery", StorageActions::resourceRequested);
-//    actionHelper.setAction<RepositoryEvent>("repoInfo", RepositoryActions::getRepositoryInformation);
 }
 
 bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     bool ret = actionHelper.assignAction<JournalRequestEvent>("journalRequest");
     ret &= actionHelper.assignAction<JournalResponseEvent>("journalReceive");
     ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
-//    ret &= actionHelper.assignAction<RepositoryEvent>(RepositoryEventId::REQUEST_REPO_INFO, "repoInfo");
 
     //@todo implements all those required methods.
     when(TimeConditions::every(5s)).fireNewGenericAction(
@@ -55,7 +53,6 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
 bool RepoModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
     sourceHelper.requireSource<JournalSource>();
     sourceHelper.requireSource<StorageSource>();
-    sourceHelper.requireSource<RepositorySource>();
     return true;
 }
 
@@ -195,21 +192,7 @@ void RepoModule::prepareSubModules() {
     commandSub.mapCommand("turbo", &RepoModule::selectRepository);
 
     auto &networkSub = getSubModule<NodeNetworkModule>();
-    networkSub.registerPacketProcessor<RepoQuery>([this](RepoQuery::Request::Ptr ptr) {
-        LOGGER("Repo Query Processor")
-        auto repo = this->findRepository(ptr->getRepoId());
-        RepoQuery::Response::Ptr res = RepoQuery::Response::getNew();
-        res->setRepoId(ptr->getRepoId());
-        if (repo != nullptr) {
-            LOGGER("repo isn't null")
-            res->setExists(true);
-            res->setJournal(repo->getJournal());
-        } else {
-            res->setExists(false);
-            LOGGER("repo is null")
-        }
-        return res;
-    });
+    networkSub.registerPacketProcessor<RepoQuery>(RepoProcessors::queryProcessor);
 
 }
 

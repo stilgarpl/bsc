@@ -6,7 +6,6 @@
 #define BASYCO_REPOACTIONS_H
 
 
-#include <repo/repository/logic/events/RepositoryEvent.h>
 
 struct RepositoryActions {
 
@@ -22,7 +21,6 @@ struct RepositoryActions {
         return false;
     }
 
-    static void getRepositoryInformation(const RepositoryEvent &repositoryEvent);
 };
 
 
