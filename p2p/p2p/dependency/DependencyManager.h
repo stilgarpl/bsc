@@ -22,13 +22,13 @@ public:
     typedef IDependency::ArrayType ArrayType;
 protected:
 
-    static const TypeIdType getNextTypeId() {
+    static TypeIdType getNextTypeId() {
         static TypeIdType val = 0;
         return val++;
     }
 
     template<typename...>
-    static const TypeIdType getTypeId() {
+    static TypeIdType getTypeId() {
         const static auto typeId = getNextTypeId();
         return typeId;
     }

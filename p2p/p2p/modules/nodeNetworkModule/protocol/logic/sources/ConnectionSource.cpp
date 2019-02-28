@@ -23,7 +23,7 @@ void ConnectionSource::sentPacket(std::shared_ptr<BasePacket> p, Connection *con
     event->setPacket(p);
     event->setConnection(connection);
     packetSource.queueEvent(event);
-    PacketSourceWorker packetSourceWorker(*this, PacketEventId::PACKET_SENT);
+    PacketSourceWorker packetSourceWorker(*this, PacketEventId::PACKET_SENT, nullptr);
     p->_operate(packetSourceWorker, p);
 }
 
@@ -36,7 +36,7 @@ void ConnectionSource::receivedPacket(std::shared_ptr<BasePacket> p, Connection 
     event->setConnection(connection);
     packetSource.queueEvent(event);
     // LOGGER("packet source: packet queue size " + std::to_string(packetSource.queueSize()))
-    PacketSourceWorker packetSourceWorker(*this, PacketEventId::PACKET_RECEIVED);
+    PacketSourceWorker packetSourceWorker(*this, PacketEventId::PACKET_RECEIVED, connection);
     p->_operate(packetSourceWorker, p);
 }
 
@@ -102,7 +102,7 @@ void ConnectionSource::droppedPacket(std::shared_ptr<BasePacket> p, Connection *
     event->setPacket(p);
     event->setConnection(connection);
     packetSource.queueEvent(event);
-    PacketSourceWorker packetSourceWorker(*this, PacketEventId::PACKET_DROPPED);
+    PacketSourceWorker packetSourceWorker(*this, PacketEventId::PACKET_DROPPED, nullptr);
     p->_operate(packetSourceWorker, p);
 }
 

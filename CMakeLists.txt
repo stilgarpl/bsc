@@ -24,7 +24,7 @@ endif ()
 
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    add_compile_options(-pthread -lstdc++fs -Wall -Wno-unused-local-typedefs -pedantic)
+    add_compile_options(-pthread -lstdc++fs -Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic)
 #    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -lstdc++fs -Wall -Wno-unused-local-typedefs -pedantic")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     if (MSVC_VERSION GREATER_EQUAL "1900")

@@ -95,13 +95,15 @@ public:
 
     class CommandSubModule {
     private:
-        Uber<std::map> commands;
+//        Uber<std::map> commands;
+        std::map<std::string, std::function<void(ArgumentContainerType)>> commands;
         CommandModule &parent;
         std::map<std::string, std::shared_ptr<CommandSubModule>> submodules;
 
     private:
         auto &getCommandMap() {
-            return commands.get<std::string, std::function<void(ArgumentContainerType)>>();
+            //return commands.get<std::string, std::function<void(ArgumentContainerType)>>();
+            return commands;
         }
 
     public:
@@ -112,7 +114,7 @@ public:
     protected:
         ///template <typename ReturnType, typename ... Args>
         bool mapCommand(const std::string &prefix, const std::string &commandName,
-                        std::function<void(ArgumentContainerType)> func) {
+                        const std::function<void(ArgumentContainerType)> &func) {
             std::string key = prefix + ":::" + commandName;
             auto &map = getCommandMap();//commands.get<std::string, std::function<void(ArgumentContainerType)>>();
             map[key] = std::move(func);

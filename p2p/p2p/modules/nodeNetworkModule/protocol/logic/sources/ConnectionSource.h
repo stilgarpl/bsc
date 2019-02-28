@@ -56,9 +56,11 @@ private:
 class PacketSourceWorker {
     ConnectionSource &source;
     PacketEventId eventId;
+    Connection *connection;
 
 public:
-    explicit PacketSourceWorker(ConnectionSource &source, PacketEventId id) : source(source), eventId(id) {}
+    explicit PacketSourceWorker(ConnectionSource &source, PacketEventId id, Connection *connection)
+            : source(source), eventId(id), connection(connection) {}
 
 public:
     template<typename T>
@@ -66,6 +68,7 @@ public:
 //        LOGGER(std::string("operating o ") + typeid(T).name());
         SpecificPacketEvent<T> packetEvent;
         packetEvent.setPacket(ptr);
+        packetEvent.setConnection(connection);
         packetEvent.setEventId(eventId);
         source.queuePacketEvent<SpecificPacketEvent<T>>(packetEvent);
 

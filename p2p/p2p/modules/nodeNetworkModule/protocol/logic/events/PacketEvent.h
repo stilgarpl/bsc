@@ -36,6 +36,7 @@ template<typename PacketType>
 class SpecificPacketEvent : public IEvent<PacketEventId> {
 private:
     NetworkPacketPointer<PacketType> packet;
+    Connection *connection;
 
 public:
     const NetworkPacketPointer<PacketType> &getPacket() const {
@@ -44,6 +45,14 @@ public:
 
     void setPacket(const NetworkPacketPointer<PacketType> &packet) {
         SpecificPacketEvent::packet = packet;
+    }
+
+    Connection *getConnection() const {
+        return connection;
+    }
+
+    void setConnection(Connection *connection) {
+        SpecificPacketEvent::connection = connection;
     }
 };
 

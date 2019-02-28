@@ -20,6 +20,7 @@
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
 #include <p2p/role/RoleScope.h>
 #include <p2p/logic/events/LogicStateEvent.h>
+#include <p2p/modules/nodeNetworkModule/protocol/logic/conditions/NetworkConditions.h>
 #include "p2p/modules/nodeNetworkModule/remote/exception/RemoteNodeNotFoundException.h"
 
 
@@ -60,6 +61,59 @@ CONFIG_NAME(NodeNetworkModuleConfig, "network")
 
 class NodeNetworkModule
         : public NodeModuleConfigDependent<NodeNetworkModule, NodeNetworkModuleConfig, ConfigurationModule> {
+
+public:
+    template<typename PacketType>
+    using ProcessorType = std::function<typename PacketType::Response::Ptr(typename PacketType::Request::Ptr)>;
+
+    class PacketProcessingData {
+
+    protected:
+        virtual void registerPacketProcessor(NodeNetworkModule &node) = 0;
+
+        friend class NodeNetworkModule;
+
+    };
+
+    template<typename PacketType>
+    class SpecificPacketProcessingData : public PacketProcessingData {
+
+    private:
+        ProcessorType<PacketType> processor;
+
+        void registerPacketProcessor(NodeNetworkModule &node) override {
+            node.when(NetworkConditions::packetReceived<PacketType::Request>()).fireNewAction(
+                    [processor = processor](const SpecificPacketEvent<typename PacketType::Request> packet) {
+                        auto response = processor(packet);
+                        packet->getConnection()->send(response);
+                    });
+        }
+
+    public:
+        explicit SpecificPacketProcessingData(const ProcessorType<PacketType> &processor) : processor(processor) {}
+
+
+    };
+
+    class SubModule {
+        std::list<std::shared_ptr<PacketProcessingData>> processingList;
+    public:
+        template<typename PacketType>
+        void registerPacketProcessor(ProcessorType<PacketType> processor) {
+            auto data = std::make_shared<SpecificPacketProcessingData<PacketType>>(processor);
+            processingList.push_back(data);
+        }
+
+    private:
+        void setupPacketProcessing(NodeNetworkModule &node);
+
+        friend class NodeNetworkModule;
+    };
+
+
+
+
+
     //@todo why is this a pointer?
     std::shared_ptr<NetworkInfo> networkInfo;
 protected:
@@ -153,33 +207,6 @@ public: // @todo should be public or shouldn't ?
     auto sendPacketToNode(const NodeIdType &nodeId, NetworkPacketPointer<SendType> p) {
         return getRemoteNode(nodeId).sendRequestToNode(p);
     }
-
-//
-//    template<enum Status status = Status::RESPONSE, typename SendType>
-//    auto sendPacketToNode(const NodeIdType &nodeId, NetworkPacketPointer<SendType> p) {
-//        typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
-//        ConnectionPtr conn = nullptr;
-//        for (auto &&connection : activeClientConnections) {
-//            if (connection->nodeId && connection->nodeId == nodeId) {
-//                conn = connection->connection;
-//            }
-//        }
-//        if (conn == nullptr) {
-//            //@todo connect to node
-//        }
-//
-//        if (conn != nullptr) {
-//
-////            LOGGER("sending packet to node " + nodeId)
-//            auto[response, error] = protocol->sendExpectExtended(conn.get(), p);
-//            return response;
-//
-//        } else {
-//            LOGGER("unable to send packet to " + nodeId)
-//            return std::shared_ptr<ReturnType>(nullptr);
-//
-//        }
-//    };
 
     template<typename SendType>
     void broadcastPacket(NetworkPacketPointer<SendType> p, const BroadcastScope &scope = BroadcastScope::CONNECTED) {

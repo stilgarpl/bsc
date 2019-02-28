@@ -72,5 +72,11 @@ void runMemberFunction(T &t, RetType (T::*f)(Args...), std::vector<std::string> 
     a(t, f, values);
 }
 
+template<typename RetType, typename ... Args>
+void runFunction(RetType (*f)(Args...), std::vector<std::string> values) {
+    unpack_caller<sizeof... (Args)> a;
+    a(f, values);
+}
+
 
 #endif //BASYCO_TEMPLATE_CAST_H

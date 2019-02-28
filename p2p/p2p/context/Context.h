@@ -35,19 +35,19 @@ public:
 
 private:
 
-    const TypeIdType getNextTypeId() const {
+    TypeIdType getNextTypeId() const {
         static TypeIdType val = 0;
         return val++;
     }
 
-    const KeyType getNextKey() const {
+    KeyType getNextKey() const {
         static KeyType val = 1;
         return val++;
     }
 
     //@todo possible improvement: add key offset for different types, so for example keys "test" and 1 do not point to the same values
     template<typename T>
-    const KeyType getKey(const T &t) const {
+    KeyType getKey(const T &t) const {
         static std::map<T, KeyType> keyMap;
         KeyType &result = keyMap[t];
         if (result == 0) {
@@ -58,12 +58,12 @@ private:
 
     //special case: treat c-string as std::string
     //needed because char * can't be a key in a map
-    const KeyType getKey(const char *s) const {
+    KeyType getKey(const char *s) const {
         return getKey(std::string(s));
     }
 
     template<typename>
-    const TypeIdType getTypeId() const {
+    TypeIdType getTypeId() const {
         static auto typeId = getNextTypeId();
         return typeId;
     }

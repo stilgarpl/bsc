@@ -121,6 +121,16 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
     }
 
 
+    //register packet processors from submodules
+
+    when(state<ILogicModule>(ModuleState::SUBMODULES_PREPARED).entered()).fireStateChangeReaction(
+            [&](ILogicModule &module) {
+                //@todo move this mechanism to NodeModule to auto collect all submodules from other modules.
+                //  submodules probably have to be optional or sth.
+                auto &networkSub = module.getSubModule<NodeNetworkModule>();
+                networkSub.setupPacketProcessing(*this);
+            });
+
 
 
     //high level logic:
@@ -411,4 +421,12 @@ const std::shared_ptr<IProtocol> &NodeNetworkModule::getProtocol() const {
 
 std::shared_ptr<NetworkInfo> &NodeNetworkModule::getNetworkInfo() {
     return networkInfo;
+}
+
+void NodeNetworkModule::SubModule::setupPacketProcessing(NodeNetworkModule &node) {
+
+    for (const auto &processingItem : processingList) {
+        processingItem->registerPacketProcessor(node);
+    }
+
 }

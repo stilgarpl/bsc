@@ -17,13 +17,13 @@ protected:
     typedef unsigned int TypeIdType;
     std::vector<std::shared_ptr<void>> containers;
 
-    const TypeIdType getNextTypeId() const {
+    TypeIdType getNextTypeId() const {
         static TypeIdType val = 0;
         return val++;
     }
 
     template<typename...>
-    const TypeIdType getTypeId() const {
+    TypeIdType getTypeId() const {
         idLock.lock();
         const static auto typeId = getNextTypeId();
         idLock.unlock();
