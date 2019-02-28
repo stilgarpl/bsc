@@ -84,9 +84,16 @@ public:
         void registerPacketProcessor(NodeNetworkModule &node) override {
             node.when(NetworkConditions::packetReceived<typename PacketType::Request>()).fireNewAction(
                     [processor = processor](const SpecificPacketEvent<typename PacketType::Request> packetEvent) {
+                        //@todo Status::ERROR handling.
                         auto response = processor(packetEvent.getPacket());
-                        response->setId(packetEvent.getPacket()->getId());
-                        packetEvent.getConnection()->send(response);
+                        if (response != nullptr) {
+                            response->setId(packetEvent.getPacket()->getId());
+                            packetEvent.getConnection()->send(response);
+                        } else {
+                            auto error = PacketType::Error::getNew();
+                            error->setId(packetEvent.getPacket()->getId());
+                            packetEvent.getConnection()->send(error);
+                        }
                     });
         }
 

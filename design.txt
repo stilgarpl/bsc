@@ -431,4 +431,6 @@ dla kazdego pakietu można zdefiniować metodę-rurę Request -> Response. trigg
 
 to byłoby opakowane w generic function albo nawet zwykłą action, która bierze pakiet ze specificpacketeventu, przepuszcza go przez tą metodę, bierze odpowiedź, ustawia packet id i wysyła ją do connection wziętą z kontekstu.
 
-//@todo Networking processors. ^^^
+
+
+zaimplementowałem networking processory. ładnie to działa. z jednej strony to szkoda, ze processowanie nie będzie związane bezpośrednio z pakietem, z drugiej strony, to prowadziło do całej masy dziwnych powiązań. Idealnie pakiety w ogóle nie powinny wiedzieć nic o ich przetwarzaniu i być takim bardziej POCO.
