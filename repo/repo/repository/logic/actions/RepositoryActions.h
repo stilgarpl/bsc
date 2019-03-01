@@ -13,12 +13,13 @@ struct RepositoryActions {
     //@todo implement
     static bool checkIfUpdateRequired(const JournalPtr &currentJournal, const JournalPtr &newJournal) {
         LOGGER("REPO CHECK IF U")
-        if (newJournal == nullptr) {
+        if (newJournal == nullptr || currentJournal == nullptr) {
             return false;
         }
 
+        //@todo add more checks
+        return newJournal->getChecksum() == currentJournal->getChecksum();
 
-        return false;
     }
 
 };

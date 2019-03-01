@@ -20,6 +20,14 @@ struct ChainEvaluators {
         };
     }
 
+    template<typename Stage, typename T = typename Stage::EventType>
+    static auto chainResult(const Stage &stage) {
+        auto id = *stage.getChainId();
+        return [id](auto e, auto ... args) {
+            return Context::getActiveContext()->get<ChainContext>()->getChainResult<T>(id);
+        };
+    }
+
     template<typename T>
     static auto genericChainResult(const ChainIdType &id) {
         return [id](auto e, auto ... args) {

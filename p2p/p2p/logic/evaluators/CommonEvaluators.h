@@ -39,9 +39,24 @@ struct CommonEvaluators {
         };
     }
 
+    template<typename ... Evaluators>
+    static auto stack(Evaluators... evaluators) {
+        return [evaluators...](auto e, auto ... args) {
+            return evaluateStack(e, args..., evaluators...);
 
+        };
+    }
 
-
+private:
+    template<typename E, typename ... Args, typename Evaluator, typename ...RestOfEvaluators>
+    constexpr static auto
+    evaluateStack(const E &e, const Args &... args, Evaluator evaluator, RestOfEvaluators ... rest) {
+        if constexpr (sizeof... (rest) == 0) {
+            return evaluator(e, args...);
+        } else {
+            return evaluator(evaluateStack(e, args..., rest...));
+        }
+    }
 };
 
 
