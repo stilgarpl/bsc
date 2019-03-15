@@ -413,7 +413,6 @@ w modułach mamy operacje do wykonania w kolejnych stanach. nie wykonują się j
 
 
 teraz jak mam packetReceived<T> to zastanawiam sie, czy packet->process() jeszcze czemuś służy. można to usunąć i całą low-level logic dać na when(packetReceived)
-//@todo a propos, packetReceived powinien byc triggerowany w processorze, nie w connection, bo przez filtr nie przechodzi
 
 
 logic chain moze w chain context trzymać id konkretnego wykonania chaina, generowany przy start chain. mozna tez dodać end chain. wtedy wiadomo czy dana iteracja chaina jeszcze pracuje i czy trzeba czekać na evaluator ktory pobiera wynik innego brancha
@@ -434,3 +433,19 @@ to byłoby opakowane w generic function albo nawet zwykłą action, która bierz
 
 
 zaimplementowałem networking processory. ładnie to działa. z jednej strony to szkoda, ze processowanie nie będzie związane bezpośrednio z pakietem, z drugiej strony, to prowadziło do całej masy dziwnych powiązań. Idealnie pakiety w ogóle nie powinny wiedzieć nic o ich przetwarzaniu i być takim bardziej POCO.
+
+
+repository i storage to jest jeden wielki chaos. i jedno i drugie wysyła pakiety jak leci i nikt nie wie kto w zasadzie odpowiada za pobieranie plików i skąd
+a przy tym fajnie zrobić pobieranie a'la torrent gdzie automatycznie jest wykrywane jakie nody mają dany plik i pobierać go równolegle partiami (z mapą pliku)
+
+na pewno będę miał inne rzeczy wymagające kopiowania plików i bez sensu implementować to tam wszędzie, zresztą, to nie jest obowiazek storage zeby sie zajmować takimi rzeczami
+
+rozwiązanie:
+
+transfer manager w FileModule wykorzystując ResourceIdenfier może odpytywać nody czy mają dany resource i go pobierać. storage nie musi w ogóle wiedzieć skąd pobiera dane, po prostu przekazać RI do transfer managera. download bez node id by odpytywał broadcastem kto ma dany resource i inicjował pobieranie.
+
+żeby to działało lepiej, dobrze byłoby zrobić separację Repository i Storage, z relacją n:1
+
+w ten sposób storage się pozbędzie praktycznie wszystkich pakietów, a Repository będzie miało tylko pakiet do transferu Journal. (+ ewentualnie jakieś query)
+
+@todo ^^^^
