@@ -511,11 +511,11 @@ time_t Repository::RepoFileMap::Attributes::getModificationTime() const {
     return modificationTime;
 }
 
-const ResourceId &Repository::RepoFileMap::Attributes::getChecksum() const {
+const ChecksumId &Repository::RepoFileMap::Attributes::getChecksum() const {
     return checksum;
 }
 
-const ResourceId &Repository::RepoFileMap::Attributes::getResourceId() const {
+const IStorage::ResourceId &Repository::RepoFileMap::Attributes::getResourceId() const {
     return resourceId;
 }
 

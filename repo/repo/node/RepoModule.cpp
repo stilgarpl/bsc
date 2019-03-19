@@ -196,6 +196,10 @@ void RepoModule::prepareSubModules() {
 
 }
 
+void RepoModule::downloadRepository(const Repository::RepoIdType &repoId) {
+
+}
+
 const std::filesystem::path &RepoModuleConfiguration::getRepositoryDataPath() const {
     return repositoryDataPath;
 }

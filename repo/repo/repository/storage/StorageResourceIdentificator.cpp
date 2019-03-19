@@ -50,5 +50,6 @@ bool StorageResourceIdentificator::exists() {
 }
 
 StorageResourceIdentificator::StorageResourceIdentificator(const IRepository::RepoIdType &repositoryId,
-                                                           const ResourceId &objectId) : repositoryId(repositoryId),
-                                                                                         objectId(objectId) {}
+                                                           const IStorage::ResourceId &objectId) : repositoryId(
+        repositoryId),
+                                                                                                   objectId(objectId) {}

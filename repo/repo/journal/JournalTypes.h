@@ -7,7 +7,9 @@
 
 #include <string>
 
-typedef std::string ResourceId;
+//typedef std::string ResourceId;
+using ChecksumId = std::string;
+
 
 //@todo path serialization doesn't work, so it's string
 typedef std::string PathType;

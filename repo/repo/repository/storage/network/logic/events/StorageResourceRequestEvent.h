@@ -21,9 +21,9 @@ public:
 
     void setRepositoryId(const IRepository::RepoIdType &repositoryId);
 
-    const ResourceId &getObjectId() const;
+    const IStorage::ResourceId &getObjectId() const;
 
-    void setObjectId(const ResourceId &objectId);
+    void setObjectId(const IStorage::ResourceId &objectId);
 };
 
 

@@ -51,7 +51,7 @@ public:
 
         const JournalPtr getJournal() const;
 
-        void setJournal(const JournalPtr journal);
+        void setJournal(JournalPtr journal);
 
     private:
         friend class cereal::access;

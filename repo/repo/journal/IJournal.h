@@ -27,7 +27,7 @@ public:
     typedef std::vector<JournalStatePtr> JournalHistory;
     typedef std::shared_ptr<IJournal> JournalPtr;
 public:
-    virtual ResourceId getChecksum() const = 0;
+    virtual ChecksumId getChecksum() const = 0;
 
     virtual void commitState() =0;
 

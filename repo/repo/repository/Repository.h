@@ -25,9 +25,9 @@ public:
             fs::perms permissions = fs::perms::none;
             uintmax_t size = 0;
             std::time_t modificationTime = 0;
-            ResourceId checksum; //checksum of the file.
+            ChecksumId checksum; //checksum of the file.
             bool directory = false;
-            ResourceId resourceId;
+            IStorage::ResourceId resourceId;
         public:
             fs::perms getPermissions() const;
 
@@ -35,9 +35,9 @@ public:
 
             time_t getModificationTime() const;
 
-            const ResourceId &getChecksum() const;
+            const ChecksumId &getChecksum() const;
 
-            const ResourceId &getResourceId() const;
+            const IStorage::ResourceId &getResourceId() const;
 
             Attributes() = default;
 

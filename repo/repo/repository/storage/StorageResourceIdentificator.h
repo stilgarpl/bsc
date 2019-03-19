@@ -22,7 +22,7 @@ public:
 
     bool exists() override;
 
-    StorageResourceIdentificator(const IRepository::RepoIdType &repositoryId, const ResourceId &objectId);
+    StorageResourceIdentificator(const IRepository::RepoIdType &repositoryId, const IStorage::ResourceId &objectId);
 
 private:
     template<class Archive>

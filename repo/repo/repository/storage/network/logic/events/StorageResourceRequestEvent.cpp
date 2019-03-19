@@ -14,10 +14,10 @@ void StorageResourceRequestEvent::setRepositoryId(const IRepository::RepoIdType 
     StorageResourceRequestEvent::repositoryId = repositoryId;
 }
 
-const ResourceId &StorageResourceRequestEvent::getObjectId() const {
+const IStorage::ResourceId &StorageResourceRequestEvent::getObjectId() const {
     return objectId;
 }
 
-void StorageResourceRequestEvent::setObjectId(const ResourceId &objectId) {
+void StorageResourceRequestEvent::setObjectId(const IStorage::ResourceId &objectId) {
     StorageResourceRequestEvent::objectId = objectId;
 }

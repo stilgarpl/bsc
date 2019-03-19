@@ -11,16 +11,9 @@ struct RepositoryActions {
 
 
     //@todo implement
-    static bool checkIfUpdateRequired(const JournalPtr &currentJournal, const JournalPtr &newJournal) {
-        LOGGER("REPO CHECK IF U")
-        if (newJournal == nullptr || currentJournal == nullptr) {
-            return false;
-        }
+    static bool checkIfUpdateRequired(const JournalPtr &currentJournal, const JournalPtr &newJournal);
 
-        //@todo add more checks
-        return newJournal->getChecksum() == currentJournal->getChecksum();
-
-    }
+    static void downloadRepository(const IRepository::RepoIdType repoId);
 
 };
 
