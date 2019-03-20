@@ -57,7 +57,7 @@ public:
     }
 
     void doPrepareSubmodules() {
-        prepareSubModules();
+        prepareSubmodules();
         changeModuleState(ModuleState::SUBMODULES_PREPARED);
     }
 
@@ -67,7 +67,7 @@ public:
 
     virtual void shutdown() = 0;
 
-    virtual void prepareSubModules() {};
+    virtual void prepareSubmodules() {};
     virtual IConfig &configuration()=0;
 
     virtual bool setupLogic()=0;

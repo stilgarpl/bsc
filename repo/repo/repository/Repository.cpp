@@ -205,7 +205,7 @@ void Repository::downloadStorage() {
         //@todo change this bool to actual transfer management
 
         //check for resources.
-        if (value) {
+        if (value && !value->isDirectory()) {
             if (!storage->hasResource(value->getResourceId())) {
                 hasResources &= storage->acquireResource(value->getResourceId());
             }

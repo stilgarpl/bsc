@@ -34,6 +34,8 @@ public:
         return *chainData.get<std::shared_ptr<EventType>>()[id];
     }
 
+    virtual ~ChainContext();
+
 };
 
 

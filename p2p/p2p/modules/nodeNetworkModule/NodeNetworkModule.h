@@ -330,6 +330,7 @@ public: // @todo should be public or shouldn't ?
 
     static std::string testingMethod1xs(std::string s) {
         LOGGER("ret testin XXXXXXXXX 1s ! " + s)
+        auto activeContext = Context::getActiveContext();
         return s;
     }
 

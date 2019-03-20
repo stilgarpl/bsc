@@ -168,6 +168,7 @@ public:
         void
         queueTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
 
+        void queueTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
         void start();
     };
 
@@ -202,6 +203,10 @@ public:
 
     [[nodiscard]]  LocalTransferDescriptorPtr
     initiateTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination,
+                     bool start = true);
+
+    [[nodiscard]]  LocalTransferDescriptorPtr
+    initiateTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination,
                      bool start = true);
 
 };

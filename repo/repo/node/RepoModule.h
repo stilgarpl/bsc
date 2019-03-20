@@ -91,7 +91,7 @@ public:
     const RepositoryPtr &getSelectedRepository() const;
 
 
-    void prepareSubModules() override;
+    void prepareSubmodules() override;
 
 };
 

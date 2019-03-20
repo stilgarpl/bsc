@@ -23,6 +23,8 @@ private:
     typedef unsigned int KeyType;
     typedef unsigned int TypeIdType;
 private:
+    //@todo remove debug id
+    std::string debug_id = "";
     bool defaultContext = false;
     mutable std::recursive_mutex contextLock;
     //initialized to nullptr in .cpp file
@@ -156,6 +158,8 @@ public:
 
     Context(bool defaultContext);
 
+    void setDebug_id(const std::string &debug_id);
+
     explicit Context(const Ptr &ptr);
 
     Context() = default;
@@ -182,6 +186,8 @@ public:
             return makeContext();
         }
     };
+
+    virtual ~Context();
 };
 
 class SetLocalContext {

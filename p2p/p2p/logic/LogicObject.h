@@ -335,12 +335,13 @@ public:
                     std::function<ChainEvent<RetType>(ChainEvent<EventType>)> f = [=, chainId = chainId](
                             ChainEvent<EventType> chainedEvent) {
                         LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
-                               chainedEvent.getStageId())
+                               chainedEvent.getEventId())
 
                         if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
                             LOGGER("chained action" + *chainId)
                             auto value = func(*chainedEvent.getActualEvent(), setArgs...);
                             ChainEvent<RetType> result(generatedChainId, value);
+//                            LOGGER("storing chain result in chain context " + std::to_string(Context::getActiveContext()->get<ChainContext>().use_count()) )
                             Context::getActiveContext()->get<ChainContext>()->storeChainResult<RetType>(
                                     generatedChainId, value);
                             return result;
@@ -362,7 +363,7 @@ public:
                     std::function<void(ChainEvent<EventType>)> f = [=, chainId = chainId](
                             ChainEvent<EventType> chainedEvent) {
                         LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
-                               chainedEvent.getStageId())
+                               chainedEvent.getEventId())
 
                         if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
                             func(*chainedEvent.getActualEvent(), setArgs...);

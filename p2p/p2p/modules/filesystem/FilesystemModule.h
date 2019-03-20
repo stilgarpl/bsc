@@ -1,3 +1,7 @@
+#include <utility>
+
+#include <utility>
+
 //
 // Created by stilgar on 07.11.17.
 //
@@ -17,7 +21,7 @@
 
 namespace fs = std::filesystem;
 
-class FilesystemModule : public NodeModuleDependent<FilesystemModule> {
+class FilesystemModule : public NodeModuleDependent<FilesystemModule, NodeNetworkModule> {
 
     fs::path currentPath = fs::current_path();
     std::list<std::shared_ptr<TransferManager::LocalTransferDescriptor>> currentTransfers;
@@ -34,6 +38,9 @@ public:
     bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
 
     const std::filesystem::path &getCurrentPath() const;
+
+    void prepareSubmodules() override;
+
 
 public:
     ////////////////////////////////
@@ -90,9 +97,10 @@ public:
     }
 
     auto remoteGetStream(const NodeIdType &nodeId, ResourceIdentificatorPtr from, ResourceIdentificatorPtr to) {
-        return transferManager.initiateTransfer(nodeId, from, to);
+        return transferManager.initiateTransfer(nodeId, std::move(from), std::move(to));
     }
 
+    //@todo name of this method does not indicate that it creates stuff.
     auto transferQueue() {
         return transferManager.transferQueue();
     }

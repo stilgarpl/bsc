@@ -3,11 +3,13 @@
 //
 
 #include <p2p/modules/filesystem/network/logic/sources/TransferSource.h>
+#include <p2p/modules/filesystem/network/packet/TransferQuery.h>
 #include "FilesystemModule.h"
-#include "p2p/modules/basic/BasicModule.h"
+#include <p2p/modules/basic/BasicModule.h>
+#include <p2p/modules/filesystem/network/processor/NetworkProcessors.h>
 
-FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent<FilesystemModule>(node) {
-    setRequired<BasicModule, NodeNetworkModule>();
+FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent<FilesystemModule, NodeNetworkModule>(node) {
+//    setRequired<BasicModule, NodeNetworkModule>();
 }
 
 void FilesystemModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
@@ -49,5 +51,10 @@ bool FilesystemModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelpe
 
 const std::filesystem::path &FilesystemModule::getCurrentPath() const {
     return currentPath;
+}
+
+void FilesystemModule::prepareSubmodules() {
+    auto &networkSub = getSubModule<NodeNetworkModule>();
+    networkSub.registerPacketProcessor<TransferQuery>(NetworkProcessors::queryProcessor);
 }
 

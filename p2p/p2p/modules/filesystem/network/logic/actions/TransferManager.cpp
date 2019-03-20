@@ -10,6 +10,7 @@
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include <p2p/modules/filesystem/network/packet/FinishTransfer.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNodeContext.h>
+#include <p2p/modules/filesystem/network/packet/TransferQuery.h>
 #include "TransferManager.h"
 
 //const ResourceIdentificatorPtr &TransferManager::RemoteTransferDescriptor::getResourceIdentificatorPtr() const {
@@ -209,7 +210,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
                     if (response != nullptr) {
                         // SendFile::Response* response;
                         LOGGER(std::to_string(response->getEnd()) + "/" + std::to_string(resourceSize) + " : " +
-                                       std::to_string(100 * response->getEnd() / resourceSize) + "%");
+                               std::to_string(100 * response->getEnd() / resourceSize) + "%");
                         TransferManager::saveDataChunk(destinationStream, response->getBegin(), response->getEnd(),
                                                        response->getData());
                         descriptorPtr.setTransferredSize(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
@@ -234,6 +235,29 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
     }
     localTransfers.push_back(ret);
     return ret;
+}
+
+TransferManager::LocalTransferDescriptorPtr
+TransferManager::initiateTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination, bool start) {
+    auto netModule = NodeContext::getNodeFromActiveContext().getModule<NodeNetworkModule>();
+    //@todo this broadcast shouldn't happen at the moment of ordering the request, but at the time of actual run. but it's not high priority, most of the time it won't matter
+    //broadcast who has
+    TransferQuery::Request::Ptr request = TransferQuery::Request::getNew();
+    request->setResourceIdentificator(source);
+    //@todo this will block... maybe do it in async way? it would be best to do all the broadcast stuff at the start of the transfer thread
+    auto responseMap = netModule->broadcastRequest(request);
+    //select best node.
+    //@todo actual strategy to select the best node - for example, a object that takes this map and returns best nodeId
+    for (auto &&[nodeId, response] : responseMap) {
+        LOGGER("response from " + nodeId)
+        if (response->isExists()) {
+            //initiate transfer
+            return initiateTransfer(nodeId, source, destination, start);
+        }
+    }
+    LOGGER("no node has the resource?")
+    return nullptr;
+
 }
 
 
@@ -361,4 +385,15 @@ unsigned long TransferManager::TransferQueue::countUnfinishedTransfers() {
         }
     }
     return result;
+}
+
+void
+TransferManager::TransferQueue::queueTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination) {
+    auto transfer = manager.initiateTransfer(std::move(source), std::move(destination), false);
+    if (transfer != nullptr) {
+        transfer->registerStateObserver(*this);
+        transfers.push_back(transfer);
+    } else {
+        LOGGER("failed to initiate transfer!")
+    }
 }

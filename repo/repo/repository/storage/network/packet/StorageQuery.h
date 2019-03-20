@@ -11,7 +11,7 @@
 #include <repo/journal/JournalTypes.h>
 #include <repo/repository/storage/network/logic/sources/StorageSource.h>
 
-
+//@todo to be deleted
 class StorageQuery : public PacketGroup {
 
 public:

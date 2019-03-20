@@ -449,3 +449,19 @@ transfer manager w FileModule wykorzystując ResourceIdenfier może odpytywać n
 w ten sposób storage się pozbędzie praktycznie wszystkich pakietów, a Repository będzie miało tylko pakiet do transferu Journal. (+ ewentualnie jakieś query)
 
 @todo ^^^^
+
+
+locked chains - jak sprawić, by chain nie mógł być odpalony wiecej niż raz w tym samym czasie.
+
+można lockować mutex na początku chaina i unlockować na koniec - ta, tylko, że nie wiadomo, kiedy jest koniec. myślałem, że ChainContext będzie sie niszczył na koniec, ale ewidentnie nie ma na to gwarancji.
+
+nie bardzo wchodzi w grę też end chain, bo łańcuch może się rozgałęziać.
+
+można wprowadzać ręczne dwie akcje - lockChain, unlockChain. ryzyko permamentnego zablokowania wątku jeśli unlock się nie uda.
+
+
+może dodać w chainie onFail() ktora wykona rozne rzeczy? defaultowo moglaby unlockowac mutex. to oczywiscie dalej ma problem branchy
+
+lockChain() i unlockChain() wydają się w tym momencie najsensowniejszą alternatywą
+
+lockChain() brałoby mutex z ChainContextu, który to z kolei miałby wspólny mutex dla wszystkich chainów o tym id -> może go brać z jakiegoś globalnego logic chain context na poziomie logic managera.

@@ -63,6 +63,7 @@ public:
 template<typename idType>
 IEvent<idType>::IEvent() : _context(Context::makeContext(Context::getActiveContext())) {
 
+    _context->setDebug_id("event context");
 //    _context = Context::makeContext(Context::getActiveContext());
 //    _context = Context::getActiveContext();
 

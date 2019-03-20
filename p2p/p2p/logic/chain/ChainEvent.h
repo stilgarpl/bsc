@@ -12,26 +12,28 @@
 
 
 template<typename ActualEventType>
-class ChainEvent : public IEvent<typename ActualEventType::IdType> {
+class ChainEvent : public IEvent<ChainIdType> {
 private:
-    ChainIdType stageId;
     std::optional<ActualEventType> actualEvent;
 
 public:
-    const ChainIdType &getStageId() const {
-        return stageId;
-    }
 
     std::optional<ActualEventType> getActualEvent() const {
         return actualEvent;
     }
 
-    ChainEvent(ChainIdType stageId, ActualEventType actualEvent) : stageId(std::move(stageId)),
-                                                                   actualEvent(actualEvent) {}
+    ChainEvent(ChainIdType stageId, ActualEventType actualEvent) : IEvent(stageId),
+                                                                   actualEvent(actualEvent) {
+        this->context()->setParentContext(actualEvent.context());
+
+
+        this->context()->setDebug_id("chain event " + stageId);
+    }
 
     ChainEvent() {
         actualEvent = std::nullopt;
         this->setEventValid(false);
+        this->context()->setDebug_id("chain event");
     }
 };
 

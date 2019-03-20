@@ -22,5 +22,7 @@ void SourceManager::work() {
 }
 
 void SourceManager::setContext(const Context::Ptr context) {
-    *commonContext += context;
+//    *commonContext += context;
+    commonContext->setParentContext(context);
+    commonContext->setDebug_id("source manager common context");
 }

@@ -280,8 +280,21 @@ public:
 };
 
 
+class ContextDestTest {
+public:
+    virtual ~ContextDestTest() {
+        LOGGER("context destructor test")
+    }
+};
+
 
 int main(int argc, char *argv[]) {
+
+//    Context  * conte1 = new Context();
+//    conte1->set<ContextDestTest>();
+//    delete conte1;
+//    exit(0);
+
 //    {
 
 //    LogicManager logicManager;

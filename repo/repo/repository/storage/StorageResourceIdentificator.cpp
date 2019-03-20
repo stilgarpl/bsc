@@ -39,12 +39,15 @@ uintmax_t StorageResourceIdentificator::getResourceSize() {
 }
 
 bool StorageResourceIdentificator::exists() {
+    LOGGER("storage resource exists")
     auto repoModule = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
     auto repo = repoModule->findRepository(repositoryId);
     if (repo != nullptr) {
+        LOGGER("repo isn't null")
+        LOGGER(repo->getStorage()->getResourcePath(objectId));
         return fs::exists(repo->getStorage()->getResourcePath(objectId));
     } else {
-
+        LOGGER("repo is null")
         return false;
     }
 }

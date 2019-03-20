@@ -77,7 +77,7 @@ public:
 
 private:
 
-    void prepareSubModules() override;
+    void prepareSubmodules() override;
 
 
 };

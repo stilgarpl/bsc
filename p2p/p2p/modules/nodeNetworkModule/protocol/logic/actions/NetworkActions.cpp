@@ -27,7 +27,7 @@ void NetworkActions::updateNetworkInfo(const NetworkInfoEvent &event) {
 
 void NetworkActions::saveNetworkInfo(const ModuleEvent<NodeNetworkModule> &event) {
     Context::Ptr context = Context::getActiveContext();
-    LOGGER("SAVE NETWORK INFO")
+//    LOGGER("SAVE NETWORK INFO")
     auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
         auto &node = nodeContext->getNode();
@@ -37,7 +37,7 @@ void NetworkActions::saveNetworkInfo(const ModuleEvent<NodeNetworkModule> &event
 
 void NetworkActions::loadNetworkInfo(const ModuleEvent<NodeNetworkModule> &event) {
     Context::Ptr context = Context::getActiveContext();
-    LOGGER("LOAD NETWORK INFO")
+//    LOGGER("LOAD NETWORK INFO")
     auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
         auto &node = nodeContext->getNode();

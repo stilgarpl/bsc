@@ -65,8 +65,9 @@ public:
 
         //@todo pass to executor
 //        Context::setActiveContext(&commonContext);
-        Context::Ptr previousContext = Context::getActiveContext();
-        Context::setActiveContext(event.context());
+//        Context::Ptr previousContext = Context::getActiveContext();
+//        Context::setActiveContext(event.context());
+        SetLocalContext localContext(event.context());
 
         auto policy = getExecutionPolicy<EventType>();
         if (policy != nullptr) {
@@ -78,8 +79,7 @@ public:
             /*int b =*/ this->getSignal<EventType, Args...>().signal(event, args...);
             /*int a =*/ this->getSignal<EventType, Args...>(event.getEventId()).signal(event, args...);
         }
-        //restore previous context
-        Context::setActiveContext(previousContext);
+
     }
 
 

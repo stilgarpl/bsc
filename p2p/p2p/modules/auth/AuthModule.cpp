@@ -27,7 +27,7 @@ bool AuthModule::setupSources(LogicObject::SetupSourceHelper &sourceHelper) {
     return true;
 }
 
-void AuthModule::prepareSubModules() {
+void AuthModule::prepareSubmodules() {
     LOGGER("PREPARING SUBMODULE AUTH")
     auto &sub = getOwnSubModule();
     sub.requiredRoles<NetworkInfoRequest>("user");

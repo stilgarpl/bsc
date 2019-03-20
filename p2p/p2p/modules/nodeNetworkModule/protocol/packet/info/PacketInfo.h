@@ -177,6 +177,16 @@ struct PacketGroup {
 
 };
 
+template<typename PacketGroupType>
+using RequestPtr = typename PacketGroupType::Request::Ptr;
+template<typename PacketGroupType>
+using ResponsePtr = typename PacketGroupType::Response::Ptr;
+template<typename PacketGroupType>
+using AckPtr = typename PacketGroupType::Ack::Ptr;
+template<typename PacketGroupType>
+using ErrorPtr = typename PacketGroupType::Error::Ptr;
+
+
 CEREAL_REGISTER_TYPE(PacketGroup::Request)
 CEREAL_REGISTER_TYPE(PacketGroup::Response)
 CEREAL_REGISTER_TYPE(PacketGroup::Error)

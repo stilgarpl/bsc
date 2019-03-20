@@ -149,22 +149,22 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     when(event<ModuleEvent<NodeNetworkModule>>()).fireNewAction([](auto event) { LOGGER("module event NNM") });
 
-    auto list = {88, 77, 44, 101};
-    auto list2 = {99, 10};
-    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
-//    stage1.
-    auto stage2 = stage1.fireNewGenericChainAction(testingMethod1s, [](auto tick) -> std::string {
-        static int rr = 0;
-        rr++;
-        return std::string("lala " + std::to_string(rr));
-    }).fireNewGenericChainAction(testingMethod1s, CommonEvaluators::unwrapEvent);
-
-    stage2.fireNewGenericChainAction(testingMethod1xs,
-//                                     CommonEvaluators::stack(CommonEvaluators::passthrough,ChainEvaluators::genericChainResult(stage2), CommonEvaluators::passthrough));
-                                     CommonEvaluators::stack(CommonEvaluators::unwrapEvent,
-                                                             ChainEvaluators::chainResult(stage2)));
-    stage2.fireNewGenericChainAction(CommonActions::foreachAction(testingMethod1i, list),
-                                     CommonEvaluators::foreachValue<int>());
+//    auto list = {88, 77, 44, 101};
+//    auto list2 = {99, 10};
+//    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
+////    stage1.
+//    auto stage2 = stage1.fireNewGenericChainAction(testingMethod1s, [](auto tick) -> std::string {
+//        static int rr = 0;
+//        rr++;
+//        return std::string("lala " + std::to_string(rr));
+//    }).fireNewGenericChainAction(testingMethod1s, CommonEvaluators::unwrapEvent);
+//
+//    stage2.fireNewGenericChainAction(testingMethod1xs,
+////                                     CommonEvaluators::stack(CommonEvaluators::passthrough,ChainEvaluators::genericChainResult(stage2), CommonEvaluators::passthrough));
+//                                     CommonEvaluators::stack(CommonEvaluators::unwrapEvent,
+//                                                             ChainEvaluators::chainResult(stage2)));
+//    stage2.fireNewGenericChainAction(CommonActions::foreachAction(testingMethod1i, list),
+//                                     CommonEvaluators::foreachValue<int>());
 
 //    when(event < SpecificPacketEvent<KeepAlivePacket::Response>>
 //    (PacketEventId::PACKET_RECEIVED)).fireNewAction([](auto event) {

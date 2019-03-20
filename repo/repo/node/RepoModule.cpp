@@ -41,7 +41,6 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
                     [](RepositoryPtr rep) ->BasePacketPtr {auto p = RepoQuery::Request::getNew();p->setRepoId(rep->getRepositoryId());return p;} ),
             CommonEvaluators::foreachValue<BasePacketPtr>());
 
-
     when(NetworkConditions::packetReceived<RepoQuery::Response>())
     .newChain("repoUpdateChain")
     .ifTrue(RepositoryActions::checkIfUpdateRequired, RepoEvaluators::currentJournalFromRepoQueryResponse,RepoEvaluators::newJournalFromRepoQueryResponse);
@@ -187,7 +186,7 @@ void RepoModule::persistFile(const Repository::RepoIdType &repoId, const fs::pat
     findRepository(repoId)->persist(path);
 }
 
-void RepoModule::prepareSubModules() {
+void RepoModule::prepareSubmodules() {
     auto &commandSub = getSubModule<CommandModule>();
     commandSub.mapCommand("turbo", &RepoModule::selectRepository);
 
