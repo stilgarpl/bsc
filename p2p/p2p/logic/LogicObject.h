@@ -431,9 +431,9 @@ public:
                     LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
                            chainedEvent.getEventId())
 
-                        if (chainedEvent.getActualEvent() && *chainId == chainedEvent.getStageId()) {
-                            func(*chainedEvent.getActualEvent(), setArgs...);
-                        }
+                    if (chainedEvent.getActualEvent()) {
+                        func(*chainedEvent.getActualEvent(), setArgs...);
+                    }
 
                 };
 
@@ -488,8 +488,14 @@ public:
             chainId = id;
             return transform<ChainEvent<EventType>>([=](auto event) {
                 LOGGER("starting chain " + id)
-                Context::getActiveContext()->set<ChainContext>(id);
-                ChainEvent r(id, event);
+                //@todo be careful - if new chain starts before previous one has finished, the chain context will be overwritten. !!!! --- but is it really? I think active context should belong to an event.
+                auto chainContext = Context::getActiveContext()->set<ChainContext>(id);
+
+                ChainEvent r(id, id, chainContext->instanceGenerator().nextValue(), event);
+
+                //debug stuff @todo remove
+                auto activeContext = Context::getActiveContext();
+                activeContext->setDebug_id(id);
                 return r;
             });
 
