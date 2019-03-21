@@ -35,15 +35,22 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
 
     //@todo implements all those required methods.
-    when(TimeConditions::every(5s)).fireNewGenericAction(
+    when(TimeConditions::every(15s)).fireNewGenericAction(
             CommonActions::foreachActionGetter(NetworkActions::broadcastPacket,
                     [this](){ return this->repositoryManager.getRepositories();},
                     [](RepositoryPtr rep) ->BasePacketPtr {auto p = RepoQuery::Request::getNew();p->setRepoId(rep->getRepositoryId());return p;} ),
             CommonEvaluators::foreachValue<BasePacketPtr>());
 
-    when(NetworkConditions::packetReceived<RepoQuery::Response>())
-    .newChain("repoUpdateChain")
-    .ifTrue(RepositoryActions::checkIfUpdateRequired, RepoEvaluators::currentJournalFromRepoQueryResponse,RepoEvaluators::newJournalFromRepoQueryResponse);
+    auto stage1 = when(NetworkConditions::packetReceived<RepoQuery::Response>())
+            .newChain("repoUpdateChain");
+    // stage1.ifTrue(RepositoryActions::checkIfUpdateRequired, RepoEvaluators::currentJournalFromRepoQueryResponse,RepoEvaluators::newJournalFromRepoQueryResponse);
+    //debug
+    stage1.lockChain()
+            .fireNewGenericChainAction([]() { LOGGER("super secret generic action"); })
+            .fireNewGenericChainAction([]() { LOGGER("and one after that"); })
+            .fireNewGenericChainAction([]() { LOGGER("one more"); })
+            .fireNewGenericChainAction([]() { LOGGER("and last one"); })
+            .unlockChain();
     //.fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
 
     return ret;

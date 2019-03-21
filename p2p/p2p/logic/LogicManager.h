@@ -124,8 +124,10 @@ public:
 
     void run() override {
         while (!isStopping()) {
+            //@todo cos wymyslec, zebyt to nie zżerało 100% cpu
             work();
             //  std::this_thread::sleep_for(0s);
+            std::this_thread::sleep_for(1ms);
         }
 
     }

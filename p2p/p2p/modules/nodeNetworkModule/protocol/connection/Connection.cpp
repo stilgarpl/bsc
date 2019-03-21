@@ -53,11 +53,12 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
             //  std::cout << "sending " << socket.address().port() << std::endl;
             //check the queue
             std::unique_lock<std::mutex> g(sendQueueLock);
-            while (sendQueue.empty() && sending) {
-                // std::cout << "work::send waiting" << std::endl;
-                //sendReady.wait_for(g, 1s);
-                sendReady.wait_for(g, 1s);
-            }
+//            while (sendQueue.empty() && sending) {
+//                // std::cout << "work::send waiting" << std::endl;
+//                //sendReady.wait_for(g, 1s);
+//                sendReady.wait_for(g, 1s);
+//            }
+            sendReady.wait(g, [this] { return !(sendQueue.empty() && sending); });
             while (!sendQueue.empty()) {
                 //  std::cout << "work::send found packet to send" << std::endl;
                 BasePacketPtr v;

@@ -7,6 +7,7 @@
 
 
 #include "ChainDefinitions.h"
+#include "InstanceGenerator.h"
 #include <map>
 #include <p2p/uber/Uber.h>
 
@@ -17,6 +18,7 @@ private:
     template<typename ...T>
     using ChainMap = std::map<ChainIdType, T...>;
     Uber<ChainMap> chainData;
+    InstanceGenerator _instanceGenerator;
 
 public:
     explicit ChainContext(const ChainIdType &chainId);
@@ -35,6 +37,11 @@ public:
     }
 
     virtual ~ChainContext();
+
+    //@todo maybe move it somewhere from context? or not.
+    InstanceGenerator &instanceGenerator() {
+        return _instanceGenerator;
+    }
 
 };
 

@@ -511,7 +511,7 @@ int main(int argc, char *argv[]) {
     setupCommands(cmdN.get());
 
 //    setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
-    thirdNode.start();
+//    thirdNode.start();
 
     //@todo this is required so logic is set up before connecting. change it so start wait until the end of the initialization phase
     // std::this_thread::sleep_for(1000ms);

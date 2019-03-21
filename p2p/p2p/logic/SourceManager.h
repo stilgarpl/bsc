@@ -21,6 +21,9 @@ class ISource;
 
 class SourceManager {
 public:
+    SourceManager();
+
+public:
     typedef std::shared_ptr<ISource> SourcePtr;
     typedef std::list<SourcePtr> SourceList;
 
@@ -144,7 +147,7 @@ private:
     SourceList sources;
     //@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
     Uber<Type> sourcesByType;
-    //@todo maybe this should just be a reference to node context?
+    //@todo it would appear that the common context is not actually used - it is replaced by context from events.
     Context::OwnPtr commonContext = Context::makeContext();
 public:
 

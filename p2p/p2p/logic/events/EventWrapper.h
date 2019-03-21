@@ -31,5 +31,13 @@ public:
     }
 };
 
+template<>
+struct EventWrapper<void> : public IEvent<int> {
+
+public:
+    template<typename ... T>
+    explicit EventWrapper(T... t) {}
+};
+
 
 #endif //BASYCO_EVENTWRAPPER_H

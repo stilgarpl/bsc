@@ -465,3 +465,6 @@ może dodać w chainie onFail() ktora wykona rozne rzeczy? defaultowo moglaby un
 lockChain() i unlockChain() wydają się w tym momencie najsensowniejszą alternatywą
 
 lockChain() brałoby mutex z ChainContextu, który to z kolei miałby wspólny mutex dla wszystkich chainów o tym id -> może go brać z jakiegoś globalnego logic chain context na poziomie logic managera.
+
+żeby unlock mógł działać poprawnie, pasowałoby zmienić zasadę, że void przerywa chaina. gdyby ChainEvent<void> był normalnym eventem, tylko pustym, można byłoby zrobić coś jak fireNewChain(sthReturnVoid).unlock() czy po prostu chainować kilka funkcji zwracających void (to jest bardziej istotne przy generic func, bo tak i tak wartosc leci przez evaluatory). z drugiej strony, przy zwykłych chain actions to nie ma sensu, bo void to void, a nie event type.
+ewentualnie można zostawić chain action tak jak jest, ale zmienic generic chain action, zeby akceptował EventWrapper<void> - tylko żeby user nie użył unwrap na void! @todo error handling w unwrap
