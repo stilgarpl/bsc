@@ -42,15 +42,15 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
             CommonEvaluators::foreachValue<BasePacketPtr>());
 
     auto stage1 = when(NetworkConditions::packetReceived<RepoQuery::Response>())
-            .newChain("repoUpdateChain");
-    // stage1.ifTrue(RepositoryActions::checkIfUpdateRequired, RepoEvaluators::currentJournalFromRepoQueryResponse,RepoEvaluators::newJournalFromRepoQueryResponse);
+            .newChain("repoUpdateChain").lockChain();
+    stage1.ifTrue(RepositoryActions::checkIfUpdateRequired, RepoEvaluators::currentJournalFromRepoQueryResponse,RepoEvaluators::newJournalFromRepoQueryResponse).unlockChain();
     //debug
-    stage1.lockChain()
-            .fireNewGenericChainAction([]() { LOGGER("super secret generic action"); })
-            .fireNewGenericChainAction([]() { LOGGER("and one after that"); })
-            .fireNewGenericChainAction([]() { LOGGER("one more"); })
-            .fireNewGenericChainAction([]() { LOGGER("and last one"); })
-            .unlockChain();
+//    stage1.lockChain()
+//            .fireNewGenericChainAction([]() { LOGGER("super secret generic action"); })
+//            .fireNewGenericChainAction([]() { LOGGER("and one after that"); })
+//            .fireNewGenericChainAction([]() { LOGGER("one more"); })
+//            .fireNewGenericChainAction([]() { LOGGER("and last one"); })
+//            .unlockChain();
     //.fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
 
     return ret;

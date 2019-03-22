@@ -160,23 +160,13 @@ public:
         std::list<ConstraintFunc> _constraint;
         LogicManager &logicManager;
 
-//        static void obtainChainLock(const ChainIdType &chainId) {
-//            //@todo mutex synchronize this whole method? on mutex from chainLock?
-//            auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
-//            auto activeContext = Context::getActiveContext();
-//            auto& chainLock = chainContext->getChainLock(chainId);
-//            if (chainLock.isLocked()) {
-//                //@todo what about double lock? check instance to make sure it's the same one
-//                if (*chainLock.getInstance() != )
-//                chainLock.waitForUnlock();
-//            }
-//
-//        }
 
         static void obtainChainLock(const ChainIdType &chainId, InstanceType instance, bool lock) {
             //@todo mutex synchronize this whole method? on mutex from chainLock?
+
             auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
             auto &chainLock = chainContext->getChainLock(chainId);
+            std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
             if (chainLock.isLocked()) {
                 if (*chainLock.getInstance() != instance) {
                     chainLock.waitForUnlock();
@@ -342,6 +332,14 @@ public:
         }
 
 
+        //@todo maybe think of better name
+        template<typename ConditionalFunc, typename ValueType, typename ... Evaluators>
+        auto ifChain(ConditionalFunc conditionalFunc, ValueType value, Evaluators... evaluators) {
+            //this method will emit two events, one for result == value, the other for result != value
+            using RetType = std::invoke_result_t<ConditionalFunc, std::invoke_result_t<Evaluators, EventType, Args...>...>;
+        }
+
+
         /*
          * works like generic func, but return value should be bool or convertible to bool
          */
@@ -376,9 +374,9 @@ public:
             auto generatedChainId = nextChainId();
             std::function<ChainEvent<EventType>(ChainEvent<EventType>)> f =
                     [generatedChainId](ChainEvent<EventType> event, auto... args) -> ChainEvent<EventType> {
-                        LOGGER("lockiiing")
+//                        LOGGER("lockiiing")
                         obtainChainLock(event.getBaseChainId(), event.getInstance(), true);
-                        LOGGER("locked")
+//                        LOGGER("locked")
                         event.setEventId(generatedChainId);
                         return event;
                     };

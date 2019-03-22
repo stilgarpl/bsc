@@ -31,6 +31,14 @@ public:
 
     void waitForUnlock();
 
+private:
+    template<typename ... T>
+    friend class LogicChainHelper;
+
+    decltype(_lock)& getMutex() {
+        return _lock;
+    }
+
 };
 
 

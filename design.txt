@@ -174,7 +174,7 @@ jedyny problem, to jak w tym przechowywac dodatkowe informacje. bo np. to connec
 i żadnych TTarget czy void*, ma byc porządnie.
 
 
-MIXED SIGNALS! @TODO THINK ABOUT IT
+MIXED SIGNALS! //DONE
 a co jesli sygnały nie byłyby per source tylko globalne, per logic manager? wtedy odpadłaby potrzeba rejestrowania providerów. source mogłyby generować takie eventy jakie chcą, a sygnały byłyby połączone. dla konkretnego eventa byłby konkretny sygnał a nie zbiór sygnałów per source
 a logic manager i tak wszystkie te sygnały odpala jednocześnie.
 z drugiej strony w tym momencie eventy są generowane tylko przez source, w dodatku clock source przegląda listę swoich sygnałów... może lepiej zostawić to tak jak jest, póki co.
@@ -227,7 +227,7 @@ w przypadku eventów generowanych z eventów RN, kontekst RN powinien być zacho
 
 pytanie techniczne - czy remote node powinny się pojawiać po obu stronach połączenia, czy tylko u klienta? z jednej strony wystarczy jak będą tylko u klienta, z drugiej, fajnie by było jakby się pojawiały, przez co widać by było wszystkie połączone nody
 
-TODO:
+
 
 Context w IEvent - DONE
 setActiveContext(eventContext) - DONE
@@ -332,7 +332,7 @@ TransferQueue {
 LogicStateMachine<TransferQueue>(this) ?
 
 
-//@todo enforce execution order for events
+//DONE
 niektóre eventy (jak state eventy) powinny się wykonywać w kolejności, inaczej nie ma to sensu.
 mozna to zrobic albo flagą w IEvent, numerem kolejki przetwarzania, execution policy albo czyms takim. wazne jest, zeby eventy z tego samego source z ustawionym tym szły sekwencyjnie.
 
@@ -468,3 +468,27 @@ lockChain() brałoby mutex z ChainContextu, który to z kolei miałby wspólny m
 
 żeby unlock mógł działać poprawnie, pasowałoby zmienić zasadę, że void przerywa chaina. gdyby ChainEvent<void> był normalnym eventem, tylko pustym, można byłoby zrobić coś jak fireNewChain(sthReturnVoid).unlock() czy po prostu chainować kilka funkcji zwracających void (to jest bardziej istotne przy generic func, bo tak i tak wartosc leci przez evaluatory). z drugiej strony, przy zwykłych chain actions to nie ma sensu, bo void to void, a nie event type.
 ewentualnie można zostawić chain action tak jak jest, ale zmienic generic chain action, zeby akceptował EventWrapper<void> - tylko żeby user nie użył unwrap na void! @todo error handling w unwrap
+
+
+locking i conditionale - jeśli jest warunkowy branch, to co z tym zrobic? może dojść do unlocka, może nie dojść.
+ifTrue mogłoby dodawać automatycznie akcję unlocka na false, a ifFalse na true... ale to takie grzebanie w rzeczach, których nie powinno być.
+najłatwiej byłoby ręcznie dodawać unlock do obu branchy, ale jak to zrobić bez podwójnego wywoływania warunku
+
+mam pomysł na eleganckie rozwiązanie problemu unlocku w ifie
+
+zmienić conditional/ifTrue/ifFalse (które to nie są ładne) na if(condition).then()... lub .else()
+wystarczy wtedy
+auto stage1 = if(...);
+stage1.then()...
+stage2.else().unlock();
+
+teraz conditional w przypadku != zwraca event który jest pusty przerywając chain.
+lepiej byłoby gdyby zamiast tego zwracało dwa eventy - success i failure. then() i else() podpinałoby się do tych eventów.
+
+
+ewentualnie można dodać jeszcze .fail() lub .finish() który kończy instancję chaina i zdejmuje wszystkie locki
+
+
+lekki problem przy implementacji tego - if() powinien zrobić dwa eventy... a do tej pory takie eventy lecą przez ActionExtended, która po prostu wywołuje zwrotkę z funkcji jako kolejny event.
+
+opcja jest taka, żeby zrobić wersję, która bierze structured binding albo kontener i iteruje po nim eventując. chyba ta druga opcja jest trochę lepsza
