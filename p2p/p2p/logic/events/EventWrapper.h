@@ -39,15 +39,16 @@ public:
     explicit EventWrapper(T... t) {}
 };
 
-template<typename Type>
-class ConditionalEventWrapper : public EventWrapper<Type> {
+template<typename EventType, typename ValueType>
+class ConditionalEventWrapper : public EventWrapper<EventType> {
 private:
-    Type otherValue;
+    ValueType otherValue;
 public:
-    ConditionalEventWrapper(Type payload, Type otherValue) : EventWrapper<Type>(payload), otherValue(otherValue) {}
+    ConditionalEventWrapper(EventType payload, ValueType otherValue) : EventWrapper<EventType>(payload),
+                                                                       otherValue(otherValue) {}
 
 public:
-    const Type &getOtherValue() const {
+    const ValueType &getOtherValue() const {
         return otherValue;
     }
 };

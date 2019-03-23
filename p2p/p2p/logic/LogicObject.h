@@ -354,7 +354,7 @@ public:
             //RetType should be comparable to ValueType
             return fireNewChainAction([=](EventType e) {
                 //@todo what if ValueType != RetType?
-                ConditionalEventWrapper<RetType> ret(conditionalFunc(evaluators(e)...), value);
+                ConditionalEventWrapper<RetType, ValueType> ret(conditionalFunc(evaluators(e)...), value);
 
 //                if (ret.getPayload() != value) {
 //                    //terminates the chain
