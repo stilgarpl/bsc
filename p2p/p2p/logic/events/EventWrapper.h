@@ -39,5 +39,18 @@ public:
     explicit EventWrapper(T... t) {}
 };
 
+template<typename Type>
+class ConditionalEventWrapper : public EventWrapper<Type> {
+private:
+    Type otherValue;
+public:
+    ConditionalEventWrapper(Type payload, Type otherValue) : EventWrapper<Type>(payload), otherValue(otherValue) {}
+
+public:
+    const Type &getOtherValue() const {
+        return otherValue;
+    }
+};
+
 
 #endif //BASYCO_EVENTWRAPPER_H

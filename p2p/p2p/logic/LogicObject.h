@@ -332,12 +332,15 @@ public:
         }
 
 
-        //@todo maybe think of better name
-        template<typename ConditionalFunc, typename ValueType, typename ... Evaluators>
-        auto ifChain(ConditionalFunc conditionalFunc, ValueType value, Evaluators... evaluators) {
-            //this method will emit two events, one for result == value, the other for result != value
-            using RetType = std::invoke_result_t<ConditionalFunc, std::invoke_result_t<Evaluators, EventType, Args...>...>;
-        }
+//        //@todo maybe think of better name
+//        template<typename ConditionalFunc, typename ValueType, typename ... Evaluators>
+//        auto ifChain(ConditionalFunc conditionalFunc, ValueType value, Evaluators... evaluators) {
+//            //this method will emit two events, one for result == value, the other for result != value
+//            using RetType = std::invoke_result_t<ConditionalFunc, std::invoke_result_t<Evaluators, EventType, Args...>...>;
+//            //@todo make typedef for std::list
+//            std::function<std::list<ChainEvent<RetType>>(ChainEvent<EventType>)> f = [](){};
+//            return fireRawChainActionPack<std::list,RetType>(f,);
+//        }
 
 
         /*
@@ -347,13 +350,16 @@ public:
         auto conditionalChain(ConditionalFunc conditionalFunc, ValueType value, Evaluators... evaluators) {
             //@todo check if RetType is void or already an event type
             using RetType = std::invoke_result_t<ConditionalFunc, std::invoke_result_t<Evaluators, EventType, Args...>...>;
+
             //RetType should be comparable to ValueType
             return fireNewChainAction([=](EventType e) {
-                EventWrapper<RetType> ret(conditionalFunc(evaluators(e)...));
-                if (ret.getPayload() != value) {
-                    //terminates the chain
-                    ret.setEventValid(false);
-                }
+                //@todo what if ValueType != RetType?
+                ConditionalEventWrapper<RetType> ret(conditionalFunc(evaluators(e)...), value);
+
+//                if (ret.getPayload() != value) {
+//                    //terminates the chain
+//                    ret.setEventValid(false);
+//                }
                 return ret;
             });
         }
@@ -366,6 +372,28 @@ public:
         template<typename ConditionalFunc, typename ... Evaluators>
         auto ifFalse(ConditionalFunc conditionalFunc, Evaluators... evaluators) {
             return conditionalChain(conditionalFunc, false, evaluators...);
+        }
+
+        template<typename ValueType = bool>
+        auto thenChain() {
+            return fireNewChainAction([=](EventType e) {
+                if (e.getPayload() != e.getOtherValue()) {
+                    //terminates the chain
+                    e.setEventValid(false);
+                }
+                return e;
+            });
+        }
+
+        template<typename ValueType = bool>
+        auto elseChain() {
+            return fireNewChainAction([=](EventType e) {
+                if (e.getPayload() == e.getOtherValue()) {
+                    //terminates the chain
+                    e.setEventValid(false);
+                }
+                return e;
+            });
         }
 
 
@@ -407,7 +435,7 @@ public:
                             LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
                                    chainedEvent.getEventId())
                             obtainChainLock(chainedEvent.getBaseChainId(), chainedEvent.getInstance(), false);
-                            if (chainedEvent.getActualEvent()) {
+                            if (chainedEvent.getActualEvent() && chainedEvent.getActualEvent()->isEventValid()) {
                                 LOGGER("chained action" + *chainId)
                                 auto value = func(*chainedEvent.getActualEvent(), setArgs...);
                                 ChainEvent<RetType> result(chainedEvent.getBaseChainId(), generatedChainId,
@@ -479,6 +507,44 @@ public:
             }
 
         }
+//
+//        //@todo func or std::function<RetType(EventType,Args...)> ?
+//        template<template<typename> typename container,typename RetType, typename ... SetArgs>
+//        auto
+//        fireRawChainActionPack(std::function<container<ChainEvent<RetType>>(ChainEvent<EventType>)> f, unsigned long generatedActionId,
+//                           const ChainIdType &generatedChainId, SetArgs... setArgs) {
+//            if (chainId) {
+//                //@todo apply constraint?
+//                if constexpr (!std::is_same<void, RetType>::value) { //Return Type of func is not void
+//                    LOGGER("generated chain id " + generatedChainId);
+//                    logicManager.setActionExtendedPack<container,ChainEvent<RetType>, ChainEvent<EventType>, Args...>(
+//                            generatedActionId, f);
+//                    logicManager.assignAction<ChainEvent<EventType>, Args...>(*chainId, generatedActionId);
+//                    //@todo return LogicChainHelper for <RetType>, but what about Args... ?
+//                    LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, generatedChainId);
+//                    return retLogicHelper;
+//                } else { //Return Type of func is void
+//                    logicManager.setAction<ChainEvent<EventType>, Args...>(generatedActionId, f);
+//                    logicManager.assignAction<ChainEvent<EventType>, Args...>(*chainId, generatedActionId);
+//                    return *this;
+//                }
+//
+//            } else {
+//
+//                //@todo exception!!!
+//                LOGGER("FAILURE! NO EVENT CHAIN ID SET!")
+//                //@todo generated chain if no chain set! fix!
+////                auto generatedChainId = nextChainId();
+//                if constexpr (!std::is_same<void, RetType>::value) {
+//                    LogicChainHelper<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, generatedChainId);
+//                    return retLogicHelper;
+//                } else {
+//                    return *this;
+//                }
+//            }
+//
+//        }
+
 
     public:
 

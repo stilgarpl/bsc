@@ -509,7 +509,7 @@ int main(int argc, char *argv[]) {
     thirdNode.getModule<NodeNetworkModule>()->configuration().setPort(9898);
     cmdN = thirdNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
-
+    cmdN = nullptr;
 //    setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
 //    thirdNode.start();
 
@@ -525,7 +525,7 @@ int main(int argc, char *argv[]) {
 //    otherNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 //    thirdNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 
-    std::this_thread::sleep_for(599s);
+    std::this_thread::sleep_for(1995s);
     //auto fdes = FileTransferControl::initiateTransfer(thisNode, "second", "/tmp/zsh", "/tmp/copied_zsh");
     thisNode.stop();
     thisNode.waitToFinish();

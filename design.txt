@@ -492,3 +492,12 @@ ewentualnie można dodać jeszcze .fail() lub .finish() który kończy instancj�
 lekki problem przy implementacji tego - if() powinien zrobić dwa eventy... a do tej pory takie eventy lecą przez ActionExtended, która po prostu wywołuje zwrotkę z funkcji jako kolejny event.
 
 opcja jest taka, żeby zrobić wersję, która bierze structured binding albo kontener i iteruje po nim eventując. chyba ta druga opcja jest trochę lepsza
+
+if powinien chyba zwracac *this z tym samym chain context a dopiero then i else popychać licznik do przodu
+
+
+lekka zmiana planów
+
+if wcale nie musi wyrzucać N eventów. nie wiem czy w ogóle ten event pack jest potrzebny
+
+wystarczy, żeby dawny conditional zwrócił jeden event, ale zawsze i nie zatrzymywał chaina przy failu. dopiero then() i else() robiłyby taką akcję: wziąć ten event i zabrać z niego wartość, bo przecież conditional zwraca tego boola w evencie! then by kontynuował chain przy true, a else przy false.

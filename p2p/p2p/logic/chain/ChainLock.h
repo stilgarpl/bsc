@@ -11,6 +11,8 @@
 #include <condition_variable>
 #include "ChainDefinitions.h"
 
+class LogicObject;
+
 
 class ChainLock {
 
@@ -31,9 +33,9 @@ public:
 
     void waitForUnlock();
 
+    friend class LogicObject;
+
 private:
-    template<typename ... T>
-    friend class LogicChainHelper;
 
     decltype(_lock)& getMutex() {
         return _lock;

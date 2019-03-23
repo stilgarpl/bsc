@@ -42,8 +42,11 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
             CommonEvaluators::foreachValue<BasePacketPtr>());
 
     auto stage1 = when(NetworkConditions::packetReceived<RepoQuery::Response>())
-            .newChain("repoUpdateChain").lockChain();
-    stage1.ifTrue(RepositoryActions::checkIfUpdateRequired, RepoEvaluators::currentJournalFromRepoQueryResponse,RepoEvaluators::newJournalFromRepoQueryResponse).unlockChain();
+            .newChain("repoUpdateChain").lockChain().ifTrue(RepositoryActions::checkIfUpdateRequired,
+                                                            RepoEvaluators::currentJournalFromRepoQueryResponse,
+                                                            RepoEvaluators::newJournalFromRepoQueryResponse);
+    stage1.thenChain().fireNewGenericChainAction([]() { LOGGER("then chain!"); }).unlockChain();
+    stage1.elseChain().fireNewGenericChainAction([]() { LOGGER("else chain!"); }).unlockChain();
     //debug
 //    stage1.lockChain()
 //            .fireNewGenericChainAction([]() { LOGGER("super secret generic action"); })
