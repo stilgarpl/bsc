@@ -24,7 +24,9 @@ struct ChainEvaluators {
     static auto chainResult(const Stage &stage) {
         auto id = *stage.getChainId();
         return [id](auto e, auto ... args) {
-            return Context::getActiveContext()->get<ChainContext>()->getChainResult<T>(id);
+            auto activeContext = Context::getActiveContext();
+            auto chainContext = activeContext->get<ChainContext>();
+            return chainContext->getChainResult<T>(id);
         };
     }
 

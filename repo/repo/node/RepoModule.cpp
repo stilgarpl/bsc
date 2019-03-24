@@ -20,6 +20,7 @@
 #include <repo/repository/network/RepoProcessors.h>
 #include <p2p/logic/conditions/TriggerConditions.h>
 #include <p2p/logic/sources/TriggerSource.h>
+#include <p2p/logic/chain/ChainEvaluators.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
@@ -39,7 +40,7 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     //@todo implements all those required methods.
 //    when(TimeConditions::every(15s)).fireNewGenericAction(
 
-    when(TimeConditions::every(15s)).fireNewGenericAction([this] {
+    when(TimeConditions::every(60s)).fireNewGenericAction([this] {
         node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("lala");
     });
     when(TriggerConditions::trigger<std::string>("lala")).fireNewGenericAction(
@@ -48,11 +49,15 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
                     [](RepositoryPtr rep) ->BasePacketPtr {auto p = RepoQuery::Request::getNew();p->setRepoId(rep->getRepositoryId());return p;} ),
             CommonEvaluators::foreachValue<BasePacketPtr>());
 
-    auto stage1 = when(NetworkConditions::packetReceived<RepoQuery::Response>())
-            .newChain("repoUpdateChain").lockChain().ifTrue(RepositoryActions::checkIfUpdateRequired,
+    auto start = when(NetworkConditions::packetReceived<RepoQuery::Response>())
+            .newChain("repoUpdateChain");
+    auto stage1 = start.lockChain().ifTrue(RepositoryActions::checkIfUpdateRequired,
                                                             RepoEvaluators::currentJournalFromRepoQueryResponse,
                                                             RepoEvaluators::newJournalFromRepoQueryResponse);
-    stage1.thenChain().fireNewGenericChainAction([]() { LOGGER("then chain!"); }).unlockChain();
+    stage1.thenChain().fireNewGenericChainAction(RepositoryActions::downloadRepository,
+                                                 CommonEvaluators::stack(RepoEvaluators::getRepoId,
+                                                                         ChainEvaluators::chainResult(
+                                                                                 start))).unlockChain();
     stage1.elseChain().fireNewGenericChainAction([]() { LOGGER("else chain!"); }).unlockChain();
     //debug
 //    stage1.lockChain()
@@ -61,7 +66,7 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
 //            .fireNewGenericChainAction([]() { LOGGER("one more"); })
 //            .fireNewGenericChainAction([]() { LOGGER("and last one"); })
 //            .unlockChain();
-    //.fireNewGenericChainAction(RepoActions::downloadRepo,RepoEvaluators::getRepoId)
+    //
 
     return ret;
 }
