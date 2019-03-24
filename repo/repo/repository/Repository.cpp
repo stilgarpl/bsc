@@ -217,7 +217,7 @@ void Repository::downloadStorage() {
 }
 
 void Repository::update(fs::path path) {
-
+    //@todo maybe repository should have update strategy for each situation?
     path = fs::weakly_canonical(path);
     auto &fileMap = getFileMap();
     //only update if the file is in the repository
@@ -230,6 +230,7 @@ void Repository::update(fs::path path) {
             LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
                    std::to_string(value->getModificationTime()))
             if (currentFileTime < value->getModificationTime()) {
+                //file in repository is newer than the file in filesystem, restore
                 LOGGER("restoring..." + path.string())
                 if (!attr->isDirectory()) {
                     storage->restore(value->getResourceId(), path);
@@ -238,9 +239,11 @@ void Repository::update(fs::path path) {
             } else {
                 if (currentFileTime == value->getModificationTime() && currentFileSize == value->getSize()) {
                     //@todo verify other things, like size() maybe
+                    //file appear identical, nothing to do.
                     LOGGER("leaving alone " + path.string())
                 } else {
                     LOGGER("persisting... " + path.string())
+                    //file in the filesystem is newer then the one in repository
                     persist(path); //this should add file as modified.
                 }
             }
@@ -264,42 +267,14 @@ void Repository::update(fs::path path) {
             //not in the map
         }
     } else {
-        //file was removed
-
+        //file was removed or perhaps wasn't deployed yet...
+        //@todo not so sure about that...
         if (attr) {
             //file is in file map, but not on filesystem, removing
             LOGGER("deleting " + path.string());
             remove(path); //@todo or forget?
         }
     }
-//    if (value) {
-//        if (fs::exists(path)) {
-//            //@tod if fs::is_directory(path), iterate over files and directories and persist new ones.
-//            //@todo use some kind of FileUtil to get this
-//            auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
-//            LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
-//                   std::to_string(value->getModificationTime()))
-//            if (currentFileTime < value->getModificationTime()) {
-//                LOGGER("restoring...")
-//                storage->restore(value->getResourceId(), path);
-//                restoreAttributes(path);
-//            } else {
-//                if (currentFileTime == value->getModificationTime()) {
-//
-//                } else {
-//                    //@todo pull file into repository? persist()?
-//                    persist(path); //this should add file as modified.
-//                }
-//            }
-//        } else {
-//            //@todo reform those ifs to combine two restore paths
-//            storage->restore(value->getResourceId(), path);
-//            restoreAttributes(path);
-//        }
-//    } else {
-//        //exception or sth?
-//        ;
-//    };
 
 
 }

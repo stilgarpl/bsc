@@ -106,25 +106,6 @@ bool InternalStorage::acquireResource(const ResourceId &resourceId) {
             repository->getRepositoryId(), resourceId));
     transferQueue->start();
 
-//    TransferManager::LocalTransferDescriptorPtr transfer = nullptr;
-
-//    for (auto &&[nodeId,response] : responseMap) {
-//        LOGGER("node " + nodeId + " replied with " + std::to_string(response->isExists()));
-//        if (response->isExists()) {
-//
-//
-//
-//            break;
-//        }
-//    }
-
-//    if (transfer != nullptr) {
-//        //@todo in the future, change it so acquire only starts transfer, but does not wait for them... maybe it should return transfer pointer?
-//        transfer->wait(); //@todo handle errors
-//        return true;
-//    } else {
-//        return false;
-//    }
     return true;
 }
 

@@ -18,6 +18,8 @@
 #include <repo/repository/logic/evaluators/RepoEvaluators.h>
 #include <p2p/logic/actions/CommonActions.h>
 #include <repo/repository/network/RepoProcessors.h>
+#include <p2p/logic/conditions/TriggerConditions.h>
+#include <p2p/logic/sources/TriggerSource.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
@@ -35,7 +37,12 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
 
     //@todo implements all those required methods.
-    when(TimeConditions::every(15s)).fireNewGenericAction(
+//    when(TimeConditions::every(15s)).fireNewGenericAction(
+
+    when(TimeConditions::every(15s)).fireNewGenericAction([this] {
+        node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("lala");
+    });
+    when(TriggerConditions::trigger<std::string>("lala")).fireNewGenericAction(
             CommonActions::foreachActionGetter(NetworkActions::broadcastPacket,
                     [this](){ return this->repositoryManager.getRepositories();},
                     [](RepositoryPtr rep) ->BasePacketPtr {auto p = RepoQuery::Request::getNew();p->setRepoId(rep->getRepositoryId());return p;} ),
@@ -62,6 +69,7 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
 bool RepoModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
     sourceHelper.requireSource<JournalSource>();
     sourceHelper.requireSource<StorageSource>();
+    sourceHelper.requireSource<TriggerSource>();
     return true;
 }
 
@@ -206,7 +214,8 @@ void RepoModule::prepareSubmodules() {
 }
 
 void RepoModule::downloadRepository(const Repository::RepoIdType &repoId) {
-
+    //@todo error handling
+    findRepository(repoId)->downloadStorage();
 }
 
 const std::filesystem::path &RepoModuleConfiguration::getRepositoryDataPath() const {
