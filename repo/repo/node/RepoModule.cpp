@@ -38,7 +38,12 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
 
     //@todo implements all those required methods.
-//    when(TimeConditions::every(15s)).fireNewGenericAction(
+//    when(TimeConditions::every(15s)).fireNewGenericAction(LOGGER("super secret generic action");
+
+
+//    when(TimeConditions::every(15s)).newChain("lockTest").lockChain().fireNewGenericChainAction([]{LOGGER("LOCK TEST secret generic action");})
+//            .fireNewGenericChainAction([]{std::this_thread::sleep_for(18s);LOGGER("LOCK TEST super 2 action ");})
+//            .fireNewGenericChainAction([]{LOGGER("LOCK TEST super 2 action ");}).unlockChain();
 
     when(TimeConditions::every(60s)).fireNewGenericAction([this] {
         node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("lala");

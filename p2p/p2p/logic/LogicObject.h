@@ -169,22 +169,28 @@ public:
             std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
             if (chainLock.isLocked()) {
                 if (*chainLock.getInstance() != instance) {
+                    guard.unlock();
                     chainLock.waitForUnlock();
+                    guard.lock();
                 }
             }
             if (lock) {
                 chainLock.lock(instance);
             }
+            LOGGER("LOCK OBTAINED")
         }
 
         static void releaseChainLock(const ChainIdType &chainId, InstanceType instance) {
             //@todo mutex synchronize this whole method? on mutex from chainLock?
             auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
             auto &chainLock = chainContext->getChainLock(chainId);
+            LOGGER("RELEASE BEFORE")
+            std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
             //@todo check instance.
             if (chainLock.isLocked()) {
                 chainLock.unlock();
             }
+            LOGGER("RELEASE AFTER")
         }
 
     public:

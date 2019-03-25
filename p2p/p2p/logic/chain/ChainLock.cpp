@@ -16,11 +16,12 @@ const std::optional<InstanceType> &ChainLock::getInstance() const {
 }
 
 void ChainLock::lock(InstanceType newInstance) {
-    LOGGER("LOCK")
+    LOGGER("LOCK " + std::to_string(newInstance))
     std::unique_lock<std::recursive_mutex> guard(_lock);
-
-    chainReady.wait(guard, [this, newInstance] { return !_locked || (_instance && *_instance == newInstance); });
-
+    if (_locked) {
+        chainReady.wait(guard, [this, newInstance] { return !_locked || (_instance && *_instance == newInstance); });
+    }
+    LOGGER("LOCKING ACTUALLY")
     _locked = true;
     _instance = newInstance;
 }
@@ -28,8 +29,9 @@ void ChainLock::lock(InstanceType newInstance) {
 void ChainLock::waitForUnlock() {
     LOGGER("WAIT LOCK")
     std::unique_lock<std::recursive_mutex> guard(_lock);
-
-    chainReady.wait(guard, [this] { return !_locked; });
+    if (_locked) {
+        chainReady.wait(guard, [this] { return !_locked; });
+    }
 }
 
 void ChainLock::unlock() {
