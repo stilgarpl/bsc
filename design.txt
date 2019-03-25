@@ -503,3 +503,6 @@ if wcale nie musi wyrzucać N eventów. nie wiem czy w ogóle ten event pack jes
 wystarczy, żeby dawny conditional zwrócił jeden event, ale zawsze i nie zatrzymywał chaina przy failu. dopiero then() i else() robiłyby taką akcję: wziąć ten event i zabrać z niego wartość, bo przecież conditional zwraca tego boola w evencie! then by kontynuował chain przy true, a else przy false.
 
 kiedy storage kończy pobierać pliki, powinien pójśc event o tym. czy nie po to robiłęm całe to state machine? /@todo ???
+
+
+@todo scripts!

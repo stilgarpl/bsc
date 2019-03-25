@@ -285,32 +285,37 @@ private:
 public:
 
 
+    void runLine(std::string line) {
+        LOGGER("Command: " + line);
+        //explode command into words
+        auto words = explode(line, ' ');
+
+        std::string module = "";
+        //  std::string commandName = "";
+        std::vector<std::string> data;
+        if (!words.empty()) module = words[0];
+        //if (words.size() > 1) commandName = words[1];
+        if (words.size() > 1) {
+            auto b = words.begin() + 1;
+            auto e = words.end();
+            data.insert(data.end(), b, e);
+        }
+
+        try {
+            runCommand(module, data);
+        } catch (const IncorrectParametersException &e) {
+            LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " +
+                   std::to_string(e.gotParameters));
+        }
+    }
+
+
     void runInteractive() {
         std::string line;
         node.setNodeContextActive();
         while (!isStopping() && std::getline(std::cin, line)) {
+            runLine(line);
 
-            LOGGER("Command: " + line);
-            //explode command into words
-            auto words = explode(line, ' ');
-
-            std::string module = "";
-            //  std::string commandName = "";
-            std::vector<std::string> data;
-            if (words.size() > 0) module = words[0];
-            //if (words.size() > 1) commandName = words[1];
-            if (words.size() > 1) {
-                auto b = words.begin() + 1;
-                auto e = words.end();
-                data.insert(data.end(), b, e);
-            }
-
-            try {
-                runCommand(module, data);
-            } catch (const IncorrectParametersException &e) {
-                LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " +
-                               std::to_string(e.gotParameters));
-            }
 
         }
 
@@ -358,6 +363,25 @@ public:
     void broadcastRemoteCommand(ArgumentContainerType args);
 
     void listCommands() {
+
+    }
+
+    void sleep(int seconds) {
+        std::this_thread::sleep_for(std::chrono::seconds(seconds));
+    }
+
+    void runScript(const fs::path &scriptPath) {
+        if (fs::exists(scriptPath)) {
+            std::string line;
+            std::ifstream stream(scriptPath);
+            while (std::getline(stream, line)) {
+                runLine(line);
+            }
+
+        } else {
+            //@todo error handling
+            LOGGER("script does not exist")
+        }
 
     }
 
