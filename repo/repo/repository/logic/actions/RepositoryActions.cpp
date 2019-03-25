@@ -25,3 +25,11 @@ void RepositoryActions::downloadRepository(const IRepository::RepoIdType repoId)
     repoMod->downloadRepository(repoId);
 
 }
+
+void RepositoryActions::updateJournal(const IRepository::RepoIdType repoId, const JournalPtr &newJournal) {
+    auto repoMod = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
+    //@todo error handling
+    //@todo shouldn't take journal, instead merge should be a function of Repository
+    LOGGER("merging journal")
+    repoMod->findRepository(repoId)->getJournal()->merge(newJournal);
+}

@@ -10,10 +10,11 @@
 struct RepositoryActions {
 
 
-    //@todo implement
     static bool checkIfUpdateRequired(const JournalPtr &currentJournal, const JournalPtr &newJournal);
 
-    static void downloadRepository(const IRepository::RepoIdType repoId);
+    static void updateJournal(IRepository::RepoIdType repoId, const JournalPtr &newJournal);
+
+    static void downloadRepository(IRepository::RepoIdType repoId);
 
 };
 

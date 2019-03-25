@@ -33,7 +33,8 @@ public:
 
     template<typename EventType>
     EventType &getChainResult(ChainIdType id) {
-        return *chainData.get<std::shared_ptr<EventType>>()[id];
+        auto result = chainData.get<std::shared_ptr<EventType>>()[id];
+        return *result;
     }
 
     virtual ~ChainContext();

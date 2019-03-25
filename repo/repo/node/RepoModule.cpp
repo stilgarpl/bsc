@@ -52,12 +52,21 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     auto start = when(NetworkConditions::packetReceived<RepoQuery::Response>())
             .newChain("repoUpdateChain");
     auto stage1 = start.lockChain().ifTrue(RepositoryActions::checkIfUpdateRequired,
-                                                            RepoEvaluators::currentJournalFromRepoQueryResponse,
-                                                            RepoEvaluators::newJournalFromRepoQueryResponse);
-    stage1.thenChain().fireNewGenericChainAction(RepositoryActions::downloadRepository,
-                                                 CommonEvaluators::stack(RepoEvaluators::getRepoId,
-                                                                         ChainEvaluators::chainResult(
-                                                                                 start))).unlockChain();
+                                           RepoEvaluators::currentJournalFromRepoQueryResponse,
+                                           RepoEvaluators::newJournalFromRepoQueryResponse);
+    stage1.thenChain()
+            .fireNewGenericChainAction(RepositoryActions::updateJournal,
+                                       CommonEvaluators::stack(
+                                               RepoEvaluators::getRepoId,
+                                               ChainEvaluators::chainResult(start)),
+                                       CommonEvaluators::stack(
+                                               RepoEvaluators::newJournalFromRepoQueryResponse,
+                                               ChainEvaluators::chainResult(start)))
+            .fireNewGenericChainAction(RepositoryActions::downloadRepository,
+                                       CommonEvaluators::stack(
+                                               RepoEvaluators::getRepoId,
+                                               ChainEvaluators::chainResult(start)))
+            .unlockChain();
     stage1.elseChain().fireNewGenericChainAction([]() { LOGGER("else chain!"); }).unlockChain();
     //debug
 //    stage1.lockChain()

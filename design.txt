@@ -505,4 +505,7 @@ wystarczy, żeby dawny conditional zwrócił jeden event, ale zawsze i nie zatrz
 kiedy storage kończy pobierać pliki, powinien pójśc event o tym. czy nie po to robiłęm całe to state machine? /@todo ???
 
 
-@todo scripts!
+
+dwa problemy które są teraz - przy próbie merge journala pobranego z nowego repo, nie przechodzi walidacji - wyliczane chechsumy są różne od zapisanych. nie wiem czemu. sprawdzic to
+dwa, jeśli chain trwa za długo i nastepny zacznie się zanim ten sie skonczy, to locki się blokują. naprawić.
+

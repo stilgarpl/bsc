@@ -26,7 +26,8 @@ struct ChainEvaluators {
         return [id](auto e, auto ... args) {
             auto activeContext = Context::getActiveContext();
             auto chainContext = activeContext->get<ChainContext>();
-            return chainContext->getChainResult<T>(id);
+            auto result = chainContext->getChainResult<T>(id);
+            return result;
         };
     }
 

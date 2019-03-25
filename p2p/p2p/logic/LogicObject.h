@@ -557,7 +557,7 @@ public:
 
                 ChainEvent r(id, id, chainContext->instanceGenerator().nextValue(), event);
                 LOGGER("new chain: storing initial result " + r.getEventId())
-                chainContext->storeChainResult(r.getEventId(), r.getActualEvent());
+                chainContext->storeChainResult<EventType>(r.getEventId(), *r.getActualEvent());
                 //debug stuff @todo remove
                 auto activeContext = Context::getActiveContext();
                 activeContext->setDebug_id(id);
