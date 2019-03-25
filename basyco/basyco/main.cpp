@@ -133,6 +133,7 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("updateAll", &RepoModule::updateAllFiles);
     cmd->mapCommand("run", &CommandModule::runScript);
     cmd->mapCommand("sleep", &CommandModule::sleep);
+    cmd->mapRawCommand("bg", &CommandModule::runInBackground);
 //    cmd->mapCommand("requestResource", &RepoModule::requestStoragePath);
 //    cmd->mapCommand("beginTransfer", &FilesystemModule::beginTransferTest);
 //    cmd->submodule("help").mapCommand("cmdList",&CommandModule::listCommands);

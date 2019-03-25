@@ -117,6 +117,21 @@ void CommandModule::broadcastRemoteCommand(const std::vector<std::string> &args)
     }
 }
 
+void CommandModule::runInBackground(const std::vector<std::string> &args) {
+    //@todo think about mutexes and thread safety
+    if (args.size() >= 1) {
+        std::string command = args[0];
+        std::vector<std::string> rest(args.begin() + 1, args.end());
+        auto activeContext = Context::getActiveContext();
+        std::thread([this, command, rest, activeContext] {
+            Context::setActiveContext(activeContext);
+            this->runCommand(command, rest);
+        }).detach();
+
+
+    }
+}
+
 
 CommandModule::CommandSubModule &CommandModule::CommandSubModule::submodule(std::string name) {
     if (submodules.count(name) == 0) {

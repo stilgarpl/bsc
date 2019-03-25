@@ -370,6 +370,8 @@ public:
         std::this_thread::sleep_for(std::chrono::seconds(seconds));
     }
 
+    void runInBackground(ArgumentContainerType args);
+
     void runScript(const fs::path &scriptPath) {
         if (fs::exists(scriptPath)) {
             std::string line;
