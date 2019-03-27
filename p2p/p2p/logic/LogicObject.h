@@ -166,9 +166,11 @@ public:
 
             auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
             auto &chainLock = chainContext->getChainLock(chainId);
+            //@todo maybe use different mutex than chainLock mutex?
             std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
             if (chainLock.isLocked()) {
                 if (*chainLock.getInstance() != instance) {
+                    //@todo remove mutex unlocking, maybe add parameter to waitForUnlock to double unlock it?
                     guard.unlock();
                     chainLock.waitForUnlock();
                     guard.lock();

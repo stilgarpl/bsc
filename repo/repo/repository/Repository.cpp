@@ -135,7 +135,7 @@ void Repository::commit() {
         auto &fileMap = getFileMap();
 
         if (fileMap[filePath]) {
-            journal->append(JournalMethod::FORGOT, JournalTarget::FILE,
+            journal->append(JournalMethod::FORGOTTEN, JournalTarget::FILE,
                             filePath,
                             fileMap[filePath]->toFileData(filePath));
         }
@@ -149,7 +149,7 @@ void Repository::commit() {
         for (const auto &[subPath, value] : subMap) {
             //this will not set the isDirectory flag, but I don't think it's important.
             LOGGER("subpath " + subPath.string())
-            journal->append(JournalMethod::FORGOT,
+            journal->append(JournalMethod::FORGOTTEN,
                             value->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
                             pathTransformer->transformToJournalFormat(subPath),
                             getFileMap()[subPath]->toFileData(subPath));
@@ -308,7 +308,7 @@ void Repository::forget(fs::path path) {
     }
     auto &attr = fileMap[path];
     if (attr) {
-        journal->append(JournalMethod::FORGOT, attr->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
+        journal->append(JournalMethod::FORGOTTEN, attr->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
                         pathTransformer->transformToJournalFormat(path),
                         attr->toFileData(path));
     } else {
@@ -396,7 +396,7 @@ void Repository::RepoFileMap::prepareMap() {
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::FORGOT, JournalTarget::FILE, [&](auto &i) {
+        journal->setFunc(JournalMethod::FORGOTTEN, JournalTarget::FILE, [&](auto &i) {
             auto path = pathTransformer->transformFromJournalFormat(i.getPath());
             attributesMap[path] = std::nullopt;
             deleteMap[path].setDeleted(false);
@@ -427,7 +427,7 @@ void Repository::RepoFileMap::prepareMap() {
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::FORGOT, JournalTarget::DIRECTORY, [&](auto &i) {
+        journal->setFunc(JournalMethod::FORGOTTEN, JournalTarget::DIRECTORY, [&](auto &i) {
             auto path = pathTransformer->transformFromJournalFormat(i.getPath());
             attributesMap[path] = std::nullopt;
             deleteMap[path].setDeleted(false);

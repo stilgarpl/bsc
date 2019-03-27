@@ -45,20 +45,27 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
 //            .fireNewGenericChainAction([]{std::this_thread::sleep_for(18s);LOGGER("LOCK TEST super 2 action ");})
 //            .fireNewGenericChainAction([]{LOGGER("LOCK TEST super 2 action ");}).unlockChain();
 
-    when(TimeConditions::every(60s)).fireNewGenericAction([this] {
-        node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("lala");
-    });
-    when(TriggerConditions::trigger<std::string>("lala")).fireNewGenericAction(
+    when(TimeConditions::every(60s))
+            .fireNewGenericAction([this] {
+                node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("updateRepoTrigger");
+            });
+    when(TriggerConditions::trigger<std::string>("updateRepoTrigger")).fireNewGenericAction(
             CommonActions::foreachActionGetter(NetworkActions::broadcastPacket,
-                    [this](){ return this->repositoryManager.getRepositories();},
-                    [](RepositoryPtr rep) ->BasePacketPtr {auto p = RepoQuery::Request::getNew();p->setRepoId(rep->getRepositoryId());return p;} ),
+                                               [this] { return this->repositoryManager.getRepositories(); },
+                                               [](RepositoryPtr rep) -> BasePacketPtr {
+                                                   auto p = RepoQuery::Request::getNew();
+                                                   p->setRepoId(rep->getRepositoryId());
+                                                   return p;
+                                               }),
             CommonEvaluators::foreachValue<BasePacketPtr>());
 
     auto start = when(NetworkConditions::packetReceived<RepoQuery::Response>())
             .newChain("repoUpdateChain");
-    auto stage1 = start.lockChain().ifTrue(RepositoryActions::checkIfUpdateRequired,
-                                           RepoEvaluators::currentJournalFromRepoQueryResponse,
-                                           RepoEvaluators::newJournalFromRepoQueryResponse);
+    auto stage1 = start
+            .lockChain()
+            .ifTrue(RepositoryActions::checkIfUpdateRequired,
+                    RepoEvaluators::currentJournalFromRepoQueryResponse,
+                    RepoEvaluators::newJournalFromRepoQueryResponse);
     stage1.thenChain()
             .fireNewGenericChainAction(RepositoryActions::updateJournal,
                                        CommonEvaluators::stack(
@@ -72,7 +79,9 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
                                                RepoEvaluators::getRepoId,
                                                ChainEvaluators::chainResult(start)))
             .unlockChain();
-    stage1.elseChain().fireNewGenericChainAction([]() { LOGGER("else chain!"); }).unlockChain();
+    stage1.elseChain()
+            .fireNewGenericChainAction([]() { LOGGER("else chain!"); })
+            .unlockChain();
     //debug
 //    stage1.lockChain()
 //            .fireNewGenericChainAction([]() { LOGGER("super secret generic action"); })

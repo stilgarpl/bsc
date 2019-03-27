@@ -509,3 +509,5 @@ kiedy storage kończy pobierać pliki, powinien pójśc event o tym. czy nie po 
 dwa problemy które są teraz - przy próbie merge journala pobranego z nowego repo, nie przechodzi walidacji - wyliczane chechsumy są różne od zapisanych. nie wiem czemu. sprawdzic to
 dwa, jeśli chain trwa za długo i nastepny zacznie się zanim ten sie skonczy, to locki się blokują. naprawić.
 
+locki naprawione. problem był w podwójnym lockowaniu mutexa. @todo do tego trzeba jeszcze zajrzeć, bo w obecnej implementacji nie jest 100% thread safe - mutex jest odblokowany przez pewien czas.
+merge naprawiony, w konstruktorze kopiującym nie było metadata uwzględnionego i nadpisywał sobie nowymi lokalnymi danymi

@@ -14,7 +14,7 @@ enum JournalMethod {
     DELETED,
     IGNORED,
     UNIGNORED,
-    FORGOT,
+    FORGOTTEN,
 };
 
 

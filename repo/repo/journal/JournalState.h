@@ -183,6 +183,7 @@ public:
         checksum = other.checksum;
         dataList = other.dataList;
         commitTime = other.commitTime;
+        metaData = other.metaData;
         previousState = other.previousState;
     }
 
