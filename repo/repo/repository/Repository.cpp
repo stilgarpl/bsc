@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 17.10.17.
 //
@@ -20,9 +22,9 @@ void Repository::setJournal(const JournalPtr &journal) {
     Repository::journal = journal;
 }
 
-Repository::Repository(const RepoIdType &repositoryId) : repositoryId(repositoryId),
-                                                         storage(std::make_shared<InternalStorage>(
-                                                                 static_cast<IRepository *>(this))) {
+Repository::Repository(RepoIdType repositoryId) : repositoryId(std::move(repositoryId)),
+                                                  storage(std::make_shared<InternalStorage>(
+                                                          static_cast<IRepository *>(this))) {
     pathTransformer->addRule(std::make_shared<TmpRule>());
     pathTransformer->addRule(std::make_shared<HomeDirRule>());
 }
@@ -42,6 +44,7 @@ void Repository::restoreAll() {
             } else {
                 storage->restore(value->getResourceId(), path);
             }
+            deployMap.markDeployed(path);
             restoreAttributes(path);
         } else {
             LOGGER("resAll: no value")
@@ -64,7 +67,7 @@ void Repository::commit() {
     journal->setFunc(JournalMethod::ADDED, JournalTarget::DIRECTORY, [&](auto &i) {
         //nothing to store, but... files from the directory should be added.
         LOGGER("commit: added dir " + i.getPath() + " tt: " +
-               pathTransformer->transformFromJournalFormat(i.getPath()).string())
+                       pathTransformer->transformFromJournalFormat(i.getPath()).string())
         fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
         for (const auto &item : fs::directory_iterator(dirPath)) {
             fs::path path = fs::canonical(item.path());
@@ -92,7 +95,7 @@ void Repository::commit() {
                 if (!attr) {
                     //I don't like the fact that this logic is in two places, here and update().
                     if (!fileMap.isDeleted(fs::canonical(item.path())) ||
-                        currentFileTime > fileMap.getDeletionTime(path)) {
+                            currentFileTime > fileMap.getDeletionTime(path)) {
                         journal->append(JournalMethod::ADDED,
                                         fs::is_directory(path) ? JournalTarget::DIRECTORY : JournalTarget::FILE,
                                         pathTransformer->transformToJournalFormat(path),
@@ -213,6 +216,7 @@ void Repository::downloadStorage() {
 
 
     }
+    //@todo wait for finish?
 
 }
 
@@ -221,23 +225,24 @@ void Repository::update(fs::path path) {
     path = fs::weakly_canonical(path);
     auto &fileMap = getFileMap();
     //only update if the file is in the repository
-    auto &value = fileMap[path];
-    auto &attr = fileMap[path];
+    auto &attributes = fileMap[path];
     if (fs::exists(path)) {
         auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
         auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
-        if (attr) {
+        if (attributes) {
             LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
-                   std::to_string(value->getModificationTime()))
-            if (currentFileTime < value->getModificationTime()) {
+                   std::to_string(attributes->getModificationTime()))
+            if (currentFileTime < attributes->getModificationTime()) {
                 //file in repository is newer than the file in filesystem, restore
                 LOGGER("restoring..." + path.string())
-                if (!attr->isDirectory()) {
-                    storage->restore(value->getResourceId(), path);
+                if (!attributes->isDirectory()) {
+                    storage->restore(attributes->getResourceId(), path);
+
                 }
                 restoreAttributes(path);
+                deployMap.markDeployed(path);
             } else {
-                if (currentFileTime == value->getModificationTime() && currentFileSize == value->getSize()) {
+                if (currentFileTime == attributes->getModificationTime() && currentFileSize == attributes->getSize()) {
                     //@todo verify other things, like size() maybe
                     //file appear identical, nothing to do.
                     LOGGER("leaving alone " + path.string())
@@ -261,6 +266,7 @@ void Repository::update(fs::path path) {
                     LOGGER("trashing " + path.string())
                     //file should be deleted, but let's check deletion time...
                     trash(path);
+                    deployMap.markDeployed(path, false);
                 }
             }
 
@@ -269,10 +275,23 @@ void Repository::update(fs::path path) {
     } else {
         //file was removed or perhaps wasn't deployed yet...
         //@todo not so sure about that...
-        if (attr) {
-            //file is in file map, but not on filesystem, removing
-            LOGGER("deleting " + path.string());
-            remove(path); //@todo or forget?
+        if (attributes) {
+            if (deployMap.isDeployed(path)) {
+                //file is in file map and was deployed but is not on filesystem, removing (user must have deleted it)
+                LOGGER("deleting " + path.string());
+                remove(path); //@todo or forget? I think remove.
+            } else {
+                //file wasn't deployed. must be a new file from another node. restore.
+                //@todo this is duplicated code. move to strategies or sth. (three times as of writing this. seriously, do something about it)
+                if (!attributes->isDirectory()) {
+                    storage->restore(attributes->getResourceId(), path);
+                }
+                restoreAttributes(path);
+                deployMap.markDeployed(path);
+            }
+        } else {
+            //file is neither on file system nor in the map. someone trying to update unknown file?
+            LOGGER("file unknown " + path.string());
         }
     }
 
@@ -287,7 +306,7 @@ void Repository::update() {
 
 }
 
-void Repository::restoreAttributes(fs::path path) {
+void Repository::restoreAttributes(const fs::path &path) {
 
     auto &fileMap = getFileMap();
 
@@ -359,7 +378,7 @@ void Repository::ignore(fs::path path) {
     }
 }
 
-void Repository::trash(fs::path path) {
+void Repository::trash(const fs::path &path) {
 
     //@todo implement trashing
     fs::remove(path);
@@ -460,11 +479,11 @@ auto Repository::RepoFileMap::end() -> decltype(attributesMap.end()) {
 Repository::RepoFileMap::RepoFileMap(JournalPtr &journal, std::shared_ptr<IPathTransformer> &pathTransformer) : journal(
         journal), pathTransformer(pathTransformer) {}
 
-auto Repository::RepoFileMap::getSize(fs::path path) {
+auto Repository::RepoFileMap::getSize(const fs::path &path) {
     return attributesMap[path]->getSize();
 }
 
-decltype(Repository::RepoFileMap::attributesMap) Repository::RepoFileMap::subMap(const fs::path root) {
+decltype(Repository::RepoFileMap::attributesMap) Repository::RepoFileMap::subMap(const fs::path &root) {
     decltype(Repository::RepoFileMap::attributesMap) result;
     for (const auto &[path, value] : attributesMap) {
         if (path.string().find(root.string()) != std::string::npos) {
@@ -472,6 +491,14 @@ decltype(Repository::RepoFileMap::attributesMap) Repository::RepoFileMap::subMap
         }
     }
     return result;
+}
+
+std::time_t Repository::RepoFileMap::getDeletionTime(const fs::path &path) {
+    return deleteMap[path].getDeletionTime();
+}
+
+auto Repository::RepoFileMap::isDeleted(const fs::path &path) -> decltype(deleteMap[path].isDeleted()) {
+    return deleteMap[path].isDeleted();
 }
 
 fs::perms Repository::RepoFileMap::Attributes::getPermissions() const {
@@ -522,4 +549,24 @@ void Repository::RepoFileMap::DeleteInfo::setDeletionTime(time_t deletionTime) {
 
 void Repository::RepoFileMap::DeleteInfo::setDeleted(bool deleted) {
     DeleteInfo::deleted = deleted;
+}
+
+auto Repository::RepoDeployMap::begin() -> decltype(deployMap.begin()) {
+    return deployMap.begin();
+}
+
+auto Repository::RepoDeployMap::end() -> decltype(deployMap.end()) {
+    return deployMap.end();
+}
+
+auto Repository::RepoDeployMap::operator[](const fs::path &path) -> decltype(deployMap[fs::current_path()]) {
+    return deployMap[path];
+}
+
+bool Repository::RepoDeployMap::DeployAttributes::isDeployed() const {
+    return deployed;
+}
+
+void Repository::RepoDeployMap::DeployAttributes::setDeployed(bool deployed) {
+    DeployAttributes::deployed = deployed;
 }

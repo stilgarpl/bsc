@@ -96,7 +96,7 @@ bool InternalStorage::acquireResource(const ResourceId &resourceId) {
 //    req->setObjectId(resourceId);
 //    //@todo this will wait for response, potentially blocking Repository
 //    auto responseMap = netModule->broadcastRequest(req);
-
+    LOGGER("acquiring resource " + resourceId)
     if (transferQueue == nullptr) {
         transferQueue = fileModule->transferQueue();
     }

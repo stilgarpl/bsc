@@ -69,6 +69,7 @@ public:
 
             void setDeletionTime(time_t deletionTime);
         };
+
     private:
         std::map<fs::path, std::optional<Attributes>> attributesMap;
         std::map<fs::path, DeleteInfo> deleteMap;
@@ -77,12 +78,13 @@ public:
         decltype(journal->getChecksum()) mapChecksum;
     private:
         void prepareMap();
+
     public:
         auto operator[](const fs::path &path) -> decltype(attributesMap[fs::current_path()]);
 
-        auto getSize(fs::path path);
+        auto getSize(const fs::path &path);
 
-        decltype(attributesMap) subMap(fs::path root);
+        decltype(attributesMap) subMap(const fs::path &root);
 
     public:
 
@@ -92,15 +94,62 @@ public:
 
         auto end() -> decltype(attributesMap.end());
 
-        std::time_t getDeletionTime(const fs::path &path) {
-            return deleteMap[path].getDeletionTime();
-        }
+        std::time_t getDeletionTime(const fs::path &path);
 
-        auto isDeleted(const fs::path &path) {
-            return deleteMap[path].isDeleted();
-        }
+        auto isDeleted(const fs::path &path) -> decltype(deleteMap[path].isDeleted());
 
         RepoFileMap(JournalPtr &journal, std::shared_ptr<IPathTransformer> &pathTransformer);
+    };
+
+
+    class RepoDeployMap {
+
+        class DeployAttributes {
+            bool deployed = false;
+
+        public:
+            bool isDeployed() const;
+
+            void setDeployed(bool deployed);
+
+        private:
+            template<class Archive>
+            void serialize(Archive &ar) {
+                ar(deployed);
+            }
+
+
+            friend class cereal::access;
+
+        };
+
+    public:
+
+        std::map<fs::path, std::optional<DeployAttributes>> deployMap;
+
+        auto begin() -> decltype(deployMap.begin());
+
+        auto end() -> decltype(deployMap.end());
+
+        auto operator[](const fs::path &path) -> decltype(deployMap[fs::current_path()]);
+
+        void markDeployed(const fs::path &path, bool value = true) {
+            deployMap[path]->setDeployed(value);
+        }
+
+        bool isDeployed(const fs::path &path) {
+            return deployMap[path] && deployMap[path]->isDeployed();
+        }
+
+    private:
+        template<class Archive>
+        void serialize(Archive &ar) {
+            ar(deployMap);
+        }
+
+
+        friend class cereal::access;
+
     };
 
 
@@ -112,6 +161,8 @@ private:
 
 
     RepoFileMap _repoFileMap = RepoFileMap(journal, pathTransformer);
+    //@todo add saving and loading of a deployMap
+    RepoDeployMap deployMap;
 
 protected:
 
@@ -146,7 +197,7 @@ public:
 
     void ignore(fs::path path);
 
-    void restoreAttributes(fs::path path);
+    void restoreAttributes(const fs::path &path);
 
     //update one file from the repository
     void update(fs::path path);
@@ -154,9 +205,9 @@ public:
     //update everything
     void update();
 
-    explicit Repository(const RepoIdType &repositoryId);
+    explicit Repository(RepoIdType repositoryId);
 
-    void trash(fs::path path);
+    void trash(const fs::path &path);
 
     ~Repository() override = default;
 };

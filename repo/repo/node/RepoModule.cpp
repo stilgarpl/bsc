@@ -115,7 +115,7 @@ void RepoModule::loadRepository(const Repository::RepoIdType &repoId) {
     RepositoryPtr ptr = std::make_shared<Repository>(repoId);
 
     repositoryManager.addRepository(ptr);
-
+//@todo this metod should be moved somewhere else. Journal is not the only thing of repo that needs to be saved. Repository should have serialize and RepoManager should handle loading and saving.
 //@todo throw exception if repo does not exist
     ptr->setJournal(node.getConfigurationManager().loadData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml")));
 //    {
