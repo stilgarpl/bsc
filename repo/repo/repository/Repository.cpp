@@ -91,6 +91,7 @@ void Repository::commit() {
             fs::path path = fs::canonical(item.path());
             auto &attr = fileMap[path];
             if (fs::exists(path)) {
+                //@todo replace time_t with file clock of C++20
                 auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
                 if (!attr) {
                     //I don't like the fact that this logic is in two places, here and update().
@@ -504,6 +505,8 @@ auto Repository::RepoFileMap::isDeleted(const fs::path &path) -> decltype(delete
 fs::perms Repository::RepoFileMap::Attributes::getPermissions() const {
     return permissions;
 }
+
+to_time
 
 uintmax_t Repository::RepoFileMap::Attributes::getSize() const {
     return size;

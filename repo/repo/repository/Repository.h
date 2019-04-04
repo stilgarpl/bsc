@@ -17,6 +17,7 @@
 #include "IRepository.h"
 
 class Repository : public IRepository {
+
 public:
 
     class RepoFileMap {
@@ -24,6 +25,7 @@ public:
         class Attributes {
             fs::perms permissions = fs::perms::none;
             uintmax_t size = 0;
+            //@todo utc clock instead of old time_t value. or, typedef clock
             std::time_t modificationTime = 0;
             ChecksumId checksum; //checksum of the file.
             bool directory = false;
@@ -58,6 +60,7 @@ public:
         class DeleteInfo {
         private:
             bool deleted = false;
+            //@todo store utc_clock value instead of old time_t
             std::time_t deletionTime = 0;
 
         public:
