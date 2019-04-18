@@ -19,6 +19,7 @@
 #include <p2p/logic/chain/ChainContext.h>
 #include <p2p/logic/chain/GlobalChainContext.h>
 #include <p2p/logic/chain/ChainGroup.h>
+#include <p2p/logic/chain/LockConfiguration.h>
 
 class LogicObject {
 protected:
@@ -572,14 +573,15 @@ public:
 
     public:
 
-        ThisType &newChain(const ChainIdType &id, const std::optional<ChainGroup>& chainGroup = std::nullopt) {
+        ThisType &newChain(const ChainIdType &id,
+                           const std::optional<LockConfiguration<EventType >> &lockConfiguration = std::nullopt) {
             chainId = id;
             return transform<ChainEvent<EventType>>([=](auto event) {
                 LOGGER("starting chain " + id)
                 //@todo be careful - if new chain starts before previous one has finished, the chain context will be overwritten. !!!! --- but is it really? I think active context should belong to an event.
                 auto chainContext = Context::getActiveContext()->set<ChainContext>(id);
 
-                auto lockId = chainGroup ? getLockIdFromChainGroupId(chainGroup->getChainGroupId()) : getLockIdFromChainId(id);
+                auto lockId = lockConfiguration ? lockConfiguration->getLockId(event) : id;
 
                 ChainEvent r(id, id, chainContext->instanceGenerator().nextValue(), event, lockId);
                 LOGGER("new chain: " + id + " lock id " + lockId + " storing initial result " + r.getEventId())

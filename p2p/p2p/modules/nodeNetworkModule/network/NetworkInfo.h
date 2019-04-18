@@ -7,12 +7,10 @@
 
 
 #include <list>
-#include "p2p/node/NodeInfo.h"
 #include "cereal/types/map.hpp"
 #include "p2p/log/Logger.h"
 #include "RemoteNodeInfo.h"
 #include <optional>
-#include "NetAddressType.h"
 
 
 //typedef std::string NetworkIdType;

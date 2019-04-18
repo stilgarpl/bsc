@@ -62,7 +62,7 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
             CommonEvaluators::foreachValue<BasePacketPtr>());
 
     auto start = when(NetworkConditions::packetReceived<RepoQuery::Response>())
-            .newChain("repoUpdateChain",updateChainGroup);
+            .newChain("repoUpdateChain");
     auto stage1 = start
             .lockChain()
             .ifTrue(RepositoryActions::checkIfUpdateRequired,
