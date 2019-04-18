@@ -45,6 +45,8 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
 //            .fireNewGenericChainAction([]{std::this_thread::sleep_for(18s);LOGGER("LOCK TEST super 2 action ");})
 //            .fireNewGenericChainAction([]{LOGGER("LOCK TEST super 2 action ");}).unlockChain();
 
+    auto updateChainGroup = chainGroup("updateChain");
+
     when(TimeConditions::every(60s))
             .fireNewGenericAction([this] {
                 node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("updateRepoTrigger");
@@ -60,7 +62,7 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
             CommonEvaluators::foreachValue<BasePacketPtr>());
 
     auto start = when(NetworkConditions::packetReceived<RepoQuery::Response>())
-            .newChain("repoUpdateChain");
+            .newChain("repoUpdateChain",updateChainGroup);
     auto stage1 = start
             .lockChain()
             .ifTrue(RepositoryActions::checkIfUpdateRequired,

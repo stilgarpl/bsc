@@ -11,17 +11,12 @@
 #include "p2p/modules/configuration/IConfig.h"
 #include "p2p/logic/SourceManager.h"
 #include "p2p/logic/LogicManager.h"
-#include "NodeModule.h"
 #include "INode.h"
 
 #include <memory>
 #include <p2p/dependency/DependencyManager.h>
 #include <p2p/role/RoleScope.h>
 #include <p2p/modules/configuration/ConfigurationManager.h>
-
-
-class NodeActions;
-
 
 
 class Node : public INode, public RoleScope {

@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include <utility>
+
 //
 // Created by stilgar on 01.01.19.
 //
@@ -17,6 +19,7 @@ template<typename ActualEventType>
 class ChainEvent : public IEvent<ChainIdType> {
 private:
     ChainIdType baseChainId;
+    ChainLockIdType chainLockId;
     std::optional<ActualEventType> actualEvent;
     InstanceType instance;
 public:
@@ -25,16 +28,11 @@ public:
         return actualEvent;
     }
 
-    ChainEvent(ChainIdType base, ChainIdType stageId, InstanceType instance, ActualEventType actualEvent) : IEvent(
-            stageId), baseChainId(
-            std::move(base)),
-                                                                                                            actualEvent(
-                                                                                                                    actualEvent),
-                                                                                                            instance(
-                                                                                                                    instance) {
+    ChainEvent(ChainIdType base, const ChainIdType& stageId, InstanceType instance, ActualEventType actualEvent,
+               ChainLockIdType chainLockId) :
+            IEvent(stageId), baseChainId(std::move(base)),chainLockId(std::move(chainLockId)) , actualEvent(actualEvent), instance(instance)
+            {
 //        this->context()->setParentContext(actualEvent.context());
-
-
         this->context()->setDebug_id("chain event " + stageId);
     }
 
@@ -51,6 +49,10 @@ public:
 
     const ChainIdType &getBaseChainId() const {
         return baseChainId;
+    }
+
+    const ChainLockIdType &getChainLockId() const {
+        return chainLockId;
     }
 };
 

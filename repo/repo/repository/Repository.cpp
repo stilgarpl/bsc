@@ -506,8 +506,6 @@ fs::perms Repository::RepoFileMap::Attributes::getPermissions() const {
     return permissions;
 }
 
-to_time
-
 uintmax_t Repository::RepoFileMap::Attributes::getSize() const {
     return size;
 }

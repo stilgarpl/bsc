@@ -1,5 +1,7 @@
 #include <utility>
 
+#include <utility>
+
 //
 // Created by stilgar on 06.07.18.
 //
@@ -16,6 +18,7 @@
 #include <p2p/logic/events/Tick.h>
 #include <p2p/logic/chain/ChainContext.h>
 #include <p2p/logic/chain/GlobalChainContext.h>
+#include <p2p/logic/chain/ChainGroup.h>
 
 class LogicObject {
 protected:
@@ -161,11 +164,11 @@ public:
         LogicManager &logicManager;
 
 
-        static void obtainChainLock(const ChainIdType &chainId, InstanceType instance, bool lock) {
+        static void obtainChainLock(const ChainLockIdType &chainLockId, InstanceType instance, bool lock) {
             //@todo mutex synchronize this whole method? on mutex from chainLock?
 
             auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
-            auto &chainLock = chainContext->getChainLock(chainId);
+            auto &chainLock = chainContext->getChainLock(chainLockId);
             //@todo maybe use different mutex than chainLock mutex?
             std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
             if (chainLock.isLocked()) {
@@ -202,7 +205,7 @@ public:
             _constraint = eventHelper._constraint;
         }
 
-        explicit LogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, ChainIdType id)
+        explicit LogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, const ChainIdType& id)
                 : LogicChainHelper(eventHelper, l) {
             chainId = id;
         };
@@ -411,7 +414,7 @@ public:
             std::function<ChainEvent<EventType>(ChainEvent<EventType>)> f =
                     [generatedChainId](ChainEvent<EventType> event, auto... args) -> ChainEvent<EventType> {
 //                        LOGGER("lockiiing")
-                        obtainChainLock(event.getBaseChainId(), event.getInstance(), true);
+                        obtainChainLock(event.getChainLockId(), event.getInstance(), true);
 //                        LOGGER("locked")
                         event.setEventId(generatedChainId);
                         return event;
@@ -420,10 +423,12 @@ public:
         }
 
         auto unlockChain() {
+
             auto generatedActionId = generateActionId<unsigned long>();
             auto generatedChainId = nextChainId();
             std::function<ChainEvent<EventType>(ChainEvent<EventType>)> f =
                     [generatedChainId](ChainEvent<EventType> event, auto... args) -> ChainEvent<EventType> {
+                        obtainChainLock(event.getChainLockId(), event.getInstance(), false);
                         releaseChainLock(event.getBaseChainId(), event.getInstance());
                         event.setEventId(generatedChainId);
                         return event;
@@ -442,12 +447,13 @@ public:
                         [=, chainId = chainId](ChainEvent<EventType> chainedEvent) {
                             LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
                                    chainedEvent.getEventId())
-                            obtainChainLock(chainedEvent.getBaseChainId(), chainedEvent.getInstance(), false);
+                            obtainChainLock(chainedEvent.getChainLockId(), chainedEvent.getInstance(), false);
                             if (chainedEvent.getActualEvent() && chainedEvent.getActualEvent()->isEventValid()) {
                                 LOGGER("chained action" + *chainId)
                                 auto value = func(*chainedEvent.getActualEvent(), setArgs...);
                                 ChainEvent<RetType> result(chainedEvent.getBaseChainId(), generatedChainId,
-                                                           chainedEvent.getInstance(), value);
+                                                           chainedEvent.getInstance(), value,
+                                                           chainedEvent.getChainLockId());
 //                            LOGGER("storing chain result in chain context " + std::to_string(Context::getActiveContext()->get<ChainContext>().use_count()) )
                                 Context::getActiveContext()->get<ChainContext>()->storeChainResult<RetType>(
                                         generatedChainId, value);
@@ -553,18 +559,30 @@ public:
 //
 //        }
 
+    protected:
+
+        static ChainLockIdType getLockIdFromChainId(const ChainIdType& chainId) {
+            return ":>" + chainId;
+        }
+
+        static ChainLockIdType getLockIdFromChainGroupId(const ChainIdType& chainId) {
+            return "::" + chainId;
+        }
+
 
     public:
 
-        ThisType &newChain(ChainIdType id) {
+        ThisType &newChain(const ChainIdType &id, const std::optional<ChainGroup>& chainGroup = std::nullopt) {
             chainId = id;
             return transform<ChainEvent<EventType>>([=](auto event) {
                 LOGGER("starting chain " + id)
                 //@todo be careful - if new chain starts before previous one has finished, the chain context will be overwritten. !!!! --- but is it really? I think active context should belong to an event.
                 auto chainContext = Context::getActiveContext()->set<ChainContext>(id);
 
-                ChainEvent r(id, id, chainContext->instanceGenerator().nextValue(), event);
-                LOGGER("new chain: storing initial result " + r.getEventId())
+                auto lockId = chainGroup ? getLockIdFromChainGroupId(chainGroup->getChainGroupId()) : getLockIdFromChainId(id);
+
+                ChainEvent r(id, id, chainContext->instanceGenerator().nextValue(), event, lockId);
+                LOGGER("new chain: " + id + " lock id " + lockId + " storing initial result " + r.getEventId())
                 chainContext->storeChainResult<EventType>(r.getEventId(), *r.getActualEvent());
                 //debug stuff @todo remove
                 auto activeContext = Context::getActiveContext();
@@ -648,6 +666,10 @@ public:
         }
     };
 
+
+    ChainGroup chainGroup(ChainIdType groupId) {
+        return ChainGroup(std::move(groupId));
+    }
 
     template<typename EventType, typename ... Args>
     static EventHelper<EventType, Args...> event() {

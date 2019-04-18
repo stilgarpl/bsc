@@ -511,3 +511,18 @@ dwa, jeśli chain trwa za długo i nastepny zacznie się zanim ten sie skonczy, 
 
 locki naprawione. problem był w podwójnym lockowaniu mutexa. @todo do tego trzeba jeszcze zajrzeć, bo w obecnej implementacji nie jest 100% thread safe - mutex jest odblokowany przez pewien czas.
 merge naprawiony, w konstruktorze kopiującym nie było metadata uwzględnionego i nadpisywał sobie nowymi lokalnymi danymi
+
+
+
+ostatecznie rozwiazanie problemu synchronizacji chainów:
+
+przy newChain trzeba podać lockConfiguration czy tam lockGroup, nazwa mało istotna
+
+lockGroup(chainGroup,RepoId)
+lockGroup(chain) = default
+lockGroup(repoId) - nie blokuje tego samego watku jesli dotyczy roznych obiektow
+lockGroup(...)
+
+
+podaje sie dowolne parametry
+idea jest taka, ze chainy sie lockuja zgodnie z zadana konfiguracja. chainy ze wspolna konfiguracja lockuja sie na tym samym obiekcie, zgodnie z definicja konfiguracji. np. group blokuje wspólnie kilka chainów, z kolei repo id wyciaga repo id i tylko chainy z takim samym id sie blokuja, a z roznym moga dzialac w tym samym czasie. mozna w ten sposob nawet mieć global locka, ktory zawsze zwraca to samo id.
