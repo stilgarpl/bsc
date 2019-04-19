@@ -165,11 +165,16 @@ public:
         LogicManager &logicManager;
 
 
-        static void obtainChainLock(const ChainLockIdType &chainLockId, InstanceType instance, bool lock) {
+        static void
+        obtainChainLock(const std::optional<ChainLockIdType> &chainLockId, InstanceType instance, bool lock) {
             //@todo mutex synchronize this whole method? on mutex from chainLock?
-
+            if (!chainLockId) {
+                //no chain lock id!
+                //@todo maybe rearrange function so it doesn't return here.
+                return;
+            }
             auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
-            auto &chainLock = chainContext->getChainLock(chainLockId);
+            auto &chainLock = chainContext->getChainLock(*chainLockId);
             //@todo maybe use different mutex than chainLock mutex?
             std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
             if (chainLock.isLocked()) {
@@ -409,15 +414,20 @@ public:
         }
 
 
-        auto lockChain() {
+        auto lockChain(std::function<ChainLockIdType(const ChainIdType &,
+                                                     const EventType &)> lockIdGenerator = LockConfiguration::chain()) {
             auto generatedActionId = generateActionId<unsigned long>();
             auto generatedChainId = nextChainId();
+
             std::function<ChainEvent<EventType>(ChainEvent<EventType>)> f =
-                    [generatedChainId](ChainEvent<EventType> event, auto... args) -> ChainEvent<EventType> {
+                    [generatedChainId, lockIdGenerator](ChainEvent<EventType> event,
+                                                        auto... args) -> ChainEvent<EventType> {
+                        auto generatedLockId = lockIdGenerator(event.getBaseChainId(), *event.getActualEvent());
 //                        LOGGER("lockiiing")
-                        obtainChainLock(event.getChainLockId(), event.getInstance(), true);
+                        obtainChainLock(generatedLockId, event.getInstance(), true);
 //                        LOGGER("locked")
                         event.setEventId(generatedChainId);
+                        event.setChainLockId(generatedLockId);
                         return event;
                     };
             return fireRawChainAction(f, generatedActionId, generatedChainId);
@@ -432,6 +442,7 @@ public:
                         obtainChainLock(event.getChainLockId(), event.getInstance(), false);
                         releaseChainLock(event.getBaseChainId(), event.getInstance());
                         event.setEventId(generatedChainId);
+                        event.setChainLockId(std::nullopt);
                         return event;
                     };
             return fireRawChainAction(f, generatedActionId, generatedChainId);
@@ -573,18 +584,15 @@ public:
 
     public:
 
-        ThisType &newChain(const ChainIdType &id,
-                           const std::optional<LockConfiguration<EventType >> &lockConfiguration = std::nullopt) {
+        ThisType &newChain(const ChainIdType &id) {
             chainId = id;
             return transform<ChainEvent<EventType>>([=](auto event) {
                 LOGGER("starting chain " + id)
                 //@todo be careful - if new chain starts before previous one has finished, the chain context will be overwritten. !!!! --- but is it really? I think active context should belong to an event.
                 auto chainContext = Context::getActiveContext()->set<ChainContext>(id);
 
-                auto lockId = lockConfiguration ? lockConfiguration->getLockId(event) : id;
-
-                ChainEvent r(id, id, chainContext->instanceGenerator().nextValue(), event, lockId);
-                LOGGER("new chain: " + id + " lock id " + lockId + " storing initial result " + r.getEventId())
+                ChainEvent r(id, id, chainContext->instanceGenerator().nextValue(), event, std::nullopt);
+                LOGGER("new chain: " + id + " storing initial result " + r.getEventId())
                 chainContext->storeChainResult<EventType>(r.getEventId(), *r.getActualEvent());
                 //debug stuff @todo remove
                 auto activeContext = Context::getActiveContext();

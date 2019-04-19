@@ -19,7 +19,7 @@ template<typename ActualEventType>
 class ChainEvent : public IEvent<ChainIdType> {
 private:
     ChainIdType baseChainId;
-    ChainLockIdType chainLockId;
+    std::optional<ChainLockIdType> chainLockId;
     std::optional<ActualEventType> actualEvent;
     InstanceType instance;
 public:
@@ -29,7 +29,7 @@ public:
     }
 
     ChainEvent(ChainIdType base, const ChainIdType& stageId, InstanceType instance, ActualEventType actualEvent,
-               ChainLockIdType chainLockId) :
+               std::optional<ChainLockIdType> chainLockId) :
             IEvent(stageId), baseChainId(std::move(base)),chainLockId(std::move(chainLockId)) , actualEvent(actualEvent), instance(instance)
             {
 //        this->context()->setParentContext(actualEvent.context());
@@ -51,8 +51,12 @@ public:
         return baseChainId;
     }
 
-    const ChainLockIdType &getChainLockId() const {
+    const std::optional<ChainLockIdType> &getChainLockId() const {
         return chainLockId;
+    }
+
+    void setChainLockId(const std::optional<ChainLockIdType> &chainLockId) {
+        ChainEvent::chainLockId = chainLockId;
     }
 };
 

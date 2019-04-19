@@ -294,11 +294,7 @@ public:
 int main(int argc, char *argv[]) {
 
 
-    LockConfiguration<int> lockConfiguration([](const int &) -> std::string { return "lala"; },
-                                             [](const int &) -> std::string { return "lama"; });
-
-    LOGGER(lockConfiguration.getLockId(1));
-    return 0;
+//
 
 //    Context  * conte1 = new Context();
 //    conte1->set<ContextDestTest>();

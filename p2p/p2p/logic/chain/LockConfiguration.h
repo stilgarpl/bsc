@@ -9,22 +9,36 @@
 #include "ChainDefinitions.h"
 #include <functional>
 
-template<typename EventType>
 class LockConfiguration {
-    std::function<ChainLockIdType(const EventType &)> lockEvaluator;
+private:
+    inline static const std::string GROUP_PREFIX = "::";
+    inline static const std::string CHAIN_PREFIX = ">>";
+    inline static const std::string EVAL_PREFIX = ">>";
 
 public:
 
-    template<typename ... Evaluators>
-    explicit LockConfiguration(Evaluators ... evaluators) {
-        lockEvaluator = [=](const EventType &event) {
-            return (evaluators(event)+...);
+
+    static auto group(const ChainIdType &groupId) {
+        return [GROUP_PREFIX = GROUP_PREFIX, groupId](const ChainIdType &chainId, auto &event) {
+            //conversion from group id to lock id
+            return GROUP_PREFIX + groupId;
         };
     }
 
-    //@todo this may be pure virtual and this whole implementation may be just combinedLockConfigurator... or not. it may be fine as it is
-    ChainLockIdType getLockId(const EventType &event) const {
-        return lockEvaluator(event);
+    static auto chain() {
+        return [CHAIN_PREFIX = CHAIN_PREFIX](const ChainIdType &chainId, auto &event) {
+            //conversion from chain id to lock id
+            return CHAIN_PREFIX + chainId;
+        };
+    }
+
+    template<typename Func>
+    static auto eval(Func func) {
+        return [EVAL_PREFIX = EVAL_PREFIX, func](const ChainIdType &chainId, auto &event) {
+            //@todo I'm quite sure this can be implemented better
+            //conversion from evaluated id to lock id
+            return EVAL_PREFIX + func(event);
+        };
     }
 
 };
