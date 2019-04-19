@@ -171,8 +171,10 @@ public:
             if (!chainLockId) {
                 //no chain lock id!
                 //@todo maybe rearrange function so it doesn't return here.
+                LOGGER("no lock id")
                 return;
             }
+            LOGGER("chain lock id " + *chainLockId)
             auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
             auto &chainLock = chainContext->getChainLock(*chainLockId);
             //@todo maybe use different mutex than chainLock mutex?
