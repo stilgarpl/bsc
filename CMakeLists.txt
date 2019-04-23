@@ -1,13 +1,14 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.14)
 project(basyco VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-
+message($ENV{PATH})
 #conan setup
-find_program(conan conan)
+find_program(conan NAMES conan)
+message("DEBUG: conan = ${conan}")
 if (EXISTS ${conan})
     message("CONAN EXISTS")
     include(${CMAKE_SOURCE_DIR}/conan/conan.cmake)
@@ -19,6 +20,8 @@ if (EXISTS ${conan})
             BASIC_SETUP
             BUILD missing)
     set(LIBS ${LIBS} ${CONAN_LIBS})
+else ()
+    message("Conan not found")
 endif ()
 #end of conan setup
 

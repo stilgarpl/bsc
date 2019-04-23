@@ -190,20 +190,25 @@ public:
             if (lock) {
                 chainLock.lock(instance);
             }
-            LOGGER("LOCK OBTAINED")
+            LOGGER("LOCK OBTAINED " + *chainLockId)
         }
 
-        static void releaseChainLock(const ChainIdType &chainId, InstanceType instance) {
+        static void releaseChainLock(const std::optional<ChainLockIdType> &chainLockId, InstanceType instance) {
             //@todo mutex synchronize this whole method? on mutex from chainLock?
-            auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
-            auto &chainLock = chainContext->getChainLock(chainId);
-            LOGGER("RELEASE BEFORE")
-            std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
-            //@todo check instance.
-            if (chainLock.isLocked()) {
-                chainLock.unlock();
+            if (chainLockId) {
+                auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
+                auto &chainLock = chainContext->getChainLock(*chainLockId);
+                LOGGER("RELEASE BEFORE " + *chainLockId)
+                std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
+                //@todo check instance.
+                if (chainLock.isLocked()) {
+                    chainLock.unlock();
+                }
+                LOGGER("RELEASE AFTER")
+            } else {
+                //@todo error handling
+                LOGGER("UNLOCK CALLED WITH NO CHAIN ID")
             }
-            LOGGER("RELEASE AFTER")
         }
 
     public:
@@ -442,7 +447,7 @@ public:
             std::function<ChainEvent<EventType>(ChainEvent<EventType>)> f =
                     [generatedChainId](ChainEvent<EventType> event, auto... args) -> ChainEvent<EventType> {
                         obtainChainLock(event.getChainLockId(), event.getInstance(), false);
-                        releaseChainLock(event.getBaseChainId(), event.getInstance());
+                        releaseChainLock(event.getChainLockId(), event.getInstance());
                         event.setEventId(generatedChainId);
                         event.setChainLockId(std::nullopt);
                         return event;
