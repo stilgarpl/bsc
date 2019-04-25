@@ -4,6 +4,13 @@
 #include <catch2/catch.hpp>
 #include <repo/journal/SimpleJournal.h>
 
+TEST_CASE("Journal deterministic hash test") {
+    SimpleJournal journal;
+    journal.append(JournalMethod::ADDED, JournalTarget::FILE, "/tmp/dupa.txt", FileData("/tmp/dupa.txt"));
+    journal.commitState();
+    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("80E58CD2BD2038194EDA8379D3A58319DB94F704"));
+}
+
 
 TEST_CASE("Journal merge test") {
     SimpleJournal journal;

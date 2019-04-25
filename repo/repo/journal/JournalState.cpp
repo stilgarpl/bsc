@@ -30,18 +30,13 @@ void JournalState::setDataList(const std::list<JournalStateData> &dataList) {
 }
 
 void JournalState::commit() {
+    //@todo how about a way to override this during test? commit(clock=system_clock)? or maybe get the clock from context?
     commitTime = std::chrono::system_clock::now();
     checksum = calculateChecksum();
-//        std::stringstream ss;
-//        {
-//            cereal::XMLOutputArchive oa(ss);
-//            oa << *this;
-//        }
-//
-//        std::cout << ss.str() << std::endl;
 }
 
 std::string JournalState::calculateChecksum() {
+    //@todo make sure this is deterministic. instead of using cereal to get the string, just generate it yourself.
     checksum = "";
     std::stringstream ss;
     std::string hash;

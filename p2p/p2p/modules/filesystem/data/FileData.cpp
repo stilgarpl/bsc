@@ -30,6 +30,7 @@ bool FileData::isIsDirectory() const {
 }
 
 FileData::FileData(const fs::path &path) {
+    //@todo combine both exists paths and just set directory stuff in inside if
     if (fs::exists(path) && !fs::is_directory(path)) {
         canonicalPath = fs::canonical(path);
         size = fs::file_size(fs::path(path));
