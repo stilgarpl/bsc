@@ -11,9 +11,9 @@
 
 class LockConfiguration {
 private:
-    inline static const std::string GROUP_PREFIX = "::";
-    inline static const std::string CHAIN_PREFIX = ">>";
-    inline static const std::string EVAL_PREFIX = ">>";
+    inline static const std::string GROUP_PREFIX = ">GROUP>";
+    inline static const std::string CHAIN_PREFIX = ">CHAIN>";
+    inline static const std::string EVAL_PREFIX = ">EVAL>";
 
 public:
 

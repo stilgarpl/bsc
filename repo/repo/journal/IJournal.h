@@ -51,6 +51,7 @@ public:
 
     virtual bool merge(const JournalPtr &other) =0;
 
+    //@todo setfunc and clearfunc should be replaced with passing a funcmap object to replay()
     virtual void setFunc(const JournalMethod &method, const JournalTarget &target, Func func) = 0;
 
     virtual void clearFunc() = 0;

@@ -526,3 +526,26 @@ lockGroup(...)
 
 podaje sie dowolne parametry
 idea jest taka, ze chainy sie lockuja zgodnie z zadana konfiguracja. chainy ze wspolna konfiguracja lockuja sie na tym samym obiekcie, zgodnie z definicja konfiguracji. np. group blokuje wspólnie kilka chainów, z kolei repo id wyciaga repo id i tylko chainy z takim samym id sie blokuja, a z roznym moga dzialac w tym samym czasie. mozna w ten sposob nawet mieć global locka, ktory zawsze zwraca to samo id.
+
+
+>>> Strategie do repo
+
+use case:
+*różne rodzaje repozytoriów załatwić bez potrzeby wielu implementacji repository np. częściowe repo, gdzie usuwanie plików z dysku nie usuwa ich z kroniki (czyli incoming repo, do którego wrzuca sie pliki, lecą do sieci i można je usunąć), read only repo, które nie wprowadza nowych zmian czy jeszcze inne warianty (user może customizować wybór strategii dla każdej sytuacji w UI)
+* uproszczenie implementacji. w tym momencie pasowałoby osobno zaimplementować update, osobno deploy, nie mówiąc już o innych wariantach i opcjach update. zamiast tego, wystarczy tylko update i strategy pack.
+
+sytuacje:
+
+fileInRepoNewerThanFs (restore)
+fileInRepoSameAsInFs (do nothing)
+fileInRepoOlderThanFs (persist -> update)
+newFileInFs (persist)
+newFileinRepo (restore)
+deletedFileinFs (remove from repo)
+deletedFileinRepo (delete from fs)
+
+dzieki temu updateAll() bedzie miało działanie mniej wiecej jak teraz (a potem commit by sie przydał)
+deployAll() bedzie mogło być takie samo ale bez zapisywania zmian z systemu plików
+część logiki persist dla katalogów bedzie można usunąć z replaya na commicie (dalej nie jestem przekonany czy to dobry pomysł, żeby wciagało pliki z katalogów dopiero przy commicie, raczej uważam, że to był zły i nieintuicyjny pomysł i po prostu chciałem do czegoś użyć replaya)
+
+

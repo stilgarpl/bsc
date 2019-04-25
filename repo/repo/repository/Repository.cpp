@@ -9,6 +9,7 @@
 #include "Repository.h"
 
 using namespace std::chrono_literals;
+
 const IRepository::RepoIdType &Repository::getRepositoryId() const {
     return repositoryId;
 }
@@ -35,7 +36,7 @@ const std::shared_ptr<IStorage> &Repository::getStorage() const {
 
 void Repository::restoreAll() {
 
-    auto& fileMap = getFileMap();
+    auto &fileMap = getFileMap();
     for (auto &&[path, value] :fileMap) {
         if (value) {
             LOGGER("restoring path " + path.string())
@@ -67,7 +68,7 @@ void Repository::commit() {
     journal->setFunc(JournalMethod::ADDED, JournalTarget::DIRECTORY, [&](auto &i) {
         //nothing to store, but... files from the directory should be added.
         LOGGER("commit: added dir " + i.getPath() + " tt: " +
-                       pathTransformer->transformFromJournalFormat(i.getPath()).string())
+               pathTransformer->transformFromJournalFormat(i.getPath()).string())
         fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
         for (const auto &item : fs::directory_iterator(dirPath)) {
             fs::path path = fs::canonical(item.path());
@@ -96,7 +97,7 @@ void Repository::commit() {
                 if (!attr) {
                     //I don't like the fact that this logic is in two places, here and update().
                     if (!fileMap.isDeleted(fs::canonical(item.path())) ||
-                            currentFileTime > fileMap.getDeletionTime(path)) {
+                        currentFileTime > fileMap.getDeletionTime(path)) {
                         journal->append(JournalMethod::ADDED,
                                         fs::is_directory(path) ? JournalTarget::DIRECTORY : JournalTarget::FILE,
                                         pathTransformer->transformToJournalFormat(path),
@@ -175,28 +176,22 @@ void Repository::persist(fs::path path) {
     auto &attr = fileMap[path];
     if (attr) {
         //file exists in map! update mode
-
+        auto target = !attr->isDirectory() ? JournalTarget::FILE : JournalTarget::DIRECTORY;
         //@todo check if file was actually changed.
-        if (!attr->isDirectory()) {
-            journal->append(JournalMethod::MODIFIED, JournalTarget::FILE,
-                            pathTransformer->transformToJournalFormat(path),
-                            FileData(path));
+        journal->append(JournalMethod::MODIFIED, target,
+                        pathTransformer->transformToJournalFormat(path),
+                        FileData(path));
 
-        } else {
-            journal->append(JournalMethod::MODIFIED, JournalTarget::DIRECTORY,
-                            pathTransformer->transformToJournalFormat(path),
-                            FileData(path));
-        }
+
     } else {
-        if (!fs::is_directory(path)) {
-            journal->append(JournalMethod::ADDED, JournalTarget::FILE, pathTransformer->transformToJournalFormat(path),
-                            FileData(path));
+        auto target = !fs::is_directory(path) ? JournalTarget::FILE : JournalTarget::DIRECTORY;
 
-        } else {
-            journal->append(JournalMethod::ADDED, JournalTarget::DIRECTORY,
-                            pathTransformer->transformToJournalFormat(path),
-                            FileData(path));
-        }
+
+        journal->append(JournalMethod::ADDED, target,
+                        pathTransformer->transformToJournalFormat(path),
+                        FileData(path));
+
+
     }
 }
 
@@ -228,9 +223,11 @@ void Repository::update(fs::path path) {
     //only update if the file is in the repository
     auto &attributes = fileMap[path];
     if (fs::exists(path)) {
+        //file exists in filesystem
         auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
         auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
         if (attributes) {
+            //file exists in the journal
             LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
                    std::to_string(attributes->getModificationTime()))
             if (currentFileTime < attributes->getModificationTime()) {
@@ -244,19 +241,21 @@ void Repository::update(fs::path path) {
                 deployMap.markDeployed(path);
             } else {
                 if (currentFileTime == attributes->getModificationTime() && currentFileSize == attributes->getSize()) {
-                    //@todo verify other things, like size() maybe
+                    //@todo verify other things maybe
                     //file appear identical, nothing to do.
                     LOGGER("leaving alone " + path.string())
                 } else {
-                    LOGGER("persisting... " + path.string())
+                    LOGGER("updated file, persisting... " + path.string())
                     //file in the filesystem is newer then the one in repository
                     persist(path); //this should add file as modified.
                 }
             }
         } else {
+            //not in the map
+
             LOGGER("cur fil tim " + std::to_string(currentFileTime) + " deltim " +
                    std::to_string(fileMap.getDeletionTime(path)))
-            if (currentFileTime > fileMap.getDeletionTime(path)) {
+            if (currentFileTime > fileMap.getDeletionTime(path) || !fileMap.isDeleted(path)) {
                 //this is new file that has the same path as deleted one. persist!
                 LOGGER("new file, persisting " + path.string())
                 persist(path);
@@ -271,7 +270,7 @@ void Repository::update(fs::path path) {
                 }
             }
 
-            //not in the map
+
         }
     } else {
         //file was removed or perhaps wasn't deployed yet...
