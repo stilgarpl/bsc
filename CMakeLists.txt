@@ -20,6 +20,7 @@ if (EXISTS ${conan})
             BASIC_SETUP
             BUILD missing)
     set(LIBS ${LIBS} ${CONAN_LIBS})
+    set(INCLUDES ${CONAN_INCLUDE_DIRS})
 else ()
     message("Conan not found")
 endif ()
