@@ -80,6 +80,8 @@ public:
     void downloadRemoteRepository(const NodeIdType &remoteId, const Repository::RepoIdType &repoId);
 
     void downloadRepository(const Repository::RepoIdType &repoId);
+
+    void deployRepository(const Repository::RepoIdType &repoId);
     void findNewestRepositoryInTheNetwork(const Repository::RepoIdType &repoId) {
         //broadcast to every node get repo info packet
         //for every response:

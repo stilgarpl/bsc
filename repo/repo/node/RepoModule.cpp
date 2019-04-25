@@ -64,7 +64,10 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     auto start = when(NetworkConditions::packetReceived<RepoQuery::Response>())
             .newChain("repoUpdateChain");
     auto stage1 = start
-            .lockChain()
+            //@todo add lock name function
+            .lockChain(LockConfiguration::eval(CommonEvaluators::stack(
+                    RepoEvaluators::getRepoId,
+                    ChainEvaluators::chainResult(start))))
             .ifTrue(RepositoryActions::checkIfUpdateRequired,
                     RepoEvaluators::currentJournalFromRepoQueryResponse,
                     RepoEvaluators::newJournalFromRepoQueryResponse);
@@ -77,6 +80,10 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
                                                RepoEvaluators::newJournalFromRepoQueryResponse,
                                                ChainEvaluators::chainResult(start)))
             .fireNewGenericChainAction(RepositoryActions::downloadRepository,
+                                       CommonEvaluators::stack(
+                                               RepoEvaluators::getRepoId,
+                                               ChainEvaluators::chainResult(start)))
+            .fireNewGenericChainAction(RepositoryActions::deployRepository,
                                        CommonEvaluators::stack(
                                                RepoEvaluators::getRepoId,
                                                ChainEvaluators::chainResult(start)))
@@ -246,6 +253,11 @@ void RepoModule::prepareSubmodules() {
 void RepoModule::downloadRepository(const Repository::RepoIdType &repoId) {
     //@todo error handling
     findRepository(repoId)->downloadStorage();
+}
+
+void RepoModule::deployRepository(const Repository::RepoIdType &repoId) {
+    //@todo add to the deployed repository list?
+    findRepository(repoId)->update();
 }
 
 const std::filesystem::path &RepoModuleConfiguration::getRepositoryDataPath() const {
