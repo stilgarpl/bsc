@@ -21,7 +21,7 @@ class Repository : public IRepository {
 public:
 
     class RepoFileMap {
-    private:
+    public: //@todo should be private, I think.
         class Attributes {
             fs::perms permissions = fs::perms::none;
             uintmax_t size = 0;
@@ -153,6 +153,56 @@ public:
 
         friend class cereal::access;
 
+    };
+
+    enum class RepositorySituation {
+        UPDATED_IN_REPO,
+        UPDATED_IN_FILESYSTEM,
+        SAME,
+        NEW_IN_REPO,
+        NEW_IN_FILESYSTEM,
+        DELETED_IN_REPO,
+        DELETED_IN_FILESYSTEM,
+    };
+
+    enum class RepositoryAction {
+        PERSIST,
+        UPDATE, //this name is a little ambigious
+        DELETE,
+        TRASH,
+        REMOVE,
+        RESTORE,
+        NOP,
+    };
+
+    class RepositoryActionStrategy {
+    protected:
+        Repository &repository;
+    public:
+        bool apply(const fs::path &path) {
+            return this->apply(path, std::nullopt);
+        }
+
+        //right now it returns deployed state, but maybe it should return enum or sth //@todo think about it
+        virtual bool apply(const fs::path &path, const std::optional<RepoFileMap::Attributes> &attributes) = 0;
+
+        explicit RepositoryActionStrategy(Repository &repository) : repository(repository) {}
+    };
+
+    class RepositoryActionStrategyFactory {
+    protected:
+        Repository &repository;
+    public:
+        std::shared_ptr<RepositoryActionStrategy> create(RepositoryAction action);
+
+        RepositoryActionStrategyFactory(Repository &repository);
+    };
+
+    class RepositoryActionStrategyPack {
+        using StrategyType = std::shared_ptr<RepositoryActionStrategy>;
+        std::map<RepositorySituation, StrategyType> strategies;
+    public:
+        StrategyType getStrategyFor(RepositorySituation action);
     };
 
 

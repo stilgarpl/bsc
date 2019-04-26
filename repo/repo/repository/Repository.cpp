@@ -570,3 +570,72 @@ bool Repository::RepoDeployMap::DeployAttributes::isDeployed() const {
 void Repository::RepoDeployMap::DeployAttributes::setDeployed(bool deployed) {
     DeployAttributes::deployed = deployed;
 }
+
+
+class StrategyPersist : public Repository::RepositoryActionStrategy {
+    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+        repository.persist(path);
+        return true;
+    }
+
+public:
+    explicit StrategyPersist(Repository &repository) : RepositoryActionStrategy(repository) {
+
+    }
+};
+
+class StrategyRestore : public Repository::RepositoryActionStrategy {
+public:
+    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+        repository.getStorage()->restore(attributes->getResourceId(), path);
+        return true;
+    }
+
+};
+
+class StrategyNull : public Repository::RepositoryActionStrategy {
+public:
+    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+        return true; //@todo bool is stupid thing to return. even enum would be better. even optional<bool> would be better!
+    }
+
+    explicit StrategyNull(Repository &repository) : RepositoryActionStrategy(repository) {
+
+    }
+};
+
+Repository::RepositoryActionStrategyPack::StrategyType
+Repository::RepositoryActionStrategyPack::getStrategyFor(RepositorySituation action) {
+    if (strategies.count(action) > 0) {
+        return strategies[action];
+    } else {
+        //@todo is it good to return null? it would probably cause lots of problems. it should never be null
+        //@todo error handling
+        return nullptr;
+    }
+}
+
+
+std::shared_ptr<Repository::RepositoryActionStrategy>
+Repository::RepositoryActionStrategyFactory::create(Repository::RepositoryAction action) {
+    switch (action) {
+//@todo add missing switches
+        case RepositoryAction::PERSIST:
+            return std::make_shared<StrategyPersist>(repository);
+        case RepositoryAction::UPDATE:
+            return std::make_shared<StrategyPersist>(repository);
+        case RepositoryAction::DELETE:
+            break;
+        case RepositoryAction::TRASH:
+            break;
+        case RepositoryAction::REMOVE:
+            break;
+        case RepositoryAction::RESTORE:
+            return std::make_shared<StrategyRestore>(repository);
+        case RepositoryAction::NOP:
+            return std::make_shared<StrategyNull>(repository);
+    }
+}
+
+Repository::RepositoryActionStrategyFactory::RepositoryActionStrategyFactory(Repository &repository) : repository(
+        repository) {}

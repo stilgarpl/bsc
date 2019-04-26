@@ -12,10 +12,10 @@
 
 class GlobalChainContext {
 private:
-    std::map<ChainIdType, ChainLock> chainLocks;
+    std::map<ChainLockIdType, ChainLock> chainLocks;
 
 public:
-    ChainLock &getChainLock(const ChainIdType &chainId) {
+    ChainLock &getChainLock(const ChainLockIdType &chainId) {
         return chainLocks[chainId];
     }
 
