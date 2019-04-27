@@ -155,15 +155,15 @@ public:
 
     };
 
-    enum class RepositorySituation {
-        UPDATED_IN_REPO,
-        UPDATED_IN_FILESYSTEM,
-        SAME,
-        NEW_IN_REPO,
-        NEW_IN_FILESYSTEM,
-        DELETED_IN_REPO,
-        DELETED_IN_FILESYSTEM,
-    };
+//    enum class RepositorySituation {
+//        UPDATED_IN_REPO,
+//        UPDATED_IN_FILESYSTEM,
+//        SAME,
+//        NEW_IN_REPO,
+//        NEW_IN_FILESYSTEM,
+//        DELETED_IN_REPO,
+//        DELETED_IN_FILESYSTEM,
+//    };
 
     enum class RepositoryAction {
         PERSIST,
@@ -189,28 +189,51 @@ public:
         explicit RepositoryActionStrategy(Repository &repository) : repository(repository) {}
     };
 
+protected:
+    template<typename PackType>
+    struct RepoPack {
+
+
+        PackType updatedInRepo;
+        PackType updatedInFilesystem;
+        PackType same;
+        PackType newInRepo;
+        PackType newInFilesystem;
+        PackType deletedInRepo;
+        PackType deletedInFilesystem;
+    };
+public:
+
+    //RepositoryActionStrategyPack
+
+    using StrategyType = std::shared_ptr<RepositoryActionStrategy>;
+    using RepositoryActionStrategyPack = RepoPack<StrategyType>;
+    using RepoActionPack = RepoPack<RepositoryAction>;
+
     class RepositoryActionStrategyFactory {
     protected:
         Repository &repository;
     public:
         std::shared_ptr<RepositoryActionStrategy> create(RepositoryAction action);
 
+        //maybe should return unique or shared_ptr? maybe not @todo think about it
+        RepositoryActionStrategyPack createPack(RepoActionPack actionPack);
         RepositoryActionStrategyFactory(Repository &repository);
     };
 
-    class RepositoryActionStrategyPack {
-        using StrategyType = std::shared_ptr<RepositoryActionStrategy>;
-        std::map<RepositorySituation, StrategyType> strategies;
-    public:
-        StrategyType getStrategyFor(RepositorySituation action);
-    };
+
 
 
 private:
     JournalPtr journal = std::make_shared<SimpleJournal>();
+    RepositoryActionStrategyFactory strategyFactory;
     RepoIdType repositoryId;
     std::shared_ptr<IStorage> storage;
     std::shared_ptr<IPathTransformer> pathTransformer = std::make_shared<PathTransformer>();
+public: //@todo should it be public?
+    RepositoryActionStrategyPack deployPack;
+    RepositoryActionStrategyPack updatePack;
+    RepositoryActionStrategyPack fullPack;
 
 
     RepoFileMap _repoFileMap = RepoFileMap(journal, pathTransformer);
@@ -253,7 +276,7 @@ public:
     void restoreAttributes(const fs::path &path);
 
     //update one file from the repository
-    void update(fs::path path);
+    void update(fs::path path, const RepositoryActionStrategyPack &strategyPack);
 
     //update everything
     void update();

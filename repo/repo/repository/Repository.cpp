@@ -23,9 +23,37 @@ void Repository::setJournal(const JournalPtr &journal) {
     Repository::journal = journal;
 }
 
-Repository::Repository(RepoIdType repositoryId) : repositoryId(std::move(repositoryId)),
+Repository::Repository(RepoIdType repositoryId) : strategyFactory(*this),
+                                                  repositoryId(std::move(repositoryId)),
                                                   storage(std::make_shared<InternalStorage>(
-                                                          static_cast<IRepository *>(this))) {
+                                                          static_cast<IRepository *>(this))),
+                                                  deployPack(strategyFactory.createPack(
+                                                          {.updatedInRepo = RepositoryAction::RESTORE,
+                                                                  .updatedInFilesystem = RepositoryAction::NOP,
+                                                                  .same = RepositoryAction::NOP,
+                                                                  .newInRepo = RepositoryAction::RESTORE,
+                                                                  .newInFilesystem = RepositoryAction::NOP,
+                                                                  .deletedInRepo = RepositoryAction::TRASH,
+                                                                  .deletedInFilesystem = RepositoryAction::NOP,
+                                                          })),
+                                                  updatePack(strategyFactory.createPack(
+                                                          {.updatedInRepo = RepositoryAction::NOP,
+                                                                  .updatedInFilesystem = RepositoryAction::UPDATE,
+                                                                  .same = RepositoryAction::NOP,
+                                                                  .newInRepo = RepositoryAction::NOP,
+                                                                  .newInFilesystem = RepositoryAction::PERSIST,
+                                                                  .deletedInRepo = RepositoryAction::NOP,
+                                                                  .deletedInFilesystem = RepositoryAction::REMOVE,
+                                                          })),
+                                                  fullPack(strategyFactory.createPack(
+                                                          {.updatedInRepo = RepositoryAction::RESTORE,
+                                                                  .updatedInFilesystem = RepositoryAction::UPDATE,
+                                                                  .same = RepositoryAction::NOP,
+                                                                  .newInRepo = RepositoryAction::RESTORE,
+                                                                  .newInFilesystem = RepositoryAction::PERSIST,
+                                                                  .deletedInRepo = RepositoryAction::TRASH,
+                                                                  .deletedInFilesystem = RepositoryAction::REMOVE,
+                                                          })) {
     pathTransformer->addRule(std::make_shared<TmpRule>());
     pathTransformer->addRule(std::make_shared<HomeDirRule>());
 }
@@ -216,8 +244,8 @@ void Repository::downloadStorage() {
 
 }
 
-void Repository::update(fs::path path) {
-    //@todo maybe repository should have update strategy for each situation?
+void Repository::update(fs::path path, const RepositoryActionStrategyPack &strategyPack) {
+    //@todo change the name of this function to something else. it's about merging the state or journal and filesystem and updating one from the other or both
     path = fs::weakly_canonical(path);
     auto &fileMap = getFileMap();
     //only update if the file is in the repository
@@ -233,21 +261,19 @@ void Repository::update(fs::path path) {
             if (currentFileTime < attributes->getModificationTime()) {
                 //file in repository is newer than the file in filesystem, restore
                 LOGGER("restoring..." + path.string())
-                if (!attributes->isDirectory()) {
-                    storage->restore(attributes->getResourceId(), path);
-
-                }
-                restoreAttributes(path);
+                strategyPack.updatedInRepo->apply(path, attributes);
+                //@todo fix deployed by using return value from strategy->apply
                 deployMap.markDeployed(path);
             } else {
                 if (currentFileTime == attributes->getModificationTime() && currentFileSize == attributes->getSize()) {
                     //@todo verify other things maybe
                     //file appear identical, nothing to do.
                     LOGGER("leaving alone " + path.string())
+                    strategyPack.same->apply(path, attributes);
                 } else {
                     LOGGER("updated file, persisting... " + path.string())
                     //file in the filesystem is newer then the one in repository
-                    persist(path); //this should add file as modified.
+                    strategyPack.updatedInFilesystem->apply(path, attributes);
                 }
             }
         } else {
@@ -258,14 +284,15 @@ void Repository::update(fs::path path) {
             if (currentFileTime > fileMap.getDeletionTime(path) || !fileMap.isDeleted(path)) {
                 //this is new file that has the same path as deleted one. persist!
                 LOGGER("new file, persisting " + path.string())
-                persist(path);
+                strategyPack.newInFilesystem->apply(path);
 
             } else {
                 //@todo delete file
                 if (fileMap.isDeleted(path)) {
                     LOGGER("trashing " + path.string())
                     //file should be deleted, but let's check deletion time...
-                    trash(path);
+                    strategyPack.deletedInRepo->apply(path);
+                    //@todo fix deploy map by using return value from strategy
                     deployMap.markDeployed(path, false);
                 }
             }
@@ -279,14 +306,11 @@ void Repository::update(fs::path path) {
             if (deployMap.isDeployed(path)) {
                 //file is in file map and was deployed but is not on filesystem, removing (user must have deleted it)
                 LOGGER("deleting " + path.string());
-                remove(path); //@todo or forget? I think remove.
+                strategyPack.deletedInFilesystem->apply(path, attributes);
             } else {
                 //file wasn't deployed. must be a new file from another node. restore.
                 //@todo this is duplicated code. move to strategies or sth. (three times as of writing this. seriously, do something about it)
-                if (!attributes->isDirectory()) {
-                    storage->restore(attributes->getResourceId(), path);
-                }
-                restoreAttributes(path);
+                strategyPack.newInRepo->apply(path, attributes);
                 deployMap.markDeployed(path);
             }
         } else {
@@ -299,9 +323,9 @@ void Repository::update(fs::path path) {
 }
 
 void Repository::update() {
-
+//@todo change the name of this function to updateAll or sth
     for (const auto &i : getFileMap()) {
-        update(i.first);
+        update(i.first, updatePack);
     }
 
 }
@@ -571,6 +595,7 @@ void Repository::RepoDeployMap::DeployAttributes::setDeployed(bool deployed) {
     DeployAttributes::deployed = deployed;
 }
 
+//@todo maybe move actual implementation code from methods like repository.persist, delete, trash... etc. to those strategies? just a thought
 
 class StrategyPersist : public Repository::RepositoryActionStrategy {
     bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
@@ -579,17 +604,55 @@ class StrategyPersist : public Repository::RepositoryActionStrategy {
     }
 
 public:
-    explicit StrategyPersist(Repository &repository) : RepositoryActionStrategy(repository) {
+    StrategyPersist(Repository &repository) : RepositoryActionStrategy(repository) {}
 
-    }
+
 };
 
 class StrategyRestore : public Repository::RepositoryActionStrategy {
 public:
     bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
-        repository.getStorage()->restore(attributes->getResourceId(), path);
+        if (!attributes->isDirectory()) {
+            repository.getStorage()->restore(attributes->getResourceId(), path);
+        }
+        repository.restoreAttributes(path);
         return true;
     }
+
+    StrategyRestore(Repository &repository) : RepositoryActionStrategy(repository) {}
+
+};
+
+class StrategyTrash : public Repository::RepositoryActionStrategy {
+public:
+    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+        repository.trash(path);
+        return true;
+    }
+
+    StrategyTrash(Repository &repository) : RepositoryActionStrategy(repository) {}
+
+};
+
+class StrategyRemove : public Repository::RepositoryActionStrategy {
+public:
+    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+        repository.remove(path);
+        return true;
+    }
+
+    StrategyRemove(Repository &repository) : RepositoryActionStrategy(repository) {}
+
+};
+
+class StrategyDelete : public Repository::RepositoryActionStrategy {
+public:
+    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+        //@todo implement
+        return true;
+    }
+
+    StrategyDelete(Repository &repository) : RepositoryActionStrategy(repository) {}
 
 };
 
@@ -599,39 +662,26 @@ public:
         return true; //@todo bool is stupid thing to return. even enum would be better. even optional<bool> would be better!
     }
 
-    explicit StrategyNull(Repository &repository) : RepositoryActionStrategy(repository) {
+    StrategyNull(Repository &repository) : RepositoryActionStrategy(repository) {}
 
-    }
 };
-
-Repository::RepositoryActionStrategyPack::StrategyType
-Repository::RepositoryActionStrategyPack::getStrategyFor(RepositorySituation action) {
-    if (strategies.count(action) > 0) {
-        return strategies[action];
-    } else {
-        //@todo is it good to return null? it would probably cause lots of problems. it should never be null
-        //@todo error handling
-        return nullptr;
-    }
-}
-
 
 std::shared_ptr<Repository::RepositoryActionStrategy>
 Repository::RepositoryActionStrategyFactory::create(Repository::RepositoryAction action) {
     switch (action) {
-//@todo add missing switches
         case RepositoryAction::PERSIST:
             return std::make_shared<StrategyPersist>(repository);
         case RepositoryAction::UPDATE:
             return std::make_shared<StrategyPersist>(repository);
         case RepositoryAction::DELETE:
-            break;
+            return std::make_shared<StrategyDelete>(repository);
         case RepositoryAction::TRASH:
-            break;
+            return std::make_shared<StrategyTrash>(repository);
         case RepositoryAction::REMOVE:
-            break;
+            return std::make_shared<StrategyRemove>(repository);
         case RepositoryAction::RESTORE:
             return std::make_shared<StrategyRestore>(repository);
+        default: //<---- this is here just so that compiler won't complain about return reaching end of function.
         case RepositoryAction::NOP:
             return std::make_shared<StrategyNull>(repository);
     }
@@ -639,3 +689,16 @@ Repository::RepositoryActionStrategyFactory::create(Repository::RepositoryAction
 
 Repository::RepositoryActionStrategyFactory::RepositoryActionStrategyFactory(Repository &repository) : repository(
         repository) {}
+
+Repository::RepositoryActionStrategyPack
+Repository::RepositoryActionStrategyFactory::createPack(Repository::RepoActionPack actionPack) {
+    Repository::RepositoryActionStrategyPack strategyPack;
+    strategyPack.updatedInRepo = create(actionPack.updatedInRepo);
+    strategyPack.updatedInFilesystem = create(actionPack.updatedInFilesystem);
+    strategyPack.same = create(actionPack.same);
+    strategyPack.newInRepo = create(actionPack.newInRepo);
+    strategyPack.newInFilesystem = create(actionPack.newInFilesystem);
+    strategyPack.deletedInRepo = create(actionPack.deletedInRepo);
+    strategyPack.deletedInFilesystem = create(actionPack.deletedInFilesystem);
+    return strategyPack;
+}
