@@ -34,7 +34,7 @@ Repository::Repository(RepoIdType repositoryId) : strategyFactory(*this),
                                                                   .newInRepo = RepositoryAction::RESTORE,
                                                                   .newInFilesystem = RepositoryAction::NOP,
                                                                   .deletedInRepo = RepositoryAction::TRASH,
-                                                                  .deletedInFilesystem = RepositoryAction::NOP,
+                                                                  .deletedInFilesystem = RepositoryAction::RESTORE,
                                                           })),
                                                   updatePack(strategyFactory.createPack(
                                                           {.updatedInRepo = RepositoryAction::NOP,
@@ -409,6 +409,13 @@ void Repository::trash(const fs::path &path) {
 
 }
 
+void Repository::deploy() {
+    for (const auto &i : getFileMap()) {
+        //@todo add force level, by using different pack
+        update(i.first, deployPack);
+    }
+}
+
 void Repository::RepoFileMap::prepareMap() {
 //    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
 
@@ -670,8 +677,8 @@ std::shared_ptr<Repository::RepositoryActionStrategy>
 Repository::RepositoryActionStrategyFactory::create(Repository::RepositoryAction action) {
     switch (action) {
         case RepositoryAction::PERSIST:
-            return std::make_shared<StrategyPersist>(repository);
         case RepositoryAction::UPDATE:
+            //update and persist are the same
             return std::make_shared<StrategyPersist>(repository);
         case RepositoryAction::DELETE:
             return std::make_shared<StrategyDelete>(repository);

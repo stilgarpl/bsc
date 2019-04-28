@@ -62,6 +62,8 @@ public:
 
     void updateAllFiles();
 
+    void deployAllFiles();
+
     void persistFile(const Repository::RepoIdType &repoId, const fs::path &path);
 
 

@@ -131,6 +131,7 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("update", &RepoModule::updateFile);
     cmd->mapCommand("ignore", &RepoModule::ignoreFile);
     cmd->mapCommand("updateAll", &RepoModule::updateAllFiles);
+    cmd->mapCommand("deploy", &RepoModule::deployAllFiles);
     cmd->mapCommand("run", &CommandModule::runScript);
     cmd->mapCommand("sleep", &CommandModule::sleep);
     cmd->mapRawCommand("bg", &CommandModule::runInBackground);

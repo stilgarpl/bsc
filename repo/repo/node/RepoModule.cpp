@@ -229,6 +229,15 @@ void RepoModule::updateAllFiles() {
 
 }
 
+void RepoModule::deployAllFiles() {
+
+    if (selectedRepository != nullptr) {
+        selectedRepository->deploy();
+
+    }
+
+}
+
 void RepoModule::ignoreFile(const fs::path &path) {
     if (selectedRepository != nullptr) {
         selectedRepository->ignore(path);

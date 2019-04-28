@@ -265,6 +265,7 @@ public:
 
 public:
 
+    //direct actions:
     void persist(fs::path path);
 
     void forget(fs::path path);
@@ -280,6 +281,9 @@ public:
 
     //update everything
     void update();
+
+    //deploy everything, apply repository to filesystem @todo add force levels, what to do with changed files. standard = just create files that are not there, force = replace changed files, muchForce = replace everything.
+    void deploy();
 
     explicit Repository(RepoIdType repositoryId);
 
