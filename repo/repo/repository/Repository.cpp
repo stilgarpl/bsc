@@ -64,6 +64,7 @@ const std::shared_ptr<IStorage> &Repository::getStorage() const {
 
 void Repository::restoreAll() {
 
+    //@todo this method kind of does the same as deploy() merge the two
     auto &fileMap = getFileMap();
     for (auto &&[path, value] :fileMap) {
         if (value) {
@@ -73,7 +74,7 @@ void Repository::restoreAll() {
             } else {
                 storage->restore(value->getResourceId(), path);
             }
-            deployMap.markDeployed(path);
+            deployMap.markDeployed(path, Repository::DeployState::DEPLOYED);
             restoreAttributes(path);
         } else {
             LOGGER("resAll: no value")
@@ -261,19 +262,21 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
             if (currentFileTime < attributes->getModificationTime()) {
                 //file in repository is newer than the file in filesystem, restore
                 LOGGER("restoring..." + path.string())
-                strategyPack.updatedInRepo->apply(path, attributes);
+                auto state = strategyPack.updatedInRepo->apply(path, attributes);
                 //@todo fix deployed by using return value from strategy->apply
-                deployMap.markDeployed(path);
+                deployMap.markDeployed(path, state);
             } else {
                 if (currentFileTime == attributes->getModificationTime() && currentFileSize == attributes->getSize()) {
                     //@todo verify other things maybe
                     //file appear identical, nothing to do.
                     LOGGER("leaving alone " + path.string())
-                    strategyPack.same->apply(path, attributes);
+                    auto state = strategyPack.same->apply(path, attributes);
+                    deployMap.markDeployed(path, state);
                 } else {
                     LOGGER("updated file, persisting... " + path.string())
                     //file in the filesystem is newer then the one in repository
-                    strategyPack.updatedInFilesystem->apply(path, attributes);
+                    auto state = strategyPack.updatedInFilesystem->apply(path, attributes);
+                    deployMap.markDeployed(path, state);
                 }
             }
         } else {
@@ -284,16 +287,16 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
             if (currentFileTime > fileMap.getDeletionTime(path) || !fileMap.isDeleted(path)) {
                 //this is new file that has the same path as deleted one. persist!
                 LOGGER("new file, persisting " + path.string())
-                strategyPack.newInFilesystem->apply(path);
+                auto state = strategyPack.newInFilesystem->apply(path);
+                deployMap.markDeployed(path, state);
 
             } else {
                 //@todo delete file
                 if (fileMap.isDeleted(path)) {
                     LOGGER("trashing " + path.string())
                     //file should be deleted, but let's check deletion time...
-                    strategyPack.deletedInRepo->apply(path);
-                    //@todo fix deploy map by using return value from strategy
-                    deployMap.markDeployed(path, false);
+                    auto state = strategyPack.deletedInRepo->apply(path);
+                    deployMap.markDeployed(path, state);
                 }
             }
 
@@ -306,16 +309,18 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
             if (deployMap.isDeployed(path)) {
                 //file is in file map and was deployed but is not on filesystem, removing (user must have deleted it)
                 LOGGER("deleting " + path.string());
-                strategyPack.deletedInFilesystem->apply(path, attributes);
+                auto state = strategyPack.deletedInFilesystem->apply(path, attributes);
+                deployMap.markDeployed(path, state);
             } else {
                 //file wasn't deployed. must be a new file from another node. restore.
                 //@todo this is duplicated code. move to strategies or sth. (three times as of writing this. seriously, do something about it)
-                strategyPack.newInRepo->apply(path, attributes);
-                deployMap.markDeployed(path);
+                auto state = strategyPack.newInRepo->apply(path, attributes);
+                deployMap.markDeployed(path, state);
             }
         } else {
             //file is neither on file system nor in the map. someone trying to update unknown file?
             LOGGER("file unknown " + path.string());
+            //@todo add strategy for this ?
         }
     }
 
@@ -605,9 +610,10 @@ void Repository::RepoDeployMap::DeployAttributes::setDeployed(bool deployed) {
 //@todo maybe move actual implementation code from methods like repository.persist, delete, trash... etc. to those strategies? just a thought
 
 class StrategyPersist : public Repository::RepositoryActionStrategy {
-    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    Repository::DeployState
+    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
         repository.persist(path);
-        return true;
+        return Repository::DeployState::UNCHANGED;
     }
 
 public:
@@ -618,12 +624,13 @@ public:
 
 class StrategyRestore : public Repository::RepositoryActionStrategy {
 public:
-    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    Repository::DeployState
+    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
         if (!attributes->isDirectory()) {
             repository.getStorage()->restore(attributes->getResourceId(), path);
         }
         repository.restoreAttributes(path);
-        return true;
+        return Repository::DeployState::DEPLOYED;
     }
 
     StrategyRestore(Repository &repository) : RepositoryActionStrategy(repository) {}
@@ -632,9 +639,10 @@ public:
 
 class StrategyTrash : public Repository::RepositoryActionStrategy {
 public:
-    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    Repository::DeployState
+    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
         repository.trash(path);
-        return true;
+        return Repository::DeployState::NOT_DEPLOYED;
     }
 
     StrategyTrash(Repository &repository) : RepositoryActionStrategy(repository) {}
@@ -643,9 +651,10 @@ public:
 
 class StrategyRemove : public Repository::RepositoryActionStrategy {
 public:
-    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    Repository::DeployState
+    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
         repository.remove(path);
-        return true;
+        return Repository::DeployState::NOT_DEPLOYED;
     }
 
     StrategyRemove(Repository &repository) : RepositoryActionStrategy(repository) {}
@@ -654,9 +663,10 @@ public:
 
 class StrategyDelete : public Repository::RepositoryActionStrategy {
 public:
-    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    Repository::DeployState
+    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
         //@todo implement
-        return true;
+        return Repository::DeployState::NOT_DEPLOYED;
     }
 
     StrategyDelete(Repository &repository) : RepositoryActionStrategy(repository) {}
@@ -665,8 +675,9 @@ public:
 
 class StrategyNull : public Repository::RepositoryActionStrategy {
 public:
-    bool apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
-        return true; //@todo bool is stupid thing to return. even enum would be better. even optional<bool> would be better!
+    Repository::DeployState
+    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+        return Repository::DeployState::UNCHANGED; //@todo bool is stupid thing to return. even enum would be better. even optional<bool> would be better!
     }
 
     StrategyNull(Repository &repository) : RepositoryActionStrategy(repository) {}

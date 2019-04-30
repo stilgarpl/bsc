@@ -8,6 +8,7 @@
 
 #include <p2p/node/NodeModule.h>
 #include <p2p/dependency/DependencyManaged.h>
+#include <p2p/logic/sources/TriggerSource.h>
 
 
 class BasicModule : public NodeModuleDependent<BasicModule> {
@@ -27,6 +28,18 @@ public:
 
     void shutdownNode() {
         node.stop();
+    }
+
+    //@todo not sure if it belongs here: (fireTriggers)
+
+    template<typename TriggerIdType>
+    void fireTrigger(TriggerIdType id) {
+        node.getLogicManager().getSource<TriggerSource>()->fireTrigger<TriggerIdType>(id);
+    }
+
+    template<typename TriggerIdType, typename TriggerValueType>
+    void fireTriggerValue(TriggerIdType id, TriggerValueType value) {
+        node.getLogicManager().getSource<TriggerSource>()->fireTrigger<TriggerIdType, TriggerValueType>(id, value);
     }
 
 

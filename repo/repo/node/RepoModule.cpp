@@ -21,6 +21,7 @@
 #include <p2p/logic/conditions/TriggerConditions.h>
 #include <p2p/logic/sources/TriggerSource.h>
 #include <p2p/logic/chain/ChainEvaluators.h>
+#include <p2p/logic/evaluators/TriggerEvaluators.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
@@ -90,6 +91,16 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
             .unlockChain();
     stage1.elseChain()
             .fireNewGenericChainAction([]() { LOGGER("else chain!"); })
+            .unlockChain();
+
+//@todo implement
+    auto syncStart = when(TriggerConditions::trigger<std::string, std::string>("syncLocalRepo"));
+
+    syncStart.newChain("syncRepoChain")
+                    //@todo add lock name function
+            .lockChain(LockConfiguration::eval(CommonEvaluators::stack(
+                    TriggerEvaluators::triggerValue,
+                    ChainEvaluators::chainResult(syncStart))))
             .unlockChain();
     //debug
 //    stage1.lockChain()

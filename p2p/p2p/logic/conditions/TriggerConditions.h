@@ -16,10 +16,10 @@ struct TriggerConditions {
         return LogicObject::event<TriggerEvent<TriggerIdType>>(triggerId);
     }
 
-//    template<typename TriggerIdType,typename TriggerValue>
-//    static auto trigger(TriggerIdType triggerId, TriggerValue value) {
-//        return LogicObject::event<TriggerEvent<TriggerIdType>>(triggerId);
-//    }
+    template<typename TriggerIdType, typename TriggerValue>
+    static auto trigger(TriggerIdType triggerId) {
+        return LogicObject::event<TriggerEvent<TriggerIdType, TriggerValue>>(triggerId);
+    }
 
 };
 

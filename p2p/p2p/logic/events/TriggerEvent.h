@@ -19,6 +19,10 @@ public:
 
     TriggerEvent(TriggerIdType e, TriggerValueType value) : IEvent<TriggerIdType>(e), value(value) {}
 
+    TriggerValueType getValue() const {
+        return value;
+    }
+
 };
 
 

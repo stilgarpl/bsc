@@ -105,6 +105,12 @@ public:
     };
 
 
+    enum class DeployState {
+        DEPLOYED,
+        NOT_DEPLOYED,
+        UNCHANGED,
+    };
+
     class RepoDeployMap {
 
         class DeployAttributes {
@@ -136,8 +142,12 @@ public:
 
         auto operator[](const fs::path &path) -> decltype(deployMap[fs::current_path()]);
 
-        void markDeployed(const fs::path &path, bool value = true) {
-            deployMap[path]->setDeployed(value);
+        void markDeployed(const fs::path &path, DeployState deployState) {
+            if (deployState == DeployState::DEPLOYED) {
+                deployMap[path]->setDeployed(true);
+            } else if (deployState == DeployState::NOT_DEPLOYED) {
+                deployMap[path]->setDeployed(false);
+            }
         }
 
         bool isDeployed(const fs::path &path) {
@@ -179,12 +189,12 @@ public:
     protected:
         Repository &repository;
     public:
-        bool apply(const fs::path &path) {
+        DeployState apply(const fs::path &path) {
             return this->apply(path, std::nullopt);
         }
 
         //right now it returns deployed state, but maybe it should return enum or sth //@todo think about it
-        virtual bool apply(const fs::path &path, const std::optional<RepoFileMap::Attributes> &attributes) = 0;
+        virtual DeployState apply(const fs::path &path, const std::optional<RepoFileMap::Attributes> &attributes) = 0;
 
         explicit RepositoryActionStrategy(Repository &repository) : repository(repository) {}
     };
