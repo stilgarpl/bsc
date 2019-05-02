@@ -18,6 +18,10 @@ struct RepositoryActions {
 
     static void deployRepository(const IRepository::RepoIdType &repoId);
 
+    static void syncRepository(const IRepository::RepoIdType &repoId);
+
+    static void saveRepository(const IRepository::RepoIdType &repoId);
+
 };
 
 

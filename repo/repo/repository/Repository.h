@@ -242,7 +242,7 @@ private:
     std::shared_ptr<IPathTransformer> pathTransformer = std::make_shared<PathTransformer>();
 public: //@todo should it be public?
     RepositoryActionStrategyPack deployPack;
-    RepositoryActionStrategyPack updatePack;
+    RepositoryActionStrategyPack localSyncPack;
     RepositoryActionStrategyPack fullPack;
 
 
@@ -290,7 +290,7 @@ public:
     void update(fs::path path, const RepositoryActionStrategyPack &strategyPack);
 
     //update everything
-    void update();
+    void syncLocalChanges();
 
     //deploy everything, apply repository to filesystem @todo add force levels, what to do with changed files. standard = just create files that are not there, force = replace changed files, muchForce = replace everything.
     void deploy();

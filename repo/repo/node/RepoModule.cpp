@@ -93,7 +93,6 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
             .fireNewGenericChainAction([]() { LOGGER("else chain!"); })
             .unlockChain();
 
-//@todo implement
     auto syncStart = when(TriggerConditions::trigger<std::string, std::string>("syncLocalRepo"));
 
     syncStart.newChain("syncRepoChain")
@@ -101,6 +100,14 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
             .lockChain(LockConfiguration::eval(CommonEvaluators::stack(
                     TriggerEvaluators::triggerValue,
                     ChainEvaluators::chainResult(syncStart))))
+            .fireNewGenericChainAction(RepositoryActions::syncRepository,
+                                       CommonEvaluators::stack(
+                                               TriggerEvaluators::triggerValue,
+                                               ChainEvaluators::chainResult(syncStart)))
+            .fireNewGenericChainAction(RepositoryActions::saveRepository,
+                                       CommonEvaluators::stack(
+                                               TriggerEvaluators::triggerValue,
+                                               ChainEvaluators::chainResult(syncStart)))
             .unlockChain();
     //debug
 //    stage1.lockChain()
@@ -137,7 +144,8 @@ void RepoModule::loadRepository(const Repository::RepoIdType &repoId) {
     repositoryManager.addRepository(ptr);
 //@todo this metod should be moved somewhere else. Journal is not the only thing of repo that needs to be saved. Repository should have serialize and RepoManager should handle loading and saving.
 //@todo throw exception if repo does not exist
-    ptr->setJournal(node.getConfigurationManager().loadData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml")));
+    ptr->setJournal(node.getConfigurationManager().loadData<JournalPtr>(
+            configuration().getRepositoryDataPath() / (repoId + ".xml")));
 //    {
 //        std::ifstream is(path);
 //        cereal::XMLInputArchive ia(is);
@@ -151,7 +159,9 @@ void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
 //    rep->getJournal()->commitState();
     rep->commit();
     fs::path savePath = fs::temp_directory_path() / (repoId + ".xml");
-    node.getConfigurationManager().saveData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"), rep->getJournal());
+    auto repoPath = (configuration().getRepositoryDataPath() / (repoId + ".xml")).string();
+    node.getConfigurationManager().saveData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"),
+                                                        rep->getJournal());
 //    {
 //        std::ofstream os(savePath);
 //        cereal::XMLOutputArchive oa(os);
@@ -234,7 +244,7 @@ void RepoModule::updateFile(const fs::path &path) {
 void RepoModule::updateAllFiles() {
 
     if (selectedRepository != nullptr) {
-        selectedRepository->update();
+        selectedRepository->syncLocalChanges();
 
     }
 
@@ -277,7 +287,7 @@ void RepoModule::downloadRepository(const Repository::RepoIdType &repoId) {
 
 void RepoModule::deployRepository(const Repository::RepoIdType &repoId) {
     //@todo add to the deployed repository list?
-    findRepository(repoId)->update();
+    findRepository(repoId)->deploy();
 }
 
 const std::filesystem::path &RepoModuleConfiguration::getRepositoryDataPath() const {

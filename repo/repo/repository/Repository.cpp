@@ -36,7 +36,7 @@ Repository::Repository(RepoIdType repositoryId) : strategyFactory(*this),
                                                                   .deletedInRepo = RepositoryAction::TRASH,
                                                                   .deletedInFilesystem = RepositoryAction::RESTORE,
                                                           })),
-                                                  updatePack(strategyFactory.createPack(
+                                                  localSyncPack(strategyFactory.createPack(
                                                           {.updatedInRepo = RepositoryAction::NOP,
                                                                   .updatedInFilesystem = RepositoryAction::UPDATE,
                                                                   .same = RepositoryAction::NOP,
@@ -327,10 +327,10 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
 
 }
 
-void Repository::update() {
+void Repository::syncLocalChanges() {
 //@todo change the name of this function to updateAll or sth
     for (const auto &i : getFileMap()) {
-        update(i.first, updatePack);
+        update(i.first, localSyncPack);
     }
 
 }

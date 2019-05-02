@@ -15,7 +15,7 @@ private:
     std::string to;
 
 public:
-    CustomRule(const std::string &from, const std::string &to);
+    CustomRule(std::string from, std::string to);
 
     std::filesystem::path transformToJournalFormat(fs::path path) override;
 

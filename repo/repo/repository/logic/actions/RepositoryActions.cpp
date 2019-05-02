@@ -41,3 +41,13 @@ void RepositoryActions::deployRepository(const IRepository::RepoIdType &repoId) 
     repoMod->deployRepository(repoId);
 
 }
+
+void RepositoryActions::syncRepository(const IRepository::RepoIdType &repoId) {
+    auto repoMod = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
+    repoMod->updateAllFiles();
+}
+
+void RepositoryActions::saveRepository(const IRepository::RepoIdType &repoId) {
+    auto repoMod = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
+    repoMod->saveRepository(repoId);
+}

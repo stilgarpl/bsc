@@ -1,3 +1,7 @@
+#include <utility>
+
+#include <utility>
+
 //
 // Created by stilgar on 04.11.18.
 //
@@ -5,7 +9,7 @@
 #include <regex>
 #include "CustomRule.h"
 
-CustomRule::CustomRule(const std::string &from, const std::string &to) : from(from), to(to) {}
+CustomRule::CustomRule(std::string from, std::string to) : from(std::move(from)), to(std::move(to)) {}
 
 std::filesystem::path CustomRule::transformToJournalFormat(fs::path path) {
     return std::regex_replace(path.string(), std::regex(from), to);

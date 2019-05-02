@@ -549,3 +549,6 @@ deployAll() bedzie mogło być takie samo ale bez zapisywania zmian z systemu pl
 część logiki persist dla katalogów bedzie można usunąć z replaya na commicie (dalej nie jestem przekonany czy to dobry pomysł, żeby wciagało pliki z katalogów dopiero przy commicie, raczej uważam, że to był zły i nieintuicyjny pomysł i po prostu chciałem do czegoś użyć replaya)
 
 
+@todo attach fail action to the IEvent. if exception is thrown from an event, execute that
+
+@todo zrobic Configuration w Module na tej samej zasadzie co Submodule. nie ma sensu dodawać kolejnej warstwy dziedziczenia dla konfiguracji. dzialać i tak bedzie tak samo, a zniknie potrzeba dodawania dodatkowej klasy na zewnątrz
