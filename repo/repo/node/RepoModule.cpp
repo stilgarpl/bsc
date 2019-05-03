@@ -158,7 +158,6 @@ void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
     auto rep = findRepository(repoId);
 //    rep->getJournal()->commitState();
     rep->commit();
-    fs::path savePath = fs::temp_directory_path() / (repoId + ".xml");
     auto repoPath = (configuration().getRepositoryDataPath() / (repoId + ".xml")).string();
     node.getConfigurationManager().saveData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"),
                                                         rep->getJournal());

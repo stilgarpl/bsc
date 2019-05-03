@@ -22,10 +22,12 @@ private:
 
 protected:
     fs::path getConfigPath() {
+        //@todo replace "config" with variable
         return rootPath / fs::path("config");
     }
 
     fs::path getDataPath() {
+        //@todo replace "data" with variable
         return rootPath / fs::path("data");
     }
 

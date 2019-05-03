@@ -64,6 +64,11 @@ void setupCommands(CommandModule *cmd) {
 
 }
 
+void createFile(fs::path path, std::string content) {
+    std::ofstream file(path);
+    file << content;
+}
+
 
 TEST_CASE("Repo module test", "[!throws]") {
 
@@ -102,20 +107,41 @@ TEST_CASE("Repo module test", "[!throws]") {
 
     SECTION ("create repository on second ") {
         auto otherRepoMod = otherNode.getModule<RepoModule>();
+        otherRepoMod->configuration().setRepositoryDataPath("repo");
         REQUIRE(otherRepoMod != nullptr);
         otherRepoMod->createRepository("test");
         REQUIRE(otherRepoMod->findRepository("test") != nullptr);
         otherRepoMod->selectRepository("test");
         REQUIRE(otherRepoMod->getSelectedRepository() != nullptr);
-        otherRepoMod->persistFile("/etc/hosts");
+
+        //create dirs and files
+        fs::path testPath = fs::temp_directory_path() / "dirtest";
+        fs::create_directories(testPath);
+        createFile(testPath / "1.txt", "111");
+        createFile(testPath / "2.txt", "222");
+        createFile(testPath / "3.txt", "333");
+        createFile(testPath / "4.txt", "444");
+
+
+        otherRepoMod->persistFile(testPath);
         otherRepoMod->saveRepository("test");
+
+        auto num = fs::remove_all(testPath);
+
+        REQUIRE(num == 5);
         //@todo set the path from the actual configuration set in this test
-        REQUIRE(fs::exists("/tmp/basyco/second/data/repository/test.xml"));
+        auto repoXMLPath = fs::temp_directory_path() / "basyco/second/data/repo/test.xml";
+        REQUIRE(fs::exists(repoXMLPath));
 
         auto otherSum = otherRepoMod->getSelectedRepository()->getJournal()->getChecksum();
 
 
         SECTION("download remote repository") {
+            REQUIRE(!fs::exists(testPath));
+            REQUIRE(!fs::exists(testPath / "1.txt"));
+            REQUIRE(!fs::exists(testPath / "2.txt"));
+            REQUIRE(!fs::exists(testPath / "3.txt"));
+            REQUIRE(!fs::exists(testPath / "4.txt"));
 
             auto thisRepoMod = thisNode.getModule<RepoModule>();
 
@@ -129,6 +155,14 @@ TEST_CASE("Repo module test", "[!throws]") {
 
             auto thisSum = thisRepoMod->getSelectedRepository()->getJournal()->getChecksum();
             REQUIRE(thisSum == otherSum);
+
+            thisRepoMod->deployAllFiles();
+
+            REQUIRE(fs::exists(testPath));
+            REQUIRE(fs::exists(testPath / "1.txt"));
+            REQUIRE(fs::exists(testPath / "2.txt"));
+            REQUIRE(fs::exists(testPath / "3.txt"));
+            REQUIRE(fs::exists(testPath / "4.txt"));
 
 
         }
@@ -146,4 +180,9 @@ TEST_CASE("Repo module test", "[!throws]") {
     std::this_thread::sleep_for(5s);
 
 
+}
+
+
+TEST_CASE("Repo Integration Test", "[!throws]") {
+    //@todo implement
 }
