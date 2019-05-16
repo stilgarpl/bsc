@@ -42,6 +42,8 @@ protected:
 public:
     void save(const IdType &id, std::shared_ptr<IConfig> config);
 
+    void save(const IdType &id, IConfig &config);
+
     template<typename DataType /* @todo Concept: DataType is serializable*/>
     void saveData(const fs::path &fname, const DataType &data) {
         fs::path filePath = getDataPath() / fname;
@@ -68,13 +70,13 @@ public:
 
 
     //@todo Concept: T extends IConfig
+    //@todo maybe reference or optional instead of shared_ptr?
     template<typename T>
     std::shared_ptr<T> load(const IdType &id) {
-        return std::static_pointer_cast<T>(load_void(id));
+        return std::static_pointer_cast<T>(loadRaw(id));
     }
 protected:
-    //@todo why not IConfig
-    std::shared_ptr<void> load_void(const IdType &id);
+    std::shared_ptr<IConfig> loadRaw(const IdType &id);
 
 private:
     void initializeRootPath() {

@@ -71,13 +71,7 @@ public:
     }
 
     void initializeConfiguration() override {
-        auto loaded = node.getConfigurationManager().template load<typename T::Configuration>(
-                configuration().getConfigId());
-        LOGGER(std::string("Checking configuration for class: ") + typeid(T).name());
-        if (loaded != nullptr) {
-            configuration() = *loaded;
-            LOGGER("Configuration found, loading")
-        }
+        loadConfiguration();
     }
 
 protected:
@@ -85,6 +79,23 @@ protected:
         ILogicModule::changeModuleState(state);
         node.getLogicManager().template requireSource<ModuleSource>().
                 template moduleStateChanged<T>(state, *static_cast<T *>(this));
+    }
+
+public:
+    void saveConfiguration() override {
+        //@todo I don't like creating shared pointer just so it can be saved. configuration manager should take and make references.
+        node.getConfigurationManager().save(configuration().getConfigId(),
+                                            std::make_shared<typename T::Configuration>(configuration()));
+    }
+
+    void loadConfiguration() override {
+        auto loaded = node.getConfigurationManager().template load<typename T::Configuration>(
+                configuration().getConfigId());
+        LOGGER(std::string("Checking configuration for class: ") + typeid(T).name());
+        if (loaded != nullptr) {
+            configuration() = *loaded;
+            LOGGER("Configuration found, loading")
+        }
     }
 };
 

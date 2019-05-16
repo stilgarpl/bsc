@@ -23,7 +23,7 @@ void ConfigurationManager::save(const ConfigurationManager::IdType &id, std::sha
 
 }
 
-std::shared_ptr<void> ConfigurationManager::load_void(const ConfigurationManager::IdType &id) {
+std::shared_ptr<IConfig> ConfigurationManager::loadRaw(const ConfigurationManager::IdType &id) {
     std::shared_ptr<IConfig> config;
     fs::path fname = this->filenameFromId(id);
     fs::path filePath = getConfigPath() / fname;
@@ -49,4 +49,15 @@ const std::filesystem::path &ConfigurationManager::getRootPath() const {
 void ConfigurationManager::setRootPath(const std::filesystem::path &rootPath) {
     ConfigurationManager::rootPath = rootPath;
     initializeRootPath();
+}
+
+void ConfigurationManager::save(const ConfigurationManager::IdType &id, IConfig &config) {
+    fs::path fname;//("test");
+    fname = this->filenameFromId(id);
+    fs::path filePath = getConfigPath() / fname;
+    fs::create_directories(filePath.parent_path());
+    LOGGER(filePath);
+    std::ofstream os(filePath);
+    cereal::XMLOutputArchive archive(os);
+    archive << config;
 }

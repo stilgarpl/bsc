@@ -65,6 +65,10 @@ public:
     virtual bool setupLogic()=0;
     virtual void initializeConfiguration()=0;
 
+    virtual void saveConfiguration() = 0;
+
+    virtual void loadConfiguration() = 0;
+
 protected:
     //module events
     //@todo maybe integrate somehow changeModuleState with changeState? the problem is, changeModuleState generated event with real module type. changeState just does this type
