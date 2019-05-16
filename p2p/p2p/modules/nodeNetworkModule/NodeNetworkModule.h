@@ -16,7 +16,6 @@
 #include <p2p/modules/nodeNetworkModule/protocol/broadcast/BroadcastScope.h>
 #include <p2p/modules/nodeNetworkModule/network/NetworkInfo.h>
 #include <p2p/modules/configuration/IConfig.h>
-#include <p2p/modules/configuration/ConfigurationModule.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
 #include <p2p/role/RoleScope.h>
 #include <p2p/logic/events/LogicStateEvent.h>

@@ -28,6 +28,7 @@ using namespace std::chrono_literals;
 #include <p2p/modules/command/CommandModule.h>
 #include <p2p/modules/command/StandardCommandsDirectory.h>
 #include <variant>
+#include <p2p/modules/basic/BasicModule.h>
 
 
 void setupModules(Node &node) {
