@@ -15,7 +15,6 @@ void setupModules(Node &node) {
     node.addModule<NodeNetworkModule>();
     node.addModule<RepoModule>();
     node.addModule<CommandModule>();
-    node.addModule<ConfigurationModule>();
 }
 
 void setupCommands(CommandModule *cmd) {
@@ -157,6 +156,24 @@ TEST_CASE("Repo module test", "[!throws]") {
             REQUIRE(thisSum == otherSum);
 
             thisRepoMod->deployAllFiles();
+
+            REQUIRE(fs::exists(testPath));
+            REQUIRE(fs::exists(testPath / "1.txt"));
+            REQUIRE(fs::exists(testPath / "2.txt"));
+            REQUIRE(fs::exists(testPath / "3.txt"));
+            REQUIRE(fs::exists(testPath / "4.txt"));
+
+
+        }
+
+        SECTION("integration command test") {
+            REQUIRE(!fs::exists(testPath));
+            REQUIRE(!fs::exists(testPath / "1.txt"));
+            REQUIRE(!fs::exists(testPath / "2.txt"));
+            REQUIRE(!fs::exists(testPath / "3.txt"));
+            REQUIRE(!fs::exists(testPath / "4.txt"));
+
+            auto cmdMod = thisNode.getModule<CommandModule>();
 
             REQUIRE(fs::exists(testPath));
             REQUIRE(fs::exists(testPath / "1.txt"));

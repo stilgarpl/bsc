@@ -18,6 +18,8 @@ class NodeModule : public ILogicModule {
 
 public:
 
+    using Configuration = IConfig;
+
     //@todo pure or not?
     void initialize() override {};
 
@@ -37,19 +39,12 @@ protected:
 };
 
 
-template<typename T, typename ConfigType, typename ... Args>
-class NodeModuleConfigDependent : public NodeModule, public DependencyManaged<T> {
-private:
-    typedef ConfigType Config;
-    Config _config;
+template<typename T, typename ... Args>
+class NodeModuleDependent : public NodeModule, public DependencyManaged<T> {
 public:
-//    typename T::Config _config;
-
     auto &getOwnSubModule() {
         return getSubModule<T>();
     }
-
-
 
 private:
     template<typename T1, typename... Args1>
@@ -64,19 +59,20 @@ private:
     }
 
 public:
-    explicit NodeModuleConfigDependent(INode &node) : NodeModule(node) {
+    explicit NodeModuleDependent(INode &node) : NodeModule(node) {
         this->template setRequired<Args...>();
         if constexpr (sizeof...(Args) > 0) {
             checkAndAddModules<Args...>();
         }
     };
 
-    Config &configuration() override {
-        return _config;
+    auto &configuration() {
+        return getConfiguration<T>();
     }
 
     void initializeConfiguration() override {
-        auto loaded = node.getConfigurationManager().template load<Config>(configuration().getConfigId());
+        auto loaded = node.getConfigurationManager().template load<typename T::Configuration>(
+                configuration().getConfigId());
         LOGGER(std::string("Checking configuration for class: ") + typeid(T).name());
         if (loaded != nullptr) {
             configuration() = *loaded;
@@ -90,11 +86,6 @@ protected:
         node.getLogicManager().template requireSource<ModuleSource>().
                 template moduleStateChanged<T>(state, *static_cast<T *>(this));
     }
-
 };
-
-template<typename T, typename ... Args>
-using NodeModuleDependent = NodeModuleConfigDependent<T, INodeModule::Config, Args...>;
-
 
 #endif //BASYCO_NODEMODULE_H

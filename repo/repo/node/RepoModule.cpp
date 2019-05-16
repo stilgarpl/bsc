@@ -52,6 +52,10 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
             .fireNewGenericAction([this] {
                 node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("updateRepoTrigger");
             });
+    when(TimeConditions::every(60s))
+            .fireNewGenericAction([this] {
+                node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("syncLocalRepo");
+            });
     when(TriggerConditions::trigger<std::string>("updateRepoTrigger")).fireNewGenericAction(
             CommonActions::foreachActionGetter(NetworkActions::broadcastPacket,
                                                [this] { return this->repositoryManager.getRepositories(); },
@@ -128,7 +132,7 @@ bool RepoModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
     return true;
 }
 
-RepoModule::RepoModule(INode &node) : NodeModuleConfigDependent(node) {
+RepoModule::RepoModule(INode &node) : NodeModuleDependent(node) {
     setRequired<BasicModule>();
 }
 
@@ -289,10 +293,10 @@ void RepoModule::deployRepository(const Repository::RepoIdType &repoId) {
     findRepository(repoId)->deploy();
 }
 
-const std::filesystem::path &RepoModuleConfiguration::getRepositoryDataPath() const {
+const std::filesystem::path &RepoModule::Configuration::getRepositoryDataPath() const {
     return repositoryDataPath;
 }
 
-void RepoModuleConfiguration::setRepositoryDataPath(const std::filesystem::path &repositoryDataPath) {
-    RepoModuleConfiguration::repositoryDataPath = repositoryDataPath;
+void RepoModule::Configuration::setRepositoryDataPath(const std::filesystem::path &repositoryDataPath) {
+    RepoModule::Configuration::repositoryDataPath = repositoryDataPath;
 }

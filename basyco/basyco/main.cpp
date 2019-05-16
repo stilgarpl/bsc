@@ -36,7 +36,6 @@ void setupModules(Node &node) {
     node.addModule<NodeNetworkModule>();
     node.addModule<RepoModule>();
     node.addModule<CommandModule>();
-    node.addModule<ConfigurationModule>();
 }
 
 void setupCommands(CommandModule *cmd) {

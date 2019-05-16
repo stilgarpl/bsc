@@ -14,26 +14,27 @@
 #include <repo/journal/network/packet/JournalGroup.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>
 
-class RepoModuleConfiguration : public IConfig {
-private:
-    fs::path repositoryDataPath = fs::path("repository");
 
+class RepoModule : public NodeModuleDependent<RepoModule> {
 public:
-    const std::filesystem::path &getRepositoryDataPath() const;
+    class Configuration : public IConfig {
+    private:
+        fs::path repositoryDataPath = fs::path("repository");
 
-    void setRepositoryDataPath(const std::filesystem::path &repositoryDataPath);
+    public:
+        const std::filesystem::path &getRepositoryDataPath() const;
 
-private:
-    template<class Archive>
-    void serialize(Archive &ar) {
-        ar(repositoryDataPath);
-    }
+        void setRepositoryDataPath(const std::filesystem::path &repositoryDataPath);
+
+    private:
+        template<class Archive>
+        void serialize(Archive &ar) {
+            ar(repositoryDataPath);
+        }
 
 
-    friend class cereal::access;
-};
-
-class RepoModule : public NodeModuleConfigDependent<RepoModule,RepoModuleConfiguration> {
+        friend class cereal::access;
+    };
 private:
     RepositoryManager repositoryManager;
     RepositoryPtr selectedRepository = nullptr;
@@ -84,6 +85,7 @@ public:
     void downloadRepository(const Repository::RepoIdType &repoId);
 
     void deployRepository(const Repository::RepoIdType &repoId);
+
     void findNewestRepositoryInTheNetwork(const Repository::RepoIdType &repoId) {
         //broadcast to every node get repo info packet
         //for every response:

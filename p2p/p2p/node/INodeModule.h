@@ -8,7 +8,6 @@
 
 #include <p2p/thread/Runnable.h>
 #include <p2p/dependency/IDependencyManaged.h>
-#include <p2p/modules/logic/ILogicModule.h>
 //@todo this is interface for configuration, it shouldn't have dependencies on modules
 #include <p2p/modules/configuration/IConfig.h>
 #include "INode.h"
@@ -19,9 +18,19 @@ private:
     Uber<Type> submodule;
 protected:
     INode &node;
+    std::unique_ptr<IConfig> _config;
+
+    template<typename ModuleType>
+    typename ModuleType::Configuration &getConfiguration() {
+        if (_config == nullptr) {
+            _config = std::make_unique<typename ModuleType::Configuration>();
+        }
+        return static_cast<typename ModuleType::Configuration &>(*_config);
+    }
 
 public:
     typedef IConfig Config;
+    using Configuration = IConfig;
 
 
     class SubModule {
@@ -34,32 +43,15 @@ public:
 
     explicit INodeModule(INode &node) : node(node) {}
 
-    void doInitialize() {
-        initialize();
-        changeModuleState(ModuleState::INITIALIZED);
-    }
+    void doInitialize();
 
-    void doSetupLogic() {
-        if (setupLogic()) {
-            changeModuleState(ModuleState::LOGIC_READY);
-        }
+    void doSetupLogic();
 
-    }
+    void doReady();
 
-    void doReady() {
-        ready();
-        changeModuleState(ModuleState::READY);
-    }
+    void doShutdown();
 
-    void doShutdown() {
-        shutdown();
-        changeModuleState(ModuleState::SHUTDOWN);
-    }
-
-    void doPrepareSubmodules() {
-        prepareSubmodules();
-        changeModuleState(ModuleState::SUBMODULES_PREPARED);
-    }
+    void doPrepareSubmodules();
 
     virtual void initialize()=0;
 
@@ -68,7 +60,7 @@ public:
     virtual void shutdown() = 0;
 
     virtual void prepareSubmodules() {};
-    virtual IConfig &configuration()=0;
+    //virtual IConfig &configuration()=0;
 
     virtual bool setupLogic()=0;
     virtual void initializeConfiguration()=0;
@@ -79,6 +71,8 @@ protected:
     virtual void changeModuleState(const ModuleState &state) = 0;
 
 };
+
+
 
 //typedef std::shared_ptr<INodeModule> INodeModulePtr;
 

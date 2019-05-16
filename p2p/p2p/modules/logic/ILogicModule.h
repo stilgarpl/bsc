@@ -9,6 +9,7 @@
 #include <p2p/logic/sources/AutoSource.h>
 #include <p2p/node/INodeModule.h>
 #include <p2p/node/INode.h>
+#include <p2p/node/ModuleState.h>
 #include <p2p/logic/state/LogicStateMachine.h>
 #include "p2p/logic/LogicManager.h"
 #include "p2p/logic/LogicObject.h"

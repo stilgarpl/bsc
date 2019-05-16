@@ -3,7 +3,7 @@
 
 #set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(test)
+
 
 
 find_package(Crypto++ REQUIRED)
@@ -27,3 +27,4 @@ target_include_directories(repo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(repo p2p ${LIBS})
 
+add_subdirectory(test)

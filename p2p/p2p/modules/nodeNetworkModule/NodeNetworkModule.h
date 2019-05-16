@@ -31,38 +31,38 @@ struct NodeConnectionInfo {
 
 typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
 
-class NodeNetworkModuleConfig : public IConfig {
-private:
-    unsigned short port = 6667;
-public:
-    unsigned short getPort() const {
-        return port;
-    }
-
-    void setPort(unsigned short port) {
-        NodeNetworkModuleConfig::port = port;
-    }
-
-private:
-    template<class Archive>
-    void serialize(Archive &ar) {
-        ar & cereal::base_class<IConfig>(this) & port;
-    }
 
 
-private:
-
-
-    friend class cereal::access;
-};
-
-
-CONFIG_NAME(NodeNetworkModuleConfig, "network")
 
 class NodeNetworkModule
-        : public NodeModuleConfigDependent<NodeNetworkModule, NodeNetworkModuleConfig, ConfigurationModule> {
+        : public NodeModuleDependent<NodeNetworkModule> {
 
 public:
+
+    class Configuration : public IConfig {
+    private:
+        unsigned short port = 6667;
+    public:
+        unsigned short getPort() const {
+            return port;
+        }
+
+        void setPort(unsigned short port) {
+            Configuration::port = port;
+        }
+
+    private:
+        template<class Archive>
+        void serialize(Archive &ar) {
+            ar & cereal::base_class<IConfig>(this) & port;
+        }
+
+
+    private:
+
+
+        friend class cereal::access;
+    };
     template<typename PacketType>
     using ProcessorType = std::function<typename PacketType::Response::Ptr(typename PacketType::Request::Ptr)>;
 
@@ -349,8 +349,9 @@ public: // @todo should be public or shouldn't ?
     }
 };
 
+CONFIG_NAME(NodeNetworkModule::Configuration, "network")
 
-CEREAL_REGISTER_TYPE(NodeNetworkModuleConfig)
+CEREAL_REGISTER_TYPE(NodeNetworkModule::Configuration)
 //CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig,NodeNetworkModule::Config);
 
 #endif //BASYCO_NODENETWORKMODULE_H

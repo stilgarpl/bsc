@@ -10,7 +10,7 @@
 
 struct TimeConditions {
 
-
+//@todo add offset to event tick, for example every 60s + 15s offset so not every event is at the same moment
     static auto every(typename Tick::IdType id) {
         return LogicObject::event<Tick>(id);
     }
