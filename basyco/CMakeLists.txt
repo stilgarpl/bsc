@@ -19,3 +19,5 @@ add_executable(basyco ${SOURCE_FILES})
 #target_include_directories(basyco PUBLIC p2p)
 target_link_libraries(basyco repo)
 
+install(TARGETS basyco)
+

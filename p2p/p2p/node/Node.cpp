@@ -12,6 +12,7 @@
 
 Node::~Node() {
 
+
     stop();
 
 
@@ -147,8 +148,9 @@ void Node::joinModules() {
 
 void Node::waitToFinish() {
     logicManager.join();
-    //@todo replace this with waiting for modules
-    std::this_thread::sleep_for(1s);
+    joinModules();
+//    //@todo replace this with waiting for modules
+//    std::this_thread::sleep_for(1s);
 
 }
 

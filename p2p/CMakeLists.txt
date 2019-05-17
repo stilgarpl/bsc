@@ -31,4 +31,4 @@ add_library(p2p SHARED ${SOURCE_FILES})
 target_include_directories(p2p PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(p2p ${LIBS})
-
+install(TARGETS p2p)

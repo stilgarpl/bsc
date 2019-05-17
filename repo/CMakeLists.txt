@@ -28,3 +28,5 @@ message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(repo p2p ${LIBS})
 
 add_subdirectory(test)
+
+install(TARGETS repo)

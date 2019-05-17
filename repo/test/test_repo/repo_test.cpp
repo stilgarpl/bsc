@@ -166,23 +166,23 @@ TEST_CASE("Repo module test", "[!throws]") {
 
         }
 
-        SECTION("integration command test") {
-            REQUIRE(!fs::exists(testPath));
-            REQUIRE(!fs::exists(testPath / "1.txt"));
-            REQUIRE(!fs::exists(testPath / "2.txt"));
-            REQUIRE(!fs::exists(testPath / "3.txt"));
-            REQUIRE(!fs::exists(testPath / "4.txt"));
-
-            auto cmdMod = thisNode.getModule<CommandModule>();
-
-            REQUIRE(fs::exists(testPath));
-            REQUIRE(fs::exists(testPath / "1.txt"));
-            REQUIRE(fs::exists(testPath / "2.txt"));
-            REQUIRE(fs::exists(testPath / "3.txt"));
-            REQUIRE(fs::exists(testPath / "4.txt"));
-
-
-        }
+        //@todo implement: (passing commands as user would)
+//        SECTION("integration command test") {
+//            REQUIRE(!fs::exists(testPath));
+//            REQUIRE(!fs::exists(testPath / "1.txt"));
+//            REQUIRE(!fs::exists(testPath / "2.txt"));
+//            REQUIRE(!fs::exists(testPath / "3.txt"));
+//            REQUIRE(!fs::exists(testPath / "4.txt"));
+//
+//
+//            REQUIRE(fs::exists(testPath));
+//            REQUIRE(fs::exists(testPath / "1.txt"));
+//            REQUIRE(fs::exists(testPath / "2.txt"));
+//            REQUIRE(fs::exists(testPath / "3.txt"));
+//            REQUIRE(fs::exists(testPath / "4.txt"));
+//
+//
+//        }
 
 
     }
