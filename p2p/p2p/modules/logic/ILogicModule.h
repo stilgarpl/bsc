@@ -39,8 +39,8 @@ public:
     }
 
     template<typename EventType, typename ... Args>
-    class ModuleLogicChainHelper : public SpecificLogicChainHelper<EventType, Args...> {
-        typedef ModuleLogicChainHelper<EventType, Args...> ThisType;
+    class ModuleLogicChainHelper : public SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...> {
+//        typedef ModuleLogicChainHelper<EventType, Args...> ThisType;
     private:
         INode &node;
     public:
@@ -50,15 +50,15 @@ public:
             std::cout << "assigning module action ... " << std::endl;
             //@todo c++ bind_front? or sth? unpack placeholders to the sizeof ModArgs?
             if constexpr  (sizeof...(ModArgs) == 0) {
-                LogicChainHelper<EventType, Args...>::fireNewAction(std::bind(f, node.getModule<ModuleType>()));
+                fireNewAction(std::bind(f, node.getModule<ModuleType>()));
             } else if constexpr (sizeof...(ModArgs) == 1) {
-                LogicChainHelper<EventType, Args...>::fireNewAction(
+                fireNewAction(
                         std::bind(f, node.getModule<ModuleType>(), std::placeholders::_1));
             } else if constexpr (sizeof...(ModArgs) == 2) {
-                LogicChainHelper<EventType, Args...>::fireNewAction(
+                fireNewAction(
                         std::bind(f, node.getModule<ModuleType>(), std::placeholders::_1, std::placeholders::_2));
             } else if constexpr (sizeof...(ModArgs) == 3) {
-                LogicChainHelper<EventType, Args...>::fireNewAction(
+                fireNewAction(
                         std::bind(f, node.getModule<ModuleType>(), std::placeholders::_1, std::placeholders::_2,
                                   std::placeholders::_3));
             }
@@ -66,7 +66,20 @@ public:
         }
 
         ModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, INode &node)
-                : SpecificLogicChainHelper<EventType, Args...>(eventHelper, l), node(node) {}
+                : SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...>(eventHelper, l), node(node) {}
+
+        template<typename NewThisType>
+        ModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l,
+                               const NewThisType &self)
+                : SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...>(eventHelper, l, self),
+                  node(self.node) {
+
+        }
+
+        template<typename NewEventType, typename ... NewArgs>
+        friend
+        class ModuleLogicChainHelper;
+
     };
 
 //    template<typename EventType, typename ... Args>

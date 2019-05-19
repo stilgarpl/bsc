@@ -23,7 +23,8 @@ public:
         fs::path::string_type repositoryDataPath = fs::path("repository");
 
     public:
-        const std::filesystem::path &getRepositoryDataPath() const;
+        //@todo make it return reference when cereal path is fixed.
+        const std::filesystem::path getRepositoryDataPath() const;
 
         void setRepositoryDataPath(const std::filesystem::path &repositoryDataPath);
 

@@ -293,7 +293,7 @@ void RepoModule::deployRepository(const Repository::RepoIdType &repoId) {
     findRepository(repoId)->deploy();
 }
 
-const std::filesystem::path &RepoModule::Configuration::getRepositoryDataPath() const {
+const std::filesystem::path RepoModule::Configuration::getRepositoryDataPath() const {
     return repositoryDataPath;
 }
 
