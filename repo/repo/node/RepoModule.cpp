@@ -132,7 +132,7 @@ bool RepoModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
     return true;
 }
 
-RepoModule::RepoModule(INode &node) : NodeModuleDependent(node) {
+RepoModule::RepoModule(INode &node) : NodeModuleDependent(node, "repo") {
     setRequired<BasicModule>();
 }
 

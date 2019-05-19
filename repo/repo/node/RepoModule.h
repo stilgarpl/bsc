@@ -19,7 +19,8 @@ class RepoModule : public NodeModuleDependent<RepoModule> {
 public:
     class Configuration : public IConfig {
     private:
-        fs::path repositoryDataPath = fs::path("repository");
+        //@todo cereal fix path type to path!
+        fs::path::string_type repositoryDataPath = fs::path("repository");
 
     public:
         const std::filesystem::path &getRepositoryDataPath() const;

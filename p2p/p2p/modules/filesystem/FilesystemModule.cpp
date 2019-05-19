@@ -8,7 +8,8 @@
 #include <p2p/modules/basic/BasicModule.h>
 #include <p2p/modules/filesystem/network/processor/NetworkProcessors.h>
 
-FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent<FilesystemModule, NodeNetworkModule>(node) {
+FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent<FilesystemModule, NodeNetworkModule>(node,
+                                                                                                           "filesystem") {
 //    setRequired<BasicModule, NodeNetworkModule>();
 }
 

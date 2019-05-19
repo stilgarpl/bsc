@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 20.10.17.
 //
@@ -15,6 +17,8 @@
 #include "INodeModule.h"
 
 class NodeModule : public ILogicModule {
+private:
+    const ModuleIdType moduleId;
 
 public:
 
@@ -26,7 +30,6 @@ public:
     void ready() override {};
 
     void shutdown() override {};
-    explicit NodeModule(INode &node) : ILogicModule(node) {}
 
     void run() override {
         //do nothing, just so modules do not have to implement this if they don't want to
@@ -36,6 +39,13 @@ protected:
     ConfigurationManager &getConfigurationManager() {
         return node.getConfigurationManager();
     }
+
+public:
+    const ModuleIdType &getModuleId() const override {
+        return moduleId;
+    }
+
+    NodeModule(INode &node, ModuleIdType moduleId) : ILogicModule(node), moduleId(std::move(moduleId)) {}
 };
 
 
@@ -59,12 +69,13 @@ private:
     }
 
 public:
-    explicit NodeModuleDependent(INode &node) : NodeModule(node) {
+
+    NodeModuleDependent(INode &node, const ModuleIdType &moduleId) : NodeModule(node, moduleId) {
         this->template setRequired<Args...>();
         if constexpr (sizeof...(Args) > 0) {
             checkAndAddModules<Args...>();
         }
-    };
+    }
 
     auto &configuration() {
         return getConfiguration<T>();
@@ -83,18 +94,20 @@ protected:
 
 public:
     void saveConfiguration() override {
-        //@todo I don't like creating shared pointer just so it can be saved. configuration manager should take and make references.
-        node.getConfigurationManager().save(configuration().getConfigId(),
-                                            std::make_shared<typename T::Configuration>(configuration()));
+        //@todo replace getConfigId() with getModuleId() from module. Modules should have unique ids.
+        node.getConfigurationManager().save<typename T::Configuration>(this->getModuleId(),
+                                                                       configuration());
     }
 
     void loadConfiguration() override {
         auto loaded = node.getConfigurationManager().template load<typename T::Configuration>(
-                configuration().getConfigId());
+                this->getModuleId());
         LOGGER(std::string("Checking configuration for class: ") + typeid(T).name());
-        if (loaded != nullptr) {
+        if (loaded) {
             configuration() = *loaded;
             LOGGER("Configuration found, loading")
+        } else {
+            LOGGER("Failed to load configuration")
         }
     }
 };

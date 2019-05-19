@@ -7,6 +7,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <p2p/log/Logger.h>
 
 namespace fs = std::filesystem;
 
@@ -21,28 +22,29 @@ private:
 
 
 protected:
-    fs::path getConfigPath() {
-        //@todo replace "config" with variable
-        return rootPath / fs::path("config");
-    }
+    fs::path getConfigPath();
 
-    fs::path getDataPath() {
-        //@todo replace "data" with variable
-        return rootPath / fs::path("data");
-    }
-
+    fs::path getDataPath();
 
 protected:
-    fs::path filenameFromId(const IdType &id) {
-        //@todo do something with it
-        fs::path ret = (id + ".cfg");
-        return ret;
-    }
+    fs::path filenameFromId(const IdType &id);
 
 public:
-    void save(const IdType &id, std::shared_ptr<IConfig> config);
+//    void save(const IdType &id, std::shared_ptr<IConfig> config);
 
-    void save(const IdType &id, IConfig &config);
+//@todo maybe unify save(load) and saveData (loadData) functions
+
+    template<typename ConfigType>
+    void save(const IdType &id, ConfigType &config) {
+        fs::path fname;//("test");
+        fname = this->filenameFromId(id);
+        fs::path filePath = getConfigPath() / fname;
+        fs::create_directories(filePath.parent_path());
+        LOGGER(filePath);
+        std::ofstream os(filePath);
+        cereal::XMLOutputArchive archive(os);
+        archive << config;
+    }
 
     template<typename DataType /* @todo Concept: DataType is serializable*/>
     void saveData(const fs::path &fname, const DataType &data) {
@@ -70,22 +72,30 @@ public:
 
 
     //@todo Concept: T extends IConfig
-    //@todo maybe reference or optional instead of shared_ptr?
-    template<typename T>
-    std::shared_ptr<T> load(const IdType &id) {
-        return std::static_pointer_cast<T>(loadRaw(id));
+    template<typename ConfigType>
+    std::optional<ConfigType> load(const IdType &id) {
+        std::optional<ConfigType> config;
+        fs::path fname = this->filenameFromId(id);
+        fs::path filePath = getConfigPath() / fname;
+        if (fs::exists(filePath)) {
+            std::ifstream is(filePath);
+            cereal::XMLInputArchive archive(is);
+            archive >> *config;
+
+        }
+        return config;
     }
 protected:
-    std::shared_ptr<IConfig> loadRaw(const IdType &id);
+//    std::shared_ptr<IConfig> loadRaw(const IdType &id);
 
 private:
     void initializeRootPath() {
         fs::create_directories(rootPath);
     }
 public:
-    explicit ConfigurationManager(const std::filesystem::path &rootPath);
+    explicit ConfigurationManager(std::filesystem::path rootPath);
 
-    ConfigurationManager();
+    ConfigurationManager() = default;
 
     const std::filesystem::path &getRootPath() const;
 

@@ -18,6 +18,5 @@ add_executable(basyco ${SOURCE_FILES})
 #target_include_directories(basyco PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 #target_include_directories(basyco PUBLIC p2p)
 target_link_libraries(basyco repo)
-
-install(TARGETS basyco)
+install(TARGETS basyco COMPONENT basyco)
 

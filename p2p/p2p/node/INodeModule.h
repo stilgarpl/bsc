@@ -29,8 +29,8 @@ protected:
     }
 
 public:
-    typedef IConfig Config;
     using Configuration = IConfig;
+    using ModuleIdType = std::string;
 
 
     class SubModule {
@@ -64,10 +64,10 @@ public:
 
     virtual bool setupLogic()=0;
     virtual void initializeConfiguration()=0;
-
     virtual void saveConfiguration() = 0;
-
     virtual void loadConfiguration() = 0;
+
+    virtual const ModuleIdType &getModuleId() const = 0;
 
 protected:
     //module events
