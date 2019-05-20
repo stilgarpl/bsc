@@ -24,12 +24,19 @@ public:
     typedef unsigned int IdType; //@todo replace it with a real id, hash or something
 
 public:
+
+    struct Configuration {
+        fs::path rootPath;
+
+        Configuration();
+    };
 private:
 
     ConfigurationManager configurationManager;
+    Configuration nodeConfiguration;
     LogicManager logicManager;
     Context::Ptr nodeContext = Context::makeContext();
-
+public:
     Context::Ptr getContext() override {
         return nodeContext;
     }
@@ -40,22 +47,10 @@ public:
         Context::setActiveContext(nodeContext);
     }
 
-public:
-//    const std::shared_ptr<Config> &getConfiguration() const;
-//
-//    void setConfiguration(const std::shared_ptr<Config> &configuration);
-
 private:
 
 
     NodeInfo thisNodeInfo;
-    // = nsm(networkInfo); //network this node belongs to @todo more than 1?
-
-
-    // typedef std::shared_ptr<INodeModule> INodeModulePtr;
-
-
-
 
 public:
 
@@ -63,12 +58,8 @@ public:
         return configurationManager;
     }
 
-
-
 protected:
 
-
-    void work();
 
     void initialize();
 
@@ -106,32 +97,7 @@ public:
     void joinModules();
 
 protected:
-
-
-//    template<typename Ret, typename ... Args>
-//    void forEachModule(std::function<Ret(Args...)> f, Args... args) {
-//        std::list<INodeModulePtr> modulesList;
-//        modules.forEach(
-//                [&](INodeModulePtr ptr) {
-//                    if (ptr != nullptr) {
-//                        //ptr->initialize();
-//                        //ptr->setupLogic(logicManager);
-//                        modulesList.push_back(ptr);
-//                    };
-//                });
-//        auto sortedList = DependencyManager::dependencySort(modulesList);
-//
-//        for (auto &&item : sortedList) {
-//            ((*item).*f)(args...);
-//        }
-//    }
-
-//    friend class NodeModule;
-protected:
     void shutdownModules();
 };
-
-//CEREAL_REGISTER_TYPE(Node::Config)
-//CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig, Node::Config)
 
 #endif //BASYCO_NODE_H

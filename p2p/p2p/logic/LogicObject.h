@@ -144,15 +144,10 @@ public:
                 : EventHelper<eventType, Args...>(eventId) {}
     };
 
-protected:
-    template<template<typename, typename...> typename SelfType, bool isChain, typename eventType, typename ... Args>
-    class BaseChainHelper {
-//@todo implement two version, with chain function and without them but with newChain
-    };
 
 public:
     template<template<typename, typename...> typename SelfType, typename eventType, typename ... Args>
-    class LogicChainHelper : public BaseChainHelper<SelfType, true, eventType, Args...> {
+    class LogicChainHelper {
     public:
         using EventType = eventType;
         typedef typename EventType::IdType EventId;

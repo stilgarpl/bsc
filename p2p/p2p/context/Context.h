@@ -142,6 +142,7 @@ public:
     template<typename T, typename... Vals>
     auto set(Vals... values) {
         std::lock_guard<std::recursive_mutex> guard(contextLock);
+        //@todo assert that data[typeId][getKey(0)] is null
         static auto typeId = getTypeId<T>();
         //std::clog << "Context::set type id " << typeId << std::endl;
         auto ret = std::make_shared<T>(values...);
@@ -156,7 +157,7 @@ public:
 
     Context(const Context &other);
 
-    Context(bool defaultContext);
+    explicit Context(bool defaultContext);
 
     void setDebug_id(const std::string &debug_id);
 
