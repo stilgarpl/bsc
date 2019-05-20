@@ -6,12 +6,7 @@
 #define BASYCO_ICONFIG_H
 
 
-#include <cereal/access.hpp>
-#include <cereal/types/polymorphic.hpp>
-#include <cereal/types/memory.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/xml.hpp>
-#include <cereal/types/base_class.hpp>
+#include <p2p/utils/cereal_include.h>
 #include <utility>
 #include <ostream>
 

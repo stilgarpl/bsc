@@ -84,7 +84,7 @@ void Node::initialize() {
     setNodeContextActive();
 
 //    //@todo debug values
-    configurationManager.setRootPath(fs::path("/tmp/basyco") / this->getNodeInfo().getNodeId());
+    configurationManager.setRootPath(nodeConfiguration.rootPath / this->getNodeInfo().getNodeId());
 
     //this slightly changed the order of execution - instead of being initialized and setupLogic module by module,
     //now all modules are initialized and then all modules are setupLogiced
@@ -121,8 +121,14 @@ void Node::shutdownModules() {
 
 }
 
+void Node::saveConfiguration() {
+    forEachModule(&INodeModule::doSaveConfiguration);
+
+}
+
 Node::Configuration::Configuration() {
 
-    rootPath = std::getenv("HOME");
+    //@todo constant or sth for project name
+    rootPath = fs::path(std::getenv("HOME")) / ".basyco";
     LOGGER("root path is " + rootPath.string());
 }

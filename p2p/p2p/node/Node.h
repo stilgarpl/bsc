@@ -96,6 +96,8 @@ public:
 
     void joinModules();
 
+    void saveConfiguration() override;
+
 protected:
     void shutdownModules();
 };

@@ -42,6 +42,13 @@ public:
         node.getLogicManager().getSource<TriggerSource>()->fireTrigger<TriggerIdType, TriggerValueType>(id, value);
     }
 
+    ///IMPORTANT: DO NOT NAME COMMANDS LIKE THE METHOD THEY CALL FROM OTHER MODULES. I HAD THIS PROBLEM WITH SHUTDOWN, STOP AND SAVECONFIGURATION.
+
+
+    void saveAllConfiguration() {
+        node.saveConfiguration();
+    }
+
 
 };
 

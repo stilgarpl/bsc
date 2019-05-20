@@ -53,6 +53,8 @@ public:
 
     void doPrepareSubmodules();
 
+    void doSaveConfiguration();
+
     virtual void initialize()=0;
 
     virtual void ready() = 0;

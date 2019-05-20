@@ -76,6 +76,7 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("deploy", &RepoModule::deployAllFiles);
     cmd->mapCommand("run", &CommandModule::runScript);
     cmd->mapCommand("sleep", &CommandModule::sleep);
+    cmd->mapCommand("saveConf", &BasicModule::saveAllConfiguration);
     cmd->mapRawCommand("bg", &CommandModule::runInBackground);
     cmd->mapCommand("fireTrigV", &BasicModule::fireTriggerValue<std::string, std::string>);
     cmd->mapCommand("fireTrig", &BasicModule::fireTrigger<std::string>);

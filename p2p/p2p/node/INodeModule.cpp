@@ -31,3 +31,8 @@ void INodeModule::doPrepareSubmodules() {
     prepareSubmodules();
     changeModuleState(ModuleState::SUBMODULES_PREPARED);
 }
+
+void INodeModule::doSaveConfiguration() {
+    saveConfiguration();
+
+}

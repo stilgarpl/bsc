@@ -31,7 +31,7 @@ public:
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            ar(repositoryDataPath);
+            ar(CEREAL_NVP(repositoryDataPath));
         }
 
 

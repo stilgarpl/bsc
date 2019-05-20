@@ -117,6 +117,8 @@ public:
 
     virtual void waitToFinish() = 0;
 
+    virtual void saveConfiguration() = 0;
+
 };
 
 #endif //BASYCO_INODE_H

@@ -42,7 +42,7 @@ public:
         fs::create_directories(filePath.parent_path());
         LOGGER(filePath);
         std::ofstream os(filePath);
-        cereal::XMLOutputArchive archive(os);
+        cereal::JSONOutputArchive archive(os);
         archive << config;
     }
 
@@ -79,7 +79,7 @@ public:
         fs::path filePath = getConfigPath() / fname;
         if (fs::exists(filePath)) {
             std::ifstream is(filePath);
-            cereal::XMLInputArchive archive(is);
+            cereal::JSONInputArchive archive(is);
             archive >> *config;
 
         }
