@@ -40,10 +40,31 @@ public:
         fname = this->filenameFromId(id);
         fs::path filePath = getConfigPath() / fname;
         fs::create_directories(filePath.parent_path());
-        LOGGER(filePath);
+        LOGGER("saving: " + filePath.string());
         std::ofstream os(filePath);
         cereal::JSONOutputArchive archive(os);
-        archive << config;
+        archive << cereal::make_nvp("configuration", config);
+    }
+
+    template<typename ConfigType>
+    std::optional<ConfigType> load(const IdType &id) {
+        std::optional<ConfigType> config;
+        fs::path fname = this->filenameFromId(id);
+        fs::path filePath = getConfigPath() / fname;
+        LOGGER("loading: " + filePath.string());
+        if (fs::exists(filePath)) {
+            ConfigType temp;
+            try {
+                std::ifstream is(filePath);
+                cereal::JSONInputArchive archive(is);
+                archive >> temp;
+                config = temp;
+            } catch (...) {
+                LOGGER("failed to load file. " + filePath.string())
+            }
+
+        }
+        return config;
     }
 
     template<typename DataType /* @todo Concept: DataType is serializable*/>
@@ -71,20 +92,6 @@ public:
     }
 
 
-    //@todo Concept: T extends IConfig
-    template<typename ConfigType>
-    std::optional<ConfigType> load(const IdType &id) {
-        std::optional<ConfigType> config;
-        fs::path fname = this->filenameFromId(id);
-        fs::path filePath = getConfigPath() / fname;
-        if (fs::exists(filePath)) {
-            std::ifstream is(filePath);
-            cereal::JSONInputArchive archive(is);
-            archive >> *config;
-
-        }
-        return config;
-    }
 protected:
 //    std::shared_ptr<IConfig> loadRaw(const IdType &id);
 
@@ -92,6 +99,7 @@ private:
     void initializeRootPath() {
         fs::create_directories(rootPath);
     }
+
 public:
     explicit ConfigurationManager(std::filesystem::path rootPath);
 

@@ -15,6 +15,7 @@ find_program(conan NAMES conan)
 message("DEBUG: conan = ${conan}")
 if (EXISTS ${conan})
     message("CONAN EXISTS")
+    set(CONAN_SYSTEM_INCLUDES ON)
     include(${CMAKE_SOURCE_DIR}/conan/conan.cmake)
     conan_check()
     conan_add_remote(NAME bincrafters INDEX 1

@@ -18,7 +18,7 @@ message(libs:: ${LIBS})
 
 set(INCLUDES ${Poco_INCLUDE_DIRS} ${Cereal_INCLUDE_DIRS})
 message(includ:: ${INCLUDES})
-include_directories(${INCLUDES})
+include_directories(SYSTEM ${INCLUDES})
 set(LIBS ${LIBS} ${Poco_LIBRARIES})
 
 message(libs:: ${LIBS})
