@@ -87,10 +87,12 @@ void setupCommands(CommandModule *cmd) {
 }
 
 
-
+#include <spdlog/spdlog.h>
 
 
 int main(int argc, char *argv[]) {
+
+    spdlog::info("lala");
 
     Node thisNode(9191);
 

@@ -8,15 +8,14 @@
 #include <filesystem>
 #include <fstream>
 #include <p2p/log/Logger.h>
+#include <p2p/utils/cereal_include.h>
 
 namespace fs = std::filesystem;
-
-#include "IConfig.h"
 
 //@todo consider changing name to IOManager or sth like that, because it doesn't just do configuration but everything that goes into private node directory
 class ConfigurationManager {
 public:
-    typedef IConfig::IdType IdType;
+    typedef std::string IdType;
 private:
     fs::path rootPath;
 

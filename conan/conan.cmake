@@ -52,6 +52,8 @@ function(_get_msvc_ide_version result)
         set(${result} 14 PARENT_SCOPE)
     elseif(NOT MSVC_VERSION VERSION_LESS 1910 AND MSVC_VERSION VERSION_LESS 1920)
         set(${result} 15 PARENT_SCOPE)
+    elseif (NOT MSVC_VERSION VERSION_LESS 1920 AND MSVC_VERSION VERSION_LESS 1930)
+        set(${result} 16 PARENT_SCOPE)
     else()
         message(FATAL_ERROR "Conan: Unknown MSVC compiler version [${MSVC_VERSION}]")
     endif()
@@ -78,6 +80,18 @@ function(conan_cmake_settings result)
     else()
         message(FATAL_ERROR "Please specify in command line CMAKE_BUILD_TYPE (-DCMAKE_BUILD_TYPE=Release)")
     endif()
+
+    string(TOUPPER ${_CONAN_SETTING_BUILD_TYPE} _CONAN_SETTING_BUILD_TYPE_UPPER)
+    if (_CONAN_SETTING_BUILD_TYPE_UPPER STREQUAL "DEBUG")
+        set(_CONAN_SETTING_BUILD_TYPE "Debug")
+    elseif (_CONAN_SETTING_BUILD_TYPE_UPPER STREQUAL "RELEASE")
+        set(_CONAN_SETTING_BUILD_TYPE "Release")
+    elseif (_CONAN_SETTING_BUILD_TYPE_UPPER STREQUAL "RELWITHDEBINFO")
+        set(_CONAN_SETTING_BUILD_TYPE "RelWithDebInfo")
+    elseif (_CONAN_SETTING_BUILD_TYPE_UPPER STREQUAL "MINSIZEREL")
+        set(_CONAN_SETTING_BUILD_TYPE "MinSizeRel")
+    endif ()
+
     if(ARGUMENTS_ARCH)
         set(_CONAN_SETTING_ARCH ${ARGUMENTS_ARCH})
     endif()
@@ -211,7 +225,7 @@ function(conan_cmake_settings result)
 
     if(NOT _SETTINGS OR ARGUMENTS_PROFILE_AUTO STREQUAL "ALL")
         set(ARGUMENTS_PROFILE_AUTO arch build_type compiler compiler.version
-                                   compiler.runtime compiler.libcxx compiler.toolset)
+                compiler.runtime compiler.libcxx compiler.toolset)
     endif()
 
     # Automatic from CMake
@@ -302,12 +316,12 @@ endfunction()
 
 
 macro(parse_arguments)
-    set(options BASIC_SETUP CMAKE_TARGETS UPDATE KEEP_RPATHS NO_OUTPUT_DIRS OUTPUT_QUIET NO_IMPORTS)
+    set(options BASIC_SETUP CMAKE_TARGETS UPDATE KEEP_RPATHS NO_LOAD NO_OUTPUT_DIRS OUTPUT_QUIET NO_IMPORTS)
     set(oneValueArgs CONANFILE ARCH BUILD_TYPE INSTALL_FOLDER CONAN_COMMAND)
     set(multiValueArgs DEBUG_PROFILE RELEASE_PROFILE RELWITHDEBINFO_PROFILE MINSIZEREL_PROFILE
             PROFILE REQUIRES OPTIONS IMPORTS SETTINGS BUILD ENV GENERATORS PROFILE_AUTO
             INSTALL_ARGS)
-  cmake_parse_arguments(ARGUMENTS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(ARGUMENTS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 endmacro()
 
 function(conan_cmake_install)
@@ -334,29 +348,29 @@ function(conan_cmake_install)
         endif()
     endforeach()
     if(ARGUMENTS_CONAN_COMMAND)
-       set(conan_command ${ARGUMENTS_CONAN_COMMAND})
+        set(conan_command ${ARGUMENTS_CONAN_COMMAND})
     else()
-      set(conan_command conan)
+        set(conan_command conan)
     endif()
     set(CONAN_OPTIONS "")
     if(ARGUMENTS_CONANFILE)
-      set(CONANFILE ${CMAKE_CURRENT_SOURCE_DIR}/${ARGUMENTS_CONANFILE})
-      # A conan file has been specified - apply specified options as well if provided
-      foreach(ARG ${ARGUMENTS_OPTIONS})
-          set(CONAN_OPTIONS ${CONAN_OPTIONS} -o=${ARG})
-      endforeach()
+        set(CONANFILE ${CMAKE_CURRENT_SOURCE_DIR}/${ARGUMENTS_CONANFILE})
+        # A conan file has been specified - apply specified options as well if provided
+        foreach (ARG ${ARGUMENTS_OPTIONS})
+            set(CONAN_OPTIONS ${CONAN_OPTIONS} -o=${ARG})
+        endforeach ()
     else()
-      set(CONANFILE ".")
+        set(CONANFILE ".")
     endif()
     if(ARGUMENTS_UPDATE)
-      set(CONAN_INSTALL_UPDATE --update)
+        set(CONAN_INSTALL_UPDATE --update)
     endif()
     if (ARGUMENTS_NO_IMPORTS)
         set(CONAN_INSTALL_NO_IMPORTS --no-imports)
     endif ()
     set(CONAN_INSTALL_FOLDER "")
     if(ARGUMENTS_INSTALL_FOLDER)
-      set(CONAN_INSTALL_FOLDER -if=${ARGUMENTS_INSTALL_FOLDER})
+        set(CONAN_INSTALL_FOLDER -if=${ARGUMENTS_INSTALL_FOLDER})
     endif()
     foreach(ARG ${ARGUMENTS_GENERATORS})
         set(CONAN_GENERATORS ${CONAN_GENERATORS} -g=${ARG})
@@ -370,70 +384,78 @@ function(conan_cmake_install)
     message(STATUS "Conan executing: ${conan_command} ${_conan_args}")
 
     if(ARGUMENTS_OUTPUT_QUIET)
-      set(OUTPUT_CONTROL OUTPUT_QUIET)
-    endif()
+        execute_process(COMMAND ${conan_command} ${conan_args}
+                RESULT_VARIABLE return_code
+                OUTPUT_VARIABLE conan_output
+                ERROR_VARIABLE conan_output
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    else ()
+        execute_process(COMMAND ${conan_command} ${conan_args}
+                RESULT_VARIABLE return_code
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    endif ()
 
-    execute_process(COMMAND ${conan_command} ${conan_args}
-                     RESULT_VARIABLE return_code
-                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-
-    message(STATUS "${conan_output}")
-				 
     if(NOT "${return_code}" STREQUAL "0")
-      message(FATAL_ERROR "Conan install failed='${return_code}'")
+        message(FATAL_ERROR "Conan install failed='${return_code}'")
     endif()
 
 endfunction()
 
 
 function(conan_cmake_setup_conanfile)
-  parse_arguments(${ARGV})
-  if(ARGUMENTS_CONANFILE)
-    # configure_file will make sure cmake re-runs when conanfile is updated
-    configure_file(${ARGUMENTS_CONANFILE} ${ARGUMENTS_CONANFILE}.junk)
-    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${ARGUMENTS_CONANFILE}.junk)
-  else()
-    conan_cmake_generate_conanfile(${ARGV})
-  endif()
+    parse_arguments(${ARGV})
+    if (ARGUMENTS_CONANFILE)
+        get_filename_component(_CONANFILE_NAME ${ARGUMENTS_CONANFILE} NAME)
+        # configure_file will make sure cmake re-runs when conanfile is updated
+        configure_file(${ARGUMENTS_CONANFILE} ${CMAKE_CURRENT_BINARY_DIR}/${_CONANFILE_NAME}.junk)
+        file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${_CONANFILE_NAME}.junk)
+    else ()
+        conan_cmake_generate_conanfile(${ARGV})
+    endif ()
 endfunction()
 
 function(conan_cmake_generate_conanfile)
-  # Generate, writing in disk a conanfile.txt with the requires, options, and imports
-  # specified as arguments
-  # This will be considered as temporary file, generated in CMAKE_CURRENT_BINARY_DIR)
-  parse_arguments(${ARGV})
-  set(_FN "${CMAKE_CURRENT_BINARY_DIR}/conanfile.txt")
+    # Generate, writing in disk a conanfile.txt with the requires, options, and imports
+    # specified as arguments
+    # This will be considered as temporary file, generated in CMAKE_CURRENT_BINARY_DIR)
+    parse_arguments(${ARGV})
+    set(_FN "${CMAKE_CURRENT_BINARY_DIR}/conanfile.txt")
 
-  file(WRITE ${_FN} "[generators]\ncmake\n\n[requires]\n")
-  foreach(ARG ${ARGUMENTS_REQUIRES})
-    file(APPEND ${_FN} ${ARG} "\n")
-  endforeach()
+    file(WRITE ${_FN} "[generators]\ncmake\n\n[requires]\n")
+    foreach (ARG ${ARGUMENTS_REQUIRES})
+        file(APPEND ${_FN} ${ARG} "\n")
+    endforeach ()
 
-  file(APPEND ${_FN} ${ARG} "\n[options]\n")
-  foreach(ARG ${ARGUMENTS_OPTIONS})
-    file(APPEND ${_FN} ${ARG} "\n")
-  endforeach()
+    file(APPEND ${_FN} ${ARG} "\n[options]\n")
+    foreach (ARG ${ARGUMENTS_OPTIONS})
+        file(APPEND ${_FN} ${ARG} "\n")
+    endforeach ()
 
-  file(APPEND ${_FN} ${ARG} "\n[imports]\n")
-  foreach(ARG ${ARGUMENTS_IMPORTS})
-    file(APPEND ${_FN} ${ARG} "\n")
-  endforeach()
+    file(APPEND ${_FN} ${ARG} "\n[imports]\n")
+    foreach (ARG ${ARGUMENTS_IMPORTS})
+        file(APPEND ${_FN} ${ARG} "\n")
+    endforeach ()
 endfunction()
 
 
 macro(conan_load_buildinfo)
     if(CONAN_CMAKE_MULTI)
-      set(_CONANBUILDINFO conanbuildinfo_multi.cmake)
+        set(_CONANBUILDINFO conanbuildinfo_multi.cmake)
     else()
-      set(_CONANBUILDINFO conanbuildinfo.cmake)
+        set(_CONANBUILDINFO conanbuildinfo.cmake)
     endif()
+    if (ARGUMENTS_INSTALL_FOLDER)
+        set(_CONANBUILDINFOFOLDER ${ARGUMENTS_INSTALL_FOLDER})
+    else ()
+        set(_CONANBUILDINFOFOLDER ${CMAKE_CURRENT_BINARY_DIR})
+    endif ()
     # Checks for the existence of conanbuildinfo.cmake, and loads it
     # important that it is macro, so variables defined at parent scope
-    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${_CONANBUILDINFO}")
-      message(STATUS "Conan: Loading ${_CONANBUILDINFO}")
-      include(${CMAKE_CURRENT_BINARY_DIR}/${_CONANBUILDINFO})
+    if (EXISTS "${_CONANBUILDINFOFOLDER}/${_CONANBUILDINFO}")
+        message(STATUS "Conan: Loading ${_CONANBUILDINFO}")
+        include(${_CONANBUILDINFOFOLDER}/${_CONANBUILDINFO})
     else()
-      message(FATAL_ERROR "${_CONANBUILDINFO} doesn't exist in ${CMAKE_CURRENT_BINARY_DIR}")
+        message(FATAL_ERROR "${_CONANBUILDINFO} doesn't exist in ${CMAKE_CURRENT_BINARY_DIR}")
     endif()
 endmacro()
 
@@ -464,7 +486,9 @@ macro(conan_cmake_run)
         endif()
     endif()
 
-    conan_load_buildinfo()
+    if (NOT ARGUMENTS_NO_LOAD)
+        conan_load_buildinfo()
+    endif ()
 
     if(ARGUMENTS_BASIC_SETUP)
         foreach(_option CMAKE_TARGETS KEEP_RPATHS NO_OUTPUT_DIRS)
@@ -496,17 +520,17 @@ macro(conan_check)
     endif()
     message(STATUS "Conan: Found program ${CONAN_CMD}")
     execute_process(COMMAND ${CONAN_CMD} --version
-                    OUTPUT_VARIABLE CONAN_VERSION_OUTPUT
-                    ERROR_VARIABLE CONAN_VERSION_OUTPUT)
+            OUTPUT_VARIABLE CONAN_VERSION_OUTPUT
+            ERROR_VARIABLE CONAN_VERSION_OUTPUT)
     message(STATUS "Conan: Version found ${CONAN_VERSION_OUTPUT}")
 
     if(DEFINED CONAN_VERSION)
         string(REGEX MATCH ".*Conan version ([0-9]+\.[0-9]+\.[0-9]+)" FOO
-            "${CONAN_VERSION_OUTPUT}")
+                "${CONAN_VERSION_OUTPUT}")
         if(${CMAKE_MATCH_1} VERSION_LESS ${CONAN_VERSION})
-            message(FATAL_ERROR "Conan outdated. Installed: ${CONAN_VERSION}, \
-                required: ${CONAN_VERSION_REQUIRED}. Consider updating via 'pip \
-                install conan --upgrade'.")
+            message(FATAL_ERROR "Conan outdated. Installed: ${CMAKE_MATCH_1}, \
+                required: ${CONAN_VERSION}. Consider updating via 'pip \
+                install conan==${CONAN_VERSION}'.")
         endif()
     endif()
 endmacro()
@@ -524,7 +548,7 @@ macro(conan_add_remote)
         set(CONAN_INDEX_ARG "-i ${CONAN_INDEX}")
     endif()
 
-    message(STATUS "Conan: Adding ${CONAN_NAME} remote repositoy (${CONAN_URL})")
+    message(STATUS "Conan: Adding ${CONAN_NAME} remote repository (${CONAN_URL})")
     execute_process(COMMAND ${CONAN_CMD} remote add ${CONAN_NAME} ${CONAN_URL}
-            ${CONAN_INDEX_ARG})
+            ${CONAN_INDEX_ARG} -f)
 endmacro()

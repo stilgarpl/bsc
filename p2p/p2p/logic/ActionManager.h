@@ -37,6 +37,7 @@ public:
     template<typename... Args, typename ActionIdType>
     void setAction(ActionIdType id, ActionType<Args...> action) {
         auto &map = actionMap.get<ActionIdType, ActionType<Args...>>();
+        //@todo what if map[id] was already set?
         map[id] = action;
     }
 

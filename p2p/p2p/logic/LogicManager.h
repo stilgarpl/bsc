@@ -110,7 +110,7 @@ public:
     //@todo this could probably removed and I could just emit events from chains directly using autosource... but maybe it's useful?
     template<typename RetType, typename... Args, typename ActionIdType>
     void setActionExtended(ActionIdType id, std::function<typename std::decay<RetType>::type(Args...)> func) {
-        actionManager.setAction<Args...>(id, [=](Args... args) {
+        actionManager.setAction<Args...>(id, [=, this](Args... args) {
             //@todo by value?
             RetType ret = func(args...);
             if (ret.isEventValid()) {

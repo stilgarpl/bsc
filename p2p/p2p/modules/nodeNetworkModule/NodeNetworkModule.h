@@ -15,7 +15,6 @@
 #include <p2p/modules/nodeNetworkModule/protocol/connection/IServerConnection.h>
 #include <p2p/modules/nodeNetworkModule/protocol/broadcast/BroadcastScope.h>
 #include <p2p/modules/nodeNetworkModule/network/NetworkInfo.h>
-#include <p2p/modules/configuration/IConfig.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
 #include <p2p/role/RoleScope.h>
 #include <p2p/logic/events/LogicStateEvent.h>
@@ -38,7 +37,7 @@ class NodeNetworkModule
 
 public:
 
-    class Configuration : public IConfig {
+    class Configuration {
     private:
         unsigned short port = 6667;
     public:
@@ -53,7 +52,7 @@ public:
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            ar & cereal::base_class<IConfig>(this) & port;
+            ar & port;
         }
 
 
@@ -348,9 +347,9 @@ public: // @todo should be public or shouldn't ?
     }
 };
 
-CONFIG_NAME(NodeNetworkModule::Configuration, "network")
+//CONFIG_NAME(NodeNetworkModule::Configuration, "network")
 
-CEREAL_REGISTER_TYPE(NodeNetworkModule::Configuration)
+//CEREAL_REGISTER_TYPE(NodeNetworkModule::Configuration)
 //CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig,NodeNetworkModule::Config);
 
 #endif //BASYCO_NODENETWORKMODULE_H

@@ -121,8 +121,7 @@ void Repository::commit() {
             fs::path path = fs::canonical(item.path());
             auto &attr = fileMap[path];
             if (fs::exists(path)) {
-                //@todo replace time_t with file clock of C++20
-                auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
+                auto currentFileTime = fs::last_write_time(path);
                 if (!attr) {
                     //I don't like the fact that this logic is in two places, here and update().
                     if (!fileMap.isDeleted(fs::canonical(item.path())) ||
@@ -253,12 +252,12 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
     auto &attributes = fileMap[path];
     if (fs::exists(path)) {
         //file exists in filesystem
-        auto currentFileTime = std::chrono::system_clock::to_time_t(fs::last_write_time(path));
+        auto currentFileTime = fs::last_write_time(path);
         auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
         if (attributes) {
             //file exists in the journal
-            LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
-                   std::to_string(attributes->getModificationTime()))
+//            LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
+//                   std::to_string(attributes->getModificationTime()))
             if (currentFileTime < attributes->getModificationTime()) {
                 //file in repository is newer than the file in filesystem, restore
                 LOGGER("restoring..." + path.string())
@@ -282,8 +281,8 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
         } else {
             //not in the map
 
-            LOGGER("cur fil tim " + std::to_string(currentFileTime) + " deltim " +
-                   std::to_string(fileMap.getDeletionTime(path)))
+//            LOGGER("cur fil tim " + std::to_string(currentFileTime) + " deltim " +
+//                   std::to_string(fileMap.getDeletionTime(path)))
             if (currentFileTime > fileMap.getDeletionTime(path) || !fileMap.isDeleted(path)) {
                 //this is new file that has the same path as deleted one. persist!
                 LOGGER("new file, persisting " + path.string())
@@ -342,7 +341,7 @@ void Repository::restoreAttributes(const fs::path &path) {
     if (fs::exists(path)) {
         auto &attributes = fileMap[path];
         fs::permissions(path, attributes->getPermissions());
-        fs::last_write_time(path, std::chrono::system_clock::from_time_t(attributes->getModificationTime()));
+        fs::last_write_time(path, attributes->getModificationTime());
     }
 
 }
@@ -455,7 +454,7 @@ void Repository::RepoFileMap::prepareMap() {
             auto path = pathTransformer->transformFromJournalFormat(i.getPath());
             attributesMap[path] = std::nullopt;
             deleteMap[path].setDeleted(false);
-            deleteMap[path].setDeletionTime(0);
+            deleteMap[path].setDeletionTime(fs::file_time_type::min());
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
@@ -486,7 +485,7 @@ void Repository::RepoFileMap::prepareMap() {
             auto path = pathTransformer->transformFromJournalFormat(i.getPath());
             attributesMap[path] = std::nullopt;
             deleteMap[path].setDeleted(false);
-            deleteMap[path].setDeletionTime(0);
+            deleteMap[path].setDeletionTime(fs::file_time_type::min());
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
@@ -529,7 +528,7 @@ decltype(Repository::RepoFileMap::attributesMap) Repository::RepoFileMap::subMap
     return result;
 }
 
-std::time_t Repository::RepoFileMap::getDeletionTime(const fs::path &path) {
+fs::file_time_type Repository::RepoFileMap::getDeletionTime(const fs::path &path) {
     return deleteMap[path].getDeletionTime();
 }
 
@@ -545,7 +544,7 @@ uintmax_t Repository::RepoFileMap::Attributes::getSize() const {
     return size;
 }
 
-time_t Repository::RepoFileMap::Attributes::getModificationTime() const {
+fs::file_time_type Repository::RepoFileMap::Attributes::getModificationTime() const {
     return modificationTime;
 }
 
@@ -575,11 +574,11 @@ bool Repository::RepoFileMap::DeleteInfo::isDeleted() const {
     return deleted;
 }
 
-time_t Repository::RepoFileMap::DeleteInfo::getDeletionTime() const {
+fs::file_time_type Repository::RepoFileMap::DeleteInfo::getDeletionTime() const {
     return deletionTime;
 }
 
-void Repository::RepoFileMap::DeleteInfo::setDeletionTime(time_t deletionTime) {
+void Repository::RepoFileMap::DeleteInfo::setDeletionTime(fs::file_time_type deletionTime) {
     DeleteInfo::deletionTime = deletionTime;
 }
 

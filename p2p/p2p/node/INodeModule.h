@@ -12,20 +12,21 @@
 #include <p2p/modules/configuration/IConfig.h>
 #include "INode.h"
 #include "ModuleState.h"
+#include <any>
 
 class INodeModule : public virtual IDependencyManaged, public Runnable {
 private:
     Uber<Type> submodule;
 protected:
     INode &node;
-    std::unique_ptr<IConfig> _config;
+    std::shared_ptr<void> _config;
 
     template<typename ModuleType>
     typename ModuleType::Configuration &getConfiguration() {
         if (_config == nullptr) {
-            _config = std::make_unique<typename ModuleType::Configuration>();
+            _config = std::make_shared<typename ModuleType::Configuration>();
         }
-        return static_cast<typename ModuleType::Configuration &>(*_config);
+        return *std::static_pointer_cast<typename ModuleType::Configuration>(_config);
     }
 
 public:

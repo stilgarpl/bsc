@@ -25,8 +25,7 @@ public:
         class Attributes {
             fs::perms permissions = fs::perms::none;
             uintmax_t size = 0;
-            //@todo utc clock instead of old time_t value. or, typedef clock
-            std::time_t modificationTime = 0;
+            fs::file_time_type modificationTime = fs::file_time_type::min();
             ChecksumId checksum; //checksum of the file.
             bool directory = false;
             IStorage::ResourceId resourceId;
@@ -35,7 +34,7 @@ public:
 
             uintmax_t getSize() const;
 
-            time_t getModificationTime() const;
+            fs::file_time_type getModificationTime() const;
 
             const ChecksumId &getChecksum() const;
 
@@ -61,16 +60,16 @@ public:
         private:
             bool deleted = false;
             //@todo store utc_clock value instead of old time_t
-            std::time_t deletionTime = 0;
+            fs::file_time_type deletionTime = fs::file_time_type::min();
 
         public:
             bool isDeleted() const;
 
             void setDeleted(bool deleted);
 
-            time_t getDeletionTime() const;
+            fs::file_time_type getDeletionTime() const;
 
-            void setDeletionTime(time_t deletionTime);
+            void setDeletionTime(fs::file_time_type deletionTime);
         };
 
     private:
@@ -97,7 +96,7 @@ public:
 
         auto end() -> decltype(attributesMap.end());
 
-        std::time_t getDeletionTime(const fs::path &path);
+        fs::file_time_type getDeletionTime(const fs::path &path);
 
         auto isDeleted(const fs::path &path) -> decltype(deleteMap[path].isDeleted());
 

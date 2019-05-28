@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include "Logger.h"
 #include "Poco/ConsoleChannel.h"
 
@@ -22,7 +23,8 @@ void Logger::error(std::string txt) {
 void Logger::debug(std::string txt) {
     std::lock_guard<std::mutex> g(getLock());
 //    logger.debug(txt);
-    std::clog << loggerName << " : " << txt << std::endl;
+//    std::clog << loggerName << " : " << txt << std::endl;
+    spdlog::debug(txt);
 }
 
 void Logger::info(std::string txt) {
@@ -33,4 +35,5 @@ void Logger::debug(int line, std::string txt) {
 
     std::lock_guard<std::mutex> g(getLock());
     std::clog << loggerName << " @ " << line << " : " << txt << std::endl;
+//    spdlog::info(txt);
 }

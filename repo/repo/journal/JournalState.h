@@ -49,8 +49,7 @@ private:
     fs::perms permissions = fs::perms::none;
     PathType path;
     uintmax_t size = 0;
-    //@todo maybe I should use time_point instead of old time_t? but which clock?
-    std::time_t modificationTime{};
+    fs::file_time_type modificationTime;
     //@todo bool or type? directory, file, socket, link...
     bool directory = false;
     ChecksumType checksum; //checksum of the file.
@@ -83,7 +82,7 @@ public:
 
     fs::perms getPermissions() const;
 
-    time_t getModificationTime() const {
+    fs::file_time_type getModificationTime() const {
         return modificationTime;
     }
 

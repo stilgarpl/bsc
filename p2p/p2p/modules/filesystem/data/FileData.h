@@ -20,7 +20,7 @@ private:
     std::string sha256hash;
     fs::perms permissions;
     uintmax_t size = 0;
-    std::time_t modificationTime = 0;
+    fs::file_time_type modificationTime = fs::file_time_type::min();
     bool isDirectory = false;
 
 public:
@@ -35,14 +35,15 @@ public:
 
     const uintmax_t &getSize() const;
 
-    const std::time_t &getModificationTime() const;
+    const fs::file_time_type &getModificationTime() const;
 
     explicit FileData(const fs::path &path);
 
-    FileData(const std::filesystem::path &canonicalPath, const std::string &sha256hash,
-             std::filesystem::perms permissions, uintmax_t size, time_t modificationTime, bool isDirectory);
+    FileData(std::filesystem::path canonicalPath, std::string sha256hash,
+             std::filesystem::perms permissions, uintmax_t size, fs::file_time_type modificationTime, bool isDirectory);
 
-    FileData(const std::string &sha256hash, std::filesystem::perms permissions, uintmax_t size, time_t modificationTime,
+    FileData(std::string sha256hash, std::filesystem::perms permissions, uintmax_t size,
+             fs::file_time_type modificationTime,
              bool isDirectory);
 };
 
