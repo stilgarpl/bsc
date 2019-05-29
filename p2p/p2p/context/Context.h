@@ -153,7 +153,7 @@ public:
     //@todo non-const context does set parent but const doesn't. WHY?
 //    Context &operator+=(const Context::Ptr other);
 
-    Context &operator+=(Context::Ptr other);
+    Context &operator+=(const Context::Ptr &other);
 
     Context(const Context &other);
 

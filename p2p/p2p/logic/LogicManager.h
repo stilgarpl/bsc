@@ -42,7 +42,6 @@ public:
         }
     }
 
-    //@todo perhaps getAction<EventType should be getAction<const std::decay(EventType)&> ?
     template<typename EventType, typename... Args, typename ActionId>
     auto getAction(ActionId actionId) {
         return actionManager.getAction<const typename std::decay<EventType>::type &, Args...>(actionId);
@@ -123,21 +122,6 @@ public:
         });
     }
 
-//    //@todo this could probably removed and I could just emit events from chains directly using autosource... but maybe it's useful?
-//    template<template<typename> typename container,typename RetType, typename... Args, typename ActionIdType>
-//    void setActionExtendedPack(ActionIdType id, std::function<container<typename std::decay<RetType>::type>(Args...)> func) {
-//        actionManager.setAction<Args...>(id, [=](Args... args) {
-//            //@todo by value?
-//            container<RetType> retPack = func(args...);
-//            for (const auto &ret : retPack) {
-//                if (ret.isEventValid()) {
-//                    sourceManager.event(ret);
-//                }
-//            }
-//
-//        });
-//    }
-
     LogicManager(const LogicManager &) = delete;
 
     LogicManager() = default;
@@ -161,13 +145,6 @@ public:
         join();
     }
 
-//
-//    //@todo think about it -> I'm not convinced event generation should be here (events should be fired from sources), but it's required by ILogicModule smart logic setup (I could make a separate source just for that... )
-//    template<typename T, typename... Args>
-//    void event(const T &event, Args... args) {
-//
-//        sourceManager.event<T, Args...>(event, args...);
-//    }
 
 };
 

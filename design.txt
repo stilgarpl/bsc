@@ -241,7 +241,7 @@ Poprawić metody z NodeNetModule, zeby uniknąć poprawiania większośći kodu,
     * disconnect
 
 
-here's an idea: CONTEXT STACK! pushActiveContext, popActiveContext @todo think about it
+here's an idea: CONTEXT STACK! pushActiveContext, popActiveContext //implemented as SetLocalContext
 
 mysle, ze trzeba context przeniesc na shared_ptr. w tym momencie event trzyma context* i w przypadku gdy remote node zostanie usuniety, eventy z kolejek mogą zaliczyć segfaulty
 
@@ -336,7 +336,6 @@ LogicStateMachine<TransferQueue>(this) ?
 niektóre eventy (jak state eventy) powinny się wykonywać w kolejności, inaczej nie ma to sensu.
 mozna to zrobic albo flagą w IEvent, numerem kolejki przetwarzania, execution policy albo czyms takim. wazne jest, zeby eventy z tego samego source z ustawionym tym szły sekwencyjnie.
 
-//@todo "przeciążyć" when i LogicChainHelper by móc dodać runModuleCommand()
 
 EventChainHelper - dodać optional std::function<bool(EventType)> constraint, która będzie ograniczać eventy
 
@@ -344,7 +343,7 @@ np. state<Transfer>(STARTED).entered() ustawiłoby constraint na if (event.metho
 
 if (constraint(event)) action(event);
 
-//@todo CONTEXT STACK! przyda sie w event() i podobnych. ContextStack stack(newActiveContext); - przywraca poprzedni kontekst w destruktorze
+done CONTEXT STACK! przyda sie w event() i podobnych. ContextStack stack(newActiveContext); - przywraca poprzedni kontekst w destruktorze
 
 LogicManager (albo SourceManager raczej) powinien mieć ExecutionPolicy dla Eventów
 

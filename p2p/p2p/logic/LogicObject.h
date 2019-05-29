@@ -165,7 +165,6 @@ public:
 
     public:
         const std::optional<ChainIdType> &getChainId() const {
-            //@todo return this or optional?
             return chainId;
         }
 

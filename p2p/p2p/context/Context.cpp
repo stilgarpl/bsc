@@ -52,7 +52,7 @@ Context::Context(const Context &other) {
 //    return *this;
 //}
 
-Context &Context::operator+=(Context::Ptr other) {
+Context &Context::operator+=(const Context::Ptr &other) {
     std::lock_guard<std::recursive_mutex> guard(contextLock);
 
     for (auto &&item : other->data) {
@@ -60,7 +60,6 @@ Context &Context::operator+=(Context::Ptr other) {
         this->data[item.first] = item.second;
     }
 
-    //@todo think about this:
     setParentContext(other);
     return *this;
 }

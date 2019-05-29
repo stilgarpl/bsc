@@ -48,7 +48,7 @@ public:
     NodeModule(INode &node, ModuleIdType moduleId) : ILogicModule(node), moduleId(std::move(moduleId)) {}
 };
 
-
+//@todo maybe remove DependencyManaged, I don't think it's required. modules are now async, they don't have to be sorted
 template<typename T, typename ... Args>
 class NodeModuleDependent : public NodeModule, public DependencyManaged<T> {
 public:

@@ -14,9 +14,7 @@
 
 
 class ISource {
-private:
 protected:
-    ///@todo protected or maybe private?
     SourceManager &sourceManager;
 public:
     explicit ISource(SourceManager &sourceManager);
@@ -29,11 +27,6 @@ protected:
 
         sourceManager.event(event, args...);
 
-//        //@todo pass to executor
-//        Context::setActiveContext(&context);
-//        /*int a =*/ this->getSignal<T, Args...>(event.getEventId()).signal(event, args...);
-//        /*int b =*/ this->getSignal<T, Args...>().signal(event, args...);
-//        // LOGGER("event : a "+ std::to_string(a)+ " b:" + std::to_string(b));
     }
 
 
