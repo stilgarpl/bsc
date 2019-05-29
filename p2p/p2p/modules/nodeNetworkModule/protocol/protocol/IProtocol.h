@@ -63,6 +63,8 @@ public:
     virtual std::future<BasePacketPtr>
     send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) = 0;
 
+    void testMethod(std::string);
+
     std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p);
 
     template<enum Status status = Status::RESPONSE, typename SendType>

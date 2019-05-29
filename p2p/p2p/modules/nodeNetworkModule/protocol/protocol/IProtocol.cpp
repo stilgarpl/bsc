@@ -4,6 +4,7 @@
 
 #include <p2p/logic/sources/ClockSource.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h>
+#include <p2p/logic/evaluators/CommonEvaluators.h>
 #include "IProtocol.h"
 
 
@@ -52,6 +53,8 @@ bool IProtocol::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     when(event<Tick>(800ms)).runMethod(this, &IProtocol::work);
     when(event<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED)).runMethod(&IProtocol::onConnectionEvent);
 
+    when(event<Tick>(800ms)).runGenericMethod(&IProtocol::testMethod, CommonEvaluators::value("PROTO"));
+
     return result;
 }
 
@@ -65,4 +68,9 @@ IProtocol::IProtocol(LogicManager &logicManager) : LogicObject(logicManager) {}
 
 std::future<BasePacketPtr> IProtocol::send(Connection *conn, BasePacketPtr p) {
     return this->send(conn, std::move(p),Status::RESPONSE);
+}
+
+void IProtocol::testMethod(std::string a) {
+    LOGGER("test method " + a);
+
 }

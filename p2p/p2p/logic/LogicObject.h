@@ -1,7 +1,3 @@
-#include <utility>
-
-#include <utility>
-
 //
 // Created by stilgar on 06.07.18.
 //
@@ -9,7 +5,7 @@
 #ifndef BASYCO_LOGICOBJECT_H
 #define BASYCO_LOGICOBJECT_H
 
-
+#include <utility>
 #include "LogicManager.h"
 #include <p2p/logic/sources/AutoSource.h>
 #include <p2p/logic/events/LogicStateEvent.h>
@@ -20,6 +16,7 @@
 #include <p2p/logic/chain/GlobalChainContext.h>
 #include <p2p/logic/chain/ChainGroup.h>
 #include <p2p/logic/chain/LockConfiguration.h>
+
 
 //@todo replace Args... with AdditionalEventArgs... or sth
 
@@ -348,10 +345,26 @@ public:
 //            return fireNewAction(std::bind_front(f,type,methodArgs...));
 //        }
 
+        template<typename Type, typename ... MethodArgs, typename ... Evaluators>
+        auto runGenericMethod(Type *type, void(Type::*f)(MethodArgs...), Evaluators... evaluators) {
+
+            return fireNewAction([=](const typename std::decay<EventType>::type &e) {
+                (type->*f)(evaluators(e)...);
+            });
+        }
+
+        template<typename Type, typename ... MethodArgs, typename ... Evaluators>
+        auto runGenericMethod(void(Type::*f)(MethodArgs...), Evaluators... evaluators) {
+
+            return fireNewAction([=, this](const typename std::decay<EventType>::type &e) {
+                (static_cast<Type *>(&logicObject)->*f)(evaluators(e)...);
+            });
+        }
+
         template<typename GenericFunc, typename ... Evaluators>
         auto fireNewGenericAction(GenericFunc genericFunc, Evaluators... evaluators) {
             LOGGER("fireNewGenericAction - normal")
-            return fireNewAction([=](EventType e) {
+            return fireNewAction([=](const typename std::decay<EventType>::type &e) {
                 genericFunc(evaluators(e)...);
             });
 
