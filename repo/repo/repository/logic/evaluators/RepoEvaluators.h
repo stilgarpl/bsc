@@ -29,7 +29,7 @@ struct RepoEvaluators {
                 e.getPacket()->getRepoId())->getJournal();
     };
 
-    static constexpr auto getRepoId = [](auto e) {
+    static constexpr auto getRepoId = [](const auto &e) {
         LOGGER("currentJournalFromRepoQueryResponse event")
         //@todo error handling.
         return e.getPacket()->getRepoId();

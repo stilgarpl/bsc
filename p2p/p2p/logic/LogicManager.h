@@ -32,7 +32,7 @@ public:
 //            std::cerr << "Provider doesn't exist: " << typeid(EventType).name() << std::endl;
 //            return false;
 //        }
-        auto &&action = actionManager.getAction<EventType, Args...>(actionId);
+        auto &&action = actionManager.getAction<const typename std::decay<EventType>::type &, Args...>(actionId);
         if (action) {
             auto ret = sourceManager.registerTrigger<EventType, Args...>(eventId, *action);
             return ret > 0;
@@ -42,14 +42,15 @@ public:
         }
     }
 
+    //@todo perhaps getAction<EventType should be getAction<const std::decay(EventType)&> ?
     template<typename EventType, typename... Args, typename ActionId>
     auto getAction(ActionId actionId) {
-        return actionManager.getAction<EventType, Args...>(actionId);
+        return actionManager.getAction<const typename std::decay<EventType>::type &, Args...>(actionId);
     }
 
     template<typename EventType, typename... Args, typename ActionId>
     bool assignAction(ActionId actionId) {
-        auto &&action = actionManager.getAction<EventType, Args...>(actionId);
+        auto &&action = actionManager.getAction<const typename std::decay<EventType>::type &, Args...>(actionId);
 //        if (!sourceManager.hasProvider<EventType>()) {
 //            std::cerr << "Provider doesn't exist: " << typeid(EventType).name() << std::endl;
 //        }
@@ -102,17 +103,20 @@ public:
     }
 
 
-    template<typename... Args, typename ActionIdType>
-    void setAction(ActionIdType id, ActionManager::ActionType<Args...> action) {
-        actionManager.setAction<Args...>(id, action);
+    template<typename EventType, typename... Args, typename ActionIdType>
+    void setAction(ActionIdType id,
+                   ActionManager::ActionType<const typename std::decay<EventType>::type &, Args...> action) {
+        actionManager.setAction<const typename std::decay<EventType>::type &, Args...>(id, action);
     }
 
     //@todo this could probably removed and I could just emit events from chains directly using autosource... but maybe it's useful?
-    template<typename RetType, typename... Args, typename ActionIdType>
-    void setActionExtended(ActionIdType id, std::function<typename std::decay<RetType>::type(Args...)> func) {
-        actionManager.setAction<Args...>(id, [=, this](Args... args) {
+    template<typename RetType, typename EventType, typename... Args, typename ActionIdType>
+    void setActionExtended(ActionIdType id, std::function<typename std::decay<RetType>::type(
+            const typename std::decay<EventType>::type &, Args...)> func) {
+        actionManager.setAction<const typename std::decay<EventType>::type &, Args...>(id, [=, this](
+                const typename std::decay<EventType>::type &e, Args... args) {
             //@todo by value?
-            RetType ret = func(args...);
+            RetType ret = func(e, args...);
             if (ret.isEventValid()) {
                 sourceManager.event(ret);
             }

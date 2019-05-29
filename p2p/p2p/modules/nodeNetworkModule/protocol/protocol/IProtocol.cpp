@@ -41,22 +41,17 @@ DummyProtocol::DummyProtocol(LogicManager &logicManager) : IProtocol(logicManage
 
 
 void IProtocol::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
-    actionHelper.setAction<PacketEvent>(Actions::onPacketSent, std::bind(&IProtocol::onPacketSent, this, _1));
-    actionHelper.setAction<PacketEvent>(Actions::onPacketReceived,
-                                        std::bind(&IProtocol::onPacketReceived, this, _1));
-    actionHelper.setAction<Tick>(Actions::onWork, std::bind(&IProtocol::work, this, _1));
-    actionHelper.setAction<ConnectionEvent>("protocolConnectionClosed",
-                                            std::bind(&IProtocol::onConnectionEvent, this, _1));
+
 
 }
 
 bool IProtocol::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     bool result = true;
-    result &= actionHelper.assignAction<PacketEvent>(PacketEvent::IdType::PACKET_SENT, Actions::onPacketSent);
-    result &= actionHelper.assignAction<PacketEvent>(PacketEvent::IdType::PACKET_RECEIVED, Actions::onPacketReceived);
-    result &= actionHelper.assignAction<Tick>(800ms, Actions::onWork);
-    result &= actionHelper.assignAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED,
-                                                         "protocolConnectionClosed");
+    when(event<PacketEvent>(PacketEvent::IdType::PACKET_SENT)).runMethod(this, &IProtocol::onPacketSent);
+    when(event<PacketEvent>(PacketEvent::IdType::PACKET_RECEIVED)).runMethod(this, &IProtocol::onPacketReceived);
+    when(event<Tick>(800ms)).runMethod(this, &IProtocol::work);
+    when(event<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED)).runMethod(this, &IProtocol::onConnectionEvent);
+
     return result;
 }
 
