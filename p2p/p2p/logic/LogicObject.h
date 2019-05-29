@@ -169,6 +169,7 @@ public:
             return chainId;
         }
 
+        //@todo maybe this should return mutex guard? so obtained lock can be maintained through whole execution of chain block?
         static void
         obtainChainLock(const std::optional<ChainLockIdType> &chainLockId, InstanceType instance, bool lock) {
             //@todo mutex synchronize this whole method? on mutex from chainLock?
@@ -192,7 +193,9 @@ public:
                 }
             }
             if (lock) {
+                guard.unlock();
                 chainLock.lock(instance);
+                guard.lock();
             }
             LOGGER("LOCK OBTAINED " + *chainLockId)
         }
@@ -205,9 +208,10 @@ public:
                 LOGGER("RELEASE BEFORE " + *chainLockId)
                 std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
                 //@todo check instance.
-                if (chainLock.isLocked()) {
-                    chainLock.unlock();
+                while (chainLock.isLocked() && chainLock.getInstance() != instance) {
+                    chainLock.waitForUnlock();
                 }
+                chainLock.unlock();
                 LOGGER("RELEASE AFTER")
             } else {
                 //@todo error handling
@@ -539,7 +543,7 @@ public:
             } else { //Return Type of func is void
 
                 std::function<void(const ChainEvent<EventType> &)> f = [=, chainId = chainId](
-                        ChainEvent<EventType> chainedEvent) {
+                        const ChainEvent<EventType> &chainedEvent) {
                     LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
                            chainedEvent.getEventId())
 

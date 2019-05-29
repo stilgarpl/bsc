@@ -38,14 +38,6 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     ret &= actionHelper.assignAction<JournalResponseEvent>("journalReceive");
     ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
 
-    //@todo implements all those required methods.
-//    when(TimeConditions::every(15s)).fireNewGenericAction(LOGGER("super secret generic action");
-
-
-//    when(TimeConditions::every(15s)).newChain("lockTest").lockChain().fireNewGenericChainAction([]{LOGGER("LOCK TEST secret generic action");})
-//            .fireNewGenericChainAction([]{std::this_thread::sleep_for(18s);LOGGER("LOCK TEST super 2 action ");})
-//            .fireNewGenericChainAction([]{LOGGER("LOCK TEST super 2 action ");}).unlockChain();
-
     auto updateChainGroup = chainGroup("updateChain");
 
     when(TimeConditions::every(60s))
@@ -113,6 +105,13 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
                                                TriggerEvaluators::triggerValue,
                                                ChainEvaluators::chainResult(syncStart)))
             .unlockChain();
+
+//    when(event<Tick>(100ms)).newChain("dupaChain").lockChain(LockConfiguration::chain()).fireNewChainAction([](auto e){
+//        LOGGER("gen1")
+//        std::this_thread::sleep_for(1s);
+//        LOGGER("gen2")
+//        return e;
+//    }).unlockChain();
     //debug
 //    stage1.lockChain()
 //            .fireNewGenericChainAction([]() { LOGGER("super secret generic action"); })

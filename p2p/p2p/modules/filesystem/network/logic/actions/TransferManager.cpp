@@ -116,16 +116,16 @@ void TransferManager::sendData(const TransferEvent &event) {
         transferDescriptor->getInputStream()->read(rawData, event.getEnd() - event.getBegin());
         fileContents.assign(rawData, rawData + sizeof rawData / sizeof rawData[0]);
 
-        //@todo insert ACTUAL begin and end read from stream (in case stream in shorter than requested)
+        //@todo insert ACTUAL begin and end read from stream (in case stream is shorter than requested)
         response->setBegin(event.getBegin());
         response->setEnd(event.getEnd());
         //@todo make sure this isn't copying the data for the third time
-        response->setData(std::move(fileContents));
+        response->setData(fileContents);
         connection.send(response);
     }
 }
 
-void TransferManager::saveDataChunk(std::shared_ptr<std::ostream> outputStream, const TransferSize &begin,
+void TransferManager::saveDataChunk(const std::shared_ptr<std::ostream> &outputStream, const TransferSize &begin,
                                     const TransferSize &end, const RawDataType &data) {
 
 

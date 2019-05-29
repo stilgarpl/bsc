@@ -19,6 +19,7 @@ void ChainLock::lock(InstanceType newInstance) {
     LOGGER("LOCK " + std::to_string(newInstance))
     std::unique_lock<std::recursive_mutex> guard(_lock);
     if (_locked) {
+        LOGGER("waiting for lock")
         chainReady.wait(guard, [this, newInstance] { return !_locked || (_instance && *_instance == newInstance); });
     }
     LOGGER("LOCKING ACTUALLY")

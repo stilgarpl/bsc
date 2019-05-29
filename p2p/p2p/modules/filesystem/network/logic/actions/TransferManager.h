@@ -193,7 +193,7 @@ public:
     void transferProperties(const TransferEvent &event);
 
     static void
-    saveDataChunk(std::shared_ptr<std::ostream> outputStream, const TransferSize &begin, const TransferSize &end,
+    saveDataChunk(const std::shared_ptr<std::ostream> &outputStream, const TransferSize &begin, const TransferSize &end,
                   const RawDataType &data);
 
     std::shared_ptr<TransferQueue> transferQueue() {
