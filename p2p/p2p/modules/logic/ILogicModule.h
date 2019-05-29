@@ -65,13 +65,15 @@ public:
             return *this;
         }
 
-        ModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, INode &node)
-                : SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...>(eventHelper, l), node(node) {}
+        ModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, LogicObject &lo,
+                               INode &node)
+                : SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...>(eventHelper, l, lo),
+                  node(node) {}
 
         template<typename NewThisType>
-        ModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l,
+        ModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, LogicObject &lo,
                                const NewThisType &self)
-                : SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...>(eventHelper, l, self),
+                : SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...>(eventHelper, l, lo, self),
                   node(self.node) {
 
         }
@@ -94,7 +96,7 @@ public:
 
     template<typename EventType, typename ... Args>
     ModuleLogicChainHelper<EventType, Args...> when(const EventHelper<EventType, Args...> eventHelper) {
-        return ModuleLogicChainHelper<EventType, Args...>(eventHelper, logicManager, node);
+        return ModuleLogicChainHelper<EventType, Args...>(eventHelper, logicManager, *this, node);
     }
 
 //    template<typename EventType, typename ... Args>

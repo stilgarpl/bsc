@@ -47,10 +47,10 @@ void IProtocol::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
 
 bool IProtocol::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     bool result = true;
-    when(event<PacketEvent>(PacketEvent::IdType::PACKET_SENT)).runMethod(this, &IProtocol::onPacketSent);
-    when(event<PacketEvent>(PacketEvent::IdType::PACKET_RECEIVED)).runMethod(this, &IProtocol::onPacketReceived);
+    when(event<PacketEvent>(PacketEvent::IdType::PACKET_SENT)).runMethod(&IProtocol::onPacketSent);
+    when(event<PacketEvent>(PacketEvent::IdType::PACKET_RECEIVED)).runMethod(&IProtocol::onPacketReceived);
     when(event<Tick>(800ms)).runMethod(this, &IProtocol::work);
-    when(event<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED)).runMethod(this, &IProtocol::onConnectionEvent);
+    when(event<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED)).runMethod(&IProtocol::onConnectionEvent);
 
     return result;
 }
