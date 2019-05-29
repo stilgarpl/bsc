@@ -7,7 +7,6 @@
 
 
 #include <Poco/Net/StreamSocket.h>
-#include <Poco/Net/SocketStream.h>
 #include "Connection.h"
 
 class ClientConnection : public Connection {

@@ -7,13 +7,8 @@
 
 
 #include <string>
-
-#include <list>
-#include <Poco/Net/SocketAddress.h>
-#include <cereal/access.hpp>
-//#include "Node.h"
-#include "p2p/utils/cereal_include.h"
-
+#include <iostream>
+#include <p2p/utils/cereal_include.h>
 
 typedef std::string NodeIdType;
 typedef std::string NetworkIdType;

@@ -295,6 +295,7 @@ public:
             return *static_cast<ThisType *>(this);
         }
 
+        //@todo this should be separate generator and should generate one specific type that is different so no one would make collisions.
         template<typename ActionId>
         auto generateActionId() {
             //@todo maybe create a version that will also work with strings? I have a lot of strings...

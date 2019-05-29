@@ -33,10 +33,10 @@ endif ()
 
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    add_compile_options(-lstdc++fs -Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic)
+    add_compile_options(-Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic)
     if (LINUX)
         add_compile_options(-pthread)
-        add_link_options(-lpthread)
+        add_link_options(-lpthread -lstdc++fs)
     endif ()
 
     #    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -lstdc++fs -Wall -Wno-unused-local-typedefs -pedantic")
@@ -46,6 +46,10 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         add_compile_options("/DNOMINMAX")
     endif ()
 endif ()
+
+
+# Generate clang compilation database
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 add_subdirectory(p2p)
