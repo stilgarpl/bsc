@@ -86,20 +86,19 @@ int main(int argc, char *argv[]) {
     setupCommands(cmdN.get());
     cmdN->setInteractive(false);
     //@todo better way of running stuff from commandline
-    std::string commandLine = "remote daemon";
+    std::vector<std::string> commands;
     for (int i = 1; i < argc; ++i) {
-        commandLine += " ";
-        commandLine += argv[i];
+        commands.emplace_back(argv[i]);
     }
+
 
 
     thisNode.start();
     thisNode.waitUntilStarted();
 //@todo get actual daemon address from configuration
-    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+    auto daemonNode = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
     //@todo find a better way to wait for connection
-    std::this_thread::sleep_for(100ms);
-    cmdN->runLine(commandLine);
+    cmdN->sendCommandToRemoteNode(daemonNode, commands);
     thisNode.stop();
 
     thisNode.waitToFinish();

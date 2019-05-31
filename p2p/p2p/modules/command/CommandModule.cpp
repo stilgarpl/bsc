@@ -90,6 +90,33 @@ void CommandModule::sendRemoteCommand(ArgumentContainerType args) {
     }
 }
 
+void CommandModule::sendCommandToRemoteNode(RemoteNode &remoteNode, ArgumentContainerType args) {
+    //@todo unify this and sendRemoteCommand
+    LOGGER("send remote")
+    //@todo add checking if the number of parameters is correct
+    if (args.size() >= 1) {
+        std::string command = args[0];
+        std::vector<std::string> rest(args.begin() + 1, args.end());
+
+        auto netModule = node.getModule<NodeNetworkModule>();
+        CommandPacket::Request::Ptr packet = CommandPacket::Request::getNew();
+        //CommandPacket::Request* packet;
+        packet->setData(rest);
+        packet->setCommandName(command);
+        LOGGER("sending packet ")
+        auto res = remoteNode.sendRequestToNode(packet);
+
+        if (res && res->isRunStatus()) {
+            LOGGER("remote run successful")
+        } else {
+            LOGGER("remote run failure")
+        }
+
+
+    }
+}
+
+
 void CommandModule::broadcastRemoteCommand(const std::vector<std::string> &args) {
     LOGGER("send broadcast")
     //@todo add checking if the number of parameters is correct

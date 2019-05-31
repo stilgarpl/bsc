@@ -12,6 +12,7 @@
 #include <p2p/node/NodeModule.h>
 #include <p2p/node/Node.h>
 #include <p2p/utils/from_string.h>
+#include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
 
 class DummyCommandEvent : public IEvent<int> {
 
@@ -359,6 +360,8 @@ public:
 
 
     void sendRemoteCommand(ArgumentContainerType args);
+
+    void sendCommandToRemoteNode(RemoteNode &remoteNode, ArgumentContainerType args);
 
     void broadcastRemoteCommand(ArgumentContainerType args);
 

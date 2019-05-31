@@ -20,7 +20,7 @@ class NetworkInfo {
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(networkId, knownNodes);
+        ar(CEREAL_NVP(networkId), CEREAL_NVP(knownNodes));
     }
 
 

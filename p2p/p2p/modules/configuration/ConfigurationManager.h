@@ -9,6 +9,7 @@
 #include <fstream>
 #include <p2p/log/Logger.h>
 #include <p2p/utils/cereal_include.h>
+#include "DataFileNotFoundException.h"
 
 namespace fs = std::filesystem;
 
@@ -85,7 +86,7 @@ public:
             archive >> data;
 
         } else {
-            //@todo throw file not found exception
+            throw DataFileNotFoundException();
         }
         return data;
     }
