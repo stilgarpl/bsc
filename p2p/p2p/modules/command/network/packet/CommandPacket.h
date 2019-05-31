@@ -14,15 +14,10 @@ public:
 
     class Request : public Packet<CommandPacket, CommandPacket::Request> {
     private:
-        std::vector<std::string> modules;
         std::string commandName;
         std::vector<std::string> data;
     public:
         void process(Context::Ptr context) override;
-
-        const std::vector<std::string> &getModules() const;
-
-        void setModules(const std::vector<std::string> &modules);
 
         const std::string &getCommandName() const;
 
@@ -37,7 +32,7 @@ public:
         void serialize(Archive &ar) {
             ar & cereal::base_class<Packet<CommandPacket, CommandPacket::Request>>(this);
 
-            ar(modules, commandName, data);
+            ar(commandName, data);
         }
 
 

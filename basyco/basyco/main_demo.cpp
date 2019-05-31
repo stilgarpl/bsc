@@ -18,7 +18,6 @@
 #include <p2p/modules/auth/AuthModule.h>
 
 
-
 using namespace std::chrono_literals;
 
 #include <repo/journal/SimpleJournal.h>

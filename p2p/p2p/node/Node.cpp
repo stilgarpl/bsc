@@ -21,24 +21,23 @@ Node::~Node() {
 
 
 void Node::start() {
-
+    std::unique_lock<std::mutex> g(startMutex);
     initialize();
-
     logicManager.start();
-
     startModules();
-
+    started = true;
+    startedReady.notify_all();
 
 }
 
 void Node::stop() {
-
+    std::unique_lock<std::mutex> g(startMutex);
+    started = false;
     shutdownModules();
     //@todo wait for shutdown to complete, sleep will do for now
-    std::this_thread::sleep_for(1s);
+    std::this_thread::sleep_for(100ms);
     logicManager.stop();
     stopModules();
-
 }
 
 
@@ -124,6 +123,11 @@ void Node::shutdownModules() {
 void Node::saveConfiguration() {
     forEachModule(&INodeModule::doSaveConfiguration);
 
+}
+
+void Node::waitUntilStarted() {
+    std::unique_lock<std::mutex> g(startMutex);
+    startedReady.wait_for(g, 10ms, [this] { return started; });
 }
 
 Node::Configuration::Configuration() {

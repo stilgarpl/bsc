@@ -15,17 +15,7 @@ void CommandActions::runCommand(const CommandEvent &commandEvent) {
         Connection &connection = connectionContext->getConnection();//commandEvent.origin();
         auto commandModule = nc->getNode().getModule<CommandModule>();
         if (commandModule != nullptr) {
-            bool runStatus = false;
-            if (commandEvent.getModules().empty()) {
-                runStatus = commandModule->runCommand(commandEvent.getCommandName(), commandEvent.getData());
-            } else {
-                CommandModule::CommandSubModule *pSubModule = &commandModule->submodule(commandEvent.getModules()[0]);
-                for (unsigned int i = 1/* 1, we already have the 0th */; i < commandEvent.getModules().size(); ++i) {
-                    pSubModule = &pSubModule->submodule(commandEvent.getModules()[i]);
-                }
-                runStatus = pSubModule->runCommand(commandEvent.getCommandName(), commandEvent.getData());
-
-            }
+            bool runStatus = commandModule->runCommand(commandEvent.getCommandName(), commandEvent.getData());
             CommandPacket::Response::Ptr res = CommandPacket::Response::getNew(commandEvent.getRequestId());
             res->setRunStatus(runStatus);
             connection.send(res);

@@ -14,7 +14,7 @@ public:
 
     CommandSource(SourceManager &sourceManager);
 
-    void commandReceived(const BasePacket::IdType &id, const std::vector<std::string> &modules,
+    void commandReceived(const BasePacket::IdType &id,
                          const std::string &commandName,
                          const std::vector<std::string> &data);
 };

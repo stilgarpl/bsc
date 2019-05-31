@@ -12,16 +12,8 @@ void CommandPacket::Request::process(Context::Ptr context) {
     auto lc = context->get<LogicContext>();
     if (lc != nullptr) {
         auto commnandSource = lc->getLogicManager().getSource<CommandSource>();
-        commnandSource->commandReceived(this->getId(), this->modules, this->commandName, this->data);
+        commnandSource->commandReceived(this->getId(), this->getCommandName(), this->getData());
     }
-}
-
-const std::vector<std::string> &CommandPacket::Request::getModules() const {
-    return modules;
-}
-
-void CommandPacket::Request::setModules(const std::vector<std::string> &modules) {
-    Request::modules = modules;
 }
 
 const std::string &CommandPacket::Request::getCommandName() const {

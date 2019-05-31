@@ -13,10 +13,14 @@
 #
 #message(libs:: ${LIBS})
 
-set(SOURCE_FILES basyco/main.cpp)
-add_executable(basyco ${SOURCE_FILES})
+set(SOURCE_FILES)
+add_executable(basyco-demo basyco/main_demo.cpp)
+add_executable(basyco-control basyco/main_control.cpp)
+add_executable(basyco-daemon basyco/main_daemon.cpp)
 #target_include_directories(basyco PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 #target_include_directories(basyco PUBLIC p2p)
-target_link_libraries(basyco repo)
-install(TARGETS basyco COMPONENT basyco)
+target_link_libraries(basyco-demo repo)
+target_link_libraries(basyco-control repo)
+target_link_libraries(basyco-daemon repo)
+install(TARGETS basyco-demo basyco-daemon basyco-control COMPONENT basyco)
 

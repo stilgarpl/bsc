@@ -250,7 +250,7 @@ public:
 
     }
 
-    bool runCommand(std::string commandName, ArgumentContainerType arguments) {
+    bool runCommand(const std::string &commandName, ArgumentContainerType arguments) {
 
         if (submodules.count(commandName) > 0 && arguments.size() > 1) {
             //@todo type
@@ -285,7 +285,7 @@ private:
 public:
 
 
-    void runLine(std::string line) {
+    void runLine(const std::string &line) {
         LOGGER("Command: " + line);
         //explode command into words
         auto words = explode(line, ' ');

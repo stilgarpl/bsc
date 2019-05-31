@@ -533,3 +533,6 @@ idea jest taka, ze chainy sie lockuja zgodnie z zadana konfiguracja. chainy ze w
 
 
 @todo maybe add timeout to chainlocking - for example, if chains are triggered more often than it takes to process them, they will pile up. kolejka będzie się nawarstwiać aż ram sie skończy. zamiast tego chain po czekaniu na locka zbyt długo powinien przerwać chain.
+
+@todo basyco-control ma miec tylko Command module który w dodatku wszystkie komendy zmienia w "remote daemon $@"
+@todo dodac jakiś mechanizm zwracania odpowiedzi z daemona, nie tylko jako SUCCESS/FAILURE
