@@ -16,7 +16,6 @@ private:
     AutoSource source;
 
 public:
-    void work() override;
 
     explicit TriggerSource(SourceManager &sourceManager);
 
@@ -31,6 +30,12 @@ public:
         LOGGER("firing trigger " + triggerId + " with value " + value)
         source.generateEvent<TriggerEvent<TriggerIdType, TriggerValueType>>(triggerId, value);
     }
+
+    void run() override;
+
+    void onStop() override;
+
+    void onStart() override;
 
 };
 

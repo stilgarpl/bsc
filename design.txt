@@ -536,3 +536,6 @@ idea jest taka, ze chainy sie lockuja zgodnie z zadana konfiguracja. chainy ze w
 
 @todo basyco-control ma miec tylko Command module który w dodatku wszystkie komendy zmienia w "remote daemon $@"
 @todo dodac jakiś mechanizm zwracania odpowiedzi z daemona, nie tylko jako SUCCESS/FAILURE
+
+
+trzeba zreorganizować Source. busy loop i metoda work() to zło. na moim laptopie basyco w idlu bierze 10% cpu. każdy source zamiast tego powinien sobie chodzić we własnym wątku i czekać na cokolwiek go wybudza. większość sourceów to i tak EventQueueSource w jakimś opakowaniu, który ma tą zmianę banalną. Z AutoSource może być lekki problem, bo on ma ubera eventqueuesourceów, ale na pewno da sie to jakoś zrobić.

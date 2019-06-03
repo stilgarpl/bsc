@@ -6,22 +6,13 @@
 #include "ISource.h"
 #include "SourceManager.h"
 
-void SourceManager::addSource(std::shared_ptr<ISource> source) {
+void SourceManager::addSource(const std::shared_ptr<ISource> &source) {
     sources.push_back(source);
 //    source->setContext(commonContext);
 }
 
-void SourceManager::work() {
-    Context::setActiveContext(commonContext);
-    for (auto &&i : sources) {
-        if (i != nullptr) {
-            i->work();
-        }
-    }
 
-}
-
-void SourceManager::setContext(const Context::Ptr context) {
+void SourceManager::setContext(const Context::Ptr &context) {
 //    *commonContext += context;
     commonContext->setParentContext(context);
     commonContext->setDebug_id("source manager common context");
@@ -30,6 +21,23 @@ void SourceManager::setContext(const Context::Ptr context) {
     context->set<GlobalChainContext>();
 }
 
-SourceManager::SourceManager() {
-
+void SourceManager::startSources() {
+    Context::setActiveContext(commonContext);
+    for (auto &&source : sources) {
+        source->start();
+    }
 }
+
+void SourceManager::stopSources() {
+    for (auto &&source : sources) {
+        source->stop();
+    }
+}
+
+void SourceManager::joinSources() {
+    for (auto &&source : sources) {
+        source->join();
+    }
+}
+
+SourceManager::SourceManager() = default;

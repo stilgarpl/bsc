@@ -63,6 +63,12 @@ public:
 
 public:
 
+    void startSources();
+
+    void stopSources();
+
+    void joinSources();
+
     template<typename EventType, typename... Args>
     void event(const EventType &event, Args... args) {
 
@@ -151,7 +157,6 @@ private:
     Context::OwnPtr commonContext = Context::makeContext();
 public:
 
-    void work();
 
     template<typename SourceType, typename... Args>
     void addSource(Args... args) {
@@ -174,7 +179,7 @@ public:
     }
 
 protected:
-    void addSource(SourcePtr source);
+    void addSource(const SourcePtr &source);
 
     void removeSource(SourcePtr source) {
         sources.remove(source);
@@ -210,7 +215,7 @@ public:
 //            it->setContext(context);
 //        }
 //    }
-    void setContext(Context::Ptr context);
+    void setContext(const Context::Ptr &context);
 
 
 };

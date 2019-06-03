@@ -366,11 +366,7 @@ void NodeNetworkModule::onStart() {
 
 
 void NodeNetworkModule::run() {
-    //@todo find a better way to trigger onStop after run
-    //@todo just add conditional variable with predicate on !isStopping!
-    while (!isStopping()) {
-        std::this_thread::sleep_for(100ms);
-    }
+    waitForStop();
 }
 //
 //bool NodeNetworkModule::sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet) {

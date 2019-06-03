@@ -42,3 +42,11 @@ void ClockSource::setLastTick(ClockSource::duration d, ClockSource::time_point t
 }
 
 ClockSource::ClockSource(SourceManager &sourceManager) : ISource(sourceManager) {}
+
+void ClockSource::run() {
+//@todo implement actual version
+    while (!this->isStopping()) {
+        work();
+    }
+
+}

@@ -6,6 +6,7 @@
 #define BASYCO_SOURCE_H
 
 
+#include <p2p/thread/Runnable.h>
 #include "p2p/signal/Signal.h"
 #include "p2p/context/Context.h"
 #include "p2p/uber/Uber.h"
@@ -13,7 +14,7 @@
 #include "SourceManager.h"
 
 
-class ISource {
+class ISource : public Runnable {
 protected:
     SourceManager &sourceManager;
 public:
@@ -24,24 +25,13 @@ protected:
 
     template<typename T, typename... Args>
     void event(const T &event, Args... args) {
-
         sourceManager.event(event, args...);
-
     }
-
-
 public:
-
-
-
-
-
-
-    virtual void work() =0;
 
     void setContext(Context &context) {};
 
-    virtual ~ISource() = default;
+    ~ISource() override = default;
 
 };
 

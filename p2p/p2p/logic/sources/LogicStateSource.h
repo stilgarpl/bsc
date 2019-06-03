@@ -23,7 +23,6 @@ private:
         sourceManager.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
     }
 public:
-    void work() override;
 
     explicit LogicStateSource(SourceManager &sourceManager);
 
@@ -46,7 +45,13 @@ public:
         source.generateEvent<LogicStateEvent<Object, StateIdType>>(logicEvent);
     }
 
-    virtual ~LogicStateSource();
+    ~LogicStateSource() override;
+
+    void run() override;
+
+    void onStop() override;
+
+    void onStart() override;
 };
 
 

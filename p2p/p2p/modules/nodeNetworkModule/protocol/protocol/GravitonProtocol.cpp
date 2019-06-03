@@ -84,7 +84,7 @@ void GravitonProtocol::onConnectionEvent(const ConnectionEvent &event) {
 //        }
 
         for (auto &&item : responseMap) {
-            if (item.second->getConnection() == event.getConnection()) {
+            if (item.second == nullptr || item.second->getConnection() == event.getConnection()) {
                 responseMap.erase(item.first);
             }
         }

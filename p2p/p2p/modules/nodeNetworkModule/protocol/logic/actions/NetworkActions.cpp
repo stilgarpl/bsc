@@ -41,9 +41,13 @@ void NetworkActions::loadNetworkInfo(const ModuleEvent<NodeNetworkModule> &event
     auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
         auto &node = nodeContext->getNode();
-        //@todo handle failed load
-        event.getModule().getNetworkInfo() = std::make_shared<NetworkInfo>(
-                node.getConfigurationManager().loadData<NetworkInfo>("networkInfo.dat"));
+        try {
+            event.getModule().getNetworkInfo() = std::make_shared<NetworkInfo>(
+                    node.getConfigurationManager().loadData<NetworkInfo>("networkInfo.dat"));
+        } catch (DataFileNotFoundException &e) {
+            // data file not found
+            LOGGER("network data file not found")
+        }
     }
 }
 

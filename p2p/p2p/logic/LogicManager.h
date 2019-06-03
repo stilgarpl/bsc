@@ -99,9 +99,6 @@ public:
         return *getSource<SourceType>();
     }
 
-    void work() {
-        sourceManager.work();
-    }
 
 
     template<typename EventType, typename... Args, typename ActionIdType>
@@ -128,25 +125,15 @@ public:
 
     LogicManager() = default;
 
-    void run() override {
-        while (!isStopping()) {
-            //@todo cos wymyslec, zebyt to nie zżerało 100% cpu
-            //@todo I should remove busy loops from everywhere.
-            work();
-            //  std::this_thread::sleep_for(0s);
-            std::this_thread::sleep_for(1ms);
-        }
+    void run() override;
 
-    }
+    void onStop() override;
 
-    void setContexts(Context::Ptr context) {
-        sourceManager.setContext(std::move(context));
-    }
+    void onStart() override;
 
-    ~LogicManager() override {
-        stop();
-        join();
-    }
+    void setContexts(const Context::Ptr &context);
+
+    ~LogicManager() override;
 
 
 };

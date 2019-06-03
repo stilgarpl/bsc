@@ -77,7 +77,7 @@ public:
 
     BasePacketPtr receive();
 
-    explicit Connection(Context::Ptr context);
+    explicit Connection(const Context::Ptr &context);
 
     ConnectionProcessor &getProcessor();
 

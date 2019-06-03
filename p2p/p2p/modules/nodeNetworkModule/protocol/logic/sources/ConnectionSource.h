@@ -30,8 +30,6 @@ public:
 
     void droppedPacket(std::shared_ptr<BasePacket> p, Connection *connection);
 
-    void work() override;
-
     void connectionAccepted(Connection *c);
 
     void connectionEstablished(Connection *c);
@@ -50,6 +48,12 @@ private:
     void queuePacketEvent(T &t) {
         advancedPacketSource.generateEvent<T>(t);
     }
+
+    void run() override;
+
+    void onStop() override;
+
+    void onStart() override;
 };
 
 

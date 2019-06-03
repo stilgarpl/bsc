@@ -217,14 +217,15 @@ void Connection::stopReceiving() {
     try {
         getSocket().shutdown();
     } catch (const Poco::Net::NetException &e) {
-        e.what();
+        LOGGER(e.what());
     }
     //  receiveReady.notify_all();
 
     //  processor.stop();
 }
 
-Connection::Connection(Context::Ptr context) : processor(*this), connectionContext(Context::makeContext(context)) {
+Connection::Connection(const Context::Ptr &context) : processor(*this),
+                                                      connectionContext(Context::makeContext(context)) {
 
     connectionContext->set<ConnectionContext, Connection &>(*this);
 }

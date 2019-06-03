@@ -18,15 +18,20 @@ private:
 public:
     explicit AutoSource(SourceManager &sourceManager);
 
-    void work() override;
 
     template<typename EventType, typename ... Args>
     void generateEvent(Args... args) {
 //        LOGGER("generating event for type " + std::string(typeid(EventType).name()))
         auto &source = eventQueueSources.get<EventType, AutoSource>(std::ref(sourceManager));
+        //will only start the thread if not started already.
+        source.start();
         auto newEvent = source.newEvent(args...);
         source.queueEvent(newEvent);
     }
+
+    void onStop() override;
+
+    void run() override;
 
 };
 

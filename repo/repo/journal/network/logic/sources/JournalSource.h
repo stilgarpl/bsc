@@ -18,11 +18,15 @@ private:
 public:
     explicit JournalSource(SourceManager &sourceManager);
 
-    void journalRequested(std::string repoId, JournalGroup::Request::IdType requestId);
+    void journalRequested(const std::string &repoId, JournalGroup::Request::IdType requestId);
 
-    void journalReceived(std::string repoId, JournalPtr journal);
+    void journalReceived(const std::string &repoId, const JournalPtr &journal);
 
-    void work() override;
+    void run() override;
+
+    void onStop() override;
+
+    void onStart() override;
 
 };
 

@@ -21,13 +21,14 @@ protected:
 public:
     typedef std::shared_ptr<EventType_> EventTypePtr;
 private:
-    //@todo thread safety
     std::mutex queueLock;
+    std::condition_variable queueReady;
     std::queue<EventTypePtr> eventQueue;
 protected:
     void queueEvent(EventTypePtr event) {
         std::lock_guard<std::mutex> g(queueLock);
         eventQueue.push(event);
+        queueReady.notify_one();
     }
 
     template<typename ... Args>
@@ -37,27 +38,32 @@ protected:
 public:
     explicit EventQueueSource(SourceManager &sourceManager) : ISource(sourceManager) {}
 
-    void work() override {
+
+    void run() override {
         //std::lock_guard<std::mutex> g(queueLock);
-        queueLock.lock();
-        while (!eventQueue.empty()) {
-            //  NODECONTEXTLOGGER("Processing event");
-            //@todo better locking and unlocking of mutex
+        std::unique_lock<std::mutex> g(queueLock);
+        g.unlock();
+        while (!this->isStopping()) {
+            g.lock();
+            //@todo 1s or other value?
+            queueReady.wait_for(g, 1s, [&]() -> bool { return (!eventQueue.empty() || this->isStopping()); });
+            while (!eventQueue.empty()) {
+                //  NODECONTEXTLOGGER("Processing event");
+                //@todo better locking and unlocking of mutex
 
-            EventTypePtr i = eventQueue.front();
-            eventQueue.pop();
-            queueLock.unlock();
-            if (i != nullptr) {
-                this->event(*i);
-            } else {
-                LOGGER("BAD POINTER");
+                EventTypePtr i = eventQueue.front();
+                eventQueue.pop();
+                //unlock so event execution won't block adding new things to queue
+                g.unlock();
+                if (i != nullptr) {
+                    this->event(*i);
+                } else {
+                    LOGGER("BAD POINTER");
+                }
+                g.lock();
             }
-
-
-            queueLock.lock();
-
+            g.unlock();
         }
-        queueLock.unlock();
 
     }
 
@@ -65,7 +71,10 @@ public:
         return eventQueue.size();
     }
 
-    virtual ~EventQueueSource() = default;
+    ~EventQueueSource() override {
+        stop();
+        queueReady.notify_all();
+    }
 };
 
 

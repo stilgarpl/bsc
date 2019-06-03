@@ -4,15 +4,21 @@
 
 #include "LogicStateSource.h"
 
-void LogicStateSource::work() {
-    source.work();
-
-}
-
 LogicStateSource::LogicStateSource(SourceManager &sourceManager) : ISource(sourceManager), source(sourceManager) {
 
 }
 
-LogicStateSource::~LogicStateSource() {
-
+void LogicStateSource::run() {
+    waitForStop();
 }
+
+void LogicStateSource::onStop() {
+    source.stop();
+    source.join();
+}
+
+void LogicStateSource::onStart() {
+    source.start();
+}
+
+LogicStateSource::~LogicStateSource() = default;

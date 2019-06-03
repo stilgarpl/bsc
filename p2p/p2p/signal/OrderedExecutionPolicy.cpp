@@ -44,6 +44,7 @@ void OrderedExecutor::run() {
 
 OrderedExecutor::~OrderedExecutor() {
     working = false;
+    taskReady.notify_all(); // so it stops waiting
     if (orderedExecutorThread) {
         //@todo kill if not finished in few seconds?
         orderedExecutorThread->join();

@@ -40,19 +40,6 @@ void ConnectionSource::receivedPacket(std::shared_ptr<BasePacket> p, Connection 
     p->_operate(packetSourceWorker, p);
 }
 
-void ConnectionSource::work() {
-    //  LOGGER("connection source WOOOOORK")
-    connSource.work();
-    /*   auto qs =*/ //packetSource.queueSize();
-    // if (qs) LOGGER("before packet work")
-    packetSource.work();
-    advancedPacketSource.work();
-    // if (qs) LOGGER("after packet work")
-
-
-}
-
-
 void ConnectionSource::connectionAccepted(Connection *c) {
 
     auto event = std::make_shared<ConnectionEvent>();
@@ -106,4 +93,21 @@ void ConnectionSource::droppedPacket(std::shared_ptr<BasePacket> p, Connection *
     p->_operate(packetSourceWorker, p);
 }
 
+void ConnectionSource::run() {
+    waitForStop();
+}
 
+void ConnectionSource::onStop() {
+    packetSource.stop();
+    connSource.stop();
+    advancedPacketSource.stop();
+    packetSource.join();
+    connSource.join();
+    advancedPacketSource.join();
+}
+
+void ConnectionSource::onStart() {
+    packetSource.start();
+    connSource.start();
+    advancedPacketSource.start();
+}

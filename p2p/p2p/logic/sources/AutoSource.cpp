@@ -6,8 +6,15 @@
 
 AutoSource::AutoSource(SourceManager &sourceManager) : ISource(sourceManager) {}
 
-void AutoSource::work() {
+void AutoSource::onStop() {
+    //stop all threads.
+    eventQueueSources.forEach<ISource>([](ISource &source) { source.stop(); });
+    eventQueueSources.forEach<ISource>([](ISource &source) { source.join(); });
+}
 
-    eventQueueSources.forEach<ISource>([&](ISource &source) { source.work(); });
+void AutoSource::run() {
+    //all eventQueueSource threads will start automatically from queue executions.
+    waitForStop();
 
 }
+

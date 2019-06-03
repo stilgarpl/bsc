@@ -4,12 +4,20 @@
 
 #include "ModuleSource.h"
 
-void ModuleSource::work() {
-    source.work();
-//    LOGGER("Module source work")
-
-}
 
 ModuleSource::ModuleSource(SourceManager &sourceManager) : ISource(sourceManager), source(sourceManager) {
 
+}
+
+void ModuleSource::run() {
+    waitForStop();
+}
+
+void ModuleSource::onStop() {
+    source.stop();
+    source.join();
+}
+
+void ModuleSource::onStart() {
+    source.start();
 }

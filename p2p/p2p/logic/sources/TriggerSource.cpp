@@ -4,11 +4,20 @@
 
 #include "TriggerSource.h"
 
-void TriggerSource::work() {
-    source.work();
-
-}
 
 TriggerSource::TriggerSource(SourceManager &sourceManager) : ISource(sourceManager), source(sourceManager) {
 
+}
+
+void TriggerSource::run() {
+    waitForStop();
+}
+
+void TriggerSource::onStop() {
+    source.stop();
+    source.join();
+}
+
+void TriggerSource::onStart() {
+    source.start();
 }
