@@ -23,9 +23,6 @@ protected:
 public:
     explicit ClockSource(SourceManager &sourceManager);
 
-    //@todo remove work
-    void work();
-
     void run() override;
 
 
