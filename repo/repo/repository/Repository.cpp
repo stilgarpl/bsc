@@ -100,15 +100,20 @@ void Repository::commit() {
                pathTransformer->transformFromJournalFormat(i.getPath()).string())
         fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
         for (const auto &item : fs::directory_iterator(dirPath)) {
-            fs::path path = fs::canonical(item.path());
-            if (fs::is_directory(item)) {
-                journal->append(JournalMethod::ADDED, JournalTarget::DIRECTORY,
-                                pathTransformer->transformToJournalFormat(path),
-                                FileData(item.path()));
+            std::error_code error;
+            fs::path path = fs::canonical(item.path(), error);
+            if (!error) {
+                if (fs::is_directory(item)) {
+                    journal->append(JournalMethod::ADDED, JournalTarget::DIRECTORY,
+                                    pathTransformer->transformToJournalFormat(path),
+                                    FileData(item.path()));
+                } else {
+                    journal->append(JournalMethod::ADDED, JournalTarget::FILE,
+                                    pathTransformer->transformToJournalFormat(path),
+                                    FileData(item.path()));
+                }
             } else {
-                journal->append(JournalMethod::ADDED, JournalTarget::FILE,
-                                pathTransformer->transformToJournalFormat(path),
-                                FileData(item.path()));
+                LOGGER("error occured: " + error.+ error.message());
             }
         }
     });

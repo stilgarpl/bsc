@@ -95,12 +95,6 @@ int main(int argc, char *argv[]) {
     cmdN->setInteractive(false);
 
     thisNode.start();
-//    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
-
-
-
     thisNode.waitToFinish();
-
-
     return 0;
 }

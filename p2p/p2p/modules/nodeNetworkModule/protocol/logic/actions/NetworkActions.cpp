@@ -47,6 +47,8 @@ void NetworkActions::loadNetworkInfo(const ModuleEvent<NodeNetworkModule> &event
         } catch (DataFileNotFoundException &e) {
             // data file not found
             LOGGER("network data file not found")
+        } catch (cereal::Exception &e) {
+            LOGGER("cereal error during file load " + std::string(e.what()));
         }
     }
 }

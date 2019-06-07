@@ -36,7 +36,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options(-Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic)
     if (LINUX)
         add_compile_options(-pthread)
-        add_link_options(-lpthread -lstdc++fs)
+        add_link_options(-lpthread)
     endif ()
 
     #    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -lstdc++fs -Wall -Wno-unused-local-typedefs -pedantic")

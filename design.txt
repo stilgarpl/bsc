@@ -537,3 +537,5 @@ idea jest taka, ze chainy sie lockuja zgodnie z zadana konfiguracja. chainy ze w
 @todo basyco-control ma miec tylko Command module który w dodatku wszystkie komendy zmienia w "remote daemon $@"
 @todo dodac jakiś mechanizm zwracania odpowiedzi z daemona, nie tylko jako SUCCESS/FAILURE
 
+
+dodawanie troche sie wywala przy linkach, uwaza, ze wrzuca sie drugi raz to samo.
