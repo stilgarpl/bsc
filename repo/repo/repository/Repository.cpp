@@ -113,7 +113,7 @@ void Repository::commit() {
                                     FileData(item.path()));
                 }
             } else {
-                LOGGER("error occured: " + error.+ error.message());
+                LOGGER("error occured: " + error.message());
             }
         }
     });
