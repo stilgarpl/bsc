@@ -46,7 +46,11 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
             });
     when(TimeConditions::every(60s))
             .fireNewGenericAction([this] {
-                node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("syncLocalRepo");
+                for (const auto &repository : repositoryManager.getRepositories()) {
+                    node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string, std::string>(
+                            "syncLocalRepo", repository->getRepositoryId());
+                }
+
             });
     when(TriggerConditions::trigger<std::string>("updateRepoTrigger")).fireNewGenericAction(
             CommonActions::foreachActionGetter(NetworkActions::broadcastPacket,
@@ -244,8 +248,9 @@ void RepoModule::updateFile(const fs::path &path) {
 }
 
 void RepoModule::updateAllFiles() {
-
+    LOGGER("updateAllFiles")
     if (selectedRepository != nullptr) {
+        LOGGER("syncing...")
         selectedRepository->syncLocalChanges();
 
     }

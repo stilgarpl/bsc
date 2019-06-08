@@ -63,7 +63,6 @@ void setupCommands(CommandModule *cmd) {
 
     cmd->mapCommand("createRep", &RepoModule::createRepository);
     cmd->mapCommand("selectRep", &RepoModule::selectRepository);
-    cmd->mapCommand<RepoModule, void, const fs::path &>("persist", &RepoModule::persistFile);
     cmd->mapCommand("saveRep", &RepoModule::saveRepository);
     cmd->mapCommand("loadRep", &RepoModule::loadRepository);
     cmd->mapCommand("printRep", &RepoModule::printHistory);

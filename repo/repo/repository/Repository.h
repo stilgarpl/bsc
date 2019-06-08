@@ -126,6 +126,13 @@ public:
                 ar(deployed);
             }
 
+        public:
+            DeployAttributes(bool deployed);
+
+            DeployAttributes();
+
+        private:
+
 
             friend class cereal::access;
 
@@ -141,13 +148,7 @@ public:
 
         auto operator[](const fs::path &path) -> decltype(deployMap[fs::current_path()]);
 
-        void markDeployed(const fs::path &path, DeployState deployState) {
-            if (deployState == DeployState::DEPLOYED) {
-                deployMap[path]->setDeployed(true);
-            } else if (deployState == DeployState::NOT_DEPLOYED) {
-                deployMap[path]->setDeployed(false);
-            }
-        }
+        void markDeployed(const fs::path &path, DeployState deployState);
 
         bool isDeployed(const fs::path &path) {
             return deployMap[path] && deployMap[path]->isDeployed();

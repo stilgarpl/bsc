@@ -44,7 +44,7 @@ void RepositoryActions::deployRepository(const IRepository::RepoIdType &repoId) 
 
 void RepositoryActions::syncRepository(const IRepository::RepoIdType &repoId) {
     auto repoMod = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
-    repoMod->updateAllFiles();
+    repoMod->findRepository(repoId)->syncLocalChanges();
 }
 
 void RepositoryActions::saveRepository(const IRepository::RepoIdType &repoId) {

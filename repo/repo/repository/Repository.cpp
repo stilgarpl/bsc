@@ -91,110 +91,6 @@ void Repository::commit() {
         LOGGER("commit: added file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())
     });
 
-    journal->setFunc(JournalMethod::MOVED, JournalTarget::FILE, [&](auto &i) {
-    });
-
-    journal->setFunc(JournalMethod::ADDED, JournalTarget::DIRECTORY, [&](auto &i) {
-        //nothing to store, but... files from the directory should be added.
-        LOGGER("commit: added dir " + i.getPath() + " tt: " +
-               pathTransformer->transformFromJournalFormat(i.getPath()).string())
-        fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
-        for (const auto &item : fs::directory_iterator(dirPath)) {
-            std::error_code error;
-            fs::path path = fs::canonical(item.path(), error);
-            if (!error) {
-                if (fs::is_directory(item)) {
-                    journal->append(JournalMethod::ADDED, JournalTarget::DIRECTORY,
-                                    pathTransformer->transformToJournalFormat(path),
-                                    FileData(item.path()));
-                } else {
-                    journal->append(JournalMethod::ADDED, JournalTarget::FILE,
-                                    pathTransformer->transformToJournalFormat(path),
-                                    FileData(item.path()));
-                }
-            } else {
-                LOGGER("error occured: " + error.message());
-            }
-        }
-    });
-
-    journal->setFunc(JournalMethod::MODIFIED, JournalTarget::DIRECTORY, [&](auto &i) {
-        fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
-
-        auto &fileMap = getFileMap();
-        for (const auto &item : fs::directory_iterator(dirPath)) {
-            fs::path path = fs::canonical(item.path());
-            auto &attr = fileMap[path];
-            if (fs::exists(path)) {
-                auto currentFileTime = fs::last_write_time(path);
-                if (!attr) {
-                    //I don't like the fact that this logic is in two places, here and update().
-                    if (!fileMap.isDeleted(fs::canonical(item.path())) ||
-                        currentFileTime > fileMap.getDeletionTime(path)) {
-                        journal->append(JournalMethod::ADDED,
-                                        fs::is_directory(path) ? JournalTarget::DIRECTORY : JournalTarget::FILE,
-                                        pathTransformer->transformToJournalFormat(path),
-                                        FileData(item.path()));
-                    }
-                }
-            } else {
-                if (attr) {
-                    journal->append(JournalMethod::DELETED,
-                                    attr->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
-                                    pathTransformer->transformToJournalFormat(path),
-                                    attr->toFileData(path));
-                }
-
-            }
-        }
-    });
-
-    journal->setFunc(JournalMethod::DELETED, JournalTarget::DIRECTORY, [&](auto &i) {
-        //@todo delete everything recursively
-        auto subMap = getFileMap().subMap(pathTransformer->transformFromJournalFormat(i.getPath()));
-        for (const auto &[subPath, value] : subMap) {
-            //this will not set the isDirectory flag, but I don't think it's important.
-            // @todo maybe I should split METHOD into two: METHOD and TARGET (DELETED, DIRECTORY)
-            if (value->isDirectory()) {
-                journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
-                                pathTransformer->transformToJournalFormat(subPath),
-                                getFileMap()[subPath]->toFileData(subPath));
-            } else {
-                journal->append(JournalMethod::DELETED, JournalTarget::FILE,
-                                pathTransformer->transformToJournalFormat(subPath),
-                                getFileMap()[subPath]->toFileData(subPath));
-            }
-        }
-    });
-
-
-    journal->setFunc(JournalMethod::IGNORED, JournalTarget::FILE, [&](auto &i) {
-        fs::path filePath = pathTransformer->transformFromJournalFormat(i.getPath());
-        auto &fileMap = getFileMap();
-
-        if (fileMap[filePath]) {
-            journal->append(JournalMethod::FORGOTTEN, JournalTarget::FILE,
-                            filePath,
-                            fileMap[filePath]->toFileData(filePath));
-        }
-
-    });
-
-    journal->setFunc(JournalMethod::IGNORED, JournalTarget::DIRECTORY, [&](auto &i) {
-        fs::path dirPath = pathTransformer->transformFromJournalFormat(i.getPath());
-        LOGGER("ignoring dir ... " + dirPath.string())
-        auto subMap = getFileMap().subMap(dirPath);
-        for (const auto &[subPath, value] : subMap) {
-            //this will not set the isDirectory flag, but I don't think it's important.
-            LOGGER("subpath " + subPath.string())
-            journal->append(JournalMethod::FORGOTTEN,
-                            value->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
-                            pathTransformer->transformToJournalFormat(subPath),
-                            getFileMap()[subPath]->toFileData(subPath));
-        }
-
-    });
-
     journal->replayCurrentState();
     journal->commitState();
 }
@@ -261,13 +157,10 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
         auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
         if (attributes) {
             //file exists in the journal
-//            LOGGER("current time " + std::to_string(currentFileTime) + " lwt " +
-//                   std::to_string(attributes->getModificationTime()))
             if (currentFileTime < attributes->getModificationTime()) {
                 //file in repository is newer than the file in filesystem, restore
                 LOGGER("restoring..." + path.string())
                 auto state = strategyPack.updatedInRepo->apply(path, attributes);
-                //@todo fix deployed by using return value from strategy->apply
                 deployMap.markDeployed(path, state);
             } else {
                 if (currentFileTime == attributes->getModificationTime() && currentFileSize == attributes->getSize()) {
@@ -285,10 +178,7 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
             }
         } else {
             //not in the map
-
-//            LOGGER("cur fil tim " + std::to_string(currentFileTime) + " deltim " +
-//                   std::to_string(fileMap.getDeletionTime(path)))
-            if (currentFileTime > fileMap.getDeletionTime(path) || !fileMap.isDeleted(path)) {
+            if (!fileMap.isDeleted(path) || currentFileTime > fileMap.getDeletionTime(path)) {
                 //this is new file that has the same path as deleted one. persist!
                 LOGGER("new file, persisting " + path.string())
                 auto state = strategyPack.newInFilesystem->apply(path);
@@ -306,6 +196,18 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
 
 
         }
+        //@todo this iterates over all directories and files in path, which means that it will probably call some methods twice or even more times on some files. make sure it doesn't
+        if (fs::is_directory(path)) {
+            LOGGER(path.string() + " is a directory, iterating over...")
+            for (const auto &item : fs::directory_iterator(path)) {
+                //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
+
+                LOGGER(" item: " + item.path().string())
+                if (!fileMap[item]) {
+                    update(item, strategyPack);
+                }
+            }
+        }
     } else {
         //file was removed or perhaps wasn't deployed yet...
         //@todo not so sure about that...
@@ -318,13 +220,18 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
             } else {
                 //file wasn't deployed. must be a new file from another node. restore.
                 //@todo this is duplicated code. move to strategies or sth. (three times as of writing this. seriously, do something about it)
+                LOGGER("not deployed " + path.string())
                 auto state = strategyPack.newInRepo->apply(path, attributes);
                 deployMap.markDeployed(path, state);
             }
         } else {
-            //file is neither on file system nor in the map. someone trying to update unknown file?
-            LOGGER("file unknown " + path.string());
-            //@todo add strategy for this ?
+            if (fileMap.isDeleted(path)) {
+                LOGGER("file deleted, but not in filesystem so nothing to do: " + path.string())
+            } else {
+                //file is neither on file system nor in the map. someone trying to update unknown file?
+                LOGGER("file unknown " + path.string());
+                //@todo add strategy for this ?
+            }
         }
     }
 
@@ -334,6 +241,7 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
 void Repository::syncLocalChanges() {
 //@todo change the name of this function to updateAll or sth
     for (const auto &i : getFileMap()) {
+        LOGGER("update()" + i.first.string())
         update(i.first, localSyncPack);
     }
 
@@ -603,13 +511,28 @@ auto Repository::RepoDeployMap::operator[](const fs::path &path) -> decltype(dep
     return deployMap[path];
 }
 
+void Repository::RepoDeployMap::markDeployed(const fs::path &path, Repository::DeployState deployState) {
+    if (deployState == DeployState::DEPLOYED) {
+        LOGGER("marking " + path.string() + " as deployed")
+        deployMap[path] = true;
+    } else if (deployState == DeployState::NOT_DEPLOYED) {
+        LOGGER("marking " + path.string() + " as not deployed")
+        deployMap[path] = false;
+    } //else unchanged
+}
+
 bool Repository::RepoDeployMap::DeployAttributes::isDeployed() const {
     return deployed;
 }
 
 void Repository::RepoDeployMap::DeployAttributes::setDeployed(bool deployed) {
+    LOGGER("set deployed")
     DeployAttributes::deployed = deployed;
 }
+
+Repository::RepoDeployMap::DeployAttributes::DeployAttributes(bool deployed) : deployed(deployed) {}
+
+Repository::RepoDeployMap::DeployAttributes::DeployAttributes() = default;
 
 //@todo maybe move actual implementation code from methods like repository.persist, delete, trash... etc. to those strategies? just a thought
 
@@ -617,7 +540,8 @@ class StrategyPersist : public Repository::RepositoryActionStrategy {
     Repository::DeployState
     apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
         repository.persist(path);
-        return Repository::DeployState::UNCHANGED;
+        return Repository::DeployState::DEPLOYED; //it was UNCHANGED, but file is clearly in the filesystem, so it's deployed!
+        //UNCHANGED made some sense, because persisting the file doesn't actually deploy it, but new files weren't marked as deployed, so update thought they were deleted. and new files go through persist, so it should return DEPLOYED.
     }
 
 public:
@@ -681,7 +605,7 @@ class StrategyNull : public Repository::RepositoryActionStrategy {
 public:
     Repository::DeployState
     apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
-        return Repository::DeployState::UNCHANGED; //@todo bool is stupid thing to return. even enum would be better. even optional<bool> would be better!
+        return Repository::DeployState::UNCHANGED;
     }
 
     StrategyNull(Repository &repository) : RepositoryActionStrategy(repository) {}
