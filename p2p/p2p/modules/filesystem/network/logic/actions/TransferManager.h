@@ -148,7 +148,9 @@ public:
     private:
         std::list<LocalTransferDescriptorPtr> transfers;
         TransferManager &manager;
-        unsigned long MAX_CONCURRENT_TRANSFERS = 2;
+        const unsigned long MAX_CONCURRENT_TRANSFERS = 2;
+        std::mutex finishLock;
+        std::condition_variable finishReady;
 
     public:
         explicit TransferQueue(TransferManager &manager);
@@ -170,7 +172,11 @@ public:
 
         void queueTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
         void start();
+
+        void waitToFinishAllTransfers();
     };
+
+    using TransferQueuePtr = std::shared_ptr<TransferQueue>;
 
 
 private:

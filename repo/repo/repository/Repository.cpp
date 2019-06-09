@@ -91,6 +91,13 @@ void Repository::commit() {
         LOGGER("commit: added file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())
     });
 
+    journal->setFunc(JournalMethod::MODIFIED, JournalTarget::FILE, [&](auto &i) {
+        storage->store(calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
+                       fs::file_size(pathTransformer->transformFromJournalFormat(i.getPath())),
+                       pathTransformer->transformFromJournalFormat(i.getPath()));
+        LOGGER("commit: modified file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())
+    });
+
     journal->replayCurrentState();
     journal->commitState();
 }
@@ -141,7 +148,10 @@ void Repository::downloadStorage() {
 
 
     }
-    //@todo wait for finish?
+    auto queue = storage->getTransferQueue();
+    if (queue != nullptr) {
+        queue->waitToFinishAllTransfers();
+    }
 
 }
 

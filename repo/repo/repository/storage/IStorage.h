@@ -10,6 +10,7 @@
 #include <p2p/node/NodeInfo.h>
 #include <repo/repository/IRepository.h>
 #include <filesystem>
+#include <p2p/modules/filesystem/network/logic/actions/TransferManager.h>
 
 namespace fs = std::filesystem;
 
@@ -56,6 +57,8 @@ public:
     }
 
     virtual ~IStorage() = default;
+
+    virtual TransferManager::TransferQueuePtr getTransferQueue() = 0;
 
 };
 

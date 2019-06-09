@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by stilgar on 06.07.18.
 //
@@ -27,8 +29,7 @@ bool RemoteNode::connectTo(const NetAddressType &address) {
     //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
     //@todo check for problems and handle them
     try {
-//        ///@todo THIS IS BAD. It switches context for any thread that calls connect!
-//        Context::setActiveContext(_context);
+        SetLocalContext localContext(_context); //RAII
         auto conn = std::make_shared<ClientConnection>(address,
                                                        _context);
 
@@ -49,7 +50,7 @@ RemoteNode::RemoteNode() : RemoteNode(nullptr) {
 
 }
 
-RemoteNode::RemoteNode(const std::shared_ptr<IProtocol> &protocol) : protocol(protocol) {
+RemoteNode::RemoteNode(std::shared_ptr<IProtocol> protocol) : protocol(std::move(protocol)) {
     context()->set<RemoteNodeContext, RemoteNode &>(*this);
 }
 

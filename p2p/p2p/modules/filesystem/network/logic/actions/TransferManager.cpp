@@ -307,6 +307,7 @@ void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescri
             if (countUnfinishedTransfers() == 0) {
                 changeState(TransferState::FINISHED);
                 LOGGER("transfer queue finished")
+                finishReady.notify_all();
             } else {
                 //start more transfers
                 start();
@@ -396,4 +397,11 @@ TransferManager::TransferQueue::queueTransfer(ResourceIdentificatorPtr source, R
     } else {
         LOGGER("failed to initiate transfer!")
     }
+}
+
+void TransferManager::TransferQueue::waitToFinishAllTransfers() {
+    std::unique_lock<std::mutex> g(finishLock);
+
+    finishReady.wait(g, [this] { return this->getCurrentState() == TransferState::FINISHED; });
+
 }

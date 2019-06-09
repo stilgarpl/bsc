@@ -68,6 +68,17 @@ void createFile(fs::path path, std::string content) {
     file << content;
 }
 
+void changeFile(fs::path path, std::string content) {
+    std::ofstream file(path);
+    file << content;
+}
+
+std::string readFile(fs::path path) {
+    std::ifstream t(path);
+    std::string str((std::istreambuf_iterator<char>(t)),
+                    std::istreambuf_iterator<char>());
+    return str;
+}
 
 TEST_CASE("Repo module test", "[!throws]") {
 
@@ -97,10 +108,9 @@ TEST_CASE("Repo module test", "[!throws]") {
 
     otherNode.start();
 
-    std::this_thread::sleep_for(2s);
-    thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
-    std::this_thread::sleep_for(2s);
-    bool connectedToSecond = thisNode.getModule<NodeNetworkModule>()->getRemoteNode("second").isConnected();
+    otherNode.waitUntilStarted();
+    auto secondNode = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+    bool connectedToSecond = secondNode.isConnected();
 
     REQUIRE(connectedToSecond);
 
@@ -115,6 +125,7 @@ TEST_CASE("Repo module test", "[!throws]") {
 
         //create dirs and files
         fs::path testPath = fs::temp_directory_path() / "dirtest";
+        INFO("test path is " << testPath.string())
         fs::create_directories(testPath);
         createFile(testPath / "1.txt", "111");
         createFile(testPath / "2.txt", "222");
@@ -122,14 +133,17 @@ TEST_CASE("Repo module test", "[!throws]") {
         createFile(testPath / "4.txt", "444");
 
 
-        otherRepoMod->persistFile(testPath);
+        otherRepoMod->updateFile(testPath);
         otherRepoMod->saveRepository("test");
 
         auto num = fs::remove_all(testPath);
 
         REQUIRE(num == 5);
         //@todo set the path from the actual configuration set in this test
-        auto repoXMLPath = fs::temp_directory_path() / "basyco/second/data/repo/test.xml";
+
+        auto repoXMLPath = otherNode.getConfigurationManager().getDataPath() / "repo" / "test.xml";
+        std::cout << repoXMLPath << std::endl;
+        INFO("root path is " << repoXMLPath.string())
         REQUIRE(fs::exists(repoXMLPath));
 
         auto otherSum = otherRepoMod->getSelectedRepository()->getJournal()->getChecksum();
@@ -151,6 +165,7 @@ TEST_CASE("Repo module test", "[!throws]") {
 
             thisRepoMod->selectRepository("test");
             REQUIRE(thisRepoMod->getSelectedRepository() != nullptr);
+            REQUIRE(thisRepoMod->getSelectedRepository()->getRepositoryId() == "test");
 
             auto thisSum = thisRepoMod->getSelectedRepository()->getJournal()->getChecksum();
             REQUIRE(thisSum == otherSum);
@@ -162,6 +177,37 @@ TEST_CASE("Repo module test", "[!throws]") {
             REQUIRE(fs::exists(testPath / "2.txt"));
             REQUIRE(fs::exists(testPath / "3.txt"));
             REQUIRE(fs::exists(testPath / "4.txt"));
+
+            SECTION("add, change, delete") {
+                fs::remove(testPath / "4.txt");
+                changeFile(testPath / "3.txt", "QWQQQQQQQQQ");
+                createFile(testPath / "5.txt", "555");
+                otherRepoMod->updateAllFiles();
+                otherRepoMod->saveRepository("test");
+
+                auto num2 = fs::remove_all(testPath);
+                REQUIRE(num2 == 5);
+                REQUIRE(!fs::exists(testPath));
+                REQUIRE(!fs::exists(testPath / "1.txt"));
+                REQUIRE(!fs::exists(testPath / "2.txt"));
+                REQUIRE(!fs::exists(testPath / "3.txt"));
+                REQUIRE(!fs::exists(testPath / "4.txt"));
+                REQUIRE(!fs::exists(testPath / "5.txt"));
+                thisRepoMod->downloadRemoteRepository("second", "test");
+                REQUIRE(thisRepoMod->findRepository("test") != nullptr);
+                thisRepoMod->selectRepository("test");
+                thisRepoMod->deployAllFiles();
+
+                REQUIRE(fs::exists(testPath));
+                REQUIRE(fs::exists(testPath / "1.txt"));
+                REQUIRE(fs::exists(testPath / "2.txt"));
+                REQUIRE(fs::exists(testPath / "3.txt"));
+                REQUIRE(!fs::exists(testPath / "4.txt"));
+                REQUIRE(fs::exists(testPath / "5.txt"));
+                REQUIRE(readFile(testPath / "3.txt") == "QWQQQQQQQQQ");
+
+
+            }
 
 
         }
@@ -185,6 +231,9 @@ TEST_CASE("Repo module test", "[!throws]") {
 //        }
 
 
+        //cleanup:
+        fs::remove_all(testPath);
+
     }
 
     WARN("closing");
@@ -193,8 +242,6 @@ TEST_CASE("Repo module test", "[!throws]") {
     thisNode.waitToFinish();
     otherNode.stop();
     otherNode.waitToFinish();
-    //@todo stop() should join all threads, including poco ones. stopping the app before it has finished crashes the app
-    std::this_thread::sleep_for(5s);
 
 
 }

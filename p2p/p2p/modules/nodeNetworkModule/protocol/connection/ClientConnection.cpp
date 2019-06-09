@@ -11,9 +11,9 @@
 #include "ClientConnection.h"
 
 
-ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, Context::Ptr context) : Connection(
-        std::move(context)),
-                                                                                              socket(a) {
+ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, const Context::Ptr &context) : Connection(
+        context),
+                                                                                                     socket(a) {
 
     auto lm = getConnectionContext()->get<LogicContext>();
     if (lm != nullptr) {

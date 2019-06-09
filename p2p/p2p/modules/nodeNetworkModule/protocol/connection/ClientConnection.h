@@ -15,7 +15,7 @@ private:
     Poco::Net::StreamSocket socket;
 
 protected:
-    ClientConnection(const Poco::Net::SocketAddress &a, Context::Ptr);
+    ClientConnection(const Poco::Net::SocketAddress &a, const Context::Ptr &);
 
 public:
     ClientConnection(const std::string &a, Context::Ptr);

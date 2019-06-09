@@ -121,6 +121,10 @@ void InternalStorage::restore(const ResourceId &resourceId, const PathType &dest
     fs::copy(resourcePath, destinationPath, fs::copy_options::overwrite_existing);
 }
 
+TransferManager::TransferQueuePtr InternalStorage::getTransferQueue() {
+    return transferQueue;
+}
+
 //InternalStorage::InternalStorage(const std::string &storageId) /*: storageId(storageId)*/ {
 //    initStorage();
 //}

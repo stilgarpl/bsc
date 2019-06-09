@@ -19,7 +19,7 @@ private:
     // std::string storageId;
     //@todo make configuration() with this value?
     fs::path storagePath = "/tmp/internal/";
-    std::shared_ptr<TransferManager::TransferQueue> transferQueue = nullptr;
+    TransferManager::TransferQueuePtr transferQueue = nullptr;
 public:
     void store(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) override;
 
@@ -43,6 +43,8 @@ public:
 
     void restore(const ResourceId &resourceId, const PathType &destinationPath) override;
     ~InternalStorage() override = default;
+
+    TransferManager::TransferQueuePtr getTransferQueue() override;
 };
 
 

@@ -21,7 +21,7 @@ private:
     fs::path rootPath;
 
 
-protected:
+public:
     fs::path getConfigPath();
 
     fs::path getDataPath();

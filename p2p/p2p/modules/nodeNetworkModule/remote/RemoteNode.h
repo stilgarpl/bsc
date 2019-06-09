@@ -54,7 +54,7 @@ public:
         return connection != nullptr;
     }
 
-    explicit RemoteNode(const std::shared_ptr<IProtocol> &protocol);
+    explicit RemoteNode(std::shared_ptr<IProtocol> protocol);
 
     template<typename SendType>
     void sendPacketToNode(NetworkPacketPointer<SendType> p) {

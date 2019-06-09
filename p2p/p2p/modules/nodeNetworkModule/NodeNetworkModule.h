@@ -19,6 +19,7 @@
 #include <p2p/role/RoleScope.h>
 #include <p2p/logic/events/LogicStateEvent.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/conditions/NetworkConditions.h>
+#include <p2p/modules/nodeNetworkModule/remote/exception/RemoteNodeConnectionException.h>
 #include "p2p/modules/nodeNetworkModule/remote/exception/RemoteNodeNotFoundException.h"
 
 
@@ -191,7 +192,9 @@ public: // @todo should be public or shouldn't ?
 
     RemoteNode &connectTo(const NetAddressType &address) {
         RemoteNode &remoteNode = getRemoteNode();
-        remoteNode.connectTo(address);
+        if (!remoteNode.connectTo(address)) {
+            throw RemoteNodeConnectionException();
+        }
         return remoteNode;
     }
 
@@ -202,7 +205,7 @@ public: // @todo should be public or shouldn't ?
         return remoteNode;
     }
 
-    void disconnect(const NodeIdType id);
+    void disconnect(NodeIdType id);
 
     void disconnectAll();
 

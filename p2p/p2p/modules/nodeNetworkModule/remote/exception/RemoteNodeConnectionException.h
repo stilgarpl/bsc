@@ -1,0 +1,14 @@
+//
+// Created by stilgar on 10.06.19.
+//
+
+#ifndef BASYCO_REMOTENODECONNECTIONEXCEPTION_H
+#define BASYCO_REMOTENODECONNECTIONEXCEPTION_H
+
+
+class RemoteNodeConnectionException {
+
+};
+
+
+#endif //BASYCO_REMOTENODECONNECTIONEXCEPTION_H
