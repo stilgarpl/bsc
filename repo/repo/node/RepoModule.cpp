@@ -232,6 +232,7 @@ void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repo
 //        localRepo->buildFileMap();
         localRepo->downloadStorage();
     } else {
+        //@todo throw exception maybe
         LOGGER("no response")
     }
 
@@ -241,7 +242,7 @@ void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repo
 void RepoModule::updateFile(const fs::path &path) {
 
     if (selectedRepository != nullptr) {
-        selectedRepository->update(path, selectedRepository->fullPack);
+        selectedRepository->update(path, selectedRepository->fullPack, {Repository::UpdateOptions::FOLLOW_DIRECTORIES});
 
     }
 

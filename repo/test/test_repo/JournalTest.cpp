@@ -16,7 +16,8 @@ TEST_CASE("Journal deterministic hash test") {
 
 TEST_CASE("Journal merge test") {
     SimpleJournal journal;
-    journal.append(JournalMethod::ADDED, JournalTarget::FILE, "/tmp/dupa.txt", FileData("/tmp/dupa.txt"));
+    journal.append(JournalMethod::ADDED, JournalTarget::FILE, "/tmp/THIS_IS_OTHER_TEST.txt",
+                   FileData("/tmp/THIS_IS_OTHER_TEST.txt"));
     journal.append(JournalMethod::DELETED, JournalTarget::FILE, "/tmp/to_remove.txt", FileData("/tmp/to_remove.txt"));
     journal.commitState();
     journal.append(JournalMethod::MODIFIED, JournalTarget::FILE, "/tmp/dupa.txt", FileData("/tmp/to_remove.txt"));
@@ -57,6 +58,10 @@ TEST_CASE("Journal merge test") {
         REQUIRE_FALSE(journal.merge(journal2));
 
     }
+
+    //cleanup
+
+    fs::remove("/tmp/journal.xml");
 
 
 }

@@ -232,6 +232,10 @@ public:
     };
 
 
+    enum class UpdateOptions {
+        FOLLOW_DIRECTORIES,
+    };
+
 
 
 private:
@@ -287,7 +291,7 @@ public:
     void restoreAttributes(const fs::path &path);
 
     //update one file from the repository
-    void update(fs::path path, const RepositoryActionStrategyPack &strategyPack);
+    void update(fs::path path, const RepositoryActionStrategyPack &strategyPack, std::set<UpdateOptions> updateOptions);
 
     //update everything
     void syncLocalChanges();

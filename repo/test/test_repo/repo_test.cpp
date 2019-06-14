@@ -131,6 +131,9 @@ TEST_CASE("Repo module test", "[!throws]") {
         createFile(testPath / "2.txt", "222");
         createFile(testPath / "3.txt", "333");
         createFile(testPath / "4.txt", "444");
+        fs::path subPath = testPath / "subdirectory" / "sub1";
+        fs::create_directories(subPath);
+        createFile(subPath / "sub.txt", "sub");
 
 
         otherRepoMod->updateFile(testPath);
@@ -138,7 +141,7 @@ TEST_CASE("Repo module test", "[!throws]") {
 
         auto num = fs::remove_all(testPath);
 
-        REQUIRE(num == 5);
+        REQUIRE(num == 8);
         //@todo set the path from the actual configuration set in this test
 
         auto repoXMLPath = otherNode.getConfigurationManager().getDataPath() / "repo" / "test.xml";
@@ -155,6 +158,7 @@ TEST_CASE("Repo module test", "[!throws]") {
             REQUIRE(!fs::exists(testPath / "2.txt"));
             REQUIRE(!fs::exists(testPath / "3.txt"));
             REQUIRE(!fs::exists(testPath / "4.txt"));
+            REQUIRE(!fs::exists(subPath / "sub.txt"));
 
             auto thisRepoMod = thisNode.getModule<RepoModule>();
 
@@ -177,6 +181,7 @@ TEST_CASE("Repo module test", "[!throws]") {
             REQUIRE(fs::exists(testPath / "2.txt"));
             REQUIRE(fs::exists(testPath / "3.txt"));
             REQUIRE(fs::exists(testPath / "4.txt"));
+            REQUIRE(fs::exists(subPath / "sub.txt"));
 
             SECTION("add, change, delete") {
                 fs::remove(testPath / "4.txt");
@@ -186,7 +191,7 @@ TEST_CASE("Repo module test", "[!throws]") {
                 otherRepoMod->saveRepository("test");
 
                 auto num2 = fs::remove_all(testPath);
-                REQUIRE(num2 == 5);
+                REQUIRE(num2 == 8);
                 REQUIRE(!fs::exists(testPath));
                 REQUIRE(!fs::exists(testPath / "1.txt"));
                 REQUIRE(!fs::exists(testPath / "2.txt"));

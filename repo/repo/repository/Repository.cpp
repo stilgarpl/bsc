@@ -103,10 +103,11 @@ void Repository::commit() {
 }
 
 void Repository::persist(fs::path path) {
-
+    LOGGER("persist: " + path.string())
     auto &fileMap = getFileMap();
     if (path.is_relative()) {
         path = fs::canonical(fs::current_path() / path);
+        LOGGER("after canonical: " + path.string())
     }
 
     auto &attr = fileMap[path];
@@ -155,68 +156,75 @@ void Repository::downloadStorage() {
 
 }
 
-void Repository::update(fs::path path, const RepositoryActionStrategyPack &strategyPack) {
+void Repository::update(fs::path path, const RepositoryActionStrategyPack &strategyPack,
+                        std::set<UpdateOptions> updateOptions) {
     //@todo change the name of this function to something else. it's about merging the state or journal and filesystem and updating one from the other or both
     path = fs::weakly_canonical(path);
     auto &fileMap = getFileMap();
     //only update if the file is in the repository
     auto &attributes = fileMap[path];
     if (fs::exists(path)) {
-        //file exists in filesystem
-        auto currentFileTime = fs::last_write_time(path);
-        auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
-        if (attributes) {
-            //file exists in the journal
-            if (currentFileTime < attributes->getModificationTime()) {
-                //file in repository is newer than the file in filesystem, restore
-                LOGGER("restoring..." + path.string())
-                auto state = strategyPack.updatedInRepo->apply(path, attributes);
-                deployMap.markDeployed(path, state);
-            } else {
-                if (currentFileTime == attributes->getModificationTime() && currentFileSize == attributes->getSize()) {
-                    //@todo verify other things maybe
-                    //file appear identical, nothing to do.
-                    LOGGER("leaving alone " + path.string())
-                    auto state = strategyPack.same->apply(path, attributes);
+        if (fs::is_directory(path) || fs::is_regular_file(path)) {
+            //file exists in filesystem
+            auto currentFileTime = fs::last_write_time(path);
+            auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
+            if (attributes) {
+                //file exists in the journal
+                if (currentFileTime < attributes->getModificationTime()) {
+                    //file in repository is newer than the file in filesystem, restore
+                    LOGGER("restoring..." + path.string())
+                    auto state = strategyPack.updatedInRepo->apply(path, attributes);
                     deployMap.markDeployed(path, state);
                 } else {
-                    LOGGER("updated file, persisting... " + path.string())
-                    //file in the filesystem is newer then the one in repository
-                    auto state = strategyPack.updatedInFilesystem->apply(path, attributes);
+                    if (currentFileTime == attributes->getModificationTime() &&
+                        currentFileSize == attributes->getSize()) {
+                        //@todo verify other things maybe
+                        //file appear identical, nothing to do.
+                        LOGGER("leaving alone " + path.string())
+                        auto state = strategyPack.same->apply(path, attributes);
+                        deployMap.markDeployed(path, state);
+                    } else {
+                        LOGGER("updated file, persisting... " + path.string())
+                        //file in the filesystem is newer then the one in repository
+                        auto state = strategyPack.updatedInFilesystem->apply(path, attributes);
+                        deployMap.markDeployed(path, state);
+                    }
+                }
+            } else {
+                //not in the map
+                if (!fileMap.isDeleted(path) || currentFileTime > fileMap.getDeletionTime(path)) {
+                    //this is new file that has the same path as deleted one. persist!
+                    LOGGER("new file, persisting " + path.string())
+                    auto state = strategyPack.newInFilesystem->apply(path);
                     deployMap.markDeployed(path, state);
+
+                } else {
+                    //@todo delete file
+                    if (fileMap.isDeleted(path)) {
+                        LOGGER("trashing " + path.string())
+                        //file should be deleted, but let's check deletion time...
+                        auto state = strategyPack.deletedInRepo->apply(path);
+                        deployMap.markDeployed(path, state);
+                    }
+                }
+
+
+            }
+            //@todo this iterates over all directories and files in path, which means that it will probably call some methods twice or even more times on some files. make sure it doesn't
+            if (fs::is_directory(path)) {
+                LOGGER(path.string() + " is a directory, iterating over...")
+                for (const auto &item : fs::directory_iterator(path)) {
+                    //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
+
+                    LOGGER(" item: " + item.path().string())
+                    if (!fileMap[item] || updateOptions.contains(UpdateOptions::FOLLOW_DIRECTORIES)) {
+                        LOGGER("following directory " + path.string() + " to " + item.path().string())
+                        update(item, strategyPack, updateOptions);
+                    }
                 }
             }
         } else {
-            //not in the map
-            if (!fileMap.isDeleted(path) || currentFileTime > fileMap.getDeletionTime(path)) {
-                //this is new file that has the same path as deleted one. persist!
-                LOGGER("new file, persisting " + path.string())
-                auto state = strategyPack.newInFilesystem->apply(path);
-                deployMap.markDeployed(path, state);
-
-            } else {
-                //@todo delete file
-                if (fileMap.isDeleted(path)) {
-                    LOGGER("trashing " + path.string())
-                    //file should be deleted, but let's check deletion time...
-                    auto state = strategyPack.deletedInRepo->apply(path);
-                    deployMap.markDeployed(path, state);
-                }
-            }
-
-
-        }
-        //@todo this iterates over all directories and files in path, which means that it will probably call some methods twice or even more times on some files. make sure it doesn't
-        if (fs::is_directory(path)) {
-            LOGGER(path.string() + " is a directory, iterating over...")
-            for (const auto &item : fs::directory_iterator(path)) {
-                //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
-
-                LOGGER(" item: " + item.path().string())
-                if (!fileMap[item]) {
-                    update(item, strategyPack);
-                }
-            }
+            LOGGER("file type not supported for : " + path.string())
         }
     } else {
         //file was removed or perhaps wasn't deployed yet...
@@ -252,8 +260,9 @@ void Repository::syncLocalChanges() {
 //@todo change the name of this function to updateAll or sth
     for (const auto &i : getFileMap()) {
         LOGGER("update()" + i.first.string())
-        update(i.first, localSyncPack);
+        update(i.first, localSyncPack, {});
     }
+
 
 }
 
@@ -339,7 +348,7 @@ void Repository::trash(const fs::path &path) {
 void Repository::deploy() {
     for (const auto &i : getFileMap()) {
         //@todo add force level, by using different pack
-        update(i.first, deployPack);
+        update(i.first, deployPack, {});
     }
 }
 
