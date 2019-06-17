@@ -241,7 +241,7 @@ TEST_CASE("Repo module test", "[!throws]") {
 
     }
 
-    WARN("closing");
+    INFO("closing");
 
     thisNode.stop();
     thisNode.waitToFinish();

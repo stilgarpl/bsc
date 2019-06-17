@@ -83,10 +83,12 @@ void GravitonProtocol::onConnectionEvent(const ConnectionEvent &event) {
 //            item.second->getResponsePromise().
 //        }
 
-        for (auto &&item : responseMap) {
-            if (item.second == nullptr || item.second->getConnection() == event.getConnection()) {
-                responseMap.erase(item.first);
-            }
+        auto item = std::begin(responseMap);
+        while(item != std::end(responseMap))
+            if (item->second == nullptr || item->second->getConnection() == event.getConnection()) {
+                item = responseMap.erase(item);
+            } else {
+                item++;
         }
 //        responseMap.erase(std::remove_if(responseMap.begin(),responseMap.end(),[&](auto& i)->bool{
 //            return (i.second->getConnection == event.getConnection());
