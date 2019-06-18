@@ -178,7 +178,8 @@ public:
     }
 
     [[nodiscard]]  LocalTransferDescriptorPtr
-    initiateTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination,
+    initiateTransfer(const NodeIdType &nodeId, const ResourceIdentificatorPtr &source,
+                     const ResourceIdentificatorPtr &destination,
                      bool start = true);
 
     [[nodiscard]]  LocalTransferDescriptorPtr

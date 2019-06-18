@@ -11,6 +11,7 @@
 #include <p2p/modules/filesystem/network/packet/FinishTransfer.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNodeContext.h>
 #include <p2p/modules/filesystem/network/packet/TransferQuery.h>
+#include <p2p/modules/filesystem/FilesystemModule.h>
 #include "TransferManager.h"
 
 //const ResourceIdentificatorPtr &TransferManager::RemoteTransferDescriptor::getResourceIdentificatorPtr() const {
@@ -147,13 +148,13 @@ void TransferManager::transferProperties(const TransferEvent &event) {
 }
 
 TransferId TransferManager::generateTransferId() {
-    static TransferId tid = static_cast<TransferId>(std::rand());
+    static auto tid = static_cast<TransferId>(std::rand());
     return ++tid;
 }
 
 TransferManager::LocalTransferDescriptorPtr
-TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source,
-                                  ResourceIdentificatorPtr destination, bool start) {
+TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdentificatorPtr &source,
+                                  const ResourceIdentificatorPtr &destination, bool start) {
     INode &node = NodeContext::getNodeFromActiveContext();
     auto networkModule = node.getModule<NodeNetworkModule>();
     LocalTransferDescriptorPtr ret = std::make_shared<LocalTransferDescriptor>();
@@ -168,9 +169,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, ResourceIdentificato
         Context::setActiveContext(activeContext);
         LOGGER("starting transfer...")
 
-
-        //@todo get from config
-        const TransferSize MAX_CHUNK_SIZE = 19500;
+        const TransferSize MAX_CHUNK_SIZE = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>()->configuration().maxChunkSize;
 //        LOGGER("download thread started")
         auto destinationStream = destination->getResourceOutputStream();
         //starting transfer

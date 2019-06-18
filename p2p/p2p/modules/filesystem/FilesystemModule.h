@@ -22,6 +22,24 @@
 namespace fs = std::filesystem;
 
 class FilesystemModule : public NodeModuleDependent<FilesystemModule, NodeNetworkModule> {
+public:
+
+    class Configuration {
+    public:
+        unsigned int maxChunkSize = 20000;
+
+    private:
+        template<class Archive>
+        void serialize(Archive &ar) {
+            ar(maxChunkSize);
+        }
+
+
+        friend class cereal::access;
+
+    };
+
+private:
 
     fs::path currentPath = fs::current_path();
     std::list<std::shared_ptr<TransferManager::LocalTransferDescriptor>> currentTransfers;
@@ -29,7 +47,7 @@ class FilesystemModule : public NodeModuleDependent<FilesystemModule, NodeNetwor
     TransferManager transferManager;
 
 public:
-    FilesystemModule(INode &node);
+    explicit FilesystemModule(INode &node);
 
     void setupActions(ILogicModule::SetupActionHelper &actionHelper) override;
 
