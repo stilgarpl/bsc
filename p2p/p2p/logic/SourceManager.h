@@ -45,6 +45,7 @@ private:
     Uber<std::map> signalMap;
     Uber<Type> globalSignal;
     StaticUber<std::shared_ptr<ExecutionPolicy>> executionPolicy;
+    std::mutex signalMapMutex;
 
 protected:
 
@@ -100,6 +101,7 @@ public:
 
     template<typename EventType, typename... Args>
     SignalType<EventType, Args...> &getSignal(const typename EventType::IdType &id) {
+        std::lock_guard<std::mutex> g(signalMapMutex);
         // typedef Signal<Context&, const GroupType&> SignalType;
         //   typedef std::shared_ptr<SignalType> SignalTypePtr;
         auto &map = getSignalMap<EventType, Args...>();//signalMap.get<typename GroupType::IdType,SignalTypePtr<GroupType>>();

@@ -5,7 +5,6 @@
 #include "p2p/node/Node.h"
 #include "p2p/logic/sources/ClockSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h"
-#include "p2p/modules/nodeNetworkModule/protocol/logic/actions/TransmissionControl.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/actions/ProtocolActions.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/actions/NodeActions.h"

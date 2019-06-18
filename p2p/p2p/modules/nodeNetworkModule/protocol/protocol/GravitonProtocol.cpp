@@ -34,19 +34,22 @@ void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
 
 void GravitonProtocol::work(const Tick &tick) {
     std::lock_guard<std::mutex> g(lock);
-    for (auto &&[key, value] : responseMap) {
+
+    auto it = std::begin(responseMap);
+    while (it != std::end(responseMap)) {
+        auto &value = it->second;
         if (tick.getNow() - value->getTimeSent() > MAX_TIMEOUT) {
             NODECONTEXTLOGGER("TIMEOUT REACHED, removing packet data, breaking promises")
             if (value->getRetry() >= MAX_RETRY) {
-                responseMap.erase(key);
+                it = responseMap.erase(it);
             } else {
                 value->getConnection()->send(value->getPacketPtr());
                 value->setRetry(value->getRetry() + 1);
                 value->setTimeSent(tick.getNow());
+                it++;
             }
         }
     }
-
     //  LOGGER("onWork");
 }
 
