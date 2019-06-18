@@ -210,6 +210,7 @@ TEST_CASE("Repo module test", "[!throws]") {
                 REQUIRE(!fs::exists(testPath / "4.txt"));
                 REQUIRE(fs::exists(testPath / "5.txt"));
                 REQUIRE(readFile(testPath / "3.txt") == "QWQQQQQQQQQ");
+                REQUIRE(fs::exists(subPath / "sub.txt"));
 
 
             }

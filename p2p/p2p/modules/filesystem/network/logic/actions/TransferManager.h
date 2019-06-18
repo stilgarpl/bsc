@@ -52,6 +52,7 @@ public:
         NodeIdType sourceNode;
         TransferSize size;
         TransferSize transferredSize;
+        std::mutex threadStartMutex;
 
         //very private, no getters:
 
@@ -66,6 +67,7 @@ public:
         }
 
         void startThread() {
+            std::lock_guard<std::mutex> g(threadStartMutex);
             if (thread == nullptr) {
                 thread = std::make_unique<std::thread>(payload, std::ref(*this));
             } else {
@@ -119,6 +121,7 @@ public:
         }
 
         virtual ~LocalTransferDescriptor() {
+            std::lock_guard<std::mutex> g(threadStartMutex);
             //@todo kill the thread or something.
             if (thread != nullptr && thread->joinable()) {
                 thread->join();
@@ -126,6 +129,7 @@ public:
         }
 
         void wait() {
+            std::lock_guard<std::mutex> g(threadStartMutex);
             if (thread != nullptr && thread->joinable()) {
                 thread->join();
             }
