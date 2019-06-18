@@ -1,7 +1,7 @@
 //
 // Created by stilgar on 06.09.17.
 //
-
+#include "BasePacketInfo.h"
 
 BasePacketInfo::BasePacketInfo(const BasePacketPtr &packetPtr,
                                const std::chrono::time_point<Tick::clock> &timeSent)

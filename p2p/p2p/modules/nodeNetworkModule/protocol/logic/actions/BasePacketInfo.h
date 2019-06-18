@@ -5,8 +5,6 @@
 #ifndef BASYCO_NETWORKPACKETINFO_H
 #define BASYCO_NETWORKPACKETINFO_H
 
-//#include "context/Context.h"
-//#include "events/PacketEvent.h"
 #include <future>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/Connection.h>
