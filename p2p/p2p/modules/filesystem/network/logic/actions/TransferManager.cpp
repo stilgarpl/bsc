@@ -276,6 +276,60 @@ TransferManager::LocalTransferDescriptor::LocalTransferDescriptor()
 
 }
 
+void TransferManager::LocalTransferDescriptor::setPayload(const std::function<void(LocalTransferDescriptor &)> &p) {
+    payload = p;
+}
+
+void TransferManager::LocalTransferDescriptor::startThread() {
+    std::lock_guard<std::mutex> g(threadStartMutex);
+    if (thread == nullptr) {
+        thread = std::make_unique<std::thread>(payload, std::ref(*this));
+    } else {
+        //@todo error already started
+        LOGGER("thread already started!!!")
+    }
+    //f(*this);
+}
+
+const ResourceIdentificatorPtr &TransferManager::LocalTransferDescriptor::getDestination() const {
+    return destination;
+}
+
+void TransferManager::LocalTransferDescriptor::setDestination(const ResourceIdentificatorPtr &destination) {
+    LocalTransferDescriptor::destination = destination;
+}
+
+const ResourceIdentificatorPtr &TransferManager::LocalTransferDescriptor::getSource() const {
+    return source;
+}
+
+void TransferManager::LocalTransferDescriptor::setSource(const ResourceIdentificatorPtr &source) {
+    LocalTransferDescriptor::source = source;
+}
+
+const NodeIdType &TransferManager::LocalTransferDescriptor::getSourceNode() const {
+    return sourceNode;
+}
+
+void TransferManager::LocalTransferDescriptor::setSourceNode(const NodeIdType &sourceNode) {
+    LocalTransferDescriptor::sourceNode = sourceNode;
+}
+
+TransferManager::LocalTransferDescriptor::~LocalTransferDescriptor() {
+    std::lock_guard<std::mutex> g(threadStartMutex);
+    //@todo kill the thread or something.
+    if (thread != nullptr && thread->joinable()) {
+        thread->join();
+    }
+}
+
+void TransferManager::LocalTransferDescriptor::wait() {
+    std::lock_guard<std::mutex> g(threadStartMutex);
+    if (thread != nullptr && thread->joinable()) {
+        thread->join();
+    }
+}
+
 void TransferManager::TransferQueue::queueTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source,
                                                    ResourceIdentificatorPtr destination) {
     auto transfer = manager.initiateTransfer(nodeId, std::move(source), std::move(destination), false);

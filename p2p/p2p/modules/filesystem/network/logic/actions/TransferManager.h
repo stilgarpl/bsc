@@ -62,47 +62,24 @@ public:
 
     protected:
 
-        void setPayload(const std::function<void(LocalTransferDescriptor &)> &p) {
-            payload = p;
-        }
+        void setPayload(const std::function<void(LocalTransferDescriptor &)> &p);
 
-        void startThread() {
-            std::lock_guard<std::mutex> g(threadStartMutex);
-            if (thread == nullptr) {
-                thread = std::make_unique<std::thread>(payload, std::ref(*this));
-            } else {
-                //@todo error already started
-                LOGGER("thread already started!!!")
-            }
-            //f(*this);
-        }
+        void startThread();
 
         friend class TransferManager;
 
     public:
-        const ResourceIdentificatorPtr &getDestination() const {
-            return destination;
-        }
+        const ResourceIdentificatorPtr &getDestination() const;
 
-        void setDestination(const ResourceIdentificatorPtr &destination) {
-            LocalTransferDescriptor::destination = destination;
-        }
+        void setDestination(const ResourceIdentificatorPtr &destination);
 
-        const ResourceIdentificatorPtr &getSource() const {
-            return source;
-        }
+        const ResourceIdentificatorPtr &getSource() const;
 
-        void setSource(const ResourceIdentificatorPtr &source) {
-            LocalTransferDescriptor::source = source;
-        }
+        void setSource(const ResourceIdentificatorPtr &source);
 
-        const NodeIdType &getSourceNode() const {
-            return sourceNode;
-        }
+        const NodeIdType &getSourceNode() const;
 
-        void setSourceNode(const NodeIdType &sourceNode) {
-            LocalTransferDescriptor::sourceNode = sourceNode;
-        }
+        void setSourceNode(const NodeIdType &sourceNode);
 
         TransferSize getSize() const {
             return size;
@@ -120,20 +97,9 @@ public:
             LocalTransferDescriptor::transferredSize = transferredSize;
         }
 
-        virtual ~LocalTransferDescriptor() {
-            std::lock_guard<std::mutex> g(threadStartMutex);
-            //@todo kill the thread or something.
-            if (thread != nullptr && thread->joinable()) {
-                thread->join();
-            }
-        }
+        virtual ~LocalTransferDescriptor();
 
-        void wait() {
-            std::lock_guard<std::mutex> g(threadStartMutex);
-            if (thread != nullptr && thread->joinable()) {
-                thread->join();
-            }
-        }
+        void wait();
 
         friend class TransferQueue;
 
