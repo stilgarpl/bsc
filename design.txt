@@ -543,3 +543,4 @@ dodawanie troche sie wywala przy linkach, uwaza, ze wrzuca sie drugi raz to samo
 
 
 //@fixme getSource<LogicStateSource> z requireSource() czasem wyrzuca sigsegv z ubera przy próbie wzięcia odpowiedniego kontenera. zbadać, naprawić.
+^prawdopodobnie któryś moduł nie czeka na zatrzymanie swoich elementów i one zatrzymuja sie dopiero w destruktorze, gdy nie ma juz aktywnego logic managera

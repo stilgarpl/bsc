@@ -15,6 +15,6 @@ add_library(repo SHARED ${SOURCE_FILES})
 target_include_directories(repo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} SYSTEM ${CRYPTO++_INCLUDE_DIR})
 message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(repo p2p ${CRYPTO++_LIBRARIES} ${LIBS} stdc++fs)
+install(TARGETS repo COMPONENT repo)
 
 add_subdirectory(test)
-install(TARGETS repo COMPONENT repo)

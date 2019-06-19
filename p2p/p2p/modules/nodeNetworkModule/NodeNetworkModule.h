@@ -205,7 +205,7 @@ public: // @todo should be public or shouldn't ?
         return remoteNode;
     }
 
-    void disconnect(NodeIdType id);
+    void disconnect(const NodeIdType &id);
 
     void disconnectAll();
 

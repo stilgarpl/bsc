@@ -22,3 +22,5 @@ target_include_directories(p2p PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} spdlog::spdlog
 message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(p2p ${Poco_LIBRARIES} ${LIBS} spdlog::spdlog)
 install(TARGETS p2p COMPONENT p2p)
+
+add_subdirectory(test)

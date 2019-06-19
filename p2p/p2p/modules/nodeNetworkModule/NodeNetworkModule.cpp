@@ -354,7 +354,6 @@ void NodeNetworkModule::stopListening() {
 }
 
 void NodeNetworkModule::onStop() {
-
     stopListening();
     disconnectAll();
 }
@@ -391,23 +390,14 @@ void NodeNetworkModule::run() {
 //    }
 //}
 
-void NodeNetworkModule::disconnect(const NodeIdType id) {
-    {
+void NodeNetworkModule::disconnect(const NodeIdType &id) {
         getRemoteNode(id).disconnect();
-    }
-//    purgeInactiveConnections();
 }
 
 void NodeNetworkModule::disconnectAll() {
-//    std::lock_guard<std::mutex> g(activeConnectionsMutex);
-//    //activeClientConnections.remove_if([](auto i) { return true; });
-//    for (auto &&item : activeClientConnections) {
-//        if (item->connection != nullptr) {
-//            item->connection->shutdown();
-//        }
-//
-//    }
-//    activeClientConnections.clear();
+    for (const auto &remoteNode : remoteNodes) {
+        remoteNode->disconnect();
+    }
 
 }
 

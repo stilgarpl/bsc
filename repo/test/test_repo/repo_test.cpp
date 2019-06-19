@@ -92,7 +92,6 @@ TEST_CASE("Repo module test", "[!throws]") {
     auto cmdN = thisNode.getModule<CommandModule>();
 
     setupCommands(cmdN.get());
-//    cmdN->setInteractive(true);
 
     thisNode.start();
 
@@ -107,7 +106,7 @@ TEST_CASE("Repo module test", "[!throws]") {
     setupCommands(cmdN.get());
 
     otherNode.start();
-
+    thisNode.waitUntilStarted();
     otherNode.waitUntilStarted();
     auto secondNode = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
     bool connectedToSecond = secondNode.isConnected();
