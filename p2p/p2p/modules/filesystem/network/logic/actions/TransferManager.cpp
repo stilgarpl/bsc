@@ -13,6 +13,7 @@
 #include <p2p/modules/filesystem/network/packet/TransferQuery.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include "TransferManager.h"
+#include "TransferExeption.h"
 
 //const ResourceIdentificatorPtr &TransferManager::RemoteTransferDescriptor::getResourceIdentificatorPtr() const {
 //    return resourceIdentificatorPtr;
@@ -449,6 +450,7 @@ TransferManager::TransferQueue::queueTransfer(ResourceIdentificatorPtr source, R
         transfers.push_back(transfer);
     } else {
         LOGGER("failed to initiate transfer!")
+        throw new TransferExeption();
     }
 }
 

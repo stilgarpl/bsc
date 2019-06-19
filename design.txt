@@ -544,3 +544,7 @@ dodawanie troche sie wywala przy linkach, uwaza, ze wrzuca sie drugi raz to samo
 
 //@fixme getSource<LogicStateSource> z requireSource() czasem wyrzuca sigsegv z ubera przy próbie wzięcia odpowiedniego kontenera. zbadać, naprawić.
 ^prawdopodobnie któryś moduł nie czeka na zatrzymanie swoich elementów i one zatrzymuja sie dopiero w destruktorze, gdy nie ma juz aktywnego logic managera
+
+@todo koniecznie trzeba poprawić queueTransfer bo to wysylanie pakietow z miejsca wywolania zmiast z logiki rozwala mi test.
+
+jedna opcja na rozwiazanie tego problemu to zrobienie node id w local transfer descriptor optionalem. jesli jest podany, to transfer idzie z tego noda. jak nie ma, to leci broadcast "who has"

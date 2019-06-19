@@ -34,6 +34,6 @@ void Logger::info(std::string txt) {
 void Logger::debug(int line, std::string txt) {
 
     std::lock_guard<std::mutex> g(getLock());
-    std::clog << loggerName << " @ " << line << " : " << txt << std::endl;
+    std::cout << loggerName << " @ " << line << " : " << txt << std::endl;
 //    spdlog::info(txt);
 }
