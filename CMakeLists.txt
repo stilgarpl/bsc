@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 enable_testing()
 include(GNUInstallDirs)
-include(CPack)
+
 
 message($ENV{PATH})
 #conan setup
@@ -55,3 +55,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(p2p)
 add_subdirectory(repo)
 add_subdirectory(basyco)
+
+
+set(CPACK_GENERATOR tgz;deb)
+include(CPack)
