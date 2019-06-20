@@ -56,7 +56,7 @@ void TransferManager::beginTransfer(const TransferEvent &event) {
 
         TransferId transferId = generateTransferId();
         transfers[transferId] = descriptor;
-        NODECONTEXTLOGGER("adding transfer " + std::to_string(transferId));
+        LOGGER ("adding transfer " + std::to_string(transferId));
         BeginTransfer::Response::Ptr response = BeginTransfer::Response::getNew(event.getRequestId());
         response->setTransferId(transferId);
 
@@ -180,6 +180,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdenti
 
         BeginTransfer::Response::Ptr beginResponse = networkModule->sendPacketToNode(nodeId, beginRequest);
         if (beginResponse != nullptr) {
+            LOGGER("transfer manager -> STARTED")
             descriptorPtr.changeState(TransferState::STARTED);
             auto transferId = beginResponse->getTransferId();
 //            LOGGER("begin res received")
@@ -192,11 +193,13 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdenti
                                                                                                    propertiesRequest);
             if (propertiesResponse != nullptr) {
 //                LOGGER("got properties")
+                LOGGER("transfer manager -> AA")
                 descriptorPtr.changeState(TransferState::ATTRIBUTES_ACCQUIRED);
                 auto resourceSize = propertiesResponse->getSize();
                 SHOW(resourceSize);
                 TransferSize chunk_count = resourceSize / MAX_CHUNK_SIZE;
 //                LOGGER("chunk count = " + std::to_string(chunk_count));
+                LOGGER("transfer manager -> DOWNLOADING")
                 descriptorPtr.changeState(TransferState::DOWNLOADING);
                 for (TransferSize i = 0; i < chunk_count + 1; ++i) {
 
@@ -206,7 +209,8 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdenti
 //                    LOGGER("begin =" + std::to_string(i * MAX_CHUNK_SIZE));
                     dataRequest->setEnd(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
 //                    LOGGER("begin =" + std::to_string(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize)));
-                    DataTransfer::Response::Ptr response = networkModule->sendPacketToNode(nodeId, dataRequest);
+                    LOGGER("requesting data chunk ")
+                    auto response = networkModule->sendPacketToNode(nodeId, dataRequest);
                     if (response != nullptr) {
                         // SendFile::Response* response;
                         LOGGER(std::to_string(response->getEnd()) + "/" + std::to_string(resourceSize) + " : " +
@@ -216,6 +220,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdenti
                         descriptorPtr.setTransferredSize(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
 //                         std::this_thread::sleep_for(3s);
                     } else {
+                        LOGGER("transfer manager -> ERROR")
                         descriptorPtr.changeState(TransferState::ERROR);
                         break;
                     }
@@ -226,9 +231,10 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdenti
             FinishTransfer::Request::Ptr finishRequest = FinishTransfer::Request::getNew();
             LOGGER("finishing transfer");
             networkModule->sendPacketToNode(nodeId, finishRequest);
+            LOGGER("transfer manager -> FINISHED")
             descriptorPtr.changeState(TransferState::FINISHED);
         }
-        LOGGER("transfer finished");
+        LOGGER("transfer finished ");
     });
     if (start) {
         ret->startThread();
@@ -347,6 +353,7 @@ void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescri
             break;
         case TransferState::STARTED:
             //if at least one transfer is started
+            LOGGER("transfer queue -> STARTED")
             changeState(TransferState::STARTED);
             break;
         case TransferState::ATTRIBUTES_ACCQUIRED:
@@ -354,11 +361,13 @@ void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescri
             break;
         case TransferState::DOWNLOADING:
             //if at least one transfer is in downloading state -- and since we got update, one definitely is
+            LOGGER("transfer queue -> DOWNLOADING")
             changeState(TransferState::DOWNLOADING);
             break;
         case TransferState::FINISHED:
             //when all transfers from queue are finished, the queue is finished.
             if (countUnfinishedTransfers() == 0) {
+                LOGGER("transfer queue -> FINISHED")
                 changeState(TransferState::FINISHED);
                 LOGGER("transfer queue finished")
                 finishReady.notify_all();

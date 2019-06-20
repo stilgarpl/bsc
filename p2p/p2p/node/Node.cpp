@@ -135,5 +135,5 @@ Node::Configuration::Configuration() {
 
     //@todo constant or sth for project name
     rootPath = fs::path(std::getenv("HOME")) / ".basyco";
-    LOGGER("root path is " + rootPath.string());
+//    LOGGER("root path is " + rootPath.string());
 }

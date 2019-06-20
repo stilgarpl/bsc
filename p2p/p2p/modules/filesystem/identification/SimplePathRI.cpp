@@ -21,12 +21,7 @@ std::shared_ptr<std::istream> SimplePathRI::getResourceInputStream() {
 }
 
 std::shared_ptr<std::ostream> SimplePathRI::getResourceOutputStream() {
-    if (exists()) {
-        return std::make_shared<std::ofstream>(resourcePath, std::ios::in | std::ios::out | std::fstream::binary);
-    } else {
-        return nullptr;
-    }
-
+    return std::make_shared<std::ofstream>(resourcePath, std::ios::out | std::fstream::binary);
 }
 
 bool SimplePathRI::exists() {

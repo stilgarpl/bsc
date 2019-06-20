@@ -137,7 +137,7 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 //    when(event<ConnectionEvent>().withId(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).
 
     //send keepalives - I tried using it to help with the packet loss, but it didn't work.
-    when(event<Tick>(120s)).fireNewAction(
+    when(event<Tick>(1s)).fireNewAction(
             [&, this](auto e) { this->broadcastPacket(KeepAlivePacket::Request::getNew()); });
 
     when(event<ModuleEvent<NodeNetworkModule>>(ModuleState::READY)).fireNewAction(

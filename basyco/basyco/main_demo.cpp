@@ -29,6 +29,47 @@ using namespace std::chrono_literals;
 #include <p2p/modules/basic/BasicModule.h>
 
 
+void createFile(fs::path path, std::string content) {
+    std::ofstream file(path);
+    file << content;
+}
+
+std::string readFile(fs::path path) {
+    std::ifstream t(path);
+    std::string str((std::istreambuf_iterator<char>(t)),
+                    std::istreambuf_iterator<char>());
+    return str;
+}
+
+const std::string longString = std::string(
+        "fdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklf") +
+                               "fdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklf" +
+                               "fdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklf" +
+                               "fdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklf" +
+                               "fdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklf" +
+                               "fdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklf" +
+                               "fdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklf" +
+                               "fdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklffdsfjsdlkfjsdjfsdkhfsdlkfjhdskfhjsdklf";
+
+const std::string veryLongString =
+        longString + longString + longString + longString + longString + longString + longString + longString +
+        longString + longString + longString + longString + longString + longString + longString + longString +
+        longString + longString + longString + longString + longString + longString + longString + longString +
+        longString + longString + longString + longString + longString + longString + longString + longString +
+        longString + longString + longString + longString + longString + longString + longString + longString +
+        longString + longString + longString + longString + longString + longString + longString + longString +
+        longString + longString;
+
+const std::string extremelyLongString =
+        veryLongString + veryLongString + veryLongString + veryLongString + veryLongString + veryLongString +
+        veryLongString + veryLongString + veryLongString + veryLongString + veryLongString + veryLongString +
+        veryLongString + veryLongString + veryLongString + veryLongString + veryLongString + veryLongString +
+        veryLongString + veryLongString + veryLongString + veryLongString + veryLongString + veryLongString +
+        veryLongString + veryLongString + veryLongString + veryLongString + veryLongString + veryLongString +
+        veryLongString;
+
+
+
 void setupModules(Node &node) {
     node.addModule<BasicModule>();
     node.addModule<FilesystemModule>();
@@ -147,7 +188,40 @@ int main(int argc, char *argv[]) {
 //    otherNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 //    thirdNode.getModule<NodeNetworkModule>()->updateNodeConnectionInfo();
 
-    thisNode.waitToFinish();
+
+    thisNode.waitUntilStarted();
+    otherNode.waitUntilStarted();
+
+    fs::path testPath = fs::temp_directory_path() / "one";
+    fs::path destinationPath = fs::temp_directory_path() / "two";
+    fs::create_directories(testPath);
+    fs::create_directories(destinationPath);
+    for (int i = 0; i < 50; ++i) {
+        createFile(testPath / ("l" + std::to_string(i) + ".txt"), longString);
+        createFile(testPath / ("v" + std::to_string(i) + ".txt"), veryLongString);
+        createFile(testPath / ("e" + std::to_string(i) + ".txt"), extremelyLongString);
+    }
+    thisNode.setNodeContextActive();
+
+    auto transferQueue = thisNode.getModule<FilesystemModule>()->transferQueue();
+
+    for (int i = 0; i < 1; ++i) {
+        LOGGER("queueing transfers for " + std::to_string(i));
+        transferQueue->queueTransfer(std::make_shared<SimplePathRI>(testPath / ("l" + std::to_string(i) + ".txt")),
+                                     std::make_shared<SimplePathRI>(
+                                             destinationPath / ("l" + std::to_string(i) + ".txt")));
+//        transferQueue->queueTransfer(std::make_shared<SimplePathRI>(testPath / ("v" + std::to_string(i) + ".txt")),
+//                                     std::make_shared<SimplePathRI>(
+//                                             destinationPath / ("v" + std::to_string(i) + ".txt")));
+//        transferQueue->queueTransfer(std::make_shared<SimplePathRI>(testPath / ("e" + std::to_string(i) + ".txt")),
+//                                     std::make_shared<SimplePathRI>(
+//                                             destinationPath / ("e" + std::to_string(i) + ".txt")));
+    }
+
+    transferQueue->start();
+    transferQueue->waitToFinishAllTransfers();
+
+//    thisNode.waitToFinish();
     //auto fdes = FileTransferControl::initiateTransfer(thisNode, "second", "/tmp/zsh", "/tmp/copied_zsh");
     thisNode.stop();
     thisNode.waitToFinish();

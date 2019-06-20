@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <spdlog/spdlog.h>
+#include <p2p/node/context/NodeContext.h>
 #include "Logger.h"
 #include "Poco/ConsoleChannel.h"
 
@@ -13,6 +14,7 @@ Logger::Logger(std::string name) : logger(Poco::Logger::get(name)), loggerName(n
     // logger.setLevel(Poco::Message::Priority::PRIO_DEBUG);
 //    logger.setChannel(consoleChannel);
 
+    spdlog::set_pattern("[%T]%L:%v");
 }
 
 void Logger::error(std::string txt) {
@@ -34,6 +36,13 @@ void Logger::info(std::string txt) {
 void Logger::debug(int line, std::string txt) {
 
     std::lock_guard<std::mutex> g(getLock());
-    std::cout << loggerName << " @ " << line << " : " << txt << std::endl;
+//    std::cout << loggerName << " @ " << line << " : " << txt << std::endl;
+    if (Context::getActiveContext()->get<NodeContext>()) {
+        spdlog::info("[{:10}] [{}:{}]: {}", Context::getActiveContext()->get<NodeContext>()->getNodeInfo().getNodeId(),
+                     loggerName, std::to_string(line), txt);
+    } else {
+        spdlog::info("[{}:{}]: {}", loggerName, std::to_string(line), txt);
+    }
+
 //    spdlog::info(txt);
 }
