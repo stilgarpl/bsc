@@ -81,6 +81,8 @@ public:
 
         void setSourceNode(const NodeIdType &sourceNode);
 
+        bool isStarted();
+
         TransferSize getSize() const {
             return size;
         }

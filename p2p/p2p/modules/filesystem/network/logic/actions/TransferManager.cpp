@@ -336,6 +336,11 @@ void TransferManager::LocalTransferDescriptor::wait() {
     }
 }
 
+bool TransferManager::LocalTransferDescriptor::isStarted() {
+    std::lock_guard<std::mutex> g(threadStartMutex);
+    return thread != nullptr;
+}
+
 void TransferManager::TransferQueue::queueTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source,
                                                    ResourceIdentificatorPtr destination) {
     auto transfer = manager.initiateTransfer(nodeId, std::move(source), std::move(destination), false);
@@ -411,7 +416,7 @@ void TransferManager::TransferQueue::start() {
 //    LOGGER("transfers to start " + std::to_string(transfersToStart));
     //@todo actual transfer policy
     for (const auto &item : transfers) {
-        if (item->getCurrentState() == TransferState::NOT_STARTED) {
+        if (!item->isStarted()) {
             item->startThread();
             transfersToStart--;
         }

@@ -55,6 +55,8 @@ const std::string extremelyLongString =
 
 TEST_CASE("Transfer test", "[!throws]") {
 
+    const int TEST_FILES_NUM = 10;
+
     Node thisNode(9191);
 
     thisNode.getNodeInfo().setNodeId("firstNode");
@@ -79,21 +81,21 @@ TEST_CASE("Transfer test", "[!throws]") {
     bool connectedToSecond = remoteSecondNode.isConnected();
     INFO("testing require")
     REQUIRE(connectedToSecond);
-    std::this_thread::sleep_for(2s);
+    std::this_thread::sleep_for(200ms);
     bool hasNodeId = remoteSecondNode.getNodeId().has_value();
     REQUIRE(hasNodeId);
     auto realNodeId = *remoteSecondNode.getNodeId();
     REQUIRE(realNodeId == "second");
-
+    fs::path testPath = fs::temp_directory_path() / "one";
+    fs::path destinationPath = fs::temp_directory_path() / "two";
     //@todo test is broken, it hangs on queue transfer. fix queue function so it doesn't broadcast immediately, but only on start of the transfer.
 //    //actual tests
     SECTION("transfer test") {
-        fs::path testPath = fs::temp_directory_path() / "one";
-        fs::path destinationPath = fs::temp_directory_path() / "two";
+
         INFO("test path is " << testPath.string())
         fs::create_directories(testPath);
         fs::create_directories(destinationPath);
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < TEST_FILES_NUM; ++i) {
             INFO("creating files for " + std::to_string(i))
             createFile(testPath / ("l" + std::to_string(i) + ".txt"), longString);
             createFile(testPath / ("v" + std::to_string(i) + ".txt"), veryLongString);
@@ -103,7 +105,7 @@ TEST_CASE("Transfer test", "[!throws]") {
 
         auto transferQueue = thisNode.getModule<FilesystemModule>()->transferQueue();
 
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < TEST_FILES_NUM; ++i) {
             INFO("downloading files for " + std::to_string(i))
             transferQueue->queueTransfer(std::make_shared<SimplePathRI>(testPath / ("l" + std::to_string(i) + ".txt")),
                                          std::make_shared<SimplePathRI>(
@@ -117,9 +119,11 @@ TEST_CASE("Transfer test", "[!throws]") {
         }
 
         transferQueue->start();
+        INFO("waiting for all transfers")
         transferQueue->waitToFinishAllTransfers();
+        INFO("transfers complete, check downloaded files")
 
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < TEST_FILES_NUM; ++i) {
             REQUIRE(readFile(destinationPath / ("l" + std::to_string(i) + ".txt")) == longString);
             REQUIRE(readFile(destinationPath / ("v" + std::to_string(i) + ".txt")) == veryLongString);
             REQUIRE(readFile(destinationPath / ("e" + std::to_string(i) + ".txt")) == extremelyLongString);
@@ -135,9 +139,12 @@ TEST_CASE("Transfer test", "[!throws]") {
 
     //finish and cleanup
     INFO("stopping")
+    fs::remove_all(testPath);
+    fs::remove_all(destinationPath);
     thisNode.stop();
     otherNode.stop();
     thisNode.waitToFinish();
     otherNode.waitToFinish();
+
 
 }

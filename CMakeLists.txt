@@ -48,7 +48,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif ()
 
 
-# Generate clang compilation database
+# Generate clang compilation databaseDom (Muzyczna 7)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
