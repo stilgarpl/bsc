@@ -35,3 +35,9 @@ bool BasePacket::isRetry() const {
 void BasePacket::setRetry(bool retry) {
     BasePacket::retry = retry;
 }
+
+BasePacket::IdType BasePacket::nextId() {
+    std::lock_guard<std::mutex> g(idLock);
+    static IdType val = 0;
+    return val++;
+}

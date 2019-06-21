@@ -341,9 +341,9 @@ bool TransferManager::LocalTransferDescriptor::isStarted() {
     return thread != nullptr;
 }
 
-void TransferManager::TransferQueue::queueTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source,
-                                                   ResourceIdentificatorPtr destination) {
-    auto transfer = manager.initiateTransfer(nodeId, std::move(source), std::move(destination), false);
+void TransferManager::TransferQueue::queueTransfer(const NodeIdType &nodeId, const ResourceIdentificatorPtr &source,
+                                                   const ResourceIdentificatorPtr &destination) {
+    auto transfer = manager.initiateTransfer(nodeId, source, destination, false);
     transfer->registerStateObserver(*this);
     transfers.push_back(transfer);
 }
@@ -383,6 +383,8 @@ void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescri
             break;
         case TransferState::ERROR:
             //@todo handle error
+            changeState(TransferState::ERROR);
+            finishReady.notify_all();
             break;
     }
 
@@ -411,18 +413,25 @@ void TransferManager::TransferQueue::start() {
 //    LOGGER("transfers in finished :" + std::to_string(countTransfersInState(TransferState::FINISHED)));
 //    LOGGER("all transfers " + std::to_string(transfers.size()));
 //    unsigned long  transfersToStart = std::min(countTransfersNotInState(TransferState::NOT_STARTED) - countTransfersInState(TransferState::FINISHED),MAX_CONCURRENT_TRANSFERS);
+    std::lock_guard<std::recursive_mutex> g(startLock);
     unsigned long transfersToStart = std::min(countTransfersInState(TransferState::NOT_STARTED),
                                               MAX_CONCURRENT_TRANSFERS);
 //    LOGGER("transfers to start " + std::to_string(transfersToStart));
+    LOGGER("Transfer queue start, transfers to start=" + std::to_string(transfersToStart))
     //@todo actual transfer policy
     for (const auto &item : transfers) {
         if (!item->isStarted()) {
+            LOGGER("transfer not started, starting ")
             item->startThread();
             transfersToStart--;
         }
         if (transfersToStart == 0) {
             break;
         }
+    }
+    if (transfersToStart > 0) {
+        LOGGER("some transfers were not started " + std::to_string(transfersToStart))
+        throw TransferExeption();
     }
 }
 
@@ -447,13 +456,14 @@ unsigned long TransferManager::TransferQueue::countTransfersInState(TransferMana
 }
 
 unsigned long TransferManager::TransferQueue::countUnfinishedTransfers() {
-    unsigned long result = transfers.size();
-    for (const auto &item : transfers) {
-        if (item->getCurrentState() == TransferState::FINISHED) {
-            result--;
-        }
-    }
-    return result;
+//    unsigned long result = transfers.size();
+//    for (const auto &item : transfers) {
+//        if (item->getCurrentState() == TransferState::FINISHED) {
+//            result--;
+//        }
+//    }
+//    return result;
+    return countTransfersNotInState(TransferState::FINISHED);
 }
 
 void
@@ -464,13 +474,19 @@ TransferManager::TransferQueue::queueTransfer(ResourceIdentificatorPtr source, R
         transfers.push_back(transfer);
     } else {
         LOGGER("failed to initiate transfer!")
-        throw new TransferExeption();
+        throw TransferExeption();
     }
 }
 
 void TransferManager::TransferQueue::waitToFinishAllTransfers() {
     std::unique_lock<std::mutex> g(finishLock);
 
-    finishReady.wait(g, [this] { return this->getCurrentState() == TransferState::FINISHED; });
+    finishReady.wait(g, [this] {
+        return this->getCurrentState() == TransferState::FINISHED || this->getCurrentState() == TransferState::ERROR;
+    });
+
+    if (this->getCurrentState() == TransferState::ERROR) {
+        throw TransferExeption();
+    }
 
 }

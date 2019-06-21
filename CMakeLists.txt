@@ -57,5 +57,5 @@ add_subdirectory(repo)
 add_subdirectory(basyco)
 
 
-set(CPACK_GENERATOR tgz;deb)
+set(CPACK_GENERATOR TGZ;DEB;RPM;)
 include(CPack)

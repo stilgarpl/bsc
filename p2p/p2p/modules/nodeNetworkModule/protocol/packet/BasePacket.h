@@ -29,13 +29,11 @@ public:
     typedef unsigned int IdType;
     typedef std::shared_ptr<BasePacket> Ptr;
     typedef PacketGroup BaseType;
+    std::mutex idLock;
 private:
     //@fixme Ids are not unique across nodes! Is that a problem for Transmission Control or Graviton? Probably not, but investigate
     /// what if A sends id 5 to B and then C sends id 5 to B ? would that work?
-    IdType nextId() {
-        static IdType val = 0;
-        return val++;
-    }
+    IdType nextId();
     Status status;
     IdType id;
     bool retry = false;
@@ -71,6 +69,10 @@ public:
     void setRetry(bool retry);
 
     virtual const RoleList &requiredRoles() =0;
+
+    void resetId() {
+        setId(nextId());
+    }
 
 
 protected:

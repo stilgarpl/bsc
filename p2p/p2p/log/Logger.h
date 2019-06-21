@@ -9,12 +9,12 @@
 #include <string>
 #include <mutex>
 #include <filesystem>
-#include <cryptopp/hex.h>
 
 namespace fs = std::filesystem;
 
 
 #define LOGGER(x) Logger(fs::path(__FILE__).filename()).debug(__LINE__, x);
+#define ERROR(x) Logger(fs::path(__FILE__).filename()).error(__LINE__, x);
 #define SHOW(x) LOGGER(std::string(#x) +"="+std::to_string(x))
 #define NODECONTEXTLOGGER(x) if (Context::getActiveContext()->get<NodeContext>()) Logger("["+Context::getActiveContext()->get<NodeContext>()->getNodeInfo().getNodeId() + "] " + __FILE__).debug(__LINE__,x);
 
@@ -29,11 +29,14 @@ public:
         static std::mutex lock;
         return lock;
     }
-    Logger(std::string name);
+
+    explicit Logger(std::string name);
 
     void debug(std::string txt);
 
     void debug(int line, std::string txt);
+
+    void error(int line, std::string txt);
     void error(std::string txt);
 
     void info(std::string txt);

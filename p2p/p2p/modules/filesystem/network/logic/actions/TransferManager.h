@@ -123,6 +123,7 @@ public:
         const unsigned long MAX_CONCURRENT_TRANSFERS = 2;
         std::mutex finishLock;
         std::condition_variable finishReady;
+        std::recursive_mutex startLock;
 
     public:
         explicit TransferQueue(TransferManager &manager);
@@ -140,7 +141,8 @@ public:
 
     public:
         void
-        queueTransfer(const NodeIdType &nodeId, ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
+        queueTransfer(const NodeIdType &nodeId, const ResourceIdentificatorPtr &source,
+                      const ResourceIdentificatorPtr &destination);
 
         void queueTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
         void start();

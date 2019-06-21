@@ -19,6 +19,7 @@ public:
     typedef LogicStateEvent<Object, stateIdType> EventType;
 protected:
     typedef LogicStateMachine<Object, StateIdType> ThisType;
+    std::mutex notifyLock;
 public:
 
     class Observer {
@@ -40,6 +41,7 @@ private:
     std::list<std::reference_wrapper<Observer>> observers;
 
     void notify(StateIdType state) {
+        std::lock_guard<std::mutex> g(notifyLock);
         for (const auto &observer : observers) {
             observer.get().update(object, state);
         }

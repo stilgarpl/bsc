@@ -46,3 +46,17 @@ void Logger::debug(int line, std::string txt) {
 
 //    spdlog::info(txt);
 }
+
+void Logger::error(int line, std::string txt) {
+
+    std::lock_guard<std::mutex> g(getLock());
+//    std::cout << loggerName << " @ " << line << " : " << txt << std::endl;
+    if (Context::getActiveContext() != nullptr && Context::getActiveContext()->get<NodeContext>()) {
+        spdlog::error("[{:10}] [{}:{}]: {}", Context::getActiveContext()->get<NodeContext>()->getNodeInfo().getNodeId(),
+                      loggerName, std::to_string(line), txt);
+    } else {
+        spdlog::error("[{}:{}]: {}", loggerName, std::to_string(line), txt);
+    }
+
+//    spdlog::info(txt);
+}

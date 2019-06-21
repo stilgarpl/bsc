@@ -115,6 +115,8 @@ public:
             return returnValue;
         } catch (const std::future_error &e) {
             //broken promise
+            LOGGER("future error. broken promise! returning default value (null) " + std::to_string(p->getId()))
+            ERROR(std::string("Promise broken ") + e.what() + " ... " + e.code().message());
             return returnValue;
         }
     }

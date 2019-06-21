@@ -6,20 +6,20 @@
 #include "GravitonProtocol.h"
 
 void GravitonProtocol::onPacketSent(const PacketEvent &event) {
-    std::lock_guard<std::mutex> g(lock);
+    std::lock_guard<std::mutex> g(responseMapLock);
     LOGGER("onPacketSent" + std::to_string(event.getPacket()->getId()));
     //@todo maybe check if packet is in the response map?
 }
 
 void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
-    std::lock_guard<std::mutex> g(lock);
+    std::lock_guard<std::mutex> g(responseMapLock);
     LOGGER("onPacketReceived" + std::to_string(event.getPacket()->getId()));
     if (responseMap.count(event.getPacket()->getId()) > 0) {
         auto &ptr = responseMap[event.getPacket()->getId()];
         if (ptr != nullptr) { //not all packets are from this protocol...
             if (event.getPacket()->getStatus() == ptr->getExpectedStatus()) {
                 ptr->getResponsePromise().set_value(event.getPacket());
-//                NODECONTEXTLOGGER("expected packet received")
+                LOGGER("expected packet received")
                 responseMap.erase(event.getPacket()->getId());
             } else if (event.getPacket()->getStatus() == Status::ERROR) {
                 ptr->getResponsePromise().set_value(event.getPacket());
@@ -33,7 +33,7 @@ void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
 
 
 void GravitonProtocol::work(const Tick &tick) {
-    std::lock_guard<std::mutex> g(lock);
+    std::lock_guard<std::mutex> g(responseMapLock);
 //    LOGGER("gravi work " + std::to_string(responseMap.size()))
     auto it = std::begin(responseMap);
     while (it != std::end(responseMap)) {
@@ -57,7 +57,7 @@ void GravitonProtocol::work(const Tick &tick) {
 }
 
 std::future<BasePacketPtr> GravitonProtocol::send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) {
-    std::lock_guard<std::mutex> g(lock);
+    std::lock_guard<std::mutex> g(responseMapLock);
     //  LOGGER("send");
     std::shared_ptr<BasePacketInfo> ptr = std::make_shared<BasePacketInfo>(p, conn,
                                                                            std::chrono::steady_clock::now(),
