@@ -272,7 +272,8 @@ TransferManager::LocalTransferDescriptor::LocalTransferDescriptor()
 
     addState(TransferState::NOT_STARTED, TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING,
              TransferState::STARTED, TransferState::ERROR, TransferState::FINISHED);
-    addLink(TransferState::NOT_STARTED, TransferState::STARTED, TransferState::ERROR);
+    addLink(TransferState::NOT_STARTED, TransferState::PREPARED, TransferState::STARTED, TransferState::ERROR);
+    addLink(TransferState::PREPARED, TransferState::STARTED, TransferState::ERROR);
     addLink(TransferState::STARTED, TransferState::ATTRIBUTES_ACCQUIRED, TransferState::ERROR);
     addLink(TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING, TransferState::ERROR);
     addLink(TransferState::DOWNLOADING, TransferState::FINISHED, TransferState::ERROR);
@@ -289,6 +290,7 @@ void TransferManager::LocalTransferDescriptor::setPayload(const std::function<vo
 void TransferManager::LocalTransferDescriptor::startThread() {
     std::lock_guard<std::mutex> g(threadStartMutex);
     if (thread == nullptr) {
+        changeState(TransferState::PREPARED);
         thread = std::make_unique<std::thread>(payload, std::ref(*this));
     } else {
         //@todo error already started
@@ -354,6 +356,7 @@ void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescri
     switch (state) {
 
         case TransferState::NOT_STARTED:
+        case TransferState::PREPARED:
             //does not apply
             break;
         case TransferState::STARTED:
@@ -398,7 +401,8 @@ TransferManager::TransferQueue::TransferQueue(TransferManager &manager) : LogicS
 
     addState(TransferState::NOT_STARTED, TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING,
              TransferState::STARTED, TransferState::ERROR, TransferState::FINISHED);
-    addLink(TransferState::NOT_STARTED, TransferState::STARTED, TransferState::ERROR);
+    addLink(TransferState::NOT_STARTED, TransferState::PREPARED, TransferState::STARTED, TransferState::ERROR);
+    addLink(TransferState::PREPARED, TransferState::STARTED, TransferState::ERROR);
     addLink(TransferState::STARTED, TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING,
             TransferState::ERROR);
     addLink(TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING, TransferState::ERROR);
@@ -414,8 +418,12 @@ void TransferManager::TransferQueue::start() {
 //    LOGGER("all transfers " + std::to_string(transfers.size()));
 //    unsigned long  transfersToStart = std::min(countTransfersNotInState(TransferState::NOT_STARTED) - countTransfersInState(TransferState::FINISHED),MAX_CONCURRENT_TRANSFERS);
     std::lock_guard<std::recursive_mutex> g(startLock);
-    unsigned long transfersToStart = std::min(countTransfersInState(TransferState::NOT_STARTED),
-                                              MAX_CONCURRENT_TRANSFERS);
+    auto transfersNotStarted = countTransfersInState(TransferState::NOT_STARTED);
+    auto transfersFinished = countTransfersInState(TransferState::FINISHED);
+    auto transfersRunning = transfers.size() - transfersFinished - transfersNotStarted;
+
+    unsigned long transfersToStart = std::min<long>(std::max<long>(MAX_CONCURRENT_TRANSFERS - transfersRunning, 0),
+                                                    transfersNotStarted);
 //    LOGGER("transfers to start " + std::to_string(transfersToStart));
     LOGGER("Transfer queue start, transfers to start=" + std::to_string(transfersToStart))
     //@todo actual transfer policy

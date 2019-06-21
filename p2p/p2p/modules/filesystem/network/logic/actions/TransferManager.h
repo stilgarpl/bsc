@@ -35,6 +35,7 @@ public:
 
     enum class TransferState {
         NOT_STARTED,
+        PREPARED,
         STARTED,
         ATTRIBUTES_ACCQUIRED,
         DOWNLOADING,
