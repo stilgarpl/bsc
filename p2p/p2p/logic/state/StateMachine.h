@@ -33,6 +33,7 @@ public:
 protected:
 
     auto getCurrentState() {
+        std::lock_guard<std::recursive_mutex> g(changeStateMutex);
         return *currentState;
     }
 
