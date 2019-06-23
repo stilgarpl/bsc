@@ -5,7 +5,7 @@
 #ifndef BASYCO_UBER_H
 #define BASYCO_UBER_H
 
-#include <vector>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <functional>
@@ -15,7 +15,7 @@ private:
     mutable std::mutex idLock;
 protected:
     typedef unsigned int TypeIdType;
-    std::vector<std::shared_ptr<void>> containers;
+    std::map<TypeIdType, std::shared_ptr<void>> containers;
 
     TypeIdType getNextTypeId() const {
         static TypeIdType val = 0;
@@ -46,9 +46,9 @@ public:
     container<Args...> &get(ConstructorArgs ... constructorArgs) {
         typedef container<Args...> ContainerType;
         const static auto typeId = getTypeId<Args...>();
-        if (containers.size() <= typeId) {
-            containers.resize(10 * typeId + 20);
-        }
+//        if (containers.size() <= typeId) {
+//            containers.resize(10 * typeId + 20);
+//        }
         auto &ref = containers[typeId];
         if (ref == nullptr) {
             ref = std::make_shared<ContainerType>(constructorArgs...);
@@ -66,7 +66,7 @@ public:
      */
     template<typename BaseClass>
     void forEach(std::function<void(BaseClass &)> func) {
-        for (auto &&it : containers) {
+        for (auto &&[key, it] : containers) {
             if (it != nullptr) {
                 BaseClass &result = *std::static_pointer_cast<BaseClass>(it);
                 func(result);
@@ -87,9 +87,9 @@ public:
     container &get() {
         typedef container ContainerType;
         const static auto typeId = getTypeId<Args...>();
-        if (containers.size() <= typeId) {
-            containers.resize(typeId + 2);
-        }
+//        if (containers.size() <= typeId) {
+//            containers.resize(10*typeId + 20);
+//        }
         auto &ref = containers[typeId];
         if (ref == nullptr) {
             ref = std::make_shared<ContainerType>();
@@ -101,7 +101,7 @@ public:
     }
 
     void forEach(std::function<void(container &)> func) {
-        for (auto &&it : containers) {
+        for (auto &&[key, it] : containers) {
             if (it != nullptr) {
                 container &result = *std::static_pointer_cast<container>(it);
                 func(result);
