@@ -245,6 +245,7 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
         } else {
             if (fileMap.isDeleted(path)) {
                 LOGGER("file deleted, but not in filesystem so nothing to do: " + path.string())
+                deployMap.markDeployed(path, DeployState::NOT_DEPLOYED);
             } else {
                 //file is neither on file system nor in the map. someone trying to update unknown file?
                 LOGGER("file unknown " + path.string());

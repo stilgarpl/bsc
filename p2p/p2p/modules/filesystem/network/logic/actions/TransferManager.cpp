@@ -13,7 +13,7 @@
 #include <p2p/modules/filesystem/network/packet/TransferQuery.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include "TransferManager.h"
-#include "TransferExeption.h"
+#include "TransferException.h"
 
 //const ResourceIdentificatorPtr &TransferManager::RemoteTransferDescriptor::getResourceIdentificatorPtr() const {
 //    return resourceIdentificatorPtr;
@@ -220,7 +220,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdenti
                         descriptorPtr.setTransferredSize(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
 //                         std::this_thread::sleep_for(3s);
                     } else {
-                        LOGGER("transfer manager -> ERROR")
+                        LOGGER("no response for request, transfer manager -> ERROR")
                         descriptorPtr.changeState(TransferState::ERROR);
                         break;
                     }
@@ -441,7 +441,7 @@ void TransferManager::TransferQueue::start() {
     }
     if (transfersToStart > 0) {
         LOGGER("some transfers were not started " + std::to_string(transfersToStart))
-        throw TransferExeption();
+        throw TransferException();
     }
 }
 
@@ -484,7 +484,7 @@ TransferManager::TransferQueue::queueTransfer(ResourceIdentificatorPtr source, R
         transfers.push_back(transfer);
     } else {
         LOGGER("failed to initiate transfer!")
-        throw TransferExeption();
+        throw TransferException();
     }
 }
 
@@ -496,7 +496,8 @@ void TransferManager::TransferQueue::waitToFinishAllTransfers() {
     });
 
     if (this->getCurrentState() == TransferState::ERROR) {
-        throw TransferExeption();
+        LOGGER("current state is error, terminating")
+        throw TransferException();
     }
 
 }
