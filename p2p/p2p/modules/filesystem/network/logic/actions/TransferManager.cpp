@@ -270,7 +270,8 @@ TransferManager::initiateTransfer(ResourceIdentificatorPtr source, ResourceIdent
 TransferManager::LocalTransferDescriptor::LocalTransferDescriptor()
         : LogicStateMachine(*this) {
 
-    addState(TransferState::NOT_STARTED, TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING,
+    addState(TransferState::NOT_STARTED, TransferState::PREPARED, TransferState::ATTRIBUTES_ACCQUIRED,
+             TransferState::DOWNLOADING,
              TransferState::STARTED, TransferState::ERROR, TransferState::FINISHED);
     addLink(TransferState::NOT_STARTED, TransferState::PREPARED, TransferState::STARTED, TransferState::ERROR);
     addLink(TransferState::PREPARED, TransferState::STARTED, TransferState::ERROR);
@@ -399,7 +400,8 @@ void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescri
 
 TransferManager::TransferQueue::TransferQueue(TransferManager &manager) : LogicStateMachine(*this), manager(manager) {
 
-    addState(TransferState::NOT_STARTED, TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING,
+    addState(TransferState::NOT_STARTED, TransferState::PREPARED, TransferState::ATTRIBUTES_ACCQUIRED,
+             TransferState::DOWNLOADING,
              TransferState::STARTED, TransferState::ERROR, TransferState::FINISHED);
     addLink(TransferState::NOT_STARTED, TransferState::PREPARED, TransferState::STARTED, TransferState::ERROR);
     addLink(TransferState::PREPARED, TransferState::STARTED, TransferState::ERROR);

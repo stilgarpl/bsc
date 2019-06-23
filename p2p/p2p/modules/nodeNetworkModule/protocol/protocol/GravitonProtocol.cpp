@@ -40,8 +40,8 @@ void GravitonProtocol::work(const Tick &tick) {
         auto &value = it->second;
 //        LOGGER("in loop")
         if (tick.getNow() - value->getTimeSent() > MAX_TIMEOUT) {
-            LOGGER("TIMEOUT REACHED, removing packet data, breaking promises")
             if (value->getRetry() >= MAX_RETRY) {
+                LOGGER("TIMEOUT REACHED, removing packet data, breaking promises")
                 it = responseMap.erase(it);
             } else {
                 value->getConnection()->send(value->getPacketPtr());
