@@ -13,13 +13,10 @@
 
 class ServerConnection : public Poco::Net::TCPServerConnection, public IServerConnection {
 
-private:
-    Node &serverNode;
-
 public:
     void run() override;
 
-    ServerConnection(const Poco::Net::StreamSocket &socket, Node &serverNode, Context::Ptr context);
+    ServerConnection(const Poco::Net::StreamSocket &socket, Context::Ptr context);
 
     void startReceiving(Poco::Net::StreamSocket &socket) override;
 
@@ -38,11 +35,12 @@ protected:
 
 class ServerConnectionFactory : public Poco::Net::TCPServerConnectionFactory {
 private:
-    Node &serverNode;
-    Context::OwnPtr context = nullptr; //initialized from the constructor
+    std::function<Context::OwnPtr(void)> contextGetter;
+    std::list<std::reference_wrapper<Connection::Observer>> observers;
 public:
 
-    ServerConnectionFactory(Node &serverNode, Context::Ptr context);
+    ServerConnectionFactory(std::function<Context::OwnPtr(void)> contextGetter,
+                            std::list<std::reference_wrapper<Connection::Observer>> observers);
 
     Poco::Net::TCPServerConnection *createConnection(const Poco::Net::StreamSocket &socket) override;
 

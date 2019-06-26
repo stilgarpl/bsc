@@ -22,6 +22,7 @@
 #include <p2p/logic/evaluators/CommonEvaluators.h>
 #include <p2p/logic/actions/CommonActions.h>
 #include <p2p/logic/chain/ChainEvaluators.h>
+#include <p2p/modules/nodeNetworkModule/remote/RemoteNodeContext.h>
 
 
 using namespace Poco::Net;
@@ -83,6 +84,11 @@ bool NodeNetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHe
 
     if (actionHelper.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNoI")) {
         std::clog << "Debug: reqNoI assignment!" << std::endl;
+
+    }
+
+    if (actionHelper.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ACCEPTED, "reqNoI")) {
+        std::clog << "Debug: server reqNoI assignment!" << std::endl;
 
     }
 
@@ -321,7 +327,8 @@ void NodeNetworkModule::stopAcceptedConnections() {
         if (it != nullptr)
             it->stop();
     }
-    acceptedConnections.remove_if([](auto) { return true; });
+//    acceptedConnections.erase(acceptedConnections.remove_if([](auto) { return true; }),acceptedConnections.end());
+    acceptedConnections.clear();
 }
 
 
@@ -337,7 +344,7 @@ void NodeNetworkModule::listen() {
 
 
     server = std::make_shared<TCPServer>(
-            new ServerConnectionFactory(dynamic_cast<Node &>(this->node), this->node.getContext()),
+            new ServerConnectionFactory([&] { return getRemoteNode().context(); }, {*this}),
             *serverSocket);
     server->start();
 
@@ -407,6 +414,21 @@ const std::shared_ptr<IProtocol> &NodeNetworkModule::getProtocol() const {
 
 std::shared_ptr<NetworkInfo> &NodeNetworkModule::getNetworkInfo() {
     return networkInfo;
+}
+
+void NodeNetworkModule::update(Connection &connection, ConnectionState type) {
+    //@todo maybe RemoteNode should be watching this...
+    switch (type) {
+        case ConnectionState::NEW:
+            break;
+        case ConnectionState::CONNECTED:
+            Context::getActiveContext()->get<RemoteNodeContext>()->getRemoteNode().connect(&connection);
+//            getRemoteNode().connect(&connection);
+            break;
+        case ConnectionState::DISCONNECTED:
+            break;
+    }
+
 }
 
 void NodeNetworkModule::SubModule::setupPacketProcessing(NodeNetworkModule &node) {

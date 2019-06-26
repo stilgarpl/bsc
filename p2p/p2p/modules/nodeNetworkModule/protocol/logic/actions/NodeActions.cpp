@@ -54,9 +54,12 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
             auto remoteNodeContext = context->get<RemoteNodeContext>();
             if (remoteNodeContext) {
                 auto &remoteNode = remoteNodeContext->getRemoteNode();
-                node.getModule<NodeNetworkModule>()->getNetworkInfo()->addKnownAddress(event.getNodeInfo().getNodeId(),
-                                                                                       *remoteNode.getAddress());
+                if (remoteNode.getAddress()) {
+                    node.getModule<NodeNetworkModule>()->getNetworkInfo()->addKnownAddress(
+                            event.getNodeInfo().getNodeId(),
+                            *remoteNode.getAddress());
 
+                }
             }
 
         }

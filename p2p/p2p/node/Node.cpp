@@ -12,8 +12,10 @@
 
 Node::~Node() {
 
-
-    stop();
+    if (started) {
+        ERROR("stopping in destructor is usually too late. stop and wait!")
+        stop();
+    }
 
 
 }

@@ -224,10 +224,18 @@ void Connection::stopReceiving() {
     //  processor.stop();
 }
 
-Connection::Connection(const Context::Ptr &context) : processor(*this),
+Connection::Connection(const Context::Ptr &context) : LogicStateMachine(*this), processor(*this),
                                                       connectionContext(Context::makeContext(context)) {
 
     connectionContext->set<ConnectionContext, Connection &>(*this);
+
+    //@todo when state machine global definition setting is implemented, move this out of the constructor:
+
+    addState(ConnectionState::NEW, ConnectionState::CONNECTED, ConnectionState::DISCONNECTED);
+    addLink(ConnectionState::NEW, ConnectionState::CONNECTED, ConnectionState::DISCONNECTED);
+    addLink(ConnectionState::CONNECTED, ConnectionState::DISCONNECTED);
+    addLink(ConnectionState::DISCONNECTED, ConnectionState::CONNECTED);
+    setState(ConnectionState::NEW);
 }
 
 ConnectionProcessor &Connection::getProcessor() {

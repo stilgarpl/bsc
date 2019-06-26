@@ -34,7 +34,7 @@ typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
 
 
 class NodeNetworkModule
-        : public NodeModuleDependent<NodeNetworkModule> {
+        : public NodeModuleDependent<NodeNetworkModule>, public Connection::Observer/*for server connections*/ {
 
 public:
 
@@ -271,6 +271,7 @@ public: // @todo should be public or shouldn't ?
 
     const std::shared_ptr<IProtocol> &getProtocol() const;
 
+    void update(Connection &connection, ConnectionState type) override;
 
     /**
      * this method creates new remote nodes

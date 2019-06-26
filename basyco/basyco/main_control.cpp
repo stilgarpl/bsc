@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
     thisNode.start();
     thisNode.waitUntilStarted();
 //@todo get actual daemon address from configuration
-    auto daemonNode = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+    auto &daemonNode = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
     //@todo find a better way to wait for connection
     cmdN->sendCommandToRemoteNode(daemonNode, commands);
     thisNode.stop();

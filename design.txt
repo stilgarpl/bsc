@@ -550,3 +550,8 @@ dodawanie troche sie wywala przy linkach, uwaza, ze wrzuca sie drugi raz to samo
 jedna opcja na rozwiazanie tego problemu to zrobienie node id w local transfer descriptor optionalem. jesli jest podany, to transfer idzie z tego noda. jak nie ma, to leci broadcast "who has"
 
 @todo error handling w transferach - teraz po prostu rzucam TransferException ktory crashuje cala apke.
+
+
+jest DEADLOCK - disconnectAll() na remote node ustawia connection = null, co łapie fetcher locka i próbuje ustawić observera, co potrzebuje notification locka
+
+ale w tym samym czasie połączenie się zatrzymuje i robi to samo tylko w drugą stronę - notify() z changeState ma observer locka i próbuje złapać fetcher locka

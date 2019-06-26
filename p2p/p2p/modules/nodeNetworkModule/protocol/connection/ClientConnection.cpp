@@ -28,6 +28,7 @@ ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, const Cont
 
 void ClientConnection::startReceivingImpl() {
     Connection::startReceiving(socket);
+    changeState(ConnectionState::CONNECTED);
 
 }
 
@@ -67,6 +68,7 @@ void ClientConnection::shutdown() {
             nested = nested->nested();
         }
     }
+    changeState(ConnectionState::DISCONNECTED);
     auto lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();

@@ -84,6 +84,8 @@ public:
 
     Node();
 
+    Node(Node &) = delete;
+
     explicit Node(int port);
 
     LogicManager &getLogicManager() override {

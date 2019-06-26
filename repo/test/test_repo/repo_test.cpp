@@ -9,7 +9,7 @@
 #include <p2p/modules/basic/BasicModule.h>
 #include <p2p/modules/auth/AuthModule.h>
 
-void setupModules(Node &node) {
+void remoteServerTestModuleSetup(Node &node) {
     node.addModule<BasicModule>();
     node.addModule<FilesystemModule>();
     node.addModule<NodeNetworkModule>();
@@ -86,7 +86,7 @@ TEST_CASE("Repo module test", "[!throws]") {
 
     thisNode.getNodeInfo().setNodeId("first Node");
 
-    setupModules(thisNode);
+    remoteServerTestModuleSetup(thisNode);
     thisNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
     thisNode.getModule<NodeNetworkModule>()->configuration().setPort(9191);
     auto cmdN = thisNode.getModule<CommandModule>();
@@ -99,7 +99,7 @@ TEST_CASE("Repo module test", "[!throws]") {
     otherNode.getNodeInfo().setNodeId("second");
 
 
-    setupModules(otherNode);
+    remoteServerTestModuleSetup(otherNode);
     otherNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
     otherNode.getModule<NodeNetworkModule>()->configuration().setPort(9999);
     cmdN = otherNode.getModule<CommandModule>();
@@ -108,7 +108,7 @@ TEST_CASE("Repo module test", "[!throws]") {
     otherNode.start();
     thisNode.waitUntilStarted();
     otherNode.waitUntilStarted();
-    auto secondNode = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+    auto &secondNode = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
     bool connectedToSecond = secondNode.isConnected();
 
     REQUIRE(connectedToSecond);
