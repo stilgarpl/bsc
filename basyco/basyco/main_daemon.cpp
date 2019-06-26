@@ -27,7 +27,6 @@ using namespace std::chrono_literals;
 #include <p2p/modules/command/StandardCommandsDirectory.h>
 #include <variant>
 #include <p2p/modules/basic/BasicModule.h>
-#include <boost/asio/ip/host_name.hpp>
 #include <Poco/Environment.h>
 
 
