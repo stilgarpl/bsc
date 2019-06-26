@@ -27,6 +27,8 @@ using namespace std::chrono_literals;
 #include <p2p/modules/command/StandardCommandsDirectory.h>
 #include <variant>
 #include <p2p/modules/basic/BasicModule.h>
+#include <boost/asio/ip/host_name.hpp>
+#include <Poco/Environment.h>
 
 
 void setupModules(Node &node) {
@@ -80,8 +82,9 @@ int main(int argc, char *argv[]) {
 
     Node thisNode(9191);
 
+//    auto host_name = boost::asio::ip::host_name();
     //@todo name from configuration
-    thisNode.getNodeInfo().setNodeId("daemon");
+    thisNode.getNodeInfo().setNodeId(Poco::Environment::nodeName());
 
     setupModules(thisNode);
     thisNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
