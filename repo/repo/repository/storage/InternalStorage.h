@@ -9,7 +9,7 @@
 #include "IStorage.h"
 
 #include <filesystem>
-#include <p2p/modules/filesystem/network/logic/actions/TransferManager.h>
+#include <p2p/modules/filesystem/transfer/TransferManager.h>
 
 namespace fs = std::filesystem;
 

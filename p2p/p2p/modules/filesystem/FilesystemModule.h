@@ -14,7 +14,7 @@
 #include <p2p/dependency/DependencyManaged.h>
 
 #include <filesystem>
-#include <p2p/modules/filesystem/network/logic/actions/TransferManager.h>
+#include <p2p/modules/filesystem/transfer/TransferManager.h>
 #include <p2p/modules/filesystem/identification/SimplePathRI.h>
 
 #include "p2p/modules/nodeNetworkModule/NodeNetworkModule.h"

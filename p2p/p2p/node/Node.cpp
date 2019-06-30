@@ -6,7 +6,7 @@
 #include "Node.h"
 #include <p2p/node/context/NodeContext.h>
 #include <p2p/node/context/LogicContext.h>
-#include <p2p/modules/configuration/ConfigurationManager.h>
+#include <p2p/node/configuration/ConfigurationManager.h>
 #include "NodeModule.h"
 
 

@@ -8,11 +8,10 @@
 
 #include <p2p/thread/Runnable.h>
 #include <p2p/dependency/IDependencyManaged.h>
-//@todo this is interface for configuration, it shouldn't have dependencies on modules
-#include <p2p/modules/configuration/IConfig.h>
 #include "INode.h"
 #include "ModuleState.h"
 #include <any>
+#include <p2p/node/configuration/IConfig.h>
 
 class INodeModule : public virtual IDependencyManaged, public Runnable {
 private:

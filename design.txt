@@ -247,7 +247,7 @@ mysle, ze trzeba context przeniesc na shared_ptr. w tym momencie event trzyma co
 
 
 
-@todo really think about server side remote nodes.
+
 mam trochę taką niespójność - z jednej strony ConnectionContext daje dostęp do połączenia, z drugiej strony teraz mam Remote node które z grubsza dają to samo...
 z trzeciej strony mam jeszcze origin(), który w kolejny sposób duplikuje tę funkcjonalność.
 ======================================================================
@@ -534,7 +534,7 @@ idea jest taka, ze chainy sie lockuja zgodnie z zadana konfiguracja. chainy ze w
 
 @todo maybe add timeout to chainlocking - for example, if chains are triggered more often than it takes to process them, they will pile up. kolejka będzie się nawarstwiać aż ram sie skończy. zamiast tego chain po czekaniu na locka zbyt długo powinien przerwać chain.
 
-@todo basyco-control ma miec tylko Command module który w dodatku wszystkie komendy zmienia w "remote daemon $@"
+done: basyco-control ma miec tylko Command module który w dodatku wszystkie komendy zmienia w "remote daemon $@"
 @todo dodac jakiś mechanizm zwracania odpowiedzi z daemona, nie tylko jako SUCCESS/FAILURE
 
 
@@ -544,10 +544,8 @@ dodawanie troche sie wywala przy linkach, uwaza, ze wrzuca sie drugi raz to samo
 
 //@fixme getSource<LogicStateSource> z requireSource() czasem wyrzuca sigsegv z ubera przy próbie wzięcia odpowiedniego kontenera. zbadać, naprawić.
 ^prawdopodobnie któryś moduł nie czeka na zatrzymanie swoich elementów i one zatrzymuja sie dopiero w destruktorze, gdy nie ma juz aktywnego logic managera
+^to sie dzieje zawsze jak leci destruktor z Node.
 
-@todo koniecznie trzeba poprawić queueTransfer bo to wysylanie pakietow z miejsca wywolania zmiast z logiki rozwala mi test.
-
-jedna opcja na rozwiazanie tego problemu to zrobienie node id w local transfer descriptor optionalem. jesli jest podany, to transfer idzie z tego noda. jak nie ma, to leci broadcast "who has"
 
 @todo error handling w transferach - teraz po prostu rzucam TransferException ktory crashuje cala apke.
 

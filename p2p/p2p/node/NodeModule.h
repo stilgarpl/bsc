@@ -11,7 +11,7 @@
 #include <p2p/modules/logic/ILogicModule.h>
 #include <p2p/dependency/IDependencyManaged.h>
 #include <p2p/dependency/DependencyManaged.h>
-#include <p2p/modules/configuration/ConfigurationManager.h>
+#include <p2p/node/configuration/ConfigurationManager.h>
 #include <p2p/logic/sources/ModuleSource.h>
 #include "INode.h"
 #include "INodeModule.h"

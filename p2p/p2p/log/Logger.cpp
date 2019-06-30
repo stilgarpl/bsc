@@ -36,7 +36,7 @@ void Logger::info(std::string txt) {
 void Logger::debug(int line, std::string txt) {
 
     std::lock_guard<std::mutex> g(getLock());
-    static int nodeIdLength = 0;
+    static std::string::size_type nodeIdLength = 0;
 //    std::cout << loggerName << " @ " << line << " : " << txt << std::endl;
 //@todo optimize this call:
     if (Context::getActiveContext() != nullptr &&

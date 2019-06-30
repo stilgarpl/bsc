@@ -8,7 +8,7 @@
 
 #include "NodeInfo.h"
 
-#include "p2p/modules/configuration/IConfig.h"
+#include "p2p/node/configuration/IConfig.h"
 #include "p2p/logic/SourceManager.h"
 #include "p2p/logic/LogicManager.h"
 #include "INode.h"
@@ -16,7 +16,7 @@
 #include <memory>
 #include <p2p/dependency/DependencyManager.h>
 #include <p2p/role/RoleScope.h>
-#include <p2p/modules/configuration/ConfigurationManager.h>
+#include <p2p/node/configuration/ConfigurationManager.h>
 
 
 class Node : public INode, public RoleScope {
