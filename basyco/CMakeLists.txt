@@ -20,7 +20,7 @@ add_executable(basyco-daemon basyco/main_daemon.cpp)
 #target_include_directories(basyco PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 #target_include_directories(basyco PUBLIC p2p)
 target_link_libraries(basyco-demo repo auth)
-target_link_libraries(basyco-control repo)
+target_link_libraries(basyco-control p2p_core command)
 target_link_libraries(basyco-daemon repo)
 install(TARGETS basyco-demo basyco-daemon basyco-control COMPONENT basyco)
 

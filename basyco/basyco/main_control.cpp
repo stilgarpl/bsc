@@ -12,7 +12,6 @@
 #include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"
 #include <cereal/archives/xml.hpp>
 #include <cereal/types/memory.hpp>
-#include <repo/repository/storage/InternalStorage.h>
 #include <p2p/modules/network/protocol/packet/NodeInfoGroup.h>
 #include <p2p/modules/auth/AuthModule.h>
 
@@ -29,41 +28,9 @@ using namespace std::chrono_literals;
 
 
 void setupModules(Node &node) {
-    node.addModule<NetworkModule>();
     node.addModule<CommandModule>();
 }
 
-void setupCommands(CommandModule *cmd) {
-    cmd->mapCommand("t2", &CommandModule::testingMethodInt);
-    cmd->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
-    cmd->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
-    cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-    cmd->mapCommand("connect", &NetworkModule::connectTo);
-    cmd->mapCommand("connectTo", &NetworkModule::connectToNode);
-    cmd->mapCommand<NetworkModule, RemoteNode &, const NodeIdType &>("getnode", &NetworkModule::getRemoteNode);
-    cmd->mapCommand("disconnect", &NetworkModule::disconnect);
-    cmd->mapCommand("print", &NetworkModule::printConnections);
-    cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
-    cmd->mapRawCommand("broadcast", &CommandModule::broadcastRemoteCommand);
-    cmd->mapCommand("shutdown", &BasicModule::shutdownNode);
-    cmd->mapCommand("cd", &FilesystemModule::changeDirectory);
-    cmd->mapCommand("pwd", &FilesystemModule::printWorkingDirectory);
-    cmd->mapCommand("ls", &FilesystemModule::listCurrentDirectory);
-//    cmd->mapCommand("scp", &FilesystemModule::remoteGetFile);
-    cmd->mapCommand("scp", &FilesystemModule::remoteGetFile);
-//    cmd->mapCommand("lscp", &FilesystemModule::printCurrentTransfers);
-
-    cmd->mapCommand("run", &CommandModule::runScript);
-    cmd->mapCommand("sleep", &CommandModule::sleep);
-    cmd->mapCommand("saveConf", &BasicModule::saveAllConfiguration);
-    cmd->mapRawCommand("bg", &CommandModule::runInBackground);
-    cmd->mapCommand("fireTrigV", &BasicModule::fireTriggerValue<std::string, std::string>);
-    cmd->mapCommand("fireTrig", &BasicModule::fireTrigger<std::string>);
-//    cmd->mapCommand("requestResource", &RepoModule::requestStoragePath);
-//    cmd->mapCommand("beginTransfer", &FilesystemModule::beginTransferTest);
-//    cmd->submodule("help").mapCommand("cmdList",&CommandModule::listCommands);
-
-}
 
 
 int main(int argc, char *argv[]) {
@@ -81,8 +48,6 @@ int main(int argc, char *argv[]) {
     thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
 
     auto cmdN = thisNode.getModule<CommandModule>();
-
-    setupCommands(cmdN.get());
     cmdN->setInteractive(false);
     //@todo better way of running stuff from commandline
     std::vector<std::string> commands;

@@ -10,7 +10,7 @@
 #include "p2p/modules/basic/BasicModule.h"
 #include "p2p/modules/network/NetworkModule.h"
 
-CommandModule::CommandModule(INode &node) : NodeModuleDependent<CommandModule>(node, "command"),
+CommandModule::CommandModule(INode &node) : NodeModuleDependent(node, "command"),
                                             defaultSubModule(*this) {
 
     setRequired<BasicModule>();

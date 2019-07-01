@@ -13,31 +13,13 @@
 #include <p2p/node/Node.h>
 #include <core/utils/from_string.h>
 #include <p2p/modules/network/remote/RemoteNode.h>
-
-class DummyCommandEvent : public IEvent<int> {
-
-};
-
-//@todo remove class
-class Dupa {
-private:
-    int a;
-public:
-    Dupa(const std::string &s) {
-        a = std::atoi(s.c_str());
-    }
-
-    int getA() const {
-        return a;
-    }
-};
-
+#include <p2p/modules/network/NetworkModule.h>
 #include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/command/ICommandsDirectory.h>
 #include <core/utils/template_cast.h>
 
 
-class CommandModule : public NodeModuleDependent<CommandModule> {
+class CommandModule : public NodeModuleDependent<CommandModule, NetworkModule> {
 public:
     typedef const std::vector<std::string> &ArgumentContainerType;
 public:
@@ -345,11 +327,6 @@ public:
     ////////////////////////////////
     /// Commands section
     ////////////////////////////////
-
-    void testingMethod(Dupa a) {
-        LOGGER("Command testing method " + std::to_string(a.getA()));
-    }
-
     void testingMethodInt(int a) {
         LOGGER("Command testing method INT " + std::to_string(a));
     }
