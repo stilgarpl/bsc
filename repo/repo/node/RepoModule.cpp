@@ -22,6 +22,7 @@
 #include <logic/sources/TriggerSource.h>
 #include <logic/chain/ChainEvaluators.h>
 #include <logic/evaluators/TriggerEvaluators.h>
+#include <logic/LogicObject.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");

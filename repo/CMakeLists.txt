@@ -14,7 +14,7 @@ set(SOURCE_FILES repo/journal/SimpleJournal.cpp repo/journal/SimpleJournal.h rep
 add_library(repo SHARED ${SOURCE_FILES})
 target_include_directories(repo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} SYSTEM ${CRYPTO++_INCLUDE_DIR})
 message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(repo p2p ${CRYPTO++_LIBRARIES} ${LIBS} stdc++fs)
+target_link_libraries(repo PUBLIC p2p_core command filesystem network ${CRYPTO++_LIBRARIES} ${LIBS} stdc++fs)
 install(TARGETS repo COMPONENT repo)
 
 add_subdirectory(test)

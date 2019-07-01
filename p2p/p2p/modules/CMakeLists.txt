@@ -1,0 +1,5 @@
+add_subdirectory(auth)
+add_subdirectory(basic)
+add_subdirectory(command)
+add_subdirectory(filesystem)
+add_subdirectory(network)
