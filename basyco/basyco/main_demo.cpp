@@ -32,7 +32,7 @@ using namespace std::chrono_literals;
 void setupModules(Node &node) {
     node.addModule<BasicModule>();
     node.addModule<FilesystemModule>();
-    node.addModule<network>();
+    node.addModule<NetworkModule>();
     node.addModule<RepoModule>();
     node.addModule<CommandModule>();
 }
@@ -42,14 +42,14 @@ void setupCommands(CommandModule *cmd) {
     cmd->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-    cmd->mapCommand("connect", &network::connectTo);
-    cmd->mapCommand("connectTo", &network::connectToNode);
-    cmd->mapCommand<network, RemoteNode &, const NodeIdType &>("getnode", &network::getRemoteNode);
-    cmd->mapCommand("disconnect", &network::disconnect);
-    cmd->mapCommand("print", &network::printConnections);
+    cmd->mapCommand("connect", &NetworkModule::connectTo);
+    cmd->mapCommand("connectTo", &NetworkModule::connectToNode);
+    cmd->mapCommand<NetworkModule, RemoteNode &, const NodeIdType &>("getnode", &NetworkModule::getRemoteNode);
+    cmd->mapCommand("disconnect", &NetworkModule::disconnect);
+    cmd->mapCommand("print", &NetworkModule::printConnections);
 //    cmd->mapCommand("update", &network:prin:updateNodeConnectionInfo);
-//    cmd->mapCommand("purgeD", &network::purgeDuplicateConnections);
-//    cmd->mapCommand("purgeI", &network::purgeInactiveConnections);
+//    cmd->mapCommand("purgeD", &NetworkModule::purgeDuplicateConnections);
+//    cmd->mapCommand("purgeI", &NetworkModule::purgeInactiveConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
     cmd->mapRawCommand("broadcast", &CommandModule::broadcastRemoteCommand);
     cmd->mapCommand("shutdown", &BasicModule::shutdownNode);
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
     thisNode.getNodeInfo().setNodeId("first Node");
 
     setupModules(thisNode);
-    thisNode.getModule<network>()->addToNetwork("TheNetwork");
-    thisNode.getModule<network>()->configuration().setPort(9191);
+    thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
+    thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
     thisNode.addModule<AuthModule>();
     thisNode.getModule<AuthModule>()->getSubModule<AuthModule>().a = 5;
     thisNode.getModule<CommandModule>()->getSubModule<AuthModule>().a = 2;
@@ -115,8 +115,8 @@ int main(int argc, char *argv[]) {
 
 
     setupModules(otherNode);
-    otherNode.getModule<network>()->addToNetwork("TheNetwork");
-    otherNode.getModule<network>()->configuration().setPort(9999);
+    otherNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
+    otherNode.getModule<NetworkModule>()->configuration().setPort(9999);
     cmdN = otherNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
 
@@ -127,8 +127,8 @@ int main(int argc, char *argv[]) {
     thirdNode.getNodeInfo().setNodeId("third");
 
     setupModules(thirdNode);
-    thirdNode.getModule<network>()->addToNetwork("TheNetwork");
-    thirdNode.getModule<network>()->configuration().setPort(9898);
+    thirdNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
+    thirdNode.getModule<NetworkModule>()->configuration().setPort(9898);
     cmdN = thirdNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
     cmdN = nullptr;
@@ -141,11 +141,11 @@ int main(int argc, char *argv[]) {
     thisNode.getNodeInfo().printAll();
     otherNode.getNodeInfo().printAll();
     thirdNode.getNodeInfo().printAll();
-    thisNode.getModule<network>()->connectTo("127.0.0.1:9999");
-//    thisNode.getModule<network>()->connectTo("127.0.0.1:9898");
-//    thisNode.getModule<network>()->updateNodeConnectionInfo();
-//    otherNode.getModule<network>()->updateNodeConnectionInfo();
-//    thirdNode.getModule<network>()->updateNodeConnectionInfo();
+    thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
+//    thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9898");
+//    thisNode.getModule<NetworkModule>()->updateNodeConnectionInfo();
+//    otherNode.getModule<NetworkModule>()->updateNodeConnectionInfo();
+//    thirdNode.getModule<NetworkModule>()->updateNodeConnectionInfo();
 
 
     thisNode.waitUntilStarted();
@@ -162,43 +162,43 @@ int main(int argc, char *argv[]) {
 
 
 //    LOGGER("connection was ... " + std::to_string(ret));
-//    otherNode.getModule<network>()->connectTo("127.0.0.1:9898");
-    //  thisNode.getModule<network>()->connectTo("127.0.0.1:100");
+//    otherNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9898");
+    //  thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:100");
 //    std::this_thread::sleep_for(5s);
 
-//    thisNode.getModule<network>()->updateNodeConnectionInfo();
-//    otherNode.getModule<network>()->updateNodeConnectionInfo();
-//    thirdNode.getModule<network>()->updateNodeConnectionInfo();
+//    thisNode.getModule<NetworkModule>()->updateNodeConnectionInfo();
+//    otherNode.getModule<NetworkModule>()->updateNodeConnectionInfo();
+//    thirdNode.getModule<NetworkModule>()->updateNodeConnectionInfo();
 //
-//    thisNode.getModule<network>()->printConnections();
-//    otherNode.getModule<network>()->printConnections();
-//    thirdNode.getModule<network>()->printConnections();
+//    thisNode.getModule<NetworkModule>()->printConnections();
+//    otherNode.getModule<NetworkModule>()->printConnections();
+//    thirdNode.getModule<NetworkModule>()->printConnections();
 //
 //    std::this_thread::sleep_for(1s);
-//    thisNode.getModule<network>()->purgeDuplicateConnections();
-//    otherNode.getModule<network>()->purgeDuplicateConnections();
-//    thirdNode.getModule<network>()->purgeDuplicateConnections();
-//    thisNode.getModule<network>()->purgeInactiveConnections();
-//    otherNode.getModule<network>()->purgeInactiveConnections();
-//    thirdNode.getModule<network>()->purgeInactiveConnections();
+//    thisNode.getModule<NetworkModule>()->purgeDuplicateConnections();
+//    otherNode.getModule<NetworkModule>()->purgeDuplicateConnections();
+//    thirdNode.getModule<NetworkModule>()->purgeDuplicateConnections();
+//    thisNode.getModule<NetworkModule>()->purgeInactiveConnections();
+//    otherNode.getModule<NetworkModule>()->purgeInactiveConnections();
+//    thirdNode.getModule<NetworkModule>()->purgeInactiveConnections();
 //    //LOGGER("lala");
 //    std::this_thread::sleep_for(2s);
-//    thisNode.getModule<network>()->printConnections();
-//    otherNode.getModule<network>()->printConnections();
-//    thirdNode.getModule<network>()->printConnections();
+//    thisNode.getModule<NetworkModule>()->printConnections();
+//    otherNode.getModule<NetworkModule>()->printConnections();
+//    thirdNode.getModule<NetworkModule>()->printConnections();
 //    std::this_thread::sleep_for(9995s);
 //    LOGGER("stopping");
 //    thisNode.stop();
 //    otherNode.stop();
 //    thirdNode.stop();
 //    std::this_thread::sleep_for(5s);
-//    thisNode.getModule<network>()->purgeInactiveConnections();
-//    otherNode.getModule<network>()->purgeInactiveConnections();
-//    thirdNode.getModule<network>()->purgeInactiveConnections();
+//    thisNode.getModule<NetworkModule>()->purgeInactiveConnections();
+//    otherNode.getModule<NetworkModule>()->purgeInactiveConnections();
+//    thirdNode.getModule<NetworkModule>()->purgeInactiveConnections();
 //    std::this_thread::sleep_for(45s);
-//    thisNode.getModule<network>()->printConnections();
-//    otherNode.getModule<network>()->printConnections();
-//    thirdNode.getModule<network>()->printConnections();
+//    thisNode.getModule<NetworkModule>()->printConnections();
+//    otherNode.getModule<NetworkModule>()->printConnections();
+//    thirdNode.getModule<NetworkModule>()->printConnections();
 //    LOGGER("finishing");
 //
 //    std::this_thread::sleep_for(115s);

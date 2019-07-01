@@ -33,7 +33,7 @@ using namespace std::chrono_literals;
 void setupModules(Node &node) {
     node.addModule<BasicModule>();
     node.addModule<FilesystemModule>();
-    node.addModule<network>();
+    node.addModule<NetworkModule>();
     node.addModule<RepoModule>();
     node.addModule<CommandModule>();
 }
@@ -44,11 +44,11 @@ void setupCommands(CommandModule *cmd) {
     cmd->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-    cmd->mapCommand("connect", &network::connectTo);
-    cmd->mapCommand("connectTo", &network::connectToNode);
-    cmd->mapCommand<network, RemoteNode &, const NodeIdType &>("getnode", &network::getRemoteNode);
-    cmd->mapCommand("disconnect", &network::disconnect);
-    cmd->mapCommand("print", &network::printConnections);
+    cmd->mapCommand("connect", &NetworkModule::connectTo);
+    cmd->mapCommand("connectTo", &NetworkModule::connectToNode);
+    cmd->mapCommand<NetworkModule, RemoteNode &, const NodeIdType &>("getnode", &NetworkModule::getRemoteNode);
+    cmd->mapCommand("disconnect", &NetworkModule::disconnect);
+    cmd->mapCommand("print", &NetworkModule::printConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
     cmd->mapRawCommand("broadcast", &CommandModule::broadcastRemoteCommand);
     cmd->mapCommand("shutdown", &BasicModule::shutdownNode);
@@ -86,8 +86,8 @@ int main(int argc, char *argv[]) {
     thisNode.getNodeInfo().setNodeId(Poco::Environment::nodeName());
 
     setupModules(thisNode);
-    thisNode.getModule<network>()->addToNetwork("TheNetwork");
-    thisNode.getModule<network>()->configuration().setPort(9999);
+    thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
+    thisNode.getModule<NetworkModule>()->configuration().setPort(9999);
 
     auto cmdN = thisNode.getModule<CommandModule>();
 

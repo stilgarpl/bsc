@@ -14,7 +14,6 @@
 #include <logic/LogicManager.h>
 #include <logic/LogicObject.h>
 
-//@todo #warning move this class to node modules
 class ILogicModule : public INodeModule, public LogicObject, public LogicStateMachine<ILogicModule, ModuleState> {
 
 public:

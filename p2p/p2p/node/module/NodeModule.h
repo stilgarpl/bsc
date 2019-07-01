@@ -8,7 +8,7 @@
 #define BASYCO_NODEMODULE_H
 
 
-#include <p2p/modules/logic/ILogicModule.h>
+#include <p2p/node/module/logic/ILogicModule.h>
 #include <p2p/dependency/IDependencyManaged.h>
 #include <p2p/dependency/DependencyManaged.h>
 #include <p2p/node/configuration/ConfigurationManager.h>
