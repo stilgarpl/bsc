@@ -7,7 +7,7 @@
 
 
 #include <p2p/modules/nodeNetworkModule/network/NetworkInfo.h>
-#include "p2p/logic/IEvent.h"
+#include "logic/IEvent.h"
 
 
 enum class NetworInfoEventId {

@@ -2,7 +2,7 @@
 // Created by stilgar on 17.10.17.
 //
 
-#include <p2p/log/Logger.h>
+#include <core/log/Logger.h>
 #include <Poco/Environment.h>
 #include <p2p/node/context/NodeContext.h>
 #include "JournalState.h"

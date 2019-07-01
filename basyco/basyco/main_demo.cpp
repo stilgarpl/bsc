@@ -3,7 +3,7 @@
 
 //#define CEREAL_THREAD_SAFE 1
 #include "p2p/node/Node.h"
-#include "p2p/logic/sources/ClockSource.h"
+#include "logic/sources/ClockSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/actions/ProtocolActions.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h"
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 
     spdlog::info("lala");
 
-    Node thisNode(9191);
+    Node thisNode;
 
     thisNode.getNodeInfo().setNodeId("first Node");
 
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
     thisNode.start();
 //    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
 
-    Node otherNode(9999);
+    Node otherNode;
     otherNode.getNodeInfo().setNodeId("second");
 
 
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
     otherNode.start();
 //    setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
 
-    Node thirdNode(9898);
+    Node thirdNode;
     thirdNode.getNodeInfo().setNodeId("third");
 
     setupModules(thirdNode);

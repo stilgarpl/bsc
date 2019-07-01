@@ -9,10 +9,10 @@
 
 
 #include <p2p/modules/nodeNetworkModule/protocol/enum/Status.h>
-#include "p2p/utils/cereal_include.h"
-#include "p2p/log/Logger.h"
+#include "core/utils/cereal_include.h"
+#include "core/log/Logger.h"
 
-#include "p2p/context/Context.h"
+#include "core/context/Context.h"
 #include <p2p/role/Roles.h>
 
 struct PacketGroup;

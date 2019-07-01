@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/Connection.h>
-#include <p2p/node/context/LogicContext.h>
+#include <logic/context/LogicContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h>
 #include <p2p/modules/nodeNetworkModule/protocol/context/ProcessorContext.h>
 #include <p2p/role/Roles.h>

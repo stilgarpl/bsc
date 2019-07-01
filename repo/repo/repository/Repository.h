@@ -9,10 +9,10 @@
 
 
 #include <repo/journal/SimpleJournal.h>
-#include <p2p/log/Logger.h>
+#include <core/log/Logger.h>
 #include <repo/repository/storage/IStorage.h>
 #include <repo/repository/storage/InternalStorage.h>
-#include <p2p/utils/crypto.h>
+#include <core/utils/crypto.h>
 #include <repo/repository/transformer/PathTransformer.h>
 #include "IRepository.h"
 

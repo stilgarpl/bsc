@@ -5,7 +5,7 @@
 #ifndef BASYCO_SIMPLEPATHRI_H
 #define BASYCO_SIMPLEPATHRI_H
 
-#include "p2p/utils/cereal_include.h"
+#include "core/utils/cereal_include.h"
 #include "ResourceIdentificator.h"
 
 class SimplePathRI : public ResourceIdentificator {

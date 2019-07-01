@@ -6,7 +6,7 @@
 #define BASYCO_NODENETWORKMODULE_H
 
 
-#include <p2p/node/NodeModule.h>
+#include <p2p/node/module/NodeModule.h>
 #include <p2p/dependency/DependencyManaged.h>
 #include <Poco/Net/ServerSocket.h>
 #include <Poco/Net/TCPServer.h>
@@ -17,7 +17,7 @@
 #include <p2p/modules/nodeNetworkModule/network/NetworkInfo.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
 #include <p2p/role/RoleScope.h>
-#include <p2p/logic/events/LogicStateEvent.h>
+#include <logic/events/LogicStateEvent.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/conditions/NetworkConditions.h>
 #include <p2p/modules/nodeNetworkModule/remote/exception/RemoteNodeConnectionException.h>
 #include "p2p/modules/nodeNetworkModule/remote/exception/RemoteNodeNotFoundException.h"

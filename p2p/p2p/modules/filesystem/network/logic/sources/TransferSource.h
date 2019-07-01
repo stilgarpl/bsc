@@ -6,7 +6,7 @@
 #define BASYCO_TRANSFERSOURCE_H
 
 
-#include <p2p/logic/sources/EventQueueSource.h>
+#include <logic/sources/EventQueueSource.h>
 #include <p2p/modules/filesystem/network/logic/events/TransferEvent.h>
 
 class TransferSource : public EventQueueSource<TransferEvent> {

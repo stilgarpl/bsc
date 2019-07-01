@@ -18,10 +18,10 @@
 #include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/KeepAlivePacket.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
-#include <p2p/logic/state/LogicStateMachine.h>
-#include <p2p/logic/evaluators/CommonEvaluators.h>
-#include <p2p/logic/actions/CommonActions.h>
-#include <p2p/logic/chain/ChainEvaluators.h>
+#include <logic/state/LogicStateMachine.h>
+#include <logic/evaluators/CommonEvaluators.h>
+#include <logic/actions/CommonActions.h>
+#include <logic/chain/ChainEvaluators.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNodeContext.h>
 
 

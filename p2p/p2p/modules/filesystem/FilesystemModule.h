@@ -10,7 +10,7 @@
 #define BASYCO_FILESYSTEMMODULE_H
 
 
-#include <p2p/node/NodeModule.h>
+#include <p2p/node/module/NodeModule.h>
 #include <p2p/dependency/DependencyManaged.h>
 
 #include <filesystem>

@@ -5,9 +5,10 @@
 
 #include "Node.h"
 #include <p2p/node/context/NodeContext.h>
-#include <p2p/node/context/LogicContext.h>
+#include <logic/context/LogicContext.h>
 #include <p2p/node/configuration/ConfigurationManager.h>
-#include "NodeModule.h"
+#include <core/log/LoggerContext.h>
+#include "p2p/node/module/NodeModule.h"
 
 
 Node::~Node() {
@@ -47,7 +48,9 @@ void Node::stop() {
 Node::Node() {
 
     nodeContext->set<NodeContext, Node &, NodeInfo &>(*this, this->thisNodeInfo);
+    //@todo setting of LogicContext should probably be done inside LogicManager
     nodeContext->set<LogicContext, LogicManager &>(logicManager);
+    nodeContext->set<LoggerContext>([&] { return thisNodeInfo.getNodeId(); });
 
     //this creates common context for role definitions across the entire node.
     nodeContext->set<RoleDefinitionsContext>();
@@ -55,25 +58,7 @@ Node::Node() {
 
     logicManager.setContexts(nodeContext);
 
-
-
-}
-
-Node::Node(int port) : Node() {
-//    std::shared_ptr<Node::Config> config = std::make_shared<Node::Config>();
-//    config->setPort(port);
-//    setConfiguration(config);
-
-    //@todo debug remove
-//    ConfigurationManager manager;
-//    manager.save("Node", config);
-
-//    ConfigurationModule
-
-
-
-//    thisNodeInfo.addKnownAddress("127.0.0.1:" + std::to_string(getConfiguration()->getPort()));
-
+    setNodeContextActive();
 
 }
 

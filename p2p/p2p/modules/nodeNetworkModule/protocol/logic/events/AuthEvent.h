@@ -6,7 +6,7 @@
 #define BASYCO_AUTHEVENT_H
 
 
-#include "p2p/logic/IEvent.h"
+#include "logic/IEvent.h"
 #include <string>
 
 

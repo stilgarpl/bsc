@@ -3,7 +3,7 @@
 
 //#define CEREAL_THREAD_SAFE 1
 #include "p2p/node/Node.h"
-#include "p2p/logic/sources/ClockSource.h"
+#include "logic/sources/ClockSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/actions/ProtocolActions.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h"
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     if (argc <= 1) {
         return 0;
     }
-    Node thisNode(9191);
+    Node thisNode;
 
     //@todo load node info from file? or sth?
     thisNode.getNodeInfo().setNodeId("control");

@@ -9,19 +9,19 @@
 #include <repo/repository/storage/network/logic/sources/StorageSource.h>
 #include <repo/repository/storage/network/logic/actions/StorageActions.h>
 #include <p2p/modules/command/CommandModule.h>
-#include <p2p/logic/evaluators/CommonEvaluators.h>
+#include <logic/evaluators/CommonEvaluators.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/actions/NetworkActions.h>
 #include <repo/repository/network/RepoQuery.h>
-#include <p2p/logic/conditions/TimeConditions.h>
+#include <logic/conditions/TimeConditions.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/conditions/NetworkConditions.h>
 #include <repo/repository/logic/actions/RepositoryActions.h>
 #include <repo/repository/logic/evaluators/RepoEvaluators.h>
-#include <p2p/logic/actions/CommonActions.h>
+#include <logic/actions/CommonActions.h>
 #include <repo/repository/network/RepoProcessors.h>
-#include <p2p/logic/conditions/TriggerConditions.h>
-#include <p2p/logic/sources/TriggerSource.h>
-#include <p2p/logic/chain/ChainEvaluators.h>
-#include <p2p/logic/evaluators/TriggerEvaluators.h>
+#include <logic/conditions/TriggerConditions.h>
+#include <logic/sources/TriggerSource.h>
+#include <logic/chain/ChainEvaluators.h>
+#include <logic/evaluators/TriggerEvaluators.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");

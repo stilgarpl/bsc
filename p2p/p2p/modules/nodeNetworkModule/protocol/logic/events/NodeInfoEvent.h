@@ -7,7 +7,7 @@
 
 
 #include <p2p/node/NodeInfo.h>
-#include "p2p/logic/IEvent.h"
+#include "logic/IEvent.h"
 
 
 enum class NodeEventId {

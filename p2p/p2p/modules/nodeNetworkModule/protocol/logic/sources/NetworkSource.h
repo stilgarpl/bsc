@@ -8,7 +8,7 @@
 
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkInfoEvent.h>
 
-#include "p2p/logic/sources/EventQueueSource.h"
+#include "logic/sources/EventQueueSource.h"
 
 
 class NetworkSource : public EventQueueSource<NetworkInfoEvent> {

@@ -9,8 +9,8 @@
 #include "NodeInfo.h"
 
 #include "p2p/node/configuration/IConfig.h"
-#include "p2p/logic/SourceManager.h"
-#include "p2p/logic/LogicManager.h"
+#include "logic/SourceManager.h"
+#include "logic/LogicManager.h"
 #include "INode.h"
 
 #include <memory>
@@ -85,8 +85,6 @@ public:
     Node();
 
     Node(Node &) = delete;
-
-    explicit Node(int port);
 
     LogicManager &getLogicManager() override {
         return logicManager;

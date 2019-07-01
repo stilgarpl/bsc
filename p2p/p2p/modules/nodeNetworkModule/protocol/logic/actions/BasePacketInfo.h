@@ -8,7 +8,7 @@
 #include <future>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/Connection.h>
-#include "p2p/logic/events/Tick.h"
+#include "logic/events/Tick.h"
 
 
 class BasePacketInfo {

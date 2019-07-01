@@ -6,7 +6,7 @@
 #define BASYCO_STORAGESOURCE_H
 
 
-#include <p2p/logic/sources/EventQueueSource.h>
+#include <logic/sources/EventQueueSource.h>
 #include <repo/repository/storage/network/logic/events/StorageResourceRequestEvent.h>
 #include <repo/repository/IRepository.h>
 #include <repo/journal/JournalTypes.h>

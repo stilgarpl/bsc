@@ -2,8 +2,8 @@
 // Created by stilgar on 10.12.17.
 //
 
-#include <p2p/log/Logger.h>
-#include <p2p/utils/crypto.h>
+#include <core/log/Logger.h>
+#include <core/utils/crypto.h>
 #include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>

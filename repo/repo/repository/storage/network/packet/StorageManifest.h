@@ -5,7 +5,7 @@
 #ifndef BASYCO_STORAGEMANIFEST_H
 #define BASYCO_STORAGEMANIFEST_H
 
-#include <p2p/utils/cereal_include.h>
+#include <core/utils/cereal_include.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/info/PacketInfo.h>
 #include <repo/repository/IRepository.h>
 

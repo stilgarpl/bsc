@@ -8,7 +8,7 @@
 
 #include <string>
 #include <iostream>
-#include <p2p/utils/cereal_include.h>
+#include <core/utils/cereal_include.h>
 
 typedef std::string NodeIdType;
 typedef std::string NetworkIdType;

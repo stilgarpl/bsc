@@ -7,7 +7,7 @@
 
 #include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
 #include <p2p/modules/nodeNetworkModule/protocol/connection/Connection.h>
-#include "p2p/logic/IEvent.h"
+#include "logic/IEvent.h"
 
 enum class PacketEventId {
     PACKET_SENT,

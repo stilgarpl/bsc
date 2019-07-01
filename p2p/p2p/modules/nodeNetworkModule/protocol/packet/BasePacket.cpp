@@ -2,7 +2,7 @@
 // Created by stilgar on 01.08.17.
 //
 
-#include "p2p/context/Context.h"
+#include "core/context/Context.h"
 #include "BasePacket.h"
 
 void BasePacket::process(Context::Ptr context) {

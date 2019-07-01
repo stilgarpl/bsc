@@ -6,7 +6,7 @@
 #define BASYCO_COMMANDSOURCE_H
 
 
-#include <p2p/logic/sources/EventQueueSource.h>
+#include <logic/sources/EventQueueSource.h>
 #include <p2p/modules/command/network/logic/events/CommandEvent.h>
 
 class CommandSource : public EventQueueSource<CommandEvent> {

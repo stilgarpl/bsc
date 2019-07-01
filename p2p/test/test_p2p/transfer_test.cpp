@@ -13,12 +13,12 @@ void setupModules(Node &node) {
     node.addModule<FilesystemModule>();
 }
 
-void createFile(fs::path path, std::string content) {
+void createFile(fs::path path, const std::string &content) {
     std::ofstream file(path);
     file << content;
 }
 
-std::string readFile(fs::path path) {
+std::string readFile(const fs::path &path) {
     std::ifstream t(path);
     std::string str((std::istreambuf_iterator<char>(t)),
                     std::istreambuf_iterator<char>());
@@ -57,7 +57,7 @@ TEST_CASE("Transfer test", "[!throws]") {
 
     const int TEST_FILES_NUM = 10;
 
-    Node thisNode(9191);
+    Node thisNode;
 
     thisNode.getNodeInfo().setNodeId("firstNode");
 
@@ -65,7 +65,7 @@ TEST_CASE("Transfer test", "[!throws]") {
     thisNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
     thisNode.getModule<NodeNetworkModule>()->configuration().setPort(9191);
 
-    Node otherNode(9192);
+    Node otherNode;
     otherNode.getNodeInfo().setNodeId("second");
     setupModules(otherNode);
     otherNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");

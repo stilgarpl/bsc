@@ -3,7 +3,7 @@
 //
 
 #include "SimpleJournal.h"
-#include <p2p/log/Logger.h>
+#include <core/log/Logger.h>
 
 ChecksumType SimpleJournal::getChecksum() const {
     //checksum is calculated at commit and always stored. no need to recalculate it.

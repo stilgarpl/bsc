@@ -10,7 +10,7 @@
 
 #include <list>
 #include <algorithm>
-#include <p2p/log/Logger.h>
+#include <core/log/Logger.h>
 #include <iostream>
 #include "IDependency.h"
 #include "IDependencyManaged.h"

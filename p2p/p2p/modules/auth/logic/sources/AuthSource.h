@@ -7,7 +7,7 @@
 
 
 #include <p2p/node/NodeInfo.h>
-#include <p2p/logic/sources/EventQueueSource.h>
+#include <logic/sources/EventQueueSource.h>
 #include <p2p/modules/auth/logic/events/AuthHelloEvent.h>
 
 class AuthSource : public EventQueueSource<AuthHelloEvent> {

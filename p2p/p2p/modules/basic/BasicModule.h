@@ -6,9 +6,9 @@
 #define BASYCO_BASICMODULE_H
 
 
-#include <p2p/node/NodeModule.h>
+#include <p2p/node/module/NodeModule.h>
 #include <p2p/dependency/DependencyManaged.h>
-#include <p2p/logic/sources/TriggerSource.h>
+#include <logic/sources/TriggerSource.h>
 
 
 class BasicModule : public NodeModuleDependent<BasicModule> {

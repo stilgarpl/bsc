@@ -6,7 +6,7 @@
 #define BASYCO_REPOMODULE_H
 
 
-#include <p2p/node/NodeModule.h>
+#include <p2p/node/module/NodeModule.h>
 #include <repo/repository/RepositoryManager.h>
 #include <p2p/dependency/DependencyManaged.h>
 #include <repo/repository/Repository.h>

@@ -2,7 +2,7 @@
 // Created by stilgar on 30.12.17.
 //
 
-#include <p2p/node/context/LogicContext.h>
+#include <logic/context/LogicContext.h>
 #include <p2p/modules/filesystem/network/logic/sources/TransferSource.h>
 #include "BeginTransfer.h"
 

@@ -5,7 +5,7 @@
 //
 
 #include <Poco/Net/SocketStream.h>
-#include <p2p/node/context/LogicContext.h>
+#include <logic/context/LogicContext.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h>
 #include <Poco/Net/NetException.h>
 #include "ClientConnection.h"

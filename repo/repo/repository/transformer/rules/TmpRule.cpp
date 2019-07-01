@@ -3,7 +3,7 @@
 //
 
 #include <regex>
-#include <p2p/log/Logger.h>
+#include <core/log/Logger.h>
 #include "TmpRule.h"
 
 std::filesystem::path TmpRule::transformToJournalFormat(fs::path path) {

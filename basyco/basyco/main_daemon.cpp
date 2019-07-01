@@ -3,7 +3,7 @@
 
 //#define CEREAL_THREAD_SAFE 1
 #include "p2p/node/Node.h"
-#include "p2p/logic/sources/ClockSource.h"
+#include "logic/sources/ClockSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/actions/ProtocolActions.h"
 #include "p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h"
@@ -79,7 +79,7 @@ void setupCommands(CommandModule *cmd) {
 int main(int argc, char *argv[]) {
 
 
-    Node thisNode(9191);
+    Node thisNode;
 
 //    auto host_name = boost::asio::ip::host_name();
     //@todo name from configuration

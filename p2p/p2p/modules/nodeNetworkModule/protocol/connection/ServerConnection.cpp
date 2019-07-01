@@ -11,7 +11,7 @@
 #include <utility>
 #include <Poco/Net/NetException.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h>
-#include <p2p/node/context/LogicContext.h>
+#include <logic/context/LogicContext.h>
 #include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
 #include "ServerConnection.h"
 

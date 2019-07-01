@@ -6,7 +6,7 @@
 #define BASYCO_STORAGEEVENT_H
 
 
-#include <p2p/logic/IEvent.h>
+#include <logic/IEvent.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkingEvent.h>
 #include <repo/repository/storage/IStorage.h>
 

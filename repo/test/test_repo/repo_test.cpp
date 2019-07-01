@@ -82,7 +82,7 @@ std::string readFile(fs::path path) {
 
 TEST_CASE("Repo module test", "[!throws]") {
 
-    Node thisNode(9191);
+    Node thisNode;
 
     thisNode.getNodeInfo().setNodeId("first Node");
 
@@ -95,7 +95,7 @@ TEST_CASE("Repo module test", "[!throws]") {
 
     thisNode.start();
 
-    Node otherNode(9999);
+    Node otherNode;
     otherNode.getNodeInfo().setNodeId("second");
 
 

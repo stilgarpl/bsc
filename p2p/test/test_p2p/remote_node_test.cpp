@@ -15,7 +15,7 @@ void remoteServerTestModuleSetup(Node &node) {
 TEST_CASE("Remote node test", "[!throws]") {
 
 
-    Node thisNode(9191);
+    Node thisNode;
 
     thisNode.getNodeInfo().setNodeId("firstNode");
 
@@ -23,7 +23,7 @@ TEST_CASE("Remote node test", "[!throws]") {
     thisNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
     thisNode.getModule<NodeNetworkModule>()->configuration().setPort(9191);
 
-    Node otherNode(9192);
+    Node otherNode;
     otherNode.getNodeInfo().setNodeId("second");
     remoteServerTestModuleSetup(otherNode);
     otherNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");

@@ -3,7 +3,7 @@
 //
 
 #include <p2p/modules/command/network/logic/sources/CommandSource.h>
-#include <p2p/node/context/LogicContext.h>
+#include <logic/context/LogicContext.h>
 #include "CommandPacket.h"
 
 void CommandPacket::Request::process(Context::Ptr context) {

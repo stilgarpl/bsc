@@ -7,7 +7,7 @@
 
 
 #include <p2p/modules/nodeNetworkModule/protocol/packet/info/PacketInfo.h>
-#include <p2p/utils/cereal_include.h>
+#include <core/utils/cereal_include.h>
 
 class CommandPacket : public PacketGroup {
 public:

@@ -6,13 +6,13 @@
 #define BASYCO_ILOGICMODULE_H
 
 
-#include <p2p/logic/sources/AutoSource.h>
-#include <p2p/node/INodeModule.h>
+#include <logic/sources/AutoSource.h>
+#include <p2p/node/module/INodeModule.h>
 #include <p2p/node/INode.h>
-#include <p2p/node/ModuleState.h>
-#include <p2p/logic/state/LogicStateMachine.h>
-#include "p2p/logic/LogicManager.h"
-#include "p2p/logic/LogicObject.h"
+#include <p2p/node/module/ModuleState.h>
+#include <logic/state/LogicStateMachine.h>
+#include <logic/LogicManager.h>
+#include <logic/LogicObject.h>
 
 //@todo #warning move this class to node modules
 class ILogicModule : public INodeModule, public LogicObject, public LogicStateMachine<ILogicModule, ModuleState> {

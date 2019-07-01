@@ -6,7 +6,7 @@
 #define BASYCO_AUTHHELLOPACKET_H
 
 
-#include <p2p/utils/cereal_include.h>
+#include <core/utils/cereal_include.h>
 #include <p2p/modules/nodeNetworkModule/protocol/packet/info/PacketInfo.h>
 #include <p2p/node/NodeInfo.h>
 

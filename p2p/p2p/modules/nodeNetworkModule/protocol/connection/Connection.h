@@ -15,7 +15,7 @@
 #include <p2p/modules/nodeNetworkModule/protocol/packet/BasePacket.h>
 #include <p2p/role/RoleScope.h>
 #include <p2p/modules/nodeNetworkModule/network/NetAddressType.h>
-#include <p2p/logic/state/LogicStateMachine.h>
+#include <logic/state/LogicStateMachine.h>
 
 enum class ConnectionState {
     NEW,

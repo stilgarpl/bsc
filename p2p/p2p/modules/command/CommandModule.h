@@ -9,9 +9,9 @@
 
 
 #include <p2p/dependency/DependencyManaged.h>
-#include <p2p/node/NodeModule.h>
+#include <p2p/node/module/NodeModule.h>
 #include <p2p/node/Node.h>
-#include <p2p/utils/from_string.h>
+#include <core/utils/from_string.h>
 #include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
 
 class DummyCommandEvent : public IEvent<int> {
@@ -34,7 +34,7 @@ public:
 
 #include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/command/ICommandsDirectory.h>
-#include <p2p/utils/template_cast.h>
+#include <core/utils/template_cast.h>
 
 
 class CommandModule : public NodeModuleDependent<CommandModule> {

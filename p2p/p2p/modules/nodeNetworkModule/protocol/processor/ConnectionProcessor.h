@@ -9,9 +9,9 @@
 #include <thread>
 #include <p2p/modules/nodeNetworkModule/protocol/filter/PacketFilter.h>
 #include <p2p/modules/nodeNetworkModule/protocol/filter/RoleFilter.h>
-#include "p2p/thread/Runnable.h"
-#include "p2p/context/Context.h"
-#include "p2p/log/Logger.h"
+#include "core/thread/Runnable.h"
+#include "core/context/Context.h"
+#include "core/log/Logger.h"
 
 
 class Connection;

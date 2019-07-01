@@ -6,7 +6,7 @@
 #define BASYCO_ICONFIG_H
 
 
-#include <p2p/utils/cereal_include.h>
+#include <core/utils/cereal_include.h>
 #include <utility>
 #include <ostream>
 

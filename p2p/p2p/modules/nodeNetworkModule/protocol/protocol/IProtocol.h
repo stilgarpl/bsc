@@ -15,8 +15,8 @@
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/ConnectionEvent.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/ConnectionEvent.h>
 
-#include "p2p/logic/events/Tick.h"
-#include "p2p/logic/LogicManager.h"
+#include "logic/events/Tick.h"
+#include "logic/LogicManager.h"
 
 class IProtocol;
 

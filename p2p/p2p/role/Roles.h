@@ -6,8 +6,8 @@
 #define BASYCO_ROLES_H
 
 
-#include <p2p/log/Logger.h>
-#include <p2p/context/Context.h>
+#include <core/log/Logger.h>
+#include <core/context/Context.h>
 #include "Role.h"
 #include "RoleInvalidException.h"
 #include "RoleScope.h"

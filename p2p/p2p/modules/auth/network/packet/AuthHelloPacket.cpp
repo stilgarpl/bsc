@@ -4,7 +4,7 @@
 
 #include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/auth/AuthModule.h>
-#include <p2p/node/context/LogicContext.h>
+#include <logic/context/LogicContext.h>
 #include <p2p/modules/auth/logic/sources/AuthSource.h>
 #include "AuthHelloPacket.h"
 

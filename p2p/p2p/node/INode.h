@@ -8,9 +8,9 @@
 
 #include <p2p/dependency/DependencyManager.h>
 #include <p2p/node/NodeInfo.h>
-#include <p2p/context/Context.h>
+#include <core/context/Context.h>
 #include <p2p/node/configuration/ConfigurationManager.h>
-#include <p2p/logic/LogicManager.h>
+#include <logic/LogicManager.h>
 
 class INodeModule;
 

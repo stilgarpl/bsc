@@ -6,7 +6,7 @@
 #define BASYCO_JOURNALEVENT_H
 
 
-#include <p2p/logic/IEvent.h>
+#include <logic/IEvent.h>
 #include <repo/repository/Repository.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkingEvent.h>
 

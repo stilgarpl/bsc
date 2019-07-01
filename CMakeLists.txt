@@ -51,7 +51,8 @@ endif ()
 # Generate clang compilation databaseDom (Muzyczna 7)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-
+add_subdirectory(core)
+add_subdirectory(logic)
 add_subdirectory(p2p)
 add_subdirectory(repo)
 add_subdirectory(basyco)

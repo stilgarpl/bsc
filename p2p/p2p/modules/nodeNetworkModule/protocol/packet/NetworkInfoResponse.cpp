@@ -2,9 +2,9 @@
 // Created by stilgar on 06.10.17.
 //
 
-#include <p2p/log/Logger.h>
+#include <core/log/Logger.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/NetworkSource.h>
-#include <p2p/node/context/LogicContext.h>
+#include <logic/context/LogicContext.h>
 #include <p2p/node/context/NodeContext.h>
 #include "NetworkInfoResponse.h"
 

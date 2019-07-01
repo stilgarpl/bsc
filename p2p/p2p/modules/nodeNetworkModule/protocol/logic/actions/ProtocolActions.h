@@ -7,7 +7,7 @@
 
 
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/ConnectionEvent.h>
-#include "p2p/context/Context.h"
+#include "core/context/Context.h"
 
 
 class ProtocolActions {

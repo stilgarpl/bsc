@@ -8,8 +8,8 @@
 
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/ConnectionEvent.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/PacketEvent.h>
-#include <p2p/logic/sources/EventQueueSource.h>
-#include <p2p/logic/sources/AutoSource.h>
+#include <logic/sources/EventQueueSource.h>
+#include <logic/sources/AutoSource.h>
 
 class ConnectionSource : public ISource {
 

@@ -2,7 +2,7 @@
 // Created by stilgar on 05.02.19.
 //
 
-#include <p2p/node/context/LogicContext.h>
+#include <logic/context/LogicContext.h>
 #include "RepoQuery.h"
 
 void RepoQuery::Request::process(Context::Ptr context) {

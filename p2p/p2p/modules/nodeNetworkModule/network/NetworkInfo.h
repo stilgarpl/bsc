@@ -8,7 +8,7 @@
 
 #include <list>
 #include "cereal/types/map.hpp"
-#include "p2p/log/Logger.h"
+#include "core/log/Logger.h"
 #include "RemoteNodeInfo.h"
 #include <optional>
 

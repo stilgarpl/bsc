@@ -6,7 +6,7 @@
 #define BASYCO_REPOEVALUATORS_H
 
 
-#include <p2p/log/Logger.h>
+#include <core/log/Logger.h>
 #include <repo/repository/network/RepoQuery.h>
 #include <p2p/node/context/NodeContext.h>
 #include <repo/node/RepoModule.h>

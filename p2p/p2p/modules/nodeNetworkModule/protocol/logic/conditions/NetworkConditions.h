@@ -5,7 +5,7 @@
 #ifndef BASYCO_NETWORKCONDITIONS_H
 #define BASYCO_NETWORKCONDITIONS_H
 
-#include <p2p/logic/LogicObject.h>
+#include <logic/LogicObject.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/events/PacketEvent.h>
 
 struct NetworkConditions {

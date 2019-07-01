@@ -6,7 +6,7 @@
 #define BASYCO_JOURNALSOURCE_H
 
 
-#include <p2p/logic/sources/EventQueueSource.h>
+#include <logic/sources/EventQueueSource.h>
 #include <repo/journal/network/logic/events/JournalRequestEvent.h>
 #include <repo/journal/network/logic/events/JournalResponseEvent.h>
 #include <repo/journal/network/packet/JournalGroup.h>

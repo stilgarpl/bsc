@@ -6,8 +6,8 @@
 #define BASYCO_ROLEDEFINITIONS_H
 
 
-#include <p2p/uber/Uber.h>
-#include <p2p/log/Logger.h>
+#include <core/uber/Uber.h>
+#include <core/log/Logger.h>
 #include "Role.h"
 
 class RoleDefinitions {

@@ -2,9 +2,9 @@
 // Created by stilgar on 05.09.17.
 //
 
-#include <p2p/logic/sources/ClockSource.h>
+#include <logic/sources/ClockSource.h>
 #include <p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h>
-#include <p2p/logic/evaluators/CommonEvaluators.h>
+#include <logic/evaluators/CommonEvaluators.h>
 #include "IProtocol.h"
 
 

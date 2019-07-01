@@ -7,7 +7,7 @@
 
 #include <filesystem>
 #include <cereal/access.hpp>
-#include <p2p/utils/cereal_include.h>
+#include <core/utils/cereal_include.h>
 
 namespace fs = std::filesystem;
 

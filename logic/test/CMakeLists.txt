@@ -1,6 +1,6 @@
 #set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES)
+set(SOURCE_FILES test_logic/test_main.cpp)
 
 add_executable(test_logic ${SOURCE_FILES})
 add_test(NAME test_logic COMMAND test_logic)
