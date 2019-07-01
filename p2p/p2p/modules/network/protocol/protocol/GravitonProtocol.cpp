@@ -7,19 +7,20 @@
 
 void GravitonProtocol::onPacketSent(const PacketEvent &event) {
     std::lock_guard<std::mutex> g(responseMapLock);
-    LOGGER("onPacketSent" + std::to_string(event.getPacket()->getId()));
+//    LOGGER("onPacketSent" + std::to_string(event.getPacket()->getId()));
     //@todo maybe check if packet is in the response map?
 }
 
 void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
     std::lock_guard<std::mutex> g(responseMapLock);
-    LOGGER("onPacketReceived" + std::to_string(event.getPacket()->getId()));
-    if (responseMap.count(event.getPacket()->getId()) > 0) {
+//    LOGGER("onPacketReceived" + std::to_string(event.getPacket()->getId()));
+//@todo optimize if ((auto ptr = ) != null)
+    if (responseMap.contains(event.getPacket()->getId())) {
         auto &ptr = responseMap[event.getPacket()->getId()];
         if (ptr != nullptr) { //not all packets are from this protocol...
             if (event.getPacket()->getStatus() == ptr->getExpectedStatus()) {
                 ptr->getResponsePromise().set_value(event.getPacket());
-                LOGGER("expected packet received")
+//                LOGGER("expected packet received")
                 responseMap.erase(event.getPacket()->getId());
             } else if (event.getPacket()->getStatus() == Status::ERROR) {
                 ptr->getResponsePromise().set_value(event.getPacket());
