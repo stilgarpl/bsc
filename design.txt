@@ -399,7 +399,7 @@ StorageManager - Repozytorium powinno byc oddzielone od storage. jak repo jest i
 Moduły mogą mieć zdefiniowane submoduły. Definicja submodułu jest konkretna, np. w przypadku Auth może zawierać definicje reguł dla pakietów.
 
 repoModule->getSubModule<AuthModule>()
-repoModule->getSubModule<NodeNetworkModule>()
+repoModule->getSubModule<network>()
 
 
 

@@ -8,9 +8,9 @@
 #include <p2p/modules/basic/BasicModule.h>
 #include <p2p/modules/filesystem/network/processor/NetworkProcessors.h>
 
-FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent<FilesystemModule, NodeNetworkModule>(node,
-                                                                                                           "filesystem") {
-//    setRequired<BasicModule, NodeNetworkModule>();
+FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent<FilesystemModule, NetworkModule>(node,
+                                                                                                       "filesystem") {
+//    setRequired<BasicModule, NetworkModule>();
 }
 
 void FilesystemModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
@@ -55,7 +55,7 @@ const std::filesystem::path &FilesystemModule::getCurrentPath() const {
 }
 
 void FilesystemModule::prepareSubmodules() {
-    auto &networkSub = getSubModule<NodeNetworkModule>();
+    auto &networkSub = getSubModule<NetworkModule>();
     networkSub.registerPacketProcessor<TransferQuery>(NetworkProcessors::queryProcessor);
 }
 

@@ -8,7 +8,7 @@
 
 #include "CommandModule.h"
 #include "p2p/modules/basic/BasicModule.h"
-#include "p2p/modules/nodeNetworkModule/NodeNetworkModule.h"
+#include "p2p/modules/network/NetworkModule.h"
 
 CommandModule::CommandModule(INode &node) : NodeModuleDependent<CommandModule>(node, "command"),
                                             defaultSubModule(*this) {
@@ -72,7 +72,7 @@ void CommandModule::sendRemoteCommand(ArgumentContainerType args) {
         std::string command = args[1];
         std::vector<std::string> rest(args.begin() + 2, args.end());
 
-        auto netModule = node.getModule<NodeNetworkModule>();
+        auto netModule = node.getModule<NetworkModule>();
         CommandPacket::Request::Ptr packet = CommandPacket::Request::getNew();
         //CommandPacket::Request* packet;
         packet->setData(rest);
@@ -98,7 +98,7 @@ void CommandModule::sendCommandToRemoteNode(RemoteNode &remoteNode, ArgumentCont
         std::string command = args[0];
         std::vector<std::string> rest(args.begin() + 1, args.end());
 
-        auto netModule = node.getModule<NodeNetworkModule>();
+        auto netModule = node.getModule<NetworkModule>();
         CommandPacket::Request::Ptr packet = CommandPacket::Request::getNew();
         //CommandPacket::Request* packet;
         packet->setData(rest);
@@ -124,7 +124,7 @@ void CommandModule::broadcastRemoteCommand(const std::vector<std::string> &args)
         std::string command = args[0];
         std::vector<std::string> rest(args.begin() + 1, args.end());
 
-        auto netModule = node.getModule<NodeNetworkModule>();
+        auto netModule = node.getModule<NetworkModule>();
         CommandPacket::Request::Ptr packet = CommandPacket::Request::getNew();
         //CommandPacket::Request* packet;
         packet->setData(rest);

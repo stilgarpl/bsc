@@ -7,9 +7,9 @@
 #include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/filesystem/network/packet/DataTransfer.h>
 #include <p2p/modules/filesystem/network/packet/PropertiesTransfer.h>
-#include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
+#include <p2p/modules/network/NetworkModule.h>
 #include <p2p/modules/filesystem/network/packet/FinishTransfer.h>
-#include <p2p/modules/nodeNetworkModule/remote/RemoteNodeContext.h>
+#include <p2p/modules/network/remote/RemoteNodeContext.h>
 #include <p2p/modules/filesystem/network/packet/TransferQuery.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include "TransferManager.h"
@@ -157,7 +157,7 @@ TransferManager::LocalTransferDescriptorPtr
 TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdentificatorPtr &source,
                                   const ResourceIdentificatorPtr &destination, bool start) {
     INode &node = NodeContext::getNodeFromActiveContext();
-    auto networkModule = node.getModule<NodeNetworkModule>();
+    auto networkModule = node.getModule<NetworkModule>();
     LocalTransferDescriptorPtr ret = std::make_shared<LocalTransferDescriptor>();
 
     Context::Ptr activeContext = Context::getActiveContext();
@@ -245,7 +245,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdenti
 
 TransferManager::LocalTransferDescriptorPtr
 TransferManager::initiateTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination, bool start) {
-    auto netModule = NodeContext::getNodeFromActiveContext().getModule<NodeNetworkModule>();
+    auto netModule = NodeContext::getNodeFromActiveContext().getModule<NetworkModule>();
     //@todo this broadcast shouldn't happen at the moment of ordering the request, but at the time of actual run. but it's not high priority, most of the time it won't matter
     //broadcast who has
     TransferQuery::Request::Ptr request = TransferQuery::Request::getNew();

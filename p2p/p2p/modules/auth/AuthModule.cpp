@@ -2,7 +2,7 @@
 // Created by stilgar on 19.07.18.
 //
 
-#include <p2p/modules/nodeNetworkModule/protocol/packet/NetworkInfoRequest.h>
+#include <p2p/modules/network/protocol/packet/NetworkInfoRequest.h>
 #include "AuthModule.h"
 
 AuthModule::AuthModule(INode &node) : NodeModuleDependent<AuthModule>(node, "auth") {}

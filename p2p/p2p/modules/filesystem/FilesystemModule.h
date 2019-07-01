@@ -17,11 +17,11 @@
 #include <p2p/modules/filesystem/transfer/TransferManager.h>
 #include <p2p/modules/filesystem/identification/SimplePathRI.h>
 
-#include "p2p/modules/nodeNetworkModule/NodeNetworkModule.h"
+#include "p2p/modules/network/NetworkModule.h"
 
 namespace fs = std::filesystem;
 
-class FilesystemModule : public NodeModuleDependent<FilesystemModule, NodeNetworkModule> {
+class FilesystemModule : public NodeModuleDependent<FilesystemModule, NetworkModule> {
 public:
 
     class Configuration {
@@ -161,7 +161,7 @@ public:
 //    void beginTransferTest(const NodeIdType &nodeId, fs::path from) {
 //        BeginTransfer::Request::Ptr req = BeginTransfer::Request::getNew();
 //        req->setResourceId(std::make_shared<SimplePathRI>(from));
-//        auto res = node.getModule<NodeNetworkModule>()->sendPacketToNode(nodeId, req);
+//        auto res = node.getModule<NetworkModule>()->sendPacketToNode(nodeId, req);
 //        LOGGER("received begin " + std::to_string(res->getTransferId()))
 //    }
 };

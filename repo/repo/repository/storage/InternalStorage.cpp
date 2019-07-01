@@ -5,7 +5,7 @@
 #include <core/log/Logger.h>
 #include <core/utils/crypto.h>
 #include <p2p/node/context/NodeContext.h>
-#include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
+#include <p2p/modules/network/NetworkModule.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include "InternalStorage.h"
@@ -89,7 +89,7 @@ std::shared_ptr<std::iostream> InternalStorage::getResourceStream(const Resource
 }
 
 bool InternalStorage::acquireResource(const ResourceId &resourceId) {
-//    auto netModule = NodeContext::getNodeFromActiveContext().getModule<NodeNetworkModule>();
+//    auto netModule = NodeContext::getNodeFromActiveContext().getModule<NetworkModule>();
     auto fileModule = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>();
 //    StorageQuery::Request::Ptr req = StorageQuery::Request::getNew();
 //    req->setRepositoryId(repository->getRepositoryId());

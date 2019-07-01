@@ -10,10 +10,10 @@
 #include <repo/repository/storage/network/logic/actions/StorageActions.h>
 #include <p2p/modules/command/CommandModule.h>
 #include <logic/evaluators/CommonEvaluators.h>
-#include <p2p/modules/nodeNetworkModule/protocol/logic/actions/NetworkActions.h>
+#include <p2p/modules/network/protocol/logic/actions/NetworkActions.h>
 #include <repo/repository/network/RepoQuery.h>
 #include <logic/conditions/TimeConditions.h>
-#include <p2p/modules/nodeNetworkModule/protocol/logic/conditions/NetworkConditions.h>
+#include <p2p/modules/network/protocol/logic/conditions/NetworkConditions.h>
 #include <repo/repository/logic/actions/RepositoryActions.h>
 #include <repo/repository/logic/evaluators/RepoEvaluators.h>
 #include <logic/actions/CommonActions.h>
@@ -212,7 +212,7 @@ void RepoModule::restoreRepository(const Repository::RepoIdType &repoId) {
 
 void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repository::RepoIdType &repoId) {
 
-    auto netModule = node.getModule<NodeNetworkModule>();
+    auto netModule = node.getModule<NetworkModule>();
     auto localRepo = findRepository(repoId);
     LOGGER("downloading repo")
     JournalGroup::Request::Ptr req = JournalGroup::Request::getNew<Status::REQUEST>();
@@ -283,7 +283,7 @@ void RepoModule::prepareSubmodules() {
     auto &commandSub = getSubModule<CommandModule>();
     commandSub.mapCommand("turbo", &RepoModule::selectRepository);
 
-    auto &networkSub = getSubModule<NodeNetworkModule>();
+    auto &networkSub = getSubModule<NetworkModule>();
     networkSub.registerPacketProcessor<RepoQuery>(RepoProcessors::queryProcessor);
 
 }

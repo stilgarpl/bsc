@@ -12,7 +12,7 @@
 #include <p2p/node/module/NodeModule.h>
 #include <p2p/node/Node.h>
 #include <core/utils/from_string.h>
-#include <p2p/modules/nodeNetworkModule/remote/RemoteNode.h>
+#include <p2p/modules/network/remote/RemoteNode.h>
 
 class DummyCommandEvent : public IEvent<int> {
 

@@ -6,7 +6,7 @@
 #define BASYCO_COMMANDPACKET_H
 
 
-#include <p2p/modules/nodeNetworkModule/protocol/packet/info/PacketInfo.h>
+#include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 #include <core/utils/cereal_include.h>
 
 class CommandPacket : public PacketGroup {

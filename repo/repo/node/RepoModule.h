@@ -10,7 +10,7 @@
 #include <repo/repository/RepositoryManager.h>
 #include <p2p/dependency/DependencyManaged.h>
 #include <repo/repository/Repository.h>
-#include <p2p/modules/nodeNetworkModule/NodeNetworkModule.h>
+#include <p2p/modules/network/NetworkModule.h>
 #include <repo/journal/network/packet/JournalGroup.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>
 

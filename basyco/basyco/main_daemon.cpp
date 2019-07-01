@@ -4,16 +4,16 @@
 //#define CEREAL_THREAD_SAFE 1
 #include "p2p/node/Node.h"
 #include "logic/sources/ClockSource.h"
-#include "p2p/modules/nodeNetworkModule/protocol/logic/sources/ConnectionSource.h"
-#include "p2p/modules/nodeNetworkModule/protocol/logic/actions/ProtocolActions.h"
-#include "p2p/modules/nodeNetworkModule/protocol/logic/sources/NodeSource.h"
-#include "p2p/modules/nodeNetworkModule/protocol/logic/actions/NodeActions.h"
-#include "p2p/modules/nodeNetworkModule/protocol/logic/sources/NetworkSource.h"
-#include "p2p/modules/nodeNetworkModule/protocol/logic/actions/NetworkActions.h"
+#include "p2p/modules/network/protocol/logic/sources/ConnectionSource.h"
+#include "p2p/modules/network/protocol/logic/actions/ProtocolActions.h"
+#include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
+#include "p2p/modules/network/protocol/logic/actions/NodeActions.h"
+#include "p2p/modules/network/protocol/logic/sources/NetworkSource.h"
+#include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"
 #include <cereal/archives/xml.hpp>
 #include <cereal/types/memory.hpp>
 #include <repo/repository/storage/InternalStorage.h>
-#include <p2p/modules/nodeNetworkModule/protocol/packet/NodeInfoGroup.h>
+#include <p2p/modules/network/protocol/packet/NodeInfoGroup.h>
 #include <p2p/modules/auth/AuthModule.h>
 
 
@@ -33,7 +33,7 @@ using namespace std::chrono_literals;
 void setupModules(Node &node) {
     node.addModule<BasicModule>();
     node.addModule<FilesystemModule>();
-    node.addModule<NodeNetworkModule>();
+    node.addModule<network>();
     node.addModule<RepoModule>();
     node.addModule<CommandModule>();
 }
@@ -44,11 +44,11 @@ void setupCommands(CommandModule *cmd) {
     cmd->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-    cmd->mapCommand("connect", &NodeNetworkModule::connectTo);
-    cmd->mapCommand("connectTo", &NodeNetworkModule::connectToNode);
-    cmd->mapCommand<NodeNetworkModule, RemoteNode &, const NodeIdType &>("getnode", &NodeNetworkModule::getRemoteNode);
-    cmd->mapCommand("disconnect", &NodeNetworkModule::disconnect);
-    cmd->mapCommand("print", &NodeNetworkModule::printConnections);
+    cmd->mapCommand("connect", &network::connectTo);
+    cmd->mapCommand("connectTo", &network::connectToNode);
+    cmd->mapCommand<network, RemoteNode &, const NodeIdType &>("getnode", &network::getRemoteNode);
+    cmd->mapCommand("disconnect", &network::disconnect);
+    cmd->mapCommand("print", &network::printConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
     cmd->mapRawCommand("broadcast", &CommandModule::broadcastRemoteCommand);
     cmd->mapCommand("shutdown", &BasicModule::shutdownNode);
@@ -86,8 +86,8 @@ int main(int argc, char *argv[]) {
     thisNode.getNodeInfo().setNodeId(Poco::Environment::nodeName());
 
     setupModules(thisNode);
-    thisNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
-    thisNode.getModule<NodeNetworkModule>()->configuration().setPort(9999);
+    thisNode.getModule<network>()->addToNetwork("TheNetwork");
+    thisNode.getModule<network>()->configuration().setPort(9999);
 
     auto cmdN = thisNode.getModule<CommandModule>();
 

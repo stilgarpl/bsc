@@ -9,7 +9,7 @@
 
 void setupModules(Node &node) {
     node.addModule<BasicModule>();
-    node.addModule<NodeNetworkModule>();
+    node.addModule<NetworkModule>();
     node.addModule<FilesystemModule>();
 }
 
@@ -62,14 +62,14 @@ TEST_CASE("Transfer test", "[!throws]") {
     thisNode.getNodeInfo().setNodeId("firstNode");
 
     setupModules(thisNode);
-    thisNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
-    thisNode.getModule<NodeNetworkModule>()->configuration().setPort(9191);
+    thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
+    thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
 
     Node otherNode;
     otherNode.getNodeInfo().setNodeId("second");
     setupModules(otherNode);
-    otherNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
-    otherNode.getModule<NodeNetworkModule>()->configuration().setPort(9192);
+    otherNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
+    otherNode.getModule<NetworkModule>()->configuration().setPort(9192);
 
     thisNode.start();
     otherNode.start();
@@ -77,7 +77,7 @@ TEST_CASE("Transfer test", "[!throws]") {
     thisNode.waitUntilStarted();
     otherNode.waitUntilStarted();
 
-    auto &remoteSecondNode = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9192");
+    auto &remoteSecondNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9192");
     bool connectedToSecond = remoteSecondNode.isConnected();
     INFO("testing require")
     REQUIRE(connectedToSecond);

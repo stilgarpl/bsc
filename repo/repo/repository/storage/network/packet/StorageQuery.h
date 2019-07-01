@@ -6,7 +6,7 @@
 #define BASYCO_STORAGESYNC_H
 
 
-#include <p2p/modules/nodeNetworkModule/protocol/packet/info/PacketInfo.h>
+#include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 #include <repo/repository/IRepository.h>
 #include <repo/journal/JournalTypes.h>
 #include <repo/repository/storage/network/logic/sources/StorageSource.h>

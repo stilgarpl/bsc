@@ -6,7 +6,7 @@
 #define BASYCO_BEGINTRANSFER_H
 
 
-#include <p2p/modules/nodeNetworkModule/protocol/packet/info/PacketInfo.h>
+#include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 #include <p2p/modules/filesystem/identification/ResourceIdentificator.h>
 #include <p2p/modules/filesystem/identification/TransferTypes.h>
 

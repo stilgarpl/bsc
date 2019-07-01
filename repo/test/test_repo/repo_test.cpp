@@ -12,7 +12,7 @@
 void remoteServerTestModuleSetup(Node &node) {
     node.addModule<BasicModule>();
     node.addModule<FilesystemModule>();
-    node.addModule<NodeNetworkModule>();
+    node.addModule<NetworkModule>();
     node.addModule<RepoModule>();
     node.addModule<CommandModule>();
 }
@@ -22,14 +22,14 @@ void setupCommands(CommandModule *cmd) {
     cmd->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-    cmd->mapCommand("connect", &NodeNetworkModule::connectTo);
-    cmd->mapCommand("connectTo", &NodeNetworkModule::connectToNode);
-    cmd->mapCommand<NodeNetworkModule, RemoteNode &, const NodeIdType &>("getnode", &NodeNetworkModule::getRemoteNode);
-    cmd->mapCommand("disconnect", &NodeNetworkModule::disconnect);
-    cmd->mapCommand("print", &NodeNetworkModule::printConnections);
-//    cmd->mapCommand("update", &NodeNetworkModule:prin:updateNodeConnectionInfo);
-//    cmd->mapCommand("purgeD", &NodeNetworkModule::purgeDuplicateConnections);
-//    cmd->mapCommand("purgeI", &NodeNetworkModule::purgeInactiveConnections);
+    cmd->mapCommand("connect", &NetworkModule::connectTo);
+    cmd->mapCommand("connectTo", &NetworkModule::connectToNode);
+    cmd->mapCommand<NetworkModule, RemoteNode &, const NodeIdType &>("getnode", &NetworkModule::getRemoteNode);
+    cmd->mapCommand("disconnect", &NetworkModule::disconnect);
+    cmd->mapCommand("print", &NetworkModule::printConnections);
+//    cmd->mapCommand("update", &NetworkModule:prin:updateNodeConnectionInfo);
+//    cmd->mapCommand("purgeD", &NetworkModule::purgeDuplicateConnections);
+//    cmd->mapCommand("purgeI", &NetworkModule::purgeInactiveConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
     cmd->mapRawCommand("broadcast", &CommandModule::broadcastRemoteCommand);
     cmd->mapCommand("shutdown", &BasicModule::shutdownNode);
@@ -87,8 +87,8 @@ TEST_CASE("Repo module test", "[!throws]") {
     thisNode.getNodeInfo().setNodeId("first Node");
 
     remoteServerTestModuleSetup(thisNode);
-    thisNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
-    thisNode.getModule<NodeNetworkModule>()->configuration().setPort(9191);
+    thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
+    thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
     auto cmdN = thisNode.getModule<CommandModule>();
 
     setupCommands(cmdN.get());
@@ -100,15 +100,15 @@ TEST_CASE("Repo module test", "[!throws]") {
 
 
     remoteServerTestModuleSetup(otherNode);
-    otherNode.getModule<NodeNetworkModule>()->addToNetwork("TheNetwork");
-    otherNode.getModule<NodeNetworkModule>()->configuration().setPort(9999);
+    otherNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
+    otherNode.getModule<NetworkModule>()->configuration().setPort(9999);
     cmdN = otherNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
 
     otherNode.start();
     thisNode.waitUntilStarted();
     otherNode.waitUntilStarted();
-    auto &secondNode = thisNode.getModule<NodeNetworkModule>()->connectTo("127.0.0.1:9999");
+    auto &secondNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
     bool connectedToSecond = secondNode.isConnected();
 
     REQUIRE(connectedToSecond);
@@ -147,7 +147,7 @@ TEST_CASE("Repo module test", "[!throws]") {
         std::cout << repoXMLPath << std::endl;
         INFO("root path is " << repoXMLPath.string())
         REQUIRE(fs::exists(repoXMLPath));
-
+        otherNode.setNodeContextActive();
         auto otherSum = otherRepoMod->getSelectedRepository()->getJournal()->getChecksum();
 
 
@@ -158,7 +158,7 @@ TEST_CASE("Repo module test", "[!throws]") {
             REQUIRE(!fs::exists(testPath / "3.txt"));
             REQUIRE(!fs::exists(testPath / "4.txt"));
             REQUIRE(!fs::exists(subPath / "sub.txt"));
-
+            thisNode.setNodeContextActive();
             auto thisRepoMod = thisNode.getModule<RepoModule>();
 
             REQUIRE_FALSE(thisRepoMod->findRepository("test") != nullptr);
@@ -183,9 +183,11 @@ TEST_CASE("Repo module test", "[!throws]") {
             REQUIRE(fs::exists(subPath / "sub.txt"));
 
             SECTION("add, change, delete") {
+                INFO("changing files")
                 fs::remove(testPath / "4.txt");
                 changeFile(testPath / "3.txt", "QWQQQQQQQQQ");
                 createFile(testPath / "5.txt", "555");
+                otherNode.setNodeContextActive();
                 otherRepoMod->updateAllFiles();
                 otherRepoMod->saveRepository("test");
 
@@ -197,6 +199,7 @@ TEST_CASE("Repo module test", "[!throws]") {
                 REQUIRE(!fs::exists(testPath / "3.txt"));
                 REQUIRE(!fs::exists(testPath / "4.txt"));
                 REQUIRE(!fs::exists(testPath / "5.txt"));
+                thisNode.setNodeContextActive();
                 thisRepoMod->downloadRemoteRepository("second", "test");
                 REQUIRE(thisRepoMod->findRepository("test") != nullptr);
                 thisRepoMod->selectRepository("test");
@@ -242,9 +245,10 @@ TEST_CASE("Repo module test", "[!throws]") {
     }
 
     INFO("closing");
-
+    thisNode.setNodeContextActive();
     thisNode.stop();
     thisNode.waitToFinish();
+    otherNode.setNodeContextActive();
     otherNode.stop();
     otherNode.waitToFinish();
 

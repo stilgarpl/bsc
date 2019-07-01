@@ -6,9 +6,9 @@
 #define BASYCO_NODECONTEXTINFO_H
 
 
-#include <p2p/modules/nodeNetworkModule/protocol/context/exception/NodeContextNotSet.h>
+#include <p2p/modules/network/protocol/context/exception/NodeContextNotSet.h>
 #include "p2p/node/Node.h"
-#include "p2p/modules/nodeNetworkModule/protocol/context/IContextSetup.h"
+#include "p2p/modules/network/protocol/context/IContextSetup.h"
 
 class NodeContext {
 public:

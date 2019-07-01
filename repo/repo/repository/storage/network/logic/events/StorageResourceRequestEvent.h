@@ -7,7 +7,7 @@
 
 
 #include <logic/IEvent.h>
-#include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkingEvent.h>
+#include <p2p/modules/network/protocol/logic/events/NetworkingEvent.h>
 #include <repo/repository/storage/IStorage.h>
 
 class StorageResourceRequestEvent : public NetworkingEvent<int> {

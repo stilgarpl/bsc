@@ -6,7 +6,7 @@
 #define BASYCO_PROPERTIESTRANSFER_H
 
 #include <core/utils/cereal_include.h>
-#include <p2p/modules/nodeNetworkModule/protocol/packet/info/PacketInfo.h>
+#include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 #include <p2p/modules/filesystem/identification/TransferTypes.h>
 
 struct PropertiesTransfer : public PacketGroup {

@@ -9,7 +9,7 @@
 //    STARTED,
 //};
 
-#include <p2p/modules/nodeNetworkModule/protocol/logic/events/NetworkingEvent.h>
+#include <p2p/modules/network/protocol/logic/events/NetworkingEvent.h>
 #include <p2p/modules/filesystem/identification/TransferTypes.h>
 #include <p2p/modules/filesystem/identification/ResourceIdentificator.h>
 
