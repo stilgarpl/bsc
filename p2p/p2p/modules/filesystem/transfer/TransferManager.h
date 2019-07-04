@@ -54,6 +54,7 @@ public:
         TransferSize size;
         TransferSize transferredSize;
         std::mutex threadStartMutex;
+        std::chrono::time_point<std::chrono::steady_clock> startTime, endTime;
 
         //very private, no getters:
 
@@ -100,7 +101,15 @@ public:
             LocalTransferDescriptor::transferredSize = transferredSize;
         }
 
-        virtual ~LocalTransferDescriptor();
+        const std::chrono::time_point<std::chrono::steady_clock> &getStartTime() const;
+
+        void setStartTime(const std::chrono::time_point<std::chrono::steady_clock> &startTime);
+
+        const std::chrono::time_point<std::chrono::steady_clock> &getEndTime() const;
+
+        void setEndTime(const std::chrono::time_point<std::chrono::steady_clock> &endTime);
+
+        ~LocalTransferDescriptor() override;
 
         void wait();
 

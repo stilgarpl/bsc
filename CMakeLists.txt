@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(TEMPLATE_PATH "${CMAKE_SOURCE_DIR}/cmake/template/")
 enable_testing()
 include(GNUInstallDirs)
 
@@ -48,7 +49,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif ()
 
 
-# Generate clang compilation databaseDom (Muzyczna 7)
+# Generate clang compilation database
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(core)

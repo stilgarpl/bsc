@@ -42,7 +42,7 @@ public:
     explicit NetworkingEvent(BasePacket::IdType requestId) : requestId(requestId) {}
 
     NetworkingEvent() {
-        LOGGER("NetworkingEvent SETUP")
+//        LOGGER("NetworkingEvent SETUP")
         auto packet = ProcessorContext::getCurrentPacketFromActiveContext();
         if (packet != nullptr) {
             this->setRequestId(packet->getId());

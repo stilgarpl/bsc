@@ -103,9 +103,9 @@ public:
         //future.wait();
         //@todo check if there is a way to do it without exceptions, maybe .valid() ?
         try {
-            LOGGER("getting future " + std::to_string(p->getId()))
+//            LOGGER("getting future " + std::to_string(p->getId()))
             auto ret = future.get();
-            LOGGER("future got" + std::to_string(p->getId()))
+//            LOGGER("future got" + std::to_string(p->getId()))
             // auto retStatus = ret->getStatus(); //debug
             if (ret->getStatus() == Status::RESPONSE) {
                 returnValue.response = std::static_pointer_cast<ResponseType>(ret);

@@ -54,7 +54,7 @@ public:
         }
 
     public:
-        const RawDataType &getData() const {
+        RawDataType &getData() {
             return data;
         }
 

@@ -12,7 +12,8 @@
 
 
 Node::~Node() {
-
+    //setting node context to active - if more than one node is created in a single thread, things may get mixed up.
+    setNodeContextActive();
     if (started) {
         ERROR("stopping in destructor is usually too late. stop and wait!")
         stop();

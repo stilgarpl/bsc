@@ -110,19 +110,14 @@ void TransferManager::sendData(const TransferEvent &event) {
     //@todo error on bad transfer id
     auto transferDescriptor = transfers[event.getTransferId()];
 
-    std::vector<char> fileContents;
-    //@todo data are copied twice here, isn't there a better way? optimize when we have time
+    std::vector<char> &fileContents = response->getData();
     if (transferDescriptor != nullptr && transferDescriptor->getInputStream() != nullptr) {
         transferDescriptor->getInputStream()->seekg(event.getBegin());
-        char rawData[event.getEnd() - event.getBegin()];
-        transferDescriptor->getInputStream()->read(rawData, event.getEnd() - event.getBegin());
-        fileContents.assign(rawData, rawData + sizeof rawData / sizeof rawData[0]);
-
+        fileContents.resize(event.getEnd() - event.getBegin());
+        transferDescriptor->getInputStream()->read(fileContents.data(), event.getEnd() - event.getBegin());
         //@todo insert ACTUAL begin and end read from stream (in case stream is shorter than requested)
         response->setBegin(event.getBegin());
         response->setEnd(event.getEnd());
-        //@todo make sure this isn't copying the data for the third time
-        response->setData(fileContents);
         connection.send(response);
     }
 }
@@ -292,7 +287,19 @@ void TransferManager::LocalTransferDescriptor::startThread() {
     std::lock_guard<std::mutex> g(threadStartMutex);
     if (thread == nullptr) {
         changeState(TransferState::PREPARED);
-        thread = std::make_unique<std::thread>(payload, std::ref(*this));
+        thread = std::make_unique<std::thread>([=, this](LocalTransferDescriptor &descriptor) {
+            descriptor.setStartTime(std::chrono::steady_clock::now());
+            payload(descriptor);
+            descriptor.setEndTime(std::chrono::steady_clock::now());
+
+            //@todo debug, move somewhere else
+            std::chrono::milliseconds time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    descriptor.getEndTime() - descriptor.getStartTime());
+            auto dataTransferred = descriptor.getTransferredSize();
+            auto speed = dataTransferred / time.count();
+            LOGGER(std::string("Transferred bytes: ") + std::to_string(dataTransferred) + " in " +
+                   std::to_string(time.count()) + "ms. Speed " + std::to_string(speed) + "KB/s")
+        }, std::ref(*this));
     } else {
         //@todo error already started
         LOGGER("thread already started!!!")
@@ -342,6 +349,25 @@ void TransferManager::LocalTransferDescriptor::wait() {
 bool TransferManager::LocalTransferDescriptor::isStarted() {
     std::lock_guard<std::mutex> g(threadStartMutex);
     return thread != nullptr;
+}
+
+const std::chrono::time_point<std::chrono::steady_clock> &
+TransferManager::LocalTransferDescriptor::getStartTime() const {
+    return startTime;
+}
+
+void TransferManager::LocalTransferDescriptor::setStartTime(
+        const std::chrono::time_point<std::chrono::steady_clock> &startTime) {
+    LocalTransferDescriptor::startTime = startTime;
+}
+
+const std::chrono::time_point<std::chrono::steady_clock> &TransferManager::LocalTransferDescriptor::getEndTime() const {
+    return endTime;
+}
+
+void TransferManager::LocalTransferDescriptor::setEndTime(
+        const std::chrono::time_point<std::chrono::steady_clock> &endTime) {
+    LocalTransferDescriptor::endTime = endTime;
 }
 
 void TransferManager::TransferQueue::queueTransfer(const NodeIdType &nodeId, const ResourceIdentificatorPtr &source,
