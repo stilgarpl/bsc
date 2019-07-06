@@ -9,7 +9,7 @@
 //@todo change into ordinary static func or sth.
 std::function<ResponsePtr<TransferQuery>(RequestPtr<TransferQuery>)> NetworkProcessors::queryProcessor = [](
         const TransferQuery::Request::Ptr &ptr) {
-    LOGGER("Transfer Query Processor")
+//    LOGGER("Transfer Query Processor")
     auto module = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>();
     TransferQuery::Response::Ptr res = TransferQuery::Response::getNew();
 

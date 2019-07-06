@@ -250,7 +250,7 @@ TransferManager::initiateTransfer(ResourceIdentificatorPtr source, ResourceIdent
     //select best node.
     //@todo actual strategy to select the best node - for example, a object that takes this map and returns best nodeId
     for (auto &&[nodeId, response] : responseMap) {
-        LOGGER("response from " + nodeId)
+//        LOGGER("response from " + nodeId)
         if (response->isExists()) {
             //initiate transfer
             return initiateTransfer(nodeId, source, destination, start);
