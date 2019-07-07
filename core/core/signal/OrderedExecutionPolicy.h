@@ -30,6 +30,9 @@ public:
 protected:
     void run();
 
+public:
+    void stop() override;
+
 };
 
 class OrderedExecutionPolicy : public ExecutionPolicy {

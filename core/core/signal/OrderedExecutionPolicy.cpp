@@ -51,3 +51,7 @@ OrderedExecutor::~OrderedExecutor() {
     }
 
 }
+
+void OrderedExecutor::stop() {
+
+}
