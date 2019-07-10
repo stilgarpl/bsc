@@ -84,6 +84,10 @@ public:
     public:
         auto operator[](const fs::path &path) -> decltype(attributesMap[fs::current_path()]);
 
+        auto contains(const fs::path &path) {
+            return attributesMap.contains(path);
+        }
+
         auto getSize(const fs::path &path);
 
         decltype(attributesMap) subMap(const fs::path &root);

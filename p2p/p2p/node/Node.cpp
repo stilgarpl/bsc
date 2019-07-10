@@ -12,11 +12,13 @@
 
 
 Node::~Node() {
+    std::unique_lock <std::recursive_mutex> g(startMutex);
     //setting node context to active - if more than one node is created in a single thread, things may get mixed up.
     setNodeContextActive();
     if (started) {
         ERROR("stopping in destructor is usually too late. stop and wait!")
         stop();
+        waitToFinish();
     }
 
 
@@ -25,7 +27,8 @@ Node::~Node() {
 
 
 void Node::start() {
-    std::unique_lock<std::mutex> g(startMutex);
+    std::unique_lock <std::recursive_mutex> g(startMutex);
+    setNodeContextActive();
     initialize();
     logicManager.start();
     startModules();
@@ -36,7 +39,8 @@ void Node::start() {
 
 void Node::stop() {
     LOGGER("node stop")
-    std::unique_lock<std::mutex> g(startMutex);
+    std::unique_lock <std::recursive_mutex> g(startMutex);
+    setNodeContextActive();
     started = false;
     shutdownModules();
     //@todo wait for shutdown to complete, sleep will do for now
@@ -47,7 +51,7 @@ void Node::stop() {
 
 
 Node::Node() {
-
+    LOGGER("default node constructor")
     nodeContext->set<NodeContext, Node &, NodeInfo &>(*this, this->thisNodeInfo);
     //@todo setting of LogicContext should probably be done inside LogicManager
     nodeContext->set<LogicContext, LogicManager &>(logicManager);
@@ -96,10 +100,9 @@ void Node::joinModules() {
 }
 
 void Node::waitToFinish() {
+    std::unique_lock <std::recursive_mutex> g(startMutex);
     logicManager.join();
     joinModules();
-//    //@todo replace this with waiting for modules
-//    std::this_thread::sleep_for(1s);
 
 }
 
@@ -115,7 +118,7 @@ void Node::saveConfiguration() {
 }
 
 void Node::waitUntilStarted() {
-    std::unique_lock<std::mutex> g(startMutex);
+    std::unique_lock <std::recursive_mutex> g(startMutex);
     startedReady.wait(g, [this] { return started; });
 }
 

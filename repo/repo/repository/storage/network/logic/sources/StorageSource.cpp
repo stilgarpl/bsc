@@ -6,7 +6,7 @@
 
 void StorageSource::queryResource(IRepository::RepoIdType repositoryId, IStorage::ResourceId objectId,
                                   BasePacket::IdType requestId) {
-    auto event = newEvent(requestId);
+    auto event = newEvent();
     event->setObjectId(objectId);
     event->setRepositoryId(repositoryId);
     queueEvent(event);

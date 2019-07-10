@@ -10,7 +10,7 @@ JournalSource::JournalSource(SourceManager &sourceManager) : ISource(sourceManag
                                                              responseSource(sourceManager) {}
 
 void JournalSource::journalRequested(const std::string &repoId, JournalGroup::Request::IdType requestId) {
-    auto event = requestSource.newEvent(requestId);
+    auto event = requestSource.newEvent();
     event->setRepoId(repoId);
 //        event->setRequestId(requestId);
     requestSource.queueEvent(event);
@@ -18,7 +18,7 @@ void JournalSource::journalRequested(const std::string &repoId, JournalGroup::Re
 
 void JournalSource::journalReceived(const std::string &repoId, const JournalPtr &journal) {
     //networking event requires packet id, but no one would be responding to this, so...
-    auto event = responseSource.newEvent(0);
+    auto event = responseSource.newEvent();
     event->setRepoId(repoId);
     event->setJournal(journal);
     responseSource.queueEvent(event);

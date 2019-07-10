@@ -48,10 +48,3 @@ void ConnectionProcessor::run() {
     }
 
 }
-
-ConnectionProcessor::~ConnectionProcessor() {
-
-    this->stop();
-
-}
-

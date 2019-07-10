@@ -90,19 +90,9 @@ protected:
     RemoteNode();
 
 public:
-    void disconnect() {
-        std::lock_guard<ConnectionFetcher> g(connectionFetcher);
-        if (connectionFetcher.getConnection() != nullptr) {
-            connectionFetcher.getConnection()->shutdown();
-        }
-        connectionFetcher.setConnection(nullptr);
-    }
+    void disconnect();
 
-    bool isConnected() {
-        std::lock_guard<ConnectionFetcher> g(connectionFetcher);
-        //@todo refine to check actual connection state if that's possible?
-        return connectionFetcher.getConnection() != nullptr;
-    }
+    bool isConnected();
 
     explicit RemoteNode(std::shared_ptr<IProtocol> protocol);
 
@@ -151,14 +141,7 @@ public:
 
     void setRemoteNodeInfo(const RemoteNodeInfo &remoteNodeInfo);
 
-    const std::optional<NetAddressType> getAddress() {
-        std::lock_guard<ConnectionFetcher> g(connectionFetcher);
-        if (connectionFetcher.getConnection() && connectionFetcher.getConnection()->isActive()) {
-            return connectionFetcher.getConnection()->getAddress();
-        } else {
-            return std::nullopt;
-        }
-    }
+    const std::optional <NetAddressType> getAddress();
 
 };
 

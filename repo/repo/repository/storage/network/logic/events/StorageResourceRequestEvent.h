@@ -15,7 +15,6 @@ private:
     IRepository::RepoIdType repositoryId;
     IStorage::ResourceId objectId;
 public:
-    StorageResourceRequestEvent(BasePacket::IdType requestId);
 
     const IRepository::RepoIdType &getRepositoryId() const;
 

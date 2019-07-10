@@ -82,6 +82,30 @@ void RemoteNode::setNodeInfo(const NodeInfo &ni) {
 
 }
 
+void RemoteNode::disconnect() {
+    std::lock_guard <ConnectionFetcher> g(connectionFetcher);
+    if (connectionFetcher.getConnection() != nullptr) {
+        connectionFetcher.getConnection()->shutdown();
+    }
+    //@todo this setting to null is a problem. it deletes connection before state events could be processed, valgrind shows invalid read/write here
+    connectionFetcher.setConnection(nullptr);
+}
+
+bool RemoteNode::isConnected() {
+    std::lock_guard <ConnectionFetcher> g(connectionFetcher);
+    //@todo refine to check actual connection state if that's possible?
+    return connectionFetcher.getConnection() != nullptr && connectionFetcher.getConnection()->isActive();
+}
+
+const std::optional <NetAddressType> RemoteNode::getAddress() {
+    std::lock_guard <ConnectionFetcher> g(connectionFetcher);
+    if (connectionFetcher.getConnection() && connectionFetcher.getConnection()->isActive()) {
+        return connectionFetcher.getConnection()->getAddress();
+    } else {
+        return std::nullopt;
+    }
+}
+
 void ConnectionFetcher::setConnection(std::shared_ptr<Connection> p) {
     std::lock_guard<std::recursive_mutex> g(connectionLock);
     if (getConnection() != nullptr) {

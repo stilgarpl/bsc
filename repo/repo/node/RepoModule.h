@@ -21,6 +21,7 @@ public:
     private:
         //@todo cereal fix path type to path!
         fs::path::string_type repositoryDataPath = fs::path("repository");
+        bool autoProcess = true;
 
     public:
         //@todo make it return reference when cereal path is fixed.
@@ -31,8 +32,15 @@ public:
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            ar(CEREAL_NVP(repositoryDataPath));
+            ar(CEREAL_NVP(repositoryDataPath), CEREAL_NVP(autoProcess));
         }
+
+    public:
+        bool isAutoProcess() const;
+
+        void setAutoProcess(bool autoProcess);
+
+    private:
 
 
         friend class cereal::access;

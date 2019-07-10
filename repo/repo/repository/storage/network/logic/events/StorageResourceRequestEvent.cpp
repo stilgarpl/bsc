@@ -4,8 +4,6 @@
 
 #include "StorageResourceRequestEvent.h"
 
-StorageResourceRequestEvent::StorageResourceRequestEvent(BasePacket::IdType requestId) : NetworkingEvent(requestId) {}
-
 const IRepository::RepoIdType &StorageResourceRequestEvent::getRepositoryId() const {
     return repositoryId;
 }

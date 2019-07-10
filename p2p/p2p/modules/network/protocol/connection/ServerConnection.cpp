@@ -72,8 +72,6 @@ void ServerConnection::stopReceiving() {
 ServerConnection::~ServerConnection() {
     //  LOGGER("Server conn dest");
     changeState(ConnectionState::DISCONNECTED);
-    //@todo remove this, we have an event for this now -- this would also remove ServerConnection dependency on Node. it would make things much simpler
-    stop();
 }
 
 void ServerConnection::stop() {

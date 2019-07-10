@@ -80,7 +80,7 @@ std::string readFile(fs::path path) {
     return str;
 }
 
-TEST_CASE("Repo module test", "[!throws]") {
+TEST_CASE("Repo module test") {
 
     Node thisNode;
 
@@ -92,19 +92,22 @@ TEST_CASE("Repo module test", "[!throws]") {
     auto cmdN = thisNode.getModule<CommandModule>();
 
     setupCommands(cmdN.get());
-
-    thisNode.start();
+    auto thisRepoMod = thisNode.getModule<RepoModule>();
+    thisRepoMod->configuration().setAutoProcess(false);
 
     Node otherNode;
     otherNode.getNodeInfo().setNodeId("second");
-
-
     remoteServerTestModuleSetup(otherNode);
+    auto otherRepoMod = otherNode.getModule<RepoModule>();
+    otherRepoMod->configuration().setRepositoryDataPath("repo");
+    otherRepoMod->configuration().setAutoProcess(false);
+
     otherNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
     otherNode.getModule<NetworkModule>()->configuration().setPort(9999);
     cmdN = otherNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
 
+    thisNode.start();
     otherNode.start();
     thisNode.waitUntilStarted();
     otherNode.waitUntilStarted();
@@ -114,8 +117,7 @@ TEST_CASE("Repo module test", "[!throws]") {
     REQUIRE(connectedToSecond);
 
     SECTION ("create repository on second ") {
-        auto otherRepoMod = otherNode.getModule<RepoModule>();
-        otherRepoMod->configuration().setRepositoryDataPath("repo");
+
         REQUIRE(otherRepoMod != nullptr);
         otherRepoMod->createRepository("test");
         REQUIRE(otherRepoMod->findRepository("test") != nullptr);
@@ -125,6 +127,9 @@ TEST_CASE("Repo module test", "[!throws]") {
         //create dirs and files
         fs::path testPath = fs::temp_directory_path() / "dirtest";
         INFO("test path is " << testPath.string())
+        //just in case, cleanup
+        fs::remove_all(testPath);
+        //create test directories
         fs::create_directories(testPath);
         createFile(testPath / "1.txt", "111");
         createFile(testPath / "2.txt", "222");
@@ -159,12 +164,13 @@ TEST_CASE("Repo module test", "[!throws]") {
             REQUIRE(!fs::exists(testPath / "4.txt"));
             REQUIRE(!fs::exists(subPath / "sub.txt"));
             thisNode.setNodeContextActive();
-            auto thisRepoMod = thisNode.getModule<RepoModule>();
 
-            REQUIRE_FALSE(thisRepoMod->findRepository("test") != nullptr);
+            bool noTestRepo = thisRepoMod->findRepository("test") != nullptr;
+            REQUIRE_FALSE(noTestRepo);
 
             thisRepoMod->downloadRemoteRepository("second", "test");
-            REQUIRE(thisRepoMod->findRepository("test") != nullptr);
+            bool okTestRepo = thisRepoMod->findRepository("test") != nullptr;
+            REQUIRE(okTestRepo);
 
             thisRepoMod->selectRepository("test");
             REQUIRE(thisRepoMod->getSelectedRepository() != nullptr);
@@ -256,6 +262,6 @@ TEST_CASE("Repo module test", "[!throws]") {
 }
 
 
-TEST_CASE("Repo Integration Test", "[!throws]") {
+TEST_CASE("Repo Integration Test") {
     //@todo implement
 }

@@ -20,6 +20,7 @@ class LogicStateEvent
 public:
     typedef LogicStateMethod Method;
     typedef Object Type;
+    using ExecutionPolicy = OrderedExecutionPolicy;
 private:
     Object &object;
     Method method = Method::INVALID;

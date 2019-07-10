@@ -41,18 +41,20 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
 
     auto updateChainGroup = chainGroup("updateChain");
 
-    when(TimeConditions::every(60s))
-            .fireNewGenericAction([this] {
-                node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("updateRepoTrigger");
-            });
-    when(TimeConditions::every(60s))
-            .fireNewGenericAction([this] {
-                for (const auto &repository : repositoryManager.getRepositories()) {
-                    node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string, std::string>(
-                            "syncLocalRepo", repository->getRepositoryId());
-                }
+    if (configuration().isAutoProcess()) {
+        when(TimeConditions::every(60s))
+                .fireNewGenericAction([this] {
+                    node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string>("updateRepoTrigger");
+                });
+        when(TimeConditions::every(60s))
+                .fireNewGenericAction([this] {
+                    for (const auto &repository : repositoryManager.getRepositories()) {
+                        node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string, std::string>(
+                                "syncLocalRepo", repository->getRepositoryId());
+                    }
 
-            });
+                });
+    }
     when(TriggerConditions::trigger<std::string>("updateRepoTrigger")).fireNewGenericAction(
             CommonActions::foreachActionGetter(NetworkActions::broadcastPacket,
                                                [this] { return this->repositoryManager.getRepositories(); },
@@ -252,7 +254,7 @@ void RepoModule::updateFile(const fs::path &path) {
 void RepoModule::updateAllFiles() {
     LOGGER("updateAllFiles")
     if (selectedRepository != nullptr) {
-        LOGGER("syncing...")
+        LOGGER("syncing repo ..." + selectedRepository->getRepositoryId())
         selectedRepository->syncLocalChanges();
 
     }
@@ -305,4 +307,12 @@ const std::filesystem::path RepoModule::Configuration::getRepositoryDataPath() c
 
 void RepoModule::Configuration::setRepositoryDataPath(const std::filesystem::path &repositoryDataPath) {
     RepoModule::Configuration::repositoryDataPath = repositoryDataPath;
+}
+
+bool RepoModule::Configuration::isAutoProcess() const {
+    return autoProcess;
+}
+
+void RepoModule::Configuration::setAutoProcess(bool autoProcess) {
+    Configuration::autoProcess = autoProcess;
 }

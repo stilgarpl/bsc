@@ -285,7 +285,7 @@ public: // @todo should be public or shouldn't ?
 
     RemoteNode &getRemoteNode(const NodeIdType &nodeId) {
         auto iter = std::find_if(remoteNodes.begin(), remoteNodes.end(), [&](const std::shared_ptr<RemoteNode> obj) {
-            return (obj->getNodeId() && obj->getNodeId() == nodeId);
+            return (obj->getNodeId() && *obj->getNodeId() == nodeId);
         });
         if (iter != remoteNodes.end()) {
             return **iter;

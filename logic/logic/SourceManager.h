@@ -6,7 +6,6 @@
 #define BASYCO_SOURCEMANAGER_H
 
 
-
 #include <list>
 #include <memory>
 #include <thread>
@@ -14,10 +13,14 @@
 #include <core/context/Context.h>
 #include <core/uber/Uber.h>
 #include <core/signal/OrderedExecutionPolicy.h>
+#include <core/signal/ExecutorPolicyTraits.h>
+#include <core/signal/DefaultExecutionPolicy.h>
 
 using namespace std::chrono_literals;
 
 class ISource;
+
+MAP_POLICY_TO_EXECUTOR(DefaultExecutionPolicy, ThreadPoolExecutor)
 
 class SourceManager {
 public:
@@ -40,26 +43,31 @@ public:
     using SignalMapType = std::map<typename T::IdType, SignalTypePtr<T, Args...>>;
 
 protected:
-
+    class ExecutorManager {
+        StaticUber<std::shared_ptr < Executor>> executors;
+    public:
+        template<typename ExecutorPolicyType>
+        std::shared_ptr <Executor> getExecutorForPolicy() {
+            using ExecutorType = typename ExecutorPolicyTraits<ExecutorPolicyType>::ExecutorType;
+            auto &executor = executors.get<ExecutorType>();
+            if (executor == nullptr) {
+                executor = std::make_shared<ExecutorType>();
+            }
+            return executor;
+        }
+    };
 private:
     Uber<std::map> signalMap;
     Uber<Type> globalSignal;
-    StaticUber<std::shared_ptr<ExecutionPolicy>> executionPolicy;
     std::mutex signalMapMutex;
+    ExecutorManager executorManager;
 
 protected:
 
     template<typename EventType>
-    std::shared_ptr<ExecutionPolicy> getExecutionPolicy() {
-        return executionPolicy.get<EventType>();
-    }
-
-public:
-    template<typename EventType>
-    void setExecutionPolicy(std::shared_ptr<ExecutionPolicy> policy) {
-        if (executionPolicy.get<EventType>() == nullptr) {
-            executionPolicy.get<EventType>() = policy;
-        }
+    std::shared_ptr <Executor> getExecutorForEvent() {
+        using ExecutionPolicyType = typename EventType::ExecutionPolicy;
+        return executorManager.getExecutorForPolicy<ExecutionPolicyType>();
     }
 
 public:
@@ -79,16 +87,11 @@ public:
 //        Context::setActiveContext(event.context());
         SetLocalContext localContext(event.context());
 
-        auto policy = getExecutionPolicy<EventType>();
-        if (policy != nullptr) {
-            std::shared_ptr<Executor> executor = policy->executor();
-            /*int b =*/ this->getSignal<EventType, Args...>().signal(executor, event, args...);
-            /*int a =*/ this->getSignal<EventType, Args...>(event.getEventId()).signal(executor, event, args...);
-        } else {
-            //@todo or just add default executor here somewhere...
-            /*int b =*/ this->getSignal<EventType, Args...>().signal(event, args...);
-            /*int a =*/ this->getSignal<EventType, Args...>(event.getEventId()).signal(event, args...);
-        }
+
+        auto executor = getExecutorForEvent<EventType>();
+        /*int b =*/ this->getSignal<EventType, Args...>().signal(executor, event, args...);
+        /*int a =*/ this->getSignal<EventType, Args...>(event.getEventId()).signal(executor, event, args...);
+
 
     }
 

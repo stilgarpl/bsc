@@ -75,11 +75,6 @@ protected:
 
 public:
 
-    template<typename EventType>
-    void setExecutionPolicy(std::shared_ptr<ExecutionPolicy> policy) {
-        sourceManager.setExecutionPolicy<EventType>(policy);
-    }
-
     template<typename SourceType>
     std::shared_ptr<SourceType> getSource() {
         return sourceManager.getSource<SourceType>();

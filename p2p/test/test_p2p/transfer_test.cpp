@@ -53,7 +53,7 @@ const std::string extremelyLongString =
         veryLongString;
 
 
-TEST_CASE("Transfer test", "[!throws]") {
+TEST_CASE("Transfer test") {
 
     const int TEST_FILES_NUM = 10;
 

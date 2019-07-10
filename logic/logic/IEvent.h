@@ -5,16 +5,15 @@
 #ifndef BASYCO_IEVENT_H
 #define BASYCO_IEVENT_H
 
-#include <cstdlib>
-
 #include <core/context/Context.h>
-
-#include "core/log/Logger.h"
+#include <core/signal/DefaultExecutionPolicy.h>
+#include <core/log/Logger.h>
 
 template<typename idType>
 class IEvent {
 public:
     typedef idType IdType;
+    using ExecutionPolicy = DefaultExecutionPolicy;
     //static const bool OriginDefined = constexpr if (originType)
 private:
     IdType eventId;

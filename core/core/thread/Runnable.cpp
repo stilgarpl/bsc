@@ -5,10 +5,14 @@
 //
 
 #include "Runnable.h"
+#include "RunnableThreadNotFinishedException.h"
 
 void Runnable::start() {
     std::lock_guard g(startMutex);
     if (thread == nullptr) {
+        if (Context::getActiveContext() == nullptr) {
+            throw int(5);
+        }
         thread = std::make_unique<std::thread>(std::ref(*this), Context::getActiveContext());
     }
 
@@ -19,15 +23,13 @@ void Runnable::operator()(Context::Ptr contextPtr) {
     onStart();
     run();
     onStop();
+    finished = true;
 }
 
 Runnable::~Runnable() {
-
-    //@todo kill the thread
-    stop();
-    //@todo wait time?
-    std::this_thread::sleep_for(5ms);
-    join();
+    if (!finished) {
+        throw RunnableThreadNotFinishedException();
+    }
 
 
 }

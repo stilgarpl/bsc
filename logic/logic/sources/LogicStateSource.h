@@ -10,6 +10,8 @@
 #include "../events/LogicStateEvent.h"
 #include "AutoSource.h"
 
+MAP_POLICY_TO_EXECUTOR(OrderedExecutionPolicy, OrderedExecutor)
+
 class LogicStateSource : public ISource {
 
 private:
@@ -19,8 +21,9 @@ private:
     void selectExecutionPolicy() {
         //@todo think of better way of selecting it, so it isn't run on every event.
         //  probably the best way would be to have init metod in autosource that would run once on creation of every container.
-        //  so Uber should have that one init method.  
-        sourceManager.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
+        //  so Uber should have that one init method.
+        //@todo remove this function
+//        sourceManager.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
     }
 public:
 
@@ -29,7 +32,6 @@ public:
 
     template<typename Object, typename StateIdType>
     void stateEntered(Object &object, const StateIdType &state) {
-        selectExecutionPolicy<LogicStateEvent<Object, StateIdType>>();
         LogicStateEvent<Object, StateIdType> logicEvent(object);
         logicEvent.setEventId(state);
         logicEvent.setMethod(LogicStateMethod::ENTERED);
@@ -38,7 +40,6 @@ public:
 
     template<typename Object, typename StateIdType>
     void stateLeft(Object &object, const StateIdType &state) {
-        selectExecutionPolicy<LogicStateEvent<Object, StateIdType>>();
         LogicStateEvent<Object, StateIdType> logicEvent(object);
         logicEvent.setEventId(state);
         logicEvent.setMethod(LogicStateMethod::LEFT);

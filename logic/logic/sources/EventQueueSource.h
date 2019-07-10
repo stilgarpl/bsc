@@ -71,10 +71,7 @@ public:
         return eventQueue.size();
     }
 
-    ~EventQueueSource() override {
-        stop();
-        queueReady.notify_all();
-    }
+    ~EventQueueSource() = default;
 };
 
 

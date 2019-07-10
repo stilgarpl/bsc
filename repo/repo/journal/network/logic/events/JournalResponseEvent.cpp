@@ -20,4 +20,3 @@ void JournalResponseEvent::setRepoId(const std::string &repoId) {
     JournalResponseEvent::repoId = repoId;
 }
 
-JournalResponseEvent::JournalResponseEvent(BasePacket::IdType requestId) : NetworkingEvent(requestId) {}

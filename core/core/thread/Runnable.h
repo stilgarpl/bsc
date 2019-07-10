@@ -19,6 +19,7 @@ private:
     mutable std::mutex startMutex, stopMutex;
     //@todo this probably should be atomic
     bool stopping = false;
+    bool finished = false;
 protected:
     std::condition_variable shutdownSignal;
 

@@ -25,6 +25,5 @@ void LogicManager::setContexts(const Context::Ptr &context) {
 
 LogicManager::~LogicManager() {
     LOGGER("logic destructor")
-    stop();
-    join();
+
 }

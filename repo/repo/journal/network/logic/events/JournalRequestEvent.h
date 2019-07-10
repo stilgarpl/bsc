@@ -22,8 +22,6 @@ class JournalRequestEvent : public NetworkingEvent<JournalEventId> {
 
 public:
 
-    JournalRequestEvent(BasePacket::IdType requestId);
-
     const std::string &getRepoId() const;
 
     void setRepoId(const std::string &repoId);

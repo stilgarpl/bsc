@@ -31,7 +31,7 @@ protected:
 public:
     explicit ConnectionProcessor(Connection &connection);
 
-    ~ConnectionProcessor() override;
+    ~ConnectionProcessor() = default;
 
 };
 

@@ -37,8 +37,8 @@ private:
     LogicManager logicManager;
     Context::Ptr nodeContext = Context::makeContext();
     //if somehow start is called from start or wait from start or stop from... change this to recursive mutex.
-    std::mutex startMutex;
-    std::condition_variable startedReady;
+    std::recursive_mutex startMutex;
+    std::condition_variable_any startedReady;
     bool started = false;
 public:
     Context::Ptr getContext() override {
@@ -85,6 +85,8 @@ public:
     Node();
 
     Node(Node &) = delete;
+
+    Node(Node &&) = delete;
 
     LogicManager &getLogicManager() override {
         return logicManager;

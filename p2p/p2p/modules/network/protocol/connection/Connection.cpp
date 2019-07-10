@@ -163,16 +163,14 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 //                }
             }
             catch (const cereal::Exception &e) {
+                socket.shutdown();
                 //socket.close();
-                stopReceiving();
-                stopSending();
-                //cprocessor.stop();
-                // if not receiving, then it's ok!
+
+
             }
             catch (const Poco::Net::NetException &e) {
                 //processor.stop();
-                stopReceiving();
-                stopSending();
+                socket.shutdown();
                 e.displayText();
 
             }
@@ -197,7 +195,11 @@ void Connection::startSending(Poco::Net::StreamSocket &socket) {
 
 void Connection::stopSending() {
     sending = false;
-    sendReady.notify_all();
+    if (sendThread != nullptr && sendThread->joinable()) {
+        sendReady.notify_all();
+        sendThread->join();
+        sendThread = nullptr;
+    }
 
 }
 
@@ -213,13 +215,19 @@ void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
 }
 
 void Connection::stopReceiving() {
+    //@todo lock mutex?
     receiving = false;
     try {
         getSocket().shutdown();
     } catch (const Poco::Net::NetException &e) {
         LOGGER(e.what());
     }
-    //  receiveReady.notify_all();
+    if (receiveThread != nullptr && receiveThread->joinable()) {
+        receiveReady.notify_all();
+        receiveThread->join();
+        receiveThread = nullptr;
+    }
+    //
 
     //  processor.stop();
 }

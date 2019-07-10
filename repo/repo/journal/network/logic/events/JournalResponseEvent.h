@@ -15,7 +15,6 @@ private:
     JournalPtr journal;
     std::string repoId;
 public:
-    JournalResponseEvent(BasePacket::IdType requestId);
 
     const JournalPtr &getJournal() const;
 
