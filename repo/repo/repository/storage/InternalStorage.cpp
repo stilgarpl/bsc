@@ -30,7 +30,11 @@ void InternalStorage::store(const ResourceId &checksum, const size_t &size, cons
                 options = fs::copy_options::skip_existing;
             }
         }
-        fs::copy(sourcePath, getResourcePath(getResourceId(checksum, size)), options);
+        try {
+            fs::copy(sourcePath, getResourcePath(getResourceId(checksum, size)), options);
+        } catch (fs::filesystem_error &e) {
+            LOGGER(e.what());
+        }
     }
 
 }
@@ -110,6 +114,7 @@ bool InternalStorage::acquireResource(const ResourceId &resourceId) {
 }
 
 void InternalStorage::restore(const ResourceId &resourceId, const PathType &destinationPath) {
+    //@todo error handling if resourceId is not in storage
     //@todo acquire before restore ?
     //@todo don't do restore if the target is identical or changed
     //@todo verify checksum and size (add way to get those from resource id?)
@@ -118,7 +123,11 @@ void InternalStorage::restore(const ResourceId &resourceId, const PathType &dest
     //@todo PathType should really be just path, it would save a lot of trouble.
 //    fs::path desPath(destinationPath);
     fs::create_directories(fs::weakly_canonical(destinationPath).parent_path());
-    fs::copy(resourcePath, destinationPath, fs::copy_options::overwrite_existing);
+    try {
+        fs::copy(resourcePath, destinationPath, fs::copy_options::overwrite_existing);
+    } catch (fs::filesystem_error &e) {
+        LOGGER(e.what());
+    }
 }
 
 TransferManager::TransferQueuePtr InternalStorage::getTransferQueue() {

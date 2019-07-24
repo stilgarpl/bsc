@@ -109,7 +109,7 @@ void Repository::persist(fs::path path) {
         path = fs::canonical(fs::current_path() / path);
         LOGGER("after canonical: " + path.string())
     }
-    if (fileMap.contains(path)) {
+
         auto &attr = fileMap[path];
         if (attr) {
             //file exists in map! update mode
@@ -130,7 +130,7 @@ void Repository::persist(fs::path path) {
 
 
         }
-    }
+
 }
 
 void Repository::downloadStorage() {
@@ -160,17 +160,19 @@ void Repository::downloadStorage() {
 void Repository::update(fs::path path, const RepositoryActionStrategyPack &strategyPack,
                         std::set<UpdateOptions> updateOptions) {
     //@todo change the name of this function to something else. it's about merging the state or journal and filesystem and updating one from the other or both
+    LOGGER("update: " + path.string())
     path = fs::weakly_canonical(path);
     auto &fileMap = getFileMap();
     //only update if the file is in the repository
-    if (fileMap.contains(path)) {
-        auto &attributes = fileMap[path];
+//    if (fileMap.contains(path)) {
+
         if (fs::exists(path)) {
             if (fs::is_directory(path) || fs::is_regular_file(path)) {
                 //file exists in filesystem
                 auto currentFileTime = fs::last_write_time(path);
                 auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
-                if (attributes) {
+                if (fileMap.contains(path) && fileMap[path].has_value()) {
+                    auto &attributes = fileMap[path];
                     //file exists in the journal
                     if (currentFileTime < attributes->getModificationTime()) {
                         //file in repository is newer than the file in filesystem, restore
@@ -190,6 +192,23 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
                             //file in the filesystem is newer then the one in repository
                             auto state = strategyPack.updatedInFilesystem->apply(path, attributes);
                             deployMap.markDeployed(path, state);
+
+                            //@todo this is mostly the same code as below, combine the two loops into a function or sth.
+                            if (fs::is_directory(path) &&
+                                (updateOptions.contains(UpdateOptions::FOLLOW_UPDATED_DIRECTORIES) ||
+                                 updateOptions.contains(UpdateOptions::FOLLOW_DIRECTORIES))) {
+                                LOGGER(path.string() + " is a directory, iterating over...")
+                                for (const auto &item : fs::directory_iterator(path)) {
+                                    //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
+
+                                    LOGGER(" item: " + item.path().string())
+                                    if (!fileMap.contains(item)) {
+                                        LOGGER("following directory " + path.string() + " to " + item.path().string())
+                                        update(item, strategyPack, updateOptions);
+                                    }
+                                }
+                            }
+
                         }
                     }
                 } else {
@@ -231,7 +250,8 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
         } else {
             //file was removed or perhaps wasn't deployed yet...
             //@todo not so sure about that...
-            if (attributes) {
+            if (fileMap.contains(path) && fileMap[path].has_value()) {
+                auto &attributes = fileMap[path];
                 if (deployMap.isDeployed(path)) {
                     //file is in file map and was deployed but is not on filesystem, removing (user must have deleted it)
                     LOGGER("deleting " + path.string());
@@ -256,14 +276,14 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
             }
         }
 
-    }
+//    }
 }
 
 void Repository::syncLocalChanges() {
 //@todo change the name of this function to updateAll or sth
     for (const auto &i : getFileMap()) {
         LOGGER("update()" + i.first.string())
-        update(i.first, localSyncPack, {});
+        update(i.first, localSyncPack, {UpdateOptions::FOLLOW_UPDATED_DIRECTORIES});
     }
 
 

@@ -171,6 +171,7 @@ void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
     auto repoPath = (configuration().getRepositoryDataPath() / (repoId + ".xml")).string();
     node.getConfigurationManager().saveData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"),
                                                         rep->getJournal());
+    LOGGER("saving repository journal for repo " + repoId + " and checksum is " + rep->getJournal()->getChecksum())
 //    {
 //        std::ofstream os(savePath);
 //        cereal::XMLOutputArchive oa(os);
@@ -218,9 +219,9 @@ void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repo
     auto netModule = node.getModule<NetworkModule>();
     auto localRepo = findRepository(repoId);
     LOGGER("downloading repo")
-    JournalGroup::Request::Ptr req = JournalGroup::Request::getNew<Status::REQUEST>();
+    auto req = JournalGroup::Request::getNew<Status::REQUEST>();
     req->setRepoId(repoId);
-    JournalGroup::Response::Ptr res = netModule->sendPacketToNode(remoteId, req);
+    auto res = netModule->sendPacketToNode(remoteId, req);
     if (res != nullptr) {
         LOGGER("response received")
         auto remoteJournal = res->getJournal();

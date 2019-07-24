@@ -21,6 +21,8 @@ void JournalActions::journalRequested(const JournalRequestEvent &event) {
         auto &node = nodeContext->getNode();
         auto repoModule = node.getModule<RepoModule>();
         auto repository = repoModule->findRepository(event.getRepoId());
+        LOGGER("journal requested for repo: " + event.getRepoId() + " and journal checksum is " +
+               repository->getJournal()->getChecksum())
         response->setJournal(repository->getJournal());
 
     } else {

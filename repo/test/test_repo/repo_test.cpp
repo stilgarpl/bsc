@@ -80,6 +80,18 @@ std::string readFile(fs::path path) {
     return str;
 }
 
+class Cleanup {
+    fs::path pathToCleanup;
+public:
+    Cleanup(const fs::path &pathToCleanup) : pathToCleanup(pathToCleanup) {
+
+    }
+
+    virtual ~Cleanup() {
+        fs::remove_all(pathToCleanup);
+    }
+};
+
 TEST_CASE("Repo module test") {
 
     Node thisNode;
@@ -116,8 +128,8 @@ TEST_CASE("Repo module test") {
 
     REQUIRE(connectedToSecond);
 
-    SECTION ("create repository on second ") {
-
+//    SECTION ("create repository on second ") {
+    otherNode.setNodeContextActive();
         REQUIRE(otherRepoMod != nullptr);
         otherRepoMod->createRepository("test");
         REQUIRE(otherRepoMod->findRepository("test") != nullptr);
@@ -126,6 +138,7 @@ TEST_CASE("Repo module test") {
 
         //create dirs and files
         fs::path testPath = fs::temp_directory_path() / "dirtest";
+    Cleanup cleanup(testPath);
         INFO("test path is " << testPath.string())
         //just in case, cleanup
         fs::remove_all(testPath);
@@ -139,7 +152,7 @@ TEST_CASE("Repo module test") {
         fs::create_directories(subPath);
         createFile(subPath / "sub.txt", "sub");
 
-
+    otherNode.setNodeContextActive();
         otherRepoMod->updateFile(testPath);
         otherRepoMod->saveRepository("test");
 
@@ -156,7 +169,7 @@ TEST_CASE("Repo module test") {
         auto otherSum = otherRepoMod->getSelectedRepository()->getJournal()->getChecksum();
 
 
-        SECTION("download remote repository") {
+//        SECTION("download remote repository") {
             REQUIRE(!fs::exists(testPath));
             REQUIRE(!fs::exists(testPath / "1.txt"));
             REQUIRE(!fs::exists(testPath / "2.txt"));
@@ -167,7 +180,8 @@ TEST_CASE("Repo module test") {
 
             bool noTestRepo = thisRepoMod->findRepository("test") != nullptr;
             REQUIRE_FALSE(noTestRepo);
-
+    REQUIRE(secondNode.isConnected());
+    std::this_thread::sleep_for(500ms);
             thisRepoMod->downloadRemoteRepository("second", "test");
             bool okTestRepo = thisRepoMod->findRepository("test") != nullptr;
             REQUIRE(okTestRepo);
@@ -178,9 +192,9 @@ TEST_CASE("Repo module test") {
 
             auto thisSum = thisRepoMod->getSelectedRepository()->getJournal()->getChecksum();
             REQUIRE(thisSum == otherSum);
-
+    std::this_thread::sleep_for(500ms);
             thisRepoMod->deployAllFiles();
-
+    std::this_thread::sleep_for(500ms);
             REQUIRE(fs::exists(testPath));
             REQUIRE(fs::exists(testPath / "1.txt"));
             REQUIRE(fs::exists(testPath / "2.txt"));
@@ -188,7 +202,7 @@ TEST_CASE("Repo module test") {
             REQUIRE(fs::exists(testPath / "4.txt"));
             REQUIRE(fs::exists(subPath / "sub.txt"));
 
-            SECTION("add, change, delete") {
+//            SECTION("add, change, delete") {
                 INFO("changing files")
                 fs::remove(testPath / "4.txt");
                 changeFile(testPath / "3.txt", "QWQQQQQQQQQ");
@@ -209,6 +223,7 @@ TEST_CASE("Repo module test") {
                 thisRepoMod->downloadRemoteRepository("second", "test");
                 REQUIRE(thisRepoMod->findRepository("test") != nullptr);
                 thisRepoMod->selectRepository("test");
+    LOGGER("deplying files")
                 thisRepoMod->deployAllFiles();
 
                 REQUIRE(fs::exists(testPath));
@@ -221,34 +236,17 @@ TEST_CASE("Repo module test") {
                 REQUIRE(fs::exists(subPath / "sub.txt"));
 
 
-            }
+//            }
 
 
-        }
-
-        //@todo implement: (passing commands as user would)
-//        SECTION("integration command test") {
-//            REQUIRE(!fs::exists(testPath));
-//            REQUIRE(!fs::exists(testPath / "1.txt"));
-//            REQUIRE(!fs::exists(testPath / "2.txt"));
-//            REQUIRE(!fs::exists(testPath / "3.txt"));
-//            REQUIRE(!fs::exists(testPath / "4.txt"));
-//
-//
-//            REQUIRE(fs::exists(testPath));
-//            REQUIRE(fs::exists(testPath / "1.txt"));
-//            REQUIRE(fs::exists(testPath / "2.txt"));
-//            REQUIRE(fs::exists(testPath / "3.txt"));
-//            REQUIRE(fs::exists(testPath / "4.txt"));
-//
-//
 //        }
-
 
         //cleanup:
         fs::remove_all(testPath);
+    //@todo actual path or cleanup from storage
+    fs::remove_all({"/tmp/storage"});
 
-    }
+//    }
 
     INFO("closing");
     thisNode.setNodeContextActive();

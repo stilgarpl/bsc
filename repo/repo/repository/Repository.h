@@ -238,6 +238,7 @@ public:
 
     enum class UpdateOptions {
         FOLLOW_DIRECTORIES,
+        FOLLOW_UPDATED_DIRECTORIES,
     };
 
 
