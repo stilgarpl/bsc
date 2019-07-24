@@ -5,7 +5,6 @@
 //
 
 #include "Runnable.h"
-#include "RunnableThreadNotFinishedException.h"
 
 void Runnable::start() {
     std::lock_guard g(startMutex);
@@ -28,7 +27,8 @@ void Runnable::operator()(Context::Ptr contextPtr) {
 
 Runnable::~Runnable() {
     if (!finished) {
-        throw RunnableThreadNotFinishedException();
+        stop();
+        join();
     }
 
 

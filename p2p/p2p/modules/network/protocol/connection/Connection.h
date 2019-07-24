@@ -40,6 +40,8 @@ private:
 
     std::unique_ptr<std::thread> sendThread;
     std::unique_ptr<std::thread> receiveThread;
+    std::recursive_mutex sendThreadLock;
+    std::recursive_mutex receiveThreadLock;
     bool sending = true;
     bool receiving = true;
 

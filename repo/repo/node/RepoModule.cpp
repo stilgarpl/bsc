@@ -227,14 +227,18 @@ void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repo
         auto remoteJournal = res->getJournal();
         LOGGER("received journal with checksum " + res->getJournal()->getChecksum())
         if (localRepo != nullptr) {
+            LOGGER("merging journal")
             localRepo->getJournal()->merge(remoteJournal);
         } else {
+            LOGGER("Creating new repo")
             localRepo = createRepository(repoId);
             localRepo->setJournal(remoteJournal);
 
         }
 //        localRepo->buildFileMap();
+        LOGGER("downloading storage")
         localRepo->downloadStorage();
+        LOGGER("storage downloaded")
     } else {
         //@todo throw exception maybe
         LOGGER("no response")

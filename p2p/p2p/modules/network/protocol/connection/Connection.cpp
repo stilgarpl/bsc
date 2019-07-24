@@ -185,7 +185,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
 
 void Connection::startSending(Poco::Net::StreamSocket &socket) {
-
+    std::unique_lock<std::recursive_mutex> g(sendThreadLock);
     sending = true;
     //startWorker(socket);
     if (sendThread == nullptr) {
@@ -194,6 +194,7 @@ void Connection::startSending(Poco::Net::StreamSocket &socket) {
 }
 
 void Connection::stopSending() {
+    std::unique_lock<std::recursive_mutex> g(sendThreadLock);
     sending = false;
     if (sendThread != nullptr && sendThread->joinable()) {
         sendReady.notify_all();
@@ -205,6 +206,7 @@ void Connection::stopSending() {
 
 
 void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
+    std::unique_lock<std::recursive_mutex> g(receiveThreadLock);
     receiving = true;
 //    socket.setBlocking(false);
     if (receiveThread == nullptr) {
@@ -215,7 +217,7 @@ void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
 }
 
 void Connection::stopReceiving() {
-    //@todo lock mutex?
+    std::unique_lock<std::recursive_mutex> g(receiveThreadLock);
     receiving = false;
     try {
         getSocket().shutdown();
@@ -265,13 +267,6 @@ Connection::~Connection() {
 void Connection::shutdown() {
     stopReceiving();
     stopSending();
-    if (receiveThread != nullptr && receiveThread->joinable()) {
-        receiveThread->join();
-
-    }
-    if (sendThread != nullptr && sendThread->joinable()) {
-        sendThread->join();
-    }
     processor.stop();
     processor.join();
 }

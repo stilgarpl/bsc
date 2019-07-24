@@ -74,10 +74,14 @@ void changeFile(fs::path path, std::string content) {
 }
 
 std::string readFile(fs::path path) {
-    std::ifstream t(path);
-    std::string str((std::istreambuf_iterator<char>(t)),
-                    std::istreambuf_iterator<char>());
-    return str;
+    if (fs::exists(path)) {
+        std::ifstream t(path);
+        std::string str((std::istreambuf_iterator<char>(t)),
+                        std::istreambuf_iterator<char>());
+        return str;
+    } else {
+        throw std::string("file not found");
+    }
 }
 
 class Cleanup {
@@ -205,6 +209,9 @@ TEST_CASE("Repo module test") {
 //            SECTION("add, change, delete") {
                 INFO("changing files")
                 fs::remove(testPath / "4.txt");
+
+    //@todo here I have a bug that looks like a race. probably transfer queue enters finished state too soon. investigate.
+    //  after investigation : downloadStorage finished before transfer queue has actually finished. I think transfer queue goes to FINISHED state too soon.
                 changeFile(testPath / "3.txt", "QWQQQQQQQQQ");
                 createFile(testPath / "5.txt", "555");
                 otherNode.setNodeContextActive();
@@ -232,6 +239,8 @@ TEST_CASE("Repo module test") {
                 REQUIRE(fs::exists(testPath / "3.txt"));
                 REQUIRE(!fs::exists(testPath / "4.txt"));
                 REQUIRE(fs::exists(testPath / "5.txt"));
+    REQUIRE(readFile(testPath / "1.txt") == "111");
+    REQUIRE(readFile(testPath / "2.txt") == "222");
                 REQUIRE(readFile(testPath / "3.txt") == "QWQQQQQQQQQ");
                 REQUIRE(fs::exists(subPath / "sub.txt"));
 
