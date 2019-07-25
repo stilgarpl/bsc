@@ -14,11 +14,11 @@ class AuthHelloEvent : public IEvent<int> {
     std::string authData;
 
 public:
-    const NodeIdType &getNodeId() const;
+    [[nodiscard]] const NodeIdType &getNodeId() const;
 
     void setNodeId(const NodeIdType &nodeId);
 
-    const std::string &getAuthData() const;
+    [[nodiscard]] const std::string &getAuthData() const;
 
     void setAuthData(const std::string &authData);
 };

@@ -13,7 +13,6 @@ ProtocolWrapper::ProtocolWrapper(ConnectionPtr connection, IProtocol *protocol) 
 
 std::future<BasePacketPtr> ProtocolWrapper::send(BasePacketPtr p) {
     return protocol->send(connection.get(),p);
-    return std::future<BasePacketPtr>();
 }
 
 void DummyProtocol::onPacketSent(const PacketEvent &event) {

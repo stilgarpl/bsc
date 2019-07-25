@@ -450,8 +450,9 @@ void TransferManager::TransferQueue::start() {
     auto transfersFinished = countTransfersInState(TransferState::FINISHED);
     auto transfersRunning = transfers.size() - transfersFinished - transfersNotStarted;
 
-    unsigned long transfersToStart = std::min<long>(std::max<long>(MAX_CONCURRENT_TRANSFERS - transfersRunning, 0),
-                                                    transfersNotStarted);
+    unsigned long transfersToStart = std::min<unsigned long>(
+            std::max<unsigned long>(MAX_CONCURRENT_TRANSFERS - transfersRunning, 0),
+            transfersNotStarted);
 //    LOGGER("transfers to start " + std::to_string(transfersToStart));
     LOGGER("Transfer queue start, transfers to start=" + std::to_string(transfersToStart))
     //@todo actual transfer policy

@@ -45,7 +45,7 @@ void ThreadPoolExecutor::execute(std::function<void(void)> task) {
         Context::Ptr origContext = Context::getActiveContext();
         std::unique_lock<std::mutex> g(queueLock);
         taskQueue.push(std::make_pair(task, Context::getActiveContext()));
-        if (getActiveWorker() < MAX_WORKER) {
+        if (getActiveWorkerCount() < MAX_WORKER) {
             startWorker();
         }
         queueReady.notify_one();
@@ -77,7 +77,7 @@ void ThreadPoolExecutor::startWorker() {
 
 }
 
-int ThreadPoolExecutor::getActiveWorker() {
+auto ThreadPoolExecutor::getActiveWorkerCount() -> decltype(runners.size()) {
     return runners.size();
 }
 

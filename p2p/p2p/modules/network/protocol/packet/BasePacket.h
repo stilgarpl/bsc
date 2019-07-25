@@ -51,11 +51,11 @@ public:
     //@todo pure virtual perhaps? or maybe that would mess up ACK? I can create AckPacket...
     virtual void process(Context::Ptr context);
 
-    Status getStatus() const;
+    [[nodiscard]] Status getStatus() const;
 
     void setStatus(Status status);
 
-    IdType getId() const;
+    [[nodiscard]] IdType getId() const;
 
     void setId(IdType id);
 
@@ -64,7 +64,7 @@ public:
 
     BasePacket() : status(Status::REQUEST), id(nextId()) {};
 
-    bool isRetry() const;
+    [[nodiscard]] bool isRetry() const;
 
     void setRetry(bool retry);
 

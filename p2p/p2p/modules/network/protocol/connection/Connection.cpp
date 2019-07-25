@@ -7,7 +7,6 @@
 #include <logic/context/LogicContext.h>
 #include <p2p/modules/network/protocol/context/ConnectionContext.h>
 #include <Poco/Net/NetException.h>
-#include <utility>
 #include <p2p/node/context/NodeContext.h>
 
 using namespace std::chrono_literals;

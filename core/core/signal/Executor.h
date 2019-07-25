@@ -57,7 +57,7 @@ private:
     std::condition_variable queueReady;
     std::list<std::shared_ptr<std::thread>> runners;
     bool running = true;
-    int MAX_WORKER = 5;
+    unsigned MAX_WORKER = 5;
 
 public:
     void execute(std::function<void(void)> task) override;
@@ -65,7 +65,7 @@ public:
 protected:
     void startWorker();
 
-    int getActiveWorker();
+    auto getActiveWorkerCount() -> decltype(runners.size());
 
 public:
     void stop() override;
