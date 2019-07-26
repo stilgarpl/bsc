@@ -162,9 +162,15 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 //                }
             }
             catch (const cereal::Exception &e) {
-                socket.shutdown();
-                //socket.close();
+                try {
+                    socket.shutdown();
+                    //socket.close();
+                } catch (const Poco::Net::NetException &e) {
+                    //processor.stop();
+                    socket.shutdown();
+                    e.displayText();
 
+                }
 
             }
             catch (const Poco::Net::NetException &e) {

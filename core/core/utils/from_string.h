@@ -26,7 +26,7 @@ inline long from_string<long>(const std::string &s) {
 
 template<>
 inline float from_string<float>(const std::string &s) {
-    return static_cast<float>(std::stof(s));
+    return std::stof(s);
 }
 
 

@@ -505,6 +505,13 @@ unsigned long TransferManager::TransferQueue::countUnfinishedTransfers() {
 
 void
 TransferManager::TransferQueue::queueTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination) {
+    {
+        //@todo I'm not sure if this should be here or somewhere else
+        std::unique_lock<std::mutex> g(finishLock);
+        if (getCurrentState() == TransferState::FINISHED) {
+            changeState(TransferState::NOT_STARTED);
+        }
+    }
     auto transfer = manager.initiateTransfer(std::move(source), std::move(destination), false);
     if (transfer != nullptr) {
         transfer->registerStateObserver(*this);
