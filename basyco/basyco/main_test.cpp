@@ -4,21 +4,13 @@
 //#define CEREAL_THREAD_SAFE 1
 #include "p2p/node/Node.h"
 #include "logic/sources/ClockSource.h"
-#include "p2p/modules/network/protocol/logic/sources/ConnectionSource.h"
-#include "p2p/modules/network/protocol/logic/actions/ProtocolActions.h"
 #include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
 #include "p2p/modules/network/protocol/logic/actions/NodeActions.h"
-#include "p2p/modules/network/protocol/logic/sources/NetworkSource.h"
 #include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"
-#include <cereal/archives/xml.hpp>
 #include <cereal/types/memory.hpp>
-#include <p2p/modules/network/protocol/packet/NodeInfoGroup.h>
-
+#include <p2p/modules/basic/BasicModule.h>
 
 using namespace std::chrono_literals;
-
-#include <variant>
-#include <p2p/modules/basic/BasicModule.h>
 
 
 void remoteServerTestModuleSetup(Node &node) {

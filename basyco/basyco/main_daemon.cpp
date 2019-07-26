@@ -1,31 +1,16 @@
-#include <iostream>
-#include <thread>
 
 //#define CEREAL_THREAD_SAFE 1
 #include "p2p/node/Node.h"
-#include "logic/sources/ClockSource.h"
-#include "p2p/modules/network/protocol/logic/sources/ConnectionSource.h"
-#include "p2p/modules/network/protocol/logic/actions/ProtocolActions.h"
 #include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
 #include "p2p/modules/network/protocol/logic/actions/NodeActions.h"
-#include "p2p/modules/network/protocol/logic/sources/NetworkSource.h"
 #include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"
-#include <cereal/archives/xml.hpp>
-#include <cereal/types/memory.hpp>
-#include <repo/repository/storage/InternalStorage.h>
-#include <p2p/modules/network/protocol/packet/NodeInfoGroup.h>
-#include <p2p/modules/auth/AuthModule.h>
 
 
 using namespace std::chrono_literals;
 
-#include <repo/journal/SimpleJournal.h>
 #include <repo/node/RepoModule.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
-#include <p2p/dependency/Dependency.h>
 #include <p2p/modules/command/CommandModule.h>
-#include <p2p/modules/command/StandardCommandsDirectory.h>
-#include <variant>
 #include <p2p/modules/basic/BasicModule.h>
 #include <Poco/Environment.h>
 
