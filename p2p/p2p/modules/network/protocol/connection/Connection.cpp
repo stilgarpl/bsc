@@ -167,7 +167,9 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                     //socket.close();
                 } catch (const Poco::Net::NetException &e) {
                     //processor.stop();
-                    socket.shutdown();
+                    if (socket.available()) {
+                        socket.shutdown();
+                    }
                     e.displayText();
 
                 }

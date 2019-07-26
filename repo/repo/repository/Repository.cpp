@@ -143,7 +143,9 @@ void Repository::downloadStorage() {
 
         //check for resources.
         if (value && !value->isDirectory()) {
+            LOGGER("checking if file should be downloaded")
             if (!storage->hasResource(value->getResourceId())) {
+                LOGGER("storage doesn't have resource " + value->getResourceId() + " , acquiring")
                 hasResources &= storage->acquireResource(value->getResourceId());
             }
         }
