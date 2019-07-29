@@ -17,7 +17,7 @@ void NodeInfoGroup::Request::process(Context::Ptr context) {
     auto connectionContext = context->get<ConnectionContext>();
 
     if (nodeContext != nullptr && connectionContext != nullptr) {
-        // NODECONTEXTLOGGER("processing info request id" + std::to_string(this->getId()));
+        // LOGGER("processing info request id" + std::to_string(this->getId()));
 
         auto &nodeInfo = nodeContext->getNodeInfo();
         LOGGER("node info request... " + nodeInfo.getNodeId())

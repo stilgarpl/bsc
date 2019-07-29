@@ -6,10 +6,11 @@
 #include <spdlog/spdlog.h>
 #include <core/context/Context.h>
 #include "Logger.h"
-#include "Poco/ConsoleChannel.h"
 #include "LoggerContext.h"
 
-Logger::Logger(std::string name) : logger(Poco::Logger::get(name)), loggerName(name) {
+#include <utility>
+
+Logger::Logger(std::string name) : loggerName(std::move(name)) {
 
 //    Poco::ConsoleChannel *consoleChannel = new Poco::ConsoleChannel();
     // logger.setLevel(Poco::Message::Priority::PRIO_DEBUG);
@@ -18,19 +19,19 @@ Logger::Logger(std::string name) : logger(Poco::Logger::get(name)), loggerName(n
     spdlog::set_pattern("[%T]%L:%v");
 }
 
-void Logger::error(std::string txt) {
+void Logger::error(const std::string &txt) {
 
 //    logger.error(txt);
 }
 
-void Logger::debug(std::string txt) {
+void Logger::debug(const std::string &txt) {
     std::lock_guard<std::mutex> g(getLock());
 //    logger.debug(txt);
 //    std::clog << loggerName << " : " << txt << std::endl;
     spdlog::debug(txt);
 }
 
-void Logger::info(std::string txt) {
+void Logger::info(const std::string &txt) {
 //    logger.information(txt);
 }
 

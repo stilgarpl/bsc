@@ -19,13 +19,13 @@ void NetworkInfoResponse::process(Context::Ptr context) {
         if (this->getNetworkInfo() != nullptr) {
             nodeSource->networkInfoReceived(*this->getNetworkInfo());
         } else {
-            //  NODECONTEXTLOGGER("Empty network response")
+            //  LOGGER("Empty network response")
         }
     }
 
 
-    NODECONTEXTLOGGER("Network response received " + std::to_string(this->getId()) + " " +
-                      this->getNetworkInfo()->getNetworkId());
+    LOGGER("Network response received " + std::to_string(this->getId()) + " " +
+           this->getNetworkInfo()->getNetworkId());
 
 
 }

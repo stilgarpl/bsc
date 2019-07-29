@@ -24,8 +24,8 @@ void NetworkInfo::addKnownNode(const NodeInfo &nodeInfo) {
     Context::Ptr context = Context::getActiveContext();
     auto nodeContext = context->get<NodeContext>();
     auto &node = nodeContext->getNode();
-    //  NODECONTEXTLOGGER(node.getNetworkInfo()->getNetworkId());
-    //  NODECONTEXTLOGGER(nodeInfo.getNetworkId());
+    //  LOGGER(node.getNetworkInfo()->getNetworkId());
+    //  LOGGER(nodeInfo.getNetworkId());
     if (node.getModule<NetworkModule>()->getNetworkInfo()->getNetworkId() == nodeInfo.getNetworkId() &&
         !isNodeKnown(nodeInfo.getNodeId())) {
 
@@ -42,7 +42,7 @@ void NetworkInfo::addKnownNode(const NodeInfo &nodeInfo) {
     knownNodes[nodeInfo.getNodeId()] = newNode;
 //
 //    for (auto &&it : knownNodes) {
-//        NODECONTEXTLOGGER("KNOWN NODES: " + it.first);
+//        LOGGER("KNOWN NODES: " + it.first);
 //    }
 }
 

@@ -48,7 +48,7 @@ public:
             //@todo 1s or other value?
             queueReady.wait_for(g, 1s, [&]() -> bool { return (!eventQueue.empty() || this->isStopping()); });
             while (!eventQueue.empty()) {
-                //  NODECONTEXTLOGGER("Processing event");
+                //  LOGGER("Processing event");
                 //@todo better locking and unlocking of mutex
 
                 EventTypePtr i = eventQueue.front();

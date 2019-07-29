@@ -145,11 +145,11 @@ public:
                 std::string key = prefix + ":::" + commandName;
                 auto &map = getCommandMap();
                 if (map.count(key) == 0) {
-                    NODECONTEXTLOGGER("FAILURE");
+                    LOGGER("FAILURE");
                     return false;
                 } else {
                     map[key](arguments);
-                    NODECONTEXTLOGGER("SUCCESS")
+                    LOGGER("SUCCESS")
                     return true;
                 }
             }

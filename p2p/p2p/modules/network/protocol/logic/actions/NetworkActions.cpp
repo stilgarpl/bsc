@@ -21,7 +21,7 @@ void NetworkActions::updateNetworkInfo(const NetworkInfoEvent &event) {
             *node.getModule<NetworkModule>()->getNetworkInfo() += event.getNetworkInfo();
 
         }
-        // NODECONTEXTLOGGER("received network info: " + event.getNetworkInfo().getNetworkId());
+        // LOGGER("received network info: " + event.getNetworkInfo().getNetworkId());
     }
 }
 

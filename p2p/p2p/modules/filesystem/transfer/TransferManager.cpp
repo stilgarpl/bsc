@@ -81,10 +81,10 @@ void TransferManager::finishTransfer(const TransferEvent &event) {
 //    if (remoteNodeContext != nullptr) {
 //        auto & remoteNode = remoteNodeContext->getRemoteNode();
 //        FinishTransfer::Response::Ptr res = FinishTransfer::Response::getNew(event.getRequestId());
-//        NODECONTEXTLOGGER("sending finish response")
+//        LOGGER("sending finish response")
 //        remoteNode.sendPacketToNode(res);
 //    } else {
-//        NODECONTEXTLOGGER("no remote node context")
+//        LOGGER("no remote node context")
 //        LOGGER("no node context either?")
 //    }
 

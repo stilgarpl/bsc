@@ -70,7 +70,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
                         cereal::BinaryOutputArchive oa(os);
                         oa << v;
                     }
-//                    NODECONTEXTLOGGER("packet sent " + std::to_string(v->getId()) + " " + typeid(*v).name())
+//                    LOGGER("packet sent " + std::to_string(v->getId()) + " " + typeid(*v).name())
 
 //                    LOGGER("packet sent" + std::to_string(v->getId()));
                     if (connectionSourcePtr != nullptr) {
@@ -142,7 +142,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                         ia >> v;
 
 //                    ia(v);
-//                    NODECONTEXTLOGGER("packet received " + std::to_string(v->getId()) + " " + typeid(*v).name())
+//                    LOGGER("packet received " + std::to_string(v->getId()) + " " + typeid(*v).name())
                         {
                             std::lock_guard<std::mutex> g(receiveQueueLock);
                             receiveQueue.push(v);

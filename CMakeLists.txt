@@ -9,6 +9,12 @@ set(TEMPLATE_PATH "${CMAKE_SOURCE_DIR}/cmake/template/")
 enable_testing()
 include(GNUInstallDirs)
 
+find_program(CCACHE_PROGRAM ccache)
+if (CCACHE_PROGRAM)
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    set(CMAKE_CUDA_COMPILER_LAUNCHER "${CCACHE_PROGRAM}") # CMake 3.9+
+endif ()
+
 
 message($ENV{PATH})
 #conan setup

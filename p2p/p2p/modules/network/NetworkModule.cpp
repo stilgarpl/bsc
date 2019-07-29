@@ -197,8 +197,8 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
 //    });//.fireModuleAction(&NetworkModule::testingMethod);
     when(event < LogicStateEvent<NetworkModule, int>>
     ()).fireNewAction([](auto event) {
-        NODECONTEXTLOGGER("logic state event " + std::to_string(event.getState()) +
-                          (event.getMethod() == LogicStateMethod::ENTERED ? " ENTERED" : " LEFT"))
+        LOGGER("logic state event " + std::to_string(event.getState()) +
+               (event.getMethod() == LogicStateMethod::ENTERED ? " ENTERED" : " LEFT"))
     });
 
 //    Tick tick;
@@ -243,9 +243,9 @@ void NetworkModule::updateNodeConnectionInfo() {
     //   std::lock_guard<std::mutex> g1(node.getLock());
     // std::thread([&]() {
     //    //this is meant to be run from a thread
-//    NODECONTEXTLOGGER("update node ")
+//    LOGGER("update node ")
 //        for (auto &&item : activeClientConnections) {
-//            NODECONTEXTLOGGER("update connection " + (item->nodeId ? *item->nodeId : " ?? "));
+//            LOGGER("update connection " + (item->nodeId ? *item->nodeId : " ?? "));
 //            auto packet = NodeInfoRequest::getNew();
 //            NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
 //            if (response != nullptr) {

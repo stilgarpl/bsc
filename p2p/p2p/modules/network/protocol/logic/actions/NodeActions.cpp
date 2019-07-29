@@ -14,7 +14,7 @@ void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
     Context::Ptr context = Context::getActiveContext();
     auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
-        //  NODECONTEXTLOGGER("Node discovered (connecting): " + event.getNodeInfo().getNodeId())
+        //  LOGGER("Node discovered (connecting): " + event.getNodeInfo().getNodeId())
 //        auto &node = nodeContext->getNode();
         //@todo we shouldn't connect to any node, just in certain situations
 //        node.getModule<NetworkModule>()->connectTo(event.getNodeInfo());
@@ -34,7 +34,7 @@ void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
     }
 //    auto nodeContext = context->get<NodeContext>();
 //    if (nodeContext != nullptr) {
-//        //  NODECONTEXTLOGGER("received node info: " + event.getNodeInfo().getNodeId());
+//        //  LOGGER("received node info: " + event.getNodeInfo().getNodeId());
 //        auto &node = nodeContext->getNode();
 //        auto netModule = node.getModule<NetworkModule>();
 //
@@ -45,7 +45,7 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
     Context::Ptr context = Context::getActiveContext();
     auto nodeContext = context->get<NodeContext>();
     if (nodeContext != nullptr) {
-        // NODECONTEXTLOGGER(                "Adding known node " + event.getNodeInfo().getNodeId() + " ... " + event.getNodeInfo().getNetworkId())
+        // LOGGER(                "Adding known node " + event.getNodeInfo().getNodeId() + " ... " + event.getNodeInfo().getNetworkId())
         auto &node = nodeContext->getNode();
         if (event.getNodeInfo().getNetworkId() == node.getNodeInfo().getNetworkId()) {
             node.getModule<NetworkModule>()->getNetworkInfo()->addKnownNode(event.getNodeInfo());

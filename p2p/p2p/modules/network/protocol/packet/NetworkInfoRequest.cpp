@@ -20,11 +20,11 @@ void NetworkInfoRequest::process(Context::Ptr context) {
     auto connectionContext = context->get<ConnectionContext>();
 
     if (nodeContext != nullptr && connectionContext != nullptr) {
-        // NODECONTEXTLOGGER("processing network info request id" + std::to_string(this->getId()));
+        // LOGGER("processing network info request id" + std::to_string(this->getId()));
         auto &node = nodeContext->getNode();
         auto response = getNew<Status::RESPONSE>(this);//std::make_shared<NetworkInfoResponse>();
         if (node.getModule<NetworkModule>()->getNetworkInfo() == nullptr) {
-            NODECONTEXTLOGGER("empty network info! ")
+            LOGGER("empty network info! ")
         }
         response->setNetworkInfo(node.getModule<NetworkModule>()->getNetworkInfo());
         connectionContext->getConnection().send(response);
