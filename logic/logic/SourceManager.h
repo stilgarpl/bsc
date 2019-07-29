@@ -15,6 +15,7 @@
 #include <core/signal/OrderedExecutionPolicy.h>
 #include <core/signal/ExecutorPolicyTraits.h>
 #include <core/signal/DefaultExecutionPolicy.h>
+#include <core/signal/ThreadPoolExecutor.h>
 
 using namespace std::chrono_literals;
 

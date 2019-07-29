@@ -22,9 +22,9 @@ private:
 
 public:
 
-    virtual int signal(Args... args) {
-        return signal(Executor::getDefaultExecutor(), args...);
-    };
+//    virtual int signal(Args... args) {
+//        return signal(Executor::getDefaultExecutor(), args...);
+//    };
 
     virtual int signal(std::shared_ptr<Executor> executor, Args... args) {
         int executed = 0;

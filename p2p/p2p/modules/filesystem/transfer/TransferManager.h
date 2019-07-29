@@ -9,7 +9,6 @@
 
 
 #include <p2p/modules/filesystem/network/logic/events/TransferEvent.h>
-#include <p2p/modules/filesystem/network/packet/BeginTransfer.h>
 #include <logic/state/LogicStateMachine.h>
 #include <algorithm>
 

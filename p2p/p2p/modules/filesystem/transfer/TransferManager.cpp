@@ -9,11 +9,11 @@
 #include <p2p/modules/filesystem/network/packet/PropertiesTransfer.h>
 #include <p2p/modules/network/NetworkModule.h>
 #include <p2p/modules/filesystem/network/packet/FinishTransfer.h>
-#include <p2p/modules/network/remote/RemoteNodeContext.h>
 #include <p2p/modules/filesystem/network/packet/TransferQuery.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include "TransferManager.h"
 #include "TransferException.h"
+#include <p2p/modules/filesystem/network/packet/BeginTransfer.h>
 
 //const ResourceIdentificatorPtr &TransferManager::RemoteTransferDescriptor::getResourceIdentificatorPtr() const {
 //    return resourceIdentificatorPtr;
