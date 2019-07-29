@@ -435,6 +435,7 @@ TransferManager::TransferQueue::TransferQueue(TransferManager &manager) : LogicS
             TransferState::ERROR);
     addLink(TransferState::ATTRIBUTES_ACCQUIRED, TransferState::DOWNLOADING, TransferState::ERROR);
     addLink(TransferState::DOWNLOADING, TransferState::FINISHED, TransferState::ERROR);
+    addLink(TransferState::FINISHED, TransferState::NOT_STARTED, TransferState::ERROR);
     addLink(TransferState::ERROR, TransferState::NOT_STARTED);
     setState(TransferState::NOT_STARTED);
 
@@ -509,7 +510,9 @@ TransferManager::TransferQueue::queueTransfer(ResourceIdentificatorPtr source, R
         //@todo I'm not sure if this should be here or somewhere else
         std::unique_lock<std::mutex> g(finishLock);
         if (getCurrentState() == TransferState::FINISHED) {
+            LOGGER("transfer queue was finished, resetting")
             changeState(TransferState::NOT_STARTED);
+            LOGGER("not started")
         }
     }
     auto transfer = manager.initiateTransfer(std::move(source), std::move(destination), false);
