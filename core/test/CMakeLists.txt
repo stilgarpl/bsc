@@ -1,6 +1,6 @@
 #set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES test_core/test_main.cpp)
+set(SOURCE_FILES test_core/test_main.cpp test_core/signal_test.cpp test_core/context_test.cpp test_core/uber_test.cpp)
 
 add_executable(test_core ${SOURCE_FILES})
 add_test(NAME test_core COMMAND test_core)

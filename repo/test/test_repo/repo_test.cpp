@@ -134,115 +134,115 @@ TEST_CASE("Repo module test") {
 
 //    SECTION ("create repository on second ") {
     otherNode.setNodeContextActive();
-        REQUIRE(otherRepoMod != nullptr);
-        otherRepoMod->createRepository("test");
-        REQUIRE(otherRepoMod->findRepository("test") != nullptr);
-        otherRepoMod->selectRepository("test");
-        REQUIRE(otherRepoMod->getSelectedRepository() != nullptr);
+    REQUIRE(otherRepoMod != nullptr);
+    otherRepoMod->createRepository("test");
+    REQUIRE(otherRepoMod->findRepository("test") != nullptr);
+    otherRepoMod->selectRepository("test");
+    REQUIRE(otherRepoMod->getSelectedRepository() != nullptr);
 
-        //create dirs and files
-        fs::path testPath = fs::temp_directory_path() / "dirtest";
+    //create dirs and files
+    fs::path testPath = fs::temp_directory_path() / "dirtest";
     Cleanup cleanup(testPath);
-        INFO("test path is " << testPath.string())
-        //just in case, cleanup
-        fs::remove_all(testPath);
-        //create test directories
-        fs::create_directories(testPath);
-        createFile(testPath / "1.txt", "111");
-        createFile(testPath / "2.txt", "222");
-        createFile(testPath / "3.txt", "333");
-        createFile(testPath / "4.txt", "444");
-        fs::path subPath = testPath / "subdirectory" / "sub1";
-        fs::create_directories(subPath);
-        createFile(subPath / "sub.txt", "sub");
+    INFO("test path is " << testPath.string())
+    //just in case, cleanup
+    fs::remove_all(testPath);
+    //create test directories
+    fs::create_directories(testPath);
+    createFile(testPath / "1.txt", "111");
+    createFile(testPath / "2.txt", "222");
+    createFile(testPath / "3.txt", "333");
+    createFile(testPath / "4.txt", "444");
+    fs::path subPath = testPath / "subdirectory" / "sub1";
+    fs::create_directories(subPath);
+    createFile(subPath / "sub.txt", "sub");
 
     otherNode.setNodeContextActive();
-        otherRepoMod->updateFile(testPath);
-        otherRepoMod->saveRepository("test");
+    otherRepoMod->updateFile(testPath);
+    otherRepoMod->saveRepository("test");
 
-        auto num = fs::remove_all(testPath);
+    auto num = fs::remove_all(testPath);
 
-        REQUIRE(num == 8);
-        //@todo set the path from the actual configuration set in this test
+    REQUIRE(num == 8);
+    //@todo set the path from the actual configuration set in this test
 
-        auto repoXMLPath = otherNode.getConfigurationManager().getDataPath() / "repo" / "test.xml";
-        std::cout << repoXMLPath << std::endl;
-        INFO("root path is " << repoXMLPath.string())
-        REQUIRE(fs::exists(repoXMLPath));
-        otherNode.setNodeContextActive();
-        auto otherSum = otherRepoMod->getSelectedRepository()->getJournal()->getChecksum();
+    auto repoXMLPath = otherNode.getConfigurationManager().getDataPath() / "repo" / "test.xml";
+    std::cout << repoXMLPath << std::endl;
+    INFO("root path is " << repoXMLPath.string())
+    REQUIRE(fs::exists(repoXMLPath));
+    otherNode.setNodeContextActive();
+    auto otherSum = otherRepoMod->getSelectedRepository()->getJournal()->getChecksum();
 
 
 //        SECTION("download remote repository") {
-            REQUIRE(!fs::exists(testPath));
-            REQUIRE(!fs::exists(testPath / "1.txt"));
-            REQUIRE(!fs::exists(testPath / "2.txt"));
-            REQUIRE(!fs::exists(testPath / "3.txt"));
-            REQUIRE(!fs::exists(testPath / "4.txt"));
-            REQUIRE(!fs::exists(subPath / "sub.txt"));
-            thisNode.setNodeContextActive();
+    REQUIRE(!fs::exists(testPath));
+    REQUIRE(!fs::exists(testPath / "1.txt"));
+    REQUIRE(!fs::exists(testPath / "2.txt"));
+    REQUIRE(!fs::exists(testPath / "3.txt"));
+    REQUIRE(!fs::exists(testPath / "4.txt"));
+    REQUIRE(!fs::exists(subPath / "sub.txt"));
+    thisNode.setNodeContextActive();
 
-            bool noTestRepo = thisRepoMod->findRepository("test") != nullptr;
-            REQUIRE_FALSE(noTestRepo);
+    bool noTestRepo = thisRepoMod->findRepository("test") != nullptr;
+    REQUIRE_FALSE(noTestRepo);
     REQUIRE(secondNode.isConnected());
     std::this_thread::sleep_for(500ms);
-            thisRepoMod->downloadRemoteRepository("second", "test");
-            bool okTestRepo = thisRepoMod->findRepository("test") != nullptr;
-            REQUIRE(okTestRepo);
+    thisRepoMod->downloadRemoteRepository("second", "test");
+    bool okTestRepo = thisRepoMod->findRepository("test") != nullptr;
+    REQUIRE(okTestRepo);
 
-            thisRepoMod->selectRepository("test");
-            REQUIRE(thisRepoMod->getSelectedRepository() != nullptr);
-            REQUIRE(thisRepoMod->getSelectedRepository()->getRepositoryId() == "test");
+    thisRepoMod->selectRepository("test");
+    REQUIRE(thisRepoMod->getSelectedRepository() != nullptr);
+    REQUIRE(thisRepoMod->getSelectedRepository()->getRepositoryId() == "test");
 
-            auto thisSum = thisRepoMod->getSelectedRepository()->getJournal()->getChecksum();
-            REQUIRE(thisSum == otherSum);
+    auto thisSum = thisRepoMod->getSelectedRepository()->getJournal()->getChecksum();
+    REQUIRE(thisSum == otherSum);
     std::this_thread::sleep_for(500ms);
-            thisRepoMod->deployAllFiles();
+    thisRepoMod->deployAllFiles();
     std::this_thread::sleep_for(500ms);
-            REQUIRE(fs::exists(testPath));
-            REQUIRE(fs::exists(testPath / "1.txt"));
-            REQUIRE(fs::exists(testPath / "2.txt"));
-            REQUIRE(fs::exists(testPath / "3.txt"));
-            REQUIRE(fs::exists(testPath / "4.txt"));
-            REQUIRE(fs::exists(subPath / "sub.txt"));
+    REQUIRE(fs::exists(testPath));
+    REQUIRE(fs::exists(testPath / "1.txt"));
+    REQUIRE(fs::exists(testPath / "2.txt"));
+    REQUIRE(fs::exists(testPath / "3.txt"));
+    REQUIRE(fs::exists(testPath / "4.txt"));
+    REQUIRE(fs::exists(subPath / "sub.txt"));
 
 //            SECTION("add, change, delete") {
-                INFO("changing files")
-                fs::remove(testPath / "4.txt");
+    INFO("changing files")
+    fs::remove(testPath / "4.txt");
 
     //@todo here I have a bug that looks like a race. probably transfer queue enters finished state too soon. investigate.
     //  after investigation : downloadStorage finished before transfer queue has actually finished. I think transfer queue goes to FINISHED state too soon.
-                changeFile(testPath / "3.txt", "QWQQQQQQQQQ");
-                createFile(testPath / "5.txt", "555");
-                otherNode.setNodeContextActive();
-                otherRepoMod->updateAllFiles();
-                otherRepoMod->saveRepository("test");
+    changeFile(testPath / "3.txt", "QWQQQQQQQQQ");
+    createFile(testPath / "5.txt", "555");
+    otherNode.setNodeContextActive();
+    otherRepoMod->updateAllFiles();
+    otherRepoMod->saveRepository("test");
 
-                auto num2 = fs::remove_all(testPath);
-                REQUIRE(num2 == 8);
-                REQUIRE(!fs::exists(testPath));
-                REQUIRE(!fs::exists(testPath / "1.txt"));
-                REQUIRE(!fs::exists(testPath / "2.txt"));
-                REQUIRE(!fs::exists(testPath / "3.txt"));
-                REQUIRE(!fs::exists(testPath / "4.txt"));
-                REQUIRE(!fs::exists(testPath / "5.txt"));
-                thisNode.setNodeContextActive();
-                thisRepoMod->downloadRemoteRepository("second", "test");
-                REQUIRE(thisRepoMod->findRepository("test") != nullptr);
-                thisRepoMod->selectRepository("test");
+    auto num2 = fs::remove_all(testPath);
+    REQUIRE(num2 == 8);
+    REQUIRE(!fs::exists(testPath));
+    REQUIRE(!fs::exists(testPath / "1.txt"));
+    REQUIRE(!fs::exists(testPath / "2.txt"));
+    REQUIRE(!fs::exists(testPath / "3.txt"));
+    REQUIRE(!fs::exists(testPath / "4.txt"));
+    REQUIRE(!fs::exists(testPath / "5.txt"));
+    thisNode.setNodeContextActive();
+    thisRepoMod->downloadRemoteRepository("second", "test");
+    REQUIRE(thisRepoMod->findRepository("test") != nullptr);
+    thisRepoMod->selectRepository("test");
     LOGGER("deplying files")
-                thisRepoMod->deployAllFiles();
+    thisRepoMod->deployAllFiles();
 
-                REQUIRE(fs::exists(testPath));
-                REQUIRE(fs::exists(testPath / "1.txt"));
-                REQUIRE(fs::exists(testPath / "2.txt"));
-                REQUIRE(fs::exists(testPath / "3.txt"));
-                REQUIRE(!fs::exists(testPath / "4.txt"));
-                REQUIRE(fs::exists(testPath / "5.txt"));
+    REQUIRE(fs::exists(testPath));
+    REQUIRE(fs::exists(testPath / "1.txt"));
+    REQUIRE(fs::exists(testPath / "2.txt"));
+    REQUIRE(fs::exists(testPath / "3.txt"));
+    REQUIRE(!fs::exists(testPath / "4.txt"));
+    REQUIRE(fs::exists(testPath / "5.txt"));
     REQUIRE(readFile(testPath / "1.txt") == "111");
     REQUIRE(readFile(testPath / "2.txt") == "222");
-                REQUIRE(readFile(testPath / "3.txt") == "QWQQQQQQQQQ");
-                REQUIRE(fs::exists(subPath / "sub.txt"));
+    REQUIRE(readFile(testPath / "3.txt") == "QWQQQQQQQQQ");
+    REQUIRE(fs::exists(subPath / "sub.txt"));
 
 
 //            }
@@ -250,8 +250,8 @@ TEST_CASE("Repo module test") {
 
 //        }
 
-        //cleanup:
-        fs::remove_all(testPath);
+    //cleanup:
+    fs::remove_all(testPath);
     //@todo actual path or cleanup from storage
     fs::remove_all({"/tmp/storage"});
 

@@ -12,7 +12,6 @@ class Executor {
 public:
     virtual void execute(std::function<void(void)> task) = 0;
     virtual void stop() = 0;
-
     virtual ~Executor();
 };
 

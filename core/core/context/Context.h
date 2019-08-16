@@ -163,6 +163,7 @@ public:
 
     explicit Context(const Ptr &ptr);
 
+private:
     Context() = default;
 
 public:

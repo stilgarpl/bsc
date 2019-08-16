@@ -67,7 +67,9 @@ Context &Context::operator+=(const Context::Ptr &other) {
 Context::Context(const Context::Ptr &ptr) : Context(*ptr) {}
 
 Context::ContextPtr Context::makeContext() {
-    return std::make_shared<Context>();
+    struct ContextMakeSharedWorkaround : public Context {
+    };
+    return std::make_shared<ContextMakeSharedWorkaround>();
 }
 
 bool Context::isDefaultContext() const {

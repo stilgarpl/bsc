@@ -29,7 +29,7 @@ public:
     }
 
 
-    bool isEventValid() const {
+    [[nodiscard]] bool isEventValid() const {
         return _eventValid;
     }
 
@@ -49,11 +49,11 @@ public:
     }
 
 
-    Context::Ptr context() {
+    [[nodiscard]] Context::Ptr context() {
         return _context;
     }
 
-    Context::Ptr context() const {
+    [[nodiscard]] Context::Ptr context() const {
         return _context;
     }
 
