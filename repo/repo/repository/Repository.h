@@ -142,9 +142,9 @@ public:
         };
 
     public:
-
-        std::map<fs::path, std::optional<DeployAttributes>> deployMap;
-
+        //@todo C++17 cereal:
+//            std::map<fs::path, std::optional<DeployAttributes>> deployMap;
+        std::map<std::string, std::optional<DeployAttributes>> deployMap;
         auto begin() -> decltype(deployMap.begin());
 
         auto end() -> decltype(deployMap.end());
@@ -254,10 +254,13 @@ public: //@todo should it be public?
     const RepositoryActionStrategyPack localSyncPack;
     const RepositoryActionStrategyPack fullPack;
 
-
+private:
     RepoFileMap _repoFileMap = RepoFileMap(journal, pathTransformer);
     //@todo add saving and loading of a deployMap
     RepoDeployMap deployMap;
+public:
+    Repository(const IRepository::RepoIdType &repositoryId, const std::shared_ptr<IStorage> &storage,
+               const JournalPtr &journal, const Repository::RepoDeployMap &deployMap);
 
 protected:
 
@@ -311,20 +314,39 @@ public:
     ~Repository() override = default;
 
 private:
+//    template<class Archive>
+//    void save(Archive &archive) const {
+//        archive(repositoryId, journal, deployMap);
+//    }
+//
+//    template<class Archive>
+//    void load(Archive &archive) {
+//        archive(repositoryId, journal, deployMap);
+//    }
+
+private:
     template<class Archive>
-    void save(Archive &archive) const {
-        archive(repositoryId, journal, deployMap);
+    void serialize(Archive &ar) {
+        ar(repositoryId, journal, deployMap);
     }
 
     template<class Archive>
-    void load(Archive &archive) {
-        archive(repositoryId, journal, deployMap);
+    static void load_and_construct(Archive &ar, cereal::construct<Repository> &construct) {
+        Repository::RepoIdType r;
+        JournalPtr j;
+        RepoDeployMap d;
+        ar(r, j, d);
+        //@todo fix
+        construct(r, nullptr, j, d);
     }
 
+    friend class cereal::access;
 
     friend class cereal::access;
 };
 
 typedef std::shared_ptr<Repository> RepositoryPtr;
+
+//CEREAL_REGISTER_TYPE_WITH_NAME(Repository,"Repository")
 
 #endif //BASYCO_REPOSITORY_H

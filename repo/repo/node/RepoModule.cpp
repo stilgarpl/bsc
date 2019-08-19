@@ -150,18 +150,19 @@ void RepoModule::printHistory() {
 
 void RepoModule::loadRepository(const Repository::RepoIdType &repoId) {
     //@todo get storage that this actual repository uses
-    RepositoryPtr ptr = std::make_shared<Repository>(repoId, storageManager.getDefaultStorage());
+//    RepositoryPtr ptr = std::make_shared<Repository>(repoId, storageManager.getDefaultStorage());
 
-    repositoryManager.addRepository(ptr);
+
 //@todo this method should be moved somewhere else. Journal is not the only thing of repo that needs to be saved. Repository should have serialize and RepoManager should handle loading and saving.
 //@todo throw exception if repo does not exist
-    ptr->setJournal(node.getConfigurationManager().loadData<JournalPtr>(
-            configuration().getRepositoryDataPath() / (repoId + ".xml")));
+    auto ptr = node.getConfigurationManager().loadData<RepositoryPtr>(
+            configuration().getRepositoryDataPath() / (repoId + ".xml"));
 //    {
 //        std::ifstream is(path);
 //        cereal::XMLInputArchive ia(is);
 //        ia >> ptr->getJournal();
 //    }
+    repositoryManager.addRepository(ptr);
     LOGGER(ptr->getJournal()->getChecksum());
 }
 
@@ -170,8 +171,10 @@ void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
 //    rep->getJournal()->commitState();
     rep->commit();
     auto repoPath = (configuration().getRepositoryDataPath() / (repoId + ".xml")).string();
-    node.getConfigurationManager().saveData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"),
-                                                        rep->getJournal());
+//    node.getConfigurationManager().saveData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"),
+//                                                        rep->getJournal());
+    node.getConfigurationManager().saveData<RepositoryPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"),
+                                                           rep);
     LOGGER("saving repository journal for repo " + repoId + " and checksum is " + rep->getJournal()->getChecksum())
 //    {
 //        std::ofstream os(savePath);
