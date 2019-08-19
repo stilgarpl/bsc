@@ -10,6 +10,7 @@
 
 class RepositoryManager {
 
+    //@todo this probably should be a map repoId -> repoPtr
     std::list<RepositoryPtr> repositories;
 
 public:
@@ -24,13 +25,13 @@ public:
 
     }
 
-    void addRepository(RepositoryPtr ptr) {
+    void addRepository(const RepositoryPtr &ptr) {
         if (getRepository(ptr->getRepositoryId()) == nullptr) {
             repositories.push_back(ptr);
         }
     }
 
-    const std::list<RepositoryPtr> &getRepositories() const {
+    [[nodiscard]] const std::list<RepositoryPtr> &getRepositories() const {
         return repositories;
     }
 };

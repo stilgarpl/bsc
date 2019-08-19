@@ -7,11 +7,10 @@
 
 
 #include <p2p/modules/filesystem/identification/ResourceIdentificator.h>
-#include <repo/repository/Repository.h>
 
 class StorageResourceIdentificator : public ResourceIdentificator {
 private:
-    Repository::RepoIdType repositoryId;
+    IStorage::StorageId storageId;
     IStorage::ResourceId objectId;
 public:
     std::shared_ptr<std::istream> getResourceInputStream() override;
@@ -22,20 +21,20 @@ public:
 
     bool exists() override;
 
-    StorageResourceIdentificator(const IRepository::RepoIdType &repositoryId, const IStorage::ResourceId &objectId);
+    StorageResourceIdentificator(IStorage::StorageId storageId, IStorage::ResourceId objectId);
 
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(cereal::base_class<ResourceIdentificator>(this), repositoryId, objectId);
+        ar(cereal::base_class<ResourceIdentificator>(this), storageId, objectId);
     }
 
     template<class Archive>
     static void load_and_construct(Archive &ar, cereal::construct<StorageResourceIdentificator> &construct) {
-        Repository::RepoIdType repositoryId;
+        IStorage::StorageId storageId;
         IStorage::ResourceId objectId;
-        ar(repositoryId, objectId);
-        construct(repositoryId, objectId);
+        ar(storageId, objectId);
+        construct(storageId, objectId);
     }
 
     friend class cereal::access;

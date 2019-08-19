@@ -10,6 +10,7 @@
 #include <p2p/node/NodeInfo.h>
 #include <repo/repository/IRepository.h>
 #include <filesystem>
+#include <utility>
 #include <p2p/modules/filesystem/transfer/TransferManager.h>
 
 namespace fs = std::filesystem;
@@ -17,7 +18,7 @@ namespace fs = std::filesystem;
 
 class IStorage {
 public:
-
+    using StorageId = std::string;
     using ResourceId = std::string;
     //@todo export typedefs to one file included from journal and storage.
 
@@ -26,7 +27,7 @@ public:
     }
 
 protected:
-    IRepository *repository;
+    StorageId storageId;
 
 public:
 //@fixme store, restore, update -> checksum is not of ResourceId type! ResourceId is generated from checksum and size.
@@ -44,23 +45,27 @@ public:
 
     //@todo remove, I think - this is required for resource transfer between nodes, but streams should do that.
     //@todo or not remove, but make it protected
-    virtual fs::path getResourcePath(const ResourceId &resourceId) const =0;
+    [[nodiscard]] virtual fs::path getResourcePath(const ResourceId &resourceId) const = 0;
 
     virtual std::shared_ptr<std::iostream> getResourceStream(const ResourceId &resourceId) =0;
 
-    virtual bool hasResource(const ResourceId &resourceId) const =0;
+    [[nodiscard]] virtual bool hasResource(const ResourceId &resourceId) const = 0;
 
     virtual bool acquireResource(const ResourceId &resourceId) = 0;
 
-    explicit IStorage(IRepository *r) {
-        this->repository = r;
-    }
+    explicit IStorage(StorageId storageId) : storageId(std::move(storageId)) {}
 
     virtual ~IStorage() = default;
 
     virtual TransferManager::TransferQueuePtr getTransferQueue() = 0;
 
+    [[nodiscard]] const StorageId &getStorageId() const {
+        return storageId;
+    }
+
 };
+
+using IStoragePtr = std::shared_ptr<IStorage>;
 
 
 #endif //BASYCO_ISTORAGE_H

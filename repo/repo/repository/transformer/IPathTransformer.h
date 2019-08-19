@@ -29,9 +29,9 @@ public:
 
 public:
 
-    virtual fs::path transformToJournalFormat(fs::path path) = 0;
+    virtual fs::path transformToJournalFormat(fs::path path) const = 0;
 
-    virtual fs::path transformFromJournalFormat(fs::path path) = 0;
+    virtual fs::path transformFromJournalFormat(fs::path path) const = 0;
 
     //@todo probably shared_ptrs would be better
     virtual void addRule(ITransformRulePtr rule) = 0;

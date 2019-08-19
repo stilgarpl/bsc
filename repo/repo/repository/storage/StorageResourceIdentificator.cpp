@@ -4,14 +4,16 @@
 
 #include <p2p/node/context/NodeContext.h>
 #include <repo/node/RepoModule.h>
+
+#include <utility>
 #include "StorageResourceIdentificator.h"
 
 std::shared_ptr<std::istream> StorageResourceIdentificator::getResourceInputStream() {
 
     auto repoModule = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
-    auto repo = repoModule->findRepository(repositoryId);
-    if (repo != nullptr) {
-        return repo->getStorage()->getResourceStream(objectId);
+    auto storage = repoModule->findStorage(storageId);
+    if (storage != nullptr) {
+        return storage->getResourceStream(objectId);
     } else {
         return nullptr;
     }
@@ -19,9 +21,9 @@ std::shared_ptr<std::istream> StorageResourceIdentificator::getResourceInputStre
 
 std::shared_ptr<std::ostream> StorageResourceIdentificator::getResourceOutputStream() {
     auto repoModule = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
-    auto repo = repoModule->findRepository(repositoryId);
-    if (repo != nullptr) {
-        return repo->getStorage()->getResourceStream(objectId);
+    auto storage = repoModule->findStorage(storageId);
+    if (storage != nullptr) {
+        return storage->getResourceStream(objectId);
     } else {
         return nullptr;
     }
@@ -29,9 +31,9 @@ std::shared_ptr<std::ostream> StorageResourceIdentificator::getResourceOutputStr
 
 uintmax_t StorageResourceIdentificator::getResourceSize() {
     auto repoModule = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
-    auto repo = repoModule->findRepository(repositoryId);
-    if (repo != nullptr) {
-        return fs::file_size(repo->getStorage()->getResourcePath(objectId));
+    auto storage = repoModule->findStorage(storageId);
+    if (storage != nullptr) {
+        return fs::file_size(storage->getResourcePath(objectId));
     } else {
         //@todo throw error or sth?
         return 0;
@@ -41,18 +43,19 @@ uintmax_t StorageResourceIdentificator::getResourceSize() {
 bool StorageResourceIdentificator::exists() {
     LOGGER("storage resource exists")
     auto repoModule = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
-    auto repo = repoModule->findRepository(repositoryId);
-    if (repo != nullptr) {
-        LOGGER("repo isn't null")
-        LOGGER(repo->getStorage()->getResourcePath(objectId));
-        return fs::exists(repo->getStorage()->getResourcePath(objectId));
+    auto storage = repoModule->findStorage(storageId);
+    if (storage != nullptr) {
+        LOGGER("storage isn't null")
+        LOGGER(storage->getResourcePath(objectId));
+        return fs::exists(storage->getResourcePath(objectId));
     } else {
-        LOGGER("repo is null")
+        LOGGER("storage is null")
         return false;
     }
 }
 
-StorageResourceIdentificator::StorageResourceIdentificator(const IRepository::RepoIdType &repositoryId,
-                                                           const IStorage::ResourceId &objectId) : repositoryId(
-        repositoryId),
-                                                                                                   objectId(objectId) {}
+StorageResourceIdentificator::StorageResourceIdentificator(IStorage::StorageId storageId,
+                                                           IStorage::ResourceId objectId) : storageId(std::move(
+        storageId)),
+                                                                                            objectId(std::move(
+                                                                                                    objectId)) {}

@@ -4,10 +4,10 @@
 
 #include <core/log/Logger.h>
 #include <core/utils/crypto.h>
-#include <p2p/node/context/NodeContext.h>
-#include <p2p/modules/network/NetworkModule.h>
-#include <repo/repository/storage/network/packet/StorageQuery.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
+
+#include <utility>
+#include <p2p/node/context/NodeContext.h>
 #include "InternalStorage.h"
 #include "StorageResourceIdentificator.h"
 
@@ -49,14 +49,6 @@ void InternalStorage::sync(const NodeIdType &nodeID) {
 
 void InternalStorage::initStorage() {
 
-    auto &node = NodeContext::getNodeFromActiveContext();
-
-    storagePath = "/tmp/storage";
-    storagePath /= node.getNodeInfo().getNodeId();
-    storagePath /= repository->getRepositoryId();
-    storagePath /= "internal";
-
-
     if (!fs::exists(this->storagePath)) {
         if (fs::create_directories(storagePath)) {
             LOGGER("STORAGE INITIALIZED")
@@ -65,10 +57,6 @@ void InternalStorage::initStorage() {
         }
     }
 
-}
-
-InternalStorage::InternalStorage(IRepository *r) : IStorage(r) {
-    initStorage();
 }
 
 fs::path InternalStorage::getResourcePath(const IStorage::ResourceId &resourceId) const {
@@ -106,8 +94,8 @@ bool InternalStorage::acquireResource(const ResourceId &resourceId) {
     }
 
     transferQueue->queueTransfer(std::make_shared<StorageResourceIdentificator>(
-            repository->getRepositoryId(), resourceId), std::make_shared<StorageResourceIdentificator>(
-            repository->getRepositoryId(), resourceId));
+            getStorageId(), resourceId), std::make_shared<StorageResourceIdentificator>(
+            getStorageId(), resourceId));
     transferQueue->start();
 
     return true;
@@ -134,6 +122,8 @@ TransferManager::TransferQueuePtr InternalStorage::getTransferQueue() {
     return transferQueue;
 }
 
-//InternalStorage::InternalStorage(const std::string &storageId) /*: storageId(storageId)*/ {
-//    initStorage();
-//}
+InternalStorage::InternalStorage(StorageId storageId, fs::path path) : IStorage(std::move(storageId)),
+                                                                       storagePath(path) {
+    initStorage();
+}
+

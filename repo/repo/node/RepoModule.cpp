@@ -149,10 +149,11 @@ void RepoModule::printHistory() {
 }
 
 void RepoModule::loadRepository(const Repository::RepoIdType &repoId) {
-    RepositoryPtr ptr = std::make_shared<Repository>(repoId);
+    //@todo get storage that this actual repository uses
+    RepositoryPtr ptr = std::make_shared<Repository>(repoId, storageManager.getDefaultStorage());
 
     repositoryManager.addRepository(ptr);
-//@todo this metod should be moved somewhere else. Journal is not the only thing of repo that needs to be saved. Repository should have serialize and RepoManager should handle loading and saving.
+//@todo this method should be moved somewhere else. Journal is not the only thing of repo that needs to be saved. Repository should have serialize and RepoManager should handle loading and saving.
 //@todo throw exception if repo does not exist
     ptr->setJournal(node.getConfigurationManager().loadData<JournalPtr>(
             configuration().getRepositoryDataPath() / (repoId + ".xml")));
@@ -181,7 +182,7 @@ void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
 }
 
 RepositoryPtr RepoModule::createRepository(const Repository::RepoIdType &repoId) {
-    RepositoryPtr ptr = std::make_shared<Repository>(repoId);
+    auto ptr = std::make_shared<Repository>(repoId, storageManager.getDefaultStorage());
     repositoryManager.addRepository(ptr);
     return ptr;
 
@@ -304,6 +305,10 @@ void RepoModule::downloadRepository(const Repository::RepoIdType &repoId) {
 void RepoModule::deployRepository(const Repository::RepoIdType &repoId) {
     //@todo add to the deployed repository list?
     findRepository(repoId)->deploy();
+}
+
+IStoragePtr RepoModule::findStorage(const IStorage::StorageId &storageId) {
+    return storageManager.findStorage(storageId);
 }
 
 const std::filesystem::path RepoModule::Configuration::getRepositoryDataPath() const {

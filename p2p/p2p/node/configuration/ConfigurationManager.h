@@ -67,6 +67,7 @@ public:
         return config;
     }
 
+//@todo archive type? now it's always xml.
     template<typename DataType /* @todo Concept: DataType is serializable*/>
     void saveData(const fs::path &fname, const DataType &data) {
         fs::path filePath = getDataPath() / fname;
@@ -76,6 +77,7 @@ public:
         archive << data;
     }
 
+    //@todo archive type? now it's always xml.
     template<typename DataType /* @todo Concept: DataType is serializable*/>
     DataType loadData(const fs::path &fname) {
         DataType data;

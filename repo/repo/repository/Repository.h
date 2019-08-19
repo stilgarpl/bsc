@@ -11,7 +11,6 @@
 #include <repo/journal/SimpleJournal.h>
 #include <core/log/Logger.h>
 #include <repo/repository/storage/IStorage.h>
-#include <repo/repository/storage/InternalStorage.h>
 #include <core/utils/crypto.h>
 #include <repo/repository/transformer/PathTransformer.h>
 #include "IRepository.h"
@@ -228,11 +227,12 @@ public:
     protected:
         Repository &repository;
     public:
-        std::shared_ptr<RepositoryActionStrategy> create(RepositoryAction action);
+        [[nodiscard]] std::shared_ptr<RepositoryActionStrategy> create(RepositoryAction action) const;
 
         //maybe should return unique or shared_ptr? maybe not @todo think about it
-        RepositoryActionStrategyPack createPack(RepoActionPack actionPack);
-        RepositoryActionStrategyFactory(Repository &repository);
+        [[nodiscard]] RepositoryActionStrategyPack createPack(RepoActionPack actionPack) const;
+
+        explicit RepositoryActionStrategyFactory(Repository &repository);
     };
 
 
@@ -245,14 +245,14 @@ public:
 
 private:
     JournalPtr journal = std::make_shared<SimpleJournal>();
-    RepositoryActionStrategyFactory strategyFactory;
-    RepoIdType repositoryId;
+    const RepositoryActionStrategyFactory strategyFactory;
+    const RepoIdType repositoryId;
     std::shared_ptr<IStorage> storage;
     std::shared_ptr<IPathTransformer> pathTransformer = std::make_shared<PathTransformer>();
 public: //@todo should it be public?
-    RepositoryActionStrategyPack deployPack;
-    RepositoryActionStrategyPack localSyncPack;
-    RepositoryActionStrategyPack fullPack;
+    const RepositoryActionStrategyPack deployPack;
+    const RepositoryActionStrategyPack localSyncPack;
+    const RepositoryActionStrategyPack fullPack;
 
 
     RepoFileMap _repoFileMap = RepoFileMap(journal, pathTransformer);
@@ -304,11 +304,25 @@ public:
     //deploy everything, apply repository to filesystem @todo add force levels, what to do with changed files. standard = just create files that are not there, force = replace changed files, muchForce = replace everything.
     void deploy();
 
-    explicit Repository(RepoIdType repositoryId);
+    explicit Repository(RepoIdType repositoryId, IStoragePtr storagePtr);
 
     void trash(const fs::path &path);
 
     ~Repository() override = default;
+
+private:
+    template<class Archive>
+    void save(Archive &archive) const {
+        archive(repositoryId, journal, deployMap);
+    }
+
+    template<class Archive>
+    void load(Archive &archive) {
+        archive(repositoryId, journal, deployMap);
+    }
+
+
+    friend class cereal::access;
 };
 
 typedef std::shared_ptr<Repository> RepositoryPtr;

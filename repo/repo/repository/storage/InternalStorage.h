@@ -29,15 +29,16 @@ public:
 
     void initStorage();
 
+    explicit InternalStorage(StorageId storageId, fs::path path);
+
 //
     std::shared_ptr<std::iostream> getResourceStream(const ResourceId &resourceId) override;
 //    InternalStorage(const std::string &storageId);
 
-    explicit InternalStorage(IRepository *r);
 
-    fs::path getResourcePath(const ResourceId &resourceId) const override;
+    [[nodiscard]] fs::path getResourcePath(const ResourceId &resourceId) const override;
 
-    bool hasResource(const ResourceId &resourceId) const override;
+    [[nodiscard]] bool hasResource(const ResourceId &resourceId) const override;
 
     bool acquireResource(const ResourceId &resourceId) override;
 

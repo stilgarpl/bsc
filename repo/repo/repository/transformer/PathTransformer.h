@@ -15,9 +15,9 @@ class PathTransformer : public IPathTransformer {
 public:
 
 private:
-    std::filesystem::path transformToJournalFormat(fs::path path) override;
+    [[nodiscard]] std::filesystem::path transformToJournalFormat(fs::path path) const override;
 
-    std::filesystem::path transformFromJournalFormat(fs::path path) override;
+    [[nodiscard]] std::filesystem::path transformFromJournalFormat(fs::path path) const override;
 
     void addRule(ITransformRulePtr rule) override;
 

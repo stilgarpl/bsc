@@ -7,6 +7,7 @@
 #include <repo/repository/transformer/rules/TmpRule.h>
 #include <repo/repository/transformer/rules/HomeDirRule.h>
 #include "Repository.h"
+#include <repo/repository/storage/InternalStorage.h>
 
 using namespace std::chrono_literals;
 
@@ -23,11 +24,10 @@ void Repository::setJournal(const JournalPtr &journal) {
     Repository::journal = journal;
 }
 
-Repository::Repository(RepoIdType repositoryId) : strategyFactory(*this),
-                                                  repositoryId(std::move(repositoryId)),
-                                                  storage(std::make_shared<InternalStorage>(
-                                                          static_cast<IRepository *>(this))),
-                                                  deployPack(strategyFactory.createPack(
+Repository::Repository(RepoIdType repositoryId, IStoragePtr storagePtr) : strategyFactory(*this),
+                                                                          repositoryId(std::move(repositoryId)),
+                                                                          storage(std::move(storagePtr)),
+                                                                          deployPack(strategyFactory.createPack(
                                                           {.updatedInRepo = RepositoryAction::RESTORE,
                                                                   .updatedInFilesystem = RepositoryAction::NOP,
                                                                   .same = RepositoryAction::NOP,
@@ -36,7 +36,7 @@ Repository::Repository(RepoIdType repositoryId) : strategyFactory(*this),
                                                                   .deletedInRepo = RepositoryAction::TRASH,
                                                                   .deletedInFilesystem = RepositoryAction::RESTORE,
                                                           })),
-                                                  localSyncPack(strategyFactory.createPack(
+                                                                          localSyncPack(strategyFactory.createPack(
                                                           {.updatedInRepo = RepositoryAction::NOP,
                                                                   .updatedInFilesystem = RepositoryAction::UPDATE,
                                                                   .same = RepositoryAction::NOP,
@@ -45,7 +45,7 @@ Repository::Repository(RepoIdType repositoryId) : strategyFactory(*this),
                                                                   .deletedInRepo = RepositoryAction::NOP,
                                                                   .deletedInFilesystem = RepositoryAction::REMOVE,
                                                           })),
-                                                  fullPack(strategyFactory.createPack(
+                                                                          fullPack(strategyFactory.createPack(
                                                           {.updatedInRepo = RepositoryAction::RESTORE,
                                                                   .updatedInFilesystem = RepositoryAction::UPDATE,
                                                                   .same = RepositoryAction::NOP,
@@ -666,7 +666,7 @@ public:
 };
 
 std::shared_ptr<Repository::RepositoryActionStrategy>
-Repository::RepositoryActionStrategyFactory::create(Repository::RepositoryAction action) {
+Repository::RepositoryActionStrategyFactory::create(Repository::RepositoryAction action) const {
     switch (action) {
         case RepositoryAction::PERSIST:
         case RepositoryAction::UPDATE:
@@ -690,7 +690,7 @@ Repository::RepositoryActionStrategyFactory::RepositoryActionStrategyFactory(Rep
         repository) {}
 
 Repository::RepositoryActionStrategyPack
-Repository::RepositoryActionStrategyFactory::createPack(Repository::RepoActionPack actionPack) {
+Repository::RepositoryActionStrategyFactory::createPack(Repository::RepoActionPack actionPack) const {
     Repository::RepositoryActionStrategyPack strategyPack;
     strategyPack.updatedInRepo = create(actionPack.updatedInRepo);
     strategyPack.updatedInFilesystem = create(actionPack.updatedInFilesystem);

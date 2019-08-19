@@ -13,6 +13,7 @@
 #include <p2p/modules/network/NetworkModule.h>
 #include <repo/journal/network/packet/JournalGroup.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>
+#include <repo/repository/storage/StorageManager.h>
 
 
 class RepoModule : public NodeModuleDependent<RepoModule> {
@@ -47,6 +48,7 @@ public:
     };
 private:
     RepositoryManager repositoryManager;
+    StorageManager storageManager;
     RepositoryPtr selectedRepository = nullptr;
 public:
     explicit RepoModule(INode &node);
@@ -58,6 +60,8 @@ public:
     bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
 
     RepositoryPtr findRepository(const Repository::RepoIdType &repoId);
+
+    IStoragePtr findStorage(const IStorage::StorageId &storageId);
 
 
 
@@ -81,6 +85,8 @@ public:
     void selectRepository(const Repository::RepoIdType &repoId);
 
     RepositoryPtr createRepository(const Repository::RepoIdType &repoId);
+
+    //@todo add createStorage - but StorageFactory is required first.
 
     void saveRepository(const Repository::RepoIdType &repoId);
 
