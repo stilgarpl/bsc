@@ -111,7 +111,7 @@ public:
 };
 
 
-template<typename T>
+template<typename T, typename ... TypeArgs>
 class Type {
 private:
     T t;

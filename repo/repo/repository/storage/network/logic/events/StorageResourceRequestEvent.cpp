@@ -4,12 +4,12 @@
 
 #include "StorageResourceRequestEvent.h"
 
-const IRepository::RepoIdType &StorageResourceRequestEvent::getRepositoryId() const {
-    return repositoryId;
+const IStorage::StorageId &StorageResourceRequestEvent::getRepositoryId() const {
+    return storageId;
 }
 
-void StorageResourceRequestEvent::setRepositoryId(const IRepository::RepoIdType &repositoryId) {
-    StorageResourceRequestEvent::repositoryId = repositoryId;
+void StorageResourceRequestEvent::setRepositoryId(const IStorage::StorageId &repositoryId) {
+    StorageResourceRequestEvent::storageId = repositoryId;
 }
 
 const IStorage::ResourceId &StorageResourceRequestEvent::getObjectId() const {

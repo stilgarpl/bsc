@@ -12,13 +12,13 @@
 
 class StorageResourceRequestEvent : public NetworkingEvent<int> {
 private:
-    IRepository::RepoIdType repositoryId;
+    IStorage::StorageId storageId;
     IStorage::ResourceId objectId;
 public:
 
-    const IRepository::RepoIdType &getRepositoryId() const;
+    const IStorage::StorageId &getRepositoryId() const;
 
-    void setRepositoryId(const IRepository::RepoIdType &repositoryId);
+    void setRepositoryId(const IStorage::StorageId &repositoryId);
 
     const IStorage::ResourceId &getObjectId() const;
 

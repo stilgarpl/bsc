@@ -11,6 +11,6 @@ void StorageQuery::Request::process(Context::Ptr context) {
     auto storageSource = LogicContext::getLogicManagerFromActiveContext().getSource<StorageSource>();
 
     if (storageSource != nullptr) {
-        storageSource->queryResource(repositoryId, objectId, this->getId());
+        storageSource->queryResource(storageId, objectId, this->getId());
     }
 }

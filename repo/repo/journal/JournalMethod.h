@@ -8,7 +8,7 @@
 enum JournalMethod {
     //@todo add some real numbers here, in case I need to add more stuff
     NONE,
-            ADDED,
+    ADDED,
     MODIFIED,
     MOVED,
     DELETED,

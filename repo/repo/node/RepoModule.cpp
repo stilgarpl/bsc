@@ -22,7 +22,10 @@
 #include <logic/sources/TriggerSource.h>
 #include <logic/chain/ChainEvaluators.h>
 #include <logic/evaluators/TriggerEvaluators.h>
-#include <logic/LogicObject.h>
+#include <core/factory/FactoryContext.h>
+#include <repo/repository/storage/StorageFactory.h>
+#include <repo/repository/storage/StorageFactorySpecialization.h>
+#include <repo/repository/storage/ManagedStorageFactory.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
@@ -254,7 +257,7 @@ void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repo
 void RepoModule::updateFile(const fs::path &path) {
 
     if (selectedRepository != nullptr) {
-        selectedRepository->update(path, selectedRepository->fullPack, {Repository::UpdateOptions::FOLLOW_DIRECTORIES});
+        selectedRepository->update(path, selectedRepository->getFullPack(), {Repository::UpdateOptions::FOLLOW_DIRECTORIES});
 
     }
 
@@ -314,7 +317,15 @@ IStoragePtr RepoModule::findStorage(const IStorage::StorageId &storageId) {
     return storageManager.findStorage(storageId);
 }
 
-const std::filesystem::path RepoModule::Configuration::getRepositoryDataPath() const {
+void RepoModule::initialize() {
+    auto factoryContext = node.getContext()->get<FactoryContext>();
+    FactoryPtr<IStoragePtr,StorageFactoryByType> storageFactoryPtr = std::make_shared<StorageFactory>();
+    FactoryPtr<IStoragePtr,StorageFactoryByName> managedStorageFactoryPtr = std::make_shared<ManagedStorageFactory>();
+    factoryContext->setFactory<IStoragePtr,StorageFactoryByType>(storageFactoryPtr);
+    factoryContext->setFactory<IStoragePtr,StorageFactoryByName>(managedStorageFactoryPtr);
+}
+
+std::filesystem::path RepoModule::Configuration::getRepositoryDataPath() const {
     return repositoryDataPath;
 }
 

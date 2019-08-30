@@ -24,13 +24,13 @@ public:
     class Request : public Packet<StorageQuery, StorageQuery::Request> {
 
     private:
-        IRepository::RepoIdType repositoryId;
+        IStorage::StorageId storageId;
         IStorage::ResourceId objectId;
 
 
         template<class Archive>
         void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<StorageQuery, StorageQuery::Request>>(this), repositoryId, objectId);
+            ar(cereal::base_class<Packet<StorageQuery, StorageQuery::Request>>(this), storageId, objectId);
         }
 
     public:
@@ -40,12 +40,12 @@ public:
         friend class cereal::access;
 
     public:
-        const IRepository::RepoIdType &getRepositoryId() const {
-            return repositoryId;
+        const IStorage::StorageId &getRepositoryId() const {
+            return storageId;
         }
 
-        void setRepositoryId(const IRepository::RepoIdType &repositoryId) {
-            Request::repositoryId = repositoryId;
+        void setRepositoryId(const IStorage::StorageId &repositoryId) {
+            Request::storageId = repositoryId;
         }
 
         const IStorage::ResourceId &getObjectId() const {

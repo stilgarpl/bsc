@@ -8,7 +8,6 @@
 
 #include <repo/journal/JournalTypes.h>
 #include <p2p/node/NodeInfo.h>
-#include <repo/repository/IRepository.h>
 #include <filesystem>
 #include <utility>
 #include <p2p/modules/filesystem/transfer/TransferManager.h>

@@ -393,6 +393,18 @@ Repository::Repository(const IRepository::RepoIdType &repositoryId, const std::s
     this->deployMap = deployMap;
 }
 
+const IRepository::RepositoryActionStrategyPack &Repository::getDeployPack() const {
+    return deployPack;
+}
+
+const IRepository::RepositoryActionStrategyPack &Repository::getLocalSyncPack() const {
+    return localSyncPack;
+}
+
+const IRepository::RepositoryActionStrategyPack &Repository::getFullPack() const {
+    return fullPack;
+}
+
 void Repository::RepoFileMap::prepareMap() {
 //    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
 
@@ -401,18 +413,18 @@ void Repository::RepoFileMap::prepareMap() {
         attributesMap.clear();
         journal->clearFunc();
         journal->setFunc(JournalMethod::ADDED, JournalTarget::FILE, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         journal->setFunc(JournalMethod::MODIFIED, JournalTarget::FILE, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
         journal->setFunc(JournalMethod::MOVED, JournalTarget::FILE, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
         });
 
         journal->setFunc(JournalMethod::DELETED, JournalTarget::FILE, [&](auto &i) {
@@ -432,18 +444,18 @@ void Repository::RepoFileMap::prepareMap() {
         });
 
         journal->setFunc(JournalMethod::ADDED, JournalTarget::DIRECTORY, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         journal->setFunc(JournalMethod::MODIFIED, JournalTarget::DIRECTORY, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
         //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
         journal->setFunc(JournalMethod::MOVED, JournalTarget::DIRECTORY, [&](auto &i) {
-            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = Attributes(i);
+            attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
         });
 
         journal->setFunc(JournalMethod::DELETED, JournalTarget::DIRECTORY, [&, this](auto &i) {
@@ -509,39 +521,6 @@ auto Repository::RepoFileMap::isDeleted(const fs::path &path) -> decltype(delete
     return deleteMap[path].isDeleted();
 }
 
-fs::perms Repository::RepoFileMap::Attributes::getPermissions() const {
-    return permissions;
-}
-
-uintmax_t Repository::RepoFileMap::Attributes::getSize() const {
-    return size;
-}
-
-fs::file_time_type Repository::RepoFileMap::Attributes::getModificationTime() const {
-    return modificationTime;
-}
-
-const ChecksumId &Repository::RepoFileMap::Attributes::getChecksum() const {
-    return checksum;
-}
-
-const IStorage::ResourceId &Repository::RepoFileMap::Attributes::getResourceId() const {
-    return resourceId;
-}
-
-Repository::RepoFileMap::Attributes::Attributes(const JournalStateData &data) {
-    size = data.getSize();
-    permissions = data.getPermissions();
-    modificationTime = data.getModificationTime();
-    checksum = data.getChecksum();
-    resourceId = IStorage::getResourceId(data.getChecksum(), data.getSize());
-    directory = data.isDirectory();
-}
-
-bool Repository::RepoFileMap::Attributes::isDirectory() const {
-    return directory;
-}
-
 
 bool Repository::RepoFileMap::DeleteInfo::isDeleted() const {
     return deleted;
@@ -598,7 +577,7 @@ Repository::RepoDeployMap::DeployAttributes::DeployAttributes() = default;
 
 class StrategyPersist : public Repository::RepositoryActionStrategy {
     Repository::DeployState
-    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
         repository.persist(path);
         return Repository::DeployState::DEPLOYED; //it was UNCHANGED, but file is clearly in the filesystem, so it's deployed!
         //UNCHANGED made some sense, because persisting the file doesn't actually deploy it, but new files weren't marked as deployed, so update thought they were deleted. and new files go through persist, so it should return DEPLOYED.
@@ -613,7 +592,7 @@ public:
 class StrategyRestore : public Repository::RepositoryActionStrategy {
 public:
     Repository::DeployState
-    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
         if (!attributes->isDirectory()) {
             repository.getStorage()->restore(attributes->getResourceId(), path);
         }
@@ -628,7 +607,7 @@ public:
 class StrategyTrash : public Repository::RepositoryActionStrategy {
 public:
     Repository::DeployState
-    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
         repository.trash(path);
         return Repository::DeployState::NOT_DEPLOYED;
     }
@@ -640,7 +619,7 @@ public:
 class StrategyRemove : public Repository::RepositoryActionStrategy {
 public:
     Repository::DeployState
-    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
         repository.remove(path);
         return Repository::DeployState::NOT_DEPLOYED;
     }
@@ -652,7 +631,7 @@ public:
 class StrategyDelete : public Repository::RepositoryActionStrategy {
 public:
     Repository::DeployState
-    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
         //@todo implement
         return Repository::DeployState::NOT_DEPLOYED;
     }
@@ -664,7 +643,7 @@ public:
 class StrategyNull : public Repository::RepositoryActionStrategy {
 public:
     Repository::DeployState
-    apply(const fs::path &path, const std::optional<Repository::RepoFileMap::Attributes> &attributes) override {
+    apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
         return Repository::DeployState::UNCHANGED;
     }
 

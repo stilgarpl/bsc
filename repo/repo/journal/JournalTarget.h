@@ -5,7 +5,6 @@
 #ifndef BASYCO_JOURNALTARGET_H
 #define BASYCO_JOURNALTARGET_H
 
-//@todo think about splitting method into method and target.
 enum class JournalTarget {
     NONE,
     FILE,

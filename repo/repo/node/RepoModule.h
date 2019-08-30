@@ -9,7 +9,6 @@
 #include <p2p/node/module/NodeModule.h>
 #include <repo/repository/RepositoryManager.h>
 #include <p2p/dependency/DependencyManaged.h>
-#include <repo/repository/Repository.h>
 #include <p2p/modules/network/NetworkModule.h>
 #include <repo/journal/network/packet/JournalGroup.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>
@@ -26,7 +25,7 @@ public:
 
     public:
         //@todo make it return reference when cereal path is fixed.
-        const std::filesystem::path getRepositoryDataPath() const;
+        [[nodiscard]] std::filesystem::path getRepositoryDataPath() const;
 
         void setRepositoryDataPath(const std::filesystem::path &repositoryDataPath);
 
@@ -37,7 +36,7 @@ public:
         }
 
     public:
-        bool isAutoProcess() const;
+        [[nodiscard]] bool isAutoProcess() const;
 
         void setAutoProcess(bool autoProcess);
 
@@ -63,7 +62,7 @@ public:
 
     IStoragePtr findStorage(const IStorage::StorageId &storageId);
 
-
+    void initialize() override;
 
     ////////////////////////////////
     /// Commands section

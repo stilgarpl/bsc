@@ -1,6 +1,7 @@
 //
 // Created by stilgar on 25.08.17.
 //
+#include <logic/context/LogicContext.h>
 #include "LogicManager.h"
 
 void LogicManager::onStop() {
@@ -20,6 +21,7 @@ void LogicManager::run() {
 }
 
 void LogicManager::setContexts(const Context::Ptr &context) {
+    context->set<LogicContext, LogicManager &>(*this);
     sourceManager.setContext(context);
 }
 

@@ -6,12 +6,16 @@
 #define BASYCO_STORAGEFACTORY_H
 
 
+#include <core/factory/Factory.h>
 #include "IStorage.h"
+#include "StorageFactorySpecialization.h"
 
-class StorageFactory {
 
-    //@todo implement with correct type selector
-    IStoragePtr create() {};
+class StorageFactory : public Factory<IStoragePtr,StorageFactoryByType>{
+
+public:
+
+    IStoragePtr create(const SelectorType &selector) override;
 
 };
 

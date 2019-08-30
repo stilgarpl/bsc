@@ -14,46 +14,15 @@
 #include <core/utils/crypto.h>
 #include <repo/repository/transformer/PathTransformer.h>
 #include "IRepository.h"
+#include "RepositoryAttributes.h"
 
 class Repository : public IRepository {
 
 public:
 
     class RepoFileMap {
-    public: //@todo should be private, I think.
-        class Attributes {
-            fs::perms permissions = fs::perms::none;
-            uintmax_t size = 0;
-            fs::file_time_type modificationTime = fs::file_time_type::min();
-            ChecksumId checksum; //checksum of the file.
-            bool directory = false;
-            IStorage::ResourceId resourceId;
-        public:
-            fs::perms getPermissions() const;
+    public:
 
-            uintmax_t getSize() const;
-
-            fs::file_time_type getModificationTime() const;
-
-            const ChecksumId &getChecksum() const;
-
-            const IStorage::ResourceId &getResourceId() const;
-
-            Attributes() = default;
-
-            explicit Attributes(const JournalStateData &data);
-
-            bool isDirectory() const;
-
-            FileData toFileData() {
-                return FileData(checksum, permissions, size, modificationTime, directory);
-            }
-
-            FileData toFileData(const fs::path &path) {
-                return FileData(path, checksum, permissions, size, modificationTime, directory);
-            }
-
-        };
 
         class DeleteInfo {
         private:
@@ -72,7 +41,7 @@ public:
         };
 
     private:
-        std::map<fs::path, std::optional<Attributes>> attributesMap;
+        std::map<fs::path, std::optional<RepositoryAttributes>> attributesMap;
         std::map<fs::path, DeleteInfo> deleteMap;
         JournalPtr &journal;
         std::shared_ptr<IPathTransformer> &pathTransformer;
@@ -107,11 +76,7 @@ public:
     };
 
 
-    enum class DeployState {
-        DEPLOYED,
-        NOT_DEPLOYED,
-        UNCHANGED,
-    };
+
 
     class RepoDeployMap {
 
@@ -178,50 +143,10 @@ public:
 //        DELETED_IN_FILESYSTEM,
 //    };
 
-    enum class RepositoryAction {
-        PERSIST,
-        UPDATE, //this name is a little ambigious
-        DELETE,
-        TRASH,
-        REMOVE,
-        RESTORE,
-        NOP,
-    };
-
-    class RepositoryActionStrategy {
-    protected:
-        Repository &repository;
-    public:
-        DeployState apply(const fs::path &path) {
-            return this->apply(path, std::nullopt);
-        }
-
-        //right now it returns deployed state, but maybe it should return enum or sth //@todo think about it
-        virtual DeployState apply(const fs::path &path, const std::optional<RepoFileMap::Attributes> &attributes) = 0;
-
-        explicit RepositoryActionStrategy(Repository &repository) : repository(repository) {}
-    };
-
-protected:
-    template<typename PackType>
-    struct RepoPack {
 
 
-        PackType updatedInRepo;
-        PackType updatedInFilesystem;
-        PackType same;
-        PackType newInRepo;
-        PackType newInFilesystem;
-        PackType deletedInRepo;
-        PackType deletedInFilesystem;
-    };
+
 public:
-
-    //RepositoryActionStrategyPack
-
-    using StrategyType = std::shared_ptr<RepositoryActionStrategy>;
-    using RepositoryActionStrategyPack = RepoPack<StrategyType>;
-    using RepoActionPack = RepoPack<RepositoryAction>;
 
     class RepositoryActionStrategyFactory {
     protected:
@@ -235,11 +160,6 @@ public:
         explicit RepositoryActionStrategyFactory(Repository &repository);
     };
 
-
-    enum class UpdateOptions {
-        FOLLOW_DIRECTORIES,
-        FOLLOW_UPDATED_DIRECTORIES,
-    };
 
 
 
@@ -273,43 +193,44 @@ public:
     const RepoIdType &getRepositoryId() const override;
 
     //@todo hide this perhaps?
-    JournalPtr &getJournal();
+    JournalPtr &getJournal() override ;
 
     const std::shared_ptr<IStorage> &getStorage() const;
 
-    void setJournal(const JournalPtr &journal);
+    void setJournal(const JournalPtr &journal) override ;
 
-    void downloadStorage();
+    void downloadStorage() override ;
 
-    void restoreAll();
+    void restoreAll() override ;
 
-    void commit();
+    void commit() override ;
 
 public:
 
+    //@todo direct actions should be probably moved to separate class
     //direct actions:
-    void persist(fs::path path);
+    void persist(fs::path path) override;
 
-    void forget(fs::path path);
+    void forget(fs::path path) override;
 
-    void remove(fs::path path);
+    void remove(fs::path path) override;
 
-    void ignore(fs::path path);
+    void ignore(fs::path path) override;
 
-    void restoreAttributes(const fs::path &path);
+    void restoreAttributes(const fs::path &path) override;
 
     //update one file from the repository
-    void update(fs::path path, const RepositoryActionStrategyPack &strategyPack, std::set<UpdateOptions> updateOptions);
+    void update(fs::path path, const RepositoryActionStrategyPack &strategyPack, std::set<UpdateOptions> updateOptions) override;
 
     //update everything
-    void syncLocalChanges();
+    void syncLocalChanges() override;
 
     //deploy everything, apply repository to filesystem @todo add force levels, what to do with changed files. standard = just create files that are not there, force = replace changed files, muchForce = replace everything.
-    void deploy();
+    void deploy() override ;
 
     explicit Repository(RepoIdType repositoryId, IStoragePtr storagePtr);
 
-    void trash(const fs::path &path);
+    void trash(const fs::path &path) override;
 
     ~Repository() override = default;
 
@@ -342,11 +263,14 @@ private:
 
     friend class cereal::access;
 
-    friend class cereal::access;
+public:
+    [[nodiscard]] const RepositoryActionStrategyPack &getDeployPack() const;
+    [[nodiscard]] const RepositoryActionStrategyPack &getLocalSyncPack() const;
+    [[nodiscard]] const RepositoryActionStrategyPack &getFullPack() const;
+
+
 };
 
-typedef std::shared_ptr<Repository> RepositoryPtr;
-
-//CEREAL_REGISTER_TYPE_WITH_NAME(Repository,"Repository")
+CEREAL_REGISTER_TYPE_WITH_NAME(Repository,"Repository")
 
 #endif //BASYCO_REPOSITORY_H

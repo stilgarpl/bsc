@@ -5,8 +5,8 @@
 
 #include "Node.h"
 #include <p2p/node/context/NodeContext.h>
-#include <logic/context/LogicContext.h>
 #include <core/log/LoggerContext.h>
+#include <core/factory/FactoryContext.h>
 #include "p2p/node/module/NodeModule.h"
 
 
@@ -52,13 +52,13 @@ void Node::stop() {
 Node::Node() {
     LOGGER("default node constructor")
     nodeContext->set<NodeContext, Node &, NodeInfo &>(*this, this->thisNodeInfo);
-    //@todo setting of LogicContext should probably be done inside LogicManager
-    nodeContext->set<LogicContext, LogicManager &>(logicManager);
     nodeContext->set<LoggerContext>([&] { return thisNodeInfo.getNodeId(); });
 
     //this creates common context for role definitions across the entire node.
     nodeContext->set<RoleDefinitionsContext>();
     nodeContext->setDebug_id("node contxt");
+
+    nodeContext->set<FactoryContext>();
 
     logicManager.setContexts(nodeContext);
 
