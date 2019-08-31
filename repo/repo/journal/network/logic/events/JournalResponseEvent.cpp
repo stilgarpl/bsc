@@ -12,11 +12,11 @@ void JournalResponseEvent::setJournal(const JournalPtr journal) {
     JournalResponseEvent::journal = journal;
 }
 
-const std::string &JournalResponseEvent::getRepoId() const {
+const IRepository::RepoIdType &JournalResponseEvent::getRepoId() const {
     return repoId;
 }
 
-void JournalResponseEvent::setRepoId(const std::string &repoId) {
+void JournalResponseEvent::setRepoId(const IRepository::RepoIdType &repoId) {
     JournalResponseEvent::repoId = repoId;
 }
 

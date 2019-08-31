@@ -6,7 +6,7 @@
 #define BASYCO_REPOSITORYMANAGER_H
 
 
-#include "Repository.h"
+#include "IRepository.h"
 
 class RepositoryManager {
 

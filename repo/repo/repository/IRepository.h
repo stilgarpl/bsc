@@ -106,7 +106,18 @@ public:
     [[nodiscard]] virtual const RepositoryActionStrategyPack &getLocalSyncPack() const=0;
     [[nodiscard]] virtual const RepositoryActionStrategyPack &getFullPack() const=0;
 
+private:
+    template<class Archive>
+    void serialize(Archive &ar) {
+    }
+
+
+    friend class cereal::access;
+
 };
 
 typedef std::shared_ptr<IRepository> RepositoryPtr;
+
+CEREAL_REGISTER_TYPE(IRepository)
+
 #endif //BASYCO_IREPOSITORY_H

@@ -26,6 +26,7 @@
 #include <repo/repository/storage/StorageFactory.h>
 #include <repo/repository/storage/StorageFactorySpecialization.h>
 #include <repo/repository/storage/ManagedStorageFactory.h>
+#include <repo/repository/Repository.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
@@ -151,7 +152,7 @@ void RepoModule::printHistory() {
     LOGGER("history printed")
 }
 
-void RepoModule::loadRepository(const Repository::RepoIdType &repoId) {
+void RepoModule::loadRepository(const IRepository::RepoIdType &repoId) {
     //@todo get storage that this actual repository uses
 //    RepositoryPtr ptr = std::make_shared<Repository>(repoId, storageManager.getDefaultStorage());
 
@@ -169,7 +170,7 @@ void RepoModule::loadRepository(const Repository::RepoIdType &repoId) {
     LOGGER(ptr->getJournal()->getChecksum());
 }
 
-void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
+void RepoModule::saveRepository(const IRepository::RepoIdType &repoId) {
     auto rep = findRepository(repoId);
 //    rep->getJournal()->commitState();
     rep->commit();
@@ -187,14 +188,15 @@ void RepoModule::saveRepository(const Repository::RepoIdType &repoId) {
 
 }
 
-RepositoryPtr RepoModule::createRepository(const Repository::RepoIdType &repoId) {
+RepositoryPtr RepoModule::createRepository(const IRepository::RepoIdType &repoId) {
+    //@todo use factory so RepoModule don't have to rely on Repository?
     auto ptr = std::make_shared<Repository>(repoId, storageManager.getDefaultStorage());
     repositoryManager.addRepository(ptr);
     return ptr;
 
 }
 
-void RepoModule::selectRepository(const Repository::RepoIdType &repoId) {
+void RepoModule::selectRepository(const IRepository::RepoIdType &repoId) {
     selectedRepository = findRepository(repoId);
     if (selectedRepository == nullptr) {
         LOGGER("SELECTED NULL REPOSITORY!")
@@ -209,7 +211,7 @@ void RepoModule::persistFile(const fs::path &path) {
     }
 }
 
-RepositoryPtr RepoModule::findRepository(const Repository::RepoIdType &repoId) {
+RepositoryPtr RepoModule::findRepository(const IRepository::RepoIdType &repoId) {
     return repositoryManager.getRepository(repoId);
 }
 
@@ -217,11 +219,11 @@ const RepositoryPtr &RepoModule::getSelectedRepository() const {
     return selectedRepository;
 }
 
-void RepoModule::restoreRepository(const Repository::RepoIdType &repoId) {
+void RepoModule::restoreRepository(const IRepository::RepoIdType &repoId) {
     repositoryManager.getRepository(repoId)->restoreAll();
 }
 
-void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const Repository::RepoIdType &repoId) {
+void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const IRepository::RepoIdType &repoId) {
 
     auto netModule = node.getModule<NetworkModule>();
     auto localRepo = findRepository(repoId);
@@ -289,7 +291,7 @@ void RepoModule::ignoreFile(const fs::path &path) {
     }
 }
 
-void RepoModule::persistFile(const Repository::RepoIdType &repoId, const fs::path &path) {
+void RepoModule::persistFile(const IRepository::RepoIdType &repoId, const fs::path &path) {
     //@todo error handling
     findRepository(repoId)->persist(path);
 }
@@ -303,12 +305,12 @@ void RepoModule::prepareSubmodules() {
 
 }
 
-void RepoModule::downloadRepository(const Repository::RepoIdType &repoId) {
+void RepoModule::downloadRepository(const IRepository::RepoIdType &repoId) {
     //@todo error handling
     findRepository(repoId)->downloadStorage();
 }
 
-void RepoModule::deployRepository(const Repository::RepoIdType &repoId) {
+void RepoModule::deployRepository(const IRepository::RepoIdType &repoId) {
     //@todo add to the deployed repository list?
     findRepository(repoId)->deploy();
 }

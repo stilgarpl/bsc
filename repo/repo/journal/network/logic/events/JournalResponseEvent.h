@@ -8,21 +8,22 @@
 
 #include <repo/journal/SimpleJournal.h>
 #include <p2p/modules/network/protocol/logic/events/NetworkingEvent.h>
+#include <repo/repository/IRepository.h>
 
 class JournalResponseEvent : public NetworkingEvent<int> {
 private:
 
     JournalPtr journal;
-    std::string repoId;
+    IRepository::RepoIdType repoId;
 public:
 
     const JournalPtr &getJournal() const;
 
     void setJournal(const JournalPtr journal);
 
-    const std::string &getRepoId() const;
+    const IRepository::RepoIdType &getRepoId() const;
 
-    void setRepoId(const std::string &repoId);
+    void setRepoId(const IRepository::RepoIdType &repoId);
 };
 
 

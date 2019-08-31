@@ -4,11 +4,11 @@
 
 #include "JournalRequestEvent.h"
 
-const std::string &JournalRequestEvent::getRepoId() const {
+const IRepository::RepoIdType &JournalRequestEvent::getRepoId() const {
     return repoId;
 }
 
-void JournalRequestEvent::setRepoId(const std::string &repoId) {
+void JournalRequestEvent::setRepoId(const IRepository::RepoIdType &repoId) {
     JournalRequestEvent::repoId = repoId;
 }
 

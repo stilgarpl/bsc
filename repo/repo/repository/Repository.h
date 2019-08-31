@@ -99,7 +99,6 @@ public:
 
             DeployAttributes();
 
-        private:
 
 
             friend class cereal::access;
@@ -230,11 +229,13 @@ public:
 
     explicit Repository(RepoIdType repositoryId, IStoragePtr storagePtr);
 
+
     void trash(const fs::path &path) override;
 
     ~Repository() override = default;
 
 private:
+    //Repository();
 //    template<class Archive>
 //    void save(Archive &archive) const {
 //        archive(repositoryId, journal, deployMap);
@@ -248,7 +249,7 @@ private:
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(repositoryId, journal, deployMap);
+        ar(cereal::base_class<IRepository>(this), repositoryId, journal, deployMap);
     }
 
     template<class Archive>
@@ -257,13 +258,14 @@ private:
         JournalPtr j;
         RepoDeployMap d;
         ar(r, j, d);
-        //@todo fix
+        //@todo fix nullptr with factory
         construct(r, nullptr, j, d);
     }
 
-    friend class cereal::access;
+
 
 public:
+    friend class cereal::access;
     [[nodiscard]] const RepositoryActionStrategyPack &getDeployPack() const;
     [[nodiscard]] const RepositoryActionStrategyPack &getLocalSyncPack() const;
     [[nodiscard]] const RepositoryActionStrategyPack &getFullPack() const;
@@ -271,6 +273,7 @@ public:
 
 };
 
-CEREAL_REGISTER_TYPE_WITH_NAME(Repository,"Repository")
+CEREAL_REGISTER_TYPE(Repository)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(IRepository, Repository)
 
 #endif //BASYCO_REPOSITORY_H

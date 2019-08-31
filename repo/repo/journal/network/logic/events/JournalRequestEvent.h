@@ -7,7 +7,7 @@
 
 
 #include <logic/IEvent.h>
-#include <repo/repository/Repository.h>
+#include <repo/repository/IRepository.h>
 #include <p2p/modules/network/protocol/logic/events/NetworkingEvent.h>
 
 
@@ -17,14 +17,13 @@ enum class JournalEventId {
 
 class JournalRequestEvent : public NetworkingEvent<JournalEventId> {
 
-    //  Repository::
-    std::string repoId;
+    IRepository::RepoIdType repoId;
 
 public:
 
-    const std::string &getRepoId() const;
+    const IRepository::RepoIdType &getRepoId() const;
 
-    void setRepoId(const std::string &repoId);
+    void setRepoId(const IRepository::RepoIdType &repoId);
 
 
 };

@@ -5,6 +5,7 @@
 #ifndef BASYCO_CEREAL_INCLUDE_H_H
 #define BASYCO_CEREAL_INCLUDE_H_H
 
+
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
@@ -15,8 +16,10 @@
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/list.hpp>
-#include <cereal/types/set.hpp>
+#include <cereal/types/chrono.hpp>
 #include <cereal/types/string.hpp>
+#include <cereal/types/set.hpp>
+#include <cereal/types/map.hpp>
 
 //@todo remove if cereal updated with C++17:
 

@@ -405,6 +405,8 @@ const IRepository::RepositoryActionStrategyPack &Repository::getFullPack() const
     return fullPack;
 }
 
+//Repository::Repository() : Repository("", nullptr) {}
+
 void Repository::RepoFileMap::prepareMap() {
 //    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
 

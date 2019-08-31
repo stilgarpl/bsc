@@ -58,7 +58,7 @@ public:
 
     bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
 
-    RepositoryPtr findRepository(const Repository::RepoIdType &repoId);
+    RepositoryPtr findRepository(const IRepository::RepoIdType &repoId);
 
     IStoragePtr findStorage(const IStorage::StorageId &storageId);
 
@@ -78,30 +78,30 @@ public:
 
     void deployAllFiles();
 
-    void persistFile(const Repository::RepoIdType &repoId, const fs::path &path);
+    void persistFile(const IRepository::RepoIdType &repoId, const fs::path &path);
 
 
-    void selectRepository(const Repository::RepoIdType &repoId);
+    void selectRepository(const IRepository::RepoIdType &repoId);
 
-    RepositoryPtr createRepository(const Repository::RepoIdType &repoId);
+    RepositoryPtr createRepository(const IRepository::RepoIdType &repoId);
 
     //@todo add createStorage - but StorageFactory is required first.
 
-    void saveRepository(const Repository::RepoIdType &repoId);
+    void saveRepository(const IRepository::RepoIdType &repoId);
 
-    void loadRepository(const Repository::RepoIdType &repoId);
+    void loadRepository(const IRepository::RepoIdType &repoId);
 
-    void restoreRepository(const Repository::RepoIdType &repoId);
+    void restoreRepository(const IRepository::RepoIdType &repoId);
 
     void printHistory();
 
-    void downloadRemoteRepository(const NodeIdType &remoteId, const Repository::RepoIdType &repoId);
+    void downloadRemoteRepository(const NodeIdType &remoteId, const IRepository::RepoIdType &repoId);
 
-    void downloadRepository(const Repository::RepoIdType &repoId);
+    void downloadRepository(const IRepository::RepoIdType &repoId);
 
-    void deployRepository(const Repository::RepoIdType &repoId);
+    void deployRepository(const IRepository::RepoIdType &repoId);
 
-    void findNewestRepositoryInTheNetwork(const Repository::RepoIdType &repoId) {
+    void findNewestRepositoryInTheNetwork(const IRepository::RepoIdType &repoId) {
         //broadcast to every node get repo info packet
         //for every response:
         //  check if it has something this node hasn't
