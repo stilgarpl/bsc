@@ -252,8 +252,7 @@ TEST_CASE("Repo module test") {
 
     //cleanup:
     fs::remove_all(testPath);
-    //@todo actual path or cleanup from storage
-    fs::remove_all({"/tmp/storage"});
+    fs::remove_all({otherNode.getConfigurationManager().getDataPath()});
 
 //    }
 

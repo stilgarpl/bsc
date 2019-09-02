@@ -67,21 +67,25 @@ public:
         return config;
     }
 
+    fs::path getFullDataPath(const fs::path &fname) {
+        return fname.is_relative() ? getDataPath() / fname : fname;
+    }
+
 //@todo archive type? now it's always xml.
     template<typename DataType /* @todo Concept: DataType is serializable*/>
     void saveData(const fs::path &fname, const DataType &data) {
-        fs::path filePath = getDataPath() / fname;
+        fs::path filePath = getFullDataPath(fname);
         fs::create_directories(filePath.parent_path());
         std::ofstream os(filePath);
         cereal::XMLOutputArchive archive(os);
         archive << data;
     }
 
-    //@todo archive type? now it's always xml.
+    //@todo archive type? now it's always xml. maybe use type_trait for DataType?
     template<typename DataType /* @todo Concept: DataType is serializable*/>
     DataType loadData(const fs::path &fname) {
         DataType data;
-        fs::path filePath = getDataPath() / fname;
+        fs::path filePath = getFullDataPath(fname);
         if (fs::exists(filePath)) {
             std::ifstream is(filePath);
             cereal::XMLInputArchive archive(is);

@@ -20,6 +20,7 @@ public:
     }
 
     [[nodiscard]] IStoragePtr &findStorage(const IStorage::StorageId &id) {
+        //@todo check if exists first?
         return storages[id];
     }
 
@@ -29,6 +30,8 @@ public:
     }
 
     StorageManager();
+
+    void setDefaultStorage(const IStorage::StorageId &id, const IStoragePtr &defaultStorage);
 
 };
 

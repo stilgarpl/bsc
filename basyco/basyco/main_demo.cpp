@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
 
     //    thisNode.waitToFinish();
     //auto fdes = FileTransferControl::initiateTransfer(thisNode, "second", "/tmp/zsh", "/tmp/copied_zsh");
-    thisNode.stop();
+//    thisNode.stop();
     thisNode.waitToFinish();
     otherNode.stop();
     otherNode.waitToFinish();

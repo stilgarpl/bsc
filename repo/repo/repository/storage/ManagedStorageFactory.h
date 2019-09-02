@@ -7,16 +7,19 @@
 
 #include "IStorage.h"
 #include "StorageFactorySpecialization.h"
+#include "StorageManager.h"
 #include <core/factory/Factory.h>
 
-template<>
-struct FactoryTraits<IStoragePtr,StorageFactoryByName> {
-    using SelectorType = int;//IStorage::StorageId ;
-};
+
 
 class ManagedStorageFactory : public Factory<IStoragePtr,StorageFactoryByName> {
+private:
+    StorageManager &manager;
 public:
+//    IStoragePtr create(const SelectorType &selector) override;
     IStoragePtr create(const SelectorType &selector) override;
+
+    explicit ManagedStorageFactory(StorageManager &manager);
 };
 
 

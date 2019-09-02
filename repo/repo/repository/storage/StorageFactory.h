@@ -12,10 +12,13 @@
 
 
 class StorageFactory : public Factory<IStoragePtr,StorageFactoryByType>{
-
+private:
+    fs::path storagePath;
 public:
 
-    IStoragePtr create(const SelectorType &selector) override;
+    IStoragePtr create(const SelectorType &selector, const ArgumentType &argument) override;
+
+    explicit StorageFactory(const fs::path &storagePath);
 
 };
 

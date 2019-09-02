@@ -81,7 +81,7 @@ public:
         return getConfiguration<T>();
     }
 
-    void initializeConfiguration() override {
+    void initializeConfiguration() final {
         loadConfiguration();
     }
 

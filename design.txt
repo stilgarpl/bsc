@@ -557,4 +557,8 @@ ale w tym samym czasie połączenie się zatrzymuje i robi to samo tylko w drug�
 @todo trzeba zrobić usuwanie rozłączonych remote nodów albo merge w przypadku dwóch RN o takim samym id. control łączący sie do daemon tworzy za każdym razem nowego RN.
 
 
-głośno myślę: Factory mogłoby zwracać buildera, który automatycznie mógłby zwracać budowany obiekt. (lub przy uzyciu metody build)
+co zostalo jeszcze w storage separation:
+
+* storage manager : save and load
+* repo serialization : get storage by name from managed factory
+* managed factory : return storage from storage manager

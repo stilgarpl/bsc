@@ -259,7 +259,8 @@ void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const IRep
 void RepoModule::updateFile(const fs::path &path) {
 
     if (selectedRepository != nullptr) {
-        selectedRepository->update(path, selectedRepository->getFullPack(), {Repository::UpdateOptions::FOLLOW_DIRECTORIES});
+        selectedRepository->update(path, selectedRepository->getFullPack(),
+                                   {Repository::UpdateOptions::FOLLOW_DIRECTORIES});
 
     }
 
@@ -321,10 +322,17 @@ IStoragePtr RepoModule::findStorage(const IStorage::StorageId &storageId) {
 
 void RepoModule::initialize() {
     auto factoryContext = node.getContext()->get<FactoryContext>();
-    FactoryPtr<IStoragePtr,StorageFactoryByType> storageFactoryPtr = std::make_shared<StorageFactory>();
-    FactoryPtr<IStoragePtr,StorageFactoryByName> managedStorageFactoryPtr = std::make_shared<ManagedStorageFactory>();
-    factoryContext->setFactory<IStoragePtr,StorageFactoryByType>(storageFactoryPtr);
-    factoryContext->setFactory<IStoragePtr,StorageFactoryByName>(managedStorageFactoryPtr);
+    FactoryPtr<IStoragePtr, StorageFactoryByType> storageFactoryPtr = std::make_shared<StorageFactory>(
+            getConfigurationManager().getFullDataPath(configuration().getStoragePath()));
+    FactoryPtr<IStoragePtr, StorageFactoryByName> managedStorageFactoryPtr = std::make_shared<ManagedStorageFactory>(
+            storageManager);
+    factoryContext->setFactory<IStoragePtr, StorageFactoryByType>(storageFactoryPtr);
+    factoryContext->setFactory<IStoragePtr, StorageFactoryByName>(managedStorageFactoryPtr);
+
+    const std::string DEFAULT_STORAGE_ID = "default";
+    auto defaultStorage = storageFactoryPtr->create(DEFAULT_STORAGE_ID, DEFAULT_STORAGE_ID);
+    storageManager.setDefaultStorage(DEFAULT_STORAGE_ID, defaultStorage);
+
 }
 
 std::filesystem::path RepoModule::Configuration::getRepositoryDataPath() const {
@@ -341,4 +349,12 @@ bool RepoModule::Configuration::isAutoProcess() const {
 
 void RepoModule::Configuration::setAutoProcess(bool autoProcess) {
     Configuration::autoProcess = autoProcess;
+}
+
+std::filesystem::path RepoModule::Configuration::getStoragePath() const {
+    return storagePath;
+}
+
+void RepoModule::Configuration::setStoragePath(const std::filesystem::path::string_type &storagePath) {
+    Configuration::storagePath = storagePath;
 }

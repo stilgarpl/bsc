@@ -21,6 +21,7 @@ public:
     private:
         //@todo cereal fix path type to path!
         fs::path::string_type repositoryDataPath = fs::path("repository");
+        fs::path::string_type storagePath = fs::path("storage");
         bool autoProcess = true;
 
     public:
@@ -29,10 +30,14 @@ public:
 
         void setRepositoryDataPath(const std::filesystem::path &repositoryDataPath);
 
+        [[nodiscard]] std::filesystem::path getStoragePath() const;
+
+        void setStoragePath(const std::filesystem::path::string_type &storagePath);
+
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            ar(CEREAL_NVP(repositoryDataPath), CEREAL_NVP(autoProcess));
+            ar(CEREAL_NVP(repositoryDataPath), CEREAL_NVP(autoProcess), CEREAL_NVP(storagePath));
         }
 
     public:

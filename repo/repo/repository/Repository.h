@@ -13,6 +13,8 @@
 #include <repo/repository/storage/IStorage.h>
 #include <core/utils/crypto.h>
 #include <repo/repository/transformer/PathTransformer.h>
+#include <core/factory/FactoryContext.h>
+#include <repo/repository/storage/StorageFactorySpecialization.h>
 #include "IRepository.h"
 #include "RepositoryAttributes.h"
 
@@ -249,7 +251,7 @@ private:
 private:
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(cereal::base_class<IRepository>(this), repositoryId, journal, deployMap);
+        ar(cereal::base_class<IRepository>(this), repositoryId, journal, deployMap, storage->getStorageId());
     }
 
     template<class Archive>
@@ -257,9 +259,12 @@ private:
         Repository::RepoIdType r;
         JournalPtr j;
         RepoDeployMap d;
-        ar(r, j, d);
-        //@todo fix nullptr with factory
-        construct(r, nullptr, j, d);
+        IStorage::StorageId storageId;
+        ar(r, j, d, storageId);
+        auto factoryContext = Context::getActiveContext()->get<FactoryContext>();
+        auto storageFactory = factoryContext->getFactory<IStoragePtr, StorageFactoryByName>();
+        auto storagePtr = storageFactory->create(storageId);
+        construct(r, storagePtr, j, d);
     }
 
 
