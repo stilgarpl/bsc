@@ -335,6 +335,14 @@ void RepoModule::initialize() {
 
 }
 
+IStoragePtr RepoModule::createStorage(const Factory<IStoragePtr, StorageFactoryByType>::SelectorType &storageType,
+                                      const IStorage::StorageId &storageId) {
+    auto factoryContext = node.getContext()->get<FactoryContext>();
+    //@todo what if factory is null or created storage is null because storageType is wrong?
+    return factoryContext->getFactory<IStoragePtr, StorageFactoryByType>()->create(storageType, storageId);
+
+}
+
 std::filesystem::path RepoModule::Configuration::getRepositoryDataPath() const {
     return repositoryDataPath;
 }

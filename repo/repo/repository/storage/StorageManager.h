@@ -10,7 +10,7 @@
 #include "IStorage.h"
 
 class StorageManager {
-
+//@todo should manager have access to factory and create storages by itself?
     std::map<IStorage::StorageId, IStoragePtr> storages;
 
     IStoragePtr defaultStorage = nullptr;

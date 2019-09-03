@@ -13,6 +13,7 @@
 #include <repo/journal/network/packet/JournalGroup.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>
 #include <repo/repository/storage/StorageManager.h>
+#include <repo/repository/storage/StorageFactorySpecialization.h>
 
 
 class RepoModule : public NodeModuleDependent<RepoModule> {
@@ -90,7 +91,8 @@ public:
 
     RepositoryPtr createRepository(const IRepository::RepoIdType &repoId);
 
-    //@todo add createStorage - but StorageFactory is required first.
+    IStoragePtr createStorage(const Factory<IStoragePtr, StorageFactoryByType>::SelectorType &storageType,
+                              const IStorage::StorageId &storageId);
 
     void saveRepository(const IRepository::RepoIdType &repoId);
 

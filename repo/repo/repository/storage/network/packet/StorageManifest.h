@@ -15,7 +15,7 @@ public:
 
 
     class Request : public Packet<StorageManifest, StorageManifest::Request> {
-        IRepository::RepoIdType repositoryId;
+        IStorage::StorageId repositoryId;
 
     private:
         template<class Archive>
@@ -24,11 +24,11 @@ public:
         }
 
     public:
-        const IRepository::RepoIdType &getRepositoryId() const {
+        [[nodiscard]] const IStorage::StorageId &getRepositoryId() const {
             return repositoryId;
         }
 
-        void setRepositoryId(const IRepository::RepoIdType &repositoryId) {
+        void setRepositoryId(const IStorage::StorageId &repositoryId) {
             Request::repositoryId = repositoryId;
         }
 
