@@ -18,6 +18,12 @@ void setupModules(Node &node) {
     node.addModule<CommandModule>();
 }
 
+enum {
+    a, b, c
+};
+enum QQ {
+    x, y, z
+};
 
 
 int main(int argc, char *argv[]) {

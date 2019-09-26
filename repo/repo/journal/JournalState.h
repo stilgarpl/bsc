@@ -154,7 +154,7 @@ public:
 
     std::string calculateChecksum();
 
-    void commit();
+    void commit(CommitTimeType);
 
     const std::shared_ptr<JournalState> &getPreviousState() const;
 

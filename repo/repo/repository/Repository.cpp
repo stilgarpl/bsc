@@ -99,7 +99,7 @@ void Repository::commit() {
     });
 
     journal->replayCurrentState();
-    journal->commitState();
+    journal->commitState(CommitTimeType::clock::now());
 }
 
 void Repository::persist(fs::path path) {

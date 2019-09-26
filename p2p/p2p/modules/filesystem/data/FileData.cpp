@@ -62,9 +62,3 @@ FileData::FileData(std::filesystem::path canonicalPath, std::string sha256hash,
           size(size),
           modificationTime(modificationTime), isDirectory(isDirectory) {}
 
-FileData::FileData(std::string sha256hash, std::filesystem::perms permissions, uintmax_t size,
-                   fs::file_time_type modificationTime, bool isDirectory) : sha256hash(std::move(sha256hash)),
-                                                                            permissions(permissions),
-                                                                            size(size),
-                                                                            modificationTime(modificationTime),
-                                                                            isDirectory(isDirectory) {}

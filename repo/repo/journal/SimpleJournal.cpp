@@ -10,11 +10,11 @@ ChecksumType SimpleJournal::getChecksum() const {
     return checksum;
 }
 
-void SimpleJournal::commitState() {
+void SimpleJournal::commitState(CommitTimeType now) {
 
     checkCurrentState();
     if (currentState != nullptr) {
-        currentState->commit();
+        currentState->commit(now);
         currentState->calculateChecksum();
         journalHistory.push_back(currentState);
         auto prev = currentState;

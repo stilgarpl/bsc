@@ -51,7 +51,7 @@ private:
 public:
     ChecksumType getChecksum() const override;
 
-    void commitState() override;
+    void commitState(CommitTimeType now) override;
 
 
     //@todo hmm hmm variadic template? - moved may have two paths for example?

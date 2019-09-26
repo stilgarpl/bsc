@@ -29,7 +29,7 @@ public:
 public:
     virtual ChecksumId getChecksum() const = 0;
 
-    virtual void commitState() =0;
+    virtual void commitState(CommitTimeType now) = 0;
 
     //@todo add parameters, commit range or sth
     virtual void replay() = 0;

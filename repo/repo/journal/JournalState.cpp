@@ -29,9 +29,9 @@ void JournalState::setDataList(const std::list<JournalStateData> &dataList) {
     JournalState::dataList = dataList;
 }
 
-void JournalState::commit() {
+void JournalState::commit(CommitTimeType now) {
     //@todo how about a way to override this during test? commit(clock=system_clock)? or maybe get the clock from context?
-    commitTime = std::chrono::system_clock::now();
+    commitTime = now;
     checksum = calculateChecksum();
 }
 

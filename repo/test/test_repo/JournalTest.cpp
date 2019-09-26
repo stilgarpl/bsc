@@ -5,12 +5,11 @@
 #include <repo/journal/SimpleJournal.h>
 
 TEST_CASE("Journal deterministic hash test") {
-    //@todo implement - the problem is that clock is included in the checksum and it's always changing.
     SimpleJournal journal;
-    journal.append(JournalMethod::ADDED, JournalTarget::FILE, "/tmp/dupa.txt", FileData("/tmp/dupa.txt"));
-    journal.commitState();
-    //@todo find a way to enable this:
-//    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("80E58CD2BD2038194EDA8379D3A58319DB94F704"));
+    journal.append(JournalMethod::ADDED, JournalTarget::FILE, "/tmp/dupa.txt",
+                   FileData("/tmp/dupa.txt", "hash", {}, 100, fs::file_time_type::min(), false));
+    journal.commitState(CommitTimeType::clock::from_time_t(0));
+    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("DD8FBDD275891E9481C7DB83425AE42FF358A8C8"));
 }
 
 
@@ -19,10 +18,10 @@ TEST_CASE("Journal merge test") {
     journal.append(JournalMethod::ADDED, JournalTarget::FILE, "/tmp/THIS_IS_OTHER_TEST.txt",
                    FileData("/tmp/THIS_IS_OTHER_TEST.txt"));
     journal.append(JournalMethod::DELETED, JournalTarget::FILE, "/tmp/to_remove.txt", FileData("/tmp/to_remove.txt"));
-    journal.commitState();
+    journal.commitState(CommitTimeType::clock::now());
     journal.append(JournalMethod::MODIFIED, JournalTarget::FILE, "/tmp/dupa.txt", FileData("/tmp/to_remove.txt"));
     journal.replay();
-    journal.commitState();
+    journal.commitState(CommitTimeType::clock::now());
     {
         std::ofstream os("/tmp/journal.xml");
         cereal::XMLOutputArchive oa(os);
@@ -41,7 +40,7 @@ TEST_CASE("Journal merge test") {
 
 
         journal1->append(JournalMethod::ADDED, JournalTarget::FILE, "/bin/zsh", FileData("/bin/zsh"));
-        journal1->commitState();
+        journal1->commitState(CommitTimeType::clock::now());
 
 
         REQUIRE(journal.merge(journal1));
@@ -52,7 +51,7 @@ TEST_CASE("Journal merge test") {
 
         std::shared_ptr<SimpleJournal> journal2 = std::make_shared<SimpleJournal>();
         journal2->append(JournalMethod::ADDED, JournalTarget::FILE, "/tmp/journal.xml", FileData("/tmp/journal.xml"));
-        journal2->commitState();
+        journal2->commitState(CommitTimeType::clock::now());
 
 
         REQUIRE_FALSE(journal.merge(journal2));
