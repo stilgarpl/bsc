@@ -1,8 +1,8 @@
 #set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES test_logic/test_main.cpp)
+set(SOURCE_FILES test_logic/test_main.cpp test_logic/logic_test.cpp)
 
 add_executable(test_logic ${SOURCE_FILES})
-add_test(NAME test_logic COMMAND test_logic)
+catch_discover_tests(test_logic)
 
-target_link_libraries(test_logic p2p ${LIBS})
+target_link_libraries(test_logic logic Catch2::Catch2 ${LIBS})

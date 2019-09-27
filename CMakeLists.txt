@@ -7,6 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(TEMPLATE_PATH "${CMAKE_SOURCE_DIR}/cmake/template/")
 enable_testing()
+
+
 include(GNUInstallDirs)
 
 find_program(CCACHE_PROGRAM ccache)
@@ -38,6 +40,8 @@ else ()
 endif ()
 #end of conan setup
 
+find_package(Catch2 REQUIRED)
+include(Catch)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options(-Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic)

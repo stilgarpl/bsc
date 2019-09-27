@@ -1,4 +1,5 @@
 #include <utility>
+#include <c++/8/bits/exception.h>
 
 //
 // Created by 23stilgar on 20.08.17.
@@ -10,7 +11,8 @@ void Runnable::start() {
     std::lock_guard g(startMutex);
     if (thread == nullptr) {
         if (Context::getActiveContext() == nullptr) {
-            throw int(5);
+            //@todo exception
+            throw std::exception();
         }
         thread = std::make_unique<std::thread>(std::ref(*this), Context::getActiveContext());
     }

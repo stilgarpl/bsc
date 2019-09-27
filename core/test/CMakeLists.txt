@@ -3,7 +3,7 @@
 set(SOURCE_FILES test_core/test_main.cpp test_core/signal_test.cpp test_core/context_test.cpp test_core/uber_test.cpp)
 
 add_executable(test_core ${SOURCE_FILES})
-add_test(NAME test_core COMMAND test_core)
+catch_discover_tests(test_core)
 
 #target_include_directories(test_core PUBLIC test_core)
 target_link_libraries(test_core core ${LIBS})
