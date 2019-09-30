@@ -175,7 +175,7 @@ public:
             if (!chainLockId) {
                 //no chain lock id!
                 //@todo maybe rearrange function so it doesn't return here.
-                LOGGER("no lock id")
+//                LOGGER("no lock id")
                 return;
             }
             LOGGER("chain lock id " + *chainLockId)
@@ -520,11 +520,11 @@ public:
             if constexpr (!std::is_same<void, RetType>::value) { //Return Type of func is not void
                 std::function<ChainEvent<RetType>(const ChainEvent<EventType> &)> f =
                         [=, chainId = chainId](ChainEvent<EventType> chainedEvent) {
-                            LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
-                                   chainedEvent.getEventId())
+//                            LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
+//                                   chainedEvent.getEventId())
                             obtainChainLock(chainedEvent.getChainLockId(), chainedEvent.getInstance(), false);
                             if (chainedEvent.getActualEvent() && chainedEvent.getActualEvent()->isEventValid()) {
-                                LOGGER("chained action" + *chainId)
+//                                LOGGER("chained action" + *chainId)
                                 auto value = func(*chainedEvent.getActualEvent(), setArgs...);
                                 ChainEvent<RetType> result(chainedEvent.getBaseChainId(), generatedChainId,
                                                            chainedEvent.getInstance(), value,
@@ -543,8 +543,8 @@ public:
 
                 std::function<void(const ChainEvent<EventType> &)> f = [=, chainId = chainId](
                         const ChainEvent<EventType> &chainedEvent) {
-                    LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
-                           chainedEvent.getEventId())
+//                    LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
+//                           chainedEvent.getEventId())
 
                     if (chainedEvent.getActualEvent()) {
                         func(*chainedEvent.getActualEvent(), setArgs...);
@@ -569,7 +569,7 @@ public:
             if (chainId) {
                 //@todo apply constraint?
                 if constexpr (!std::is_same<void, RetType>::value) { //Return Type of func is not void
-                    LOGGER("generated chain id " + generatedChainId);
+//                    LOGGER("generated chain id " + generatedChainId);
                     logicManager.setActionExtended<ChainEvent<RetType>, const ChainEvent<EventType> &, Args...>(
                             generatedActionId, f);
                     logicManager.assignAction<ChainEvent<EventType>, Args...>(*chainId, generatedActionId);
@@ -608,12 +608,12 @@ public:
         ThisType &newChain(const ChainIdType &id) {
             chainId = id;
             return transform<ChainEvent<EventType>>([=](const auto &event) {
-                LOGGER("starting chain " + id)
+//                LOGGER("starting chain " + id)
                 //@todo be careful - if new chain starts before previous one has finished, the chain context will be overwritten. !!!! --- but is it really? I think active context should belong to an event.
                 auto chainContext = Context::getActiveContext()->set<ChainContext>(id);
 
                 ChainEvent r(id, id, chainContext->instanceGenerator().nextValue(), event, std::nullopt);
-                LOGGER("new chain: " + id + " storing initial result " + r.getEventId())
+//                LOGGER("new chain: " + id + " storing initial result " + r.getEventId())
                 chainContext->storeChainResult<EventType>(r.getEventId(), *r.getActualEvent());
                 //debug stuff @todo remove
                 auto activeContext = Context::getActiveContext();
@@ -630,7 +630,7 @@ public:
                     const typename std::decay<EventType>::type &event) -> NewEventType {
                 return transformer(event);
             };
-            LOGGER("transforming action with generated id " + std::to_string(generatedActionId))
+//            LOGGER("transforming action with generated id " + std::to_string(generatedActionId))
             logicManager.setActionExtended<NewEventType, EventType, Args...>(generatedActionId, f);
             fireAction(generatedActionId);
             return *static_cast<ThisType *>(this);

@@ -13,9 +13,9 @@ const ChainIdType &ChainContext::getChainId() const {
 
 ChainContext::ChainContext(const ChainIdType &chainId) : chainId(chainId) {
 
-    LOGGER("chain context construct " + chainId)
+//    LOGGER("chain context construct " + chainId)
 }
 
 ChainContext::~ChainContext() {
-    LOGGER("chain context destruct " + chainId)
+//    LOGGER("chain context destruct " + chainId)
 }

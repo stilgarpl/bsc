@@ -1,5 +1,5 @@
 #include <utility>
-#include <c++/8/bits/exception.h>
+#include <exception>
 
 //
 // Created by 23stilgar on 20.08.17.
