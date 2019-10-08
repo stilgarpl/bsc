@@ -35,6 +35,8 @@ if (EXISTS ${conan})
     conan_cmake_run(CONANFILE conan/conanfile.txt
             INSTALL_FOLDER ${CMAKE_BINARY_DIR}
             BASIC_SETUP
+            CMAKE_TARGETS
+            BUILD_TYPE "Debug"
             BUILD missing)
     set(LIBS ${LIBS} ${CONAN_LIBS})
     set(INCLUDES ${CONAN_INCLUDE_DIRS})
