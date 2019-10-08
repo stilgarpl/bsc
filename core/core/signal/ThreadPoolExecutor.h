@@ -10,6 +10,7 @@
 #include <condition_variable>
 #include <list>
 #include <thread>
+#include <atomic>
 
 
 class ThreadPoolExecutor : public Executor {
@@ -18,7 +19,7 @@ private:
     std::mutex queueLock;
     std::condition_variable queueReady;
     std::list<std::shared_ptr<std::thread>> runners;
-    bool running = true;
+    std::atomic<bool> running = true;
     unsigned MAX_WORKER = 5;
 
 public:

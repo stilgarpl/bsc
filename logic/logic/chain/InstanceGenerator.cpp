@@ -3,10 +3,11 @@
 //
 
 #include "InstanceGenerator.h"
+#include <atomic>
 
 InstanceGenerator::InstanceType InstanceGenerator::nextValue() {
     std::lock_guard<std::mutex> g(valueLock);
     //@todo how to make it node-local?
-    static InstanceType globalValue = 2;
-    return globalValue++;
+    static std::atomic<InstanceType> globalValue = 2;
+    return globalValue.fetch_add(1);
 }

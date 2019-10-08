@@ -37,6 +37,7 @@ Runnable::~Runnable() {
 }
 
 void Runnable::stop() {
+    std::unique_lock<std::mutex> g(stopMutex);
     stopping = true;
     shutdownSignal.notify_all();
     //@todo kill ? join?

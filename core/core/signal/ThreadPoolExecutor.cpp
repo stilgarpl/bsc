@@ -8,7 +8,7 @@
 using namespace std::chrono_literals;
 
 void ThreadPoolExecutor::execute(std::function<void(void)> task) {
-    if (running) {
+    if (running.load()) {
         Context::Ptr origContext = Context::getActiveContext();
         std::unique_lock<std::mutex> g(queueLock);
         taskQueue.push(std::make_pair(task, Context::getActiveContext()));
@@ -49,7 +49,7 @@ auto ThreadPoolExecutor::getActiveWorkerCount() -> decltype(runners.size()) {
 }
 
 void ThreadPoolExecutor::stop() {
-    running = false;
+    running.store(false);
     queueReady.notify_all();
     for (auto &runner : runners) {
         runner->join();
@@ -61,3 +61,4 @@ ThreadPoolExecutor::~ThreadPoolExecutor() {
     stop();
 
 }
+
