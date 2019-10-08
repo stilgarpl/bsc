@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(TEMPLATE_PATH "${CMAKE_SOURCE_DIR}/cmake/template/")
+
+#include additional configuration
+include(${CMAKE_SOURCE_DIR}/cmake/configuration/sanitizers.cmake)
 enable_testing()
 
 
