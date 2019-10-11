@@ -2,6 +2,7 @@
 // Created by stilgar on 01.08.17.
 //
 
+#include <atomic>
 #include "core/context/Context.h"
 #include "BasePacket.h"
 
@@ -38,6 +39,6 @@ void BasePacket::setRetry(bool retry) {
 
 BasePacket::IdType BasePacket::nextId() {
     std::lock_guard<std::mutex> g(idLock);
-    static IdType val = 0;
+    static std::atomic<IdType> val = 0;
     return val++;
 }

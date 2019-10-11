@@ -78,7 +78,12 @@ void RemoteNode::setNodeInfo(const NodeInfo &ni) {
     remoteNodeInfo.setNodeInfo(std::make_shared<NodeInfo>(ni));
 //    LOGGER(std::string("setting node info, and the connection address is ") + connection->getAddress() + " but remembered adress is " + *address);
     //@todo shouldn't this be through logic actions? or any other way? the problem is that we have to store the connection address between creating the connection and receiving node info
-    remoteNodeInfo.addKnownAddress(connectionFetcher.getConnection()->getAddress());
+    auto connection = connectionFetcher.getConnection();
+    if (connection != nullptr) {
+        remoteNodeInfo.addKnownAddress(connection->getAddress());
+    } else {
+        ERROR("CONNECTION IS NULL")
+    }
 
 }
 

@@ -11,12 +11,13 @@
 #include <core/context/Context.h>
 #include "Executor.h"
 #include <thread>
+#include <atomic>
 
 class OrderedExecutor : public Executor {
 private:
     std::unique_ptr <std::thread> orderedExecutorThread;
     std::condition_variable taskReady;
-    bool working = false;
+    std::atomic<bool> working = false;
     std::mutex queueLock;
     std::queue <std::pair<std::function < void(void)>, Context::Ptr>> runQueue;
 public:

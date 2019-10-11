@@ -379,12 +379,13 @@ void TransferManager::TransferQueue::queueTransfer(const NodeIdType &nodeId, con
 
 void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescriptor &object,
                                             TransferManager::TransferState state) {
-
+    LOGGER("transfer queue update start")
     switch (state) {
 
         case TransferState::NOT_STARTED:
         case TransferState::PREPARED:
             //does not apply
+            LOGGER("..")
             break;
         case TransferState::STARTED:
             //if at least one transfer is started
@@ -418,6 +419,7 @@ void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescri
             break;
     }
 
+    LOGGER("transfer queue update done!")
     if (state == TransferState::FINISHED) {
 
     }

@@ -9,6 +9,7 @@
 #include <map>
 #include <functional>
 #include <core/log/Logger.h>
+#include <atomic>
 
 template<typename StateIdType>
 class StateMachine {
@@ -19,7 +20,7 @@ private:
     //@todo states and links should be moved to other class with defintion.
     std::set <StateIdType> states;
     std::map <StateIdType, std::set<StateIdType>> links;
-    typename std::set<StateIdType>::iterator currentState;
+    std::atomic<typename std::set<StateIdType>::iterator> currentState;
     std::function<void(const StateIdType &)> onEnterStateHandler;
     std::function<void(const StateIdType &)> onLeaveStateHandler;
     std::function<void(const StateIdType &)> invalidStateHandler;
@@ -33,8 +34,8 @@ public:
 protected:
 
     auto getCurrentState() {
-        std::lock_guard<std::recursive_mutex> g(changeStateMutex);
-        return *currentState;
+//        std::lock_guard<std::recursive_mutex> g(changeStateMutex);
+        return *currentState.load();
     }
 
 public:
@@ -71,20 +72,23 @@ public:
 public:
     void setState(const StateIdType &state) {
         std::lock_guard<std::recursive_mutex> g(changeStateMutex);
-        currentState = states.find(state);
-        if (currentState == states.end()) {
+        auto tempState = states.find(state);
+        if (tempState == states.end()) {
             //@todo error handling
             abort();
         }
+        currentState.store(tempState);
     }
 
     //@todo maybe return bool if change state was successful?
     //@todo maybe add method to check if changing state to other is valid and then run some code and do the change...
     void changeState(const StateIdType &state) {
         std::lock_guard<std::recursive_mutex> g(changeStateMutex);
-        //already in that state, do nothing.
+
+        auto localCurrentState = this->currentState.load();
         //@todo error handling if currentState points to wrong state or uninitialized?
-        if (state == *currentState) {
+//already in that state, do nothing.
+        if (state == *localCurrentState) {
             //@todo think about it. Allow changing state to itself?
             return;
         }
@@ -96,18 +100,18 @@ public:
         }
 
 
-        if (!links.count(*currentState) || !links[*currentState].count(state)) {
+        if (!links.count(*localCurrentState) || !links[*localCurrentState].count(state)) {
             invalidChangeHandler(state);
             LOGGER("invalid change")
             return;
         }
 
-        if (currentState != states.end()) {
-            onLeaveStateHandler(*currentState);
+        if (localCurrentState != states.end()) {
+            onLeaveStateHandler(*localCurrentState);
         }
 
         setState(state);
-        onEnterStateHandler(*currentState);
+        onEnterStateHandler(state);
     }
 
 public:

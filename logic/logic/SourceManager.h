@@ -87,11 +87,13 @@ public:
 //        Context::Ptr previousContext = Context::getActiveContext();
 //        Context::setActiveContext(event.context());
         SetLocalContext localContext(event.context());
-
-
         auto executor = getExecutorForEvent<EventType>();
-        /*int b =*/ this->getSignal<EventType, Args...>().signal(executor, event, args...);
-        /*int a =*/ this->getSignal<EventType, Args...>(event.getEventId()).signal(executor, event, args...);
+        const auto& signalGlobal = this->getSignal<EventType, Args...>();
+        const auto& signal = this->getSignal<EventType, Args...>(event.getEventId());
+        signalGlobal.signal(executor, event, args...);
+        signal.signal(executor, event, args...);
+//        /*int b =*/ this->getSignal<EventType, Args...>().signal(executor, event, args...);
+//        /*int a =*/ this->getSignal<EventType, Args...>(event.getEventId()).signal(executor, event, args...);
 
 
     }

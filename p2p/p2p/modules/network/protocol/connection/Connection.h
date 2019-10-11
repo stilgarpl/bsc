@@ -9,6 +9,7 @@
 #include <Poco/Net/SocketStream.h>
 #include <queue>
 #include <mutex>
+#include <atomic>
 #include <thread>
 #include <condition_variable>
 #include <p2p/modules/network/protocol/processor/ConnectionProcessor.h>
@@ -42,8 +43,8 @@ private:
     std::unique_ptr<std::thread> receiveThread;
     std::recursive_mutex sendThreadLock;
     std::recursive_mutex receiveThreadLock;
-    bool sending = true;
-    bool receiving = true;
+    std::atomic<bool> sending = true;
+    std::atomic<bool> receiving = true;
 
 protected:
 

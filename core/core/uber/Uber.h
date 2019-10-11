@@ -9,24 +9,27 @@
 #include <memory>
 #include <mutex>
 #include <functional>
+#include <atomic>
 
 class BaseUber {
 private:
     mutable std::mutex idLock;
 protected:
+    mutable std::mutex containerLock;
+
+protected:
     typedef unsigned int TypeIdType;
     std::map<TypeIdType, std::shared_ptr<void>> containers;
 
     TypeIdType getNextTypeId() const {
-        static TypeIdType val = 0;
+        static std::atomic<TypeIdType> val = 0;
         return val++;
     }
 
     template<typename...>
     TypeIdType getTypeId() const {
-        idLock.lock();
+        std::unique_lock<std::mutex> lock(idLock);
         const static auto typeId = getNextTypeId();
-        idLock.unlock();
         return typeId;
     }
 
@@ -44,11 +47,9 @@ public:
 
     template<typename... Args, typename ... ConstructorArgs>
     container<Args...> &get(ConstructorArgs ... constructorArgs) {
+        std::unique_lock<std::mutex> lock(containerLock);
         typedef container<Args...> ContainerType;
         const static auto typeId = getTypeId<Args...>();
-//        if (containers.size() <= typeId) {
-//            containers.resize(10 * typeId + 20);
-//        }
         auto &ref = containers[typeId];
         if (ref == nullptr) {
             ref = std::make_shared<ContainerType>(constructorArgs...);
@@ -66,6 +67,7 @@ public:
      */
     template<typename BaseClass>
     void forEach(std::function<void(BaseClass &)> func) {
+        std::unique_lock<std::mutex> lock(containerLock);
         for (auto &&[key, it] : containers) {
             if (it != nullptr) {
                 BaseClass &result = *std::static_pointer_cast<BaseClass>(it);
@@ -85,6 +87,7 @@ public:
 
     template<typename... Args>
     container &get() {
+        std::unique_lock<std::mutex> lock(containerLock);
         typedef container ContainerType;
         const static auto typeId = getTypeId<Args...>();
 //        if (containers.size() <= typeId) {
@@ -101,6 +104,7 @@ public:
     }
 
     void forEach(std::function<void(container &)> func) {
+        std::unique_lock<std::mutex> lock(containerLock);
         for (auto &&[key, it] : containers) {
             if (it != nullptr) {
                 container &result = *std::static_pointer_cast<container>(it);

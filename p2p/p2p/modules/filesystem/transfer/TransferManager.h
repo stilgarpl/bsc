@@ -134,6 +134,7 @@ public:
         std::condition_variable finishReady;
         std::recursive_mutex startLock;
 
+
     public:
         explicit TransferQueue(TransferManager &manager);
 

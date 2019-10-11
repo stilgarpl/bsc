@@ -59,6 +59,7 @@ private:
             auto &o = observer.get();
             o.update(object, state);
         }
+        LOGGER("notified")
     }
 
 public:
