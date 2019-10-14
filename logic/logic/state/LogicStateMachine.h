@@ -9,79 +9,47 @@
 #include <core/log/Logger.h>
 #include <logic/context/LogicContext.h>
 #include <logic/sources/LogicStateSource.h>
+#include <core/thread/ThreadQueueProcessor.h>
 #include "StateMachine.h"
+#include "StateObserver.h"
 
-template<typename StateObject, typename stateIdType>
-class LogicStateMachine : public StateMachine<stateIdType> {
+
+template<typename StateObject, typename stateIdType, template<typename, typename> typename NotifyMethodType>
+class LogicStateMachine : public StateMachine<stateIdType>, public Observee<StateObject, stateIdType> {
 public:
-    typedef stateIdType StateIdType;
-    typedef LogicStateEvent<StateObject, stateIdType> EventType;
+    using StateIdType = stateIdType;
+    using EventType = LogicStateEvent<StateObject, stateIdType>;
 protected:
-    typedef LogicStateMachine<StateObject, StateIdType> ThisType;
-    std::recursive_mutex notifyLock;
+    using ThisType = LogicStateMachine<StateObject, StateIdType, NotifyMethodType>;
+    using NotifyMethod = NotifyMethodType<StateObject, StateIdType>;
+
 public:
 
-    class Observer {
-    private:
-        //@todo I don't like raw pointer here...
-        std::recursive_mutex observeeMutex;
-        //this should be set to null in observee destructor
-        ThisType *observee = nullptr;
+    using ObserverType = Observer<StateObject, StateIdType>;
 
-        void setObservee(ThisType *o) {
-            std::lock_guard<std::recursive_mutex> g(observeeMutex);
-            observee = o;
-        }
-    public:
-        virtual void update(StateObject &object, StateIdType) = 0;
-
-        virtual ~Observer() {
-            std::lock_guard<std::recursive_mutex> g(observeeMutex);
-            if (observee) {
-                LOGGER("unregistering observer")
-                observee->unregisterStateObserver(*this);
-            }
-        };
-
-        friend class LogicStateMachine<StateObject, stateIdType>;
-    };
 private:
     StateObject &object;
-    //Observer objects have to exist.
-    std::list<std::reference_wrapper<Observer>> observers;
+    //ObserverType objects have to exist.
+    std::unique_ptr<NotifyMethod> notifyMethod;
+
 
     void notify(StateIdType state) {
-        notifyLock.lock();
-        LOGGER(std::string("notify: ") + typeid(StateObject).name() + " : " + std::to_string(observers.size()))
-        auto observersCopy = observers;
-        notifyLock.unlock(); //@todo not sure if I can run update() without this locked. we'll see.
-        for (const auto &observer : observersCopy) {
-            auto &o = observer.get();
-            o.update(object, state);
-        }
-        LOGGER("notified")
+        notifyMethod->notify(object, state);
     }
 
 public:
 
-    void registerStateObserver(Observer &observer) {
-        std::lock_guard<std::recursive_mutex> g(notifyLock);
+    void registerStateObserver(ObserverType& observer) {
         observer.setObservee(this);
-        observers.push_back(observer);
+        notifyMethod->registerObserver(observer);
     }
 
-    void unregisterStateObserver(Observer &observer) {
-        std::lock_guard<std::recursive_mutex> g(notifyLock);
+    void unregisterStateObserver(ObserverType& observer) {
+
         LOGGER("unregistering observer ")
         observer.setObservee(nullptr);
-        auto before = observers.size();
-        observers.erase(std::remove_if(observers.begin(), observers.end(),
-                                       [&](auto &i) -> bool {
-                                           return (&i.get() == &observer);
+        notifyMethod->unregisterObserver(observer);
 
-                                       }), observers.end());
-        auto after = observers.size();
-        LOGGER("removed " + std::to_string(before - after))
     }
 
 
@@ -113,22 +81,21 @@ public:
 //    LogicStateMachine() : StateMachine<StateIdType>(onEnter, onLeave) {};
 
     explicit LogicStateMachine(StateObject &object) : StateMachine<StateIdType>(
-            std::bind(&LogicStateMachine<StateObject, StateIdType>::onEnter, this, std::placeholders::_1),
-            std::bind(&LogicStateMachine<StateObject, StateIdType>::onLeave, this, std::placeholders::_1),
-            std::bind(&LogicStateMachine<StateObject, StateIdType>::onInvalidState, this, std::placeholders::_1),
-            std::bind(&LogicStateMachine<StateObject, StateIdType>::onInvalidChange, this, std::placeholders::_1)),
+            std::bind(&ThisType::onEnter, this, std::placeholders::_1),
+            std::bind(&ThisType::onLeave, this, std::placeholders::_1),
+            std::bind(&ThisType::onInvalidState, this, std::placeholders::_1),
+            std::bind(&ThisType::onInvalidChange, this, std::placeholders::_1)),
                                                       object(object) {
 
         //@todo handle no logic manager!
 //        auto &lm = LogicContext::getLogicManagerFromActiveContext();
 //        lm.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
+        notifyMethod = std::make_unique<NotifyMethod>();
     }
 
     virtual ~LogicStateMachine() {
-        auto observersCopy = observers;
-        for (auto &observer : observersCopy) {
-            observer.get().setObservee(nullptr);
-        }
+        //this should perform cleanup of observers held in notifyMethod. may join notifyMethod thread if threaded
+        notifyMethod = nullptr;
     }
 
 };

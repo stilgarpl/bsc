@@ -11,6 +11,7 @@
 #include <p2p/modules/filesystem/network/logic/events/TransferEvent.h>
 #include <logic/state/LogicStateMachine.h>
 #include <algorithm>
+#include <logic/state/DeferredNotify.h>
 
 class TransferManager {
     /**
@@ -45,7 +46,8 @@ public:
     /**
      * transfer descriptor on local side, with its own thread that handles the downloading of the entire source stream from the other node
      */
-    class LocalTransferDescriptor : protected LogicStateMachine<LocalTransferDescriptor, TransferState> {
+    class LocalTransferDescriptor
+            : protected LogicStateMachine<LocalTransferDescriptor, TransferState, DeferredNotify> {
 
         ResourceIdentificatorPtr destination;
         ResourceIdentificatorPtr source;
@@ -125,7 +127,8 @@ public:
      * a collection of transfers, downloading them sequentially or more at a time
      */
     class TransferQueue
-            : public LocalTransferDescriptor::Observer, public LogicStateMachine<TransferQueue, TransferState> {
+            : public LocalTransferDescriptor::ObserverType,
+              public LogicStateMachine<TransferQueue, TransferState, DeferredNotify> {
     private:
         std::list<LocalTransferDescriptorPtr> transfers;
         TransferManager &manager;

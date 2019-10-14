@@ -32,7 +32,7 @@ typedef std::shared_ptr<NodeConnectionInfo> NodeConnectionInfoPtr;
 
 
 class NetworkModule
-        : public NodeModuleDependent<NetworkModule>, public Connection::Observer/*for server connections*/ {
+        : public NodeModuleDependent<NetworkModule>, public Connection::ObserverType/*for server connections*/ {
 
 public:
 

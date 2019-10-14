@@ -188,7 +188,7 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole2");
 
 
-    LogicStateMachine<NetworkModule, int> intStateMachine(*this);
+//    LogicStateMachine<NetworkModule, int> intStateMachine(*this);
 //    when(event < LogicStateEvent<NetworkModule, int>>
 //    ()).fireModuleAction(&NetworkModule::testingMethod2);
 //    when(state<NetworkModule, int>(2).entered()/*.left()*/).valid();

@@ -13,6 +13,7 @@
 #include <iostream>
 #include <mutex>
 #include <core/log/Logger.h>
+#include <atomic>
 
 class Context {
 public:
@@ -38,12 +39,12 @@ public:
 private:
 
     TypeIdType getNextTypeId() const {
-        static TypeIdType val = 0;
+        static std::atomic<TypeIdType> val = 0;
         return val++;
     }
 
     KeyType getNextKey() const {
-        static KeyType val = 1;
+        static std::atomic<KeyType> val = 1;
         return val++;
     }
 

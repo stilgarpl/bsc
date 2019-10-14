@@ -41,10 +41,11 @@ public:
 
     void run() override {
         //std::lock_guard<std::mutex> g(queueLock);
-        std::unique_lock<std::mutex> g(queueLock);
-        g.unlock();
+
+        //@todo all that locking and unlocking has to go...
+
         while (!this->isStopping()) {
-            g.lock();
+            std::unique_lock g(queueLock);
             //@todo 1s or other value?
             queueReady.wait_for(g, 1s, [&]() -> bool { return (!eventQueue.empty() || this->isStopping()); });
             while (!eventQueue.empty()) {
@@ -62,7 +63,6 @@ public:
                 }
                 g.lock();
             }
-            g.unlock();
         }
 
     }

@@ -10,6 +10,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <core/context/Context.h>
+#include <atomic>
 
 using namespace std::chrono_literals;
 
@@ -17,9 +18,8 @@ class Runnable {
 private:
     std::unique_ptr<std::thread> thread;
     mutable std::mutex startMutex, stopMutex;
-    //@todo this probably should be atomic
-    bool stopping = false;
-    bool finished = false;
+    std::atomic_bool stopping = false;
+    std::atomic_bool finished = false;
 protected:
     std::condition_variable shutdownSignal;
 

@@ -102,7 +102,7 @@ bool RemoteNode::isConnected() {
     return connectionFetcher.getConnection() != nullptr && connectionFetcher.getConnection()->isActive();
 }
 
-const std::optional <NetAddressType> RemoteNode::getAddress() {
+std::optional<NetAddressType> RemoteNode::getAddress() {
     std::lock_guard <ConnectionFetcher> g(connectionFetcher);
     if (connectionFetcher.getConnection() && connectionFetcher.getConnection()->isActive()) {
         return connectionFetcher.getConnection()->getAddress();
@@ -119,6 +119,7 @@ void ConnectionFetcher::setConnection(std::shared_ptr<Connection> p) {
     connectionPtr = p;
     if (p != nullptr) {
         p->registerStateObserver(*this);
+        valid = true;
     }
 }
 
@@ -130,21 +131,24 @@ void ConnectionFetcher::setConnection(Connection *p) {
     connectionPtr = p;
     if (p != nullptr) {
         p->registerStateObserver(*this);
+        valid = true;
     }
 }
 
 Connection *ConnectionFetcher::getConnection() {
     std::lock_guard<std::recursive_mutex> g(connectionLock);
-    return std::visit(visitor(), connectionPtr);
+    if (!valid) {
+        return nullptr;
+    } else {
+        return std::visit(visitor(), connectionPtr);
+    }
 }
 
 void ConnectionFetcher::update(Connection &connection, ConnectionState state) {
     std::lock_guard<std::recursive_mutex> g(connectionLock);
     if (state == ConnectionState::DISCONNECTED) {
-        setConnection(nullptr); //should remove observer
+        valid = false;
+//        setConnection(nullptr); //should remove observer
     }
 }
 
-ConnectionFetcher::~ConnectionFetcher() {
-
-}

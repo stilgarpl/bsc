@@ -411,11 +411,15 @@ void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescri
                 //start more transfers
                 start();
             }
+            //transfer was finished, ignoring further events from it. @todo maybe use RAII for this?
+            object.unregisterStateObserver(*this);
             break;
         case TransferState::ERROR:
             //@todo handle error
             changeState(TransferState::ERROR);
             finishReady.notify_all();
+            //@todo R U sure?
+            object.unregisterStateObserver(*this);
             break;
     }
 

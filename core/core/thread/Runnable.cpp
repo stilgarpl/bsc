@@ -45,7 +45,7 @@ void Runnable::stop() {
 }
 
 bool Runnable::isStopping() const {
-    std::unique_lock<std::mutex> g(stopMutex);
+//    std::unique_lock<std::mutex> g(stopMutex);
     return stopping;
 }
 
@@ -56,6 +56,7 @@ void Runnable::join() {
 
 void Runnable::waitForStop() {
     std::unique_lock<std::mutex> g(stopMutex);
-    shutdownSignal.wait(g, [this] { return stopping; });
+    //@todo C++20 wait on atomic
+    shutdownSignal.wait(g, [this] { return stopping.load(); });
 }
 

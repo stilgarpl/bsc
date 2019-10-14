@@ -36,6 +36,7 @@ void Context::setActiveContext(Context::Ptr ctx) {
 }
 
 Context::Context(const Context &other) {
+    std::scoped_lock g(contextLock, other.contextLock);
     for (auto &&item : other.data) {
         this->data[item.first] = item.second;
     }

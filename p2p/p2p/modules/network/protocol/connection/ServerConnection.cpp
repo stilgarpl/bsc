@@ -115,5 +115,5 @@ Poco::Net::TCPServerConnection *ServerConnectionFactory::createConnection(const 
 }
 
 ServerConnectionFactory::ServerConnectionFactory(std::function<Context::OwnPtr(void)> contextGetter,
-                                                 std::list<std::reference_wrapper<Connection::Observer>> observers)
+                                                 std::list<std::reference_wrapper<Connection::ObserverType>> observers)
         : contextGetter(std::move(contextGetter)), observers(std::move(observers)) {}

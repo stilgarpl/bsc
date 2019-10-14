@@ -130,7 +130,4 @@ fabric.properties
 /.conan/
 
 conan/*.junk
-/cmake-build-minsizerel/
-/cmake-build-release/
-/cmake-build-relwithdebinfo/
-/cmake-build-thread-sanitizer/
+/cmake-build-*

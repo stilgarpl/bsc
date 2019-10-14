@@ -17,6 +17,7 @@
 #include <p2p/role/RoleScope.h>
 #include <p2p/modules/network/network/NetAddressType.h>
 #include <logic/state/LogicStateMachine.h>
+#include <logic/state/DirectNotify.h>
 
 enum class ConnectionState {
     NEW,
@@ -25,7 +26,7 @@ enum class ConnectionState {
 };
 
 
-class Connection : public RoleScope, public LogicStateMachine<Connection, ConnectionState> {
+class Connection : public RoleScope, public LogicStateMachine<Connection, ConnectionState, DirectNotify> {
 
 protected:
     ConnectionProcessor processor;

@@ -13,8 +13,10 @@
 #include <logic/state/LogicStateMachine.h>
 #include <logic/LogicManager.h>
 #include <logic/LogicObject.h>
+#include <logic/state/DirectNotify.h>
 
-class ILogicModule : public INodeModule, public LogicObject, public LogicStateMachine<ILogicModule, ModuleState> {
+class ILogicModule
+        : public INodeModule, public LogicObject, public LogicStateMachine<ILogicModule, ModuleState, DirectNotify> {
 
 public:
 

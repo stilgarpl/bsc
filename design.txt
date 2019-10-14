@@ -564,7 +564,9 @@ co zostalo jeszcze w storage separation:
 * managed factory : return storage from storage manager
 
 
-naprawiałem data race w state machine i zepsułem transfer manager. teraz albo state downloading sie ustawia, jak juz wszystko zostalo zakonczone, albo nie startuje nowych transferow jak powinien. //@todo fix it
-//@todo transfer queue po zakonczeniu powinna usuwac zalegle transfery cyz cos, bo teraz destruktor ogolny sie zapetla i juz po usunieciu transfer queue dalej probuje ustawiac observera (na null) dla transferow
+@todo problem w RemoteNode - RN.disconnect robi shutdown() na connection, które przez maszynę stanów ustawia connetionFetchera na null, co go kasuje pewnie zanim jeszcze shutdown sie skończy.
 
-chyba wiem o co chodzi. transfer finishes-> change state(lock mutex)->update->notify queue->countTransfers->getTransferState -> upps, mutex locked, deadlock.
+problem z logic state machine . notify wywoluje update, ktore moze wywolac notify ktore wywolaja update na tym samym obiekcie. jest petla przez to na koniec notify obiekt moze byc w innym stanie niz wywolany, bo wywolanie bedzie kilkukrotne
+rozwiazanie: kolejka stanów
+zrobić ogólny QueueProcessor, który w notify przyjmuje stany i wkłada je na kolejke
+jego wątek bierze stany z kolejki i wywoluje funkcje procesujaca (tj. update)

@@ -15,14 +15,15 @@
 #include <p2p/modules/network/protocol/protocol/IProtocol.h>
 #include <p2p/modules/network/network/RemoteNodeInfo.h>
 #include "p2p/modules/network/remote/exception/NotRequestException.h"
-
+#include <atomic>
 #include <variant>
 
 
-class ConnectionFetcher : public Connection::Observer {
+class ConnectionFetcher : public Connection::ObserverType {
 private:
     std::variant<std::shared_ptr<Connection>/*client connection*/, Connection */*server connection*/> connectionPtr = nullptr;
     std::recursive_mutex connectionLock;
+    std::atomic_bool valid = false;
 
     class visitor {
     public:
@@ -36,7 +37,7 @@ private:
     };
 
 public:
-    virtual ~ConnectionFetcher();
+
 
 
 public:
@@ -141,7 +142,7 @@ public:
 
     void setRemoteNodeInfo(const RemoteNodeInfo &remoteNodeInfo);
 
-    const std::optional <NetAddressType> getAddress();
+    std::optional<NetAddressType> getAddress();
 
 };
 
