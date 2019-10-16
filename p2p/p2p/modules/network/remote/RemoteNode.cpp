@@ -11,7 +11,7 @@
 #include <Poco/Net/NetException.h>
 
 
-const std::optional<NodeIdType> RemoteNode::getNodeId() const {
+std::optional<NodeIdType> RemoteNode::getNodeId() const {
     if (remoteNodeInfo.getNodeInfo()) {
         return remoteNodeInfo.getNodeInfo()->getNodeId();
     } else {
@@ -20,9 +20,9 @@ const std::optional<NodeIdType> RemoteNode::getNodeId() const {
 }
 
 bool RemoteNode::connectTo(const NetAddressType &address) {
-    std::lock_guard<ConnectionFetcher> g(connectionFetcher);
+    std::unique_lock g(*connectionFetcher);
     //@todo better check
-    if (isConnected() && connectionFetcher.getConnection()->isActive()) {
+    if (isConnected() && connectionFetcher->getConnection()->isActive()) {
         return true;
     }
 //    Poco::Net::SocketAddress socketAddress(address);
@@ -35,7 +35,7 @@ bool RemoteNode::connectTo(const NetAddressType &address) {
 
         conn->startSendingImpl();
         conn->startReceivingImpl();
-        connectionFetcher.setConnection(conn);
+        connectionFetcher->setConnection(conn);
         return true;
     } catch (const Poco::Net::ConnectionRefusedException &) {
         //@todo connection refused in connectionSource
@@ -73,12 +73,12 @@ bool RemoteNode::connect() {
 }
 
 void RemoteNode::setNodeInfo(const NodeInfo &ni) {
-    std::lock_guard<ConnectionFetcher> g(connectionFetcher);
+    std::unique_lock g(*connectionFetcher);
     //@todo if serialization supports optional, this should be changed to optional, but for now, it's shared_ptr
     remoteNodeInfo.setNodeInfo(std::make_shared<NodeInfo>(ni));
 //    LOGGER(std::string("setting node info, and the connection address is ") + connection->getAddress() + " but remembered adress is " + *address);
     //@todo shouldn't this be through logic actions? or any other way? the problem is that we have to store the connection address between creating the connection and receiving node info
-    auto connection = connectionFetcher.getConnection();
+    auto connection = connectionFetcher->getConnection();
     if (connection != nullptr) {
         remoteNodeInfo.addKnownAddress(connection->getAddress());
     } else {
@@ -88,24 +88,24 @@ void RemoteNode::setNodeInfo(const NodeInfo &ni) {
 }
 
 void RemoteNode::disconnect() {
-    std::lock_guard <ConnectionFetcher> g(connectionFetcher);
-    if (connectionFetcher.getConnection() != nullptr) {
-        connectionFetcher.getConnection()->shutdown();
+    std::unique_lock g(*connectionFetcher);
+    if (connectionFetcher->getConnection() != nullptr) {
+        connectionFetcher->getConnection()->shutdown();
     }
     //@todo this setting to null is a problem. it deletes connection before state events could be processed, valgrind shows invalid read/write here
-    connectionFetcher.setConnection(nullptr);
+    connectionFetcher->setConnection(nullptr);
 }
 
 bool RemoteNode::isConnected() {
-    std::lock_guard <ConnectionFetcher> g(connectionFetcher);
+    std::unique_lock g(*connectionFetcher);
     //@todo refine to check actual connection state if that's possible?
-    return connectionFetcher.getConnection() != nullptr && connectionFetcher.getConnection()->isActive();
+    return connectionFetcher->getConnection() != nullptr && connectionFetcher->getConnection()->isActive();
 }
 
 std::optional<NetAddressType> RemoteNode::getAddress() {
-    std::lock_guard <ConnectionFetcher> g(connectionFetcher);
-    if (connectionFetcher.getConnection() && connectionFetcher.getConnection()->isActive()) {
-        return connectionFetcher.getConnection()->getAddress();
+    std::unique_lock g(*connectionFetcher);
+    if (connectionFetcher->getConnection() && connectionFetcher->getConnection()->isActive()) {
+        return connectionFetcher->getConnection()->getAddress();
     } else {
         return std::nullopt;
     }

@@ -66,22 +66,23 @@ public:
 class RemoteNode {
 private:
     RemoteNodeInfo remoteNodeInfo;
-    ConnectionFetcher connectionFetcher;
+    std::shared_ptr<ConnectionFetcher> connectionFetcher = std::make_shared<ConnectionFetcher>(); //it's shared ptr because it's Connection::Observer.
     Context::OwnPtr _context = Context::makeContext();
     std::shared_ptr<IProtocol> protocol;
 
 public:
     RemoteNode(const RemoteNode &) = delete; //no copying
-    const std::optional<NodeIdType> getNodeId() const;
+    RemoteNode(const RemoteNode&&) = delete; //no moving
+    [[nodiscard]] std::optional<NodeIdType> getNodeId() const;
 
     bool connectTo(const NetAddressType &address);
 
     void connect(std::shared_ptr<Connection> existingConnection) {
-        connectionFetcher.setConnection(std::move(existingConnection));
+        connectionFetcher->setConnection(std::move(existingConnection));
     }
 
     void connect(Connection *existingConnection) {
-        connectionFetcher.setConnection(existingConnection);
+        connectionFetcher->setConnection(existingConnection);
     }
 
     bool connect();
@@ -99,11 +100,11 @@ public:
 
     template<typename SendType>
     void sendPacketToNode(NetworkPacketPointer<SendType> p) {
-        std::lock_guard<ConnectionFetcher> g(connectionFetcher);
-        if (connectionFetcher.getConnection() != nullptr) {
+        std::unique_lock g(*connectionFetcher);
+        if (connectionFetcher->getConnection() != nullptr) {
 
 //            LOGGER("sending packet to node " + nodeId)
-            protocol->send(connectionFetcher.getConnection(), p);
+            protocol->send(connectionFetcher->getConnection(), p);
 
         } else {
             LOGGER("unable to send packet to " +
@@ -115,15 +116,15 @@ public:
 
     template<enum Status status = Status::RESPONSE, typename SendType>
     auto sendRequestToNode(NetworkPacketPointer<SendType> p) {
-        std::lock_guard<ConnectionFetcher> g(connectionFetcher);
+        std::unique_lock g(*connectionFetcher);
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
         if (p->getStatus() != Status::REQUEST) {
             throw NotRequestException();
         }
-        if (connectionFetcher.getConnection() != nullptr) {
+        if (connectionFetcher->getConnection() != nullptr) {
 
 //            LOGGER("sending packet to node " + nodeId)
-            auto[response, error] = protocol->sendExpectExtended(connectionFetcher.getConnection(), p);
+            auto[response, error] = protocol->sendExpectExtended(connectionFetcher->getConnection(), p);
             //@todo error handling
             return response;
 

@@ -11,15 +11,15 @@ template<typename StateObject, typename stateIdType>
 class DirectNotify {
     using ObserverType = Observer<StateObject, stateIdType>;
     std::list<std::reference_wrapper<ObserverType>> observers;
-    std::recursive_mutex notifyLock;
+    std::recursive_mutex observersLock;
 public:
     void registerObserver(ObserverType& observer) {
-        std::unique_lock g(notifyLock);
+        std::unique_lock g(observersLock);
         observers.push_back(observer);
     }
 
     void unregisterObserver(ObserverType& observer) {
-        std::unique_lock g(notifyLock);
+        std::unique_lock g(observersLock);
         auto before = observers.size();
         observers.erase(std::remove_if(observers.begin(), observers.end(),
                                        [&](auto& i) -> bool {
@@ -31,11 +31,10 @@ public:
     }
 
     void notify(StateObject& object, stateIdType state) {
-        std::unique_lock guard(notifyLock);
-//        notifyLock.lock();
+        std::unique_lock guard(observersLock);
         LOGGER(std::string("notify: ") + typeid(StateObject).name() + " : " + std::to_string(observers.size()))
         auto observersCopy = observers;
-//        notifyLock.unlock(); //@todo not sure if I can run update() without this locked. we'll see.
+        guard.unlock(); //@todo not sure if I can run update() without this locked. we'll see.
         for (const auto& observer : observersCopy) {
             auto& o = observer.get();
             o.update(object, state);

@@ -3,7 +3,6 @@
 //
 
 #include <logic/sources/ClockSource.h>
-#include <p2p/modules/network/protocol/logic/actions/NodeActions.h>
 #include <p2p/node/module/logic/ModuleSource.h>
 #include "BasicModule.h"
 
