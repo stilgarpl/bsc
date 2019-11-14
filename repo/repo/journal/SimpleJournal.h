@@ -64,21 +64,7 @@ public:
     }
 
 
-    const std::string &calculateChecksum() {
-        checksum = "";
-        std::stringstream ss;
-        std::string hash;
-        {
-            cereal::BinaryOutputArchive oa(ss);
-            oa << *this;
-        }
-        //@todo this crypto stuff is used in journal and in storage, it should be moved to separate crypto class so it's consistent
-        CryptoPP::SHA1 sha1;
-        CryptoPP::StringSource(ss.str(), true, new CryptoPP::HashFilter(sha1, new CryptoPP::HexEncoder(
-                new CryptoPP::StringSink(hash))));
-        checksum = hash;
-        return checksum;
-    }
+    const std::string& calculateChecksum();
 
     //@todo debug method, remove eventually
     void printHistory() override {

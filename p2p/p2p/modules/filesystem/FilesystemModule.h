@@ -71,7 +71,7 @@ public:
         if (newPath.is_absolute()) {
             currentPath = std::move(newPath);
         } else {
-            currentPath += fs::path::preferred_separator + change;
+            currentPath /= change;
         }
 
         if (!fs::exists(currentPath)) {

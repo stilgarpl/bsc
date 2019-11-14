@@ -348,7 +348,7 @@ std::filesystem::path RepoModule::Configuration::getRepositoryDataPath() const {
 }
 
 void RepoModule::Configuration::setRepositoryDataPath(const std::filesystem::path &repositoryDataPath) {
-    RepoModule::Configuration::repositoryDataPath = repositoryDataPath;
+    RepoModule::Configuration::repositoryDataPath = repositoryDataPath.string();
 }
 
 bool RepoModule::Configuration::isAutoProcess() const {
@@ -363,6 +363,6 @@ std::filesystem::path RepoModule::Configuration::getStoragePath() const {
     return storagePath;
 }
 
-void RepoModule::Configuration::setStoragePath(const std::filesystem::path::string_type &storagePath) {
+void RepoModule::Configuration::setStoragePath(const PathType& storagePath) {
     Configuration::storagePath = storagePath;
 }

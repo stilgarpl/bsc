@@ -30,13 +30,13 @@ protected:
 
 public:
 //@fixme store, restore, update -> checksum is not of ResourceId type! ResourceId is generated from checksum and size.
-//@todo store should only take path and return resourceId
-    virtual void store(const ResourceId &checksum, const size_t &size, const PathType &path) =0;
+//@todo store should only take path and return resourceId <--- THIS
+    virtual void store(const ResourceId& checksum, const size_t& size, const fs::path& path) = 0;
 
-    virtual void restore(const ResourceId &resourceId, const PathType &path) = 0;
+    virtual void restore(const ResourceId& resourceId, const fs::path& path) = 0;
 
     //@todo I don't know if this method is actually useful. remove it if it's really not needed
-    virtual void update(const ResourceId &checksum, const size_t &size, const PathType &path)=0;
+    virtual void update(const ResourceId& checksum, const size_t& size, const fs::path& path) = 0;
 
     //syncs whole repository to corresponding repository from other node
     virtual void sync(const NodeIdType &nodeID)=0;

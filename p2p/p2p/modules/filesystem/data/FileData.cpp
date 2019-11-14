@@ -1,4 +1,5 @@
 #include <utility>
+#include <core/utils/crypto.h>
 
 //
 // Created by stilgar on 04.11.18.
@@ -38,10 +39,8 @@ FileData::FileData(const fs::path &path) {
         modificationTime = fs::last_write_time(path);
         permissions = fs::status(path).permissions();
         isDirectory = false;
-        CryptoPP::SHA256 hash;
         std::string digest;
-        CryptoPP::FileSource f(path.c_str(), true, new CryptoPP::HashFilter(hash, new CryptoPP::HexEncoder(
-                new CryptoPP::StringSink(digest))));
+        digest = calculateSha1OfFile(path);
         sha256hash = std::move(digest);
     } else if (fs::exists(path) && fs::is_directory(path)) {
         isDirectory = true;

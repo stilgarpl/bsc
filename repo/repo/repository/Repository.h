@@ -115,12 +115,12 @@ public:
 
         auto end() -> decltype(deployMap.end());
 
-        auto operator[](const fs::path &path) -> decltype(deployMap[fs::current_path()]);
+        auto operator[](const fs::path& path) -> decltype(deployMap[fs::current_path().string()]);
 
         void markDeployed(const fs::path &path, DeployState deployState);
 
         bool isDeployed(const fs::path &path) {
-            return deployMap[path] && deployMap[path]->isDeployed();
+            return deployMap[path.string()] && deployMap[path.string()]->isDeployed();
         }
 
     private:

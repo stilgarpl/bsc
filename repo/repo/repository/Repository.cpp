@@ -116,7 +116,7 @@ void Repository::persist(fs::path path) {
         auto target = !attr->isDirectory() ? JournalTarget::FILE : JournalTarget::DIRECTORY;
         //@todo check if file was actually changed.
         journal->append(JournalMethod::MODIFIED, target,
-                        pathTransformer->transformToJournalFormat(path),
+                        pathTransformer->transformToJournalFormat(path).string(),
                         FileData(path));
 
 
@@ -125,7 +125,7 @@ void Repository::persist(fs::path path) {
 
 
         journal->append(JournalMethod::ADDED, target,
-                        pathTransformer->transformToJournalFormat(path),
+                        pathTransformer->transformToJournalFormat(path).string(),
                         FileData(path));
 
 
@@ -319,7 +319,7 @@ void Repository::forget(fs::path path) {
         if (attr) {
             journal->append(JournalMethod::FORGOTTEN,
                             attr->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
-                            pathTransformer->transformToJournalFormat(path),
+                            pathTransformer->transformToJournalFormat(path).string(),
                             attr->toFileData(path));
         } else {
             //nothing to forget!
@@ -339,12 +339,12 @@ void Repository::remove(fs::path path) {
         if (attr) {
             if (!fs::is_directory(path)) {
                 journal->append(JournalMethod::DELETED, JournalTarget::FILE,
-                                pathTransformer->transformToJournalFormat(path),
+                                pathTransformer->transformToJournalFormat(path).string(),
                                 attr->toFileData(path));
 
             } else {
                 journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
-                                pathTransformer->transformToJournalFormat(path),
+                                pathTransformer->transformToJournalFormat(path).string(),
                                 attr->toFileData(path));
                 //@todo delete everything recursively ... or maybe do it in replayCurrentState?
 
@@ -362,12 +362,13 @@ void Repository::ignore(fs::path path) {
         path = fs::canonical(fs::current_path() / path);
     }
     if (!fs::is_directory(path)) {
-        journal->append(JournalMethod::IGNORED, JournalTarget::FILE, pathTransformer->transformToJournalFormat(path),
+        journal->append(JournalMethod::IGNORED, JournalTarget::FILE,
+                        pathTransformer->transformToJournalFormat(path).string(),
                         FileData(path));
 
     } else {
         journal->append(JournalMethod::IGNORED, JournalTarget::DIRECTORY,
-                        pathTransformer->transformToJournalFormat(path),
+                        pathTransformer->transformToJournalFormat(path).string(),
                         FileData(path));
     }
 }
@@ -548,17 +549,17 @@ auto Repository::RepoDeployMap::end() -> decltype(deployMap.end()) {
     return deployMap.end();
 }
 
-auto Repository::RepoDeployMap::operator[](const fs::path &path) -> decltype(deployMap[fs::current_path()]) {
-    return deployMap[path];
+auto Repository::RepoDeployMap::operator[](const fs::path& path) -> decltype(deployMap[fs::current_path().string()]) {
+    return deployMap[path.string()];
 }
 
 void Repository::RepoDeployMap::markDeployed(const fs::path &path, Repository::DeployState deployState) {
     if (deployState == DeployState::DEPLOYED) {
         LOGGER("marking " + path.string() + " as deployed")
-        deployMap[path] = true;
+        deployMap[path.string()] = true;
     } else if (deployState == DeployState::NOT_DEPLOYED) {
         LOGGER("marking " + path.string() + " as not deployed")
-        deployMap[path] = false;
+        deployMap[path.string()] = false;
     } //else unchanged
 }
 

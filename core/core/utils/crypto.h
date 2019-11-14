@@ -6,11 +6,8 @@
 #define BASYCO_CRYPTO_H
 
 
-#include <cryptopp/files.h>
-#include <cryptopp/sha.h>
-
 #include <filesystem>
-#include <cryptopp/hex.h>
+
 
 namespace fs = std::filesystem;
 

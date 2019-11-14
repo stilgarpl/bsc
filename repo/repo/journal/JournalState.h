@@ -16,12 +16,8 @@
 #include "JournalTypes.h"
 #include "JournalTarget.h"
 #include <chrono>
-#include <cryptopp/sha.h>
-#include <cryptopp/filters.h>
-#include <cryptopp/hex.h>
 #include <sstream>
 #include <core/utils/cereal_include.h>
-#include <cryptopp/files.h>
 
 #include <filesystem>
 #include <p2p/modules/filesystem/data/FileData.h>

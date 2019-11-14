@@ -3,13 +3,14 @@
 //
 #include <catch2/catch.hpp>
 #include <repo/journal/SimpleJournal.h>
+#include <fstream>
 
 TEST_CASE("Journal deterministic hash test") {
     SimpleJournal journal;
     journal.append(JournalMethod::ADDED, JournalTarget::FILE, "/tmp/dupa.txt",
                    FileData("/tmp/dupa.txt", "hash", {}, 100, fs::file_time_type::min(), false));
     journal.commitState(CommitTimeType::clock::from_time_t(0));
-    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("DD8FBDD275891E9481C7DB83425AE42FF358A8C8"));
+    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("75d4a49e677412f6a1aafae12a2c720b3b3fe21a"));
 }
 
 

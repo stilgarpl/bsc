@@ -1,7 +1,7 @@
 //
 // Created by stilgar on 17.10.17.
 //
-
+#include <Poco/SHA1Engine.h>
 #include <core/log/Logger.h>
 #include <Poco/Environment.h>
 #include <p2p/node/context/NodeContext.h>
@@ -44,9 +44,12 @@ std::string JournalState::calculateChecksum() {
         cereal::PortableBinaryOutputArchive oa(ss);
         oa << *this;
     }
-    CryptoPP::SHA1 sha1;
-    CryptoPP::StringSource(ss.str(), true,
-                           new CryptoPP::HashFilter(sha1, new CryptoPP::HexEncoder(new CryptoPP::StringSink(hash))));
+
+    Poco::SHA1Engine sha1Engine;
+
+    sha1Engine.update(ss.str());
+    hash = Poco::SHA1Engine::digestToHex(sha1Engine.digest());
+
     // LOGGER("calculated hash " + hash);
     checksum = hash;
     return hash;

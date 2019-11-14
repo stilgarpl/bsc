@@ -12,8 +12,8 @@
 namespace fs = std::filesystem;
 
 
-#define LOGGER(x) Logger(fs::path(__FILE__).filename()).debug(__LINE__, x);
-#define ERROR(x) Logger(fs::path(__FILE__).filename()).error(__LINE__, x);
+#define LOGGER(x) Logger(fs::path(__FILE__).filename().string()).debug(__LINE__, x);
+#define ERROR(x) Logger(fs::path(__FILE__).filename().string()).error(__LINE__, x);
 #define SHOW(x) LOGGER(std::string(#x) +"="+std::to_string(x))
 
 class Logger {

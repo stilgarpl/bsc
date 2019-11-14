@@ -9,8 +9,8 @@
 //std::filesystem::path SimplePathRI::getPath() {
 //    return resourcePath;
 //}
-
-SimplePathRI::SimplePathRI(const fs::path &resourcePath) : resourcePath(resourcePath) {}
+//@todo c++17 implemented -> remove .string()
+SimplePathRI::SimplePathRI(const fs::path& resourcePath) : resourcePath(resourcePath.string()) {}
 
 std::shared_ptr<std::istream> SimplePathRI::getResourceInputStream() {
     if (exists()) {

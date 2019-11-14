@@ -4,7 +4,7 @@ set(SOURCE_FILES logic/ISource.cpp logic/ISource.h logic/IEvent.h logic/SourceMa
         logic/state/DeferredNotify.h logic/state/DirectNotify.h logic/state/StateObserver.h)
 
 
-add_library(logic SHARED ${SOURCE_FILES})
+add_library(logic ${SOURCE_FILES})
 target_include_directories(logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRIVATE SYSTEM spdlog::spdlog)
 target_link_libraries(logic PUBLIC core PRIVATE ${LIBS} spdlog::spdlog)
 install(TARGETS logic COMPONENT logic)

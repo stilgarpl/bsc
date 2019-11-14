@@ -21,8 +21,8 @@ public:
     class Configuration : public IConfig {
     private:
         //@todo cereal fix path type to path!
-        fs::path::string_type repositoryDataPath = fs::path("repository");
-        fs::path::string_type storagePath = fs::path("storage");
+        PathType repositoryDataPath = fs::path("repository").string();
+        PathType storagePath = fs::path("storage").string();
         bool autoProcess = true;
 
     public:
@@ -33,7 +33,7 @@ public:
 
         [[nodiscard]] std::filesystem::path getStoragePath() const;
 
-        void setStoragePath(const std::filesystem::path::string_type &storagePath);
+        void setStoragePath(const PathType& storagePath);
 
     private:
         template<class Archive>

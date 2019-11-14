@@ -7,6 +7,7 @@
 
 
 #include <memory>
+#include <string>
 
 template<typename ProducedObjectType,typename ...  FactorySpecialization>
 struct FactoryTraits {

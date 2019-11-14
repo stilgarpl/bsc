@@ -46,7 +46,7 @@ bool StorageResourceIdentificator::exists() {
     auto storage = repoModule->findStorage(storageId);
     if (storage != nullptr) {
         LOGGER("storage isn't null")
-        LOGGER(storage->getResourcePath(objectId));
+        LOGGER(storage->getResourcePath(objectId).string());
         return fs::exists(storage->getResourcePath(objectId));
     } else {
         LOGGER("storage is null")

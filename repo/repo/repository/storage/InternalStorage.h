@@ -21,9 +21,9 @@ private:
     fs::path storagePath = "/tmp/internal/";
     TransferManager::TransferQueuePtr transferQueue = nullptr;
 public:
-    void store(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) override;
+    void store(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) override;
 
-    void update(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) override;
+    void update(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) override;
 
     void sync(const NodeIdType &nodeID) override;
 
@@ -42,7 +42,7 @@ public:
 
     bool acquireResource(const ResourceId &resourceId) override;
 
-    void restore(const ResourceId &resourceId, const PathType &destinationPath) override;
+    void restore(const ResourceId& resourceId, const fs::path& destinationPath) override;
     ~InternalStorage() override = default;
 
     TransferManager::TransferQueuePtr getTransferQueue() override;

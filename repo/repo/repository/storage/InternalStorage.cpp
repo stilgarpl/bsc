@@ -12,7 +12,7 @@
 #include "StorageResourceIdentificator.h"
 
 
-void InternalStorage::store(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) {
+void InternalStorage::store(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) {
 
     auto realChecksum = calculateSha1OfFile(fs::path(sourcePath));
     auto realFileSize = fs::file_size(sourcePath);
@@ -39,7 +39,7 @@ void InternalStorage::store(const ResourceId &checksum, const size_t &size, cons
 
 }
 
-void InternalStorage::update(const ResourceId &checksum, const size_t &size, const PathType &sourcePath) {
+void InternalStorage::update(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) {
 
 }
 
@@ -101,15 +101,14 @@ bool InternalStorage::acquireResource(const ResourceId &resourceId) {
     return true;
 }
 
-void InternalStorage::restore(const ResourceId &resourceId, const PathType &destinationPath) {
+void InternalStorage::restore(const ResourceId& resourceId, const fs::path& destinationPath) {
     //@todo error handling if resourceId is not in storage
     //@todo acquire before restore ?
     //@todo don't do restore if the target is identical or changed
     //@todo verify checksum and size (add way to get those from resource id?)
     auto resourcePath = getResourcePath(resourceId);
-    LOGGER("IS:restore resP " + resourcePath.string() + " desP " + destinationPath)
-    //@todo PathType should really be just path, it would save a lot of trouble.
-//    fs::path desPath(destinationPath);
+    LOGGER("IS:restore resP " + resourcePath.string() + " desP " + destinationPath.string())
+
     fs::create_directories(fs::weakly_canonical(destinationPath).parent_path());
     try {
         fs::copy(resourcePath, destinationPath, fs::copy_options::overwrite_existing);

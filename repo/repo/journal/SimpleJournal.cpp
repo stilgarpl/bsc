@@ -1,9 +1,12 @@
 //
 // Created by stilgar on 17.10.17.
 //
-
+#include <utility>
+#include <core/utils/crypto.h>
 #include "SimpleJournal.h"
 #include <core/log/Logger.h>
+#include <Poco/SHA1Engine.h>
+
 
 ChecksumType SimpleJournal::getChecksum() const {
     //checksum is calculated at commit and always stored. no need to recalculate it.
@@ -183,4 +186,21 @@ IJournal::JournalStatePtr SimpleJournal::getState(const CommitTimeType &commitTi
         return *ret;
     }
 
+}
+
+const std::string& SimpleJournal::calculateChecksum() {
+    checksum = "";
+    std::stringstream ss;
+    std::string hash;
+    {
+        cereal::BinaryOutputArchive oa(ss);
+        oa << *this;
+    }
+    //@todo this crypto stuff is used in journal and in storage, it should be moved to separate crypto class so it's consistent
+    Poco::SHA1Engine sha1Engine;
+
+    sha1Engine.update(ss.str());
+    hash = Poco::SHA1Engine::digestToHex(sha1Engine.digest());
+    checksum = hash;
+    return checksum;
 }
