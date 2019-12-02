@@ -5,9 +5,9 @@
 #include <catch2/catch.hpp>
 #include <core/utils/crypto.h>
 
-//TEST_CASE("SHA1 TEST") {
-//
-//    std::string sha1Zsh = calculateSha1OfFile("/bin/zsh");
-//REQUIRE_THAT(sha1Zsh, Catch::Matchers::Equals("b98af7e0cbbf4655e976af03823c814660488cf7"));
-//
-//}
+TEST_CASE("SHA1 TEST") {
+
+    std::string sha1 = calculateSha1OfString("TEST STRING");
+REQUIRE_THAT(sha1, Catch::Matchers::Equals("d39d009c05797a93a79720952e99c7054a24e7c4"));
+
+}
