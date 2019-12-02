@@ -5,12 +5,27 @@
 #include <repo/journal/SimpleJournal.h>
 #include <fstream>
 
+class FakeMetaDataFetcher : public JournalMetaDataFetcher {
+    JournalMetaData metaData;
+public:
+    JournalMetaData makeMetaData() override {
+        return metaData;
+    }
+
+    FakeMetaDataFetcher(std::string nodeId,
+                        std::string userId,
+                        std::string operatingSystemId) : metaData(nodeId, userId, operatingSystemId) {
+
+    }
+};
+
+
 TEST_CASE("Journal deterministic hash test") {
-    SimpleJournal journal;
+    SimpleJournal journal(std::make_unique<FakeMetaDataFetcher>("node", "user", "system"));
     journal.append(JournalMethod::ADDED, JournalTarget::FILE, "/tmp/dupa.txt",
                    FileData("/tmp/dupa.txt", "hash", {}, 100, fs::file_time_type::min(), false));
     journal.commitState(CommitTimeType::clock::from_time_t(0));
-    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("75d4a49e677412f6a1aafae12a2c720b3b3fe21a"));
+    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("426675e4107b908d73623485eaf76ec0e6c0a022"));
 }
 
 

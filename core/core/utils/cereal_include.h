@@ -7,6 +7,7 @@
 
 
 #include <cereal/cereal.hpp>
+#include <cereal/access.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/portable_binary.hpp>

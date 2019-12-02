@@ -570,3 +570,5 @@ problem z logic state machine . notify wywoluje update, ktore moze wywolac notif
 rozwiazanie: kolejka stanów
 zrobić ogólny QueueProcessor, który w notify przyjmuje stany i wkłada je na kolejke
 jego wątek bierze stany z kolejki i wywoluje funkcje procesujaca (tj. update)
+
+w koncu po wielu bólach udało mi sie to zbudować na windowsie. oczywiście liczenie checksumy journala jest złe. @todo trzeba to przerobić, żeby nie serializowało cerealem (nie mam zaufania, że cereal czegos nie zmieni) i co najważniejsze, trzeba zmienić sposób inicjalizowania Metadata. teraz robi to konstruktor, co jest durnym pomysłem. Powinien być jakiś obiekt, fabryka, czy inny "fetcher", który stworzy metadane dla tego journala. w testach możę być FakeMetadataFetcher. Niektóre rzeczy w fetcherze moga byc nawet constexpr.

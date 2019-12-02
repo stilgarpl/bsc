@@ -5,9 +5,12 @@
 #include <core/log/Logger.h>
 #include <Poco/Environment.h>
 #include <p2p/node/context/NodeContext.h>
+#include <core/utils/crypto.h>
+
+#include <utility>
 #include "JournalState.h"
 
-void JournalState::add(const JournalStateData &data) {
+void JournalState::add(const JournalStateData& data) {
     auto same = std::find_if(dataList.begin(), dataList.end(), [&](auto i) {
         //@todo about that method and target... shouldn't this be an error if we have more than one method on one file?
         return data.getChecksum() == i.getChecksum() && data.getSize() == i.getSize() &&
@@ -41,14 +44,18 @@ std::string JournalState::calculateChecksum() {
     std::stringstream ss;
     std::string hash;
     {
-        cereal::PortableBinaryOutputArchive oa(ss);
-        oa << *this;
+        using namespace std::chrono;
+        //@todo add journal utils that will do these conversions to strings and checksums
+        ss << metaData.getChecksum() << std::to_string(duration_cast<seconds>(commitTime.time_since_epoch()).count());
+        //@todo this assumes dataList is sorted.
+        for (const auto& data : dataList) {
+            ss << data.getChecksum();
+        }
+//        cereal::PortableBinaryOutputArchive oa(ss);
+//        oa << *this;
     }
 
-    Poco::SHA1Engine sha1Engine;
-
-    sha1Engine.update(ss.str());
-    hash = Poco::SHA1Engine::digestToHex(sha1Engine.digest());
+    hash = calculateSha1OfString(ss.str());
 
     // LOGGER("calculated hash " + hash);
     checksum = hash;
@@ -89,19 +96,21 @@ bool JournalState::isProcessed() const {
 }
 
 void JournalState::clearProcessed() {
-    for (auto &item : dataList) {
+    for (auto& item : dataList) {
         item.setProcessed(false);
     }
 
 }
 
+JournalState::JournalState(JournalMetaData metaData) : metaData(std::move(metaData)) {}
+
 void JournalStateData::update(FileData data) {
 
     // if (!data.isIsDirectory()) {
-        size = data.getSize();
-        modificationTime = data.getModificationTime();
-        permissions = data.getPermissions();
-        checksum = data.getSha256hash();
+    size = data.getSize();
+    modificationTime = data.getModificationTime();
+    permissions = data.getPermissions();
+    checksum = data.getSha256hash();
     directory = data.isIsDirectory();
     //}
 }
@@ -124,28 +133,5 @@ bool JournalStateData::isDirectory() const {
 
 JournalTarget JournalStateData::getTarget() const {
     return target;
-}
-
-const std::string &JournalMetaData::getNodeId() const {
-    return nodeId;
-}
-
-const std::string &JournalMetaData::getUserId() const {
-    return userId;
-}
-
-const std::string &JournalMetaData::getOperatingSystem() const {
-    return operatingSystem;
-}
-
-JournalMetaData::JournalMetaData() {
-
-    Poco::Environment env;
-    operatingSystem = env.osName();
-    //@todo implement to work on all platforms
-    userId = getenv("USER");
-    if (Context::getActiveContext() != nullptr) {
-        nodeId = NodeContext::getNodeFromActiveContext().getNodeInfo().getNodeId();
-    }
 }
 

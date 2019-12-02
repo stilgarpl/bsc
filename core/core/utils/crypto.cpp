@@ -34,3 +34,9 @@ std::string calculateSha1OfFile(fs::path path) {
 //            new CryptoPP::StringSink(digest))));
     return ""; //@todo fixme return failure exception or sth.
 }
+
+std::string calculateSha1OfString(const std::string& source) {
+    Poco::SHA1Engine sha1Engine;
+    sha1Engine.update(source);
+    return Poco::SHA1Engine::digestToHex(sha1Engine.digest());
+}

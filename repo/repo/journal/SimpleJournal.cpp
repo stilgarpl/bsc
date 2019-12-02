@@ -4,8 +4,8 @@
 #include <utility>
 #include <core/utils/crypto.h>
 #include "SimpleJournal.h"
+#include "SimpleJournalMetaDataFetcher.h"
 #include <core/log/Logger.h>
-#include <Poco/SHA1Engine.h>
 
 
 ChecksumType SimpleJournal::getChecksum() const {
@@ -18,7 +18,6 @@ void SimpleJournal::commitState(CommitTimeType now) {
     checkCurrentState();
     if (currentState != nullptr) {
         currentState->commit(now);
-        currentState->calculateChecksum();
         journalHistory.push_back(currentState);
         auto prev = currentState;
         currentState = std::make_shared<JournalState>();
@@ -76,7 +75,7 @@ void SimpleJournal::append(JournalMethod method, JournalTarget target, PathType 
 
 void SimpleJournal::prepareState() {
     if (currentState == nullptr) {
-        currentState = std::make_shared<JournalState>();
+        currentState = std::make_shared<JournalState>(metaDataFetcher->makeMetaData());
 //        if (journalHistory.size() > 0) {
 //            currentState->setPreviousState(journalHistory.back());
 //        }
@@ -193,14 +192,22 @@ const std::string& SimpleJournal::calculateChecksum() {
     std::stringstream ss;
     std::string hash;
     {
-        cereal::BinaryOutputArchive oa(ss);
-        oa << *this;
+        //@todo this assumes journalHistory is sorted.
+        for (const auto& item : journalHistory) {
+            ss << item->getChecksum();
+        }
+//        cereal::BinaryOutputArchive oa(ss);
+//        oa << *this;
     }
-    //@todo this crypto stuff is used in journal and in storage, it should be moved to separate crypto class so it's consistent
-    Poco::SHA1Engine sha1Engine;
-
-    sha1Engine.update(ss.str());
-    hash = Poco::SHA1Engine::digestToHex(sha1Engine.digest());
+    std::string source = ss.str();
+    hash = calculateSha1OfString(source);
+//    LOGGER("string is " + source)
+//    LOGGER("hash is " + hash);
     checksum = hash;
     return checksum;
 }
+
+SimpleJournal::SimpleJournal(std::unique_ptr<JournalMetaDataFetcher> metaDataFetcher) : metaDataFetcher(
+        std::move(metaDataFetcher)) {}
+
+SimpleJournal::SimpleJournal() : metaDataFetcher(std::make_unique<SimpleJournalMetaDataFetcher>()) {}

@@ -10,6 +10,7 @@
 #include "JournalState.h"
 #include "IJournal.h"
 #include "JournalTypes.h"
+#include "JournalMetaDataFetcher.h"
 
 
 class SimpleJournal : public IJournal {
@@ -18,7 +19,7 @@ private:
     ChecksumType checksum;
     JournalStatePtr currentState = nullptr;
     JournalHistory journalHistory;
-
+    const std::unique_ptr<JournalMetaDataFetcher> metaDataFetcher;
     FuncMap funcMap;
 private:
     template<class Archive>
@@ -49,7 +50,7 @@ private:
     void prepareState();
 
 public:
-    ChecksumType getChecksum() const override;
+    [[nodiscard]] ChecksumType getChecksum() const override;
 
     void commitState(CommitTimeType now) override;
 
@@ -88,15 +89,19 @@ public:
 
     bool merge(std::shared_ptr<SimpleJournal> other);
 
-    bool merge(const JournalPtr &other) override;
+    bool merge(const JournalPtr& other) override;
 
     void clearFunc() override;
 
     void replayCurrentState() override;
 
-    JournalStatePtr getState(const CommitTimeType &commitTime, const ChecksumType &checksumType) override;
+    JournalStatePtr getState(const CommitTimeType& commitTime, const ChecksumType& checksumType) override;
 
     ~SimpleJournal() override = default;
+
+    SimpleJournal(std::unique_ptr<JournalMetaDataFetcher> metaDataFetcher);
+
+    SimpleJournal();
 
 };
 

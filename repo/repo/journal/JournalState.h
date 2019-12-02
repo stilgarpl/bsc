@@ -15,18 +15,18 @@
 #include "JournalMethod.h"
 #include "JournalTypes.h"
 #include "JournalTarget.h"
+#include "JournalMetaData.h"
 #include <chrono>
 #include <sstream>
 #include <core/utils/cereal_include.h>
 
 #include <filesystem>
 #include <p2p/modules/filesystem/data/FileData.h>
-#include <p2p/node/NodeInfo.h>
+
 
 namespace fs = std::filesystem;
 
-typedef std::chrono::system_clock::time_point CommitTimeType;
-typedef std::string ChecksumType;
+
 
 class JournalStateData {
 private:
@@ -35,6 +35,7 @@ private:
     fs::perms permissions = fs::perms::none;
     PathType path;
     uintmax_t size = 0;
+    //@todo this should probably be changed to utc_clock. epoch of file_time_type is uspecified and it may cause problems.
     fs::file_time_type modificationTime;
     //@todo bool or type? directory, file, socket, link...
     bool directory = false;
@@ -95,33 +96,6 @@ public:
     JournalTarget getTarget() const;
 };
 
-class JournalMetaData {
-private:
-    NodeIdType nodeId;
-    std::string userId;
-    std::string operatingSystem;
-
-public:
-    const NodeIdType &getNodeId() const;
-
-    const std::string &getUserId() const;
-
-    const std::string &getOperatingSystem() const;
-
-private:
-    template<class Archive>
-    void serialize(Archive &ar) {
-        ar(CEREAL_NVP(nodeId),CEREAL_NVP(userId),CEREAL_NVP(operatingSystem));
-    }
-
-public:
-    JournalMetaData();
-
-private:
-
-    friend class cereal::access;
-};
-
 
 class JournalState {
     ChecksumType checksum;
@@ -164,7 +138,7 @@ public:
 
     const ChecksumType &getChecksum() const;
 
-    JournalState(const JournalState &other) {
+    JournalState(const JournalState& other) {
         checksum = other.checksum;
         dataList = other.dataList;
         commitTime = other.commitTime;
@@ -173,6 +147,8 @@ public:
     }
 
     JournalState() = default;
+
+    JournalState(JournalMetaData metaData);
 
     bool isProcessed() const;
 
