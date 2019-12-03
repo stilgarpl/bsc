@@ -28,5 +28,6 @@ private:
 
 };
 
+CEREAL_REGISTER_TYPE(JournalMetaDataFetcher)
 
 #endif //BASYCO_JOURNALMETADATAFETCHER_H

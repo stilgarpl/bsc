@@ -5,7 +5,7 @@
 #ifndef BASYCO_JOURNAL_H
 #define BASYCO_JOURNAL_H
 
-
+#include <core/utils/cereal_include.h>
 
 #include "JournalState.h"
 #include "IJournal.h"
@@ -19,13 +19,16 @@ private:
     ChecksumType checksum;
     JournalStatePtr currentState = nullptr;
     JournalHistory journalHistory;
-    const std::unique_ptr<JournalMetaDataFetcher> metaDataFetcher;
+    //@todo I'd like this to be const... or not embedded in journal. there should be something like a service that makes journal, journal should be pure data.
+    //  so move it somewhere else. When it's moved metadatafetcher won't have to be serializable
+    std::unique_ptr<JournalMetaDataFetcher> metaDataFetcher;
     FuncMap funcMap;
 private:
     template<class Archive>
-    void serialize(Archive &ar) {
+    void serialize(Archive& ar) {
 
-        ar(cereal::base_class<IJournal>(this), CEREAL_NVP(checksum), CEREAL_NVP(journalHistory));
+        ar(cereal::base_class<IJournal>(this), CEREAL_NVP(checksum), CEREAL_NVP(journalHistory),
+           CEREAL_NVP(metaDataFetcher));
         //currentState is not serialized
     }
 
