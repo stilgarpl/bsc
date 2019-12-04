@@ -100,7 +100,6 @@ public:
 class JournalState {
     ChecksumType checksum;
     std::list<JournalStateData> dataList;
-    //@todo different clock maybe? steady_clock?
     CommitTimeType commitTime;
     JournalMetaData metaData;
     std::shared_ptr<JournalState> previousState = nullptr;

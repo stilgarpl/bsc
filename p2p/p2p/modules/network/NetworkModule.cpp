@@ -45,32 +45,6 @@ void NetworkModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) 
         // std::clog << "Debug: connection event!" << std::endl;
     });
 
-
-//    actionHelper.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_CLIENT,
-//                                            [&](const ConnectionEvent &event) {
-//                                                this->removeActiveClientConnection(event.getConnection());
-//                                            });
-
-//    actionHelper.setAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_SERVER, [&](const ConnectionEvent &event) {
-//        //@todo do something about this dynamic cast
-//        this->removeAcceptedConnection(dynamic_cast<IServerConnection *>(event.getConnection()));
-//    });
-//@todo reenable
-//    actionHelper.setAction<PacketEvent>(PacketEventId::PACKET_RECEIVED,
-//                                        [&transmissionControl](
-//                                                const PacketEvent &packetEvent) {
-//                                            return transmissionControl.onPacketReceived(packetEvent);
-//                                        });
-//    actionHelper.setAction<PacketEvent>(PacketEventId::PACKET_SENT,
-//                                        [&transmissionControl](const PacketEvent &packetEvent) {
-//                                            return transmissionControl.onPacketSent(packetEvent);
-//                                        });
-//
-//    actionHelper.setAction<Tick>("TransTick", [&transmissionControl](const Tick &tick) {
-//        return transmissionControl.work(tick);
-//    });
-
-
     actionHelper.setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
 
 

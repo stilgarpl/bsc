@@ -82,10 +82,6 @@ public:
     template<typename EventType, typename... Args>
     void event(const EventType &event, Args... args) {
 
-        //@todo pass to executor
-//        Context::setActiveContext(&commonContext);
-//        Context::Ptr previousContext = Context::getActiveContext();
-//        Context::setActiveContext(event.context());
         SetLocalContext localContext(event.context());
         auto executor = getExecutorForEvent<EventType>();
         const auto& signalGlobal = this->getSignal<EventType, Args...>();
