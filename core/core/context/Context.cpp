@@ -22,13 +22,12 @@ void Context::setParentContext(Context::Ptr parentContext) {
 }
 
 Context::Ptr Context::getActiveContext() {
-    thread_local static Context::Ptr defaultContext = std::make_shared<Context>(true);
-//    if (activeContext == nullptr) {
-//        LOGGER("WARNING: returning default context")
-//        return defaultContext;
-//    } else {
+    if (hasActiveContext()) {
         return activeContext;
-//    }
+    } else {
+        ERROR("No active context")
+        throw InvalidContextException("No active context");
+    }
 }
 
 void Context::setActiveContext(Context::Ptr ctx) {
@@ -79,7 +78,7 @@ bool Context::isDefaultContext() const {
 
 Context::Context(bool defaultContext) : defaultContext(defaultContext) {}
 
-void Context::setDebug_id(const std::string &debug_id) {
+void Context::setDebug_id(const std::string& debug_id) {
     Context::debug_id = debug_id;
 }
 
@@ -87,3 +86,25 @@ Context::~Context() {
 //    LOGGER("context destructor " + debug_id);
 
 }
+
+Context::ContextPtr Context::makeContext(const Context::Ptr& ptr) {
+    struct ContextMakeSharedWorkaround : public Context {
+        explicit ContextMakeSharedWorkaround(const Context& other) : Context(other) {}
+    };
+    if (ptr != nullptr) {
+        ContextPtr ret = std::make_shared<ContextMakeSharedWorkaround>(*ptr);
+        ret->setParentContext(ptr);
+        return ret;
+    } else {
+        LOGGER("ERROR: NULL CONTEXT PASSED")
+        throw InvalidContextException("Null context passed");
+    }
+}
+
+bool Context::hasActiveContext() {
+    return activeContext != nullptr;
+}
+
+InvalidContextException::InvalidContextException(const std::string& arg) : invalid_argument(arg) {}
+
+InvalidContextException::InvalidContextException(const char* string) : invalid_argument(string) {}

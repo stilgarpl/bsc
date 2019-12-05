@@ -17,8 +17,7 @@ class InternalStorage : public IStorage {
 
 private:
     // std::string storageId;
-    //@todo make configuration() with this value?
-    fs::path storagePath = "/tmp/internal/";
+    const fs::path storagePath;
     TransferManager::TransferQueuePtr transferQueue = nullptr;
 public:
     void store(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) override;

@@ -8,6 +8,7 @@
 #include <logic/context/LogicContext.h>
 #include <p2p/modules/network/protocol/logic/sources/ConnectionSource.h>
 #include <Poco/Net/NetException.h>
+#include <logic/LogicExceptions.h>
 #include "ClientConnection.h"
 
 
@@ -17,11 +18,12 @@ ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, const Cont
 
     auto lm = getConnectionContext()->get<LogicContext>();
     if (lm != nullptr) {
-        std::clog << __func__ << " adding new connection!!!!!!!!!!!!!1 " << std::endl;
+        LOGGER("adding new connection, triggering connection established event")
 
         lm->getLogicManager().getSource<ConnectionSource>()->connectionEstablished(this);
     } else {
-        std::clog << __func__ << " no logic manager in context!" << std::endl;
+        ERROR("No logic manager context!")
+        throw LogicContextInvalid("No logic manager context in Client Connection");
     }
 
 }

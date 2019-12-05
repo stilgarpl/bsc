@@ -83,10 +83,15 @@ void setupCommands(CommandModule *cmd) {
 }
 
 
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
+
+    auto file_logger = spdlog::basic_logger_mt("basic_logger", "/tmp/basyco.log");
+    spdlog::set_default_logger(file_logger);
+    spdlog::flush_every(std::chrono::seconds(5));
 
     spdlog::info("lala");
 
@@ -134,22 +139,10 @@ int main(int argc, char *argv[]) {
 //    setupProtocolLogic(thirdNode.getLogicManager(), transmissionControl);
     thirdNode.start();
 
-    //@todo this is required so logic is set up before connecting. change it so start wait until the end of the initialization phase
-    // std::this_thread::sleep_for(1000ms);
-
-    thisNode.getNodeInfo().printAll();
-    otherNode.getNodeInfo().printAll();
-    thirdNode.getNodeInfo().printAll();
-    thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
-//    thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9898");
-//    thisNode.getModule<NetworkModule>()->updateNodeConnectionInfo();
-//    otherNode.getModule<NetworkModule>()->updateNodeConnectionInfo();
-//    thirdNode.getModule<NetworkModule>()->updateNodeConnectionInfo();
-
-
     thisNode.waitUntilStarted();
     otherNode.waitUntilStarted();
-
+    thirdNode.waitUntilStarted();
+    thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
     //    thisNode.waitToFinish();
     //auto fdes = FileTransferControl::initiateTransfer(thisNode, "second", "/tmp/zsh", "/tmp/copied_zsh");
 //    thisNode.stop();

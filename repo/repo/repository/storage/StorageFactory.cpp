@@ -3,12 +3,14 @@
 //
 
 #include "StorageFactory.h"
+
+#include <utility>
 #include "InternalStorage.h"
 
-IStoragePtr StorageFactory::create(const SelectorType &selector, const ArgumentType &storageName) {
+IStoragePtr StorageFactory::create(const SelectorType& selector, const ArgumentType& storageName) {
     //@todo implement actual identifiers and different storages
     LOGGER("creating storage with path " + (storagePath / storageName).string())
     return std::make_shared<InternalStorage>(storageName, storagePath / storageName);
 }
 
-StorageFactory::StorageFactory(const fs::path &storagePath) : storagePath(storagePath) {}
+StorageFactory::StorageFactory(fs::path storagePath) : storagePath(std::move(storagePath)) {}

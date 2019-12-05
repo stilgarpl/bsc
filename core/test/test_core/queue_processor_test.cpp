@@ -17,6 +17,7 @@ public:
 };
 
 TEST_CASE("Queue processor test") {
+    Context::setActiveContext(Context::makeContext());
     int last_token = 0;
     int last_sender = 0;
     int TOKEN = 5;

@@ -40,11 +40,11 @@ void Logger::debug(int line, const std::string &txt) {
     std::lock_guard<std::mutex> g(getLock());
     static std::string::size_type instanceLength = 0;
 //@todo optimize this call:
-    if (Context::getActiveContext() != nullptr && Context::getActiveContext()->get<LoggerContext>() &&
+    if (Context::hasActiveContext() && Context::getActiveContext()->get<LoggerContext>() &&
         Context::getActiveContext()->get<LoggerContext>()->getInstance().size() > instanceLength) {
         instanceLength = Context::getActiveContext()->get<LoggerContext>()->getInstance().size();
     }
-    if (Context::getActiveContext() != nullptr && Context::getActiveContext()->get<LoggerContext>()) {
+    if (Context::hasActiveContext() && Context::getActiveContext()->get<LoggerContext>()) {
         spdlog::info("[{:<{}}] [{}:{}]: {}", Context::getActiveContext()->get<LoggerContext>()->getInstance(),
                      instanceLength,
                      loggerName, std::to_string(line), txt);
@@ -60,11 +60,11 @@ void Logger::error(int line, const std::string &txt) {
     std::lock_guard<std::mutex> g(getLock());
     static std::string::size_type instanceLength = 0;
 //@todo optimize this call:
-    if (Context::getActiveContext() != nullptr && Context::getActiveContext()->get<LoggerContext>() &&
+    if (Context::hasActiveContext() && Context::getActiveContext()->get<LoggerContext>() &&
         Context::getActiveContext()->get<LoggerContext>()->getInstance().size() > instanceLength) {
         instanceLength = Context::getActiveContext()->get<LoggerContext>()->getInstance().size();
     }
-    if (Context::getActiveContext() != nullptr && Context::getActiveContext()->get<LoggerContext>()) {
+    if (Context::hasActiveContext() && Context::getActiveContext()->get<LoggerContext>()) {
         spdlog::error("[{:<{}}] [{}:{}]: {}", Context::getActiveContext()->get<LoggerContext>()->getInstance(),
                       instanceLength,
                       loggerName, std::to_string(line), txt);

@@ -51,62 +51,24 @@ void NetworkModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) 
 }
 
 bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
-    if (actionHelper.assignAction<ConnectionEvent>("connDebug")) {
-        std::clog << "Debug: ConEv assignment!" << std::endl;
 
-    }
-
-    if (actionHelper.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNoI")) {
-        std::clog << "Debug: reqNoI assignment!" << std::endl;
-
-    }
-
-    if (actionHelper.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ACCEPTED, "reqNoI")) {
-        std::clog << "Debug: server reqNoI assignment!" << std::endl;
-
-    }
-
-    if (actionHelper.assignAction<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED, "reqNeI")) {
-        std::clog << "Debug: reqNeI assignment!" << std::endl;
-
-    }
-
-    if (actionHelper.assignAction<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED_CLIENT,
-                                                   ConnectionEventId::CONNECTION_CLOSED_CLIENT)) {
-        std::clog << "Debug: CONNECTION_CLOSED assignment!" << std::endl;
-
-    }
-
-
-    if (actionHelper.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "upNoI")) {
-        std::clog << "Debug: upNoI assignment!" << std::endl;
-
-    }
-
-    if (actionHelper.assignAction<NetworkInfoEvent>(NetworkInfoEvent::IdType::NETWORK_INFO_RECEIVED, "upNeI")) {
-        std::clog << "Debug: upNoI assignment!" << std::endl;
-
-    }
-
+    when(event<ConnectionEvent>()).fireAction("connDebug");
+    when(event<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).fireAction("reqNoI");
+    when(event<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ACCEPTED)).fireAction("reqNoI");
+    when(event<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).fireAction("reqNeI");
+    when(event<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED)).fireAction("upNoI");
+    when(event<NetworkInfoEvent>(NetworkInfoEvent::IdType::NETWORK_INFO_RECEIVED)).fireAction("upNeI");
     //@todo upNoI powinno cos takiego robic, addKnownNode powinien byc wywolany tylko w przypadku
-    if (actionHelper.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED, "addKnownNode")) {
-        std::clog << "Debug: addKnownNode assignment!" << std::endl;
-
-    }
-
-    if (actionHelper.assignAction<NodeInfoEvent>(NodeInfoEvent::IdType::NEW_NODE_DISCOVERED, "nodeDiscovered")) {
-        std::clog << "Debug: addKnownNode assignment!" << std::endl;
-
-    }
-
+    when(event<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED)).fireAction("addKnownNode");
+    when(event<NodeInfoEvent>(NodeInfoEvent::IdType::NEW_NODE_DISCOVERED)).fireAction("nodeDiscovered");
 
     //register packet processors from submodules
 
     when(state<ILogicModule>(ModuleState::SUBMODULES_PREPARED).entered()).fireStateChangeReaction(
-            [&](ILogicModule &module) {
+            [&](ILogicModule& module) {
                 //@todo move this mechanism to NodeModule to auto collect all submodules from other modules.
                 //  submodules probably have to be optional or sth.
-                auto &networkSub = module.getSubModule<NetworkModule>();
+                auto& networkSub = module.getSubModule<NetworkModule>();
                 networkSub.setupPacketProcessing(*this);
             });
 

@@ -18,7 +18,7 @@ public:
 
     IStoragePtr create(const SelectorType &selector, const ArgumentType &argument) override;
 
-    explicit StorageFactory(const fs::path &storagePath);
+    explicit StorageFactory(fs::path storagePath);
 
 };
 

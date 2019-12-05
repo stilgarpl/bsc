@@ -10,10 +10,6 @@
 void Runnable::start() {
     std::lock_guard g(startMutex);
     if (thread == nullptr) {
-        if (Context::getActiveContext() == nullptr) {
-            //@todo exception
-            throw std::exception();
-        }
         thread = std::make_unique<std::thread>(std::ref(*this), Context::getActiveContext());
     }
 

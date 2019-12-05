@@ -6,7 +6,7 @@
 
 void ConnectionSource::newConnection(Connection *con) {
 
-    std::clog << __func__ << " queue connection event" << std::endl;
+    LOGGER("queue connection event");
     auto event = std::make_shared<ConnectionEvent>();
     event->setEventId(ConnectionEvent::IdType::NEW_CONNECTION);
     event->setConnection(con);

@@ -26,10 +26,9 @@ public:
 
 
 class SetupSimpleAction : public LogicObject {
-    std::atomic_int counter;
+    std::atomic_int counter = 0;
 public:
     explicit SetupSimpleAction(LogicManager &logicManager) : LogicObject(logicManager) {
-        counter.store(0);
     }
 
     void setupActions(SetupActionHelper &actionHelper) override {
@@ -50,15 +49,13 @@ public:
 };
 
 class SetupChainAction : public LogicObject {
-    std::atomic_int firstCounter;
-    std::atomic_int secondCounter;
+    std::atomic_int firstCounter = 0;
+    std::atomic_int secondCounter = 0;
 public:
-    explicit SetupChainAction(LogicManager &logicManager) : LogicObject(logicManager) {
-        firstCounter.store(0);
-        secondCounter.store(0);
+    explicit SetupChainAction(LogicManager& logicManager) : LogicObject(logicManager) {
     }
 
-    void setupActions(SetupActionHelper &actionHelper) override {
+    void setupActions(SetupActionHelper& actionHelper) override {
         when(event<Ping>())
                 .newChain("chain")
                 .fireNewChainAction([&](auto event) {
@@ -71,22 +68,41 @@ public:
                 });
     }
 
-    bool assignActions(AssignActionHelper &actionHelper) override {
+    bool assignActions(AssignActionHelper& actionHelper) override {
         return true;
     }
 
-    bool setupSources(SetupSourceHelper &sourceHelper) override {
+    bool setupSources(SetupSourceHelper& sourceHelper) override {
         sourceHelper.requireSource<PingSource>();
         return true;
     }
 
-    auto &getFirstCounter() { return firstCounter; };
+    auto& getFirstCounter() { return firstCounter; };
 
-    auto &getSecondCounter() { return secondCounter; };
+    auto& getSecondCounter() { return secondCounter; };
 
 };
 
-void waitFor(const std::function<bool(void)> &expression, std::chrono::milliseconds timeout) {
+class SetupInvalidAssignment : public LogicObject {
+public:
+    SetupInvalidAssignment(LogicManager& logicManager) : LogicObject(logicManager) {}
+
+public:
+    void setupActions(SetupActionHelper& actionHelper) override {
+        when(event<Ping>()).fireAction("wrong action ID");
+    }
+
+    bool assignActions(AssignActionHelper& actionHelper) override {
+        return true;
+    }
+
+    bool setupSources(SetupSourceHelper& sourceHelper) override {
+        return true;
+    }
+
+};
+
+void waitFor(const std::function<bool(void)>& expression, std::chrono::milliseconds timeout) {
 
     auto beginTime = std::chrono::steady_clock::now();
     while (!expression() || std::chrono::steady_clock::now() - beginTime < timeout) {
@@ -150,4 +166,13 @@ TEST_CASE("Chain logic test") {
     logicManager.join();
 
 
+}
+
+TEST_CASE("Logic exceptions test") {
+    Context::OwnPtr context = Context::makeContext();
+    Context::setActiveContext(context);
+    LogicManager logicManager;
+    logicManager.setContexts(context);
+    SetupInvalidAssignment setupLogic(logicManager);
+    REQUIRE_THROWS_AS(setupLogic.setupLogic(), LogicAssignmentException);
 }

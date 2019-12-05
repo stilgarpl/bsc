@@ -5,6 +5,7 @@
 #include <catch2/catch.hpp>
 #include <core/context/Context.h>
 #include <thread>
+#include <core/io/InputOutputContext.h>
 
 TEST_CASE("Context test") {
     const std::string CONTEXT_NAME = "context field name";
@@ -12,7 +13,7 @@ TEST_CASE("Context test") {
 
     Context::OwnPtr localContext = Context::makeContext();
     SECTION("active context test") {
-        REQUIRE(Context::getActiveContext() == nullptr);
+        REQUIRE(!Context::hasActiveContext());
         Context::setActiveContext(localContext);
         REQUIRE(Context::getActiveContext() == localContext);
 
@@ -21,7 +22,7 @@ TEST_CASE("Context test") {
             Context::OwnPtr otherContext = Context::makeContext(localContext);
             //each thread has its own context, so new thread won't have an active context until set.
             std::thread([&otherContext]() {
-                REQUIRE(Context::getActiveContext() == nullptr);
+                REQUIRE(!Context::hasActiveContext());
                 Context::setActiveContext(otherContext);
                 REQUIRE(Context::getActiveContext() == otherContext);
             }).join();
@@ -50,5 +51,40 @@ TEST_CASE("Context test") {
         REQUIRE(*childContext->get<int>(CONTEXT_NAME) == VALUE);
     }
 
+
+}
+
+
+class TestInputOutputContext : public InputOutputContext {
+    std::stringstream stream;
+public:
+    std::ostream& out() override {
+        return stream;
+    }
+
+    std::istream& in() override {
+        return stream;
+    }
+
+    const std::stringstream& getStream() const {
+        return stream;
+    }
+};
+
+TEST_CASE("InputOutput Context test") {
+    Context::OwnPtr context = Context::makeContext();
+    Context::setActiveContext(context);
+    context->setContext<InputOutputContext, TestInputOutputContext>();
+
+    auto& out = context->get<InputOutputContext>()->out();
+    auto& in = context->get<InputOutputContext>()->in();
+    auto& stream = std::static_pointer_cast<TestInputOutputContext>(context->get<InputOutputContext>())->getStream();
+
+    const std::string TEST_STRING = "TEST STRING";
+    out << TEST_STRING;
+    REQUIRE(stream.str() == TEST_STRING);
+    std::string result;
+    in >> result;
+    REQUIRE(result == "TEST"); //first word
 
 }

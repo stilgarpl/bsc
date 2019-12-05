@@ -29,20 +29,22 @@ void FilesystemModule::setupActions(ILogicModule::SetupActionHelper &actionHelpe
 }
 
 bool FilesystemModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
-    if (actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::REQUESTED, "beginTransfer") &&
-        actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::SENDING, "sendData") &&
-        actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::GET_PROPERTIES, "sendProps") &&
-        actionHelper.assignAction<TransferEvent>(TransferEvent::IdType::FINISHING, "finishTransfer") //&&
-            ) {
-        std::clog << "Debug: File assignment!" << std::endl;
 
-        when(state<TransferManager::LocalTransferDescriptor>(
-                TransferManager::TransferState::STARTED).entered()).fireStateChangeReaction(
-                [](TransferManager::LocalTransferDescriptor &descriptor) { LOGGER("transfer started!!!!...!!"); });
-//        when(event<LogicStateEvent<TransferManager::LocalTransferDescriptor,TransferStatus >>()).fireNewAction([](auto event){LOGGER("transfer state evennnnnt")});
-        return true;
+
+    {
+        //@todo using enum TransferEvent::IdType;
+        when(event<TransferEvent>(TransferEvent::IdType::REQUESTED)).fireAction("beginTransfer");
+        when(event<TransferEvent>(TransferEvent::IdType::SENDING)).fireAction("sendData");
+        when(event<TransferEvent>(TransferEvent::IdType::GET_PROPERTIES)).fireAction("sendProps");
+        when(event<TransferEvent>(TransferEvent::IdType::FINISHING)).fireAction("finishTransfer");
+
+
     }
-    return false;
+    when(state<TransferManager::LocalTransferDescriptor>(
+            TransferManager::TransferState::STARTED).entered()).fireStateChangeReaction(
+            [](TransferManager::LocalTransferDescriptor& descriptor) { LOGGER("transfer started!!!!...!!"); });
+//        when(event<LogicStateEvent<TransferManager::LocalTransferDescriptor,TransferStatus >>()).fireNewAction([](auto event){LOGGER("transfer state evennnnnt")});
+    return true;
 }
 
 bool FilesystemModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {

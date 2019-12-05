@@ -7,6 +7,7 @@
 #include <p2p/node/context/NodeContext.h>
 #include <core/log/LoggerContext.h>
 #include <core/factory/FactoryContext.h>
+#include <core/io/InputOutputContext.h>
 #include "p2p/node/module/NodeModule.h"
 
 
@@ -53,6 +54,7 @@ Node::Node() {
     LOGGER("default node constructor")
     nodeContext->set<NodeContext, Node &, NodeInfo &>(*this, this->thisNodeInfo);
     nodeContext->set<LoggerContext>([&] { return thisNodeInfo.getNodeId(); });
+    nodeContext->setContext<InputOutputContext, StandardInputOutputContext>();
 
     //this creates common context for role definitions across the entire node.
     nodeContext->set<RoleDefinitionsContext>();
@@ -62,7 +64,7 @@ Node::Node() {
 
     logicManager.setContexts(nodeContext);
 
-    setNodeContextActive();
+    Node::setNodeContextActive();
 
 }
 

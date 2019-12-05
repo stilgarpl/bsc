@@ -15,7 +15,7 @@ JournalMetaData SimpleJournalMetaDataFetcher::makeMetaData() {
     if (auto userValue = getenv("USER"); userValue != nullptr) {
         userId = userValue;
     }
-    if (Context::getActiveContext() != nullptr) {
+    if (Context::hasActiveContext()) {
         nodeId = NodeContext::getNodeFromActiveContext().getNodeInfo().getNodeId();
     }
     return JournalMetaData(nodeId, userId, operatingSystem);

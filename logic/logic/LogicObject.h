@@ -16,6 +16,7 @@
 #include "chain/GlobalChainContext.h"
 #include "chain/ChainGroup.h"
 #include "chain/LockConfiguration.h"
+#include "LogicExceptions.h"
 
 
 //@todo replace Args... with AdditionalEventArgs... or sth
@@ -293,7 +294,14 @@ public:
                 }
             }
             if (!success) {
-                throw std::string("Failed to assign action!");
+                using namespace std::string_literals;
+                if constexpr (std::is_convertible_v<ActionId, std::string>) {
+                    throw LogicAssignmentException("Failed to assign action : "s + actionId);
+                } else {
+                    throw LogicAssignmentException(
+                            "Failed to assign action!"s); //@todo maybe some info of actionId, even if actionId cannot be converted to string?
+                }
+
             }
             return *static_cast<ThisType *>(this);
         }
