@@ -158,8 +158,8 @@ TEST_CASE("Chain logic test") {
     for (int j = 0; j < count; ++j) {
         pingSource->ping();
     }
-    logicManager.stop();
     waitFor([&] { return setupLogic.getSecondCounter().load() == count; }, 100ms);
+    logicManager.stop();
     REQUIRE(setupLogic.getFirstCounter().load() == count);
     REQUIRE(setupLogic.getSecondCounter().load() == count);
     LOGGER("all ok")
