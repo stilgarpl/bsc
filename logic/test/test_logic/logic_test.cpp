@@ -129,6 +129,7 @@ TEST_CASE("Basic logic test") {
     for (int j = 0; j < 1000; ++j) {
         pingSource->ping();
     }
+    std::this_thread::sleep_for(200ms);
     logicManager.stop();
     waitFor([&] { return setupLogic.getCounter().load() == 1000; }, 100ms);
     REQUIRE(setupLogic.getCounter().load() == 1000);

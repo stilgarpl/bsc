@@ -11,27 +11,27 @@
 #include "p2p/modules/basic/BasicModule.h"
 #include "p2p/modules/network/NetworkModule.h"
 
-CommandModule::CommandModule(INode &node) : NodeModuleDependent(node, "command"),
+CommandModule::CommandModule(INode& node) : NodeModuleDependent(node, "command"),
                                             defaultSubModule(*this) {
 
     setRequired<BasicModule>();
 }
 
-void CommandModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
+void CommandModule::setupActions(ILogicModule::SetupActionHelper& actionHelper) {
     actionHelper.setAction<CommandEvent>(CommandActions::RUN_COMMAND, CommandActions::runRemoteCommand);
 
     when(state<ILogicModule>(ModuleState::SUBMODULES_PREPARED).entered()).fireStateChangeReaction(
-            [&](ILogicModule &module) {
+            [&](ILogicModule& module) {
                 //@todo move this mechanism to NodeModule to auto collect all submodules from other modules.
                 //  submodules probably have to be optional or sth.
                 LOGGER("command submodule!")
-                auto &commandSub = module.getSubModule<CommandModule>();
+                auto& commandSub = module.getSubModule<CommandModule>();
                 commandSub.applyCommands(*this);
             });
 
 }
 
-bool CommandModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
+bool CommandModule::assignActions(ILogicModule::AssignActionHelper& actionHelper) {
 //    bool ret = actionHelper.assignAction<CommandEvent>(CommandEventId::EXECUTE_COMMAND, CommandActions::RUN_COMMAND);
     when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).fireAction(CommandActions::RUN_COMMAND);
 //    when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).fireNewAction([](auto e){ std::cout << "EXECUTING COMMAND!" << std::endl;});
@@ -44,7 +44,7 @@ bool CommandModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
 //    return ret;
 }
 
-bool CommandModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
+bool CommandModule::setupSources(ILogicModule::SetupSourceHelper& sourceHelper) {
     sourceHelper.requireSource<CommandSource>();
     return true;
 }
@@ -60,7 +60,7 @@ void CommandModule::setInteractive(bool interactive) {
 void CommandModule::initialize() {
     NodeModule::initialize();
 
-    for (auto &&directory : commandsDirectory) {
+    for (auto&& directory : commandsDirectory) {
         directory->configureCommands(*this);
     }
 }
@@ -84,7 +84,8 @@ void CommandModule::sendRemoteCommand(ArgumentContainerType args) {
         if (res && res->isRunStatus()) {
             LOGGER("remote run successful")
             auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
-            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
+//            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
+            out << res->getOutput();
         } else {
             LOGGER("remote run failure")
         }
@@ -93,7 +94,7 @@ void CommandModule::sendRemoteCommand(ArgumentContainerType args) {
     }
 }
 
-void CommandModule::sendCommandToRemoteNode(RemoteNode &remoteNode, ArgumentContainerType args) {
+void CommandModule::sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentContainerType args) {
     //@todo unify this and sendRemoteCommand
     LOGGER("send remote")
     //@todo add checking if the number of parameters is correct
@@ -120,7 +121,7 @@ void CommandModule::sendCommandToRemoteNode(RemoteNode &remoteNode, ArgumentCont
 }
 
 
-void CommandModule::broadcastRemoteCommand(const std::vector<std::string> &args) {
+void CommandModule::broadcastRemoteCommand(const std::vector<std::string>& args) {
     LOGGER("send broadcast")
     //@todo add checking if the number of parameters is correct
     if (args.size() >= 1) {
@@ -148,7 +149,7 @@ void CommandModule::broadcastRemoteCommand(const std::vector<std::string> &args)
     }
 }
 
-void CommandModule::runInBackground(const std::vector<std::string> &args) {
+void CommandModule::runInBackground(const std::vector<std::string>& args) {
     //@todo think about mutexes and thread safety
     if (args.size() >= 1) {
         std::string command = args[0];
@@ -164,7 +165,7 @@ void CommandModule::runInBackground(const std::vector<std::string> &args) {
 }
 
 
-CommandModule::CommandSubModule &CommandModule::CommandSubModule::submodule(std::string name) {
+CommandModule::CommandSubModule& CommandModule::CommandSubModule::submodule(std::string name) {
     if (submodules.count(name) == 0) {
         submodules[name] = std::make_shared<CommandSubModule>(parent);
     }
@@ -172,8 +173,8 @@ CommandModule::CommandSubModule &CommandModule::CommandSubModule::submodule(std:
     return *submodules[name];
 }
 
-CommandModule::SubModule::CommandData::CommandData(const std::string &commandName) : commandName(commandName) {}
+CommandModule::SubModule::CommandData::CommandData(const std::string& commandName) : commandName(commandName) {}
 
-const std::string &CommandModule::SubModule::CommandData::getCommandName() const {
+const std::string& CommandModule::SubModule::CommandData::getCommandName() const {
     return commandName;
 }
