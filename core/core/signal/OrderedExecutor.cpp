@@ -12,7 +12,7 @@ void OrderedExecutor::execute(std::function<void(void)> task) {
 //        LOGGER("starting executor thread")
         orderedExecutorThread = std::make_unique<std::thread>(&OrderedExecutor::run, this);
     }
-    std::lock_guard <std::mutex> lock_guard(queueLock);
+    std::lock_guard<std::mutex> lockGuard(queueLock);
     runQueue.push(std::make_pair(task, Context::getActiveContext()));
 
     taskReady.notify_all();
@@ -27,9 +27,9 @@ void OrderedExecutor::run() {
         }
         while (!runQueue.empty()) {
 //            LOGGER("processing task")
-            auto&[task, context_ptr] = runQueue.front();
+            auto&[task, contextPtr] = runQueue.front();
 
-            Context::setActiveContext(context_ptr);
+            Context::setActiveContext(contextPtr);
             task();
 
             runQueue.pop();

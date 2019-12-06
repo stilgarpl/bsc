@@ -71,11 +71,11 @@ public:
     }
 
     void onInvalidChange(const StateIdType &id) {
-//        LOGGER("LOGIC MACHINE ON INVALID CHANGE" + std::to_string(id));
+//        LOGGER("LOGIC MACHINE ON invalid CHANGE" + std::to_string(id));
     }
 
     void onInvalidState(const StateIdType &id) {
-//        LOGGER("LOGIC MACHINE ON INVALID STATE" + std::to_string(id));
+//        LOGGER("LOGIC MACHINE ON invalid STATE" + std::to_string(id));
     }
 
 //    LogicStateMachine() : StateMachine<StateIdType>(onEnter, onLeave) {};

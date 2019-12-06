@@ -37,7 +37,7 @@ public:
     void stateEntered(Object &object, const StateIdType &state) {
         LogicStateEvent<Object, StateIdType> logicEvent(object);
         logicEvent.setEventId(state);
-        logicEvent.setMethod(LogicStateMethod::ENTERED);
+        logicEvent.setMethod(LogicStateMethod::entered);
         source.generateEvent<LogicStateEvent<Object, StateIdType>>(logicEvent);
     }
 
@@ -45,7 +45,7 @@ public:
     void stateLeft(Object &object, const StateIdType &state) {
         LogicStateEvent<Object, StateIdType> logicEvent(object);
         logicEvent.setEventId(state);
-        logicEvent.setMethod(LogicStateMethod::LEFT);
+        logicEvent.setMethod(LogicStateMethod::left);
         source.generateEvent<LogicStateEvent<Object, StateIdType>>(logicEvent);
     }
 

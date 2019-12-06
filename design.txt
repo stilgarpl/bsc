@@ -177,7 +177,7 @@ i żadnych TTarget czy void*, ma byc porządnie.
 MIXED SIGNALS! //DONE
 a co jesli sygnały nie byłyby per source tylko globalne, per logic manager? wtedy odpadłaby potrzeba rejestrowania providerów. source mogłyby generować takie eventy jakie chcą, a sygnały byłyby połączone. dla konkretnego eventa byłby konkretny sygnał a nie zbiór sygnałów per source
 a logic manager i tak wszystkie te sygnały odpala jednocześnie.
-z drugiej strony w tym momencie eventy są generowane tylko przez source, w dodatku clock source przegląda listę swoich sygnałów... może lepiej zostawić to tak jak jest, póki co.
+z drugiej strony w tym momencie eventy są generowane tylko przez source, w dodatku Clock source przegląda listę swoich sygnałów... może lepiej zostawić to tak jak jest, póki co.
 
 zamiast assignActions, setupActions, setupSources przyjmujących logicManager, powinny przyjmować klasy helperów, które robią tylko tą jedną akcję. teraz nic nie stoi na przeszkodzie robic coś innego w tych metodach
 
@@ -339,7 +339,7 @@ mozna to zrobic albo flagą w IEvent, numerem kolejki przetwarzania, execution p
 
 EventChainHelper - dodać optional std::function<bool(EventType)> constraint, która będzie ograniczać eventy
 
-np. state<Transfer>(STARTED).entered() ustawiłoby constraint na if (event.method == ENTERED) a samo action byloby lambdą
+np. state<Transfer>(STARTED).entered() ustawiłoby constraint na if (event.method == entered) a samo action byloby lambdą
 
 if (constraint(event)) action(event);
 

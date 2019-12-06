@@ -11,33 +11,33 @@
 
 class LockConfiguration {
 private:
-    inline static const std::string GROUP_PREFIX = ">GROUP>";
-    inline static const std::string CHAIN_PREFIX = ">CHAIN>";
-    inline static const std::string EVAL_PREFIX = ">EVAL>";
+    inline static const std::string groupPrefix = ">GROUP>";
+    inline static const std::string chainPrefix = ">CHAIN>";
+    inline static const std::string evalPrefix = ">EVAL>";
 
 public:
 
 
-    static auto group(const ChainIdType &groupId) {
-        return [GROUP_PREFIX = GROUP_PREFIX, groupId](const ChainIdType &chainId, auto &event) {
+    static auto group(const ChainIdType& groupId) {
+        return [groupPrefix = groupPrefix, groupId](const ChainIdType& chainId, auto& event) {
             //conversion from group id to lock id
-            return GROUP_PREFIX + groupId;
+            return groupPrefix + groupId;
         };
     }
 
     static auto chain() {
-        return [CHAIN_PREFIX = CHAIN_PREFIX](const ChainIdType &chainId, auto &event) {
+        return [chainPrefix = chainPrefix](const ChainIdType& chainId, auto& event) {
             //conversion from chain id to lock id
-            return CHAIN_PREFIX + chainId;
+            return chainPrefix + chainId;
         };
     }
 
     template<typename Func>
     static auto eval(Func func) {
-        return [EVAL_PREFIX = EVAL_PREFIX, func](const ChainIdType &chainId, auto &event) {
+        return [evalPrefix = evalPrefix, func](const ChainIdType& chainId, auto& event) {
             //@todo I'm quite sure this can be implemented better
             //conversion from evaluated id to lock id
-            return EVAL_PREFIX + func(event);
+            return evalPrefix + func(event);
         };
     }
 

@@ -16,29 +16,29 @@ private:
     unsigned int retry = 0;
     BasePacketPtr packetPtr;
     Connection *connection = nullptr;
-    //@todo is Tick reference necessary? maybe some global clock function? or just std::steady_clock ?
+    //@todo is Tick reference necessary? maybe some global Clock function? or just std::steady_clock ?
     Status expectedStatus = Status::RESPONSE; //@todo what if we expect more than one response? ERROR for example?
-    Tick::clock::time_point timeSent;
+    Tick::Clock::time_point timeSent;
     std::promise<BasePacketPtr> responsePromise;
 
 public:
-    BasePacketInfo(const BasePacketPtr &packetPtr, Connection *connection,
-                   const std::chrono::time_point<Tick::clock> &timeSent);
+    BasePacketInfo(const BasePacketPtr& packetPtr, Connection* connection,
+                   const std::chrono::time_point<Tick::Clock>& timeSent);
 
 public:
     const BasePacketPtr &getPacketPtr() const;
 
     void setPacketPtr(const BasePacketPtr &packetPtr);
 
-    const std::chrono::time_point<Tick::clock> &getTimeSent() const;
+    const std::chrono::time_point<Tick::Clock>& getTimeSent() const;
 
-    void setTimeSent(const std::chrono::time_point<Tick::clock> &timeSent);
+    void setTimeSent(const std::chrono::time_point<Tick::Clock>& timeSent);
 
 public:
-    BasePacketInfo(const BasePacketPtr &packetPtr, const std::chrono::time_point<Tick::clock> &timeSent);
+    BasePacketInfo(const BasePacketPtr& packetPtr, const std::chrono::time_point<Tick::Clock>& timeSent);
 
-    BasePacketInfo(const BasePacketPtr &packetPtr, Connection *connection,
-                   const std::chrono::time_point<Tick::clock> &timeSent, Status expectedStatus);
+    BasePacketInfo(const BasePacketPtr& packetPtr, Connection* connection,
+                   const std::chrono::time_point<Tick::Clock>& timeSent, Status expectedStatus);
 
     Connection *getConnection() const;
 

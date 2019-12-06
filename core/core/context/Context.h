@@ -25,7 +25,7 @@ private:
     typedef unsigned int TypeIdType;
 private:
     //@todo remove debug id
-    std::string debug_id = "";
+    std::string debugId = "";
     bool defaultContext = false;
     mutable std::recursive_mutex contextLock;
     //initialized to nullptr in .cpp file
@@ -170,10 +170,10 @@ public:
     Context& operator+=(const Context::Ptr& other);
 
 
-    void setDebug_id(const std::string& debug_id);
+    void setDebugId(const std::string& debugId);
 
 
-private:
+protected:
     Context() = default;
 
     Context(const Context& other);

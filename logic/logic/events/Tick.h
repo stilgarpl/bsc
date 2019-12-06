@@ -15,16 +15,16 @@
  */
 class Tick : public IEvent<std::chrono::milliseconds> {
 public:
-    typedef std::chrono::steady_clock clock;
-    typedef std::chrono::milliseconds duration;
+    typedef std::chrono::steady_clock Clock;
+    typedef std::chrono::milliseconds Duration;
 
 private:
-    std::chrono::time_point<clock> now;
+    std::chrono::time_point<Clock> now;
 
 public:
-    const std::chrono::time_point<clock> &getNow() const;
+    [[nodiscard]] const std::chrono::time_point<Clock>& getNow() const;
 
-    void setNow(const std::chrono::time_point<clock> &now);
+    void setNow(const std::chrono::time_point<Clock>& now);
 
     Tick();
 };

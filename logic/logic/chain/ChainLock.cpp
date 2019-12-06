@@ -8,37 +8,37 @@
 using namespace std::chrono_literals;
 
 bool ChainLock::isLocked() const {
-    return _locked;
+    return lockedFlag;
 }
 
 const std::optional<InstanceType> &ChainLock::getInstance() const {
-    return _instance;
+    return instance;
 }
 
 void ChainLock::lock(InstanceType newInstance) {
     LOGGER("LOCK " + std::to_string(newInstance))
-    std::unique_lock<std::recursive_mutex> guard(_lock);
-    if (_locked) {
+    std::unique_lock<std::recursive_mutex> guard(mutexLock);
+    if (lockedFlag) {
         LOGGER("waiting for lock")
-        chainReady.wait(guard, [this, newInstance] { return !_locked || (_instance && *_instance == newInstance); });
+        chainReady.wait(guard, [this, newInstance] { return !lockedFlag || (instance && *instance == newInstance); });
     }
     LOGGER("LOCKING ACTUALLY")
-    _locked = true;
-    _instance = newInstance;
+    lockedFlag = true;
+    instance = newInstance;
 }
 
 void ChainLock::waitForUnlock() {
     LOGGER("WAIT LOCK")
-    std::unique_lock<std::recursive_mutex> guard(_lock);
-    if (_locked) {
-        chainReady.wait(guard, [this] { return !_locked; });
+    std::unique_lock<std::recursive_mutex> guard(mutexLock);
+    if (lockedFlag) {
+        chainReady.wait(guard, [this] { return !lockedFlag; });
     }
 }
 
 void ChainLock::unlock() {
     LOGGER("UNLOCK")
-    std::unique_lock<std::recursive_mutex> guard(_lock);
-    _locked = false;
-    _instance = std::nullopt;
+    std::unique_lock<std::recursive_mutex> guard(mutexLock);
+    lockedFlag = false;
+    instance = std::nullopt;
     chainReady.notify_all();
 }

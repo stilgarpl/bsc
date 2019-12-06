@@ -12,7 +12,7 @@ void ThreadPoolExecutor::execute(std::function<void(void)> task) {
         Context::Ptr origContext = Context::getActiveContext();
         std::unique_lock<std::mutex> g(queueLock);
         taskQueue.push(std::make_pair(task, Context::getActiveContext()));
-        if (getActiveWorkerCount() < MAX_WORKER) {
+        if (getActiveWorkerCount() < maxWorker) {
             startWorker();
         }
         queueReady.notify_one();
@@ -30,10 +30,10 @@ void ThreadPoolExecutor::startWorker() {
                 queueReady.wait_for(g, 1s, [&] { return !taskQueue.empty() || !running; });
             }
             if (running && !taskQueue.empty()) {
-                auto[task, context_ptr] = taskQueue.front();
+                auto[task, contextPtr] = taskQueue.front();
                 taskQueue.pop();
                 g.unlock();
-                Context::setActiveContext(context_ptr);
+                Context::setActiveContext(contextPtr);
                 task();
                 g.lock();
 

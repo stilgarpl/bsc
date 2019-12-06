@@ -134,7 +134,7 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
     when(event < LogicStateEvent<NetworkModule, int>>
     ()).fireNewAction([](auto event) {
         LOGGER("logic state event " + std::to_string(event.getState()) +
-               (event.getMethod() == LogicStateMethod::ENTERED ? " ENTERED" : " LEFT"))
+               (event.getMethod() == LogicStateMethod::entered ? " entered" : " left"))
     });
 
 //    Tick tick;

@@ -18,7 +18,7 @@ private:
     template<typename ...T>
     using ChainMap = std::map<ChainIdType, T...>;
     Uber<ChainMap> chainData;
-    InstanceGenerator _instanceGenerator;
+    InstanceGenerator chainInstanceGenerator;
 
 public:
     explicit ChainContext(const ChainIdType &chainId);
@@ -32,7 +32,7 @@ public:
     }
 
     template<typename EventType>
-    EventType &getChainResult(ChainIdType id) {
+    EventType& getChainResult(const ChainIdType& id) {
         auto result = chainData.get<std::shared_ptr<EventType>>()[id];
         return *result;
     }
@@ -41,7 +41,7 @@ public:
 
     //@todo maybe move it somewhere from context? or not.
     InstanceGenerator &instanceGenerator() {
-        return _instanceGenerator;
+        return chainInstanceGenerator;
     }
 
 };

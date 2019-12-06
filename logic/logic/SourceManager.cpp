@@ -15,9 +15,9 @@ void SourceManager::addSource(const std::shared_ptr<ISource> &source) {
 void SourceManager::setContext(const Context::Ptr &context) {
 //    *commonContext += context;
     commonContext->setParentContext(context);
-    commonContext->setDebug_id("source manager common context");
+    commonContext->setDebugId("source manager common context");
     //@todo there may be another way of initializing global chain context, but it may just as well be here...
-//    commonContext->setDebug_id("common context source");
+//    commonContext->setDebugId("common context source");
     context->set<GlobalChainContext>();
 }
 

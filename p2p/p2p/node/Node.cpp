@@ -58,7 +58,7 @@ Node::Node() {
 
     //this creates common context for role definitions across the entire node.
     nodeContext->set<RoleDefinitionsContext>();
-    nodeContext->setDebug_id("node contxt");
+    nodeContext->setDebugId("node contxt");
 
     nodeContext->set<FactoryContext>();
 

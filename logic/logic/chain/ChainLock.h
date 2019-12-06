@@ -17,15 +17,15 @@ class LogicObject;
 class ChainLock {
 
 private:
-    std::recursive_mutex _lock;
-    bool _locked = false;
-    std::optional<InstanceType> _instance = std::nullopt;
+    std::recursive_mutex mutexLock;
+    bool lockedFlag = false;
+    std::optional<InstanceType> instance = std::nullopt;
     std::condition_variable_any chainReady;
 
 public:
-    bool isLocked() const;
+    [[nodiscard]] bool isLocked() const;
 
-    const std::optional<InstanceType> &getInstance() const;
+    [[nodiscard]] const std::optional<InstanceType>& getInstance() const;
 
     void lock(InstanceType newInstance);
 
@@ -37,8 +37,8 @@ public:
 
 private:
 
-    decltype(_lock)& getMutex() {
-        return _lock;
+    decltype(mutexLock)& getMutex() {
+        return mutexLock;
     }
 
 };

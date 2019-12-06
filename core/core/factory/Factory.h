@@ -16,9 +16,9 @@ struct FactoryTraits {
 };
 
 template<typename T>
-class has_argument_type {
+class HasArgumentType {
     template<typename C>
-    constexpr static bool f(typename C::ArgumentType *) {
+    constexpr static bool f(typename C::ArgumentType*) {
         return true;
     }
 
@@ -53,7 +53,7 @@ struct BaseFactory<true, ProducedObjectType, FactorySpecialization...> {
 
 template<typename ProducedObjectType, typename ...  FactorySpecialization>
 struct Factory
-        : public BaseFactory<has_argument_type<FactoryTraits<ProducedObjectType, FactorySpecialization...>>::value, ProducedObjectType, FactorySpecialization...> {
+        : public BaseFactory<HasArgumentType<FactoryTraits<ProducedObjectType, FactorySpecialization...>>::value, ProducedObjectType, FactorySpecialization...> {
 };
 
 template<typename ProducedObjectType,typename ...  FactorySpecialization>

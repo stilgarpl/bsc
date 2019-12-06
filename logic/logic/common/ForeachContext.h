@@ -2,8 +2,8 @@
 // Created by stilgar on 03.02.19.
 //
 
-#ifndef BASYCO_BULKCONTEXT_H
-#define BASYCO_BULKCONTEXT_H
+#ifndef BASYCO_FOREACHCONTEXT_H
+#define BASYCO_FOREACHCONTEXT_H
 
 
 template<typename T>
@@ -11,7 +11,7 @@ class ForeachContext {
 
     T t;
 public:
-    T &getValue() {
+    T& getValue() {
         return t;
     }
 
@@ -22,4 +22,4 @@ public:
 };
 
 
-#endif //BASYCO_BULKCONTEXT_H
+#endif //BASYCO_FOREACHCONTEXT_H

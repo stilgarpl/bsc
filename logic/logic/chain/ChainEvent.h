@@ -33,14 +33,14 @@ public:
             IEvent(stageId), baseChainId(std::move(base)),chainLockId(std::move(chainLockId)) , actualEvent(actualEvent), instance(instance)
             {
 //        this->context()->setParentContext(actualEvent.context());
-        this->context()->setDebug_id("chain event " + stageId);
+        this->context()->setDebugId("chain event " + stageId);
     }
 
     ChainEvent() {
         actualEvent = std::nullopt;
         instance = 0;
         this->setEventValid(false);
-        this->context()->setDebug_id("chain event");
+        this->context()->setDebugId("chain event");
     }
 
     InstanceType getInstance() const {

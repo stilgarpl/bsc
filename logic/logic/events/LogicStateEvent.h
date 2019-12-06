@@ -9,9 +9,9 @@
 
 
 enum class LogicStateMethod {
-    ENTERED,
-    LEFT,
-    INVALID,
+    entered,
+    left,
+    invalid,
 };
 
 template<typename Object, typename StateIdType>
@@ -22,8 +22,8 @@ public:
     typedef Object Type;
     using ExecutionPolicy = OrderedExecutionPolicy;
 private:
-    Object &object;
-    Method method = Method::INVALID;
+    Object& object;
+    Method method = Method::invalid;
 public :
     StateIdType getState() {
         return this->getEventId();

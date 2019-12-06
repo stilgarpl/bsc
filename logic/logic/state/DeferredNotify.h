@@ -27,10 +27,10 @@ public:
 
     void registerObserver(ObserverType& observer) {
         std::unique_lock g(observerLock);
-        auto shared_observer = observer.shared_from_this();
+        auto sharedObserver = observer.shared_from_this();
         //@todo change this assert to something better or remove
-        assert(shared_observer != nullptr);
-        observers.push_back(shared_observer);
+        assert(sharedObserver != nullptr);
+        observers.push_back(sharedObserver);
     }
 
     void unregisterObserver(ObserverType& observer) {

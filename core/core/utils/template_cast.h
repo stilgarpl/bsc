@@ -23,27 +23,27 @@ public:
 
 template<typename T, typename RetType, typename ... Args, typename ... Strings>
 static void runStringCast(T &t, RetType (T::*f)(Args...), Strings ... strings) {
-    (t.*f)(from_string<Args>(strings)...);
+    (t.*f)(fromString<Args>(strings)...);
 }
 
 
 template<typename RetType, typename ... Args, typename ... Strings>
 static void runStringCast(RetType (*f)(Args...), Strings ... strings) {
-    (*f)(from_string<Args>(strings)...);
+    (*f)(fromString<Args>(strings)...);
 }
 
 
 template<size_t num_args>
-struct unpack_caller {
+struct UnpackCaller {
 
 private:
     template<typename T, typename RetType, typename ... Args, size_t... I>
-    void call(T &t, RetType(T::*f)(Args...), std::vector<std::string> &args, std::index_sequence<I...>) {
+    void call(T& t, RetType(T::*f)(Args...), std::vector<std::string>& args, std::index_sequence<I...>) {
         runStringCast(t, f, args[I]...);
     }
 
     template<typename RetType, typename ... Args, size_t... I>
-    void call(RetType(*f)(Args...), std::vector<std::string> &args, std::index_sequence<I...>) {
+    void call(RetType(* f)(Args...), std::vector<std::string>& args, std::index_sequence<I...>) {
         (*f)(args[I]...);
     }
 
@@ -68,13 +68,13 @@ public:
 
 template<typename T, typename RetType, typename ... Args>
 void runMemberFunction(T &t, RetType (T::*f)(Args...), std::vector<std::string> values) {
-    unpack_caller<sizeof... (Args)> a;
+    UnpackCaller<sizeof... (Args)> a;
     a(t, f, values);
 }
 
 template<typename RetType, typename ... Args>
 void runFunction(RetType (*f)(Args...), std::vector<std::string> values) {
-    unpack_caller<sizeof... (Args)> a;
+    UnpackCaller<sizeof... (Args)> a;
     a(f, values);
 }
 

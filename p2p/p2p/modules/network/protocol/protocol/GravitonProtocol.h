@@ -16,7 +16,7 @@ private:
     std::mutex responseMapLock;
     std::map<BasePacket::IdType, std::shared_ptr<BasePacketInfo>> responseMap;
     //todo dynamic timeout
-    const Tick::clock::duration MAX_TIMEOUT = 1500ms;
+    const Tick::Clock::duration MAX_TIMEOUT = 1500ms;
     const unsigned int MAX_RETRY = 5;
 public:
     explicit GravitonProtocol(LogicManager &logicManager);

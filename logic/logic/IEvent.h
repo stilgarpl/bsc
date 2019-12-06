@@ -17,8 +17,8 @@ public:
     //static const bool OriginDefined = constexpr if (originType)
 private:
     IdType eventId;
-    bool _eventValid = true;
-    Context::OwnPtr _context;
+    bool eventValid = true;
+    Context::OwnPtr eventContext;
 public:
     IdType getEventId() const {
         return eventId;
@@ -30,11 +30,11 @@ public:
 
 
     [[nodiscard]] bool isEventValid() const {
-        return _eventValid;
+        return eventValid;
     }
 
     void setEventValid(bool v) {
-        _eventValid = v;
+        eventValid = v;
     }
 
     static void setup(IEvent *event) {
@@ -50,21 +50,21 @@ public:
 
 
     [[nodiscard]] Context::Ptr context() {
-        return _context;
+        return eventContext;
     }
 
     [[nodiscard]] Context::Ptr context() const {
-        return _context;
+        return eventContext;
     }
 
 };
 
 template<typename idType>
-IEvent<idType>::IEvent() : _context(Context::makeContext(Context::getActiveContext())) {
+IEvent<idType>::IEvent() : eventContext(Context::makeContext(Context::getActiveContext())) {
 
-    _context->setDebug_id("event context");
-//    _context = Context::makeContext(Context::getActiveContext());
-//    _context = Context::getActiveContext();
+    eventContext->setDebugId("event context");
+//    eventContext = Context::makeContext(Context::getActiveContext());
+//    eventContext = Context::getActiveContext();
 
 }
 

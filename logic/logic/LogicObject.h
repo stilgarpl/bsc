@@ -127,13 +127,13 @@ public:
     public:
         StateHelper<eventType, Args...> &entered() {
             this->constraint(
-                    [](eventType &event) -> bool { return event.getMethod() == LogicStateMethod::ENTERED; });
+                    [](eventType& event) -> bool { return event.getMethod() == LogicStateMethod::entered; });
             return *this;
         }
 
         StateHelper<eventType, Args...> &left() {
             this->constraint(
-                    [](eventType &event) -> bool { return event.getMethod() == LogicStateMethod::LEFT; });
+                    [](eventType& event) -> bool { return event.getMethod() == LogicStateMethod::left; });
             return *this;
         }
 
@@ -625,7 +625,7 @@ public:
                 chainContext->storeChainResult<EventType>(r.getEventId(), *r.getActualEvent());
                 //debug stuff @todo remove
                 auto activeContext = Context::getActiveContext();
-                activeContext->setDebug_id(id);
+                activeContext->setDebugId(id);
                 return r;
             });
 

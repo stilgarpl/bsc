@@ -11,7 +11,7 @@
 //typedef std::string ResourceId;
 using ChecksumId = std::string;
 
-//@todo different clock maybe? utc_clock?
+//@todo different Clock maybe? utc_clock?
 typedef std::chrono::system_clock::time_point CommitTimeType;
 typedef std::string ChecksumType;
 //@todo path serialization doesn't work, so it's string

@@ -2,9 +2,7 @@
 // Created by stilgar on 11.02.19.
 //
 
-#include <core/log/Logger.h>
 #include "ChainContext.h"
-#include <core/context/Context.h>
 
 
 const ChainIdType &ChainContext::getChainId() const {

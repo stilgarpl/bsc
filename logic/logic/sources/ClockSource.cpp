@@ -9,14 +9,14 @@
 
 using namespace std::chrono_literals;
 
-ClockSource::time_point ClockSource::getLastTick(ClockSource::duration d) {
+ClockSource::TimePoint ClockSource::getLastTick(ClockSource::Duration d) {
     if (lastTick.count(d) == 0) {
-        lastTick[d] = clock::now();
+        lastTick[d] = Clock::now();
     }
     return lastTick[d];
 }
 
-void ClockSource::setLastTick(ClockSource::duration d, ClockSource::time_point t) {
+void ClockSource::setLastTick(ClockSource::Duration d, ClockSource::TimePoint t) {
     lastTick[d] = t;
 }
 
@@ -26,18 +26,18 @@ void ClockSource::run() {
     while (!this->isStopping()) {
         Tick tick;
         //ticks
-        auto now = clock::now();
+        auto now = Clock::now();
         tick.setNow(now);
-        time_point nextTickTime = clock::time_point::max();
+        TimePoint nextTickTime = Clock::time_point::max();
 
         for (auto &&it : sourceManager.getSignalMap<Tick>()) {
-            duration d = it.first;
+            Duration d = it.first;
             if (getLastTick(d) < now - d) {
                 tick.setEventId(it.first);
                 setLastTick(d, now);
                 event<Tick>(tick);
             }
-            time_point timeToNextTick = getLastTick(d) + d;
+            TimePoint timeToNextTick = getLastTick(d) + d;
             nextTickTime = std::min(nextTickTime, timeToNextTick);
         }
 

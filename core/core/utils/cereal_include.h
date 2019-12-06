@@ -24,8 +24,8 @@
 
 //@todo remove if cereal updated with C++17:
 
-#ifndef CEREAL_TYPES_STD_OPTIONAL_
-#define CEREAL_TYPES_STD_OPTIONAL_
+#ifndef CEREAL_TYPES_STD_OPTIONAL
+#define CEREAL_TYPES_STD_OPTIONAL
 
 #include "cereal/cereal.hpp"
 #include <optional>
@@ -34,7 +34,7 @@ namespace cereal {
     //! Saving for std::optional
     template<class Archive, typename T>
     inline
-    void CEREAL_SAVE_FUNCTION_NAME(Archive &ar, const std::optional<T> &optional) {
+    void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const std::optional<T>& optional) {
         if (!optional) {
             ar(CEREAL_NVP_("nullopt", true));
         } else {
@@ -60,6 +60,6 @@ namespace cereal {
     }
 } // namespace cereal
 
-#endif // CEREAL_TYPES_STD_OPTIONAL_
+#endif // CEREAL_TYPES_STD_OPTIONAL
 
 #endif //BASYCO_CEREAL_INCLUDE_H

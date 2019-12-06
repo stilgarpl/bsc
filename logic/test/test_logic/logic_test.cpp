@@ -140,7 +140,7 @@ TEST_CASE("Basic logic test") {
 
 
 TEST_CASE("Chain logic test") {
-    const int COUNT = 1000;
+    const int count = 1000;
 //before
     Context::OwnPtr context = Context::makeContext();
     Context::setActiveContext(context);
@@ -155,13 +155,13 @@ TEST_CASE("Chain logic test") {
 //when
     logicManager.start();
     auto pingSource = logicManager.getSource<PingSource>();
-    for (int j = 0; j < COUNT; ++j) {
+    for (int j = 0; j < count; ++j) {
         pingSource->ping();
     }
     logicManager.stop();
-    waitFor([&] { return setupLogic.getSecondCounter().load() == COUNT; }, 100ms);
-    REQUIRE(setupLogic.getFirstCounter().load() == COUNT);
-    REQUIRE(setupLogic.getSecondCounter().load() == COUNT);
+    waitFor([&] { return setupLogic.getSecondCounter().load() == count; }, 100ms);
+    REQUIRE(setupLogic.getFirstCounter().load() == count);
+    REQUIRE(setupLogic.getSecondCounter().load() == count);
     LOGGER("all ok")
     logicManager.join();
 

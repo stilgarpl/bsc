@@ -5,11 +5,11 @@
 #include <chrono>
 #include "Tick.h"
 
-const std::chrono::time_point<typename Tick::clock> &Tick::getNow() const {
+const std::chrono::time_point<typename Tick::Clock>& Tick::getNow() const {
     return now;
 }
 
-void Tick::setNow(const std::chrono::time_point<typename Tick::clock> &now) {
+void Tick::setNow(const std::chrono::time_point<typename Tick::Clock>& now) {
     Tick::now = now;
 }
 

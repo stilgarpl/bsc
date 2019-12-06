@@ -39,23 +39,23 @@ protected:
 
 /**
  * Uber implementation where containers are templates, with real parameters passed in get<>()
- * @tparam container
+ * @tparam Container
  */
-template<template<typename...> typename container>
+template<template<typename...> typename Container>
 class Uber : public BaseUber {
 public:
 
     template<typename... Args, typename ... ConstructorArgs>
-    container<Args...> &get(ConstructorArgs ... constructorArgs) {
+    Container<Args...>& get(ConstructorArgs ... constructorArgs) {
         std::unique_lock<std::mutex> lock(containerLock);
-        typedef container<Args...> ContainerType;
+        typedef Container<Args...> ContainerType;
         const static auto typeId = getTypeId<Args...>();
-        auto &ref = containers[typeId];
+        auto& ref = containers[typeId];
         if (ref == nullptr) {
             ref = std::make_shared<ContainerType>(constructorArgs...);
 
         }
-        ContainerType &result = *std::static_pointer_cast<ContainerType>(ref);
+        ContainerType& result = *std::static_pointer_cast<ContainerType>(ref);
         return result;
 
     }
@@ -79,21 +79,21 @@ public:
 
 /**
  * Uber implementation where container is always the same, predefined type
- * @tparam container
+ * @tparam Container
  */
-template<typename container>
+template<typename Container>
 class StaticUber : BaseUber {
 public:
 
     template<typename... Args>
-    container &get() {
+    Container& get() {
         std::unique_lock<std::mutex> lock(containerLock);
-        typedef container ContainerType;
+        typedef Container ContainerType;
         const static auto typeId = getTypeId<Args...>();
 //        if (containers.size() <= typeId) {
 //            containers.resize(10*typeId + 20);
 //        }
-        auto &ref = containers[typeId];
+        auto& ref = containers[typeId];
         if (ref == nullptr) {
             ref = std::make_shared<ContainerType>();
 
@@ -103,11 +103,11 @@ public:
 
     }
 
-    void forEach(std::function<void(container &)> func) {
+    void forEach(std::function<void(Container&)> func) {
         std::unique_lock<std::mutex> lock(containerLock);
         for (auto &&[key, it] : containers) {
             if (it != nullptr) {
-                container &result = *std::static_pointer_cast<container>(it);
+                Container& result = *std::static_pointer_cast<Container>(it);
                 func(result);
             }
         }

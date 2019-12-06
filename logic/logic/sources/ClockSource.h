@@ -10,18 +10,18 @@
 #include "../events/Tick.h"
 
 class ClockSource : public ISource {
-    typedef Tick::clock clock;
-    typedef std::chrono::time_point<clock> time_point;
-    typedef Tick::duration duration;
+    typedef Tick::Clock Clock;
+    typedef std::chrono::time_point<Clock> TimePoint;
+    typedef Tick::Duration Duration;
 private:
-    std::map<duration, time_point> lastTick;
+    std::map<Duration, TimePoint> lastTick;
 protected:
-    time_point getLastTick(duration d);
+    TimePoint getLastTick(Duration d);
 
-    void setLastTick(duration d, time_point t);
+    void setLastTick(Duration d, TimePoint t);
 
 public:
-    explicit ClockSource(SourceManager &sourceManager);
+    explicit ClockSource(SourceManager& sourceManager);
 
     void run() override;
 

@@ -78,12 +78,12 @@ bool Context::isDefaultContext() const {
 
 Context::Context(bool defaultContext) : defaultContext(defaultContext) {}
 
-void Context::setDebug_id(const std::string& debug_id) {
-    Context::debug_id = debug_id;
+void Context::setDebugId(const std::string& debugId) {
+    Context::debugId = debugId;
 }
 
 Context::~Context() {
-//    LOGGER("context destructor " + debug_id);
+//    LOGGER("context destructor " + debugId);
 
 }
 
