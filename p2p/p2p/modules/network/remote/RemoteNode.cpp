@@ -39,8 +39,10 @@ bool RemoteNode::connectTo(const NetAddressType &address) {
         return true;
     } catch (const Poco::Net::ConnectionRefusedException &) {
         //@todo connection refused in connectionSource
+        LOGGER("Connection refused")
         return false;
     } catch (const Poco::InvalidArgumentException &) {
+        LOGGER("Invalid connection argument")
         return false;
     }
 }

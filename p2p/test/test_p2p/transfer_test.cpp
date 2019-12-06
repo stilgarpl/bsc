@@ -76,8 +76,9 @@ TEST_CASE("Transfer test") {
 
     thisNode.waitUntilStarted();
     otherNode.waitUntilStarted();
-
-    auto &remoteSecondNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9192");
+    //@todo if possible, wait for otherNode to start listening.
+    std::this_thread::sleep_for(500ms);
+    auto& remoteSecondNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9192");
     bool connectedToSecond = remoteSecondNode.isConnected();
     INFO("testing require")
     REQUIRE(connectedToSecond);

@@ -127,7 +127,9 @@ TEST_CASE("Repo module test") {
     otherNode.start();
     thisNode.waitUntilStarted();
     otherNode.waitUntilStarted();
-    auto &secondNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
+    //@todo if possible, wait for otherNode to start listening.
+    std::this_thread::sleep_for(500ms);
+    auto& secondNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
     bool connectedToSecond = secondNode.isConnected();
 
     REQUIRE(connectedToSecond);
