@@ -27,7 +27,7 @@ void waitFor(const std::function<bool(void)> &expression, std::chrono::milliseco
 }
 
 #define INFO LOGGER
-#define REQUIRE(x) if (!(x)) throw int(5);
+#define REQUIRE(x) if (!(x)) throw std::domain_error("require");
 
 int main(int argc, char *argv[]) {
 

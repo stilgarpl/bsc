@@ -743,7 +743,7 @@ public:
     };
 
 
-    ChainGroup chainGroup(ChainIdType groupId) {
+    static ChainGroup chainGroup(ChainIdType groupId) {
         return ChainGroup(std::move(groupId));
     }
 
@@ -753,12 +753,12 @@ public:
     }
 
     template<typename ObjectType, typename StateIdType = typename ObjectType::StateIdType, typename ... Args>
-    StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...> state() {
+    static StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...> state() {
         return StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...>();
     }
 
     template<typename ObjectType, typename StateIdType = typename ObjectType::StateIdType, typename ... Args>
-    StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...> state(StateIdType id) {
+    static StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...> state(StateIdType id) {
         return StateHelper<LogicStateEvent<ObjectType, StateIdType>, Args...>(id);
     }
 
@@ -767,6 +767,7 @@ public:
         return EventHelper<EventType, Args...>(id);
     }
 
+protected:
     template<typename EventType, typename ... Args>
     SimpleLogicChainHelper<EventType, Args...> when(const EventHelper<EventType, Args...> eventHelper) {
         return SimpleLogicChainHelper<EventType, Args...>(eventHelper, logicManager, *this);

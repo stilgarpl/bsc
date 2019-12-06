@@ -4,6 +4,5 @@
 
 #include "NotRequestException.h"
 
-NotRequestException::NotRequestException() {
 
-}
+NotRequestException::NotRequestException(const std::string& arg) : invalid_argument(arg) {}

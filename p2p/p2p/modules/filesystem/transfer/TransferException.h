@@ -5,11 +5,13 @@
 #ifndef BASYCO_TRANSFEREXCEPTION_H
 #define BASYCO_TRANSFEREXCEPTION_H
 
+#include <stdexcept>
+
 //@todo move this somewhere where it belongs
-class TransferException {
+class TransferException : public std::domain_error {
 
 public:
-    TransferException();
+    explicit TransferException(const std::string& arg);
 };
 
 

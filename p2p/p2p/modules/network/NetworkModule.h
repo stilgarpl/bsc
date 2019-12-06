@@ -188,13 +188,7 @@ public: // @todo should be public or shouldn't ?
 
     void onStart() override;
 
-    RemoteNode &connectTo(const NetAddressType &address) {
-        RemoteNode &remoteNode = getRemoteNode();
-        if (!remoteNode.connectTo(address)) {
-            throw RemoteNodeConnectionException();
-        }
-        return remoteNode;
-    }
+    RemoteNode& connectTo(const NetAddressType& address);
 
     RemoteNode &connectToNode(const NodeIdType& nodeId) {
         //@todo catch exception
@@ -291,13 +285,13 @@ public: // @todo should be public or shouldn't ?
             return **iter;
         } else {
             //there is no active remote node with this id, let's see if it is known in network information
-            auto networkInfo = getNetworkInfo();
+//            auto networkInfo = getNetworkInfo();
             if (networkInfo->isNodeKnown(nodeId)) {
                 auto &remoteNode = getRemoteNode();
                 remoteNode.setRemoteNodeInfo(networkInfo->getRemoteNodeInfo(nodeId));
                 return remoteNode;
             } else {
-                throw RemoteNodeNotFoundException();
+                throw RemoteNodeNotFoundException("Remote node unknown");
             }
         }
     }

@@ -92,7 +92,7 @@ public:
             archive >> data;
 
         } else {
-            throw DataFileNotFoundException();
+            throw DataFileNotFoundException("Data file to load not found : " + filePath.string());
         }
         return data;
     }

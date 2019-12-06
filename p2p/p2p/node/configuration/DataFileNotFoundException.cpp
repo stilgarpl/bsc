@@ -3,3 +3,5 @@
 //
 
 #include "DataFileNotFoundException.h"
+
+DataFileNotFoundException::DataFileNotFoundException(const std::string& arg) : domain_error(arg) {}

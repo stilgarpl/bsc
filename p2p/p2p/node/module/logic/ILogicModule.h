@@ -94,6 +94,7 @@ public:
 //
 //        StateModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, INode &node) : ModuleLogicChainHelper<EventType, Args...>(eventHelper,l,node){};
 //    };
+protected:
 
     template<typename EventType, typename ... Args>
     ModuleLogicChainHelper<EventType, Args...> when(const EventHelper<EventType, Args...> eventHelper) {

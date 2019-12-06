@@ -253,7 +253,7 @@ public:
     bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
 
 private:
-    std::vector<std::string> explode(std::string const &s, char delim) {
+    static std::vector<std::string> explode(std::string const& s, char delim) {
         std::vector<std::string> result;
         std::istringstream iss(s);
 
@@ -322,33 +322,11 @@ public:
 
     void initialize() override;
 
-
-
-    ////////////////////////////////
-    /// Commands section
-    ////////////////////////////////
-    void testingMethodInt(int a) {
-        LOGGER("Command testing method INT " + std::to_string(a));
-    }
-
-    void testingMethodIntFloat(int a, float b) {
-        LOGGER("Command testing method INT FLOAT " + std::to_string(a) + " " + std::to_string(b));
-    }
-
-
     void sendRemoteCommand(ArgumentContainerType args);
 
     void sendCommandToRemoteNode(RemoteNode &remoteNode, ArgumentContainerType args);
 
     void broadcastRemoteCommand(ArgumentContainerType args);
-
-    void listCommands() {
-
-    }
-
-    void sleep(int seconds) {
-        std::this_thread::sleep_for(std::chrono::seconds(seconds));
-    }
 
     void runInBackground(ArgumentContainerType args);
 
@@ -366,6 +344,28 @@ public:
         }
 
     }
+
+
+    ////////////////////////////////
+    /// Commands section
+    ////////////////////////////////
+    void testingMethodInt(int a) {
+        LOGGER("Command testing method INT " + std::to_string(a));
+    }
+
+    void testingMethodIntFloat(int a, float b) {
+        LOGGER("Command testing method INT FLOAT " + std::to_string(a) + " " + std::to_string(b));
+    }
+
+
+    void listCommands() {
+
+    }
+
+    void sleep(int seconds) {
+        std::this_thread::sleep_for(std::chrono::seconds(seconds));
+    }
+
 
 };
 

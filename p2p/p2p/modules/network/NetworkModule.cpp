@@ -367,9 +367,17 @@ void NetworkModule::update(Connection &connection, ConnectionState type) {
 
 }
 
-void NetworkModule::SubModule::setupPacketProcessing(NetworkModule &node) {
+RemoteNode& NetworkModule::connectTo(const NetAddressType& address) {
+    RemoteNode& remoteNode = getRemoteNode();
+    if (!remoteNode.connectTo(address)) {
+        throw RemoteNodeConnectionException("Unable to connect to remote node");
+    }
+    return remoteNode;
+}
 
-    for (const auto &processingItem : processingList) {
+void NetworkModule::SubModule::setupPacketProcessing(NetworkModule& node) {
+
+    for (const auto& processingItem : processingList) {
         processingItem->registerPacketProcessor(node);
     }
 

@@ -5,11 +5,12 @@
 #ifndef BASYCO_DATAFILENOTFOUNDEXCEPTION_H
 #define BASYCO_DATAFILENOTFOUNDEXCEPTION_H
 
-#include <exception>
+#include <stdexcept>
 
-class DataFileNotFoundException : public std::exception {
+class DataFileNotFoundException : public std::domain_error {
 
-
+public:
+    explicit DataFileNotFoundException(const std::string& arg);
 };
 
 

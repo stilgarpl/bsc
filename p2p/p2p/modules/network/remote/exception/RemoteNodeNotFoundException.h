@@ -5,11 +5,12 @@
 #ifndef BASYCO_REMOTENODENOTFOUNDEXCEPTION_H
 #define BASYCO_REMOTENODENOTFOUNDEXCEPTION_H
 
+#include <stdexcept>
 
-class RemoteNodeNotFoundException {
+class RemoteNodeNotFoundException : public std::domain_error {
 
 public:
-    RemoteNodeNotFoundException();
+    RemoteNodeNotFoundException(const std::string& arg);
 };
 
 

@@ -5,11 +5,12 @@
 #ifndef BASYCO_NOTREQUESTEXCEPTION_H
 #define BASYCO_NOTREQUESTEXCEPTION_H
 
+#include <stdexcept>
 
-class NotRequestException {
+class NotRequestException : public std::invalid_argument {
 
 public:
-    NotRequestException();
+    NotRequestException(const std::string& arg);
 };
 
 

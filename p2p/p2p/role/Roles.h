@@ -37,7 +37,7 @@ public:
         if (isRoleValid(role)) {
             allowed(args...);
         } else {
-            throw RoleInvalidException();
+            throw RoleInvalidException("No such role");
         }
     }
 

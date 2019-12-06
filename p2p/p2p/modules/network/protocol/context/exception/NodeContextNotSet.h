@@ -6,8 +6,12 @@
 #define BASYCO_NODECONTEXTNOTSET_H
 
 
-class NodeContextNotSet {
+#include <stdexcept>
 
+class NodeContextNotSet : public std::domain_error {
+
+public:
+    NodeContextNotSet(const std::string& arg);
 };
 
 

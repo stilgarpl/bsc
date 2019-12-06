@@ -44,7 +44,7 @@ ClientConnection::~ClientConnection() {
     //@todo this socket is closed twice when client connection is destroyed. do something about it.
     try {
 //        socket.shutdown();
-        shutdown();
+        ClientConnection::shutdown();
     } catch (const Poco::Net::NetException &e) {
         LOGGER("net exception")
         LOGGER(e.displayText());

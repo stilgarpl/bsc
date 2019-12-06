@@ -5,11 +5,12 @@
 #ifndef BASYCO_ROLEINVALIDEXCEPTION_H
 #define BASYCO_ROLEINVALIDEXCEPTION_H
 
+#include <stdexcept>
 
-class RoleInvalidException {
+class RoleInvalidException : public std::domain_error {
 
 public:
-    RoleInvalidException();
+    RoleInvalidException(const std::string& arg);
 };
 
 

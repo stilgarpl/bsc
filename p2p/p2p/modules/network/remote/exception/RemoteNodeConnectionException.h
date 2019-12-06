@@ -5,8 +5,12 @@
 #ifndef BASYCO_REMOTENODECONNECTIONEXCEPTION_H
 #define BASYCO_REMOTENODECONNECTIONEXCEPTION_H
 
+#include <stdexcept>
 
-class RemoteNodeConnectionException {
+class RemoteNodeConnectionException : public std::domain_error {
+
+public:
+    RemoteNodeConnectionException(const std::string& arg);
 
 };
 

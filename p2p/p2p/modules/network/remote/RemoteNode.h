@@ -107,9 +107,10 @@ public:
             protocol->send(connectionFetcher->getConnection(), p);
 
         } else {
+            using namespace std::string_literals;
             LOGGER("unable to send packet to " +
-                   (remoteNodeInfo.getNodeInfo() ? remoteNodeInfo.getNodeInfo()->getNodeId() : "remote node.") +
-                   "Not connected")
+                   (remoteNodeInfo.getNodeInfo() ? remoteNodeInfo.getNodeInfo()->getNodeId() : "remote node."s) +
+                   "Not connected"s)
 
         }
     }
@@ -119,7 +120,7 @@ public:
         std::unique_lock g(*connectionFetcher);
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
         if (p->getStatus() != Status::REQUEST) {
-            throw NotRequestException();
+            throw NotRequestException("Packed has different status than request.");
         }
         if (connectionFetcher->getConnection() != nullptr) {
 

@@ -33,7 +33,7 @@ public:
         if (ptr != nullptr) {
             return ptr->getNode();
         } else {
-            throw NodeContextNotSet();
+            throw NodeContextNotSet("NodeContext not available in active context");
         }
     }
 };

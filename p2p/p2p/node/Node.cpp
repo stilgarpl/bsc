@@ -14,11 +14,11 @@
 Node::~Node() {
     std::unique_lock <std::recursive_mutex> g(startMutex);
     //setting node context to active - if more than one node is created in a single thread, things may get mixed up.
-    setNodeContextActive();
+    Node::setNodeContextActive();
     if (started) {
         ERROR("stopping in destructor is usually too late. stop and wait!")
-        stop();
-        waitToFinish();
+        Node::stop();
+        Node::waitToFinish();
     }
 
 
@@ -65,7 +65,7 @@ Node::Node() {
     logicManager.setContexts(nodeContext);
 
     Node::setNodeContextActive();
-
+    LOGGER("node constructor finished")
 }
 
 

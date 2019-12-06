@@ -4,6 +4,4 @@
 
 #include "TransferException.h"
 
-TransferException::TransferException() {
-
-}
+TransferException::TransferException(const std::string& arg) : domain_error(arg) {}

@@ -4,6 +4,4 @@
 
 #include "RoleInvalidException.h"
 
-RoleInvalidException::RoleInvalidException() {
-
-}
+RoleInvalidException::RoleInvalidException(const std::string& arg) : domain_error(arg) {}

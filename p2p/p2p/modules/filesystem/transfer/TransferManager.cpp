@@ -475,7 +475,7 @@ void TransferManager::TransferQueue::start() {
     }
     if (transfersToStart > 0) {
         LOGGER("some transfers were not started " + std::to_string(transfersToStart))
-        throw TransferException();
+        throw TransferException("Some transfers were not started :" + std::to_string(transfersToStart));
     }
 }
 
@@ -527,7 +527,7 @@ TransferManager::TransferQueue::queueTransfer(ResourceIdentificatorPtr source, R
         transfers.push_back(transfer);
     } else {
         LOGGER("failed to initiate transfer!")
-        throw TransferException();
+        throw TransferException("Failed to initiate transfer");
     }
 }
 
@@ -540,7 +540,7 @@ void TransferManager::TransferQueue::waitToFinishAllTransfers() {
 
     if (this->getCurrentState() == TransferState::ERROR) {
         LOGGER("current state is error, terminating")
-        throw TransferException();
+        throw TransferException("Transfer error");
     }
 
 }
