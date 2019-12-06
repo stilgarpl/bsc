@@ -311,7 +311,7 @@ void Repository::forget(fs::path path) {
 
     auto &fileMap = getFileMap();
     if (path.is_relative()) {
-        //@todo not so sure about current path, i have to make sure this is always set to the right value
+        //@todo not so sure about current path, i have to make sure this is always setDirect to the right value
         path = fs::canonical(fs::current_path() / path);
     }
     if (fileMap.contains(path)) {
@@ -331,7 +331,7 @@ void Repository::remove(fs::path path) {
 
     auto &fileMap = getFileMap();
     if (path.is_relative()) {
-        //@todo not so sure about current path, i have to make sure this is always set to the right value
+        //@todo not so sure about current path, i have to make sure this is always setDirect to the right value
         path = fs::canonical(fs::current_path() / path);
     }
     if (fileMap.contains(path)) {
@@ -358,7 +358,7 @@ void Repository::remove(fs::path path) {
 void Repository::ignore(fs::path path) {
 //    auto &fileMap = getFileMap();
     if (path.is_relative()) {
-        //@todo not so sure about current path, i have to make sure this is always set to the right value
+        //@todo not so sure about current path, i have to make sure this is always setDirect to the right value
         path = fs::canonical(fs::current_path() / path);
     }
     if (!fs::is_directory(path)) {
@@ -478,7 +478,7 @@ void Repository::RepoFileMap::prepareMap() {
         });
 
 
-        //@todo set attributes for ignores.
+        //@todo setDirect attributes for ignores.
         journal->replay();
         mapChecksum = journal->getChecksum();
     }
@@ -568,7 +568,7 @@ bool Repository::RepoDeployMap::DeployAttributes::isDeployed() const {
 }
 
 void Repository::RepoDeployMap::DeployAttributes::setDeployed(bool deployed) {
-    LOGGER("set deployed")
+    LOGGER("setDirect deployed")
     DeployAttributes::deployed = deployed;
 }
 

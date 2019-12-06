@@ -45,7 +45,7 @@ FileData::FileData(const fs::path& path) {
             sha256hash = calculateSha1OfFile(path);
         }
     } else {
-        //@todo throw? or just leave it empty? or set an "empty flag? i think it should be left empty, it will work nicely with deleting files in JournalState
+        //@todo throw? or just leave it empty? or setDirect an "empty flag? i think it should be left empty, it will work nicely with deleting files in JournalState
         canonicalPath = fs::weakly_canonical(path);
     }
 

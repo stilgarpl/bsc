@@ -67,8 +67,8 @@ public:
 
     std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p);
 
-    template<enum Status status = Status::RESPONSE, typename SendType>
-    auto sendExpect(Connection *conn, NetworkPacketPointer<SendType> p) {
+    template<enum Status status = Status::response, typename SendType>
+    auto sendExpect(Connection* conn, NetworkPacketPointer<SendType> p) {
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
         auto future = send(conn, p, status);
         //future.wait();
@@ -92,14 +92,14 @@ public:
 
     template<typename SendType>
     auto sendExpectExtended(Connection *conn, NetworkPacketPointer<SendType> p) {
-        typedef typename PacketInfo<typename SendType::BaseType, Status::RESPONSE>::Type ResponseType;
-        typedef typename PacketInfo<typename SendType::BaseType, Status::ERROR>::Type ErrorType;
+        typedef typename PacketInfo<typename SendType::BaseType, Status::response>::Type ResponseType;
+        typedef typename PacketInfo<typename SendType::BaseType, Status::error>::Type ErrorType;
         struct ReturnValue {
             std::shared_ptr<ResponseType> response = nullptr;
             std::shared_ptr<ErrorType> error = nullptr;
         };
         ReturnValue returnValue;
-        auto future = send(conn, p, Status::RESPONSE);
+        auto future = send(conn, p, Status::response);
         //future.wait();
         //@todo check if there is a way to do it without exceptions, maybe .valid() ?
         try {
@@ -107,7 +107,7 @@ public:
             auto ret = future.get();
 //            LOGGER("future got" + std::to_string(p->getId()))
             // auto retStatus = ret->getStatus(); //debug
-            if (ret->getStatus() == Status::RESPONSE) {
+            if (ret->getStatus() == Status::response) {
                 returnValue.response = std::static_pointer_cast<ResponseType>(ret);
             } else {
                 returnValue.error = std::static_pointer_cast<ErrorType>(ret);

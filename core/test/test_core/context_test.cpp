@@ -20,7 +20,7 @@ TEST_CASE("Context test") {
         SECTION("active context thread test") {
             REQUIRE(Context::getActiveContext() == localContext);
             Context::OwnPtr otherContext = Context::makeContext(localContext);
-            //each thread has its own context, so new thread won't have an active context until set.
+            //each thread has its own context, so new thread won't have an active context until setDirect.
             std::thread([&otherContext]() {
                 REQUIRE(!Context::hasActiveContext());
                 Context::setActiveContext(otherContext);
@@ -74,7 +74,7 @@ public:
 TEST_CASE("InputOutput Context test") {
     Context::OwnPtr context = Context::makeContext();
     Context::setActiveContext(context);
-    context->setContext<InputOutputContext, TestInputOutputContext>();
+    context->setDirect<InputOutputContext>(std::make_shared<TestInputOutputContext>());
 
     auto& out = context->get<InputOutputContext>()->out();
     auto& in = context->get<InputOutputContext>()->in();
@@ -87,4 +87,9 @@ TEST_CASE("InputOutput Context test") {
     in >> result;
     REQUIRE(result == "TEST"); //first word
 
+}
+
+TEST_CASE("Invalid context test") {
+    Context::OwnPtr context = Context::makeContext();
+    REQUIRE_THROWS_AS(context->setDirect<InputOutputContext>(std::make_shared<int>()), InvalidContextException);
 }

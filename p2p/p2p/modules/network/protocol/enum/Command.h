@@ -7,9 +7,9 @@
 
 
 enum class Command {
-    ECHO,
-    DISCOVERY,
-    GET_NODEINFO,
+    echo,
+    discovery,
+    getNodeinfo,
 
 };
 

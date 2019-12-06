@@ -11,7 +11,7 @@
 #include "../IEvent.h"
 
 /**
- * tick every set amount of time
+ * tick every setDirect amount of time
  */
 class Tick : public IEvent<std::chrono::milliseconds> {
 public:

@@ -1,4 +1,4 @@
-#set(CMAKE_CXX_STANDARD 17)
+#setDirect(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES test_logic/test_main.cpp test_logic/logic_test.cpp)
 

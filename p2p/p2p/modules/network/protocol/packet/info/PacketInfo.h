@@ -21,22 +21,22 @@ struct PacketInfo {
 //template partial specialization, if new Status is added, it should be specialized here
 
 template<typename PacketType>
-struct PacketInfo<PacketType, Status::REQUEST> {
+struct PacketInfo<PacketType, Status::request> {
     typedef typename PacketType::Request Type;
 };
 
 template<typename PacketType>
-struct PacketInfo<PacketType, Status::RESPONSE> {
+struct PacketInfo<PacketType, Status::response> {
     typedef typename PacketType::Response Type;
 };
 
 template<typename PacketType>
-struct PacketInfo<PacketType, Status::ACK> {
+struct PacketInfo<PacketType, Status::ack> {
     typedef typename PacketType::Ack Type;
 };
 
 template<typename PacketType>
-struct PacketInfo<PacketType, Status::ERROR> {
+struct PacketInfo<PacketType, Status::error> {
     typedef typename PacketType::Error Type;
 };
 
@@ -86,14 +86,14 @@ struct PacketUtils {
  * @tparam overrideStatus DO NOT USE, INTERNAL USE ONLY
  * @tparam sts DO NOT USE, INTERNAL USE ONLY
  */
-template<typename GroupType, typename S = BasePacket, bool overrideStatus = false, enum Status sts = Status::ERROR>
+template<typename GroupType, typename S = BasePacket, bool overrideStatus = false, enum Status sts = Status::error>
 struct Packet : public BasePacket {
     typedef GroupType BaseType;
     typedef NetworkPacketPointer<S> Ptr;
 
 
     template<enum Status ss, typename Type>
-    static auto getNew(Type *t) {
+    static auto getNew(Type* t) {
         return PacketUtils::getNewPtr<ss>(t);
     }
 
@@ -124,11 +124,11 @@ struct Packet : public BasePacket {
 
     constexpr static Status getPacketStatus() {
         if (overrideStatus) return sts;
-        if (std::is_same<typename GroupType::Request, S>::value) return Status::REQUEST;
-        if (std::is_same<typename GroupType::Response, S>::value) return Status::RESPONSE;
-        if (std::is_same<typename GroupType::Ack, S>::value) return Status::ACK;
-        if (std::is_same<typename GroupType::Error, S>::value) return Status::ERROR;
-        return Status::ERROR;
+        if (std::is_same<typename GroupType::Request, S>::value) return Status::request;
+        if (std::is_same<typename GroupType::Response, S>::value) return Status::response;
+        if (std::is_same<typename GroupType::Ack, S>::value) return Status::ack;
+        if (std::is_same<typename GroupType::Error, S>::value) return Status::error;
+        return Status::error;
     };
 
     Packet() {
@@ -169,10 +169,10 @@ protected:
 //template<typename Group=BaseGroup>
 struct PacketGroup {
 
-    typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::REQUEST> Request;
-    typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::RESPONSE> Response;
-    typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::ERROR> Error;
-    typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::ACK> Ack;
+    typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::request> Request;
+    typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::response> Response;
+    typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::error> Error;
+    typedef Packet<PacketGroup, Packet<PacketGroup>, true, Status::ack> Ack;
 
 
 };

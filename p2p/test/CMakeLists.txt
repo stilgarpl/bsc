@@ -1,4 +1,4 @@
-#set(CMAKE_CXX_STANDARD 17)
+#setDirect(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES test_p2p/test_main.cpp test_p2p/transfer_test.cpp test_p2p/remote_node_test.cpp)
 

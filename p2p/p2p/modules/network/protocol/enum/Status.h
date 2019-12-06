@@ -7,11 +7,10 @@
 
 
 enum class Status {
-
-    REQUEST,
-    RESPONSE,
-    ACK,
-    ERROR,
+    request,
+    response,
+    ack,
+    error,
 };
 
 

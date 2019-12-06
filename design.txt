@@ -69,13 +69,13 @@ persist file.file
 
 define submodule -> wersja z subCommandDispatcher jest nierealna, bo nie wiadomo ile argumentow przyjdzie, a tu musialby byc alternatywny flow ktory przekazuje caly vector
 
-cmd->submodule("opengl")->mapCommand("set", &OpenGlModule::set);
+cmd->submodule("opengl")->mapCommand("set", &OpenGlModule::setDirect);
 cmd->mapComannd == cmd->DefaultSubModule()->mapCommand
 
 pierwszy argument byłby sprawdzany czy jest w submodule. jesli jest, no to submodule(arg[0])->runCommand(arg[1], args...)
 jesli nie, noto submodule()->runCommand(arg[0], args...)
 
-a runCommand w submodule mogloby robic to samo, wiec mozliwe byloby
+a runRemoteCommand w submodule mogloby robic to samo, wiec mozliwe byloby
 
 cmd->submodule("remote")->submodule("opengl")->mapCommand
 

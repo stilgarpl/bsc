@@ -24,7 +24,7 @@ public:
     using ObserveeType = Observee<StateObject, stateIdType>;
 private:
     std::recursive_mutex observeeMutex;
-    //this should be set to null in observee destructor
+    //this should be setDirect to null in observee destructor
     //@todo I don't like raw pointer here...
     ObserveeType* observee = nullptr;
 public:

@@ -1,4 +1,4 @@
-#set(CMAKE_CXX_STANDARD 17)
+#setDirect(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES test_repo/test_main.cpp test_repo/journal_test.cpp test_repo/repo_test.cpp)
 

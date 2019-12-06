@@ -54,7 +54,7 @@ Node::Node() {
     LOGGER("default node constructor")
     nodeContext->set<NodeContext, Node &, NodeInfo &>(*this, this->thisNodeInfo);
     nodeContext->set<LoggerContext>([&] { return thisNodeInfo.getNodeId(); });
-    nodeContext->setContext<InputOutputContext, StandardInputOutputContext>();
+    nodeContext->setDirect<InputOutputContext>(std::make_shared<StandardInputOutputContext>());
 
     //this creates common context for role definitions across the entire node.
     nodeContext->set<RoleDefinitionsContext>();

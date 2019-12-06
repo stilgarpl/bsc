@@ -81,7 +81,7 @@ public:
         void registerPacketProcessor(NetworkModule &node) override {
             node.when(NetworkConditions::packetReceived<typename PacketType::Request>()).fireNewAction(
                     [processor = processor](const SpecificPacketEvent<typename PacketType::Request> packetEvent) {
-                        //@todo Status::ERROR handling.
+                        //@todo Status::error handling.
                         auto response = processor(packetEvent.getPacket());
                         if (response != nullptr) {
                             response->setId(packetEvent.getPacket()->getId());
@@ -130,7 +130,7 @@ public:
     void addToNetwork(const NetworkIdType &networkId) {
         networkInfo = std::make_shared<NetworkInfo>();
         networkInfo->setNetworkId(networkId);
-        //@todo this shouldn't be set twice... or should it?
+        //@todo this shouldn't be setDirect twice... or should it?
         node.getNodeInfo().setNetworkId(networkId);
     }
 
@@ -204,8 +204,8 @@ public: // @todo should be public or shouldn't ?
 //    //@todo add version that uses protocol and returns future
 //    bool sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet);
 
-    template<enum Status status = Status::RESPONSE, typename SendType>
-    auto sendPacketToNode(const NodeIdType &nodeId, NetworkPacketPointer<SendType> p) {
+    template<enum Status status = Status::response, typename SendType>
+    auto sendPacketToNode(const NodeIdType& nodeId, NetworkPacketPointer<SendType> p) {
         return getRemoteNode(nodeId).sendRequestToNode(p);
     }
 
@@ -222,8 +222,8 @@ public: // @todo should be public or shouldn't ?
 
     }
 
-    template<enum Status status = Status::RESPONSE, typename SendType>
-    auto broadcastRequest(NetworkPacketPointer<SendType> p, const BroadcastScope &scope = BroadcastScope::CONNECTED) {
+    template<enum Status status = Status::response, typename SendType>
+    auto broadcastRequest(NetworkPacketPointer<SendType> p, const BroadcastScope& scope = BroadcastScope::CONNECTED) {
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
 
         std::map<NodeIdType, NetworkPacketPointer<ReturnType>> ret;
@@ -231,7 +231,7 @@ public: // @todo should be public or shouldn't ?
 
         std::lock_guard<std::mutex> g(activeConnectionsMutex);
 
-        for (auto &&item : remoteNodes) {
+        for (auto&& item : remoteNodes) {
             if (item->getNodeId()) {
                 //id has to be reset so no two packets sent have the same id.
                 p->resetId();

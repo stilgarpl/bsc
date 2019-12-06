@@ -42,6 +42,7 @@ public:
 
     class Response : public Packet<CommandPacket, CommandPacket::Response> {
         bool runStatus;
+        std::string output;
     public:
         void process(Context::Ptr context) override;
 
@@ -49,11 +50,15 @@ public:
 
         void setRunStatus(bool runStatus);
 
+        const std::string& getOutput() const;
+
+        void setOutput(const std::string& output);
+
     private:
         template<class Archive>
-        void serialize(Archive &ar) {
+        void serialize(Archive& ar) {
             ar & cereal::base_class<Packet<CommandPacket, CommandPacket::Response>>(this);
-            ar & runStatus;
+            ar & runStatus & output;
         }
 
 

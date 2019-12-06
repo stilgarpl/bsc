@@ -40,7 +40,7 @@ void SimpleJournal::replay() {
         }
     }
 
-    //@todo think if clearFunc() should not be invoked here and replay should check if any functions are set. this way, if someone changes some but not all functions, replay will not do stupid things.
+    //@todo think if clearFunc() should not be invoked here and replay should check if any functions are setDirect. this way, if someone changes some but not all functions, replay will not do stupid things.
 }
 
 void SimpleJournal::replayCurrentState() {

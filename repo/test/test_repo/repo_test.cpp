@@ -165,7 +165,7 @@ TEST_CASE("Repo module test") {
     auto num = fs::remove_all(testPath);
 
     REQUIRE(num == 8);
-    //@todo set the path from the actual configuration set in this test
+    //@todo set the path from the actual configuration setDirect in this test
 
     auto repoXMLPath = otherNode.getConfigurationManager().getDataPath() / "repo" / "test.xml";
     std::cout << repoXMLPath << std::endl;

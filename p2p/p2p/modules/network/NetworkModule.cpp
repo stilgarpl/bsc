@@ -23,6 +23,7 @@
 #include <logic/actions/CommonActions.h>
 #include <logic/chain/ChainEvaluators.h>
 #include <p2p/modules/network/remote/RemoteNodeContext.h>
+#include <core/io/InputOutputContext.h>
 
 
 using namespace Poco::Net;
@@ -221,17 +222,18 @@ void NetworkModule::purgeDuplicateConnections() {
 
 void NetworkModule::printConnections() {
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    std::cout << "[" << node.getNodeInfo().getNodeId() << "]:" << std::to_string(acceptedConnections.size())
-              << std::endl;
-    for (auto &&item : remoteNodes) {
+    auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
+    out << "[" << node.getNodeInfo().getNodeId() << "]:" << std::to_string(acceptedConnections.size())
+        << std::endl;
+    for (auto&& item : remoteNodes) {
         std::string pre = "[ ]";
         if (item->isConnected()) {
             pre = "[X]";
         }
         if (!item->getNodeId()) {
-            std::cout << pre << "Connection: NO ID" << std::endl;
+            out << pre << "Connection: NO ID" << std::endl;
         } else {
-            std::cout << pre << "Connection: " << *item->getNodeId() << std::endl;
+            out << pre << "Connection: " << *item->getNodeId() << std::endl;
         }
     }
 }

@@ -115,11 +115,11 @@ public:
         }
     }
 
-    template<enum Status status = Status::RESPONSE, typename SendType>
+    template<enum Status status = Status::response, typename SendType>
     auto sendRequestToNode(NetworkPacketPointer<SendType> p) {
         std::unique_lock g(*connectionFetcher);
         typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
-        if (p->getStatus() != Status::REQUEST) {
+        if (p->getStatus() != Status::request) {
             throw NotRequestException("Packed has different status than request.");
         }
         if (connectionFetcher->getConnection() != nullptr) {

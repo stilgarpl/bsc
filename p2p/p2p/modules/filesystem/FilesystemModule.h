@@ -145,8 +145,8 @@ public:
 //                case FileTransferStatus::FINISHED:
 //                    std::cout << "FINISHED" << std::endl;
 //                    break;
-//                case FileTransferStatus::ERROR:
-//                    std::cout << "ERROR" << std::endl;
+//                case FileTransferStatus::error:
+//                    std::cout << "error" << std::endl;
 //                    break;
 //            }
 //

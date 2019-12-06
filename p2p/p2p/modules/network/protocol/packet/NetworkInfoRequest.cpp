@@ -21,8 +21,8 @@ void NetworkInfoRequest::process(Context::Ptr context) {
 
     if (nodeContext != nullptr && connectionContext != nullptr) {
         // LOGGER("processing network info request id" + std::to_string(this->getId()));
-        auto &node = nodeContext->getNode();
-        auto response = getNew<Status::RESPONSE>(this);//std::make_shared<NetworkInfoResponse>();
+        auto& node = nodeContext->getNode();
+        auto response = getNew<Status::response>(this);//std::make_shared<NetworkInfoResponse>();
         if (node.getModule<NetworkModule>()->getNetworkInfo() == nullptr) {
             LOGGER("empty network info! ")
         }

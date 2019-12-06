@@ -8,7 +8,7 @@ void JournalActions::journalRequested(const JournalRequestEvent &event) {
     auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
     Connection &connection = connectionContext->getConnection();
 
-    JournalGroup::Response::Ptr response = JournalGroup::Response::getNew<Status::RESPONSE>(event.getRequestId());
+    JournalGroup::Response::Ptr response = JournalGroup::Response::getNew<Status::response>(event.getRequestId());
 
     // JournalGroup::Response* response;
     response->setRepoId(event.getRepoId());

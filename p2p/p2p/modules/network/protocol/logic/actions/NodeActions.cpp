@@ -30,7 +30,7 @@ void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
         auto &remoteNode = remoteNodeContext->getRemoteNode();
         remoteNode.setNodeInfo(event.getNodeInfo());
     } else {
-        LOGGER("ERROR: no remote node context!")
+        LOGGER("error: no remote node context!")
     }
 //    auto nodeContext = context->get<NodeContext>();
 //    if (nodeContext != nullptr) {

@@ -23,7 +23,7 @@ void setupModules(Node &node) {
     node.addModule<CommandModule>();
 }
 
-//@todo commands should be set up by submodule, right now they are redeclared in every main
+//@todo commands should be setDirect up by submodule, right now they are redeclared in every main
 void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);

@@ -5,6 +5,7 @@
 #include <p2p/modules/command/network/logic/actions/CommandActions.h>
 #include <p2p/modules/command/network/logic/sources/CommandSource.h>
 #include <p2p/modules/command/network/packet/CommandPacket.h>
+#include <core/io/InputOutputContext.h>
 
 #include "CommandModule.h"
 #include "p2p/modules/basic/BasicModule.h"
@@ -17,7 +18,7 @@ CommandModule::CommandModule(INode &node) : NodeModuleDependent(node, "command")
 }
 
 void CommandModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
-    actionHelper.setAction<CommandEvent>(CommandActions::RUN_COMMAND, CommandActions::runCommand);
+    actionHelper.setAction<CommandEvent>(CommandActions::RUN_COMMAND, CommandActions::runRemoteCommand);
 
     when(state<ILogicModule>(ModuleState::SUBMODULES_PREPARED).entered()).fireStateChangeReaction(
             [&](ILogicModule &module) {
@@ -38,7 +39,7 @@ bool CommandModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
 //    CommandEvent dummyCommand;
 //    dummyCommand.setEventId(CommandEvent::IdType::DUMMY_COMMAND);
 //    when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).emit(event<CommandEvent>().withId(CommandEvent::IdType::DUMMY_COMMAND));
-//    when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).fireNewAction(CommandActions::runCommand);
+//    when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).fireNewAction(CommandActions::runRemoteCommand);
     return true;
 //    return ret;
 }
@@ -82,6 +83,8 @@ void CommandModule::sendRemoteCommand(ArgumentContainerType args) {
 
         if (res && res->isRunStatus()) {
             LOGGER("remote run successful")
+            auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
+            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
         } else {
             LOGGER("remote run failure")
         }

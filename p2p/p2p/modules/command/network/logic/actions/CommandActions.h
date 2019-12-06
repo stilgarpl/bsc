@@ -16,7 +16,7 @@ public:
     };
 
 
-    static void runCommand(const CommandEvent &commandEvent);
+    static void runRemoteCommand(const CommandEvent& commandEvent);
 
 };
 

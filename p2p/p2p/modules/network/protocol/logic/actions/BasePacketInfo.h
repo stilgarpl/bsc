@@ -15,9 +15,9 @@ class BasePacketInfo {
 private:
     unsigned int retry = 0;
     BasePacketPtr packetPtr;
-    Connection *connection = nullptr;
+    Connection* connection = nullptr;
     //@todo is Tick reference necessary? maybe some global Clock function? or just std::steady_clock ?
-    Status expectedStatus = Status::RESPONSE; //@todo what if we expect more than one response? ERROR for example?
+    Status expectedStatus = Status::response; //@todo what if we expect more than one response? error for example?
     Tick::Clock::time_point timeSent;
     std::promise<BasePacketPtr> responsePromise;
 
@@ -26,7 +26,7 @@ public:
                    const std::chrono::time_point<Tick::Clock>& timeSent);
 
 public:
-    const BasePacketPtr &getPacketPtr() const;
+    const BasePacketPtr& getPacketPtr() const;
 
     void setPacketPtr(const BasePacketPtr &packetPtr);
 

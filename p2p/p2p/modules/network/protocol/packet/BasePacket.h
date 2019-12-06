@@ -48,7 +48,7 @@ private:
 
 public:
 
-    //@todo pure virtual perhaps? or maybe that would mess up ACK? I can create AckPacket...
+    //@todo pure virtual perhaps? or maybe that would mess up ack? I can create AckPacket...
     virtual void process(Context::Ptr context);
 
     [[nodiscard]] Status getStatus() const;
@@ -62,13 +62,13 @@ public:
     //I don't remember why it was deleted, probably because of serialization bug(fixed) or maybe to not waste ids (who cares about ids?)
     // BasePacket(const BasePacket &) = delete;
 
-    BasePacket() : status(Status::REQUEST), id(nextId()) {};
+    BasePacket() : status(Status::request), id(nextId()) {};
 
     [[nodiscard]] bool isRetry() const;
 
     void setRetry(bool retry);
 
-    virtual const RoleList &requiredRoles() =0;
+    virtual const RoleList& requiredRoles() = 0;
 
     void resetId() {
         setId(nextId());

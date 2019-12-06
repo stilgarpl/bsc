@@ -19,7 +19,7 @@ void JournalState::add(const JournalStateData& data) {
     if (same == dataList.end()) {
         dataList.push_back(data);
     } else {
-        LOGGER("ERROR: trying to add same data again!" + data.getPath())
+        LOGGER("error: trying to add same data again!" + data.getPath())
     }
 
 }

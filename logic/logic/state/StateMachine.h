@@ -63,7 +63,7 @@ public:
 
     template<typename ... StateIdTypes>
     void addLink(const StateIdType &state1, const StateIdTypes &... otherStates) {
-        //@todo check if both states exist in states set
+        //@todo check if both states exist in states setDirect
         StateIdType allStates[] = {otherStates...};
         for (const auto &item : allStates) {
             addLink(state1, item);

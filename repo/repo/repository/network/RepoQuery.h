@@ -79,7 +79,7 @@ public:
 
         void process(Context::Ptr context) override {
             BasePacket::process(context);
-            LOGGER(" REPO Q RESPONSE RECEIVED")
+            LOGGER(" REPO Q response RECEIVED")
         }
 
     private:

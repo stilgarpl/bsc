@@ -38,7 +38,7 @@ private:
     }
 
 public:
-    //this is required for responses unless I find a way to also set it from context
+    //this is required for responses unless I find a way to also setDirect it from context
     explicit NetworkingEvent(BasePacket::IdType requestId) : requestId(requestId) {}
 
     NetworkingEvent() {
@@ -47,7 +47,7 @@ public:
         if (packet != nullptr) {
             this->setRequestId(packet->getId());
         } else {
-            LOGGER("ERROR: NO PACKET IN CONTEXT!")
+            LOGGER("error: NO PACKET IN CONTEXT!")
         }
     }
 

@@ -228,7 +228,7 @@ void RepoModule::downloadRemoteRepository(const NodeIdType &remoteId, const IRep
     auto netModule = node.getModule<NetworkModule>();
     auto localRepo = findRepository(repoId);
     LOGGER("downloading repo")
-    auto req = JournalGroup::Request::getNew<Status::REQUEST>();
+    auto req = JournalGroup::Request::getNew<Status::request>();
     req->setRepoId(repoId);
     auto res = netModule->sendPacketToNode(remoteId, req);
     if (res != nullptr) {

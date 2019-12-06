@@ -8,8 +8,8 @@ void StorageActions::resourceRequested(const StorageResourceRequestEvent &event)
     auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
     Connection &connection = connectionContext->getConnection();
 
-    StorageQuery::Response::Ptr response = StorageQuery::Response::getNew<Status::RESPONSE>(event.getRequestId());
-    auto &node = NodeContext::getNodeFromActiveContext();
+    StorageQuery::Response::Ptr response = StorageQuery::Response::getNew<Status::response>(event.getRequestId());
+    auto& node = NodeContext::getNodeFromActiveContext();
     auto repoMod = node.getModule<RepoModule>();
 
     auto repo = repoMod->findRepository(event.getRepositoryId());

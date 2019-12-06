@@ -19,14 +19,14 @@ void NodeInfoGroup::Request::process(Context::Ptr context) {
     if (nodeContext != nullptr && connectionContext != nullptr) {
         // LOGGER("processing info request id" + std::to_string(this->getId()));
 
-        auto &nodeInfo = nodeContext->getNodeInfo();
+        auto& nodeInfo = nodeContext->getNodeInfo();
         LOGGER("node info request... " + nodeInfo.getNodeId())
-        auto response = getNew<Status::RESPONSE>(this);//std::make_shared<NodeInfoResponse>();
+        auto response = getNew<Status::response>(this);//std::make_shared<NodeInfoResponse>();
         response->setNodeInfo(nodeInfo);
         connectionContext->getConnection().send(response);
     } else {
         //@todo error level
-        LOGGER("ERROR: Node Context not found!");
+        LOGGER("error: Node Context not found!");
     }
 }
 

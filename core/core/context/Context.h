@@ -15,6 +15,15 @@
 #include <core/log/Logger.h>
 #include <atomic>
 
+
+class InvalidContextException : public std::invalid_argument {
+public:
+    explicit InvalidContextException(const std::string& arg);
+
+    explicit InvalidContextException(const char* string);
+};
+
+
 class Context {
 public:
     typedef std::shared_ptr<Context> ContextPtr;
@@ -141,30 +150,47 @@ public:
         data[typeId][getKey(id)] = std::make_shared<T>(values...);
     }
 
-    template<typename ContextType, typename... Vals>
+    template<typename ContextValueType, typename... Vals>
     auto set(Vals... values) {
         std::lock_guard<std::recursive_mutex> guard(contextLock);
         //@todo assert that data[typeId][getKey(0)] is null
-        static auto typeId = getTypeId<ContextType>();
-        //std::clog << "Context::set type id " << typeId << std::endl;
-        auto ret = std::make_shared<ContextType>(values...);
+        static auto typeId = getTypeId<ContextValueType>();
+        //std::clog << "Context::setDirect type id " << typeId << std::endl;
+        auto ret = std::make_shared<ContextValueType>(values...);
         data[typeId][getKey(0)] = ret;
         return ret;
     }
 
-    //todo think of a way to combine set and setContext to one function to avoid confusion.
-    template<typename ContextType, typename ActualContextType, typename... Vals>
-    auto setContext(Vals... values) {
+    //todo this version may be a problem if someone tries to use the ordinary setDirect and std::shared_ptr is one of vals.
+    template<typename ContextValueType, typename RealValueType>
+    auto setDirect(std::shared_ptr<RealValueType> valuePtr) {
         std::lock_guard<std::recursive_mutex> guard(contextLock);
-        //@todo assert that data[typeId][getKey(0)] is null
-        static auto typeId = getTypeId<ContextType>();
-        //std::clog << "Context::set type id " << typeId << std::endl;
-        auto ret = std::make_shared<ActualContextType>(values...);
-        data[typeId][getKey(0)] = ret;
-        return ret;
+        if constexpr (std::is_base_of_v<ContextValueType, RealValueType>) {
+            auto ret = std::static_pointer_cast<ContextValueType>(valuePtr);
+            static auto typeId = getTypeId<ContextValueType>();
+            data[typeId][getKey(0)] = ret;
+            return ret;
+        } else {
+            using namespace std::string_literals;
+            throw InvalidContextException(
+                    "Cannot cast "s + typeid(RealValueType).name() + "to " + typeid(ContextValueType).name());
+        }
     }
 
-    //@todo non-const context does set parent but const doesn't. WHY?
+//    //todo think of a way to combine setDirect and setContext to one function to avoid confusion.
+//    //@todo this should not be named setContext - it can be anything, not just context.
+//    template<typename ContextType, typename ActualContextType, typename... Vals>
+//    auto setContext(Vals... values) {
+//        std::lock_guard<std::recursive_mutex> guard(contextLock);
+//        //@todo assert that data[typeId][getKey(0)] is null
+//        static auto typeId = getTypeId<ContextValueType>();
+//        //std::clog << "Context::setDirect type id " << typeId << std::endl;
+//        auto ret = std::make_shared<ActualContextType>(values...);
+//        data[typeId][getKey(0)] = ret;
+//        return ret;
+//    }
+
+    //@todo non-const context does setDirect parent but const doesn't. WHY?
 //    Context &operator+=(const Context::Ptr other);
 
     Context& operator+=(const Context::Ptr& other);
@@ -195,7 +221,7 @@ public:
 
     static ContextPtr makeContext();
 
-    static ContextPtr makeContext(const Context::Ptr& ptr);
+    static ContextPtr makeContext(const Context::Ptr& parentContext);
 
     virtual ~Context();
 };
@@ -216,12 +242,6 @@ public:
 };
 
 
-class InvalidContextException : public std::invalid_argument {
-public:
-    explicit InvalidContextException(const std::string& arg);
-
-    explicit InvalidContextException(const char* string);
-};
 
 
 #endif //BASYCO_CONTEXT_H

@@ -22,9 +22,9 @@ void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
                 ptr->getResponsePromise().set_value(event.getPacket());
 //                LOGGER("expected packet received")
                 responseMap.erase(event.getPacket()->getId());
-            } else if (event.getPacket()->getStatus() == Status::ERROR) {
+            } else if (event.getPacket()->getStatus() == Status::error) {
                 ptr->getResponsePromise().set_value(event.getPacket());
-                LOGGER("ERROR HAPPENED, removing packet data, breaking promises " +
+                LOGGER("error HAPPENED, removing packet data, breaking promises " +
                        std::string(typeid(event.getPacket()).name()))
                 responseMap.erase(event.getPacket()->getId());
             }

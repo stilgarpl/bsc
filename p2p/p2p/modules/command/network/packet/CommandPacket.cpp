@@ -44,3 +44,11 @@ bool CommandPacket::Response::isRunStatus() const {
 void CommandPacket::Response::setRunStatus(bool runStatus) {
     Response::runStatus = runStatus;
 }
+
+const std::string& CommandPacket::Response::getOutput() const {
+    return output;
+}
+
+void CommandPacket::Response::setOutput(const std::string& output) {
+    Response::output = output;
+}

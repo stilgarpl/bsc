@@ -66,7 +66,7 @@ bool IProtocol::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
 IProtocol::IProtocol(LogicManager &logicManager) : LogicObject(logicManager) {}
 
 std::future<BasePacketPtr> IProtocol::send(Connection *conn, BasePacketPtr p) {
-    return this->send(conn, std::move(p),Status::RESPONSE);
+    return this->send(conn, std::move(p), Status::response);
 }
 
 void IProtocol::testMethod(std::string a) {

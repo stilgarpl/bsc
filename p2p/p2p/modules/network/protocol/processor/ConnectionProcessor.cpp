@@ -17,7 +17,7 @@ ConnectionProcessor::ConnectionProcessor(Connection &connection) : connection(co
 
 void ConnectionProcessor::run() {
 
-    //set up context
+    //setDirect up context
     Context::Ptr context = connection.getConnectionContext();
     Context::setActiveContext(context);
     logger.info("ConnectionProcessor start " + context->get<NodeContext>()->getNodeInfo().getNodeId());

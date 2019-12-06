@@ -12,7 +12,7 @@ void KeepAlivePacket::Request::process(Context::Ptr context) {
         auto response = KeepAlivePacket::Response::getNew(this->getId());
         connectionContext->getConnection().send(response);
     } else {
-        LOGGER("ERROR: No connection context!")
+        LOGGER("error: No connection context!")
     }
 }
 

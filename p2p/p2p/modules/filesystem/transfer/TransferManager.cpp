@@ -161,7 +161,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdenti
     ret->setDestination(destination);
     ret->setSourceNode(nodeId);
     ret->setPayload([=](LocalTransferDescriptor &descriptorPtr) {
-        //before anything, set active context
+        //before anything, setDirect active context
         Context::setActiveContext(activeContext);
         LOGGER("starting transfer...")
 
@@ -215,7 +215,7 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdenti
                         descriptorPtr.setTransferredSize(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
 //                         std::this_thread::sleep_for(3s);
                     } else {
-                        LOGGER("no response for request, transfer manager -> ERROR")
+                        LOGGER("no response for request, transfer manager -> error")
                         descriptorPtr.changeState(TransferState::ERROR);
                         break;
                     }

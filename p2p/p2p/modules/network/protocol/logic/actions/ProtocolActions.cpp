@@ -9,6 +9,6 @@ void ProtocolActions::onNewConnection(const ConnectionEvent &connectionEvent) {
     std::clog << __func__ << std::endl;
 
 //    BasePacketPtr np = std::make_shared<BasePacket>();
-//    np->setStatus(Status::REQUEST);
+//    np->setStatus(Status::request);
 //    connectionEvent.getConnection()->send(np);
 }

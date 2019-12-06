@@ -18,6 +18,7 @@ Context::Ptr Context::getParentContext() const {
 
 void Context::setParentContext(Context::Ptr parentContext) {
     std::lock_guard<std::recursive_mutex> guard(contextLock);
+    //@todo maybe we need to make sure here that we are not making a loop and throw exeption if we are?
     Context::parentContext = std::move(parentContext);
 }
 
@@ -87,16 +88,17 @@ Context::~Context() {
 
 }
 
-Context::ContextPtr Context::makeContext(const Context::Ptr& ptr) {
+Context::ContextPtr Context::makeContext(const Context::Ptr& parentContext) {
     struct ContextMakeSharedWorkaround : public Context {
         explicit ContextMakeSharedWorkaround(const Context& other) : Context(other) {}
     };
-    if (ptr != nullptr) {
-        ContextPtr ret = std::make_shared<ContextMakeSharedWorkaround>(*ptr);
-        ret->setParentContext(ptr);
+    if (parentContext != nullptr) {
+        //this was using copy constructor and needlessly copying everything in parent context to this new context.
+        ContextPtr ret = makeContext();//std::make_shared<ContextMakeSharedWorkaround>(*parentContext);
+        ret->setParentContext(parentContext);
         return ret;
     } else {
-        LOGGER("ERROR: NULL CONTEXT PASSED")
+        LOGGER("error: NULL CONTEXT PASSED")
         throw InvalidContextException("Null context passed");
     }
 }

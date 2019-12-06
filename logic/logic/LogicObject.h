@@ -389,7 +389,7 @@ public:
 //            //@todo check if RetType is void or already an event type
 //            using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators<EventType>, EventType, Args...>...>;
 //            return fireNewChainAction([=](EventType e) {
-//                //@todo should I set eventWrapper ID to something? I don't think it's ever fired as a standalone event, not wrapped in chainEvent...
+//                //@todo should I setDirect eventWrapper ID to something? I don't think it's ever fired as a standalone event, not wrapped in chainEvent...
 //                return EventWrapper<RetType>(genericFunc(evaluators(e)...));
 //            });
 //
@@ -596,7 +596,7 @@ public:
 
                 //@todo exception!!!
                 LOGGER("FAILURE! NO EVENT CHAIN ID SET!")
-                //@todo generated chain if no chain set! fix!
+                //@todo generated chain if no chain setDirect! fix!
 //                auto generatedChainId = nextChainId();
                 if constexpr (!std::is_same<void, RetType>::value) {
                     SelfType<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, logicObject,
@@ -612,7 +612,7 @@ public:
 
     public:
 
-        //@todo this method could return a LogichChainHelper with a flag set (a bool or sth) - specialization would make it so that chain functions are only available if newChain was used previously and you can't use newChain after that - for example, LogicChainHelper can inherit from LogicChainHelperBase<...,bool isChain> - it would select base with chain function or without.
+        //@todo this method could return a LogichChainHelper with a flag setDirect (a bool or sth) - specialization would make it so that chain functions are only available if newChain was used previously and you can't use newChain after that - for example, LogicChainHelper can inherit from LogicChainHelperBase<...,bool isChain> - it would select base with chain function or without.
         ThisType &newChain(const ChainIdType &id) {
             chainId = id;
             return transform<ChainEvent<EventType>>([=](const auto &event) {
