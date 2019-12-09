@@ -15,13 +15,13 @@
 #include <core/signal/OrderedExecutionPolicy.h>
 #include <core/signal/ExecutorPolicyTraits.h>
 #include <core/signal/DefaultExecutionPolicy.h>
-#include <core/signal/ThreadPoolExecutor.h>
+#include <core/signal/ThreadExecutor.h>
 
 using namespace std::chrono_literals;
 
 class ISource;
 
-MAP_POLICY_TO_EXECUTOR(DefaultExecutionPolicy, ThreadPoolExecutor)
+MAP_POLICY_TO_EXECUTOR(DefaultExecutionPolicy, ThreadExecutor)
 
 class SourceManager {
 public:

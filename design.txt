@@ -573,3 +573,6 @@ w koncu po wielu bólach udało mi sie to zbudować na windowsie. oczywiście li
 
 remote commands w koncu dzialaja super, z odpowiedzia przesylana do node ktory zleca remote. teraz pasowaloby jeszcze zrobic remote interactive - gdy remote probuje czytac z stream in, leci flush out do zleceniodawcy i czeka sie na odpowiedz z in od niego. + ewentualnie timeout
 To jest bardziej skomplikowane niż sie wydaje. jak ktos robi in >> data; to ile danych przeslac z remote node? brać i brać aż sie napełni, wieloma pakietami. trzeba tylko uważać na output, bo out jest zsynchronizowany z in.
+
+
+Trzebaby dodać pakiet ConnectionControl. w ten sposob moznaby powiedziec serwerowi m.in. o zamykaniu polaczenia. Dzieki temu na daemonie nie wisialoby 10 połączeń "control".

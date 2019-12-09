@@ -9,6 +9,7 @@
 #include "RemoteNode.h"
 #include "RemoteNodeContext.h"
 #include <Poco/Net/NetException.h>
+#include <p2p/modules/network/protocol/connection/ConnectionException.h>
 
 
 std::optional<NodeIdType> RemoteNode::getNodeId() const {
@@ -82,7 +83,12 @@ void RemoteNode::setNodeInfo(const NodeInfo &ni) {
     //@todo shouldn't this be through logic actions? or any other way? the problem is that we have to store the connection address between creating the connection and receiving node info
     auto connection = connectionFetcher->getConnection();
     if (connection != nullptr) {
-        remoteNodeInfo.addKnownAddress(connection->getAddress());
+        try {
+            remoteNodeInfo.addKnownAddress(connection->getAddress());
+        } catch (const ConnectionException& e) {
+            ERROR("Error while setting known address. Connection is invalid. Disconnecting.");
+            disconnect();
+        }
     } else {
         ERROR("CONNECTION IS NULL")
     }

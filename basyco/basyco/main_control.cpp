@@ -13,8 +13,7 @@
 using namespace std::chrono_literals;
 
 
-
-void setupModules(Node &node) {
+void setupModules(Node& node) {
     node.addModule<CommandModule>();
 }
 
@@ -26,7 +25,7 @@ enum QQ {
 };
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     auto file_logger = spdlog::basic_logger_mt("basic_logger", "/tmp/basyco_control.log");
     spdlog::set_default_logger(file_logger);
     spdlog::flush_every(std::chrono::seconds(5));
@@ -53,13 +52,17 @@ int main(int argc, char *argv[]) {
     }
 
 
-
     thisNode.start();
     thisNode.waitUntilStarted();
 //@todo get actual daemon address from configuration
-    auto &daemonNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
-    //@todo find a better way to wait for connection
-    cmdN->sendCommandToRemoteNode(daemonNode, commands);
+    try {
+        auto& daemonNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
+        cmdN->sendCommandToRemoteNode(daemonNode, commands);
+        daemonNode.disconnect();
+    } catch (const RemoteNodeConnectionException& e) {
+        //@todo formatting, localization and stuff...
+        std::cerr << " Unable to connect to remote daemon node. Are you sure it's running?" << std::endl;
+    }
     thisNode.stop();
 
     thisNode.waitToFinish();

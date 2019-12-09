@@ -8,6 +8,7 @@
 #include <p2p/modules/network/protocol/context/ConnectionContext.h>
 #include <Poco/Net/NetException.h>
 #include <p2p/node/context/NodeContext.h>
+#include "ConnectionException.h"
 
 using namespace std::chrono_literals;
 
@@ -276,5 +277,16 @@ void Connection::shutdown() {
     stopSending();
     processor.stop();
     processor.join();
+}
+
+NetAddressType Connection::getAddress() {
+    //@todo if getSocket is removed, just make it pure virtual and implement in client and server connections
+    try {
+        return getSocket().peerAddress().toString();
+    } catch (const Poco::Net::NetException& e) {
+        using namespace std::string_literals;
+        ERROR("Network exception from POCO: "s + e.what());
+        throw ConnectionException("Connection Exception: Can't get connection address");
+    }
 }
 

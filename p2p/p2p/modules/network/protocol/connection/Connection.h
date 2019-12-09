@@ -66,10 +66,7 @@ public:
 
     virtual void stopReceiving();
 
-    virtual NetAddressType getAddress() {
-        //@todo if getSocket is removed, just make it pure virtual and implement in client and server connections
-        return getSocket().peerAddress().toString();
-    }
+    virtual NetAddressType getAddress();
 
     //most likely temporary address, not really useful
     virtual NetAddressType getOwnAddress() {

@@ -9,6 +9,7 @@
 #include "NodeActions.h"
 #include <p2p/modules/network/NetworkModule.h>
 #include <p2p/modules/network/protocol/packet/NodeInfoGroup.h>
+#include <p2p/modules/network/protocol/connection/ConnectionException.h>
 
 void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
     Context::Ptr context = Context::getActiveContext();
@@ -53,12 +54,16 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
             //@todo do it better way, this is quick and dirty
             auto remoteNodeContext = context->get<RemoteNodeContext>();
             if (remoteNodeContext) {
-                auto &remoteNode = remoteNodeContext->getRemoteNode();
-                if (remoteNode.getAddress()) {
-                    node.getModule<NetworkModule>()->getNetworkInfo()->addKnownAddress(
-                            event.getNodeInfo().getNodeId(),
-                            *remoteNode.getAddress());
+                auto& remoteNode = remoteNodeContext->getRemoteNode();
+                try {
+                    if (remoteNode.getAddress()) {
+                        node.getModule<NetworkModule>()->getNetworkInfo()->addKnownAddress(
+                                event.getNodeInfo().getNodeId(),
+                                *remoteNode.getAddress());
 
+                    }
+                } catch (const ConnectionException& e) {
+                    ERROR("Error while adding known node.")
                 }
             }
 
