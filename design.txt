@@ -535,7 +535,7 @@ idea jest taka, ze chainy sie lockuja zgodnie z zadana konfiguracja. chainy ze w
 @todo maybe add timeout to chainlocking - for example, if chains are triggered more often than it takes to process them, they will pile up. kolejka będzie się nawarstwiać aż ram sie skończy. zamiast tego chain po czekaniu na locka zbyt długo powinien przerwać chain.
 
 done: basyco-control ma miec tylko Command module który w dodatku wszystkie komendy zmienia w "remote daemon $@"
-@todo dodac jakiś mechanizm zwracania odpowiedzi z daemona, nie tylko jako SUCCESS/FAILURE
+
 
 
 dodawanie troche sie wywala przy linkach, uwaza, ze wrzuca sie drugi raz to samo.
@@ -564,11 +564,12 @@ co zostalo jeszcze w storage separation:
 * managed factory : return storage from storage manager
 
 
-@todo problem w RemoteNode - RN.disconnect robi shutdown() na connection, które przez maszynę stanów ustawia connetionFetchera na null, co go kasuje pewnie zanim jeszcze shutdown sie skończy.
-
 problem z logic state machine . notify wywoluje update, ktore moze wywolac notify ktore wywolaja update na tym samym obiekcie. jest petla przez to na koniec notify obiekt moze byc w innym stanie niz wywolany, bo wywolanie bedzie kilkukrotne
 rozwiazanie: kolejka stanów
 zrobić ogólny QueueProcessor, który w notify przyjmuje stany i wkłada je na kolejke
 jego wątek bierze stany z kolejki i wywoluje funkcje procesujaca (tj. update)
 
-w koncu po wielu bólach udało mi sie to zbudować na windowsie. oczywiście liczenie checksumy journala jest złe. @todo trzeba to przerobić, żeby nie serializowało cerealem (nie mam zaufania, że cereal czegos nie zmieni) i co najważniejsze, trzeba zmienić sposób inicjalizowania Metadata. teraz robi to konstruktor, co jest durnym pomysłem. Powinien być jakiś obiekt, fabryka, czy inny "fetcher", który stworzy metadane dla tego journala. w testach możę być FakeMetadataFetcher. Niektóre rzeczy w fetcherze moga byc nawet constexpr.
+w koncu po wielu bólach udało mi sie to zbudować na windowsie. oczywiście liczenie checksumy journala jest złe.
+
+remote commands w koncu dzialaja super, z odpowiedzia przesylana do node ktory zleca remote. teraz pasowaloby jeszcze zrobic remote interactive - gdy remote probuje czytac z stream in, leci flush out do zleceniodawcy i czeka sie na odpowiedz z in od niego. + ewentualnie timeout
+To jest bardziej skomplikowane niż sie wydaje. jak ktos robi in >> data; to ile danych przeslac z remote node? brać i brać aż sie napełni, wieloma pakietami. trzeba tylko uważać na output, bo out jest zsynchronizowany z in.

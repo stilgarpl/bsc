@@ -7,7 +7,7 @@
 #include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"
 #include <cereal/types/memory.hpp>
 #include <p2p/modules/command/CommandModule.h>
-
+#include <spdlog/sinks/basic_file_sink.h>
 
 
 using namespace std::chrono_literals;
@@ -27,6 +27,10 @@ enum QQ {
 
 
 int main(int argc, char *argv[]) {
+    auto file_logger = spdlog::basic_logger_mt("basic_logger", "/tmp/basyco_control.log");
+    spdlog::set_default_logger(file_logger);
+    spdlog::flush_every(std::chrono::seconds(5));
+
 
     if (argc <= 1) {
         return 0;

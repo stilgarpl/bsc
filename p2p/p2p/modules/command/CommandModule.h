@@ -31,7 +31,7 @@ public:
             std::string commandName;
 
         public:
-            explicit CommandData(const std::string &commandName);
+            explicit CommandData(std::string commandName);
 
             virtual void applyCommand(CommandModule &commandModule) = 0;
 
@@ -187,6 +187,7 @@ private:
 
 public:
 
+    void prepareSubmodules() override;
 
     CommandSubModule &submodule(std::string name) {
         if (submodules.count(name) == 0) {

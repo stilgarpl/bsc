@@ -7,6 +7,8 @@
 #include <p2p/modules/command/network/packet/CommandPacket.h>
 #include <core/io/InputOutputContext.h>
 
+#include <utility>
+
 #include "CommandModule.h"
 #include "p2p/modules/basic/BasicModule.h"
 #include "p2p/modules/network/NetworkModule.h"
@@ -164,6 +166,11 @@ void CommandModule::runInBackground(const std::vector<std::string>& args) {
     }
 }
 
+void CommandModule::prepareSubmodules() {
+//    auto &networkSub = getSubModule<NetworkModule>();
+
+}
+
 
 CommandModule::CommandSubModule& CommandModule::CommandSubModule::submodule(std::string name) {
     if (submodules.count(name) == 0) {
@@ -173,7 +180,7 @@ CommandModule::CommandSubModule& CommandModule::CommandSubModule::submodule(std:
     return *submodules[name];
 }
 
-CommandModule::SubModule::CommandData::CommandData(const std::string& commandName) : commandName(commandName) {}
+CommandModule::SubModule::CommandData::CommandData(std::string commandName) : commandName(std::move(commandName)) {}
 
 const std::string& CommandModule::SubModule::CommandData::getCommandName() const {
     return commandName;
