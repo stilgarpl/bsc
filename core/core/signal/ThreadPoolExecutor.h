@@ -20,7 +20,7 @@ private:
     std::condition_variable queueReady;
     std::list<std::shared_ptr<std::thread>> runners;
     std::atomic<bool> running = true;
-    unsigned maxWorker = 5;
+    unsigned maxWorker = 500;
 
 public:
     void execute(std::function<void(void)> task) override;
