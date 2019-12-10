@@ -24,15 +24,17 @@
 #include <logic/chain/ChainEvaluators.h>
 #include <p2p/modules/network/remote/RemoteNodeContext.h>
 #include <core/io/InputOutputContext.h>
+#include <p2p/modules/network/protocol/packet/ConnectionControl.h>
+#include <p2p/modules/network/processors/ConnectionProcessors.h>
 
 
 using namespace Poco::Net;
 
-NetworkModule::NetworkModule(INode &node) : NodeModuleDependent(node, "network") {
+NetworkModule::NetworkModule(INode& node) : NodeModuleDependent(node, "network") {
 //    setRequired<BasicModule>();
 }
 
-void NetworkModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
+void NetworkModule::setupActions(ILogicModule::SetupActionHelper& actionHelper) {
     actionHelper.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
     actionHelper.setAction<ConnectionEvent>("reqNeI", NodeActions::sendNetworkInfoRequest);
     actionHelper.setAction<NodeInfoEvent>("upNoI", NodeActions::updateNodeInfo);
@@ -42,7 +44,7 @@ void NetworkModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) 
     actionHelper.setAction<NodeInfoEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
 
 
-    actionHelper.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent &event) {
+    actionHelper.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent& event) {
         // std::clog << "Debug: connection event!" << std::endl;
     });
 
@@ -74,6 +76,17 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
             });
 
 
+    when(event<Tick>(5s)).fireNewAction([this](auto e) {
+        if (server != nullptr) {
+            using namespace std::string_literals;
+            LOGGER("SERVER DETAILS >>> ")
+            LOGGER(" rejected connections : "s + std::to_string(server->refusedConnections()))
+            LOGGER(" queued connections : "s + std::to_string(server->queuedConnections()))
+            LOGGER(" current connections : "s + std::to_string(server->currentConnections()))
+            LOGGER(" max threads : "s + std::to_string(server->maxThreads()))
+            LOGGER(">>>>>>")
+        }
+    });
 
     //high level logic:
 
@@ -280,11 +293,16 @@ void NetworkModule::listen() {
         LOGGER(std::string("Opening port") + std::to_string(configuration().getPort()));
     }
 
-
+    Poco::AutoPtr<Poco::Net::TCPServerParams> p(new Poco::Net::TCPServerParams());
+    //@todo make this magic number a configuration property
+    p->setMaxThreads(256);
+    p->setMaxQueued(256);
     server = std::make_shared<TCPServer>(
             new ServerConnectionFactory([&] { return getRemoteNode().context(); }, {*this}),
-            *serverSocket);
+            *serverSocket, p);
     server->start();
+    using namespace std::string_literals;
+    LOGGER("server connections max: "s + std::to_string(server->maxConcurrentConnections()))
 
 }
 
@@ -375,6 +393,44 @@ RemoteNode& NetworkModule::connectTo(const NetAddressType& address) {
         throw RemoteNodeConnectionException("Unable to connect to remote node");
     }
     return remoteNode;
+}
+
+RemoteNode& NetworkModule::getRemoteNode(const NodeIdType& nodeId) {
+    auto iter = std::find_if(remoteNodes.begin(), remoteNodes.end(), [&](const std::shared_ptr<RemoteNode> obj) {
+        return (obj->getNodeId() && *obj->getNodeId() == nodeId);
+    });
+    if (iter != remoteNodes.end()) {
+        return **iter;
+    } else {
+        //there is no active remote node with this id, let's see if it is known in network information
+//            auto networkInfo = getNetworkInfo();
+        if (networkInfo->isNodeKnown(nodeId)) {
+            auto& remoteNode = getRemoteNode();
+            remoteNode.setRemoteNodeInfo(networkInfo->getRemoteNodeInfo(nodeId));
+            return remoteNode;
+        } else {
+            throw RemoteNodeNotFoundException("Remote node unknown");
+        }
+    }
+}
+
+RemoteNode& NetworkModule::getRemoteNode() {
+    std::shared_ptr<RemoteNode> remoteNode = std::make_shared<RemoteNode>(protocol);
+    remoteNode->context()->setParentContext(node.getContext());
+    remoteNodes.push_back(remoteNode);
+    return *remoteNode;
+}
+
+RemoteNode& NetworkModule::connectToNode(const NodeIdType& nodeId) {
+    //@todo catch exception
+    RemoteNode& remoteNode = getRemoteNode(nodeId);
+    remoteNode.connect();
+    return remoteNode;
+}
+
+void NetworkModule::prepareSubmodules() {
+    auto& networkSub = getSubModule<NetworkModule>();
+    networkSub.registerPacketProcessor<ConnectionControl>(ConnectionProcessors::processConnectionControl);
 }
 
 void NetworkModule::SubModule::setupPacketProcessing(NetworkModule& node) {

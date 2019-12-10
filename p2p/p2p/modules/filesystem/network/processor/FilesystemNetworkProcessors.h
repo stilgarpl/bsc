@@ -2,15 +2,15 @@
 // Created by stilgar on 19.03.19.
 //
 
-#ifndef BASYCO_NETWORKPROCESSORS_H
-#define BASYCO_NETWORKPROCESSORS_H
+#ifndef BASYCO_FILESYSTEMNETWORKPROCESSORS_H
+#define BASYCO_FILESYSTEMNETWORKPROCESSORS_H
 
 #include <p2p/modules/filesystem/network/packet/TransferQuery.h>
 
-struct NetworkProcessors {
+struct FilesystemNetworkProcessors {
 
     static std::function<TransferQuery::Response::Ptr(TransferQuery::Request::Ptr)> queryProcessor;
 };
 
 
-#endif //BASYCO_NETWORKPROCESSORS_H
+#endif //BASYCO_FILESYSTEMNETWORKPROCESSORS_H

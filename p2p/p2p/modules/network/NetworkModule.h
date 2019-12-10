@@ -115,10 +115,6 @@ public:
         friend class NetworkModule;
     };
 
-
-
-
-
     //@todo why is this a pointer?
     std::shared_ptr<NetworkInfo> networkInfo;
 protected:
@@ -164,25 +160,19 @@ public:
 
     void printConnections();
 
-public:
-
-//    //@todo this should not be public
-//    decltype(activeClientConnections) &getClientConnections() {
-//        return activeClientConnections;
-//    }
-
-
 private:
     void stopAcceptedConnections();
 
 public: // @todo should be public or shouldn't ?
-    void addAcceptedConnection(IServerConnection *c);
+    void addAcceptedConnection(IServerConnection* c);
 
-    void removeAcceptedConnection(IServerConnection *c);
+    void removeAcceptedConnection(IServerConnection* c);
 
     void listen();
 
     void stopListening();
+
+    void prepareSubmodules() override;
 
     void onStop() override;
 
@@ -190,14 +180,9 @@ public: // @todo should be public or shouldn't ?
 
     RemoteNode& connectTo(const NetAddressType& address);
 
-    RemoteNode &connectToNode(const NodeIdType& nodeId) {
-        //@todo catch exception
-        RemoteNode &remoteNode = getRemoteNode(nodeId);
-        remoteNode.connect();
-        return remoteNode;
-    }
+    RemoteNode& connectToNode(const NodeIdType& nodeId);
 
-    void disconnect(const NodeIdType &id);
+    void disconnect(const NodeIdType& id);
 
     void disconnectAll();
 
@@ -270,31 +255,9 @@ public: // @todo should be public or shouldn't ?
      * @todo remove inactive nodes older than...
      * @return new remote node that is added to the list
      */
-    RemoteNode &getRemoteNode() {
-        std::shared_ptr<RemoteNode> remoteNode = std::make_shared<RemoteNode>(protocol);
-        remoteNode->context()->setParentContext(node.getContext());
-        remoteNodes.push_back(remoteNode);
-        return *remoteNode;
-    }
+    RemoteNode& getRemoteNode();
 
-    RemoteNode &getRemoteNode(const NodeIdType &nodeId) {
-        auto iter = std::find_if(remoteNodes.begin(), remoteNodes.end(), [&](const std::shared_ptr<RemoteNode> obj) {
-            return (obj->getNodeId() && *obj->getNodeId() == nodeId);
-        });
-        if (iter != remoteNodes.end()) {
-            return **iter;
-        } else {
-            //there is no active remote node with this id, let's see if it is known in network information
-//            auto networkInfo = getNetworkInfo();
-            if (networkInfo->isNodeKnown(nodeId)) {
-                auto &remoteNode = getRemoteNode();
-                remoteNode.setRemoteNodeInfo(networkInfo->getRemoteNodeInfo(nodeId));
-                return remoteNode;
-            } else {
-                throw RemoteNodeNotFoundException("Remote node unknown");
-            }
-        }
-    }
+    RemoteNode& getRemoteNode(const NodeIdType& nodeId);
 
     ////COMMANDS
     std::string testingMethod() {
@@ -344,9 +307,5 @@ public: // @todo should be public or shouldn't ?
     }
 };
 
-//CONFIG_NAME(NetworkModule::Configuration, "network")
-
-//CEREAL_REGISTER_TYPE(NetworkModule::Configuration)
-//CEREAL_REGISTER_POLYMORPHIC_RELATION(IConfig,NetworkModule::Config);
 
 #endif //BASYCO_NETWORKMODULE_H

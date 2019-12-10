@@ -576,3 +576,6 @@ To jest bardziej skomplikowane niż sie wydaje. jak ktos robi in >> data; to il
 
 
 Trzebaby dodać pakiet ConnectionControl. w ten sposob moznaby powiedziec serwerowi m.in. o zamykaniu polaczenia. Dzieki temu na daemonie nie wisialoby 10 połączeń "control".
+
+
+ROZWIAZANIE DLA PROBLEMU NetworkingEvent - PacketContext. Dla każdego przetwarzanego pakietu wygenerować PacketContext z danymi pakietu, w tym id. nie bedzie trzeba tego przekazywać w dziwny sposób do eventu. BasePacket może znać PacketContext i ładować id z niego jeśli jest dostępny. /@TODO PACKET CONTEXT

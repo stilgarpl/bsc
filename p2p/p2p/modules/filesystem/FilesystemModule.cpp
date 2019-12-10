@@ -6,7 +6,7 @@
 #include <p2p/modules/filesystem/network/packet/TransferQuery.h>
 #include "FilesystemModule.h"
 #include <p2p/modules/basic/BasicModule.h>
-#include <p2p/modules/filesystem/network/processor/NetworkProcessors.h>
+#include <p2p/modules/filesystem/network/processor/FilesystemNetworkProcessors.h>
 
 FilesystemModule::FilesystemModule(INode &node) : NodeModuleDependent<FilesystemModule, NetworkModule>(node,
                                                                                                        "filesystem") {
@@ -58,6 +58,6 @@ const std::filesystem::path &FilesystemModule::getCurrentPath() const {
 
 void FilesystemModule::prepareSubmodules() {
     auto &networkSub = getSubModule<NetworkModule>();
-    networkSub.registerPacketProcessor<TransferQuery>(NetworkProcessors::queryProcessor);
+    networkSub.registerPacketProcessor<TransferQuery>(FilesystemNetworkProcessors::queryProcessor);
 }
 

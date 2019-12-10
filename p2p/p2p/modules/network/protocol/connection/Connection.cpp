@@ -6,8 +6,9 @@
 #include <p2p/modules/network/protocol/logic/sources/ConnectionSource.h>
 #include <logic/context/LogicContext.h>
 #include <p2p/modules/network/protocol/context/ConnectionContext.h>
-#include <Poco/Net/NetException.h>
+#include <Poco/Exception.h>
 #include <p2p/node/context/NodeContext.h>
+#include <Poco/Net/NetException.h>
 #include "ConnectionException.h"
 
 using namespace std::chrono_literals;
@@ -15,8 +16,10 @@ using namespace std::chrono_literals;
 void Connection::send(BasePacketPtr np) {
     std::lock_guard<std::mutex> g(sendQueueLock);
     // std::cout << "Adding packet ..." << std::endl;
-    sendQueue.push(np);
-    sendReady.notify_all();
+    if (sending) {
+        sendQueue.push(np);
+        sendReady.notify_all();
+    }
 
 }
 
@@ -32,7 +35,6 @@ BasePacketPtr Connection::receive() {
         //@todo error handling, maybe throw exception?
         return nullptr;
     } else {
-        ///clion says it's an error. clion is WRONG.
         auto v = receiveQueue.front();
         // std::cout << "Popping " << std::endl;
         receiveQueue.pop();
@@ -48,7 +50,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
     auto &logicManager = lc->getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
-    while (sending) {
+    while (sending || !sendQueue.empty()) {
         try {
             //  std::cout << "sending " << socket.address().port() << std::endl;
             //check the queue
@@ -60,7 +62,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
 //            }
             sendReady.wait(g, [this] { return !(sendQueue.empty() && sending); });
             while (!sendQueue.empty()) {
-                //  std::cout << "work::send found packet to send" << std::endl;
+//                  std::cout << "work::send found packet to send" << std::endl;
                 BasePacketPtr v;
                 {
                     std::stringstream ss;
@@ -74,10 +76,11 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
 //                    LOGGER("packet sent " + std::to_string(v->getId()) + " " + typeid(*v).name())
 
 //                    LOGGER("packet sent" + std::to_string(v->getId()));
+                    //@todo replace this ptr with observer pattern
                     if (connectionSourcePtr != nullptr) {
                         connectionSourcePtr->sentPacket(v, this);
                     }
-//                    LOGGER("packet sent.")
+                    LOGGER("packet sent.")
                     sendQueue.pop();
                 }
 
@@ -85,7 +88,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
             os.flush();
 //            std::this_thread::sleep_for(10ms);
 //            LOGGER("sending flushed");
-        } catch (const cereal::Exception &e) {
+        } catch (const cereal::Exception& e) {
             LOGGER(" C EXCEPTION")
             LOGGER(e.what());
             //socket.close();
@@ -94,7 +97,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
             //cprocessor.stop();
             // if not receiving, then it's ok!
         }
-        catch (const Poco::Net::NetException &e) {
+        catch (const Poco::IOException& e) {
             LOGGER(" P EXCEPTION")
             //processor.stop();
             stopReceiving();
@@ -104,6 +107,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
         }
         //  std::this_thread::sleep_for(400ms);
     }
+
 
     LOGGER("stopped connection workSend")
 
@@ -166,7 +170,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                 try {
                     socket.shutdown();
                     //socket.close();
-                } catch (const Poco::Net::NetException &e) {
+                } catch (const Poco::IOException& e) {
                     //processor.stop();
                     if (socket.available()) {
                         socket.shutdown();
@@ -176,7 +180,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
                 }
 
             }
-            catch (const Poco::Net::NetException &e) {
+            catch (const Poco::IOException& e) {
                 //processor.stop();
                 socket.shutdown();
                 e.displayText();

@@ -10,6 +10,7 @@
 #include "RemoteNodeContext.h"
 #include <Poco/Net/NetException.h>
 #include <p2p/modules/network/protocol/connection/ConnectionException.h>
+#include <p2p/modules/network/protocol/packet/ConnectionControl.h>
 
 
 std::optional<NodeIdType> RemoteNode::getNodeId() const {
@@ -98,6 +99,12 @@ void RemoteNode::setNodeInfo(const NodeInfo &ni) {
 void RemoteNode::disconnect() {
     std::unique_lock g(*connectionFetcher);
     if (connectionFetcher->getConnection() != nullptr) {
+        //@todo make this code nicer.
+        auto disconnectRequest = ConnectionControl::Request::getNew();
+        disconnectRequest->setAction(ConnectionControl::Action::DISCONNECT);
+        connectionFetcher->getConnection()->send(disconnectRequest);
+        //@todo this waits for all packets to flush. It's bad. Try to fix actual flushing.
+        std::this_thread::sleep_for(1ms);
         connectionFetcher->getConnection()->shutdown();
     }
     //@todo this setting to null is a problem. it deletes connection before state events could be processed, valgrind shows invalid read/write here

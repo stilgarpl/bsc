@@ -13,15 +13,13 @@ class ConnectionContext {
 public:
 
 private:
-    Connection &connection;
+    Connection& connection;
 
 
 public:
-    explicit ConnectionContext(Connection &connection);
+    explicit ConnectionContext(Connection& connection);
 
-    Connection &getConnection() const;
-
-    int test;
+    Connection& getConnection() const;
 
 
 };

@@ -22,15 +22,16 @@ void ServerConnection::run() {
     // LOGGER("Opening server connection");
     //run is already in a separate thread, so there is no need to start a new one
     Context::setActiveContext(getConnectionContext());
-    socket().setReceiveTimeout(Poco::Timespan(150, 1));
-    socket().setSendTimeout(Poco::Timespan(150, 1));
-    socket().setKeepAlive(true);
+//    socket().setReceiveTimeout(Poco::Timespan(150, 1));
+//    socket().setSendTimeout(Poco::Timespan(150, 1));
+//    socket().setKeepAlive(true);
     startSending(socket());
     processor.start();
     changeState(ConnectionState::CONNECTED);
     try {
         workReceive(socket());
-    } catch (const Poco::Net::NetException &e) {
+    } catch (const Poco::Net::NetException& e) {
+        LOGGER("Server connection caught poco net exception")
         //processor.stop();
         stopReceiving();
         stopSending();
@@ -51,9 +52,6 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Contex
           IServerConnection(std::move(context)) {
 
     Context::setActiveContext(getConnectionContext());
-    //@todo observer pattern?
-//    serverNode.getModule<NetworkModule>()->addAcceptedConnection(this);
-//    serverNode.getModule<NetworkModule>()->getRemoteNode().connect()
     auto lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc->getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
@@ -105,10 +103,11 @@ Poco::Net::StreamSocket &ServerConnection::getSocket() {
 
 
 Poco::Net::TCPServerConnection *ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket &socket) {
+    LOGGER("creating server connection");
     Context::Ptr connectionContext = contextGetter();
     SetLocalContext localContext(connectionContext); //RAII
-    ServerConnection *connection = new ServerConnection(socket, connectionContext);
-    for (const auto &observer : observers) {
+    ServerConnection* connection = new ServerConnection(socket, connectionContext);
+    for (const auto& observer : observers) {
         connection->registerStateObserver(observer);
     }
     return connection;
