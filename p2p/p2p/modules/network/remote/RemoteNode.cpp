@@ -1,5 +1,3 @@
-#include <utility>
-
 //
 // Created by stilgar on 06.07.18.
 //
@@ -11,7 +9,7 @@
 #include <Poco/Net/NetException.h>
 #include <p2p/modules/network/protocol/connection/ConnectionException.h>
 #include <p2p/modules/network/protocol/packet/ConnectionControl.h>
-
+#include <utility>
 
 std::optional<NodeIdType> RemoteNode::getNodeId() const {
     if (remoteNodeInfo.getNodeInfo()) {

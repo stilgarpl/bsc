@@ -130,7 +130,7 @@ public:
             return response;
 
         } else {
-            LOGGER("unable to send packet to " +
+            LOGGER("unable to send request to " +
                    (remoteNodeInfo.getNodeInfo() ? remoteNodeInfo.getNodeInfo()->getNodeId() : "remote node.") +
                    "Not connected")
             return std::shared_ptr<ReturnType>(nullptr);

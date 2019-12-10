@@ -208,7 +208,7 @@ void Connection::startSending(Poco::Net::StreamSocket &socket) {
 void Connection::stopSending() {
     std::unique_lock<std::recursive_mutex> g(sendThreadLock);
     sending = false;
-    if (sendThread != nullptr && sendThread->joinable()) {
+    if (sendThread != nullptr && sendThread->joinable() && std::this_thread::get_id() != sendThread->get_id()) {
         sendReady.notify_all();
         sendThread->join();
         sendThread = nullptr;
@@ -236,7 +236,8 @@ void Connection::stopReceiving() {
     } catch (const Poco::Net::NetException &e) {
         LOGGER(e.what());
     }
-    if (receiveThread != nullptr && receiveThread->joinable()) {
+    if (receiveThread != nullptr && receiveThread->joinable() &&
+        std::this_thread::get_id() != receiveThread->get_id()) {
         receiveReady.notify_all();
         receiveThread->join();
         receiveThread = nullptr;
