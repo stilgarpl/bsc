@@ -39,22 +39,23 @@ struct CommonEvaluators {
         };
     }
 
+    //@todo I removed additional args for this evaluator. I'm not sure anything actually uses additional arguments. Maybe I should remove that ability.
     template<typename ... Evaluators>
     static auto stack(Evaluators... evaluators) {
-        return [evaluators...](auto e, auto ... args) {
-            return evaluateStack(e, args..., evaluators...);
+        return [evaluators...](auto e) {
+            return evaluateStack(e, evaluators...);
 
         };
     }
 
 private:
-    template<typename E, typename ... Args, typename Evaluator, typename ...RestOfEvaluators>
+    template<typename E,  typename Evaluator, typename ...RestOfEvaluators>
     constexpr static auto
-    evaluateStack(const E &e, const Args &... args, Evaluator evaluator, RestOfEvaluators ... rest) {
+    evaluateStack(const E &e, Evaluator evaluator, RestOfEvaluators ... rest) {
         if constexpr (sizeof... (rest) == 0) {
-            return evaluator(e, args...);
+            return evaluator(e);
         } else {
-            return evaluator(evaluateStack(e, args..., rest...));
+            return evaluator(evaluateStack(e, rest...));
         }
     }
 };

@@ -6,6 +6,7 @@
 #include <core/context/Context.h>
 #include <thread>
 #include <core/io/InputOutputContext.h>
+#include <sstream>
 
 TEST_CASE("Context test") {
     const std::string contextName = "context field name";

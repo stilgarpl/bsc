@@ -132,7 +132,7 @@ public:
     private:
         std::list<LocalTransferDescriptorPtr> transfers;
         TransferManager &manager;
-        const unsigned long MAX_CONCURRENT_TRANSFERS = 2;
+        const decltype(transfers.size()) MAX_CONCURRENT_TRANSFERS = 2;
         std::mutex finishLock;
         std::condition_variable finishReady;
         std::recursive_mutex startLock;
@@ -146,11 +146,11 @@ public:
     protected:
 
         //@todo this method probably can be made more efficient or omitted entirely
-        unsigned long countUnfinishedTransfers();
+        auto countUnfinishedTransfers() -> decltype(transfers.size());
 
-        unsigned long countTransfersInState(TransferState state);
+        auto countTransfersInState(TransferState state) -> decltype(transfers.size());
 
-        unsigned long countTransfersNotInState(TransferState state);
+        auto countTransfersNotInState(TransferState state) -> decltype(transfers.size());
 
     public:
         void

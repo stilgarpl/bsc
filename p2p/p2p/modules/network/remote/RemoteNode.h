@@ -21,7 +21,7 @@
 
 class ConnectionFetcher : public Connection::ObserverType {
 private:
-    std::variant<std::shared_ptr<Connection>/*client connection*/, Connection */*server connection*/> connectionPtr = nullptr;
+    std::variant<std::shared_ptr<Connection>/*client connection*/, Connection * /*server connection*/> connectionPtr = nullptr;
     std::recursive_mutex connectionLock;
     std::atomic_bool valid = false;
 

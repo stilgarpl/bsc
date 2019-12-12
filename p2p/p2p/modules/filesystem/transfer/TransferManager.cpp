@@ -457,8 +457,8 @@ void TransferManager::TransferQueue::start() {
     auto transfersFinished = countTransfersInState(TransferState::FINISHED);
     auto transfersRunning = transfers.size() - transfersFinished - transfersNotStarted;
 
-    unsigned long transfersToStart = std::min<unsigned long>(
-            std::max<unsigned long>(MAX_CONCURRENT_TRANSFERS - transfersRunning, 0),
+    auto transfersToStart = std::min<decltype(transfers.size())>(
+            std::max<decltype(transfers.size())>(MAX_CONCURRENT_TRANSFERS - transfersRunning, 0),
             transfersNotStarted);
 //    LOGGER("transfers to start " + std::to_string(transfersToStart));
     LOGGER("Transfer queue start, transfers to start=" + std::to_string(transfersToStart))
@@ -479,8 +479,8 @@ void TransferManager::TransferQueue::start() {
     }
 }
 
-unsigned long TransferManager::TransferQueue::countTransfersNotInState(TransferManager::TransferState state) {
-    unsigned long result = transfers.size();
+auto TransferManager::TransferQueue::countTransfersNotInState(TransferManager::TransferState state) -> decltype(transfers.size()){
+    auto result = transfers.size();
     for (const auto &item : transfers) {
         if (item->getCurrentState() == state) {
             result--;
@@ -489,8 +489,8 @@ unsigned long TransferManager::TransferQueue::countTransfersNotInState(TransferM
     return result;
 }
 
-unsigned long TransferManager::TransferQueue::countTransfersInState(TransferManager::TransferState state) {
-    unsigned long result = 0;
+auto TransferManager::TransferQueue::countTransfersInState(TransferManager::TransferState state) -> decltype(transfers.size()){
+    decltype(transfers.size()) result = 0;
     for (const auto &item : transfers) {
         if (item->getCurrentState() == state) {
             result++;
@@ -499,7 +499,7 @@ unsigned long TransferManager::TransferQueue::countTransfersInState(TransferMana
     return result;
 }
 
-unsigned long TransferManager::TransferQueue::countUnfinishedTransfers() {
+auto TransferManager::TransferQueue::countUnfinishedTransfers() -> decltype(transfers.size()) {
 //    unsigned long result = transfers.size();
 //    for (const auto &item : transfers) {
 //        if (item->getCurrentState() == TransferState::FINISHED) {

@@ -579,3 +579,5 @@ Trzebaby dodać pakiet ConnectionControl. w ten sposob moznaby powiedziec serwer
 
 
 ROZWIAZANIE DLA PROBLEMU NetworkingEvent - PacketContext. Dla każdego przetwarzanego pakietu wygenerować PacketContext z danymi pakietu, w tym id. nie bedzie trzeba tego przekazywać w dziwny sposób do eventu. BasePacket może znać PacketContext i ładować id z niego jeśli jest dostępny. /@TODO PACKET CONTEXT
+
+@todo remove getenv(). Get that data in other way. getenv() crashes on windows.
