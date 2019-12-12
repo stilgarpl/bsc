@@ -2,8 +2,8 @@
 // Created by stilgar on 22.12.17.
 //
 
-#ifndef BASYCO_STORAGEEVENT_H
-#define BASYCO_STORAGEEVENT_H
+#ifndef BASYCO_STORAGERESOURCEREQUESTEVENT_H
+#define BASYCO_STORAGERESOURCEREQUESTEVENT_H
 
 
 #include <logic/IEvent.h>
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //BASYCO_STORAGEEVENT_H
+#endif //BASYCO_STORAGERESOURCEREQUESTEVENT_H

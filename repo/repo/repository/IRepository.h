@@ -43,19 +43,19 @@ public:
 protected:
 public:
     enum class DeployState {
-        DEPLOYED,
-        NOT_DEPLOYED,
-        UNCHANGED,
+        deployed,
+        notDeployed,
+        unchanged,
     };
 
     enum class RepositoryAction {
-        PERSIST,
-        UPDATE, //this name is a little ambigious
-        DELETE,
-        TRASH,
-        REMOVE,
-        RESTORE,
-        NOP,
+        persist,
+        update, //this name is a little ambigious
+        erase,
+        trash,
+        remove,
+        restore,
+        nop,
     };
 public:
     class RepositoryActionStrategy {
@@ -90,8 +90,8 @@ public:
 public:
 
     enum class UpdateOptions {
-        FOLLOW_DIRECTORIES,
-        FOLLOW_UPDATED_DIRECTORIES,
+        followDirectories,
+        followUpdatedDirectories,
     };
 
     //RepositoryActionStrategyPack

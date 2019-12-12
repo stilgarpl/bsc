@@ -28,31 +28,31 @@ Repository::Repository(RepoIdType repositoryId, IStoragePtr storagePtr) : strate
                                                                           repositoryId(std::move(repositoryId)),
                                                                           storage(std::move(storagePtr)),
                                                                           deployPack(strategyFactory.createPack(
-                                                                                  {.updatedInRepo = RepositoryAction::RESTORE,
-                                                                                          .updatedInFilesystem = RepositoryAction::NOP,
-                                                                                          .same = RepositoryAction::NOP,
-                                                                                          .newInRepo = RepositoryAction::RESTORE,
-                                                                                          .newInFilesystem = RepositoryAction::NOP,
-                                                                                          .deletedInRepo = RepositoryAction::TRASH,
-                                                                                          .deletedInFilesystem = RepositoryAction::RESTORE,
+                                                                                  {.updatedInRepo = RepositoryAction::restore,
+                                                                                          .updatedInFilesystem = RepositoryAction::nop,
+                                                                                          .same = RepositoryAction::nop,
+                                                                                          .newInRepo = RepositoryAction::restore,
+                                                                                          .newInFilesystem = RepositoryAction::nop,
+                                                                                          .deletedInRepo = RepositoryAction::trash,
+                                                                                          .deletedInFilesystem = RepositoryAction::restore,
                                                                                   })),
                                                                           localSyncPack(strategyFactory.createPack(
-                                                                                  {.updatedInRepo = RepositoryAction::NOP,
-                                                                                          .updatedInFilesystem = RepositoryAction::UPDATE,
-                                                                                          .same = RepositoryAction::NOP,
-                                                                                          .newInRepo = RepositoryAction::NOP,
-                                                                                          .newInFilesystem = RepositoryAction::PERSIST,
-                                                                                          .deletedInRepo = RepositoryAction::NOP,
-                                                                                          .deletedInFilesystem = RepositoryAction::REMOVE,
+                                                                                  {.updatedInRepo = RepositoryAction::nop,
+                                                                                          .updatedInFilesystem = RepositoryAction::update,
+                                                                                          .same = RepositoryAction::nop,
+                                                                                          .newInRepo = RepositoryAction::nop,
+                                                                                          .newInFilesystem = RepositoryAction::persist,
+                                                                                          .deletedInRepo = RepositoryAction::nop,
+                                                                                          .deletedInFilesystem = RepositoryAction::remove,
                                                                                   })),
                                                                           fullPack(strategyFactory.createPack(
-                                                                                  {.updatedInRepo = RepositoryAction::RESTORE,
-                                                                                          .updatedInFilesystem = RepositoryAction::UPDATE,
-                                                                                          .same = RepositoryAction::NOP,
-                                                                                          .newInRepo = RepositoryAction::RESTORE,
-                                                                                          .newInFilesystem = RepositoryAction::PERSIST,
-                                                                                          .deletedInRepo = RepositoryAction::TRASH,
-                                                                                          .deletedInFilesystem = RepositoryAction::REMOVE,
+                                                                                  {.updatedInRepo = RepositoryAction::restore,
+                                                                                          .updatedInFilesystem = RepositoryAction::update,
+                                                                                          .same = RepositoryAction::nop,
+                                                                                          .newInRepo = RepositoryAction::restore,
+                                                                                          .newInFilesystem = RepositoryAction::persist,
+                                                                                          .deletedInRepo = RepositoryAction::trash,
+                                                                                          .deletedInFilesystem = RepositoryAction::remove,
                                                                                   })) {
     pathTransformer->addRule(std::make_shared<TmpRule>());
     pathTransformer->addRule(std::make_shared<HomeDirRule>());
@@ -74,7 +74,7 @@ void Repository::restoreAll() {
             } else {
                 storage->restore(value->getResourceId(), path);
             }
-            deployMap.markDeployed(path, Repository::DeployState::DEPLOYED);
+            deployMap.markDeployed(path, Repository::DeployState::deployed);
             restoreAttributes(path);
         } else {
             LOGGER("resAll: no value")
@@ -84,14 +84,14 @@ void Repository::restoreAll() {
 
 void Repository::commit() {
     journal->clearFunc();
-    journal->setFunc(JournalMethod::ADDED, JournalTarget::FILE, [&](auto &i) {
+    journal->setFunc(JournalMethod::added, JournalTarget::file, [&](auto& i) {
         storage->store(calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
                        fs::file_size(pathTransformer->transformFromJournalFormat(i.getPath())),
                        pathTransformer->transformFromJournalFormat(i.getPath()));
         LOGGER("commit: added file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())
     });
 
-    journal->setFunc(JournalMethod::MODIFIED, JournalTarget::FILE, [&](auto &i) {
+    journal->setFunc(JournalMethod::modified, JournalTarget::file, [&](auto& i) {
         storage->store(calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
                        fs::file_size(pathTransformer->transformFromJournalFormat(i.getPath())),
                        pathTransformer->transformFromJournalFormat(i.getPath()));
@@ -113,18 +113,18 @@ void Repository::persist(fs::path path) {
     auto &attr = fileMap[path];
     if (attr) {
         //file exists in map! update mode
-        auto target = !attr->isDirectory() ? JournalTarget::FILE : JournalTarget::DIRECTORY;
+        auto target = !attr->isDirectory() ? JournalTarget::file : JournalTarget::directory;
         //@todo check if file was actually changed.
-        journal->append(JournalMethod::MODIFIED, target,
+        journal->append(JournalMethod::modified, target,
                         pathTransformer->transformToJournalFormat(path).string(),
                         FileData(path));
 
 
     } else {
-        auto target = !fs::is_directory(path) ? JournalTarget::FILE : JournalTarget::DIRECTORY;
+        auto target = !fs::is_directory(path) ? JournalTarget::file : JournalTarget::directory;
 
 
-        journal->append(JournalMethod::ADDED, target,
+        journal->append(JournalMethod::added, target,
                         pathTransformer->transformToJournalFormat(path).string(),
                         FileData(path));
 
@@ -197,10 +197,10 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
 
                         //@todo this is mostly the same code as below, combine the two loops into a function or sth.
                         if (fs::is_directory(path) &&
-                            (updateOptions.contains(UpdateOptions::FOLLOW_UPDATED_DIRECTORIES) ||
-                             updateOptions.contains(UpdateOptions::FOLLOW_DIRECTORIES))) {
+                            (updateOptions.contains(UpdateOptions::followUpdatedDirectories) ||
+                             updateOptions.contains(UpdateOptions::followDirectories))) {
                             LOGGER(path.string() + " is a directory, iterating over...")
-                            for (const auto &item : fs::directory_iterator(path)) {
+                            for (const auto& item : fs::directory_iterator(path)) {
                                 //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
 
                                 LOGGER(" item: " + item.path().string())
@@ -234,9 +234,9 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
 
             }
             //@todo this iterates over all directories and files in path, which means that it will probably call some methods twice or even more times on some files. make sure it doesn't
-            if (fs::is_directory(path) && updateOptions.contains(UpdateOptions::FOLLOW_DIRECTORIES)) {
+            if (fs::is_directory(path) && updateOptions.contains(UpdateOptions::followDirectories)) {
                 LOGGER(path.string() + " is a directory, iterating over...")
-                for (const auto &item : fs::directory_iterator(path)) {
+                for (const auto& item : fs::directory_iterator(path)) {
                     //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
 
                     LOGGER(" item: " + item.path().string())
@@ -269,7 +269,7 @@ void Repository::update(fs::path path, const RepositoryActionStrategyPack &strat
         } else {
             if (fileMap.isDeleted(path)) {
                 LOGGER("file deleted, but not in filesystem so nothing to do: " + path.string())
-                deployMap.markDeployed(path, DeployState::NOT_DEPLOYED);
+                deployMap.markDeployed(path, DeployState::notDeployed);
             } else {
                 //file is neither on file system nor in the map. someone trying to update unknown file?
                 LOGGER("file unknown " + path.string());
@@ -285,7 +285,7 @@ void Repository::syncLocalChanges() {
 //@todo change the name of this function to updateAll or sth
     for (const auto &i : getFileMap()) {
         LOGGER("update()" + i.first.string())
-        update(i.first, localSyncPack, {UpdateOptions::FOLLOW_UPDATED_DIRECTORIES});
+        update(i.first, localSyncPack, {UpdateOptions::followUpdatedDirectories});
     }
 
 
@@ -317,8 +317,8 @@ void Repository::forget(fs::path path) {
     if (fileMap.contains(path)) {
         auto &attr = fileMap[path];
         if (attr) {
-            journal->append(JournalMethod::FORGOTTEN,
-                            attr->isDirectory() ? JournalTarget::DIRECTORY : JournalTarget::FILE,
+            journal->append(JournalMethod::forgotten,
+                            attr->isDirectory() ? JournalTarget::directory : JournalTarget::file,
                             pathTransformer->transformToJournalFormat(path).string(),
                             attr->toFileData(path));
         } else {
@@ -338,12 +338,12 @@ void Repository::remove(fs::path path) {
         auto &attr = fileMap[path];
         if (attr) {
             if (!fs::is_directory(path)) {
-                journal->append(JournalMethod::DELETED, JournalTarget::FILE,
+                journal->append(JournalMethod::deleted, JournalTarget::file,
                                 pathTransformer->transformToJournalFormat(path).string(),
                                 attr->toFileData(path));
 
             } else {
-                journal->append(JournalMethod::DELETED, JournalTarget::DIRECTORY,
+                journal->append(JournalMethod::deleted, JournalTarget::directory,
                                 pathTransformer->transformToJournalFormat(path).string(),
                                 attr->toFileData(path));
                 //@todo delete everything recursively ... or maybe do it in replayCurrentState?
@@ -362,12 +362,12 @@ void Repository::ignore(fs::path path) {
         path = fs::canonical(fs::current_path() / path);
     }
     if (!fs::is_directory(path)) {
-        journal->append(JournalMethod::IGNORED, JournalTarget::FILE,
+        journal->append(JournalMethod::ignored, JournalTarget::file,
                         pathTransformer->transformToJournalFormat(path).string(),
                         FileData(path));
 
     } else {
-        journal->append(JournalMethod::IGNORED, JournalTarget::DIRECTORY,
+        journal->append(JournalMethod::ignored, JournalTarget::directory,
                         pathTransformer->transformToJournalFormat(path).string(),
                         FileData(path));
     }
@@ -415,22 +415,22 @@ void Repository::RepoFileMap::prepareMap() {
         LOGGER("checksum different, recreate file map")
         attributesMap.clear();
         journal->clearFunc();
-        journal->setFunc(JournalMethod::ADDED, JournalTarget::FILE, [&](auto &i) {
+        journal->setFunc(JournalMethod::added, JournalTarget::file, [&](auto& i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::MODIFIED, JournalTarget::FILE, [&](auto &i) {
+        journal->setFunc(JournalMethod::modified, JournalTarget::file, [&](auto& i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
-        journal->setFunc(JournalMethod::MOVED, JournalTarget::FILE, [&](auto &i) {
+        //@todo moved file should have two parameters - from to. or, just remove moved and use deleted/added
+        journal->setFunc(JournalMethod::moved, JournalTarget::file, [&](auto& i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
         });
 
-        journal->setFunc(JournalMethod::DELETED, JournalTarget::FILE, [&](auto &i) {
+        journal->setFunc(JournalMethod::deleted, JournalTarget::file, [&](auto& i) {
             auto path = pathTransformer->transformFromJournalFormat(i.getPath());
             attributesMap[path] = std::nullopt;
             deleteMap[path].setDeleted(true);
@@ -438,7 +438,7 @@ void Repository::RepoFileMap::prepareMap() {
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::FORGOTTEN, JournalTarget::FILE, [&](auto &i) {
+        journal->setFunc(JournalMethod::forgotten, JournalTarget::file, [&](auto& i) {
             auto path = pathTransformer->transformFromJournalFormat(i.getPath());
             attributesMap[path] = std::nullopt;
             deleteMap[path].setDeleted(false);
@@ -446,22 +446,22 @@ void Repository::RepoFileMap::prepareMap() {
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::ADDED, JournalTarget::DIRECTORY, [&](auto &i) {
+        journal->setFunc(JournalMethod::added, JournalTarget::directory, [&](auto& i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::MODIFIED, JournalTarget::DIRECTORY, [&](auto &i) {
+        journal->setFunc(JournalMethod::modified, JournalTarget::directory, [&](auto& i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        //@todo moved file should have two parameters - from to. or, just remove MOVED and use DELETED/ADDED
-        journal->setFunc(JournalMethod::MOVED, JournalTarget::DIRECTORY, [&](auto &i) {
+        //@todo moved file should have two parameters - from to. or, just remove moved and use deleted/added
+        journal->setFunc(JournalMethod::moved, JournalTarget::directory, [&](auto& i) {
             attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
         });
 
-        journal->setFunc(JournalMethod::DELETED, JournalTarget::DIRECTORY, [&, this](auto &i) {
+        journal->setFunc(JournalMethod::deleted, JournalTarget::directory, [&, this](auto& i) {
             auto path = pathTransformer->transformFromJournalFormat(i.getPath());
             attributesMap[path] = std::nullopt;
             deleteMap[path].setDeleted(true);
@@ -469,7 +469,7 @@ void Repository::RepoFileMap::prepareMap() {
 //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
         });
 
-        journal->setFunc(JournalMethod::FORGOTTEN, JournalTarget::DIRECTORY, [&](auto &i) {
+        journal->setFunc(JournalMethod::forgotten, JournalTarget::directory, [&](auto& i) {
             auto path = pathTransformer->transformFromJournalFormat(i.getPath());
             attributesMap[path] = std::nullopt;
             deleteMap[path].setDeleted(false);
@@ -554,10 +554,10 @@ auto Repository::RepoDeployMap::operator[](const fs::path& path) -> decltype(dep
 }
 
 void Repository::RepoDeployMap::markDeployed(const fs::path &path, Repository::DeployState deployState) {
-    if (deployState == DeployState::DEPLOYED) {
+    if (deployState == DeployState::deployed) {
         LOGGER("marking " + path.string() + " as deployed")
         deployMap[path.string()] = true;
-    } else if (deployState == DeployState::NOT_DEPLOYED) {
+    } else if (deployState == DeployState::notDeployed) {
         LOGGER("marking " + path.string() + " as not deployed")
         deployMap[path.string()] = false;
     } //else unchanged
@@ -582,8 +582,8 @@ class StrategyPersist : public Repository::RepositoryActionStrategy {
     Repository::DeployState
     apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
         repository.persist(path);
-        return Repository::DeployState::DEPLOYED; //it was UNCHANGED, but file is clearly in the filesystem, so it's deployed!
-        //UNCHANGED made some sense, because persisting the file doesn't actually deploy it, but new files weren't marked as deployed, so update thought they were deleted. and new files go through persist, so it should return DEPLOYED.
+        return Repository::DeployState::deployed; //it was UNCHANGED, but file is clearly in the filesystem, so it's deployed!
+        //UNCHANGED made some sense, because persisting the file doesn't actually deploy it, but new files weren't marked as deployed, so update thought they were deleted. and new files go through persist, so it should return deployed.
     }
 
 public:
@@ -600,7 +600,7 @@ public:
             repository.getStorage()->restore(attributes->getResourceId(), path);
         }
         repository.restoreAttributes(path);
-        return Repository::DeployState::DEPLOYED;
+        return Repository::DeployState::deployed;
     }
 
     StrategyRestore(Repository &repository) : RepositoryActionStrategy(repository) {}
@@ -612,7 +612,7 @@ public:
     Repository::DeployState
     apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
         repository.trash(path);
-        return Repository::DeployState::NOT_DEPLOYED;
+        return Repository::DeployState::notDeployed;
     }
 
     StrategyTrash(Repository &repository) : RepositoryActionStrategy(repository) {}
@@ -624,7 +624,7 @@ public:
     Repository::DeployState
     apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
         repository.remove(path);
-        return Repository::DeployState::NOT_DEPLOYED;
+        return Repository::DeployState::notDeployed;
     }
 
     StrategyRemove(Repository &repository) : RepositoryActionStrategy(repository) {}
@@ -636,7 +636,7 @@ public:
     Repository::DeployState
     apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
         //@todo implement
-        return Repository::DeployState::NOT_DEPLOYED;
+        return Repository::DeployState::notDeployed;
     }
 
     StrategyDelete(Repository &repository) : RepositoryActionStrategy(repository) {}
@@ -647,7 +647,7 @@ class StrategyNull : public Repository::RepositoryActionStrategy {
 public:
     Repository::DeployState
     apply(const fs::path &path, const std::optional<RepositoryAttributes> &attributes) override {
-        return Repository::DeployState::UNCHANGED;
+        return Repository::DeployState::unchanged;
     }
 
     StrategyNull(Repository &repository) : RepositoryActionStrategy(repository) {}
@@ -657,20 +657,20 @@ public:
 std::shared_ptr<Repository::RepositoryActionStrategy>
 Repository::RepositoryActionStrategyFactory::create(Repository::RepositoryAction action) const {
     switch (action) {
-        case RepositoryAction::PERSIST:
-        case RepositoryAction::UPDATE:
+        case RepositoryAction::persist:
+        case RepositoryAction::update:
             //update and persist are the same
             return std::make_shared<StrategyPersist>(repository);
-        case RepositoryAction::DELETE:
+        case RepositoryAction::erase:
             return std::make_shared<StrategyDelete>(repository);
-        case RepositoryAction::TRASH:
+        case RepositoryAction::trash:
             return std::make_shared<StrategyTrash>(repository);
-        case RepositoryAction::REMOVE:
+        case RepositoryAction::remove:
             return std::make_shared<StrategyRemove>(repository);
-        case RepositoryAction::RESTORE:
+        case RepositoryAction::restore:
             return std::make_shared<StrategyRestore>(repository);
         default: //<---- this is here just so that compiler won't complain about return reaching end of function.
-        case RepositoryAction::NOP:
+        case RepositoryAction::nop:
             return std::make_shared<StrategyNull>(repository);
     }
 }

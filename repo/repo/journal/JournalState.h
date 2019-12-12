@@ -30,8 +30,8 @@ namespace fs = std::filesystem;
 
 class JournalStateData {
 private:
-    JournalMethod method = JournalMethod::NONE;
-    JournalTarget target = JournalTarget::NONE;
+    JournalMethod method = JournalMethod::none;
+    JournalTarget target = JournalTarget::none;
     fs::perms permissions = fs::perms::none;
     PathType path;
     uintmax_t size = 0;

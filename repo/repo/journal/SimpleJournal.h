@@ -2,8 +2,8 @@
 // Created by stilgar on 17.10.17.
 //
 
-#ifndef BASYCO_JOURNAL_H
-#define BASYCO_JOURNAL_H
+#ifndef BASYCO_SIMPLEJOURNAL_H
+#define BASYCO_SIMPLEJOURNAL_H
 
 #include <core/utils/cereal_include.h>
 
@@ -112,4 +112,4 @@ CEREAL_REGISTER_TYPE(SimpleJournal)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(IJournal, SimpleJournal)
 
-#endif //BASYCO_JOURNAL_H
+#endif //BASYCO_SIMPLEJOURNAL_H

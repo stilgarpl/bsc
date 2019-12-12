@@ -2,8 +2,8 @@
 // Created by stilgar on 22.12.17.
 //
 
-#ifndef BASYCO_STORAGESYNC_H
-#define BASYCO_STORAGESYNC_H
+#ifndef BASYCO_STORAGEQUERY_H
+#define BASYCO_STORAGEQUERY_H
 
 
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
@@ -89,4 +89,4 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageQuery::Request)
 CEREAL_REGISTER_TYPE(StorageQuery::Response)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageQuery::Response)
 
-#endif //BASYCO_STORAGESYNC_H
+#endif //BASYCO_STORAGEQUERY_H

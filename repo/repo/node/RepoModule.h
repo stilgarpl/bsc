@@ -49,7 +49,7 @@ public:
     private:
 
 
-        friend class cereal::access;
+        friend class cereal::Access;
     };
 private:
     RepositoryManager repositoryManager;

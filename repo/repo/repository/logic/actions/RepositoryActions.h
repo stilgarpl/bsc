@@ -2,17 +2,16 @@
 // Created by stilgar on 30.01.19.
 //
 
-#ifndef BASYCO_REPOACTIONS_H
-#define BASYCO_REPOACTIONS_H
-
+#ifndef BASYCO_REPOSITORYACTIONS_H
+#define BASYCO_REPOSITORYACTIONS_H
 
 
 struct RepositoryActions {
 
 //@todo those actions should return stuff, journal or repoPtr, to make things simpler and to use full potential of chaining.
-    static bool checkIfUpdateRequired(const JournalPtr &currentJournal, const JournalPtr &newJournal);
+    static bool checkIfUpdateRequired(const JournalPtr& currentJournal, const JournalPtr& newJournal);
 
-    static void updateJournal(const IRepository::RepoIdType &repoId, const JournalPtr &newJournal);
+    static void updateJournal(const IRepository::RepoIdType& repoId, const JournalPtr& newJournal);
 
     static void downloadRepository(const IRepository::RepoIdType &repoId);
 
@@ -25,4 +24,4 @@ struct RepositoryActions {
 };
 
 
-#endif //BASYCO_REPOACTIONS_H
+#endif //BASYCO_REPOSITORYACTIONS_H

@@ -17,7 +17,7 @@ void InternalStorage::store(const ResourceId& checksum, const size_t& size, cons
     auto realChecksum = calculateSha1OfFile(fs::path(sourcePath));
     auto realFileSize = fs::file_size(sourcePath);
     if (realChecksum == checksum && realFileSize == size) {
-        //FILE IS OK
+        //file IS OK
         LOGGER("CHECKSUM IS OK, COPYING TO INTERNAL STORAGE");
         fs::copy_options options = fs::copy_options::none;
         //check if file is already in storage

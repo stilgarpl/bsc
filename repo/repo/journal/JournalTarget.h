@@ -6,9 +6,9 @@
 #define BASYCO_JOURNALTARGET_H
 
 enum class JournalTarget {
-    NONE,
-    FILE,
-    DIRECTORY,
+    none,
+    file,
+    directory,
 };
 
 

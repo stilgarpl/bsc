@@ -7,14 +7,14 @@
 
 enum JournalMethod {
     //@todo add some real numbers here, in case I need to add more stuff
-    NONE,
-    ADDED,
-    MODIFIED,
-    MOVED,
-    DELETED,
-    IGNORED,
-    UNIGNORED,
-    FORGOTTEN,
+            none,
+    added,
+    modified,
+    moved,
+    deleted,
+    ignored,
+    unignored,
+    forgotten,
 };
 
 

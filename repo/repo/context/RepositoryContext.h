@@ -13,7 +13,7 @@ class RepositoryContext {
     RepositoryManager &repositoryManager;
 
 public:
-    RepositoryContext(RepositoryManager &repositoryManager);
+    explicit RepositoryContext(RepositoryManager& repositoryManager);
 
 };
 

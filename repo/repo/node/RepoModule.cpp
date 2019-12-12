@@ -206,7 +206,7 @@ void RepoModule::selectRepository(const IRepository::RepoIdType &repoId) {
 
 void RepoModule::persistFile(const fs::path &path) {
     if (selectedRepository != nullptr) {
-        selectedRepository->persist(path);//getJournal()->append(JournalMethod::ADDED,JournalTarget::FILE, path);
+        selectedRepository->persist(path);//getJournal()->append(JournalMethod::added,JournalTarget::file, path);
 
     }
 }
@@ -260,7 +260,7 @@ void RepoModule::updateFile(const fs::path &path) {
 
     if (selectedRepository != nullptr) {
         selectedRepository->update(path, selectedRepository->getFullPack(),
-                                   {Repository::UpdateOptions::FOLLOW_DIRECTORIES});
+                                   {Repository::UpdateOptions::followDirectories});
 
     }
 
@@ -329,9 +329,9 @@ void RepoModule::initialize() {
     factoryContext->setFactory<IStoragePtr, StorageFactoryByType>(storageFactoryPtr);
     factoryContext->setFactory<IStoragePtr, StorageFactoryByName>(managedStorageFactoryPtr);
 
-    const std::string DEFAULT_STORAGE_ID = "default";
-    auto defaultStorage = storageFactoryPtr->create(DEFAULT_STORAGE_ID, DEFAULT_STORAGE_ID);
-    storageManager.setDefaultStorage(DEFAULT_STORAGE_ID, defaultStorage);
+    const std::string defaultStorageId = "default";
+    auto defaultStorage = storageFactoryPtr->create(defaultStorageId, defaultStorageId);
+    storageManager.setDefaultStorage(defaultStorageId, defaultStorage);
 
 }
 
