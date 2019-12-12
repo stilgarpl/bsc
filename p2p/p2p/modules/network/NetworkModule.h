@@ -51,20 +51,16 @@ public:
     private:
         template<class Archive>
         void serialize(Archive &ar) {
-            ar & port;
+            ar & CEREAL_NVP(port);
         }
-
-
     private:
-
-
         friend class cereal::access;
     };
+
+
     template<typename PacketType>
     using ProcessorType = std::function<typename PacketType::Response::Ptr(typename PacketType::Request::Ptr)>;
-
     class PacketProcessingData {
-
     protected:
         virtual void registerPacketProcessor(NetworkModule &node) = 0;
 
