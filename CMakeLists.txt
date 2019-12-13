@@ -35,7 +35,6 @@ if (EXISTS ${conan})
     conan_cmake_run(CONANFILE conan/conanfile.txt
             INSTALL_FOLDER ${CMAKE_BINARY_DIR}
             BASIC_SETUP
-            #            CMAKE_TARGETS
             BUILD_TYPE "Debug"
             BUILD missing)
     set(LIBS ${LIBS} ${CONAN_LIBS})
@@ -69,8 +68,8 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif ()
 
 
-# Generate clang compilation database
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+## Generate clang compilation database
+#set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(core)
 add_subdirectory(logic)

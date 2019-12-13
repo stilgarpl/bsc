@@ -578,6 +578,9 @@ To jest bardziej skomplikowane niż sie wydaje. jak ktos robi in >> data; to il
 Trzebaby dodać pakiet ConnectionControl. w ten sposob moznaby powiedziec serwerowi m.in. o zamykaniu polaczenia. Dzieki temu na daemonie nie wisialoby 10 połączeń "control".
 
 
-ROZWIAZANIE DLA PROBLEMU NetworkingEvent - PacketContext. Dla każdego przetwarzanego pakietu wygenerować PacketContext z danymi pakietu, w tym id. nie bedzie trzeba tego przekazywać w dziwny sposób do eventu. BasePacket może znać PacketContext i ładować id z niego jeśli jest dostępny. /@TODO PACKET CONTEXT
+ROZWIAZANIE DLA PROBLEMU NetworkingEvent - PacketContext. Dla każdego przetwarzanego pakietu wygenerować PacketContext z danymi pakietu, w tym id. nie bedzie trzeba tego przekazywać w dziwny sposób do eventu. BasePacket może znać PacketContext i ładować id z niego jeśli jest dostępny.
+OKAZUJE SIE, ZE JUZ ROZWIAZALEM TEN PROBLEM dla processorów z network module. trzeba wszystkie pakiety przemigrowac na ten mechanizm i wyłączyć ->process() w pakietach, żeby uniemożliwić procesowanie w starym stylu. @TODO!
 
 @todo remove getenv(). Get that data in other way. getenv() crashes on windows.
+
+//@TODO zrobić generatory różnych rzeczy, może też generator context? żeby brać generator jak FactoryContext ? 
