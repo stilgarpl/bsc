@@ -34,22 +34,22 @@ TEST_CASE("Context test") {
     Context::OwnPtr childContext = Context::makeContext(localContext);
 
     SECTION("parent context value") {
-        REQUIRE(localContext->get<int>(contextName) == nullptr);
-        REQUIRE(childContext->get<int>(contextName) == nullptr);
+        REQUIRE(!localContext->has<int>(contextName));
+        REQUIRE(!childContext->has<int>(contextName));
         localContext->setKey<int>(contextName, value);
-        REQUIRE(localContext->get<int>(contextName) != nullptr);
-        REQUIRE(childContext->get<int>(contextName) != nullptr);
-        REQUIRE(*localContext->get<int>(contextName) == value);
-        REQUIRE(*childContext->get<int>(contextName) == value);
+        REQUIRE(localContext->has<int>(contextName));
+        REQUIRE(childContext->has<int>(contextName));
+        REQUIRE(localContext->get<int>(contextName) == value);
+        REQUIRE(childContext->get<int>(contextName) == value);
     }
 
     SECTION("child context value") {
-        REQUIRE(localContext->get<int>(contextName) == nullptr);
-        REQUIRE(childContext->get<int>(contextName) == nullptr);
+        REQUIRE(!localContext->has<int>(contextName));
+        REQUIRE(!childContext->has<int>(contextName));
         childContext->setKey<int>(contextName, value);
-        REQUIRE(localContext->get<int>(contextName) == nullptr);
-        REQUIRE(childContext->get<int>(contextName) != nullptr);
-        REQUIRE(*childContext->get<int>(contextName) == value);
+        REQUIRE(!localContext->has<int>(contextName));
+        REQUIRE(childContext->has<int>(contextName));
+        REQUIRE(childContext->get<int>(contextName) == value);
     }
 
 
@@ -77,9 +77,9 @@ TEST_CASE("InputOutput Context test") {
     Context::setActiveContext(context);
     context->setDirect<InputOutputContext>(std::make_shared<TestInputOutputContext>());
 
-    auto& out = context->get<InputOutputContext>()->out();
-    auto& in = context->get<InputOutputContext>()->in();
-    auto& stream = std::static_pointer_cast<TestInputOutputContext>(context->get<InputOutputContext>())->getStream();
+    auto& out = context->get<InputOutputContext>().out();
+    auto& in = context->get<InputOutputContext>().in();
+    auto& stream = static_cast<TestInputOutputContext&>(context->get<InputOutputContext>()).getStream();
 
     const std::string testString = "TEST STRING";
     out << testString;
@@ -93,4 +93,13 @@ TEST_CASE("InputOutput Context test") {
 TEST_CASE("Invalid context test") {
     Context::OwnPtr context = Context::makeContext();
     REQUIRE_THROWS_AS(context->setDirect<InputOutputContext>(std::make_shared<int>()), InvalidContextException);
+}
+
+TEST_CASE("Context loop test") {
+    Context::OwnPtr context1 = Context::makeContext();
+    Context::OwnPtr context2 = Context::makeContext();
+    context2->setParentContext(context1);
+    Context::OwnPtr context3 = Context::makeContext();
+    context3->setParentContext(context2);
+    REQUIRE_THROWS_AS(context1->setParentContext(context3),ContextLoopException);
 }

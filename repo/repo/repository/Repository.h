@@ -261,8 +261,8 @@ private:
         RepoDeployMap d;
         IStorage::StorageId storageId;
         ar(r, j, d, storageId);
-        auto factoryContext = Context::getActiveContext()->get<FactoryContext>();
-        auto storageFactory = factoryContext->getFactory<IStoragePtr, StorageFactoryByName>();
+        auto& factoryContext = Context::getActiveContext()->get<FactoryContext>();
+        auto storageFactory = factoryContext.getFactory<IStoragePtr, StorageFactoryByName>();
         auto storagePtr = storageFactory->create(storageId);
         construct(r, storagePtr, j, d);
     }

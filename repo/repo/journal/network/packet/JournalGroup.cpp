@@ -9,12 +9,10 @@
 void JournalGroup::Request::process(Context::Ptr context) {
     LOGGER("journal request process")
     BasePacket::process(context);
-    auto lc = context->get<LogicContext>();
-    if (lc != nullptr) {
-        auto journalSource = lc->getLogicManager().getSource<JournalSource>();
-        journalSource->journalRequested(repoId, this->getId());
+    auto &lc = context->get<LogicContext>();
+    auto journalSource = lc.getLogicManager().getSource<JournalSource>();
+    journalSource->journalRequested(repoId, this->getId());
 
-    }
 }
 
 const std::string &JournalGroup::Request::getRepoId() const {
@@ -27,13 +25,9 @@ void JournalGroup::Request::setRepoId(const std::string &repoId) {
 
 void JournalGroup::Response::process(Context::Ptr context) {
     BasePacket::process(context);
-    auto lc = context->get<LogicContext>();
-    if (lc != nullptr) {
-        auto journalSource = lc->getLogicManager().getSource<JournalSource>();
-        journalSource->journalReceived(repoId, journal);
-
-
-    }
+    auto &lc = context->get<LogicContext>();
+    auto journalSource = lc.getLogicManager().getSource<JournalSource>();
+    journalSource->journalReceived(repoId, journal);
 }
 
 const std::string &JournalGroup::Response::getRepoId() const {
@@ -44,7 +38,7 @@ void JournalGroup::Response::setRepoId(const std::string &repoId) {
     Response::repoId = repoId;
 }
 
-const JournalPtr JournalGroup::Response::getJournal() const {
+JournalPtr JournalGroup::Response::getJournal() const {
     return journal;
 }
 

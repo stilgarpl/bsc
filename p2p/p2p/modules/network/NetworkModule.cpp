@@ -235,7 +235,7 @@ void NetworkModule::purgeDuplicateConnections() {
 
 void NetworkModule::printConnections() {
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
+    auto& out = Context::getActiveContext()->get<InputOutputContext>().out();
     out << "[" << node.getNodeInfo().getNodeId() << "]:" << std::to_string(acceptedConnections.size())
         << std::endl;
     for (auto&& item : remoteNodes) {
@@ -378,7 +378,7 @@ void NetworkModule::update(Connection &connection, ConnectionState type) {
         case ConnectionState::NEW:
             break;
         case ConnectionState::CONNECTED:
-            Context::getActiveContext()->get<RemoteNodeContext>()->getRemoteNode().connect(&connection);
+            Context::getActiveContext()->get<RemoteNodeContext>().getRemoteNode().connect(&connection);
 //            getRemoteNode().connect(&connection);
             break;
         case ConnectionState::DISCONNECTED:

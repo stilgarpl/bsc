@@ -20,6 +20,7 @@ void Context::setParentContext(Context::Ptr parentContext) {
     std::lock_guard<std::recursive_mutex> guard(contextLock);
     //@todo maybe we need to make sure here that we are not making a loop and throw exeption if we are?
     Context::parentContext = std::move(parentContext);
+    validateParentContext();
 }
 
 Context::Ptr Context::getActiveContext() {
@@ -107,6 +108,23 @@ bool Context::hasActiveContext() {
     return activeContext != nullptr;
 }
 
+void Context::validateParentContext() {
+    //@todo if performance becomes an issue, maybe remove this call in release version.
+    // I don't think it's actually possible to make a context loop in my apps, but who knows what can happen.
+    Context::Ptr ancestor = parentContext;
+    while (ancestor != nullptr) {
+        if (&*ancestor == this) {
+            throw ContextLoopException("Context loop detected");
+        } else {
+            ancestor = ancestor->parentContext;
+        }
+    }
+}
+
 InvalidContextException::InvalidContextException(const std::string& arg) : invalid_argument(arg) {}
 
 InvalidContextException::InvalidContextException(const char* string) : invalid_argument(string) {}
+
+ContextLoopException::ContextLoopException(const std::string &arg) : domain_error(arg) {}
+
+InvalidContextValueException::InvalidContextValueException(const std::string &arg) : invalid_argument(arg) {}

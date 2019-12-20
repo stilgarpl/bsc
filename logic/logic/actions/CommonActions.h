@@ -19,7 +19,7 @@ struct CommonActions {
         //don't even think about making &container. it won't work.
         return [container, func](const auto &... param) {
             for (const auto &it : container) {
-                Context::getActiveContext()->get<ForeachContext<std::decay_t<decltype(it)>>>()->setValue(it);
+                Context::getActiveContext()->get<ForeachContext<std::decay_t<decltype(it)>>>().setValue(it);
                 func(param...);
             }
         };
@@ -30,7 +30,7 @@ struct CommonActions {
         return [containerGetter, func, transformer](const auto &... param) {
             for (const auto &it : containerGetter()) {
                 const auto& transformIt = transformer(it);
-                Context::getActiveContext()->get<ForeachContext<std::decay_t<decltype(transformIt)>>>()->setValue(transformIt);
+                Context::getActiveContext()->get<ForeachContext<std::decay_t<decltype(transformIt)>>>().setValue(transformIt);
                 func(param...);
             }
         };

@@ -21,20 +21,13 @@ public:
 
     NodeContext(Node &node, NodeInfo &nodeInfo);
 
-    Node &getNode() const;
+    [[nodiscard]] Node &getNode() const;
 
-    NodeInfo &getNodeInfo() const;
+    [[nodiscard]] NodeInfo &getNodeInfo() const;
 
     //shortcut method for getting node from active context
     static Node &getNodeFromActiveContext() {
-
-        //@todo throw exeption if no NodeContext in context
-        auto ptr = Context::getActiveContext()->get<NodeContext>();
-        if (ptr != nullptr) {
-            return ptr->getNode();
-        } else {
-            throw NodeContextNotSet("NodeContext not available in active context");
-        }
+         return Context::getActiveContext()->get<NodeContext>().getNode();
     }
 };
 

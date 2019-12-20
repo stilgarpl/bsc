@@ -43,7 +43,7 @@ void TransferManager::RemoteTransferDescriptor::setSize(TransferSize size) {
 
 void TransferManager::beginTransfer(const TransferEvent &event) {
     auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    Connection &connection = connectionContext->getConnection();
+    Connection &connection = connectionContext.getConnection();
     LOGGER("begin transfer")
     //@todo find transfer by resource id?
 
@@ -91,21 +91,21 @@ void TransferManager::finishTransfer(const TransferEvent &event) {
 //    auto connectionContext = event.context()->get<ConnectionContext>();
 //    if (connectionContext != nullptr) {
 //        FinishTransfer::Response::Ptr res = FinishTransfer::Response::getNew(event.getRequestId());
-//        connectionContext->getConnection().send(res);
+//        connectionContext.getConnection().send(res);
 //    } else {
 //        LOGGER("no connection context")
 //    }
 
     FinishTransfer::Response::Ptr res = FinishTransfer::Response::getNew(event.getRequestId());
     auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    Connection &connection = connectionContext->getConnection();
+    Connection &connection = connectionContext.getConnection();
     connection.send(res);
 }
 
 
 void TransferManager::sendData(const TransferEvent &event) {
     auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    Connection &connection = connectionContext->getConnection();
+    Connection &connection = connectionContext.getConnection();
     DataTransfer::Response::Ptr response = DataTransfer::Response::getNew(event.getRequestId());
     //@todo error on bad transfer id
     auto transferDescriptor = transfers[event.getTransferId()];
@@ -134,7 +134,7 @@ void TransferManager::saveDataChunk(const std::shared_ptr<std::ostream> &outputS
 
 void TransferManager::transferProperties(const TransferEvent &event) {
     auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    Connection &connection = connectionContext->getConnection();
+    Connection &connection = connectionContext.getConnection();
     PropertiesTransfer::Response::Ptr response = PropertiesTransfer::Response::getNew(event.getRequestId());
     auto transfer = transfers[event.getTransferId()];
     if (transfer != nullptr) {

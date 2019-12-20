@@ -16,7 +16,7 @@ private:
     std::function<std::string(void)> instanceFetcher;
 
 public:
-    LoggerContext(const std::function<std::string()> &instanceFetcher);
+    LoggerContext(std::function<std::string()> instanceFetcher);
 
     std::string getInstance();
 

@@ -85,7 +85,7 @@ void CommandModule::sendRemoteCommand(ArgumentContainerType args) {
 
         if (res && res->isRunStatus()) {
             LOGGER("remote run successful")
-            auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
+            auto& out = Context::getActiveContext()->get<InputOutputContext>().out();
 //            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
             out << res->getOutput();
         } else {
@@ -114,7 +114,7 @@ void CommandModule::sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentCont
 
         if (res && res->isRunStatus()) {
             LOGGER("remote run successful")
-            auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
+            auto& out = Context::getActiveContext()->get<InputOutputContext>().out();
 //            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
             out << res->getOutput();
         } else {

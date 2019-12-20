@@ -52,8 +52,8 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Contex
           IServerConnection(std::move(context)) {
 
     Context::setActiveContext(getConnectionContext());
-    auto lc = getConnectionContext()->get<LogicContext>();
-    auto &logicManager = lc->getLogicManager();
+    auto& lc = getConnectionContext()->get<LogicContext>();
+    auto &logicManager = lc.getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
     connectionSourcePtr->connectionAccepted(this);
 }
@@ -82,7 +82,7 @@ void ServerConnection::shutdown() {
     try {
         socket().shutdown();
 //        auto lc = getConnectionContext().get<LogicContext>();
-//        auto &logicManager = lc->getLogicManager();
+//        auto &logicManager = lc.getLogicManager();
 //        auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 //        connectionSourcePtr->connectionClosedServer(this);
     }

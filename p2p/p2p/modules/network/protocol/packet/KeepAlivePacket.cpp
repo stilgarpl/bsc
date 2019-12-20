@@ -7,13 +7,11 @@
 void KeepAlivePacket::Request::process(Context::Ptr context) {
     BasePacket::process(context);
 
-    auto connectionContext = context->get<ConnectionContext>();
-    if (connectionContext != nullptr) {
+    auto& connectionContext = context->get<ConnectionContext>();
+
         auto response = KeepAlivePacket::Response::getNew(this->getId());
-        connectionContext->getConnection().send(response);
-    } else {
-        LOGGER("error: No connection context!")
-    }
+        connectionContext.getConnection().send(response);
+
 }
 
 void KeepAlivePacket::Response::process(Context::Ptr context) {

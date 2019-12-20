@@ -12,10 +12,10 @@
 void CommandActions::runRemoteCommand(const CommandEvent& commandEvent) {
     LOGGER("remote command!")
     auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    auto nc = Context::getActiveContext()->get<NodeContext>();
-    if (nc != nullptr && connectionContext != nullptr) {
-        Connection& connection = connectionContext->getConnection();//commandEvent.origin();
-        auto commandModule = nc->getNode().getModule<CommandModule>();
+    auto& nc = Context::getActiveContext()->get<NodeContext>();
+
+        Connection& connection = connectionContext.getConnection();//commandEvent.origin();
+        auto commandModule = nc.getNode().getModule<CommandModule>();
         //todo this action shouldn't be static and have commandmodule as a field setDirect from it's constructor. or it can be a lambda in CommandModule logic.
         if (commandModule != nullptr) {
             //setting up remote command context.
@@ -32,9 +32,5 @@ void CommandActions::runRemoteCommand(const CommandEvent& commandEvent) {
                 connection.send(res);
             }
         }
-
-    } else {
-        LOGGER("NO NODE CONTEXT")
-    }
 
 }

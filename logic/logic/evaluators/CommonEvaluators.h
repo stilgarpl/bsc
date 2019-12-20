@@ -35,7 +35,7 @@ struct CommonEvaluators {
         return [](auto e, auto ... args) -> T & {
             //@todo error handling
             //@todo ^^ I made a fix for that, each event have separate context. should fix this, but... think about it.
-            return Context::getActiveContext()->getSafe<ForeachContext<T>>()->getValue();
+            return Context::getActiveContext()->getSafe<ForeachContext<T>>().getValue();
         };
     }
 

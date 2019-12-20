@@ -23,6 +23,16 @@ public:
     explicit InvalidContextException(const char* string);
 };
 
+class InvalidContextValueException : public std::invalid_argument {
+public:
+    InvalidContextValueException(const std::string &arg);
+};
+
+class ContextLoopException : public std::domain_error {
+public:
+    ContextLoopException(const std::string &arg);
+};
+
 
 class Context {
 public:
@@ -32,6 +42,7 @@ public:
 private:
     typedef unsigned int KeyType;
     typedef unsigned int TypeIdType;
+    constexpr static KeyType defaultKey = 0;
 private:
     //@todo remove debug id
     std::string debugId = "";
@@ -81,8 +92,33 @@ private:
     }
 
     std::map<TypeIdType, std::map<KeyType, std::shared_ptr<void>>> data;
-public:
 
+
+
+public:
+    template<typename T, typename CustomKeyType>
+    bool has(const CustomKeyType& id) {
+        std::lock_guard guard(contextLock);
+        const static auto typeId = getTypeId<T>();
+        bool ret = data[typeId][getKey(id)] != nullptr;
+        if (!ret && parentContext != nullptr) {
+            return parentContext->has<T>(id);
+        } else {
+            return ret;
+        }
+    }
+
+    template<typename T>
+    bool has() {
+        std::lock_guard guard(contextLock);
+        const static auto typeId = getTypeId<T>();
+        bool ret = data[typeId][getKey(defaultKey)] != nullptr;
+        if (!ret && parentContext != nullptr) {
+            return parentContext->has<T>(defaultKey);
+        } else {
+            return ret;
+        }
+    }
 
     /**
      * returns a pointer to a value with this id
@@ -93,43 +129,39 @@ public:
      * @return
      */
     template<typename T, typename CustomKeyType>
-    std::shared_ptr<T> get(const CustomKeyType& id) {
-        std::lock_guard<std::recursive_mutex> guard(contextLock);
-        static auto typeId = getTypeId<T>();
+    T& get(const CustomKeyType& id) {
+        std::lock_guard guard(contextLock);
+        const static auto typeId = getTypeId<T>();
         auto ret = std::static_pointer_cast<T>(data[typeId][getKey(id)]);
-        if (ret == nullptr && parentContext != nullptr) {
-            return parentContext->get<T, CustomKeyType>(id);
-        } else {
-            return ret;
-        }
-    }
-
-    template<typename T>
-    std::shared_ptr<T> get() {
-        std::lock_guard<std::recursive_mutex> guard(contextLock);
-        static auto typeId = getTypeId<T>();
-        auto ret = std::static_pointer_cast<T>(data[typeId][getKey(0)]);
-        if (ret == nullptr && parentContext != nullptr) {
-            return parentContext->get<T>();
-        } else {
-            return ret;
-        }
-    }
-
-    template<typename T>
-    std::shared_ptr<T> getSafe() {
-        std::lock_guard<std::recursive_mutex> guard(contextLock);
-        static auto typeId = getTypeId<T>();
-        auto ret = std::static_pointer_cast<T>(data[typeId][getKey(0)]);
-        if (ret == nullptr && parentContext != nullptr) {
-            ret = parentContext->get<T>();
-
-        }
-
         if (ret == nullptr) {
-            return set<T>();
+            if (parentContext != nullptr) {
+                return parentContext->get<T, CustomKeyType>(id);
+            } else {
+                if constexpr (std::is_convertible_v<CustomKeyType, std::string>) {
+                    throw InvalidContextValueException("Invalid context value for key " + id);
+                } else {
+                    throw InvalidContextValueException("Invalid context value for key " + std::to_string(id));
+                }
+            }
         } else {
-            return ret;
+            return *ret;
+        }
+
+
+    }
+
+    template<typename T>
+    T& get() {
+      return get<T>(defaultKey);
+    }
+
+    template<typename T>
+    T& getSafe() {
+        std::lock_guard guard(contextLock);
+        if (has<T>()) {
+            return get<T>();
+        } else {
+            return set<T>();
         }
 
     }
@@ -151,14 +183,14 @@ public:
     }
 
     template<typename ContextValueType, typename... Vals>
-    auto set(Vals... values) {
+    auto& set(Vals... values) {
         std::lock_guard<std::recursive_mutex> guard(contextLock);
         //@todo assert that data[typeId][getKey(0)] is null
         static auto typeId = getTypeId<ContextValueType>();
         //std::clog << "Context::setDirect type id " << typeId << std::endl;
         auto ret = std::make_shared<ContextValueType>(values...);
-        data[typeId][getKey(0)] = ret;
-        return ret;
+        data[typeId][getKey(defaultKey)] = ret;
+        return *ret;
     }
 
     //todo this version may be a problem if someone tries to use the ordinary setDirect and std::shared_ptr is one of vals.
@@ -168,7 +200,7 @@ public:
         if constexpr (std::is_base_of_v<ContextValueType, RealValueType>) {
             auto ret = std::static_pointer_cast<ContextValueType>(valuePtr);
             static auto typeId = getTypeId<ContextValueType>();
-            data[typeId][getKey(0)] = ret;
+            data[typeId][getKey(defaultKey)] = ret;
             return ret;
         } else {
             using namespace std::string_literals;
@@ -190,7 +222,7 @@ public:
 //        return ret;
 //    }
 
-    //@todo non-const context does setDirect parent but const doesn't. WHY?
+    //@todo non-const context does set parent but const doesn't. WHY?
 //    Context &operator+=(const Context::Ptr other);
 
     Context& operator+=(const Context::Ptr& other);
@@ -224,6 +256,9 @@ public:
     static ContextPtr makeContext(const Context::Ptr& parentContext);
 
     virtual ~Context();
+
+private:
+    void validateParentContext();
 };
 
 class SetLocalContext {

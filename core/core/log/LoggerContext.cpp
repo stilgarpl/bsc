@@ -11,4 +11,4 @@ std::string LoggerContext::getInstance() {
     return instanceFetcher();
 }
 
-LoggerContext::LoggerContext(const std::function<std::string()> &instanceFetcher) : instanceFetcher(instanceFetcher) {}
+LoggerContext::LoggerContext(std::function<std::string()> instanceFetcher) : instanceFetcher(std::move(instanceFetcher)) {}

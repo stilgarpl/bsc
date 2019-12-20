@@ -56,12 +56,12 @@ public:
     template<typename T>
     static void defineRequiredRole(const Role::IdType &roleId) {
         //@todo nullptr check?
-        Context::getActiveContext()->get<RoleDefinitionsContext>()->roleDefinitionsPtr->addRole<T>(roleId);
+        Context::getActiveContext()->get<RoleDefinitionsContext>().roleDefinitionsPtr->addRole<T>(roleId);
     }
 
     template<typename T>
     static const RoleList &getRequiredRolesDefinitions() {
-        return Context::getActiveContext()->get<RoleDefinitionsContext>()->roleDefinitionsPtr->getRequiredRoles<T>();
+        return Context::getActiveContext()->get<RoleDefinitionsContext>().roleDefinitionsPtr->getRequiredRoles<T>();
     }
 
 };

@@ -49,7 +49,7 @@ public:
 
         void setRepoId(const std::string &repoId);
 
-        const JournalPtr getJournal() const;
+        JournalPtr getJournal() const;
 
         void setJournal(JournalPtr journal);
 

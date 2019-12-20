@@ -9,11 +9,10 @@
 void CommandPacket::Request::process(Context::Ptr context) {
     BasePacket::process(context);
     LOGGER("processing command request")
-    auto lc = context->get<LogicContext>();
-    if (lc != nullptr) {
-        auto commnandSource = lc->getLogicManager().getSource<CommandSource>();
+    auto& lc = context->get<LogicContext>();
+        auto commnandSource = lc.getLogicManager().getSource<CommandSource>();
         commnandSource->commandReceived(this->getId(), this->getCommandName(), this->getData());
-    }
+
 }
 
 const std::string &CommandPacket::Request::getCommandName() const {

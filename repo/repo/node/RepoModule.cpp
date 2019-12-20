@@ -321,13 +321,13 @@ IStoragePtr RepoModule::findStorage(const IStorage::StorageId &storageId) {
 }
 
 void RepoModule::initialize() {
-    auto factoryContext = node.getContext()->get<FactoryContext>();
+    auto& factoryContext = node.getContext()->get<FactoryContext>();
     FactoryPtr<IStoragePtr, StorageFactoryByType> storageFactoryPtr = std::make_shared<StorageFactory>(
             getConfigurationManager().getFullDataPath(configuration().getStoragePath()));
     FactoryPtr<IStoragePtr, StorageFactoryByName> managedStorageFactoryPtr = std::make_shared<ManagedStorageFactory>(
             storageManager);
-    factoryContext->setFactory<IStoragePtr, StorageFactoryByType>(storageFactoryPtr);
-    factoryContext->setFactory<IStoragePtr, StorageFactoryByName>(managedStorageFactoryPtr);
+    factoryContext.setFactory<IStoragePtr, StorageFactoryByType>(storageFactoryPtr);
+    factoryContext.setFactory<IStoragePtr, StorageFactoryByName>(managedStorageFactoryPtr);
 
     const std::string defaultStorageId = "default";
     auto defaultStorage = storageFactoryPtr->create(defaultStorageId, defaultStorageId);
@@ -337,9 +337,9 @@ void RepoModule::initialize() {
 
 IStoragePtr RepoModule::createStorage(const Factory<IStoragePtr, StorageFactoryByType>::SelectorType &storageType,
                                       const IStorage::StorageId &storageId) {
-    auto factoryContext = node.getContext()->get<FactoryContext>();
+    auto& factoryContext = node.getContext()->get<FactoryContext>();
     //@todo what if factory is null or created storage is null because storageType is wrong?
-    return factoryContext->getFactory<IStoragePtr, StorageFactoryByType>()->create(storageType, storageId);
+    return factoryContext.getFactory<IStoragePtr, StorageFactoryByType>()->create(storageType, storageId);
 
 }
 

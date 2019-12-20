@@ -9,15 +9,7 @@
 ConnectionControl::Response::Ptr
 ConnectionProcessors::processConnectionControl(ConnectionControl::Request::Ptr request) {
     LOGGER("diconnection processor")
-    auto remoteNodeContext = Context::getActiveContext()->get<RemoteNodeContext>();
-    if (remoteNodeContext != nullptr) {
-        LOGGER("sending disconnect")
-        auto& remoteNode = remoteNodeContext->getRemoteNode();
-        remoteNode.disconnect();
-    } else {
-        //@todo throw
-    }
-
+    Context::getActiveContext()->get<RemoteNodeContext>().getRemoteNode().disconnect();
 
     return nullptr;
 }

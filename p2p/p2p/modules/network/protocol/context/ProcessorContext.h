@@ -25,13 +25,10 @@ public:
 
     //shortcut method for getting current packet from active context
     static const BasePacketPtr getCurrentPacketFromActiveContext() {
-        //@todo not crash with no context?
-        auto processor = Context::getActiveContext()->get<ProcessorContext>();
-        if (processor != nullptr) {
-            return processor->getThisPacket();
-        } else {
-            return nullptr;
-        }
+
+        auto &processor = Context::getActiveContext()->get<ProcessorContext>();
+        return processor.getThisPacket();
+
 
     }
 

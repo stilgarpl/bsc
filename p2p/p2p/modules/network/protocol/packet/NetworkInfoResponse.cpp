@@ -13,15 +13,15 @@ void NetworkInfoResponse::process(Context::Ptr context) {
     BasePacket::process(context);
 
 
-    auto lc = context->get<LogicContext>();
-    if (lc != nullptr) {
-        auto nodeSource = lc->getLogicManager().getSource<NetworkSource>();
+    auto& lc = context->get<LogicContext>();
+
+        auto nodeSource = lc.getLogicManager().getSource<NetworkSource>();
         if (this->getNetworkInfo() != nullptr) {
             nodeSource->networkInfoReceived(*this->getNetworkInfo());
         } else {
             //  LOGGER("Empty network response")
         }
-    }
+
 
 
     LOGGER("Network response received " + std::to_string(this->getId()) + " " +

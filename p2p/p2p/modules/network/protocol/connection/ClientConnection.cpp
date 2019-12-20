@@ -16,15 +16,12 @@ ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, const Cont
         context),
                                                                                                      socket(a) {
 
-    auto lm = getConnectionContext()->get<LogicContext>();
-    if (lm != nullptr) {
+    auto& lm = getConnectionContext()->get<LogicContext>();
+
         LOGGER("adding new connection, triggering connection established event")
 
-        lm->getLogicManager().getSource<ConnectionSource>()->connectionEstablished(this);
-    } else {
-        ERROR("No logic manager context!")
-        throw LogicContextInvalid("No logic manager context in Client Connection");
-    }
+        lm.getLogicManager().getSource<ConnectionSource>()->connectionEstablished(this);
+
 
 }
 
@@ -71,8 +68,8 @@ void ClientConnection::shutdown() {
         }
     }
     changeState(ConnectionState::DISCONNECTED);
-    auto lc = getConnectionContext()->get<LogicContext>();
-    auto &logicManager = lc->getLogicManager();
+    auto& lc = getConnectionContext()->get<LogicContext>();
+    auto &logicManager = lc.getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
     connectionSourcePtr->connectionClosedClient(this);
 

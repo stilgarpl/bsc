@@ -15,7 +15,6 @@ std::istream& StandardInputOutputContext::in() {
 }
 
 InputOutputContext& InputOutputContext::active() {
-    //@todo assert active context != null and get<IOC> != null
-    return *Context::getActiveContext()->get<InputOutputContext>();
+    return Context::getActiveContext()->get<InputOutputContext>();
 
 }

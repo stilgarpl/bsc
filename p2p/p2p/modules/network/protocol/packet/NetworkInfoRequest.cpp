@@ -16,22 +16,19 @@
 void NetworkInfoRequest::process(Context::Ptr context) {
     BasePacket::process(context);
 
-    auto nodeContext = context->get<NodeContext>();
-    auto connectionContext = context->get<ConnectionContext>();
+    auto& nodeContext = context->get<NodeContext>();
+    auto& connectionContext = context->get<ConnectionContext>();
 
-    if (nodeContext != nullptr && connectionContext != nullptr) {
+
         // LOGGER("processing network info request id" + std::to_string(this->getId()));
-        auto& node = nodeContext->getNode();
+        auto& node = nodeContext.getNode();
         auto response = getNew<Status::response>(this);//std::make_shared<NetworkInfoResponse>();
         if (node.getModule<NetworkModule>()->getNetworkInfo() == nullptr) {
             LOGGER("empty network info! ")
         }
         response->setNetworkInfo(node.getModule<NetworkModule>()->getNetworkInfo());
-        connectionContext->getConnection().send(response);
-    } else {
-        //@todo error level
-        LOGGER("Node Context not found!");
-    }
+        connectionContext.getConnection().send(response);
+
 
 
 }
