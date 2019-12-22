@@ -3,7 +3,6 @@
 //
 
 #include <p2p/modules/command/network/logic/actions/CommandActions.h>
-#include <p2p/modules/command/network/logic/sources/CommandSource.h>
 #include <p2p/modules/command/network/packet/CommandPacket.h>
 #include <core/io/InputOutputContext.h>
 
@@ -12,6 +11,7 @@
 #include "CommandModule.h"
 #include "p2p/modules/basic/BasicModule.h"
 #include "p2p/modules/network/NetworkModule.h"
+#include "CommandInputOutputContext.h"
 
 CommandModule::CommandModule(INode& node) : NodeModuleDependent(node, "command"),
                                             defaultSubModule(*this) {
@@ -20,7 +20,7 @@ CommandModule::CommandModule(INode& node) : NodeModuleDependent(node, "command")
 }
 
 void CommandModule::setupActions(ILogicModule::SetupActionHelper& actionHelper) {
-    actionHelper.setAction<CommandEvent>(CommandActions::RUN_COMMAND, CommandActions::runRemoteCommand);
+//    actionHelper.setAction<CommandEvent>(CommandActions::RUN_COMMAND, CommandActions::runRemoteCommand);
 
     when(state<ILogicModule>(ModuleState::SUBMODULES_PREPARED).entered()).fireStateChangeReaction(
             [&](ILogicModule& module) {
@@ -35,7 +35,7 @@ void CommandModule::setupActions(ILogicModule::SetupActionHelper& actionHelper) 
 
 bool CommandModule::assignActions(ILogicModule::AssignActionHelper& actionHelper) {
 //    bool ret = actionHelper.assignAction<CommandEvent>(CommandEventId::EXECUTE_COMMAND, CommandActions::RUN_COMMAND);
-    when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).fireAction(CommandActions::RUN_COMMAND);
+
 //    when(event<CommandEvent>().withId(CommandEvent::IdType::EXECUTE_COMMAND)).fireNewAction([](auto e){ std::cout << "EXECUTING COMMAND!" << std::endl;});
 //    when(event<CommandEvent>().withId(CommandEvent::IdType::DUMMY_COMMAND)).fireNewAction([](auto e){std::cout << "EXECUTING DUMMY INT COMMAND! "  << std::to_string(33)<< std::endl;});
 //    CommandEvent dummyCommand;
@@ -47,7 +47,6 @@ bool CommandModule::assignActions(ILogicModule::AssignActionHelper& actionHelper
 }
 
 bool CommandModule::setupSources(ILogicModule::SetupSourceHelper& sourceHelper) {
-    sourceHelper.requireSource<CommandSource>();
     return true;
 }
 
@@ -170,7 +169,25 @@ void CommandModule::runInBackground(const std::vector<std::string>& args) {
 }
 
 void CommandModule::prepareSubmodules() {
-//    auto &networkSub = getSubModule<NetworkModule>();
+    auto& networkSub = getSubModule<NetworkModule>();
+
+    networkSub.registerPacketProcessor<CommandPacket>([this](const CommandPacket::Request::Ptr& request) {
+        LOGGER("remote command!")
+
+        //setting up remote command context.
+        //@todo simplify context making
+        Context::OwnPtr remoteCommandContext = Context::makeContext(Context::getActiveContext());
+        auto ioContext = std::make_shared<CommandInputOutputContext>();
+        remoteCommandContext->setDirect<InputOutputContext>(ioContext);
+        {
+            SetLocalContext localContext(remoteCommandContext);
+            bool runStatus = this->runCommand(request->getCommandName(), request->getData());
+            CommandPacket::Response::Ptr res = CommandPacket::Response::getNew();
+            res->setRunStatus(runStatus);
+            res->setOutput(ioContext->getOutputStream().str());
+            return res;
+        }
+    });
 
 }
 

@@ -15,7 +15,7 @@ enum class CommandEventId {
     DUMMY_COMMAND,
 };
 
-class CommandEvent : public NetworkingEvent<CommandEventId> {
+class CommandEvent : public IEvent<CommandEventId> {
 
 private:
     std::string commandName;
@@ -24,7 +24,7 @@ private:
 public:
 //    CommandEvent() = default;
 
-    const std::string &getCommandName() const;
+    const std::string& getCommandName() const;
 
     void setCommandName(const std::string &commandName);
 

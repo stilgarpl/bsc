@@ -2,16 +2,16 @@
 // Created by stilgar on 16.11.17.
 //
 
-#include <p2p/modules/command/network/logic/sources/CommandSource.h>
 #include <logic/context/LogicContext.h>
 #include "CommandPacket.h"
 
 void CommandPacket::Request::process(Context::Ptr context) {
-    BasePacket::process(context);
-    LOGGER("processing command request")
-    auto& lc = context->get<LogicContext>();
-        auto commnandSource = lc.getLogicManager().getSource<CommandSource>();
-        commnandSource->commandReceived(this->getId(), this->getCommandName(), this->getData());
+    //@todo remove obsolete.
+//    BasePacket::process(context);
+//    LOGGER("processing command request")
+//    auto& lc = context->get<LogicContext>();
+//        auto commnandSource = lc.getLogicManager().getSource<CommandSource>();
+//        commnandSource->commandReceived(this->getId(), this->getCommandName(), this->getData());
 
 }
 
@@ -32,8 +32,7 @@ void CommandPacket::Request::setData(const std::vector<std::string> &data) {
 }
 
 void CommandPacket::Response::process(Context::Ptr context) {
-    BasePacket::process(context);
-    LOGGER("command response received")
+//@todo remove obsolete.
 }
 
 bool CommandPacket::Response::isRunStatus() const {

@@ -5,8 +5,8 @@
 #include "StorageActions.h"
 
 void StorageActions::resourceRequested(const StorageResourceRequestEvent &event) {
-    auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    Connection &connection = connectionContext.getConnection();
+    auto& connectionContext = Context::getActiveContext()->get<ConnectionContext>();
+    Connection& connection = connectionContext.getConnection();
 
     StorageQuery::Response::Ptr response = StorageQuery::Response::getNew<Status::response>(event.getRequestId());
     auto& node = NodeContext::getNodeFromActiveContext();

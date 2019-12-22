@@ -10,27 +10,6 @@
 #include "CommandActions.h"
 
 void CommandActions::runRemoteCommand(const CommandEvent& commandEvent) {
-    LOGGER("remote command!")
-    auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    auto& nc = Context::getActiveContext()->get<NodeContext>();
 
-        Connection& connection = connectionContext.getConnection();//commandEvent.origin();
-        auto commandModule = nc.getNode().getModule<CommandModule>();
-        //todo this action shouldn't be static and have commandmodule as a field setDirect from it's constructor. or it can be a lambda in CommandModule logic.
-        if (commandModule != nullptr) {
-            //setting up remote command context.
-            //@todo simplify context making
-            Context::OwnPtr remoteCommandContext = Context::makeContext(Context::getActiveContext());
-            auto ioContext = std::make_shared<CommandInputOutputContext>();
-            remoteCommandContext->setDirect<InputOutputContext>(ioContext);
-            {
-                SetLocalContext localContext(remoteCommandContext);
-                bool runStatus = commandModule->runCommand(commandEvent.getCommandName(), commandEvent.getData());
-                CommandPacket::Response::Ptr res = CommandPacket::Response::getNew(commandEvent.getRequestId());
-                res->setRunStatus(runStatus);
-                res->setOutput(ioContext->getOutputStream().str());
-                connection.send(res);
-            }
-        }
 
 }

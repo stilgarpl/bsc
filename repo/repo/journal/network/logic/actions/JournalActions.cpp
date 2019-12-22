@@ -5,8 +5,8 @@
 #include "JournalActions.h"
 
 void JournalActions::journalRequested(const JournalRequestEvent &event) {
-    auto connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    Connection &connection = connectionContext.getConnection();
+    auto& connectionContext = Context::getActiveContext()->get<ConnectionContext>();
+    Connection& connection = connectionContext.getConnection();
 
     JournalGroup::Response::Ptr response = JournalGroup::Response::getNew<Status::response>(event.getRequestId());
 

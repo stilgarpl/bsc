@@ -52,6 +52,7 @@ private:
     template<typename E,  typename Evaluator, typename ...RestOfEvaluators>
     constexpr static auto
     evaluateStack(const E &e, Evaluator evaluator, RestOfEvaluators ... rest) {
+        //@todo maybe use fold expression instead of recursion? that would probably allow to use args... again!
         if constexpr (sizeof... (rest) == 0) {
             return evaluator(e);
         } else {

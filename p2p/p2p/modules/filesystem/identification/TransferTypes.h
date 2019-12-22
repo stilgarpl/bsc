@@ -5,6 +5,9 @@
 #ifndef BASYCO_TRANSFERID_H
 #define BASYCO_TRANSFERID_H
 
+#include <vector>
+#include <cstdint>
+
 
 typedef unsigned long TransferId;
 
