@@ -42,39 +42,41 @@ void TransferManager::RemoteTransferDescriptor::setSize(TransferSize size) {
 }
 
 
-void TransferManager::beginTransfer(const TransferEvent &event) {
-    auto& connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    Connection& connection = connectionContext.getConnection();
+TransferId TransferManager::beginTransfer(ResourceIdentificatorPtr resourceIdentificatorPtr) {
+
     LOGGER("begin transfer")
     //@todo find transfer by resource id?
 
     std::shared_ptr<RemoteTransferDescriptor> descriptor = std::make_shared<RemoteTransferDescriptor>();
 
 //        descriptor->setResourceIdentificatorPtr(event.getResourceIdentificator());
-    if (event.getResourceIdentificator()->exists()) {
-        descriptor->setInputStream(event.getResourceIdentificator()->getResourceInputStream());
-        descriptor->setSize(event.getResourceIdentificator()->getResourceSize());
+    if (resourceIdentificatorPtr->exists()) {
+        descriptor->setInputStream(resourceIdentificatorPtr->getResourceInputStream());
+        descriptor->setSize(resourceIdentificatorPtr->getResourceSize());
 
         TransferId transferId = generateTransferId();
         transfers[transferId] = descriptor;
         LOGGER ("adding transfer " + std::to_string(transferId));
-        BeginTransfer::Response::Ptr response = BeginTransfer::Response::getNew(event.getRequestId());
-        response->setTransferId(transferId);
+//        BeginTransfer::Response::Ptr response = BeginTransfer::Response::getNew(event.getRequestId());
+//        response->setTransferId(transferId);
 
-        connection.send(response);
+//        connection.send(response);
+        return transferId;
 
 
     } else {
         //execute this directly or through source?
-        transferError(event);
+        //@todo error, exception or I don't know, something
+//        transferError(event);
     }
 
 
 }
 
-void TransferManager::finishTransfer(const TransferEvent &event) {
+void TransferManager::finishTransfer(TransferId transferId) {
     //@todo some checking if valid?
-    transfers.erase(event.getTransferId());
+    transfers.erase(transferId);
+    //@todo return true or anything indicating that it worked?
 
     //send response
 
@@ -97,30 +99,33 @@ void TransferManager::finishTransfer(const TransferEvent &event) {
 //        LOGGER("no connection context")
 //    }
 
-    FinishTransfer::Response::Ptr res = FinishTransfer::Response::getNew(event.getRequestId());
-    auto& connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    Connection& connection = connectionContext.getConnection();
-    connection.send(res);
+//    FinishTransfer::Response::Ptr res = FinishTransfer::Response::getNew(event.getRequestId());
+//    auto& connectionContext = Context::getActiveContext()->get<ConnectionContext>();
+//    Connection& connection = connectionContext.getConnection();
+//    connection.send(res);
 }
 
 
-void TransferManager::sendData(const TransferEvent &event) {
-    auto& connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    Connection& connection = connectionContext.getConnection();
-    DataTransfer::Response::Ptr response = DataTransfer::Response::getNew(event.getRequestId());
+std::tuple<std::vector<char>, TransferSize, TransferSize>
+TransferManager::sendData(const TransferId& transferId, const TransferSize& begin, const TransferSize& end) {
+//    auto& connectionContext = Context::getActiveContext()->get<ConnectionContext>();
+//    Connection& connection = connectionContext.getConnection();
+//    DataTransfer::Response::Ptr response = DataTransfer::Response::getNew(event.getRequestId());
     //@todo error on bad transfer id
-    auto transferDescriptor = transfers[event.getTransferId()];
+    auto transferDescriptor = transfers[transferId];
 
-    std::vector<char> &fileContents = response->getData();
+    std::vector<char> fileContents;
     if (transferDescriptor != nullptr && transferDescriptor->getInputStream() != nullptr) {
-        transferDescriptor->getInputStream()->seekg(event.getBegin());
-        fileContents.resize(event.getEnd() - event.getBegin());
-        transferDescriptor->getInputStream()->read(fileContents.data(), event.getEnd() - event.getBegin());
-        //@todo insert ACTUAL begin and end read from stream (in case stream is shorter than requested)
-        response->setBegin(event.getBegin());
-        response->setEnd(event.getEnd());
-        connection.send(response);
+        transferDescriptor->getInputStream()->seekg(begin);
+        fileContents.resize(end - begin);
+        transferDescriptor->getInputStream()->read(fileContents.data(), end - begin);
+
+//        response->setBegin(event.getBegin());
+//        response->setEnd(event.getEnd());
+//        connection.send(response);
     }
+    //@todo return ACTUAL begin and end read from stream (in case stream is shorter than requested)
+    return {fileContents, begin, end};
 }
 
 void TransferManager::saveDataChunk(const std::shared_ptr<std::ostream> &outputStream, const TransferSize &begin,
@@ -133,15 +138,16 @@ void TransferManager::saveDataChunk(const std::shared_ptr<std::ostream> &outputS
 
 }
 
-void TransferManager::transferProperties(const TransferEvent &event) {
-    auto& connectionContext = Context::getActiveContext()->get<ConnectionContext>();
-    Connection& connection = connectionContext.getConnection();
-    PropertiesTransfer::Response::Ptr response = PropertiesTransfer::Response::getNew(event.getRequestId());
-    auto transfer = transfers[event.getTransferId()];
+TransferSize TransferManager::transferProperties(const TransferId& transferId) {
+//    auto& connectionContext = Context::getActiveContext()->get<ConnectionContext>();
+//    Connection& connection = connectionContext.getConnection();
+//    PropertiesTransfer::Response::Ptr response = PropertiesTransfer::Response::getNew(event.getRequestId());
+    auto transfer = transfers[transferId];
     if (transfer != nullptr) {
-        response->setSize(transfer->getSize());
+        return transfer->getSize();
     }
-    connection.send(response);
+    //@todo error exception or sth
+    return -1;
 }
 
 TransferId TransferManager::generateTransferId() {

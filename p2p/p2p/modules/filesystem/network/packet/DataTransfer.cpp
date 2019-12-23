@@ -2,15 +2,15 @@
 // Created by stilgar on 31.12.17.
 //
 
-#include <p2p/modules/filesystem/network/logic/sources/TransferSource.h>
 #include <logic/context/LogicContext.h>
 #include "DataTransfer.h"
 
 void DataTransfer::Request::process(Context::Ptr context) {
-    BasePacket::process(context);
-    LogicContext::getLogicManagerFromActiveContext().getSource<TransferSource>()->sendData(this->getTransferId(),
-                                                                                           this->getBegin(),
-                                                                                           this->getEnd());
+    //@todo remove obsolete
+//    BasePacket::process(context);
+//    LogicContext::getLogicManagerFromActiveContext().getSource<TransferSource>()->sendData(this->getTransferId(),
+//                                                                                           this->getBegin(),
+//                                                                                           this->getEnd());
 
 }
 

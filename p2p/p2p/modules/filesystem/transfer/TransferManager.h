@@ -7,11 +7,11 @@
 #ifndef BASYCO_TRANSFERMANAGER_H
 #define BASYCO_TRANSFERMANAGER_H
 
-
-#include <p2p/modules/filesystem/network/logic/events/TransferEvent.h>
+#include <p2p/modules/filesystem/identification/ResourceIdentificator.h>
 #include <logic/state/LogicStateMachine.h>
 #include <algorithm>
 #include <logic/state/DeferredNotify.h>
+#include <p2p/modules/filesystem/identification/TransferTypes.h>
 
 class TransferManager {
     /**
@@ -173,21 +173,20 @@ private:
     std::list<LocalTransferDescriptorPtr> localTransfers;
 
 public:
-    void beginTransfer(const TransferEvent &event);
+    TransferId beginTransfer(ResourceIdentificatorPtr resourceIdentificatorPtr);
 
-    void transferError(const TransferEvent &event) {
-//@todo
-    }
+    void finishTransfer(TransferId transferId);
 
-    void finishTransfer(const TransferEvent &event);
+    //@todo this function now doesn't actually sends anything, rename to something more appropriate
+    //@todo also, return actual type.
+    std::tuple<std::vector<char>, TransferSize, TransferSize>
+    sendData(const TransferId& transferId, const TransferSize& begin, const TransferSize& end);
 
-    void sendData(const TransferEvent &event);
-
-    void transferProperties(const TransferEvent &event);
+    TransferSize transferProperties(const TransferId& transferId);
 
     static void
-    saveDataChunk(const std::shared_ptr<std::ostream> &outputStream, const TransferSize &begin, const TransferSize &end,
-                  const RawDataType &data);
+    saveDataChunk(const std::shared_ptr<std::ostream>& outputStream, const TransferSize& begin, const TransferSize& end,
+                  const RawDataType& data);
 
     std::shared_ptr<TransferQueue> transferQueue() {
         //@todo store this transfer queue somewhere?
