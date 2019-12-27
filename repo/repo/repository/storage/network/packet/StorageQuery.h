@@ -9,7 +9,6 @@
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 #include <repo/repository/IRepository.h>
 #include <repo/journal/JournalTypes.h>
-#include <repo/repository/storage/network/logic/sources/StorageSource.h>
 
 //@todo to be deleted
 class StorageQuery : public PacketGroup {

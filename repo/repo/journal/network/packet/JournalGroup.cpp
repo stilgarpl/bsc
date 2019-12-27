@@ -3,15 +3,10 @@
 //
 
 #include "JournalGroup.h"
-#include <repo/journal/network/logic/sources/JournalSource.h>
 #include <logic/context/LogicContext.h>
 
 void JournalGroup::Request::process(Context::Ptr context) {
-    LOGGER("journal request process")
-    BasePacket::process(context);
-    auto &lc = context->get<LogicContext>();
-    auto journalSource = lc.getLogicManager().getSource<JournalSource>();
-    journalSource->journalRequested(repoId, this->getId());
+
 
 }
 
@@ -24,10 +19,7 @@ void JournalGroup::Request::setRepoId(const std::string &repoId) {
 }
 
 void JournalGroup::Response::process(Context::Ptr context) {
-    BasePacket::process(context);
-    auto &lc = context->get<LogicContext>();
-    auto journalSource = lc.getLogicManager().getSource<JournalSource>();
-    journalSource->journalReceived(repoId, journal);
+
 }
 
 const std::string &JournalGroup::Response::getRepoId() const {

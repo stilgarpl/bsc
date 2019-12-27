@@ -14,7 +14,6 @@
 #include "TransferManager.h"
 #include "TransferException.h"
 #include <p2p/modules/filesystem/network/packet/BeginTransfer.h>
-#include <p2p/modules/network/protocol/context/ConnectionContext.h>
 
 //const ResourceIdentificatorPtr &TransferManager::RemoteTransferDescriptor::getResourceIdentificatorPtr() const {
 //    return resourceIdentificatorPtr;

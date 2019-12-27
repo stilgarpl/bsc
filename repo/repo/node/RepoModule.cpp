@@ -3,14 +3,8 @@
 //
 
 #include <p2p/modules/basic/BasicModule.h>
-#include <repo/journal/network/logic/events/JournalRequestEvent.h>
-#include <repo/journal/network/logic/actions/JournalActions.h>
-#include <repo/journal/network/logic/sources/JournalSource.h>
-#include <repo/repository/storage/network/logic/sources/StorageSource.h>
-#include <repo/repository/storage/network/logic/actions/StorageActions.h>
 #include <p2p/modules/command/CommandModule.h>
 #include <logic/evaluators/CommonEvaluators.h>
-#include <p2p/modules/network/protocol/logic/actions/NetworkActions.h>
 #include <repo/repository/network/RepoQuery.h>
 #include <logic/conditions/TimeConditions.h>
 #include <p2p/modules/network/protocol/logic/conditions/NetworkConditions.h>
@@ -27,21 +21,18 @@
 #include <repo/repository/storage/StorageFactorySpecialization.h>
 #include <repo/repository/storage/ManagedStorageFactory.h>
 #include <repo/repository/Repository.h>
+#include <p2p/modules/network/protocol/logic/actions/NetworkActions.h>
 #include "RepoModule.h"
 
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
 
 
 void RepoModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
-    actionHelper.setAction<JournalRequestEvent>("journalRequest", JournalActions::journalRequested);
-    actionHelper.setAction<JournalResponseEvent>("journalReceive", JournalActions::journalReceived);
-    actionHelper.setAction<StorageResourceRequestEvent>("storageQuery", StorageActions::resourceRequested);
+
 }
 
 bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
-    bool ret = actionHelper.assignAction<JournalRequestEvent>("journalRequest");
-    ret &= actionHelper.assignAction<JournalResponseEvent>("journalReceive");
-    ret &= actionHelper.assignAction<StorageResourceRequestEvent>("storageQuery");
+    bool ret = true;
 
     auto updateChainGroup = chainGroup("updateChain");
 
@@ -136,8 +127,6 @@ bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
 }
 
 bool RepoModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
-    sourceHelper.requireSource<JournalSource>();
-    sourceHelper.requireSource<StorageSource>();
     sourceHelper.requireSource<TriggerSource>();
     return true;
 }
@@ -298,11 +287,42 @@ void RepoModule::persistFile(const IRepository::RepoIdType &repoId, const fs::pa
 }
 
 void RepoModule::prepareSubmodules() {
-    auto &commandSub = getSubModule<CommandModule>();
+    auto& commandSub = getSubModule<CommandModule>();
     commandSub.mapCommand("turbo", &RepoModule::selectRepository);
 
-    auto &networkSub = getSubModule<NetworkModule>();
+    auto& networkSub = getSubModule<NetworkModule>();
     networkSub.registerPacketProcessor<RepoQuery>(RepoProcessors::queryProcessor);
+    networkSub.registerPacketProcessor<JournalGroup>([this](JournalGroup::Request::Ptr request) {
+        JournalGroup::Response::Ptr response = JournalGroup::Response::getNew();
+
+        // JournalGroup::Response* response;
+        response->setRepoId(request->getRepoId());
+        LOGGER("requested repo " + request->getRepoId());
+
+        //@todo add way more error handling to the getting of the module that's not there or repo that's not there...
+
+        auto repository = this->findRepository(request->getRepoId());
+        LOGGER("journal requested for repo: " + request->getRepoId() + " and journal checksum is " +
+               repository->getJournal()->getChecksum())
+        response->setJournal(repository->getJournal());
+
+
+        return response;
+    });
+
+    networkSub.registerPacketProcessor<StorageQuery>([this](StorageQuery::Request::Ptr request) {
+        auto response = request->getNew<Status::response>();
+
+        auto repo = this->findRepository(request->getRepositoryId());
+        if (repo != nullptr) {
+            response->setExists(repo->getStorage()->hasResource(request->getObjectId()));
+        } else {
+            //@todo maybe add another response? repository not found?
+            response->setExists(false);
+        }
+
+        return response;
+    });
 
 }
 
