@@ -37,7 +37,6 @@ public:
         friend class cereal::access;
 
     public:
-        void process(Context::Ptr context) override;
     };
 
     class Response : public Packet<RepoQuery, RepoQuery::Response> {
@@ -77,10 +76,6 @@ public:
             Response::journal = journal;
         }
 
-        void process(Context::Ptr context) override {
-            BasePacket::process(context);
-            LOGGER(" REPO Q response RECEIVED")
-        }
 
     private:
 

@@ -6,11 +6,6 @@
 #include "core/context/Context.h"
 #include "BasePacket.h"
 
-void BasePacket::process(Context::Ptr context) {
-    // std::cout << "Network packet process ";
-
-
-}
 
 Status BasePacket::getStatus() const {
     return status;

@@ -18,27 +18,34 @@
 #include "chain/LockConfiguration.h"
 #include "LogicExceptions.h"
 
+//@todo maybe move this to another file
+class InvalidChainException : public std::domain_error {
+public:
+    InvalidChainException(const std::string& arg);
+};
+
+
 
 //@todo replace Args... with AdditionalEventArgs... or sth
 
 class LogicObject {
 protected:
-    LogicManager &logicManager;
+    LogicManager& logicManager;
 
 public:
-    explicit LogicObject(LogicManager &logicManager);
+    explicit LogicObject(LogicManager& logicManager);
 
 public:
 
     class SetupActionHelper {
-        LogicManager &logicManager;
+        LogicManager& logicManager;
     public:
-        explicit SetupActionHelper(LogicManager &logicManager) : logicManager(logicManager) {}
+        explicit SetupActionHelper(LogicManager& logicManager) : logicManager(logicManager) {}
 
     public:
         template<typename EventType, typename... Args, typename ActionIdType>
         void setAction(ActionIdType id,
-                       ActionManager::ActionType<const typename std::decay<EventType>::type &, Args...> action) {
+                       ActionManager::ActionType<const typename std::decay<EventType>::type&, Args...> action) {
             logicManager.setAction<EventType, Args...>(id, action);
         }
 
@@ -49,9 +56,9 @@ public:
     };
 
     class AssignActionHelper {
-        LogicManager &logicManager;
+        LogicManager& logicManager;
     public:
-        explicit AssignActionHelper(LogicManager &logicManager) : logicManager(logicManager) {}
+        explicit AssignActionHelper(LogicManager& logicManager) : logicManager(logicManager) {}
 
     public:
         template<typename EventType, typename... Args, typename ActionId>
@@ -66,14 +73,14 @@ public:
     };
 
     class SetupSourceHelper {
-        LogicManager &logicManager;
+        LogicManager& logicManager;
     public:
-        explicit SetupSourceHelper(LogicManager &logicManager) : logicManager(logicManager) {}
+        explicit SetupSourceHelper(LogicManager& logicManager) : logicManager(logicManager) {}
 
     public:
         template<typename SourceType, typename... Args>
-        void requireSource(Args... args) {
-            logicManager.requireSource<SourceType, Args...>(args...);
+        SourceType& requireSource(Args... args) {
+            return logicManager.requireSource<SourceType, Args...>(args...);
         }
     };
 
@@ -86,13 +93,13 @@ public:
         typedef eventType EventType;
         typedef EventHelper<eventType, Args...> ThisType;
         typedef typename EventType::IdType EventId;
-        typedef std::function<bool(EventType &)> ConstraintFunc;
+        typedef std::function<bool(EventType&)> ConstraintFunc;
 
     private:
         std::optional<EventId> eventId;
         std::list<ConstraintFunc> _constraint;
     public:
-        EventHelper<EventType, Args...> &withId(EventId id) {
+        EventHelper<EventType, Args...>& withId(EventId id) {
             eventId = id;
             return *this;
         }
@@ -107,10 +114,10 @@ public:
 
         EventHelper() = default;
 
-        explicit EventHelper(const std::optional<EventId> &eventId) : eventId(eventId) {}
+        explicit EventHelper(const std::optional<EventId>& eventId) : eventId(eventId) {}
 
 
-        ThisType &constraint(const ConstraintFunc &func) {
+        ThisType& constraint(const ConstraintFunc& func) {
             _constraint.push_back(func);
 //            LOGGER("adding constraint, size " + std::to_string(_constraint.size()))
             return *this;
@@ -125,13 +132,13 @@ public:
     class StateHelper : public EventHelper<eventType, Args...> {
 
     public:
-        StateHelper<eventType, Args...> &entered() {
+        StateHelper<eventType, Args...>& entered() {
             this->constraint(
                     [](eventType& event) -> bool { return event.getMethod() == LogicStateMethod::entered; });
             return *this;
         }
 
-        StateHelper<eventType, Args...> &left() {
+        StateHelper<eventType, Args...>& left() {
             this->constraint(
                     [](eventType& event) -> bool { return event.getMethod() == LogicStateMethod::left; });
             return *this;
@@ -139,7 +146,7 @@ public:
 
         StateHelper() = default;
 
-        explicit StateHelper(const std::optional<typename EventHelper<eventType, Args...>::EventId> &eventId)
+        explicit StateHelper(const std::optional<typename EventHelper<eventType, Args...>::EventId>& eventId)
                 : EventHelper<eventType, Args...>(eventId) {}
     };
 
@@ -153,25 +160,25 @@ public:
         using ThisType = SelfType<eventType, Args...>;
         typedef typename EventHelper<EventType, Args...>::ConstraintFunc ConstraintFunc;
     private:
-        LogicManager &logicManager;
-        LogicObject &logicObject;
+        LogicManager& logicManager;
+        LogicObject& logicObject;
         std::optional<EventId> eventId;
         std::optional<ChainIdType> chainId = std::nullopt;
         int childId = 0;
         std::list<ConstraintFunc> _constraint;
     protected:
-        void setChainId(const std::optional<ChainIdType> &chainId) {
+        void setChainId(const std::optional<ChainIdType>& chainId) {
             LogicChainHelper::chainId = chainId;
         }
 
     public:
-        const std::optional<ChainIdType> &getChainId() const {
+        const std::optional<ChainIdType>& getChainId() const {
             return chainId;
         }
 
         //@todo maybe this should return mutex guard? so obtained lock can be maintained through whole execution of chain block?
         static void
-        obtainChainLock(const std::optional<ChainLockIdType> &chainLockId, InstanceType instance, bool lock) {
+        obtainChainLock(const std::optional<ChainLockIdType>& chainLockId, InstanceType instance, bool lock) {
             //@todo mutex synchronize this whole method? on mutex from chainLock?
             if (!chainLockId) {
                 //no chain lock id!
@@ -180,8 +187,8 @@ public:
                 return;
             }
             LOGGER("chain lock id " + *chainLockId)
-            auto & chainContext = Context::getActiveContext()->get<GlobalChainContext>();
-            auto &chainLock = chainContext.getChainLock(*chainLockId);
+            auto& chainContext = Context::getActiveContext()->get<GlobalChainContext>();
+            auto& chainLock = chainContext.getChainLock(*chainLockId);
             //@todo maybe use different mutex than chainLock mutex?
             std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
             if (chainLock.isLocked()) {
@@ -200,11 +207,11 @@ public:
             LOGGER("LOCK OBTAINED " + *chainLockId)
         }
 
-        static void releaseChainLock(const std::optional<ChainLockIdType> &chainLockId, InstanceType instance) {
+        static void releaseChainLock(const std::optional<ChainLockIdType>& chainLockId, InstanceType instance) {
             //@todo mutex synchronize this whole method? on mutex from chainLock?
             if (chainLockId) {
-                auto & chainContext = Context::getActiveContext()->get<GlobalChainContext>();
-                auto &chainLock = chainContext.getChainLock(*chainLockId);
+                auto& chainContext = Context::getActiveContext()->get<GlobalChainContext>();
+                auto& chainLock = chainContext.getChainLock(*chainLockId);
                 LOGGER("RELEASE BEFORE " + *chainLockId)
                 std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
                 //@todo check instance.
@@ -220,33 +227,33 @@ public:
         }
 
     public:
-        LogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, LogicObject &lo)
+        LogicChainHelper(const EventHelper<EventType, Args...>& eventHelper, LogicManager& l, LogicObject& lo)
                 : logicManager(l), logicObject(lo) {
             eventId = eventHelper.eventId;
             _constraint = eventHelper._constraint;
         }
 
-        LogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, LogicObject &lo,
-                         const ChainIdType &id)
+        LogicChainHelper(const EventHelper<EventType, Args...>& eventHelper, LogicManager& l, LogicObject& lo,
+                         const ChainIdType& id)
                 : LogicChainHelper(eventHelper, l, lo) {
             chainId = id;
         };
 
         template<typename NewThisType>
-        LogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, LogicObject &lo,
-                         const NewThisType &self)
+        LogicChainHelper(const EventHelper<EventType, Args...>& eventHelper, LogicManager& l, LogicObject& lo,
+                         const NewThisType& self)
                 : LogicChainHelper(eventHelper, l, lo) {
 
         }
 
 
-        ThisType &constraint(const ConstraintFunc &func) {
+        ThisType& constraint(const ConstraintFunc& func) {
             _constraint.push_back(func);
-            return *static_cast<ThisType *>(this);
+            return *static_cast<ThisType*>(this);
         }
 
         template<typename ActionId>
-        ThisType &fireAction(ActionId actionId) {
+        ThisType& fireAction(ActionId actionId) {
             LOGGER("assigning action ... ");
             bool success;
 
@@ -261,7 +268,7 @@ public:
                     auto generatedActionId = generateActionId<unsigned long>();
                     auto checkAction = [=, constraint = _constraint](EventType e, Args... args) {
                         bool result = true;
-                        for (auto &i : constraint) {
+                        for (auto& i : constraint) {
                             result &= ((i)(e));
                         }
 
@@ -269,8 +276,8 @@ public:
                             (*action)(e, args...);
                         }
                     };
-                    logicManager.setAction<const typename std::decay<EventType>::type &, Args...>(generatedActionId,
-                                                                                                  checkAction);
+                    logicManager.setAction<const typename std::decay<EventType>::type&, Args...>(generatedActionId,
+                                                                                                 checkAction);
                     //@todo combine duplicated branches if possible
                     if (eventId) {
                         success = logicManager.assignAction<EventType, Args...>(*eventId, generatedActionId);
@@ -303,7 +310,7 @@ public:
                 }
 
             }
-            return *static_cast<ThisType *>(this);
+            return *static_cast<ThisType*>(this);
         }
 
         //@todo this should be separate generator and should generate one specific type that is different so no one would make collisions.
@@ -315,16 +322,21 @@ public:
         }
 
         auto nextChildId() {
+            //@todo replace with generator<>
             return childId++;
         }
 
         auto nextChainId() {
+            //@todo replace with generator<>
             const std::string SEPARATOR = ".";
+            if (!chainId.has_value()) {
+                throw InvalidChainException("No chain id set");
+            }
             return *chainId + SEPARATOR + std::to_string(nextChildId());
         }
 
-        ThisType &
-        fireNewAction(ActionManager::ActionType<const typename std::decay<EventType>::type &, Args...> newAction) {
+        ThisType&
+        fireNewAction(ActionManager::ActionType<const typename std::decay<EventType>::type&, Args...> newAction) {
 
             auto generatedActionId = generateActionId<unsigned long>();
 //            int status;
@@ -332,24 +344,24 @@ public:
 
 //            LOGGER("fire new action for type " + std::string(typeid(EventType).name()) + " .... " + realname )
             LOGGER("assigning action with generated id " + std::to_string(generatedActionId));
-            logicManager.setAction<const typename std::decay<EventType>::type &, Args...>(generatedActionId, newAction);
+            logicManager.setAction<const typename std::decay<EventType>::type&, Args...>(generatedActionId, newAction);
             fireAction(generatedActionId);
-            return *static_cast<ThisType *>(this);
+            return *static_cast<ThisType*>(this);
         }
 
         // template<typename ModuleType, typename RetType, typename ... Args>
         //        void mapCommand(const std::string &commandName, RetType (ModuleType::*f)(Args... args)) {
         //template<typename Type, typename RetType, typename ... MethodArgs>
         template<typename Type>
-        ThisType &runMethod(Type *type, void(Type::*f)(const EventType &, Args...)) {
+        ThisType& runMethod(Type* type, void(Type::*f)(const EventType&, Args...)) {
             /*placeholder is for event object*/
             return fireNewAction(std::bind(f, type, std::placeholders::_1));
         }
 
         template<typename Type>
-        ThisType &runMethod(void(Type::*f)(const EventType &, Args...)) {
+        ThisType& runMethod(void(Type::*f)(const EventType&, Args...)) {
             /*placeholder is for event object*/
-            return fireNewAction(std::bind(f, static_cast<Type *>(&logicObject), std::placeholders::_1));
+            return fireNewAction(std::bind(f, static_cast<Type*>(&logicObject), std::placeholders::_1));
         }
 
 //        template<typename Type, typename ... MethodArgs>
@@ -358,9 +370,9 @@ public:
 //        }
 
         template<typename Type, typename ... MethodArgs, typename ... Evaluators>
-        auto runGenericMethod(Type *type, void(Type::*f)(MethodArgs...), Evaluators... evaluators) {
+        auto runGenericMethod(Type* type, void(Type::*f)(MethodArgs...), Evaluators... evaluators) {
 
-            return fireNewAction([=](const typename std::decay<EventType>::type &e) {
+            return fireNewAction([=](const typename std::decay<EventType>::type& e) {
                 (type->*f)(evaluators(e)...);
             });
         }
@@ -368,15 +380,15 @@ public:
         template<typename Type, typename ... MethodArgs, typename ... Evaluators>
         auto runGenericMethod(void(Type::*f)(MethodArgs...), Evaluators... evaluators) {
 
-            return fireNewAction([=, this](const typename std::decay<EventType>::type &e) {
-                (static_cast<Type *>(&logicObject)->*f)(evaluators(e)...);
+            return fireNewAction([=, this](const typename std::decay<EventType>::type& e) {
+                (static_cast<Type*>(&logicObject)->*f)(evaluators(e)...);
             });
         }
 
         template<typename GenericFunc, typename ... Evaluators>
         auto fireNewGenericAction(GenericFunc genericFunc, Evaluators... evaluators) {
             LOGGER("fireNewGenericAction - normal")
-            return fireNewAction([=](const typename std::decay<EventType>::type &e) {
+            return fireNewAction([=](const typename std::decay<EventType>::type& e) {
                 genericFunc(evaluators(e)...);
             });
 
@@ -483,14 +495,14 @@ public:
         }
 
 
-        auto lockChain(std::function<ChainLockIdType(const ChainIdType &,
-                                                     const typename std::decay<EventType>::type &)> lockIdGenerator = LockConfiguration::chain()) {
+        auto lockChain(std::function<ChainLockIdType(const ChainIdType&,
+                                                     const typename std::decay<EventType>::type&)> lockIdGenerator = LockConfiguration::chain()) {
             auto generatedActionId = generateActionId<unsigned long>();
             auto generatedChainId = nextChainId();
 
             std::function<ChainEvent<typename std::decay<EventType>::type>(
-                    const ChainEvent<typename std::decay<EventType>::type> &)> f =
-                    [generatedChainId, lockIdGenerator](const ChainEvent<typename std::decay<EventType>::type> &event,
+                    const ChainEvent<typename std::decay<EventType>::type>&)> f =
+                    [generatedChainId, lockIdGenerator](const ChainEvent<typename std::decay<EventType>::type>& event,
                                                         auto... args) -> ChainEvent<typename std::decay<EventType>::type> {
                         ChainEvent<typename std::decay<EventType>::type> newEvent(event);
                         auto generatedLockId = lockIdGenerator(event.getBaseChainId(), *event.getActualEvent());
@@ -508,7 +520,7 @@ public:
 
             auto generatedActionId = generateActionId<unsigned long>();
             auto generatedChainId = nextChainId();
-            std::function<ChainEvent<EventType>(const ChainEvent<EventType> &)> f =
+            std::function<ChainEvent<EventType>(const ChainEvent<EventType>&)> f =
                     [generatedChainId](ChainEvent<EventType> event, auto... args) -> ChainEvent<EventType> {
                         obtainChainLock(event.getChainLockId(), event.getInstance(), false);
                         releaseChainLock(event.getChainLockId(), event.getInstance());
@@ -526,7 +538,7 @@ public:
             auto generatedActionId = generateActionId<unsigned long>();
             auto generatedChainId = nextChainId();
             if constexpr (!std::is_same<void, RetType>::value) { //Return Type of func is not void
-                std::function<ChainEvent<RetType>(const ChainEvent<EventType> &)> f =
+                std::function<ChainEvent<RetType>(const ChainEvent<EventType>&)> f =
                         [=, chainId = chainId](ChainEvent<EventType> chainedEvent) {
 //                            LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
 //                                   chainedEvent.getEventId())
@@ -549,8 +561,8 @@ public:
                 return fireRawChainAction(f, generatedActionId, generatedChainId, setArgs...);
             } else { //Return Type of func is void
 
-                std::function<void(const ChainEvent<EventType> &)> f = [=, chainId = chainId](
-                        const ChainEvent<EventType> &chainedEvent) {
+                std::function<void(const ChainEvent<EventType>&)> f = [=, chainId = chainId](
+                        const ChainEvent<EventType>& chainedEvent) {
 //                    LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
 //                           chainedEvent.getEventId())
 
@@ -571,25 +583,25 @@ public:
         //@todo func or std::function<RetType(EventType,Args...)> ?
         template<typename RetType, typename ... SetArgs>
         auto
-        fireRawChainAction(std::function<ChainEvent<RetType>(const ChainEvent<EventType> &)> f,
+        fireRawChainAction(std::function<ChainEvent<RetType>(const ChainEvent<EventType>&)> f,
                            unsigned long generatedActionId,
-                           const ChainIdType &generatedChainId, SetArgs... setArgs) {
+                           const ChainIdType& generatedChainId, SetArgs... setArgs) {
             if (chainId) {
                 //@todo apply constraint?
                 if constexpr (!std::is_same<void, RetType>::value) { //Return Type of func is not void
 //                    LOGGER("generated chain id " + generatedChainId);
-                    logicManager.setActionExtended<ChainEvent<RetType>, const ChainEvent<EventType> &, Args...>(
+                    logicManager.setActionExtended<ChainEvent<RetType>, const ChainEvent<EventType>&, Args...>(
                             generatedActionId, f);
                     logicManager.assignAction<ChainEvent<EventType>, Args...>(*chainId, generatedActionId);
                     //@todo return LogicChainHelper for <RetType>, but what about Args... ?
                     SelfType<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, logicObject,
-                                                     *static_cast<ThisType *>(this));
+                                                     *static_cast<ThisType*>(this));
                     retLogicHelper.setChainId(generatedChainId);
                     return retLogicHelper;
                 } else { //Return Type of func is void
-                    logicManager.setAction<const ChainEvent<EventType> &, Args...>(generatedActionId, f);
-                    logicManager.assignAction<const ChainEvent<EventType> &, Args...>(*chainId, generatedActionId);
-                    return *static_cast<ThisType *>(this);
+                    logicManager.setAction<const ChainEvent<EventType>&, Args...>(generatedActionId, f);
+                    logicManager.assignAction<const ChainEvent<EventType>&, Args...>(*chainId, generatedActionId);
+                    return *static_cast<ThisType*>(this);
                 }
 
             } else {
@@ -600,11 +612,11 @@ public:
 //                auto generatedChainId = nextChainId();
                 if constexpr (!std::is_same<void, RetType>::value) {
                     SelfType<RetType> retLogicHelper(EventHelper<RetType>(), logicManager, logicObject,
-                                                     *static_cast<ThisType *>(this));
+                                                     *static_cast<ThisType*>(this));
                     retLogicHelper.setChainId(generatedChainId);
                     return retLogicHelper;
                 } else {
-                    return *static_cast<ThisType *>(this);
+                    return *static_cast<ThisType*>(this);
                 }
             }
 
@@ -612,10 +624,10 @@ public:
 
     public:
 
-        //@todo this method could return a LogichChainHelper with a flag setDirect (a bool or sth) - specialization would make it so that chain functions are only available if newChain was used previously and you can't use newChain after that - for example, LogicChainHelper can inherit from LogicChainHelperBase<...,bool isChain> - it would select base with chain function or without.
-        ThisType &newChain(const ChainIdType &id) {
+        //@todo this method could return a LogichChainHelper with a flag set (a bool or sth) - specialization would make it so that chain functions are only available if newChain was used previously and you can't use newChain after that - for example, LogicChainHelper can inherit from LogicChainHelperBase<...,bool isChain> - it would select base with chain function or without.
+        ThisType& newChain(const ChainIdType& id) {
             chainId = id;
-            return transform<ChainEvent<EventType>>([=](const auto &event) {
+            return transform<ChainEvent<EventType>>([=](const auto& event) {
 //                LOGGER("starting chain " + id)
                 //@todo be careful - if new chain starts before previous one has finished, the chain context will be overwritten. !!!! --- but is it really? I think active context should belong to an event.
                 auto& chainContext = Context::getActiveContext()->set<ChainContext>(id);
@@ -631,43 +643,44 @@ public:
 
         }
 
-        template<typename NewEventType, typename Func>
-        ThisType &transform(Func transformer) {
+        template<typename NewEventType>
+        ThisType& transform(std::function<NewEventType(const typename std::decay<EventType>::type&)> transformer) {
+            //@todo maybe transform should return ThisType for new event type?
             auto generatedActionId = generateActionId<unsigned long>();
-            std::function<NewEventType(const typename std::decay<EventType>::type &)> f = [=](
-                    const typename std::decay<EventType>::type &event) -> NewEventType {
+            std::function<NewEventType(const typename std::decay<EventType>::type&)> f = [=](
+                    const typename std::decay<EventType>::type& event) -> NewEventType {
                 return transformer(event);
             };
 //            LOGGER("transforming action with generated id " + std::to_string(generatedActionId))
             logicManager.setActionExtended<NewEventType, EventType, Args...>(generatedActionId, f);
             fireAction(generatedActionId);
-            return *static_cast<ThisType *>(this);
+            return *static_cast<ThisType*>(this);
         }
 
 
         template<typename NewEventType, typename ... NewArgs>
-        ThisType &emit() {
-            auto &autoSource = logicManager.requireSource<AutoSource>();
+        ThisType& emit() {
+            auto& autoSource = logicManager.requireSource<AutoSource>();
             fireNewAction([&](EventType e, Args...) {
                 autoSource.template generateEvent<NewEventType>();
             });
 
 
-            return *static_cast<ThisType *>(this);
+            return *static_cast<ThisType*>(this);
         }
 
         template<typename NewEventType, typename ... NewArgs>
-        ThisType &emit(NewEventType newEventType) {
-            auto &autoSource = logicManager.requireSource<AutoSource>();
+        ThisType& emit(NewEventType newEventType) {
+            auto& autoSource = logicManager.requireSource<AutoSource>();
             fireNewAction([&, newEventType](EventType e, Args...) {
                 autoSource.template generateEvent<NewEventType>(newEventType);
             });
 
-            return *static_cast<ThisType *>(this);
+            return *static_cast<ThisType*>(this);
         }
 
         template<typename NewEventType>
-        ThisType &emit(EventHelper<NewEventType> eventHelper) {
+        ThisType& emit(EventHelper<NewEventType> eventHelper) {
             return emit(eventHelper.makeEvent());
         }
 
@@ -680,13 +693,13 @@ public:
     template<template<typename, typename...> typename SelfType, typename EventType, typename ... Args>
     class SpecificLogicChainHelper : public LogicChainHelper<SelfType, EventType, Args...> {
     public:
-        explicit SpecificLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l,
-                                          LogicObject &lo)
+        explicit SpecificLogicChainHelper(const EventHelper<EventType, Args...>& eventHelper, LogicManager& l,
+                                          LogicObject& lo)
                 : LogicChainHelper<SelfType, EventType, Args...>(eventHelper, l, lo) {};
 
         template<typename NewThisType>
-        SpecificLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, LogicObject &lo,
-                                 const NewThisType &self) : LogicChainHelper<SelfType, EventType, Args...>(eventHelper,
+        SpecificLogicChainHelper(const EventHelper<EventType, Args...>& eventHelper, LogicManager& l, LogicObject& lo,
+                                 const NewThisType& self) : LogicChainHelper<SelfType, EventType, Args...>(eventHelper,
                                                                                                            l, lo,
                                                                                                            self) {
 
@@ -698,28 +711,28 @@ public:
             : public LogicChainHelper<SelfType, LogicStateEvent<Object, StateIdType>, Args...> {
         typedef LogicStateEvent<Object, StateIdType> LogicEventType;
     public:
-        explicit SpecificLogicChainHelper(const EventHelper<LogicEventType, Args...> &eventHelper, LogicManager &l,
-                                          LogicObject &lo)
+        explicit SpecificLogicChainHelper(const EventHelper<LogicEventType, Args...>& eventHelper, LogicManager& l,
+                                          LogicObject& lo)
                 : LogicChainHelper<SelfType, LogicEventType, Args...>(eventHelper, l, lo) {};
 
         template<typename NewThisType>
-        SpecificLogicChainHelper(const EventHelper<LogicEventType, Args...> &eventHelper, LogicManager &l,
-                                 LogicObject &lo,
-                                 const NewThisType &self) : LogicChainHelper<SelfType, LogicEventType, Args...>(
+        SpecificLogicChainHelper(const EventHelper<LogicEventType, Args...>& eventHelper, LogicManager& l,
+                                 LogicObject& lo,
+                                 const NewThisType& self) : LogicChainHelper<SelfType, LogicEventType, Args...>(
                 eventHelper, l, lo, self) {
 
         }
 
-        typename LogicChainHelper<SelfType, LogicStateEvent<Object, StateIdType>, Args ...>::ThisType &
-        fireStateChangeReaction(std::function<void(typename LogicEventType::Type &)> reaction) {
+        typename LogicChainHelper<SelfType, LogicStateEvent<Object, StateIdType>, Args ...>::ThisType&
+        fireStateChangeReaction(std::function<void(typename LogicEventType::Type&)> reaction) {
             return this->fireNewAction(
                     [reaction](auto event) {
                         reaction(event.getObject());
                     });
         }
 
-        typename LogicChainHelper<SelfType, LogicStateEvent<Object, StateIdType>, Args ...>::ThisType &
-        fireStateChangeReaction(std::function<void(typename LogicEventType::Type &, const StateIdType &)> reaction) {
+        typename LogicChainHelper<SelfType, LogicStateEvent<Object, StateIdType>, Args ...>::ThisType&
+        fireStateChangeReaction(std::function<void(typename LogicEventType::Type&, const StateIdType&)> reaction) {
             return this->fireNewAction(
                     [reaction](auto event) { reaction(event.getObject(), event.getState()); });
         }
@@ -728,13 +741,13 @@ public:
     template<typename EventType, typename ... Args>
     class SimpleLogicChainHelper : public SpecificLogicChainHelper<SimpleLogicChainHelper, EventType, Args...> {
     public:
-        explicit SimpleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l,
-                                        LogicObject &lo)
+        explicit SimpleLogicChainHelper(const EventHelper<EventType, Args...>& eventHelper, LogicManager& l,
+                                        LogicObject& lo)
                 : SpecificLogicChainHelper<SimpleLogicChainHelper, EventType, Args...>(eventHelper, l, lo) {};
 
         template<typename NewThisType>
-        SimpleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, LogicObject &lo,
-                               const NewThisType &self)
+        SimpleLogicChainHelper(const EventHelper<EventType, Args...>& eventHelper, LogicManager& l, LogicObject& lo,
+                               const NewThisType& self)
                 : SpecificLogicChainHelper<SimpleLogicChainHelper, EventType, Args...>(eventHelper,
                                                                                        l, lo, self) {
 
@@ -786,11 +799,11 @@ public:
         return ret;
     };
 
-    virtual void setupActions(SetupActionHelper &actionHelper) = 0;
+    virtual void setupActions(SetupActionHelper& actionHelper) = 0;
 
-    virtual bool assignActions(AssignActionHelper &actionHelper) = 0;
+    virtual bool assignActions(AssignActionHelper& actionHelper) = 0;
 
-    virtual bool setupSources(SetupSourceHelper &sourceHelper) = 0;
+    virtual bool setupSources(SetupSourceHelper& sourceHelper) = 0;
 
 };
 

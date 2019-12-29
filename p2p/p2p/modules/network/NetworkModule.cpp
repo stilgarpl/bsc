@@ -26,6 +26,9 @@
 #include <core/io/InputOutputContext.h>
 #include <p2p/modules/network/protocol/packet/ConnectionControl.h>
 #include <p2p/modules/network/processors/ConnectionProcessors.h>
+#include <p2p/modules/network/protocol/packet/NetworkInfoRequest.h>
+#include <p2p/modules/network/protocol/packet/NetworkInfoResponse.h>
+#include <p2p/modules/auth/network/packet/AuthHelloPacket.h>
 
 
 using namespace Poco::Net;
@@ -166,6 +169,8 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
 //    intStateMachine.changeState(4);
 //    intStateMachine.changeState(6);
 
+
+
     //@todo real value
     return true;
 }
@@ -174,8 +179,28 @@ bool NetworkModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) 
 
 
     sourceHelper.requireSource<ConnectionSource>();
-    sourceHelper.requireSource<NetworkSource>();
-    sourceHelper.requireSource<NodeSource>();
+    auto& networkSource = sourceHelper.requireSource<NetworkSource>();
+    auto& nodeSource = sourceHelper.requireSource<NodeSource>();
+    //@todo move this somewhere more appropriate
+    // response packets processing:
+    when(NetworkConditions::packetReceived<NetworkInfoGroup::Response>()).fireNewAction([&networkSource](auto& event) {
+        auto packet = event.getPacket();
+        if (packet->getNetworkInfo() != nullptr) {
+            networkSource.networkInfoReceived(*packet->getNetworkInfo());
+            LOGGER("Network response received " + std::to_string(packet->getId()) + " " +
+                   packet->getNetworkInfo()->getNetworkId());
+        } else {
+            LOGGER("Empty network response")
+        }
+    });
+
+    when(NetworkConditions::packetReceived<NodeInfoGroup::Response>()).fireNewAction([&nodeSource](auto& event) {
+        auto packet = event.getPacket();
+
+        nodeSource.nodeInfoReceived(packet->getNodeInfo());
+        LOGGER("Node response received " + packet->getNodeInfo().getNodeId() + "  " + std::to_string(packet->getId()));
+    });
+
     return true;
 }
 
@@ -431,6 +456,30 @@ RemoteNode& NetworkModule::connectToNode(const NodeIdType& nodeId) {
 void NetworkModule::prepareSubmodules() {
     auto& networkSub = getSubModule<NetworkModule>();
     networkSub.registerPacketProcessor<ConnectionControl>(ConnectionProcessors::processConnectionControl);
+    networkSub.registerPacketProcessor<NetworkInfoGroup>([this](NetworkInfoRequest::Ptr request) {
+        auto response = request->getNew<Status::response>();
+        // LOGGER("processing network info request id" + std::to_string(this->getId()));
+
+        if (this->getNetworkInfo() == nullptr) {
+            //@todo actual error handling
+            LOGGER("empty network info! ")
+        }
+        response->setNetworkInfo(this->getNetworkInfo());
+        return response;
+    });
+
+    networkSub.registerPacketProcessor<NodeInfoGroup>([this](NodeInfoGroup::Request::Ptr request) {
+        auto response = request->getNew<Status::response>();
+        // LOGGER("processing network info request id" + std::to_string(this->getId()));
+
+
+        response->setNodeInfo(node.getNodeInfo());
+        return response;
+    });
+    networkSub.registerPacketProcessor<KeepAlivePacket>([this](KeepAlivePacket::Request::Ptr request) {
+        auto response = request->getNew<Status::response>();
+        return response;
+    });
 }
 
 void NetworkModule::SubModule::setupPacketProcessing(NetworkModule& node) {

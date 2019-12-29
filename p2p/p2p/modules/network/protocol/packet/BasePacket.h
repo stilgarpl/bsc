@@ -48,8 +48,6 @@ private:
 
 public:
 
-    //@todo pure virtual perhaps? or maybe that would mess up ack? I can create AckPacket...
-    virtual void process(Context::Ptr context);
 
     [[nodiscard]] Status getStatus() const;
 

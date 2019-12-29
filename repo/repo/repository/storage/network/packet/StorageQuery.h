@@ -32,8 +32,6 @@ public:
             ar(cereal::base_class<Packet<StorageQuery, StorageQuery::Request>>(this), storageId, objectId);
         }
 
-    public:
-        void process(Context::Ptr context) override;
 
     private:
         friend class cereal::access;

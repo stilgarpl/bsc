@@ -30,8 +30,7 @@ public:
     private:
         friend class cereal::access;
 
-    public:
-        void process(Context::Ptr context) override;
+
     };
 
     class Response : public Packet<JournalGroup, Response> {
@@ -56,8 +55,6 @@ public:
     private:
         friend class cereal::access;
 
-    public:
-        void process(Context::Ptr context) override;
     };
 
 };

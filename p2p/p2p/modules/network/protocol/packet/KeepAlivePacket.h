@@ -27,7 +27,7 @@ public:
         }
 
     public:
-        void process(Context::Ptr context) override;
+
 
     private:
         friend class cereal::access;
@@ -40,9 +40,6 @@ public:
             ar(cereal::base_class<Packet<KeepAlivePacket, KeepAlivePacket::Response>>
                        (this));
         }
-
-    public:
-        void process(Context::Ptr context) override;
 
     private:
 

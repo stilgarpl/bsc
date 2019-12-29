@@ -5,6 +5,3 @@
 #include "StorageQuery.h"
 #include <logic/context/LogicContext.h>
 
-void StorageQuery::Request::process(Context::Ptr context) {
-
-}

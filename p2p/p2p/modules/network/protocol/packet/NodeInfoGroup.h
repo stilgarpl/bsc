@@ -27,8 +27,6 @@ struct NodeInfoGroup : public PacketGroup {
 
         friend class cereal::access;
 
-    public:
-        void process(Context::Ptr context);
 
     };
 
@@ -51,9 +49,6 @@ struct NodeInfoGroup : public PacketGroup {
         friend class cereal::access;
 
     public:
-
-        void process(Context::Ptr context);
-
 
     };
 

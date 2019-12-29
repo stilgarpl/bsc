@@ -5,10 +5,7 @@
 #include "JournalGroup.h"
 #include <logic/context/LogicContext.h>
 
-void JournalGroup::Request::process(Context::Ptr context) {
 
-
-}
 
 const std::string &JournalGroup::Request::getRepoId() const {
     return repoId;
@@ -18,9 +15,6 @@ void JournalGroup::Request::setRepoId(const std::string &repoId) {
     Request::repoId = repoId;
 }
 
-void JournalGroup::Response::process(Context::Ptr context) {
-
-}
 
 const std::string &JournalGroup::Response::getRepoId() const {
     return repoId;

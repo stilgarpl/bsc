@@ -583,4 +583,6 @@ OKAZUJE SIE, ZE JUZ ROZWIAZALEM TEN PROBLEM dla processorów z network module. t
 
 @todo remove getenv(). Get that data in other way. getenv() crashes on windows.
 
-//@TODO zrobić generatory różnych rzeczy, może też generator context? żeby brać generator jak FactoryContext ? 
+//@TODO zrobić generatory różnych rzeczy, może też generator context? żeby brać generator jak FactoryContext ?
+
+@todo teraz mam w niektorych pakietach event na response. event na request mam zastapiony networkSubModule processor. odpowiedź na response moze używać transform<> w logic chain do wygenerowania *ResponseEvent z packet<*::Response>. ewentualnie networksubmodule moglby miec register response processor ktory robi to samo.

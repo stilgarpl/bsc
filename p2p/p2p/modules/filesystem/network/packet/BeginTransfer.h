@@ -32,7 +32,6 @@ public:
             Request::resourceId = resourceId;
         }
 
-        void process(Context::Ptr context) override;
 
     private:
 

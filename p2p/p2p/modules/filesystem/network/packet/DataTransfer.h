@@ -24,8 +24,6 @@ public:
             ar(cereal::base_class<Packet<DataTransfer, DataTransfer::Request >>(this), transferId, begin, end);
         }
 
-    public:
-        void process(Context::Ptr context) override;
 
     private:
         friend class cereal::access;

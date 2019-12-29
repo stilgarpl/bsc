@@ -5,15 +5,6 @@
 #include <logic/context/LogicContext.h>
 #include "DataTransfer.h"
 
-void DataTransfer::Request::process(Context::Ptr context) {
-    //@todo remove obsolete
-//    BasePacket::process(context);
-//    LogicContext::getLogicManagerFromActiveContext().getSource<TransferSource>()->sendData(this->getTransferId(),
-//                                                                                           this->getBegin(),
-//                                                                                           this->getEnd());
-
-}
-
 TransferId DataTransfer::Request::getTransferId() const {
     return transferId;
 }

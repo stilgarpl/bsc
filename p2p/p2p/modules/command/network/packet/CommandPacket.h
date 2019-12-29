@@ -17,7 +17,7 @@ public:
         std::string commandName;
         std::vector<std::string> data;
     public:
-        void process(Context::Ptr context) override;
+
 
         const std::string &getCommandName() const;
 
@@ -44,7 +44,6 @@ public:
         bool runStatus;
         std::string output;
     public:
-        void process(Context::Ptr context) override;
 
         bool isRunStatus() const;
 

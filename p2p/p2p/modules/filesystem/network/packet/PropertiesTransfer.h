@@ -22,10 +22,7 @@ public:
             ar(cereal::base_class<Packet<PropertiesTransfer, PropertiesTransfer::Request>>(this), transferId);
         }
 
-    public:
-        void process(Context::Ptr context) override;
 
-    private:
     public:
         TransferId getTransferId() const;
 

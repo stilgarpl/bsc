@@ -83,6 +83,42 @@ public:
 
 };
 
+
+class SetupInvalidChainAction : public LogicObject {
+    std::atomic_int firstCounter = 0;
+    std::atomic_int secondCounter = 0;
+public:
+    explicit SetupInvalidChainAction(LogicManager& logicManager) : LogicObject(logicManager) {
+    }
+
+    void setupActions(SetupActionHelper& actionHelper) override {
+        when(event<Ping>())
+//                .newChain("chain") this is invalid, no chain id
+                .fireNewChainAction([&](auto event) {
+                    firstCounter++;
+                    return event;
+                })
+                .fireNewChainAction([&](auto event) {
+                    secondCounter++;
+                    return event;
+                });
+    }
+
+    bool assignActions(AssignActionHelper& actionHelper) override {
+        return true;
+    }
+
+    bool setupSources(SetupSourceHelper& sourceHelper) override {
+        sourceHelper.requireSource<PingSource>();
+        return true;
+    }
+
+    auto& getFirstCounter() { return firstCounter; };
+
+    auto& getSecondCounter() { return secondCounter; };
+
+};
+
 class SetupInvalidAssignment : public LogicObject {
 public:
     SetupInvalidAssignment(LogicManager& logicManager) : LogicObject(logicManager) {}
@@ -167,6 +203,16 @@ TEST_CASE("Chain logic test") {
 
 
 }
+
+TEST_CASE("Invalid chain logic test") {
+    Context::OwnPtr context = Context::makeContext();
+    Context::setActiveContext(context);
+    LogicManager logicManager;
+    logicManager.setContexts(context);
+    SetupInvalidChainAction setupLogic(logicManager);
+    REQUIRE_THROWS_AS(setupLogic.setupLogic(), InvalidChainException);
+}
+
 
 TEST_CASE("Logic exceptions test") {
     Context::OwnPtr context = Context::makeContext();
