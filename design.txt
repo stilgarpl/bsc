@@ -586,3 +586,20 @@ OKAZUJE SIE, ZE JUZ ROZWIAZALEM TEN PROBLEM dla processorów z network module. t
 //@TODO zrobić generatory różnych rzeczy, może też generator context? żeby brać generator jak FactoryContext ?
 
 @todo teraz mam w niektorych pakietach event na response. event na request mam zastapiony networkSubModule processor. odpowiedź na response moze używać transform<> w logic chain do wygenerowania *ResponseEvent z packet<*::Response>. ewentualnie networksubmodule moglby miec register response processor ktory robi to samo.
+
+wrapper do GNU argp. łatwe użycie, typy w parametrach, std::optional dla opcjonalnych
+
+struct BasycoProgramOptions :  ProgramParameters {
+Parameter<int> value ={"v","value",0};
+Parameter<std::string> text = {"t","text",getText};
+OptionalParameter<std::string> optionalText;
+}
+
+main (argc, argv) {
+
+BasycoProgramArguments arguments;
+arguments.parse(argc,argv);
+
+idea jest taka, ze konstruktor ProgramParameters ustawi thread_local kontekst dla parsera, a konstruktory Parameter<> beda ustawiac w nim odpowiednie rzeczy dla gnu argp. w ten sposob wystarczy tylko sdefiniowac strukture ktora sama napełni się danymi.
+
+ProgramParameters mozna dostosowac do uzycia w CommandModule dla submodules (chyba trzeba to przemianowac na subcommand zeby uniknac mylenia z SubModule), taki sub powinien wygneerowac ProParams z odpowiednimi ustawieniami

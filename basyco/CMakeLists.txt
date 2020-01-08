@@ -24,6 +24,6 @@ add_executable(basyco-test basyco/main_test.cpp)
 target_link_libraries(basyco-demo repo module_auth)
 target_link_libraries(basyco-control p2p_core module_command)
 target_link_libraries(basyco-daemon repo)
-target_link_libraries(basyco-test module_network)
+target_link_libraries(basyco-test core)
 install(TARGETS basyco-demo basyco-daemon basyco-control basyco-test COMPONENT basyco)
 

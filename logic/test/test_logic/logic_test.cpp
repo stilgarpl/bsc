@@ -182,7 +182,7 @@ TEST_CASE("Chain logic test") {
     Context::setActiveContext(context);
     LogicManager logicManager;
     logicManager.setContexts(context);
-//@todo think about it, doesn't it seem backwards? maybe logicManager should call setupLogic on all of its logic objects? or maybe not. Node calls setup logic on its modules in specific moment
+//@todo think about it, doesn't it seem backwards? maybe logicManager should call setupLogic on all of its logic objects? or maybe not. Node calls setup logic on its modules in specific moment. But it would be better. Right now setupLogic() can be called many times, breaking logic.
     SetupChainAction setupLogic(logicManager);
     setupLogic.setupLogic();
     setupLogic.getFirstCounter().store(0);
