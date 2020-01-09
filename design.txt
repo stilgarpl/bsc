@@ -603,3 +603,15 @@ arguments.parse(argc,argv);
 idea jest taka, ze konstruktor ProgramParameters ustawi thread_local kontekst dla parsera, a konstruktory Parameter<> beda ustawiac w nim odpowiednie rzeczy dla gnu argp. w ten sposob wystarczy tylko sdefiniowac strukture ktora sama napełni się danymi.
 
 ProgramParameters mozna dostosowac do uzycia w CommandModule dla submodules (chyba trzeba to przemianowac na subcommand zeby uniknac mylenia z SubModule), taki sub powinien wygneerowac ProParams z odpowiednimi ustawieniami
+
+submodule("module",ModuleParameters{}) <--- trzeba wymyślić sposób na przechowywanie i używanie parametrów komend. może konfigurator modułu odpalałby sie z parametrami jako argumentem i przed faktyczną komendą.
+
+bsc repo --pretend persist
+bsc --arg repo --sth persist --pretend
+
+SpecificCommandData to the rescue - można tam przechowywać szablonem w zasadzie dowolną strukturę parametrów, wystarczy ją podać jako dodatkowy argument dla mapcommand. wtedy mapcommand by mapowało nazwę na parametry i komendę do wykonania. komenda wtedy musiałaby przyjmować takie parametry jako pierwszy parametr, a dopiero potem resztę.
+
+bsc --list-commands
+bsc remote "second" --list-commands
+
+concept na Parameters - musi dziedziczyc po ProgramParameters

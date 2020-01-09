@@ -14,6 +14,7 @@ struct TestProgramParameters : public ProgramParameters {
     Alias a1 = {'x', "aaaaaa"};
 //    Parameter<int> c = {"test"};
     Parameter<std::string> d = {'d', "test", "TEXT", "Text field", "xix"};
+    Parameter<std::vector<std::string>> vec = {'v', "vector", "VEC", "Vector test"};
 };
 
 int main(int argc, char* argv[]) {
@@ -28,6 +29,11 @@ int main(int argc, char* argv[]) {
               << std::to_string(parameters.b.count()) << std::endl;
     std::cout << "a is " << std::to_string(parameters.a()) << std::endl;
     std::cout << "d is [" << parameters.d() << "]" << std::endl;
+    std::cout << "v elements are : " << std::endl;
+    for (const auto& v : parameters.vec()) {
+        std::cout << "[" << v << "] ";
+    }
+    std::cout << std::endl;
     std::cout << "arguments are : " << std::endl;
     for (const auto& argument : parameters.arguments()) {
         std::cout << "[" << argument << "] ";
