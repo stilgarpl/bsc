@@ -74,7 +74,7 @@ error_t ProgramParameters::Parser::parseArgument(int key, char* arg, struct argp
             if (self->parseMap.contains(key)) {
                 try {
                     self->parseMap[key](arg);
-                } catch (ParameterParseException& e) {
+                } catch (StringParseException& e) {
                     argp_error(state, "Argument \"%s\" parse failed for '%c' with error: [%s]", arg, key, e.what());
                 }
 

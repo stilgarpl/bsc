@@ -615,3 +615,8 @@ bsc --list-commands
 bsc remote "second" --list-commands
 
 concept na Parameters - musi dziedziczyc po ProgramParameters
+
+ciekawy problem - mozna pobrać komendy z CommandModule dopiero jak Node wstał i CoMo ma już wszystkie komendy wpisane (niektóre są dodawane przez logikę submodule) - ale same parametry są potrzebne do uruchomienia Node ( sciezka z configiem etc.). W sumie mozna to sobie zapisać z configiem i ładować, albo generować przy kompilacji... Albo po prostu podstawowe komendy ładować statycznie bez uruchamiania node i te wpisywać. resztę user zobaczy po odpaleniu list-commands.
+
+@todo dopisać testy fromString()
+//@todo zmienic nazwe CommandSubModule na CommandGroup.

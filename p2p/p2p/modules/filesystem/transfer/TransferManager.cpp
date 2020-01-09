@@ -67,6 +67,7 @@ TransferId TransferManager::beginTransfer(ResourceIdentificatorPtr resourceIdent
         //execute this directly or through source?
         //@todo error, exception or I don't know, something
 //        transferError(event);
+        return -1; //@todo replace with actual error handling
     }
 
 

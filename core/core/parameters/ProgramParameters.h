@@ -12,7 +12,7 @@
 #include <iostream>
 #include <map>
 #include <utility>
-#include "ParameterParse.h"
+#include "core/parser/FromString.h"
 
 class ProgramParameters {
 private:
@@ -159,17 +159,18 @@ private:
     int counter = 0;
 
     ProgramParameters::Parser::ParseFunc makeParseFunction() {
-        return [this](const char* text) {
+        return [this](const char* input) {
+            std::string text = input != nullptr ? input : "";
             if (!value) {
-                value = parse<T>(text);
+                value = fromString<T>(text);
             } else {
                 //if parameter is mentioned multiple times and it's a container, combine options. otherwise, overwrite.
                 if constexpr (is_container_not_string<T>::value) {
-                    auto tempValue = parse<T>(text);
+                    auto tempValue = fromString<T>(text);
                     std::for_each(tempValue.begin(), tempValue.end(),
                                   [this](auto& i) { value->insert(value->end(), i); });
                 } else {
-                    value = parse<T>(text);
+                    value = fromString<T>(text);
                 }
             }
             counter++;
@@ -323,8 +324,7 @@ public:
 };
 
 template<typename T>
-class RequiredParameter : public Parameter<T> {
-public:
+class RequiredParameter : public BaseParameter<T> {
 public:
     RequiredParameter(char shortKey, const char* longKey, const char* argumentName, const char* doc) : BaseParameter<T>(
             shortKey, longKey, argumentName, doc,

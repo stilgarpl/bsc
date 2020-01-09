@@ -46,15 +46,33 @@ public:
             RetType (ModuleType::*func)(Args... args);
 
         public:
-            SpecificCommandData(const std::string &commandName, RetType (ModuleType::*func)(Args...)) : CommandData(
+            SpecificCommandData(const std::string& commandName, RetType (ModuleType::*func)(Args...)) : CommandData(
                     commandName),
                                                                                                         func(func) {}
 
-            void applyCommand(CommandModule &commandModule) override {
+            void applyCommand(CommandModule& commandModule) override {
                 commandModule.mapCommand(commandName, func);
             }
+
             ~SpecificCommandData() override = default;
         };
+
+//        template<typename ModuleType, typename RetType, typename ParametersType, typename ... Args>
+//        class SpecificCommandDataWithParameters : public CommandData {
+//        private:
+//            RetType (ModuleType::*func)(Args... args);
+//            ParametersType parameters;
+//
+//        public:
+//            SpecificCommandDataWithParameters(const std::string &commandName, RetType (ModuleType::*func)(Args...), ParametersType&& params) : CommandData(
+//                    commandName),
+//                                                                                                        func(func), parameters(std::forward(params)) {}
+//
+//            void applyCommand(CommandModule &commandModule) override {
+//                commandModule.mapCommand(commandName, func);
+//            }
+//            ~SpecificCommandDataWithParameters() override = default;
+//        };
 
 
         std::list<std::shared_ptr<CommandData>> commands;
@@ -62,14 +80,21 @@ public:
 
     public:
         template<typename ModuleType, typename RetType, typename ... Args>
-        void mapCommand(const std::string &commandName, RetType (ModuleType::*f)(Args... args)) {
+        void mapCommand(const std::string& commandName, RetType (ModuleType::*f)(Args... args)) {
             auto command = std::make_shared<SpecificCommandData<ModuleType, RetType, Args...>>(commandName, f);
             commands.push_back(command);
             LOGGER("MAPPING COMMAND " + command->getCommandName());
         }
 
-        void applyCommands(CommandModule &commandModule) {
-            for (const auto &item : commands) {
+//        template<typename ModuleType, typename ParametersType, typename RetType, typename ... Args>
+//        void mapCommand(const std::string &commandName, RetType (ModuleType::*f)(Args... args), ParametersType parameters) {
+//            auto command = std::make_shared<SpecificCommandData<ModuleType, RetType, Args...>>(commandName, f);
+//            commands.push_back(command);
+//            LOGGER("MAPPING COMMAND " + command->getCommandName());
+//        }
+
+        void applyCommands(CommandModule& commandModule) {
+            for (const auto& item : commands) {
                 LOGGER("APPLYING COMMAND " + item->getCommandName())
                 item->applyCommand(commandModule);
             }
@@ -189,20 +214,20 @@ public:
 
     void prepareSubmodules() override;
 
-    CommandSubModule &submodule(std::string name) {
-        if (submodules.count(name) == 0) {
+    CommandSubModule& submodule(const std::string& name) {
+        if (!submodules.contains(name)) {
             submodules[name] = std::make_unique<CommandSubModule>(*this);
         }
 
         return *submodules[name];
     }
 
-    CommandSubModule &submodule() {
+    CommandSubModule& submodule() {
         return defaultSubModule;
     }
 
 
-    CommandModule(INode &node);
+    explicit CommandModule(INode& node);
 
 public:
 
@@ -211,7 +236,7 @@ public:
 
         //@todo check if commandName is a module name
         //@todo also check for collsions in creating submodules
-        if (submodules.count(commandName) > 0) {
+        if (submodules.contains(commandName)) {
             //@todo exception, return false or sth.
             LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
         }
