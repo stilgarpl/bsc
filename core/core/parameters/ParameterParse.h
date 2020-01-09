@@ -11,6 +11,26 @@
 #include <stdexcept>
 #include <sstream>
 
+
+template<typename T>
+class that_type;
+
+template<typename T>
+void name_that_type() {
+    that_type<T> tType;
+}
+
+template<typename T>
+struct is_pair : std::false_type {
+};
+
+template<typename T, typename U>
+struct is_pair<std::pair<T, U>> : std::true_type {
+};
+
+template<typename T>
+constexpr bool is_pair_v = is_pair<T>::value;
+
 template<typename T, typename _ = void>
 struct is_container_not_string : std::false_type {
 };
@@ -50,6 +70,7 @@ ParameterType parse(const char* value, std::enable_if_t<std::numeric_limits<Para
     }
 }
 
+
 template<typename ParameterType>
 ParameterType parse(const char* value, std::enable_if_t<std::is_convertible_v<ParameterType, std::string>, int>  = 0) {
     if (value != nullptr) {
@@ -65,14 +86,32 @@ inline bool parse<bool>(const char* value, int) {
     return true;
 }
 
+
+template<typename ParameterType>
+ParameterType parse(const char* value, std::enable_if_t<is_pair_v<ParameterType>, int> = 0) {
+    //@todo stoi, stol, stoii based on Parameter type length?
+    try {
+
+        std::stringstream inputStream(value);
+        std::string first, second;
+        getline(inputStream, first, '=');
+        getline(inputStream, second);
+        auto key = parse<std::decay_t<typename ParameterType::first_type>>(first.c_str());
+        auto pairValue = parse<typename ParameterType::second_type>(second.c_str());
+        return std::make_pair(key, pairValue);
+    } catch (std::invalid_argument& e) {
+        throw ParameterParseException("Integer parsing failed.");
+    }
+}
+
 template<typename ParameterType>
 ParameterType parse(const char* value, std::enable_if_t<is_container_not_string<ParameterType>::value, int>  = 0) {
     ParameterType container;
-    std::stringstream s(value);
-    std::string val;
+    std::stringstream inputStream(value);
+    std::string element;
 
-    while (getline(s, val, ',')) { ;
-        container.push_back(parse<typename ParameterType::value_type>(val.c_str()));
+    while (getline(inputStream, element, ',')) { ;
+        container.insert(container.end(), parse<typename ParameterType::value_type>(element.c_str()));
     }
 
     return container;
