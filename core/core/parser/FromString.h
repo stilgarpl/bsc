@@ -67,7 +67,7 @@ fromString(const std::string& value, std::enable_if_t<std::numeric_limits<Parame
     try {
         return std::stol(value);
     } catch (std::invalid_argument& e) {
-        throw StringParseException("Integer parsing failed.");
+        throw StringParseException("Integer parsing failed for value: " + value);
     }
 }
 
@@ -78,7 +78,7 @@ fromString(const std::string& value, std::enable_if_t<std::is_floating_point_v<P
     try {
         return std::stod(value);
     } catch (std::invalid_argument& e) {
-        throw StringParseException("Integer parsing failed.");
+        throw StringParseException("Floating parsing failed for value: " + value);
     }
 }
 
@@ -99,11 +99,60 @@ inline bool fromString<bool>(const std::string& value, int) {
     return true;
 }
 
+template<>
+inline int fromString<int>(const std::string& value, int) {
+    try {
+        return std::stoi(value);
+    } catch (std::invalid_argument& e) {
+        throw StringParseException("Integer parsing failed for value: " + value);
+    }
+}
+
+template<>
+inline long fromString<long>(const std::string& value, int) {
+    try {
+        return std::stol(value);
+    } catch (std::invalid_argument& e) {
+        throw StringParseException("Integer parsing failed for value: " + value);
+    }
+}
+
+template<>
+inline unsigned long fromString<unsigned long>(const std::string& value, int) {
+    try {
+        return std::stoul(value);
+    } catch (std::invalid_argument& e) {
+        throw StringParseException("Integer parsing failed for value: " + value);
+    }
+}
 
 
-//inline float fromString<float>(const std::string& s) {
-//    return std::stof(s);
-//}
+template<>
+inline float fromString<float>(const std::string& value, int) {
+    try {
+        return std::stof(value);
+    } catch (std::invalid_argument& e) {
+        throw StringParseException("Floating parsing failed for value: " + value);
+    }
+}
+
+template<>
+inline double fromString<double>(const std::string& value, int) {
+    try {
+        return std::stod(value);
+    } catch (std::invalid_argument& e) {
+        throw StringParseException("Floating parsing failed for value: " + value);
+    }
+}
+
+template<>
+inline long double fromString<long double>(const std::string& value, int) {
+    try {
+        return std::stold(value);
+    } catch (std::invalid_argument& e) {
+        throw StringParseException("Floating parsing failed for value: " + value);
+    }
+}
 
 
 template<typename ParameterType>
@@ -119,7 +168,7 @@ fromString(const std::string& value, std::enable_if_t<is_pair_v<ParameterType>, 
         auto pairValue = fromString<typename ParameterType::second_type>(second.c_str());
         return std::make_pair(key, pairValue);
     } catch (std::invalid_argument& e) {
-        throw StringParseException("Integer parsing failed.");
+        throw StringParseException("Pair parsing failed for value: " + value);
     }
 }
 
