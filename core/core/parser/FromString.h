@@ -20,6 +20,9 @@
 //    that_type<T> tType;
 //}
 
+
+//@todo instead of SFINAE maybe I should use just one function with constexpr if() that calls itself when needed? that would solve a problem of ambigious calls when more than one function fits
+//  basically, template<ParamType> ParamType fromString(value) {if ... return fromString<..>() else if ... else if.. }; and template specializations for specific types.
 template<typename T>
 struct is_pair : std::false_type {
 };
