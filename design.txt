@@ -620,3 +620,5 @@ ciekawy problem - mozna pobrać komendy z CommandModule dopiero jak Node wstał 
 
 @todo dopisać testy fromString()
 //@todo zmienic nazwe CommandSubModule na CommandGroup.
+
+runFunction moglby przyjmowac tez std::function. mapCommand moglby zamiast faktycznej funkcji do wykonania przy parametrach zmapować inną lambdę do wykonania - ta miałaby juz prawdziwe parametry, wiec nie byłoby problemem dodać argument parametrów @todo

@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <numeric>
+#include <core/log/Logger.h>
 #include "ProgramParameters.h"
 
 
@@ -111,4 +112,14 @@ void ProgramParameters::Parser::prepareParser(std::vector<std::string> usage, co
         }
     });
     argParams = {argpOptions.data(), Parser::parseArgument, argDoc.c_str(), doc.c_str(), nullptr, nullptr, nullptr};
+}
+
+char* ProgramParameters::Parser::helpFilter(int key, const char* text, void* input) {
+    if (text != nullptr) {
+        using namespace std::string_literals;
+//        LOGGER("TEXT FILTER IS : "s + text);
+    } else {
+//        LOGGER("TEXT IS NULL");
+    }
+    return nullptr;
 }

@@ -17,6 +17,7 @@
 #include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/command/ICommandsDirectory.h>
 #include <core/utils/template_cast.h>
+#include <core/parameters/ProgramParameters.h>
 
 
 class CommandModule : public NodeModuleDependent<CommandModule, NetworkModule> {
@@ -121,14 +122,52 @@ public:
 
     protected:
         ///template <typename ReturnType, typename ... Args>
-        bool mapCommand(const std::string &prefix, const std::string &commandName,
-                        const std::function<void(ArgumentContainerType)> &func) {
+        bool mapCommand(const std::string& prefix, const std::string& commandName,
+                        const std::function<void(ArgumentContainerType)>& func) {
             std::string key = prefix + ":::" + commandName;
-            auto &map = getCommandMap();//commands.get<std::string, std::function<void(ArgumentContainerType)>>();
-            map[key] = std::move(func);
+            auto& map = getCommandMap();//commands.get<std::string, std::function<void(ArgumentContainerType)>>();
+            map[key] = func;
             return true;
         }
+
     public:
+
+        template<typename ModuleType, typename ParametersType, typename RetType, typename ... Args>
+        void mapCommand(std::string commandName, RetType (ModuleType::*f)(const ParametersType&, Args... args),
+                        ParametersType params) {
+            parent.addRequiredDependency<ModuleType>();
+            auto mod = parent.node.getModule<ModuleType>();
+            auto command = parent.node.getModule<CommandModule>();
+            ///long cast is sad :( to_string should have size_t overload
+            ///std::to_string((long) sizeof...(Args))
+            //@todo prefix or sth, problem is that size of args breaks raw functions that are random
+            mapCommand(" ", commandName,
+                       [f, mod, commandName](CommandModule::ArgumentContainerType vals) {
+                           ParametersType localParams;
+                           // guarantee contiguous, null terminated strings
+                           std::vector<std::vector<char>> vstrings;
+
+                           // pointers to those strings
+                           std::vector<char*> cstrings;
+                           vstrings.reserve(vals.size() + 1);
+                           cstrings.reserve(vals.size() + 1);
+
+                           vstrings.emplace_back(commandName.begin(), commandName.end());
+                           vstrings.back().push_back('\0');
+                           cstrings.push_back(vstrings.back().data());
+                           for (const auto& val : vals) {
+                               vstrings.emplace_back(val.begin(), val.end());
+                               vstrings.back().push_back('\0');
+                               cstrings.push_back(vstrings.back().data());
+                           }
+                           localParams.parse(cstrings.size(), cstrings.data());
+                           std::function<RetType(Args...)> func = [mod, localParams, f](Args... args) -> RetType {
+                               ((mod.get())->*f)(localParams, args...);
+                           };
+                           runStandardFunction(func, vals);
+                       });
+        }
+
 
         template<typename ModuleType, typename RetType, typename ... Args>
         void mapCommand(std::string commandName, RetType (ModuleType::*f)(Args... args)) {
@@ -202,8 +241,6 @@ private:
      *
      */
 
-    //this does not have to be a Uber, I'm just using map<string, function>
-    Uber<std::map> commands;
     bool interactive = false;
     std::list<std::shared_ptr<ICommandsDirectory>> commandsDirectory;
 
@@ -245,6 +282,19 @@ public:
 
     }
 
+    template<typename ModuleType, typename ParametersType, typename RetType, typename ... Args>
+    void mapCommand(std::string commandName, RetType (ModuleType::*f)(const ParametersType&, Args... args),
+                    ParametersType params) {
+        //@todo check if commandName is a module name
+        //@todo also check for collsions in creating submodules
+        if (submodules.contains(commandName)) {
+            //@todo exception, return false or sth.
+            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
+        }
+
+        submodule().mapCommand(commandName, f, params);
+    }
+
     template<typename ModuleType, typename RetType>
     void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerType)) {
 
@@ -261,7 +311,7 @@ public:
 
     bool runCommand(const std::string &commandName, ArgumentContainerType arguments) {
 
-        if (submodules.count(commandName) > 0 && arguments.size() > 1) {
+        if (submodules.contains(commandName) && arguments.size() > 1) {
             //@todo type
             std::vector<std::string> newArguments(arguments.begin() + 1, arguments.end());
             std::string newCommand = (*arguments.begin());
@@ -375,12 +425,21 @@ public:
     ////////////////////////////////
     /// Commands section
     ////////////////////////////////
+
     void testingMethodInt(int a) {
         LOGGER("Command testing method INT " + std::to_string(a));
     }
 
     void testingMethodIntFloat(int a, float b) {
         LOGGER("Command testing method INT FLOAT " + std::to_string(a) + " " + std::to_string(b));
+    }
+
+    struct CommandPP : public ProgramParameters {
+        Parameter<int> a = {'a', "aaa", "NUM", "IntegerParameter"};
+    };
+
+    void parametersTestingCommand(const CommandPP& params) {
+        LOGGER("got params " + std::to_string(params.a()));
     }
 
 

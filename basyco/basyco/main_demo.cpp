@@ -76,6 +76,7 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapRawCommand("bg", &CommandModule::runInBackground);
     cmd->mapCommand("fireTrigV", &BasicModule::fireTriggerValue<std::string, std::string>);
     cmd->mapCommand("fireTrig", &BasicModule::fireTrigger<std::string>);
+    cmd->mapCommand("aaa", &CommandModule::parametersTestingCommand, CommandModule::CommandPP{});
 //    cmd->mapCommand("requestResource", &RepoModule::requestStoragePath);
 //    cmd->mapCommand("beginTransfer", &FilesystemModule::beginTransferTest);
 //    cmd->submodule("help").mapCommand("cmdList",&CommandModule::listCommands);

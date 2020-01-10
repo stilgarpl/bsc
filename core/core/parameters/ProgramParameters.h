@@ -38,6 +38,8 @@ private:
 
         void parse(int argc, char* argv[]);
 
+        static char* helpFilter(int key, const char* text, void* input);
+
         auto& gerParsedArguments() {
             return parsedArguments;
         }
@@ -218,6 +220,10 @@ public:
         if (!value.has_value()) {
             value.emplace(); // default value wasn't provided so return whatever default constructed value is.
         }
+        return value.value();
+    }
+
+    const T& operator()() const {
         return value.value();
     }
 
