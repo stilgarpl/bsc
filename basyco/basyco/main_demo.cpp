@@ -38,12 +38,15 @@ void setupModules(Node &node) {
 
 void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("t2", &CommandModule::testingMethodInt);
-    cmd->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
-    cmd->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
+    cmd->group("tt").mapCommand("t2", &CommandModule::testingMethodInt);
+    cmd->group("tt").group("xx").mapCommand("tx", &CommandModule::testingMethodInt);
+    cmd->group("tt").handler<CommandModule::CommandPP>([](auto properties) {
+        LOGGER("handler" + std::to_string(properties.a().value_or(-1)));
+    });
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
     cmd->mapCommand("connect", &NetworkModule::connectTo);
     cmd->mapCommand("connectTo", &NetworkModule::connectToNode);
-    cmd->mapCommand<NetworkModule, RemoteNode &, const NodeIdType &>("getnode", &NetworkModule::getRemoteNode);
+    cmd->mapCommand<NetworkModule, RemoteNode&, const NodeIdType&>("getnode", &NetworkModule::getRemoteNode);
     cmd->mapCommand("disconnect", &NetworkModule::disconnect);
     cmd->mapCommand("print", &NetworkModule::printConnections);
 //    cmd->mapCommand("update", &network:prin:updateNodeConnectionInfo);

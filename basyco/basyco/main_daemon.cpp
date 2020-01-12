@@ -26,12 +26,12 @@ void setupModules(Node &node) {
 //@todo commands should be setDirect up by submodule, right now they are redeclared in every main
 void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("t2", &CommandModule::testingMethodInt);
-    cmd->submodule("tt").mapCommand("t2", &CommandModule::testingMethodInt);
-    cmd->submodule("tt").submodule("xx").mapCommand("tx", &CommandModule::testingMethodInt);
+    cmd->group("tt").mapCommand("t2", &CommandModule::testingMethodInt);
+    cmd->group("tt").group("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
     cmd->mapCommand("connect", &NetworkModule::connectTo);
     cmd->mapCommand("connectTo", &NetworkModule::connectToNode);
-    cmd->mapCommand<NetworkModule, RemoteNode &, const NodeIdType &>("getnode", &NetworkModule::getRemoteNode);
+    cmd->mapCommand<NetworkModule, RemoteNode&, const NodeIdType&>("getnode", &NetworkModule::getRemoteNode);
     cmd->mapCommand("disconnect", &NetworkModule::disconnect);
     cmd->mapCommand("print", &NetworkModule::printConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);

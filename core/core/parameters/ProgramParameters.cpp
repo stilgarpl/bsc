@@ -8,13 +8,6 @@
 #include "ProgramParameters.h"
 
 
-void ProgramParameters::parse(int argc, char** argv) {
-
-    parser->prepareParser(usageDocs, beforeInfo, afterInfo);
-    parser->parse(argc, argv);
-
-}
-
 
 ProgramParameters::ProgramParameters() : parser(parserBuilder().make()) {
 
@@ -45,7 +38,7 @@ error_t ProgramParameters::Parser::parseArgument(int key, char* arg, struct argp
             {
                 auto next = state->next;
                 state->next = state->argc;
-                while (state->argv[next]) {
+                while (next < state->argc && state->argv[next]) {
                     self->parsedArguments.emplace_back(state->argv[next]);
                     next++;
                 }
@@ -100,7 +93,7 @@ void ProgramParameters::Parser::prepareParser(std::vector<std::string> usage, co
     //close argOptions:
     argpOptions.push_back({nullptr, 0, nullptr, 0, nullptr, 0});
     if (before || after) {
-        doc = before.value_or("") + "\v" + after.value_or("");
+        doc = before.value_or(" ") + "\v" + after.value_or("");
     }
 
 
@@ -123,3 +116,4 @@ char* ProgramParameters::Parser::helpFilter(int key, const char* text, void* inp
     }
     return nullptr;
 }
+

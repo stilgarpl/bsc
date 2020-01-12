@@ -22,7 +22,9 @@
 
 class CommandModule : public NodeModuleDependent<CommandModule, NetworkModule> {
 public:
-    typedef const std::vector<std::string> &ArgumentContainerType;
+    using ArgumentContainerType = std::vector<std::string>;
+    typedef const ArgumentContainerType& ArgumentContainerTypeRef;
+
 public:
 
     class SubModule {
@@ -34,9 +36,10 @@ public:
         public:
             explicit CommandData(std::string commandName);
 
-            virtual void applyCommand(CommandModule &commandModule) = 0;
+            virtual void applyCommand(CommandModule& commandModule) = 0;
 
-            const std::string &getCommandName() const;
+            const std::string& getCommandName() const;
+
             virtual ~CommandData() = default;
 
         };
@@ -102,28 +105,39 @@ public:
         }
     };
 
-    class CommandSubModule {
+    class CommandGroup {
     private:
 //        Uber<std::map> commands;
-        std::map<std::string, std::function<void(ArgumentContainerType)>> commands;
-        CommandModule &parent;
-        std::map<std::string, std::shared_ptr<CommandSubModule>> submodules;
+        std::map<std::string, std::function<void(ArgumentContainerTypeRef)>> commands{};
+        CommandModule& parent;
+        std::map<std::string, std::shared_ptr<CommandGroup>> groups{};
+        std::function<ArgumentContainerType(ArgumentContainerTypeRef)> groupHandler;
 
     private:
-        auto &getCommandMap() {
+        auto& getCommandMap() {
             //return commands.get<std::string, std::function<void(ArgumentContainerType)>>();
             return commands;
         }
 
     public:
-        explicit CommandSubModule(CommandModule &parent) : parent(parent) {}
+        explicit CommandGroup(CommandModule& parent) : parent(parent) {}
 
-        CommandSubModule &submodule(std::string name);
+        CommandGroup& group(std::string name);
+
+        template<ParametersClass ParametersType>
+        void handler(std::function<void(const ParametersType&)> handlerFunc) {
+            groupHandler = [handlerFunc](ArgumentContainerTypeRef arguments) {
+                auto parameters = ProgramParameters::parse<ParametersType>(arguments);
+                handlerFunc(parameters); //@todo return value? success? failure? anything?
+                return parameters.arguments();
+
+            };
+        }
 
     protected:
         ///template <typename ReturnType, typename ... Args>
         bool mapCommand(const std::string& prefix, const std::string& commandName,
-                        const std::function<void(ArgumentContainerType)>& func) {
+                        const std::function<void(ArgumentContainerTypeRef)>& func) {
             std::string key = prefix + ":::" + commandName;
             auto& map = getCommandMap();//commands.get<std::string, std::function<void(ArgumentContainerType)>>();
             map[key] = func;
@@ -132,7 +146,7 @@ public:
 
     public:
 
-        template<typename ModuleType, typename ParametersType, typename RetType, typename ... Args>
+        template<typename ModuleType, ParametersClass ParametersType, typename RetType, typename ... Args>
         void mapCommand(std::string commandName, RetType (ModuleType::*f)(const ParametersType&, Args... args),
                         ParametersType params) {
             parent.addRequiredDependency<ModuleType>();
@@ -142,25 +156,9 @@ public:
             ///std::to_string((long) sizeof...(Args))
             //@todo prefix or sth, problem is that size of args breaks raw functions that are random
             mapCommand(" ", commandName,
-                       [f, mod, commandName](CommandModule::ArgumentContainerType vals) {
-                           ParametersType localParams;
-                           // guarantee contiguous, null terminated strings
-                           std::vector<std::vector<char>> vstrings;
+                       [f, mod, commandName, params](CommandModule::ArgumentContainerTypeRef vals) {
 
-                           // pointers to those strings
-                           std::vector<char*> cstrings;
-                           vstrings.reserve(vals.size() + 1);
-                           cstrings.reserve(vals.size() + 1);
-
-                           vstrings.emplace_back(commandName.begin(), commandName.end());
-                           vstrings.back().push_back('\0');
-                           cstrings.push_back(vstrings.back().data());
-                           for (const auto& val : vals) {
-                               vstrings.emplace_back(val.begin(), val.end());
-                               vstrings.back().push_back('\0');
-                               cstrings.push_back(vstrings.back().data());
-                           }
-                           localParams.parse(cstrings.size(), cstrings.data());
+                           ParametersType localParams = ProgramParameters::parse<ParametersType>(commandName, vals);
                            std::function<RetType(Args...)> func = [mod, localParams, f](Args... args) -> RetType {
                                ((mod.get())->*f)(localParams, args...);
                            };
@@ -178,36 +176,43 @@ public:
             ///std::to_string((long) sizeof...(Args))
             //@todo prefix or sth, problem is that size of args breaks raw functions that are random
             mapCommand(" ", commandName,
-                       [=](CommandModule::ArgumentContainerType vals) {
+                       [=](CommandModule::ArgumentContainerTypeRef vals) {
                            runMemberFunction(*mod, f, vals);
                        });
         }
 
 
         template<typename ModuleType, typename RetType>
-        void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerType)) {
+        void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerTypeRef)) {
             parent.addRequiredDependency<ModuleType>();
             auto mod = parent.node.getModule<ModuleType>();
-            mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerType vals) {
+            mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerTypeRef vals) {
                 (mod.get()->*f)(vals);
             });
         }
 
-        bool runCommand(const std::string &commandName, ArgumentContainerType arguments) {
-            //@todo integrate duplicate code with CommandModule somehow
-            if (submodules.count(commandName) > 0 && arguments.size() > 1) {
-                //command is a submodule, redirecting
-                //@todo type
-                std::vector<std::string> newArguments(arguments.begin() + 1, arguments.end());
-                std::string newCommand = (*arguments.begin());
-                return submodule(commandName).runCommand(newCommand, newArguments);
-                // return false;
+        bool runCommand(const std::string& commandName, ArgumentContainerTypeRef arguments) {
+            if (groups.contains(commandName)) {
+                auto& thisGroup = groups[commandName];
+                ArgumentContainerTypeRef realArguments = thisGroup->groupHandler ? thisGroup->groupHandler(arguments)
+                                                                                 : arguments;
+                if (realArguments.size() > 1) {
+                    //command is a submodule, redirecting
+                    //@todo type
+                    std::vector<std::string> newArguments(realArguments.begin() + 1, realArguments.end());
+                    std::string newCommand = (*realArguments.begin());
+                    return group(commandName).runCommand(newCommand, newArguments);
+                    // return false;
+                } else {
+                    //command group invoked without any arguments
+                    return false;
+                }
             } else {
                 //command is mapped to this module, execute
                 std::string prefix = " "; //@todo raw pointers and this is colliding std::to_string(arguments.size());
                 LOGGER("Running module " + prefix + " command " + commandName);
                 std::string key = prefix + ":::" + commandName;
-                auto &map = getCommandMap();
+                auto& map = getCommandMap();
                 if (map.count(key) == 0) {
                     LOGGER("FAILURE");
                     return false;
@@ -221,7 +226,7 @@ public:
 
         auto getCommands() {
             std::list<std::string> retVal;
-            auto &map = getCommandMap();
+            auto& map = getCommandMap();
             for ([[maybe_unused]]auto &&[key, value] : map) {
                 retVal.push_back(key);
             }
@@ -244,23 +249,24 @@ private:
     bool interactive = false;
     std::list<std::shared_ptr<ICommandsDirectory>> commandsDirectory;
 
-    std::map<std::string, std::unique_ptr<CommandSubModule>> submodules;
-    CommandSubModule defaultSubModule;
+//    std::map<std::string, std::unique_ptr<CommandGroup>> commandGroups;
+    CommandGroup defaultCommandGroup;
 
 public:
 
     void prepareSubmodules() override;
 
-    CommandSubModule& submodule(const std::string& name) {
-        if (!submodules.contains(name)) {
-            submodules[name] = std::make_unique<CommandSubModule>(*this);
-        }
-
-        return *submodules[name];
+    CommandGroup& group(const std::string& name) {
+//        if (!commandGroups.contains(name)) {
+//            commandGroups[name] = std::make_unique<CommandGroup>(*this);
+//        }
+//
+//        return *commandGroups[name];
+        return defaultCommandGroup.group(name);
     }
 
-    CommandSubModule& submodule() {
-        return defaultSubModule;
+    CommandGroup& group() {
+        return defaultCommandGroup;
     }
 
 
@@ -273,12 +279,12 @@ public:
 
         //@todo check if commandName is a module name
         //@todo also check for collsions in creating submodules
-        if (submodules.contains(commandName)) {
-            //@todo exception, return false or sth.
-            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
-        }
+//        if (commandGroups.contains(commandName)) {
+//            //@todo exception, return false or sth.
+//            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
+//        }
 
-        submodule().mapCommand(commandName, f);
+        group().mapCommand(commandName, f);
 
     }
 
@@ -287,46 +293,38 @@ public:
                     ParametersType params) {
         //@todo check if commandName is a module name
         //@todo also check for collsions in creating submodules
-        if (submodules.contains(commandName)) {
-            //@todo exception, return false or sth.
-            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
-        }
+//        if (commandGroups.contains(commandName)) {
+//            //@todo exception, return false or sth.
+//            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
+//        }
 
-        submodule().mapCommand(commandName, f, params);
+        group().mapCommand(commandName, f, params);
     }
 
     template<typename ModuleType, typename RetType>
-    void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerType)) {
+    void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerTypeRef)) {
 
         //@todo check if commandName is a module name
         //@todo also check for collsions in creating submodules
-        if (submodules.count(commandName) > 0) {
-            //@todo exception, return false or sth.
-            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
-        }
+//        if (commandGroups.count(commandName) > 0) {
+//            //@todo exception, return false or sth.
+//            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
+//        }
 
-        submodule().mapRawCommand(commandName, f);
+        group().mapRawCommand(commandName, f);
 
     }
 
-    bool runCommand(const std::string &commandName, ArgumentContainerType arguments) {
-
-        if (submodules.contains(commandName) && arguments.size() > 1) {
-            //@todo type
-            std::vector<std::string> newArguments(arguments.begin() + 1, arguments.end());
-            std::string newCommand = (*arguments.begin());
-            return submodule(commandName).runCommand(newCommand, newArguments);
-        } else {
-
-            return submodule().runCommand(commandName, arguments);
-        }
+    bool runCommand(const std::string& commandName, ArgumentContainerTypeRef arguments) {
+        return group().runCommand(commandName, arguments);
+//        }
     }
 
-    void setupActions(ILogicModule::SetupActionHelper &actionHelper) override;
+    void setupActions(ILogicModule::SetupActionHelper& actionHelper) override;
 
-    bool assignActions(ILogicModule::AssignActionHelper &actionHelper) override;
+    bool assignActions(ILogicModule::AssignActionHelper& actionHelper) override;
 
-    bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
+    bool setupSources(ILogicModule::SetupSourceHelper& sourceHelper) override;
 
 private:
     static std::vector<std::string> explode(std::string const& s, char delim) {
@@ -344,15 +342,15 @@ private:
 public:
 
 
-    void runLine(const std::string &line) {
+    void runLine(const std::string& line) {
         LOGGER("Command: " + line);
         //explode command into words
         auto words = explode(line, ' ');
 
-        std::string module = "";
+        std::string groupOrCommandName = "";
         //  std::string commandName = "";
         std::vector<std::string> data;
-        if (!words.empty()) module = words[0];
+        if (!words.empty()) groupOrCommandName = words[0];
         //if (words.size() > 1) commandName = words[1];
         if (words.size() > 1) {
             auto b = words.begin() + 1;
@@ -361,8 +359,8 @@ public:
         }
 
         try {
-            runCommand(module, data);
-        } catch (const IncorrectParametersException &e) {
+            runCommand(groupOrCommandName, data);
+        } catch (const IncorrectParametersException& e) {
             LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " +
                    std::to_string(e.gotParameters));
         }
@@ -398,15 +396,15 @@ public:
 
     void initialize() override;
 
-    void sendRemoteCommand(ArgumentContainerType args);
+    void sendRemoteCommand(ArgumentContainerTypeRef args);
 
-    void sendCommandToRemoteNode(RemoteNode &remoteNode, ArgumentContainerType args);
+    void sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentContainerTypeRef args);
 
-    void broadcastRemoteCommand(ArgumentContainerType args);
+    void broadcastRemoteCommand(ArgumentContainerTypeRef args);
 
-    void runInBackground(ArgumentContainerType args);
+    void runInBackground(ArgumentContainerTypeRef args);
 
-    void runScript(const fs::path &scriptPath) {
+    void runScript(const fs::path& scriptPath) {
         if (fs::exists(scriptPath)) {
             std::string line;
             std::ifstream stream(scriptPath);
@@ -438,9 +436,7 @@ public:
         Parameter<int> a = {'a', "aaa", "NUM", "IntegerParameter"};
     };
 
-    void parametersTestingCommand(const CommandPP& params) {
-        LOGGER("got params " + std::to_string(params.a()));
-    }
+    void parametersTestingCommand(const CommandPP& params);
 
 
     void listCommands() {

@@ -14,6 +14,12 @@
 #include <utility>
 #include "core/parser/FromString.h"
 
+
+class ProgramParameters;
+
+template<typename T>
+concept ParametersClass = std::is_base_of_v<ProgramParameters, T>;
+
 class ProgramParameters {
 private:
     class ParserBuilder;
@@ -38,6 +44,7 @@ private:
 
         void parse(int argc, char* argv[]);
 
+
         static char* helpFilter(int key, const char* text, void* input);
 
         auto& gerParsedArguments() {
@@ -45,6 +52,8 @@ private:
         }
 
         friend class ProgramParameters::ParserBuilder;
+
+
     };
 
     class ParserBuilder {
@@ -104,9 +113,7 @@ private:
 
 
     const std::shared_ptr<Parser> parser;
-    std::vector<std::string> usageDocs;
-    std::optional<std::string> beforeInfo;
-    std::optional<std::string> afterInfo;
+
 
     template<typename T>
     friend
@@ -131,21 +138,59 @@ private:
 public:
     ProgramParameters();
 
-    void parse(int argc, char* argv[]);
+    struct DocsAndInfo {
+        std::vector<std::string> usageDocs;
+        std::optional<std::string> beforeInfo;
+        std::optional<std::string> afterInfo;
+    };
 
-    void usage(std::string usg) {
-        usageDocs.push_back(usg);
+    template<ParametersClass T>
+    [[nodiscard]] static T parse(int argc, char* argv[], DocsAndInfo docsAndInfo = {}) {
+        T t;
+        t.parser->prepareParser(docsAndInfo.usageDocs, docsAndInfo.beforeInfo, docsAndInfo.afterInfo);
+        t.parser->parse(argc, argv);
+        return t;
     }
 
-    void before(std::string b) {
-        beforeInfo = b;
+    template<ParametersClass T>
+    [[nodiscard]] static T parse(const std::vector<std::string>& vals) {
+        std::string empty;
+        return parse<T>(empty, vals);
     }
 
-    void after(std::string a) {
-        afterInfo = a;
+    template<ParametersClass T>
+    [[nodiscard]] static T parse(const std::string& commandName, const std::vector<std::string>& vals) {
+        // guarantee contiguous, null terminated strings
+        std::vector<std::vector<char>> vstrings;
+        // pointers to those strings
+        std::vector<char*> cstrings;
+        vstrings.reserve(vals.size() + 1);
+        cstrings.reserve(vals.size() + 1);
+
+        vstrings.emplace_back(commandName.begin(), commandName.end());
+        vstrings.back().push_back('\0');
+        cstrings.push_back(vstrings.back().data());
+        for (const auto& val : vals) {
+            vstrings.emplace_back(val.begin(), val.end());
+            vstrings.back().push_back('\0');
+            cstrings.push_back(vstrings.back().data());
+        }
+        return parse<T>(cstrings.size(), cstrings.data());
     }
 
-    const std::vector<std::string>& arguments() {
+//    void usage(std::string usg) {
+//        usageDocs.push_back(usg);
+//    }
+//
+//    void before(std::string b) {
+//        beforeInfo = b;
+//    }
+//
+//    void after(std::string a) {
+//        afterInfo = a;
+//    }
+
+    [[nodiscard]]  const std::vector<std::string>& arguments() {
         return parser->gerParsedArguments();
     }
 
@@ -216,18 +261,11 @@ public:
         builder.addOption(longKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
     }
 
-    const T& operator()() {
-        if (!value.has_value()) {
-            value.emplace(); // default value wasn't provided so return whatever default constructed value is.
-        }
-        return value.value();
+    const decltype(value)& operator()() const {
+        return value;
     }
 
-    const T& operator()() const {
-        return value.value();
-    }
-
-    int count() {
+    int count() const {
         return counter;
     }
 
@@ -297,12 +335,6 @@ public:
                                                                                                          doc, true,
                                                                                                          false) {}
 
-public:
-
-    const std::optional<T>& operator()() {
-        return this->value;
-    }
-
 };
 
 template<>
@@ -321,11 +353,6 @@ public:
 
     OptionalParameter(const char* longKey, const char* doc) : BaseParameter<bool>(longKey, nullptr, doc, true, false) {}
 
-public:
-
-    const std::optional<bool>& operator()() {
-        return this->value;
-    }
 
 };
 

@@ -14,7 +14,7 @@
 #include "CommandInputOutputContext.h"
 
 CommandModule::CommandModule(INode& node) : NodeModuleDependent(node, "command"),
-                                            defaultSubModule(*this) {
+                                            defaultCommandGroup(*this) {
 
     setRequired<BasicModule>();
 }
@@ -66,7 +66,7 @@ void CommandModule::initialize() {
     }
 }
 
-void CommandModule::sendRemoteCommand(ArgumentContainerType args) {
+void CommandModule::sendRemoteCommand(ArgumentContainerTypeRef args) {
     LOGGER("send remote")
     //@todo add checking if the number of parameters is correct
     if (args.size() >= 2) {
@@ -95,7 +95,7 @@ void CommandModule::sendRemoteCommand(ArgumentContainerType args) {
     }
 }
 
-void CommandModule::sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentContainerType args) {
+void CommandModule::sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentContainerTypeRef args) {
     //@todo unify this and sendRemoteCommand
     LOGGER("send remote")
     //@todo add checking if the number of parameters is correct
@@ -154,11 +154,12 @@ void CommandModule::broadcastRemoteCommand(const std::vector<std::string>& args)
 }
 
 void CommandModule::runInBackground(const std::vector<std::string>& args) {
-    //@todo think about mutexes and thread safety
+
     if (args.size() >= 1) {
         std::string command = args[0];
         std::vector<std::string> rest(args.begin() + 1, args.end());
         auto activeContext = Context::getActiveContext();
+        //@todo think about mutexes and thread safety
         std::thread([this, command, rest, activeContext] {
             Context::setActiveContext(activeContext);
             this->runCommand(command, rest);
@@ -191,13 +192,19 @@ void CommandModule::prepareSubmodules() {
 
 }
 
+void CommandModule::parametersTestingCommand(const CommandModule::CommandPP& params) {
+    auto& io = Context::getActiveContext()->get<InputOutputContext>();
 
-CommandModule::CommandSubModule& CommandModule::CommandSubModule::submodule(std::string name) {
-    if (submodules.count(name) == 0) {
-        submodules[name] = std::make_shared<CommandSubModule>(parent);
+    io.out() << std::string("got params " + std::to_string(params.a().value_or(-1)));
+}
+
+
+CommandModule::CommandGroup& CommandModule::CommandGroup::group(std::string name) {
+    if (groups.count(name) == 0) {
+        groups[name] = std::make_shared<CommandGroup>(parent);
     }
 
-    return *submodules[name];
+    return *groups[name];
 }
 
 CommandModule::SubModule::CommandData::CommandData(std::string commandName) : commandName(std::move(commandName)) {}
