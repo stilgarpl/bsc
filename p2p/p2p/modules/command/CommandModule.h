@@ -23,7 +23,25 @@
 class CommandModule : public NodeModuleDependent<CommandModule, NetworkModule> {
 public:
     using ArgumentContainerType = std::vector<std::string>;
-    typedef const ArgumentContainerType& ArgumentContainerTypeRef;
+    using ArgumentContainerTypeRef = const ArgumentContainerType&;
+    enum class CommandExecutionStatus {
+        success,
+        notEnoughArguments,
+        tooManyArguments,
+        noCommand,
+        badCommand,
+    };
+private:
+
+    struct GroupHandlerResult {
+        CommandExecutionStatus status;
+        ArgumentContainerType arguments;
+    };
+public:
+    class CommandGroup;
+
+private:
+    using InternalGroupHandlerFunc = std::function<GroupHandlerResult(ArgumentContainerTypeRef, const CommandGroup&)>;
 
 public:
 
@@ -108,10 +126,11 @@ public:
     class CommandGroup {
     private:
 //        Uber<std::map> commands;
-        std::map<std::string, std::function<void(ArgumentContainerTypeRef)>> commands{};
+        std::map<std::string, std::function<CommandExecutionStatus(ArgumentContainerTypeRef)>> commands{};
         CommandModule& parent;
         std::map<std::string, std::shared_ptr<CommandGroup>> groups{};
-        std::function<ArgumentContainerType(ArgumentContainerTypeRef)> groupHandler;
+        InternalGroupHandlerFunc groupHandler;
+        bool isDefaultHandler = true;
 
     private:
         auto& getCommandMap() {
@@ -119,29 +138,48 @@ public:
             return commands;
         }
 
+        const auto& getCommandMap() const {
+            //return commands.get<std::string, std::function<void(ArgumentContainerType)>>();
+            return commands;
+        }
+
+        template<ParametersClass ParametersType>
+        void setDefaultGroupHandler(const InternalGroupHandlerFunc& newGroupHandler) {
+            if (!groupHandler || isDefaultHandler) {
+                groupHandler = newGroupHandler;
+                isDefaultHandler = true;
+            }
+            std::for_each(groups.begin(), groups.end(), [&newGroupHandler](auto& i) {
+                i.second->template setDefaultGroupHandler<ParametersType>(newGroupHandler);
+            });
+
+        }
+
     public:
-        explicit CommandGroup(CommandModule& parent) : parent(parent) {}
+        explicit CommandGroup(CommandModule& parent) : parent(parent) {
+        }
 
         CommandGroup& group(std::string name);
 
         template<ParametersClass ParametersType>
-        void handler(std::function<void(const ParametersType&)> handlerFunc) {
-            groupHandler = [handlerFunc](ArgumentContainerTypeRef arguments) {
+        void handler(std::function<CommandExecutionStatus(const ParametersType&)> handlerFunc) {
+            groupHandler = [handlerFunc](ArgumentContainerTypeRef arguments,
+                                         const CommandModule::CommandGroup& group) -> GroupHandlerResult {
                 auto parameters = ProgramParameters::parse<ParametersType>(arguments);
-                handlerFunc(parameters); //@todo return value? success? failure? anything?
-                return parameters.arguments();
+                auto status = handlerFunc(parameters, group);
+                return {status, parameters.arguments()};
 
             };
+            isDefaultHandler = false;
         }
 
     protected:
         ///template <typename ReturnType, typename ... Args>
-        bool mapCommand(const std::string& prefix, const std::string& commandName,
-                        const std::function<void(ArgumentContainerTypeRef)>& func) {
+        void mapCommand(const std::string& prefix, const std::string& commandName,
+                        const std::function<CommandExecutionStatus(ArgumentContainerTypeRef)>& func) {
             std::string key = prefix + ":::" + commandName;
             auto& map = getCommandMap();//commands.get<std::string, std::function<void(ArgumentContainerType)>>();
             map[key] = func;
-            return true;
         }
 
     public:
@@ -162,7 +200,16 @@ public:
                            std::function<RetType(Args...)> func = [mod, localParams, f](Args... args) -> RetType {
                                ((mod.get())->*f)(localParams, args...);
                            };
-                           runStandardFunction(func, vals);
+                           try {
+                               runStandardFunction(func, vals);
+                           } catch (const IncorrectParametersException& e) {
+                               if (e.requiredParameters > e.gotParameters) {
+                                   return CommandExecutionStatus::notEnoughArguments;
+                               } else {
+                                   return CommandExecutionStatus::tooManyArguments;
+                               }
+                           }
+                           return CommandExecutionStatus::success;
                        });
         }
 
@@ -177,7 +224,16 @@ public:
             //@todo prefix or sth, problem is that size of args breaks raw functions that are random
             mapCommand(" ", commandName,
                        [=](CommandModule::ArgumentContainerTypeRef vals) {
-                           runMemberFunction(*mod, f, vals);
+                           try {
+                               runMemberFunction(*mod, f, vals);
+                           } catch (const IncorrectParametersException& e) {
+                               if (e.requiredParameters > e.gotParameters) {
+                                   return CommandExecutionStatus::notEnoughArguments;
+                               } else {
+                                   return CommandExecutionStatus::tooManyArguments;
+                               }
+                           }
+                           return CommandExecutionStatus::success;
                        });
         }
 
@@ -188,24 +244,32 @@ public:
             auto mod = parent.node.getModule<ModuleType>();
             mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerTypeRef vals) {
                 (mod.get()->*f)(vals);
+                return CommandExecutionStatus::success;
             });
         }
 
-        bool runCommand(const std::string& commandName, ArgumentContainerTypeRef arguments) {
+        CommandExecutionStatus runCommand(const std::string& commandName, ArgumentContainerTypeRef arguments) {
             if (groups.contains(commandName)) {
                 auto& thisGroup = groups[commandName];
-                ArgumentContainerTypeRef realArguments = thisGroup->groupHandler ? thisGroup->groupHandler(arguments)
-                                                                                 : arguments;
-                if (realArguments.size() > 1) {
-                    //command is a submodule, redirecting
-                    //@todo type
-                    std::vector<std::string> newArguments(realArguments.begin() + 1, realArguments.end());
-                    std::string newCommand = (*realArguments.begin());
-                    return group(commandName).runCommand(newCommand, newArguments);
-                    // return false;
+                //@todo optimize this, arguments are copied and copied...
+                auto handlerResult = thisGroup->groupHandler ? thisGroup->groupHandler(arguments, *thisGroup)
+                                                             : GroupHandlerResult{CommandExecutionStatus::success,
+                                                                                  arguments};
+                if (handlerResult.status == CommandExecutionStatus::success) {
+                    ArgumentContainerTypeRef realArguments = handlerResult.arguments;
+                    if (realArguments.size() > 1) {
+                        //command is a submodule, redirecting
+                        //@todo type
+                        std::vector<std::string> newArguments(realArguments.begin() + 1, realArguments.end());
+                        std::string newCommand = (*realArguments.begin());
+                        return group(commandName).runCommand(newCommand, newArguments);
+                    } else {
+                        //command group invoked without any arguments
+                        return CommandExecutionStatus::noCommand;
+                    }
                 } else {
-                    //command group invoked without any arguments
-                    return false;
+                    //handler stopped the execution
+                    return handlerResult.status;
                 }
             } else {
                 //command is mapped to this module, execute
@@ -213,29 +277,29 @@ public:
                 LOGGER("Running module " + prefix + " command " + commandName);
                 std::string key = prefix + ":::" + commandName;
                 auto& map = getCommandMap();
-                if (map.count(key) == 0) {
+                if (!map.contains(key)) {
                     LOGGER("FAILURE");
-                    return false;
+                    return CommandExecutionStatus::badCommand;
                 } else {
-                    map[key](arguments);
-                    LOGGER("SUCCESS")
-                    return true;
+                    return map[key](arguments);
+
                 }
             }
         }
 
-        auto getCommands() {
+        [[nodiscard]] auto getCommands() const {
             std::list<std::string> retVal;
             auto& map = getCommandMap();
             for ([[maybe_unused]]auto &&[key, value] : map) {
                 retVal.push_back(key);
             }
+            return retVal;
         }
 
-
+        friend class CommandModule;
     };
 
-    friend class CommandSubModule;
+    friend class CommandGroup;
 
 private:
 
@@ -247,21 +311,31 @@ private:
      */
 
     bool interactive = false;
-    std::list<std::shared_ptr<ICommandsDirectory>> commandsDirectory;
 
-//    std::map<std::string, std::unique_ptr<CommandGroup>> commandGroups;
     CommandGroup defaultCommandGroup;
+    InternalGroupHandlerFunc defaultGroupHandler;
 
 public:
+
+    template<ParametersClass ParametersType>
+    void setDefaultGroupHandler(std::function<CommandExecutionStatus(const ParametersType&,
+                                                                     const CommandModule::CommandGroup&)> handlerFunc) {
+        //@todo unify duplicated code with CommandGroup
+        defaultGroupHandler = [handlerFunc](ArgumentContainerTypeRef arguments,
+                                            const CommandModule::CommandGroup& group) -> GroupHandlerResult {
+            auto parameters = ProgramParameters::parse<ParametersType>(arguments);
+            auto status = handlerFunc(parameters, group);
+            return {status, parameters.arguments()};
+
+        };
+        defaultCommandGroup.setDefaultGroupHandler<ParametersType>(defaultGroupHandler);
+    }
+
 
     void prepareSubmodules() override;
 
     CommandGroup& group(const std::string& name) {
-//        if (!commandGroups.contains(name)) {
-//            commandGroups[name] = std::make_unique<CommandGroup>(*this);
-//        }
-//
-//        return *commandGroups[name];
+
         return defaultCommandGroup.group(name);
     }
 
@@ -277,13 +351,6 @@ public:
     template<typename ModuleType, typename RetType, typename ... Args>
     void mapCommand(std::string commandName, RetType (ModuleType::*f)(Args... args)) {
 
-        //@todo check if commandName is a module name
-        //@todo also check for collsions in creating submodules
-//        if (commandGroups.contains(commandName)) {
-//            //@todo exception, return false or sth.
-//            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
-//        }
-
         group().mapCommand(commandName, f);
 
     }
@@ -291,12 +358,6 @@ public:
     template<typename ModuleType, typename ParametersType, typename RetType, typename ... Args>
     void mapCommand(std::string commandName, RetType (ModuleType::*f)(const ParametersType&, Args... args),
                     ParametersType params) {
-        //@todo check if commandName is a module name
-        //@todo also check for collsions in creating submodules
-//        if (commandGroups.contains(commandName)) {
-//            //@todo exception, return false or sth.
-//            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
-//        }
 
         group().mapCommand(commandName, f, params);
     }
@@ -304,18 +365,11 @@ public:
     template<typename ModuleType, typename RetType>
     void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerTypeRef)) {
 
-        //@todo check if commandName is a module name
-        //@todo also check for collsions in creating submodules
-//        if (commandGroups.count(commandName) > 0) {
-//            //@todo exception, return false or sth.
-//            LOGGER("You are trying to add a command that has exactly same name as existing submodule. It won't work.")
-//        }
-
         group().mapRawCommand(commandName, f);
 
     }
 
-    bool runCommand(const std::string& commandName, ArgumentContainerTypeRef arguments) {
+    CommandExecutionStatus runCommand(const std::string& commandName, ArgumentContainerTypeRef arguments) {
         return group().runCommand(commandName, arguments);
 //        }
     }
@@ -390,9 +444,6 @@ public:
 
     void setInteractive(bool interactive);
 
-    void addCommandsDirectory(std::shared_ptr<ICommandsDirectory> c) {
-        commandsDirectory.push_back(c);
-    }
 
     void initialize() override;
 

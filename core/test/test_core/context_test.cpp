@@ -63,6 +63,10 @@ public:
         return stream;
     }
 
+    std::ostream& err() override {
+        return stream;
+    }
+
     std::istream& in() override {
         return stream;
     }

@@ -83,8 +83,8 @@ error_t ProgramParameters::Parser::parseArgument(int key, char* arg, struct argp
 
 void ProgramParameters::Parser::parse(int argc, char** argv) {
 
-
-    argp_parse(&argParams, argc, argv, ARGP_IN_ORDER, 0, this);
+//@todo add ARGP_SILENT to prevent parsing in CommandModule from crashing the app.
+    argp_parse(&argParams, argc, argv, ARGP_IN_ORDER, nullptr, this);
 }
 
 void ProgramParameters::Parser::prepareParser(std::vector<std::string> usage, const std::optional<std::string>& before,

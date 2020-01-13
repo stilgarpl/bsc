@@ -19,3 +19,11 @@ const std::stringstream& CommandInputOutputContext::getInputStream() const {
 const std::stringstream& CommandInputOutputContext::getOutputStream() const {
     return outputStream;
 }
+
+std::ostream& CommandInputOutputContext::err() {
+    return errorStream;
+}
+
+const std::stringstream& CommandInputOutputContext::getErrorStream() const {
+    return errorStream;
+}

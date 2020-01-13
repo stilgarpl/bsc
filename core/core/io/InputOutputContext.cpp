@@ -14,6 +14,10 @@ std::istream& StandardInputOutputContext::in() {
     return std::cin;
 }
 
+std::ostream& StandardInputOutputContext::err() {
+    return std::cerr;
+}
+
 InputOutputContext& InputOutputContext::active() {
     return Context::getActiveContext()->get<InputOutputContext>();
 

@@ -22,10 +22,9 @@ using namespace std::chrono_literals;
 #include <repo/journal/SimpleJournal.h>
 #include <repo/node/RepoModule.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
-#include <p2p/dependency/Dependency.h>
 #include <p2p/modules/command/CommandModule.h>
-#include <variant>
 #include <p2p/modules/basic/BasicModule.h>
+#include <p2p/modules/command/DefaultCommandGroupParameters.h>
 
 
 void setupModules(Node &node) {
@@ -38,11 +37,14 @@ void setupModules(Node &node) {
 
 void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("t2", &CommandModule::testingMethodInt);
+    cmd->setDefaultGroupHandler<DefaultCommandGroupParameters>(defaultCommandGroupHandler);
     cmd->group("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->group("tt").group("xx").mapCommand("tx", &CommandModule::testingMethodInt);
-    cmd->group("tt").handler<CommandModule::CommandPP>([](auto properties) {
-        LOGGER("handler" + std::to_string(properties.a().value_or(-1)));
-    });
+//    cmd->group("tt").handler<CommandModule::CommandPP>([](auto properties) {
+//        LOGGER("handler" + std::to_string(properties.a().value_or(-1)));
+//        return CommandModule::CommandExecutionStatus::success;
+//    });
+
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
     cmd->mapCommand("connect", &NetworkModule::connectTo);
     cmd->mapCommand("connectTo", &NetworkModule::connectToNode);

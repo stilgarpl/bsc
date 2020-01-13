@@ -61,9 +61,6 @@ void CommandModule::setInteractive(bool interactive) {
 void CommandModule::initialize() {
     NodeModule::initialize();
 
-    for (auto&& directory : commandsDirectory) {
-        directory->configureCommands(*this);
-    }
 }
 
 void CommandModule::sendRemoteCommand(ArgumentContainerTypeRef args) {
@@ -182,7 +179,9 @@ void CommandModule::prepareSubmodules() {
         remoteCommandContext->setDirect<InputOutputContext>(ioContext);
         {
             SetLocalContext localContext(remoteCommandContext);
-            bool runStatus = this->runCommand(request->getCommandName(), request->getData());
+            //@todo better return status handling
+            bool runStatus =
+                    this->runCommand(request->getCommandName(), request->getData()) == CommandExecutionStatus::success;
             CommandPacket::Response::Ptr res = CommandPacket::Response::getNew();
             res->setRunStatus(runStatus);
             res->setOutput(ioContext->getOutputStream().str());
@@ -201,7 +200,10 @@ void CommandModule::parametersTestingCommand(const CommandModule::CommandPP& par
 
 CommandModule::CommandGroup& CommandModule::CommandGroup::group(std::string name) {
     if (groups.count(name) == 0) {
-        groups[name] = std::make_shared<CommandGroup>(parent);
+        auto newGroup = std::make_shared<CommandGroup>(parent);
+        groups[name] = newGroup;
+        newGroup->groupHandler = parent.defaultGroupHandler;
+
     }
 
     return *groups[name];

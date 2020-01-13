@@ -12,6 +12,7 @@
 #include <iostream>
 #include <map>
 #include <utility>
+#include <memory>
 #include "core/parser/FromString.h"
 
 
@@ -190,7 +191,7 @@ public:
 //        afterInfo = a;
 //    }
 
-    [[nodiscard]]  const std::vector<std::string>& arguments() {
+    [[nodiscard]]  const std::vector<std::string>& arguments() const {
         return parser->gerParsedArguments();
     }
 

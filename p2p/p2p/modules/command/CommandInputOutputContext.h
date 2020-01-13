@@ -13,12 +13,17 @@ class CommandInputOutputContext : public InputOutputContext {
 private:
     std::stringstream inputStream;
     std::stringstream outputStream;
+    std::stringstream errorStream;
 public:
     std::ostream& out() override;
+
+    std::ostream& err() override;
 
     std::istream& in() override;
 
     const std::stringstream& getInputStream() const;
+
+    const std::stringstream& getErrorStream() const;
 
     const std::stringstream& getOutputStream() const;
 
