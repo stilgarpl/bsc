@@ -1,5 +1,5 @@
 
-set(SOURCE_FILES parser/parameters/CommandLineParameters.cpp parser/parameters/CommandLineParameters.h parser/parser/FromString.h parser/cast/template_cast.h)
+set(SOURCE_FILES parser/parameters/CommandLineParameters.cpp parser/parameters/CommandLineParameters.h parser/parser/fromString.h parser/cast/templateCast.h parser/parser/explode.h)
 
 add_library(parser ${SOURCE_FILES})
 target_include_directories(parser PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

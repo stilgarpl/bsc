@@ -2,12 +2,13 @@
 // Created by stilgar on 18.11.17.
 //
 
-#ifndef BASYCO_TEMPLATE_CAST_H
-#define BASYCO_TEMPLATE_CAST_H
+#ifndef BASYCO_TEMPLATECAST_H
+#define BASYCO_TEMPLATECAST_H
 
 #include <cstddef>
 #include <utility>
 #include <vector>
+#include <parser/parser/fromString.h>
 //#include "from_string.h"
 
 class IncorrectParametersException {
@@ -38,6 +39,10 @@ static void runStringCast(RetType (* f)(Args...), Strings ... strings) {
     (*f)(fromString<Args>(strings)...);
 }
 
+template<typename RetType, typename ... Args, typename ... Strings>
+static void runStringCast(std::function<RetType(Args...)> f, Strings ... strings) {
+    f(fromString<Args>(strings)...);
+}
 
 template<size_t num_args>
 struct UnpackCaller {
@@ -56,7 +61,7 @@ private:
 
     template<typename RetType, typename ... Args, size_t... I>
     void call(std::function<RetType(Args...)> f, std::vector<std::string>& args, std::index_sequence<I...>) {
-        f(args[I]...);
+        runStringCast(f, args[I]...);
     }
 
 
@@ -104,4 +109,4 @@ void runStandardFunction(std::function<RetType(Args...)> f, std::vector<std::str
 }
 
 
-#endif //BASYCO_TEMPLATE_CAST_H
+#endif //BASYCO_TEMPLATECAST_H
