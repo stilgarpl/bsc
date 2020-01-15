@@ -12,6 +12,7 @@
 #include <core/uber/Uber.h>
 #include <map>
 
+
 class LogicBuilder {
 
     class ITypeRecord {
@@ -35,8 +36,8 @@ class LogicBuilder {
     };
 private:
 
-    Uber<TypeRecord> classRegistry;
-    std::map<std::string,std::unique_ptr<ITypeRecord>> typeMap;
+    bsc::Uber<TypeRecord> classRegistry;
+    std::map<std::string, std::unique_ptr<ITypeRecord>> typeMap;
 
 public:
 

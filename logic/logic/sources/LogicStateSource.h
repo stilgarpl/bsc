@@ -9,11 +9,10 @@
 #include "../ISource.h"
 #include "../events/LogicStateEvent.h"
 #include "AutoSource.h"
-
 #include <core/signal/OrderedExecutor.h>
 #include <core/signal/OrderedExecutionPolicy.h>
 
-MAP_POLICY_TO_EXECUTOR(OrderedExecutionPolicy, OrderedExecutor)
+BSC_MAP_POLICY_TO_EXECUTOR(bsc::OrderedExecutionPolicy, bsc::OrderedExecutor)
 
 class LogicStateSource : public ISource {
 

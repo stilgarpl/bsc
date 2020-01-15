@@ -5,6 +5,7 @@
 #include <core/utils/crypto.h>
 #include "SimpleJournal.h"
 #include "SimpleJournalMetaDataFetcher.h"
+
 #include <core/log/Logger.h>
 
 
@@ -200,7 +201,7 @@ const std::string& SimpleJournal::calculateChecksum() {
 //        oa << *this;
     }
     std::string source = ss.str();
-    hash = calculateSha1OfString(source);
+    hash = bsc::calculateSha1OfString(source);
 //    LOGGER("string is " + source)
 //    LOGGER("hash is " + hash);
     checksum = hash;

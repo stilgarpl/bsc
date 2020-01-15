@@ -8,6 +8,7 @@
 #include "../IEvent.h"
 
 
+
 enum class LogicStateMethod {
     entered,
     left,
@@ -20,7 +21,7 @@ class LogicStateEvent
 public:
     typedef LogicStateMethod Method;
     typedef Object Type;
-    using ExecutionPolicy = OrderedExecutionPolicy;
+    using ExecutionPolicy = bsc::OrderedExecutionPolicy;
 private:
     Object& object;
     Method method = Method::invalid;

@@ -9,8 +9,9 @@
 #include "NetworkActions.h"
 
 
+
 void NetworkActions::updateNetworkInfo(const NetworkInfoEvent &event) {
-    Context::Ptr context = Context::getActiveContext();
+    bsc::Context::Ptr context = bsc::Context::getActiveContext();
     auto& nodeContext = context->get<NodeContext>();
 
         auto &node = nodeContext.getNode();
@@ -26,7 +27,7 @@ void NetworkActions::updateNetworkInfo(const NetworkInfoEvent &event) {
 }
 
 void NetworkActions::saveNetworkInfo(const ModuleEvent<NetworkModule> &event) {
-    Context::Ptr context = Context::getActiveContext();
+    bsc::Context::Ptr context = bsc::Context::getActiveContext();
 //    LOGGER("SAVE NETWORK INFO")
     auto& nodeContext = context->get<NodeContext>();
 
@@ -36,7 +37,7 @@ void NetworkActions::saveNetworkInfo(const ModuleEvent<NetworkModule> &event) {
 }
 
 void NetworkActions::loadNetworkInfo(const ModuleEvent<NetworkModule> &event) {
-    Context::Ptr context = Context::getActiveContext();
+    bsc::Context::Ptr context = bsc::Context::getActiveContext();
 //    LOGGER("LOAD NETWORK INFO")
     auto& nodeContext = context->get<NodeContext>();
 
@@ -54,7 +55,7 @@ void NetworkActions::loadNetworkInfo(const ModuleEvent<NetworkModule> &event) {
 }
 
 void NetworkActions::broadcastPacket(BasePacketPtr packet) {
-    Context::Ptr context = Context::getActiveContext();
+    bsc::Context::Ptr context = bsc::Context::getActiveContext();
     LOGGER("BROADCAST PACKET")
     auto& nodeContext = context->get<NodeContext>();
 

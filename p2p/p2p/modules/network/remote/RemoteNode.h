@@ -15,6 +15,8 @@
 #include <p2p/modules/network/protocol/protocol/IProtocol.h>
 #include <p2p/modules/network/network/RemoteNodeInfo.h>
 #include "p2p/modules/network/remote/exception/NotRequestException.h"
+
+
 #include <atomic>
 #include <variant>
 
@@ -67,7 +69,7 @@ class RemoteNode {
 private:
     RemoteNodeInfo remoteNodeInfo;
     std::shared_ptr<ConnectionFetcher> connectionFetcher = std::make_shared<ConnectionFetcher>(); //it's shared ptr because it's Connection::Observer.
-    Context::OwnPtr _context = Context::makeContext();
+    bsc::Context::OwnPtr _context = bsc::Context::makeContext();
     std::shared_ptr<IProtocol> protocol;
 
 public:
@@ -81,13 +83,13 @@ public:
         connectionFetcher->setConnection(std::move(existingConnection));
     }
 
-    void connect(Connection *existingConnection) {
+    void connect(Connection* existingConnection) {
         connectionFetcher->setConnection(existingConnection);
     }
 
     bool connect();
 
-    Context::Ptr context() { return _context; };
+    bsc::Context::Ptr context() { return _context; };
 protected:
     RemoteNode();
 

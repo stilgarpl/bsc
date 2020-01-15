@@ -24,14 +24,17 @@
 #include <p2p/modules/network/protocol/logic/actions/NetworkActions.h>
 #include "RepoModule.h"
 
+
+using namespace bsc;
+
 //const fs::path RepoModule::repositoryDataPath = fs::path("repository");
 
 
-void RepoModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
+void RepoModule::setupActions(ILogicModule::SetupActionHelper& actionHelper) {
 
 }
 
-bool RepoModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
+bool RepoModule::assignActions(ILogicModule::AssignActionHelper& actionHelper) {
     bool ret = true;
 
     auto updateChainGroup = chainGroup("updateChain");
@@ -341,13 +344,14 @@ IStoragePtr RepoModule::findStorage(const IStorage::StorageId &storageId) {
 }
 
 void RepoModule::initialize() {
-    auto& factoryContext = node.getContext()->get<FactoryContext>();
-    FactoryPtr<IStoragePtr, StorageFactoryByType> storageFactoryPtr = std::make_shared<StorageFactory>(
+    auto& factoryContext = node.getContext()->get<bsc::FactoryContext>();
+    using namespace bsc;
+    FactoryPtr<IStoragePtr, bsc::StorageFactoryByType> storageFactoryPtr = std::make_shared<StorageFactory>(
             getConfigurationManager().getFullDataPath(configuration().getStoragePath()));
-    FactoryPtr<IStoragePtr, StorageFactoryByName> managedStorageFactoryPtr = std::make_shared<ManagedStorageFactory>(
+    FactoryPtr<IStoragePtr, bsc::StorageFactoryByName> managedStorageFactoryPtr = std::make_shared<ManagedStorageFactory>(
             storageManager);
-    factoryContext.setFactory<IStoragePtr, StorageFactoryByType>(storageFactoryPtr);
-    factoryContext.setFactory<IStoragePtr, StorageFactoryByName>(managedStorageFactoryPtr);
+    factoryContext.setFactory<IStoragePtr, bsc::StorageFactoryByType>(storageFactoryPtr);
+    factoryContext.setFactory<IStoragePtr, bsc::StorageFactoryByName>(managedStorageFactoryPtr);
 
     const std::string defaultStorageId = "default";
     auto defaultStorage = storageFactoryPtr->create(defaultStorageId, defaultStorageId);
@@ -355,11 +359,11 @@ void RepoModule::initialize() {
 
 }
 
-IStoragePtr RepoModule::createStorage(const Factory<IStoragePtr, StorageFactoryByType>::SelectorType &storageType,
-                                      const IStorage::StorageId &storageId) {
-    auto& factoryContext = node.getContext()->get<FactoryContext>();
+IStoragePtr RepoModule::createStorage(const Factory<IStoragePtr, bsc::StorageFactoryByType>::SelectorType& storageType,
+                                      const IStorage::StorageId& storageId) {
+    auto& factoryContext = node.getContext()->get<bsc::FactoryContext>();
     //@todo what if factory is null or created storage is null because storageType is wrong?
-    return factoryContext.getFactory<IStoragePtr, StorageFactoryByType>()->create(storageType, storageId);
+    return factoryContext.getFactory<IStoragePtr, bsc::StorageFactoryByType>()->create(storageType, storageId);
 
 }
 

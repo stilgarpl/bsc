@@ -12,41 +12,44 @@
 #include <core/context/Context.h>
 #include <atomic>
 
+
 using namespace std::chrono_literals;
 
-class Runnable {
-private:
-    std::unique_ptr<std::thread> thread;
-    mutable std::mutex startMutex, stopMutex;
-    std::atomic_bool stopping = false;
-    std::atomic_bool finished = false;
-protected:
-    std::condition_variable shutdownSignal;
+namespace bsc {
+    class Runnable {
+    private:
+        std::unique_ptr<std::thread> thread;
+        mutable std::mutex startMutex, stopMutex;
+        std::atomic_bool stopping = false;
+        std::atomic_bool finished = false;
+    protected:
+        std::condition_variable shutdownSignal;
 
-    void waitForStop();
+        void waitForStop();
 
-public:
+    public:
 
-    virtual void run() = 0;
+        virtual void run() = 0;
 
-    virtual void start() final;
+        virtual void start() final;
 
-    virtual void stop() final;
+        virtual void stop() final;
 
-    virtual void join() final;
+        virtual void join() final;
 
-    void operator()(Context::Ptr contextPtr);
+        void operator()(Context::Ptr contextPtr);
 
-    virtual ~Runnable();
+        virtual ~Runnable();
 
-    bool isStopping() const;
+        bool isStopping() const;
 
 
-    //actions:
-    virtual void onStop() {};
+        //actions:
+        virtual void onStop() {};
 
-    virtual void onStart() {};
-};
+        virtual void onStart() {};
+    };
+}
 
 
 #endif //BASYCO_RUNNABLE_H

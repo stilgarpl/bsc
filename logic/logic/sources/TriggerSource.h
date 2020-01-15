@@ -10,6 +10,7 @@
 #include "../events/TriggerEvent.h"
 #include "AutoSource.h"
 
+
 class TriggerSource : public ISource {
 
 private:

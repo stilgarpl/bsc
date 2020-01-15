@@ -16,69 +16,73 @@
 #include <core/log/Logger.h>
 #include <core/context/Context.h>
 
+
 using namespace std::chrono_literals;
 
-template<typename TokenType, typename SenderType>
-class ThreadQueueProcessor {
-public :
-    using Token = TokenType;
-    using SenderTypePtr = std::reference_wrapper<SenderType>;
-    using UpdateFuncType = std::function<void(TokenType, SenderType&)>;
-private:
-    std::queue<std::pair<TokenType, SenderTypePtr>> queue;
-    std::condition_variable queueReady;
-    std::mutex queueLock;
-    std::unique_ptr<std::thread> processorThread;
-    std::atomic_bool running;
-    UpdateFuncType updateFunc;
+namespace bsc {
+    template<typename TokenType, typename SenderType>
+    class ThreadQueueProcessor {
+    public :
+        using Token = TokenType;
+        using SenderTypePtr = std::reference_wrapper<SenderType>;
+        using UpdateFuncType = std::function<void(TokenType, SenderType&)>;
+    private:
+        std::queue<std::pair<TokenType, SenderTypePtr>> queue;
+        std::condition_variable queueReady;
+        std::mutex queueLock;
+        std::unique_ptr<std::thread> processorThread;
+        std::atomic_bool running;
+        UpdateFuncType updateFunc;
 
-public:
+    public:
 
-    void process(TokenType token, SenderTypePtr senderPtr) {
-        auto pair = std::make_pair(token, senderPtr);
-        {
-            std::unique_lock lock(queueLock);
-            queue.push(pair);
+        void process(TokenType token, SenderTypePtr senderPtr) {
+            auto pair = std::make_pair(token, senderPtr);
+            {
+                std::unique_lock lock(queueLock);
+                queue.push(pair);
+            }
+            queueReady.notify_all();
         }
-        queueReady.notify_all();
-    }
 
-protected:
+    protected:
 
-    void work(Context::Ptr contextPtr) {
-        Context::setActiveContext(std::move(contextPtr));
-        while (running) {
-            std::unique_lock g(queueLock);
-            //@todo 1s or other value?
-            queueReady.wait_for(g, 1s, [&]() -> bool { return (!queue.empty() || !running); });
+        void work(Context::Ptr contextPtr) {
+            Context::setActiveContext(std::move(contextPtr));
+            while (running) {
+                std::unique_lock g(queueLock);
+                //@todo 1s or other value?
+                queueReady.wait_for(g, 1s, [&]() -> bool { return (!queue.empty() || !running); });
 
-            while (!queue.empty()) {
-                auto&[token, sender] = queue.front();
-                g.unlock();
-                updateFunc(token, sender);
-                g.lock();
-                queue.pop();
+                while (!queue.empty()) {
+                    auto&[token, sender] = queue.front();
+                    g.unlock();
+                    updateFunc(token, sender);
+                    g.lock();
+                    queue.pop();
+                }
             }
         }
-    }
 
-public:
-    explicit ThreadQueueProcessor(UpdateFuncType update) {
-        running = true;
-        updateFunc = update;
-        processorThread = std::make_unique<std::thread>(&ThreadQueueProcessor::work, this, Context::getActiveContext());
-    }
+    public:
+        explicit ThreadQueueProcessor(UpdateFuncType update) {
+            running = true;
+            updateFunc = update;
+            processorThread = std::make_unique<std::thread>(&ThreadQueueProcessor::work, this,
+                                                            Context::getActiveContext());
+        }
 
 
-public:
-    virtual ~ThreadQueueProcessor() {
-        running = false;
-        queueReady.notify_all();
-        processorThread->join();
-        LOGGER("thread queue processor finished")
+    public:
+        virtual ~ThreadQueueProcessor() {
+            running = false;
+            queueReady.notify_all();
+            processorThread->join();
+            LOGGER("thread queue processor finished")
 
-    }
-};
+        }
+    };
+}
 
 
 #endif //BASYCO_THREADQUEUEPROCESSOR_H

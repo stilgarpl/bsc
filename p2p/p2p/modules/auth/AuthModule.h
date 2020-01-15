@@ -9,6 +9,7 @@
 #include <p2p/node/module/NodeModule.h>
 #include <p2p/role/Roles.h>
 
+
 class AuthModule : public NodeModuleDependent<AuthModule> {
 public:
 

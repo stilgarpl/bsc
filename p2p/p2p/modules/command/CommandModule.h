@@ -20,6 +20,7 @@
 #include <parser/parser/explode.h>
 
 
+
 class CommandModule : public NodeModuleDependent<CommandModule, NetworkModule> {
 public:
     using ArgumentContainerType = std::vector<std::string>;
@@ -143,7 +144,7 @@ public:
             return commands;
         }
 
-        template<ParametersClass ParametersType>
+        template<bsc::ParametersClass ParametersType>
         void setDefaultGroupHandler(const InternalGroupHandlerFunc& newGroupHandler) {
             if (!groupHandler || isDefaultHandler) {
                 groupHandler = newGroupHandler;
@@ -161,14 +162,14 @@ public:
 
         CommandGroup& group(std::string name);
 
-        template<ParametersClass ParametersType>
+        template<bsc::ParametersClass ParametersType>
         void handler(std::function<CommandExecutionStatus(const ParametersType&)> handlerFunc) {
             groupHandler = [handlerFunc](ArgumentContainerTypeRef arguments,
                                          const CommandModule::CommandGroup& group) -> GroupHandlerResult {
-                auto parameters = CommandLineParameters::parse<ParametersType>(arguments, {{},
-                                                                                           {},
-                                                                                           {},
-                                                                                           {false, true}});
+                auto parameters = bsc::CommandLineParameters::parse<ParametersType>(arguments, {{},
+                                                                                                {},
+                                                                                                {},
+                                                                                                {false, true}});
                 auto status = handlerFunc(parameters, group);
                 return {status, parameters.arguments()};
 
@@ -187,7 +188,7 @@ public:
 
     public:
 
-        template<typename ModuleType, ParametersClass ParametersType, typename RetType, typename ... Args>
+        template<typename ModuleType, bsc::ParametersClass ParametersType, typename RetType, typename ... Args>
         void mapCommand(std::string commandName, RetType (ModuleType::*f)(const ParametersType&, Args... args),
                         ParametersType params) {
             parent.addRequiredDependency<ModuleType>();
@@ -199,13 +200,14 @@ public:
             mapCommand(" ", commandName,
                        [f, mod, commandName, params](CommandModule::ArgumentContainerTypeRef vals) {
 
-                           ParametersType localParams = CommandLineParameters::parse<ParametersType>(commandName, vals);
+                           ParametersType localParams = bsc::CommandLineParameters::parse<ParametersType>(commandName,
+                                                                                                          vals);
                            std::function<RetType(Args...)> func = [mod, localParams, f](Args... args) -> RetType {
                                ((mod.get())->*f)(localParams, args...);
                            };
                            try {
-                               runStandardFunction(func, vals);
-                           } catch (const IncorrectParametersException& e) {
+                               bsc::runStandardFunction(func, vals);
+                           } catch (const bsc::IncorrectParametersException& e) {
                                if (e.requiredParameters > e.gotParameters) {
                                    return CommandExecutionStatus::notEnoughArguments;
                                } else {
@@ -228,8 +230,8 @@ public:
             mapCommand(" ", commandName,
                        [=](CommandModule::ArgumentContainerTypeRef vals) {
                            try {
-                               runMemberFunction(*mod, f, vals);
-                           } catch (const IncorrectParametersException& e) {
+                               bsc::runMemberFunction(*mod, f, vals);
+                           } catch (const bsc::IncorrectParametersException& e) {
                                if (e.requiredParameters > e.gotParameters) {
                                    return CommandExecutionStatus::notEnoughArguments;
                                } else {
@@ -320,13 +322,13 @@ private:
 
 public:
 
-    template<ParametersClass ParametersType>
+    template<bsc::ParametersClass ParametersType>
     void setDefaultGroupHandler(std::function<CommandExecutionStatus(const ParametersType&,
                                                                      const CommandModule::CommandGroup&)> handlerFunc) {
         //@todo unify duplicated code with CommandGroup
         defaultGroupHandler = [handlerFunc](ArgumentContainerTypeRef arguments,
                                             const CommandModule::CommandGroup& group) -> GroupHandlerResult {
-            auto parameters = CommandLineParameters::parse<ParametersType>(arguments);
+            auto parameters = bsc::CommandLineParameters::parse<ParametersType>(arguments);
             auto status = handlerFunc(parameters, group);
             return {status, parameters.arguments()};
 
@@ -392,7 +394,7 @@ public:
     void runLine(const std::string& line) {
         LOGGER("Command: " + line);
         //explode command into words
-        auto words = explode(line, ' ');
+        auto words = bsc::explode(line, ' ');
 
         std::string groupOrCommandName = "";
         //  std::string commandName = "";
@@ -407,7 +409,7 @@ public:
 
         try {
             runCommand(groupOrCommandName, data);
-        } catch (const IncorrectParametersException& e) {
+        } catch (const bsc::IncorrectParametersException& e) {
             LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " +
                    std::to_string(e.gotParameters));
         }
@@ -476,8 +478,8 @@ public:
         LOGGER("Command testing method INT FLOAT " + std::to_string(a) + " " + std::to_string(b));
     }
 
-    struct CommandPP : public CommandLineParameters {
-        Parameter<int> a = {'a', "aaa", "NUM", "IntegerParameter"};
+    struct CommandPP : public bsc::CommandLineParameters {
+        bsc::Parameter<int> a = {'a', "aaa", "NUM", "IntegerParameter"};
     };
 
     void parametersTestingCommand(const CommandPP& params);

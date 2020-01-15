@@ -8,10 +8,11 @@
 
 #include "core/context/Context.h"
 
+
 class IContextSetup {
 
 public:
-    virtual void setup(Context &context) =0;
+    virtual void setup(bsc::Context& context) = 0;
 };
 
 

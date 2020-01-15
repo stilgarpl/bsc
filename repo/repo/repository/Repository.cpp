@@ -7,6 +7,7 @@
 #include <repo/repository/transformer/rules/TmpRule.h>
 #include <repo/repository/transformer/rules/HomeDirRule.h>
 #include "Repository.h"
+
 #include <repo/repository/storage/InternalStorage.h>
 
 using namespace std::chrono_literals;
@@ -85,14 +86,14 @@ void Repository::restoreAll() {
 void Repository::commit() {
     journal->clearFunc();
     journal->setFunc(JournalMethod::added, JournalTarget::file, [&](auto& i) {
-        storage->store(calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
+        storage->store(bsc::calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
                        fs::file_size(pathTransformer->transformFromJournalFormat(i.getPath())),
                        pathTransformer->transformFromJournalFormat(i.getPath()));
         LOGGER("commit: added file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())
     });
 
     journal->setFunc(JournalMethod::modified, JournalTarget::file, [&](auto& i) {
-        storage->store(calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
+        storage->store(bsc::calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
                        fs::file_size(pathTransformer->transformFromJournalFormat(i.getPath())),
                        pathTransformer->transformFromJournalFormat(i.getPath()));
         LOGGER("commit: modified file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())

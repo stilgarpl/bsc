@@ -18,6 +18,7 @@
 #include "logic/events/Tick.h"
 #include "logic/LogicManager.h"
 
+
 class IProtocol;
 
 using namespace std::placeholders;

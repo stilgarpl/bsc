@@ -14,6 +14,7 @@
 #include <p2p/node/configuration/ConfigurationManager.h>
 #include "p2p/node/INode.h"
 #include "INodeModule.h"
+
 #include <p2p/node/module/logic/ModuleSource.h>
 
 class NodeModule : public ILogicModule {

@@ -13,6 +13,7 @@
 #include "p2p/modules/network/NetworkModule.h"
 #include "CommandInputOutputContext.h"
 
+
 CommandModule::CommandModule(INode& node) : NodeModuleDependent(node, "command"),
                                             defaultCommandGroup(*this) {
 
@@ -81,7 +82,7 @@ void CommandModule::sendRemoteCommand(ArgumentContainerTypeRef args) {
 
         if (res && res->isRunStatus()) {
             LOGGER("remote run successful")
-            auto& out = Context::getActiveContext()->get<InputOutputContext>().out();
+            auto& out = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>().out();
 //            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
             out << res->getOutput();
         } else {
@@ -110,7 +111,7 @@ void CommandModule::sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentCont
 
         if (res && res->isRunStatus()) {
             LOGGER("remote run successful")
-            auto& out = Context::getActiveContext()->get<InputOutputContext>().out();
+            auto& out = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>().out();
 //            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
             out << res->getOutput();
         } else {
@@ -155,10 +156,10 @@ void CommandModule::runInBackground(const std::vector<std::string>& args) {
     if (args.size() >= 1) {
         std::string command = args[0];
         std::vector<std::string> rest(args.begin() + 1, args.end());
-        auto activeContext = Context::getActiveContext();
+        auto activeContext = bsc::Context::getActiveContext();
         //@todo think about mutexes and thread safety
         std::thread([this, command, rest, activeContext] {
-            Context::setActiveContext(activeContext);
+            bsc::Context::setActiveContext(activeContext);
             this->runCommand(command, rest);
         }).detach();
 
@@ -174,11 +175,11 @@ void CommandModule::prepareSubmodules() {
 
         //setting up remote command context.
         //@todo simplify context making
-        Context::OwnPtr remoteCommandContext = Context::makeContext(Context::getActiveContext());
+        bsc::Context::OwnPtr remoteCommandContext = bsc::Context::makeContext(bsc::Context::getActiveContext());
         auto ioContext = std::make_shared<CommandInputOutputContext>();
-        remoteCommandContext->setDirect<InputOutputContext>(ioContext);
+        remoteCommandContext->setDirect<bsc::InputOutputContext>(ioContext);
         {
-            SetLocalContext localContext(remoteCommandContext);
+            bsc::SetLocalContext localContext(remoteCommandContext);
             //@todo better return status handling
             bool runStatus =
                     this->runCommand(request->getCommandName(), request->getData()) == CommandExecutionStatus::success;
@@ -192,7 +193,7 @@ void CommandModule::prepareSubmodules() {
 }
 
 void CommandModule::parametersTestingCommand(const CommandModule::CommandPP& params) {
-    auto& io = Context::getActiveContext()->get<InputOutputContext>();
+    auto& io = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>();
 
     io.out() << std::string("got params " + std::to_string(params.a().value_or(-1)));
 }

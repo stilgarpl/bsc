@@ -15,6 +15,7 @@
 #include <core/context/Context.h>
 #include <p2p/role/Roles.h>
 
+
 struct PacketGroup;
 
 class PacketSourceWorker;

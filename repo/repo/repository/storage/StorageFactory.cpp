@@ -7,6 +7,7 @@
 #include <utility>
 #include "InternalStorage.h"
 
+
 IStoragePtr StorageFactory::create(const SelectorType& selector, const ArgumentType& storageName) {
     //@todo implement actual identifiers and different storages
     LOGGER("creating storage with path " + (storagePath / storageName).string())

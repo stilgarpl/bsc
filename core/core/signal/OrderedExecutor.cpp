@@ -4,21 +4,22 @@
 
 #include "OrderedExecutor.h"
 
+
 using namespace std::chrono_literals;
 
-void OrderedExecutor::execute(std::function<void(void)> task) {
+void bsc::OrderedExecutor::execute(std::function<void(void)> task) {
     if (orderedExecutorThread == nullptr) {
         working = true;
 //        LOGGER("starting executor thread")
         orderedExecutorThread = std::make_unique<std::thread>(&OrderedExecutor::run, this);
     }
     std::lock_guard<std::mutex> lockGuard(queueLock);
-    runQueue.push(std::make_pair(task, Context::getActiveContext()));
+    runQueue.push(std::make_pair(task, bsc::Context::getActiveContext()));
 
     taskReady.notify_all();
 }
 
-void OrderedExecutor::run() {
+void bsc::OrderedExecutor::run() {
     std::unique_lock<std::mutex> g(queueLock);
     while (working) {
         while (runQueue.empty() && working) {
@@ -29,7 +30,7 @@ void OrderedExecutor::run() {
 //            LOGGER("processing task")
             auto&[task, contextPtr] = runQueue.front();
 
-            Context::setActiveContext(contextPtr);
+            bsc::Context::setActiveContext(contextPtr);
             task();
 
             runQueue.pop();
@@ -37,7 +38,7 @@ void OrderedExecutor::run() {
     }
 }
 
-OrderedExecutor::~OrderedExecutor() {
+bsc::OrderedExecutor::~OrderedExecutor() {
     working = false;
     taskReady.notify_all(); // so it stops waiting
     if (orderedExecutorThread) {
@@ -47,6 +48,6 @@ OrderedExecutor::~OrderedExecutor() {
 
 }
 
-void OrderedExecutor::stop() {
+void bsc::OrderedExecutor::stop() {
 
 }

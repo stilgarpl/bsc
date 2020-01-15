@@ -5,18 +5,20 @@
 #ifndef BASYCO_THREADEXECUTOR_H
 #define BASYCO_THREADEXECUTOR_H
 
+
 #include "Executor.h"
 
+namespace bsc {
+    class ThreadExecutor : public Executor {
+    protected:
+        void execute(std::function<void(void)> task) override;
 
-class ThreadExecutor : public Executor {
-protected:
-    void execute(std::function<void(void)> task) override;
-
-public:
+    public:
 
 
-    void stop() override;
-};
+        void stop() override;
+    };
+}
 
 
 #endif //BASYCO_THREADEXECUTOR_H

@@ -9,14 +9,20 @@
 #include "IStorage.h"
 #include <core/factory/Factory.h>
 
-class StorageFactoryByName {};
-class StorageFactoryByType {};
+namespace bsc {
+    class StorageFactoryByName {
+    };
 
-template<>
-struct FactoryTraits<IStoragePtr, StorageFactoryByType> {
-    using SelectorType = std::string;
-    using ArgumentType = std::string;
-};
+    class StorageFactoryByType {
+    };
+
+    template<>
+    struct FactoryTraits<IStoragePtr, bsc::StorageFactoryByType> {
+        using SelectorType = std::string;
+        using ArgumentType = std::string;
+    };
+
+}
 
 
 #endif //BASYCO_STORAGEFACTORYSPECIALIZATION_H

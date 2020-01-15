@@ -7,23 +7,24 @@
 
 #include "Runnable.h"
 
-void Runnable::start() {
+
+void bsc::Runnable::start() {
     std::lock_guard g(startMutex);
     if (thread == nullptr) {
-        thread = std::make_unique<std::thread>(std::ref(*this), Context::getActiveContext());
+        thread = std::make_unique<std::thread>(std::ref(*this), bsc::Context::getActiveContext());
     }
 
 }
 
-void Runnable::operator()(Context::Ptr contextPtr) {
-    Context::setActiveContext(std::move(contextPtr));
+void bsc::Runnable::operator()(bsc::Context::Ptr contextPtr) {
+    bsc::Context::setActiveContext(std::move(contextPtr));
     onStart();
     run();
     onStop();
     finished = true;
 }
 
-Runnable::~Runnable() {
+bsc::Runnable::~Runnable() {
     if (!finished) {
         stop();
         join();
@@ -32,7 +33,7 @@ Runnable::~Runnable() {
 
 }
 
-void Runnable::stop() {
+void bsc::Runnable::stop() {
     std::unique_lock<std::mutex> g(stopMutex);
     stopping = true;
     shutdownSignal.notify_all();
@@ -40,17 +41,17 @@ void Runnable::stop() {
 
 }
 
-bool Runnable::isStopping() const {
+bool bsc::Runnable::isStopping() const {
 //    std::unique_lock<std::mutex> g(stopMutex);
     return stopping;
 }
 
-void Runnable::join() {
+void bsc::Runnable::join() {
     if (thread != nullptr && thread->joinable())
         thread->join();
 }
 
-void Runnable::waitForStop() {
+void bsc::Runnable::waitForStop() {
     std::unique_lock<std::mutex> g(stopMutex);
     //@todo C++20 wait on atomic
     shutdownSignal.wait(g, [this] { return stopping.load(); });

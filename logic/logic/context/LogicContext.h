@@ -8,6 +8,7 @@
 
 #include <logic/LogicManager.h>
 
+
 class LogicContext {
 
 private:
@@ -20,7 +21,7 @@ public:
 
     //shortcut method for getting logic manager from active context
     static LogicManager &getLogicManagerFromActiveContext() {
-        return Context::getActiveContext()->get<LogicContext>().getLogicManager();
+        return bsc::Context::getActiveContext()->get<LogicContext>().getLogicManager();
     }
 };
 

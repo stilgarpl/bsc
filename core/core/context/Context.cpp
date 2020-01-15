@@ -10,33 +10,33 @@
 #include "Context.h"
 
 
-thread_local Context::Ptr Context::activeContext = nullptr;
+thread_local bsc::Context::Ptr bsc::Context::activeContext = nullptr;
 
-Context::Ptr Context::getParentContext() const {
+bsc::Context::Ptr bsc::Context::getParentContext() const {
     return parentContext;
 }
 
-void Context::setParentContext(Context::Ptr parentContext) {
+void bsc::Context::setParentContext(bsc::Context::Ptr parentContext) {
     std::lock_guard<std::recursive_mutex> guard(contextLock);
     //@todo maybe we need to make sure here that we are not making a loop and throw exeption if we are?
     Context::parentContext = std::move(parentContext);
     validateParentContext();
 }
 
-Context::Ptr Context::getActiveContext() {
+bsc::Context::Ptr bsc::Context::getActiveContext() {
     if (hasActiveContext()) {
         return activeContext;
     } else {
         ERROR("No active context")
-        throw InvalidContextException("No active context");
+        throw bsc::InvalidContextException("No active context");
     }
 }
 
-void Context::setActiveContext(Context::Ptr ctx) {
+void bsc::Context::setActiveContext(Context::Ptr ctx) {
     activeContext = std::move(ctx);
 }
 
-Context::Context(const Context& other) {
+bsc::Context::Context(const Context& other) {
     std::scoped_lock g(contextLock, other.contextLock);
     for (auto&& item : other.data) {
         this->data[item.first] = item.second;
@@ -54,7 +54,7 @@ Context::Context(const Context& other) {
 //    return *this;
 //}
 
-Context& Context::operator+=(const Context::Ptr& other) {
+bsc::Context& bsc::Context::operator+=(const bsc::Context::Ptr& other) {
     std::lock_guard<std::recursive_mutex> guard(contextLock);
 
     for (auto&& item : other->data) {
@@ -66,30 +66,30 @@ Context& Context::operator+=(const Context::Ptr& other) {
     return *this;
 }
 
-Context::Context(const Context::Ptr& ptr) : Context(*ptr) {}
+bsc::Context::Context(const Context::Ptr& ptr) : Context(*ptr) {}
 
-Context::ContextPtr Context::makeContext() {
+bsc::Context::ContextPtr bsc::Context::makeContext() {
     struct ContextMakeSharedWorkaround : public Context {
     };
     return std::make_shared<ContextMakeSharedWorkaround>();
 }
 
-bool Context::isDefaultContext() const {
+bool bsc::Context::isDefaultContext() const {
     return defaultContext;
 }
 
-Context::Context(bool defaultContext) : defaultContext(defaultContext) {}
+bsc::Context::Context(bool defaultContext) : defaultContext(defaultContext) {}
 
-void Context::setDebugId(const std::string& debugId) {
+void bsc::Context::setDebugId(const std::string& debugId) {
     Context::debugId = debugId;
 }
 
-Context::~Context() {
+bsc::Context::~Context() {
 //    LOGGER("context destructor " + debugId);
 
 }
 
-Context::ContextPtr Context::makeContext(const Context::Ptr& parentContext) {
+bsc::Context::ContextPtr bsc::Context::makeContext(const Context::Ptr& parentContext) {
     struct ContextMakeSharedWorkaround : public Context {
         explicit ContextMakeSharedWorkaround(const Context& other) : Context(other) {}
     };
@@ -100,31 +100,31 @@ Context::ContextPtr Context::makeContext(const Context::Ptr& parentContext) {
         return ret;
     } else {
         LOGGER("error: NULL CONTEXT PASSED")
-        throw InvalidContextException("Null context passed");
+        throw bsc::InvalidContextException("Null context passed");
     }
 }
 
-bool Context::hasActiveContext() {
+bool bsc::Context::hasActiveContext() {
     return activeContext != nullptr;
 }
 
-void Context::validateParentContext() {
+void bsc::Context::validateParentContext() {
     //@todo if performance becomes an issue, maybe remove this call in release version.
     // I don't think it's actually possible to make a context loop in my apps, but who knows what can happen.
     Context::Ptr ancestor = parentContext;
     while (ancestor != nullptr) {
         if (&*ancestor == this) {
-            throw ContextLoopException("Context loop detected");
+            throw bsc::ContextLoopException("Context loop detected");
         } else {
             ancestor = ancestor->parentContext;
         }
     }
 }
 
-InvalidContextException::InvalidContextException(const std::string& arg) : invalid_argument(arg) {}
+bsc::InvalidContextException::InvalidContextException(const std::string& arg) : invalid_argument(arg) {}
 
-InvalidContextException::InvalidContextException(const char* string) : invalid_argument(string) {}
+bsc::InvalidContextException::InvalidContextException(const char* string) : invalid_argument(string) {}
 
-ContextLoopException::ContextLoopException(const std::string& arg) : domain_error(arg) {}
+bsc::ContextLoopException::ContextLoopException(const std::string& arg) : domain_error(arg) {}
 
-InvalidContextValueException::InvalidContextValueException(const std::string& arg) : invalid_argument(arg) {}
+bsc::InvalidContextValueException::InvalidContextValueException(const std::string& arg) : invalid_argument(arg) {}

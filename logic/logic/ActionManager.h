@@ -10,14 +10,16 @@
 #include "core/uber/Uber.h"
 #include "core/signal/Signal.h"
 #include "core/context/Context.h"
+
+
 #include <optional>
 
 class ActionManager {
 private:
-    Uber<std::map> actionMap;
+    bsc::Uber<std::map> actionMap;
 public:
     template<typename... Args>
-    using Action = typename Signal<Args...>::Func;
+    using Action = typename bsc::Signal<Args...>::Func;
 
     template<typename... Args>
     using ActionType = Action<Args...>;

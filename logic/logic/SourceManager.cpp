@@ -6,13 +6,14 @@
 #include "ISource.h"
 #include "SourceManager.h"
 
+
 void SourceManager::addSource(const std::shared_ptr<ISource> &source) {
     sources.push_back(source);
 //    source->setContext(commonContext);
 }
 
 
-void SourceManager::setContext(const Context::Ptr &context) {
+void SourceManager::setContext(const bsc::Context::Ptr& context) {
 //    *commonContext += context;
     commonContext->setParentContext(context);
     commonContext->setDebugId("source manager common context");
@@ -22,7 +23,7 @@ void SourceManager::setContext(const Context::Ptr &context) {
 }
 
 void SourceManager::startSources() {
-    Context::setActiveContext(commonContext);
+    bsc::Context::setActiveContext(commonContext);
     for (auto &&source : sources) {
         source->start();
     }

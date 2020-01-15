@@ -7,11 +7,12 @@
 #include <catch2/catch.hpp>
 
 
+
 TEST_CASE("Uber test") {
     const int maxTestInt = 51;
     const int maxTestFloat = 722;
     const int maxTestString = 39;
-    Uber<std::list> uberList;
+    bsc::Uber<std::list> uberList;
     for (unsigned i = 0; i < maxTestInt; i++) {
         uberList.get<int>().push_back(i);
     }

@@ -9,9 +9,10 @@
 #include <core/generator/RandomHashStringAlgorithm.h>
 
 
+
 TEST_CASE("Sequence generator test") {
 
-    Generator<SequenceAlgorithm<int>> generator;
+    bsc::Generator<bsc::SequenceAlgorithm<int>> generator;
 
     generator.reset(0);
     REQUIRE(generator.nextValue() == 1);
@@ -23,7 +24,7 @@ TEST_CASE("Sequence generator test") {
 
 TEST_CASE("Random generator test") {
 
-    Generator<RandomAlgorithm> generator;
+    bsc::Generator<bsc::RandomAlgorithm> generator;
 
     REQUIRE_NOTHROW(generator.nextValue());
     REQUIRE_NOTHROW(generator.nextValue());
@@ -34,7 +35,7 @@ TEST_CASE("Random generator test") {
 
 TEST_CASE("String hash generator test") {
 
-    Generator<RandomHashStringAlgorithm> generator;
+    bsc::Generator<bsc::RandomHashStringAlgorithm> generator;
 
     auto value = generator.nextValue();
 

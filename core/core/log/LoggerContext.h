@@ -10,17 +10,19 @@
 #include <optional>
 #include <string>
 
-class LoggerContext {
+namespace bsc {
+    class LoggerContext {
 
-private:
-    std::function<std::string(void)> instanceFetcher;
+    private:
+        std::function<std::string(void)> instanceFetcher;
 
-public:
-    LoggerContext(std::function<std::string()> instanceFetcher);
+    public:
+        LoggerContext(std::function<std::string()> instanceFetcher);
 
-    std::string getInstance();
+        std::string getInstance();
 
-};
+    };
+}
 
 
 #endif //BASYCO_LOGGERCONTEXT_H

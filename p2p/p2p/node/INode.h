@@ -12,6 +12,7 @@
 #include <p2p/node/configuration/ConfigurationManager.h>
 #include <logic/LogicManager.h>
 
+
 class INodeModule;
 
 template<typename ModuleType>
@@ -32,7 +33,7 @@ public:
 
 private:
 protected:
-    StaticUber<INodeModulePtr> modules;
+    bsc::StaticUber<INodeModulePtr> modules;
 
     template<typename Ret, typename ModuleType, typename ... Args>
     void forEachModule(Ret(ModuleType::*f)(Args...), Args... args) {
@@ -80,7 +81,7 @@ public:
 
     virtual NodeInfo &getNodeInfo() =0;
 
-    virtual Context::Ptr getContext() =0;
+    virtual bsc::Context::Ptr getContext() = 0;
 
     virtual void start()=0;
 

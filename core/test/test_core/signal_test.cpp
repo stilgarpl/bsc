@@ -6,13 +6,14 @@
 #include <core/signal/Signal.h>
 #include <core/signal/SimpleExecutor.h>
 
+
 TEST_CASE("Signal test") {
     //before
-    std::shared_ptr<Executor> executor = std::make_shared<SimpleExecutor>();
+    std::shared_ptr<bsc::Executor> executor = std::make_shared<bsc::SimpleExecutor>();
     //given
     int a = 5;
     int b = 7;
-    Signal<int> signalI;
+    bsc::Signal<int> signalI;
     signalI.assign([&](int a) { b = a; });
     REQUIRE(b == 7);
     //when

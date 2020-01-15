@@ -12,34 +12,36 @@
 namespace fs = std::filesystem;
 
 
-#define LOGGER(x) Logger(fs::path(__FILE__).filename().string()).debug(__LINE__, x);
-#define ERROR(x) Logger(fs::path(__FILE__).filename().string()).error(__LINE__, x);
+#define LOGGER(x) bsc::Logger(fs::path(__FILE__).filename().string()).debug(__LINE__, x);
+#define ERROR(x) bsc::Logger(fs::path(__FILE__).filename().string()).error(__LINE__, x);
 #define SHOW(x) LOGGER(std::string(#x) +"="+std::to_string(x))
 
-class Logger {
-private:
+namespace bsc {
+    class Logger {
+    private:
 
-    std::string loggerName;
-public:
+        std::string loggerName;
+    public:
 
-    //@todo think about this global locking: Is it necessary?
-    static std::mutex& getLock() {
-        static std::mutex lock;
-        return lock;
-    }
+        //@todo think about this global locking: Is it necessary?
+        static std::mutex& getLock() {
+            static std::mutex lock;
+            return lock;
+        }
 
-    explicit Logger(std::string name);
+        explicit Logger(std::string name);
 
-    void debug(const std::string& txt);
+        void debug(const std::string& txt);
 
-    void debug(int line, const std::string& txt);
+        void debug(int line, const std::string& txt);
 
-    void error(int line, const std::string& txt);
+        void error(int line, const std::string& txt);
 
-    void error(const std::string& txt);
+        void error(const std::string& txt);
 
-    void info(const std::string& txt);
-};
+        void info(const std::string& txt);
+    };
+}
 
 
 #endif //BASYCO_LOGGER_H

@@ -10,6 +10,7 @@
 #include "../ISource.h"
 #include "../IEvent.h"
 #include "core/log/Logger.h"
+
 //#include "p2p/modules/network/protocol/context/NodeContext.h"
 
 template<typename EventType_, typename FriendClass=std::nullptr_t>

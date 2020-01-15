@@ -8,27 +8,29 @@
 
 #include <iosfwd>
 
-class InputOutputContext {
+namespace bsc {
+    class InputOutputContext {
 
-public:
-    virtual std::ostream& out() = 0;
+    public:
+        virtual std::ostream& out() = 0;
 
-    virtual std::ostream& err() = 0;
+        virtual std::ostream& err() = 0;
 
-    virtual std::istream& in() = 0;
+        virtual std::istream& in() = 0;
 
-    static InputOutputContext& active();
+        static InputOutputContext& active();
 
-};
+    };
 
-class StandardInputOutputContext : public InputOutputContext {
-public:
-    std::ostream& out() override;
+    class StandardInputOutputContext : public bsc::InputOutputContext {
+    public:
+        std::ostream& out() override;
 
-    std::ostream& err() override;
+        std::ostream& err() override;
 
-    std::istream& in() override;
-};
+        std::istream& in() override;
+    };
+}
 
 
 #endif //BASYCO_INPUTOUTPUTCONTEXT_H

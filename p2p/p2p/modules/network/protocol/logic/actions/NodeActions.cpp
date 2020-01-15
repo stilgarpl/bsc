@@ -7,12 +7,14 @@
 #include <p2p/modules/network/NetworkModule.h>
 #include <p2p/modules/network/remote/RemoteNodeContext.h>
 #include "NodeActions.h"
+
+
 #include <p2p/modules/network/NetworkModule.h>
 #include <p2p/modules/network/protocol/packet/NodeInfoGroup.h>
 #include <p2p/modules/network/protocol/connection/ConnectionException.h>
 
 void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
-    Context::Ptr context = Context::getActiveContext();
+    bsc::Context::Ptr context = bsc::Context::getActiveContext();
 //    auto &nodeContext = context->get<NodeContext>();
 
     //  LOGGER("Node discovered (connecting): " + event.getNodeInfo().getNodeId())
@@ -25,7 +27,7 @@ void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
 
 void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
     LOGGER("update node info")
-    Context::Ptr context = Context::getActiveContext();
+    bsc::Context::Ptr context = bsc::Context::getActiveContext();
     auto remoteNodeContext = context->get<RemoteNodeContext>();
 
     auto &remoteNode = remoteNodeContext.getRemoteNode();
@@ -41,8 +43,8 @@ void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
 }
 
 void NodeActions::addKnownNode(const NodeInfoEvent &event) {
-    Context::Ptr context = Context::getActiveContext();
-    auto &nodeContext = context->get<NodeContext>();
+    bsc::Context::Ptr context = bsc::Context::getActiveContext();
+    auto& nodeContext = context->get<NodeContext>();
 
     // LOGGER(                "Adding known node " + event.getNodeInfo().getNodeId() + " ... " + event.getNodeInfo().getNetworkId())
     auto &node = nodeContext.getNode();
@@ -71,7 +73,7 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
 }
 
 void NodeActions::triggerUpdateNode(const Tick &tick) {
-    Context::Ptr context = Context::getActiveContext();
+    bsc::Context::Ptr context = bsc::Context::getActiveContext();
 //    auto& nodeContext = context->get<NodeContext>();
     //@todo imp[lement with RemoteNodes
 //    if (nodeContext != nullptr) {

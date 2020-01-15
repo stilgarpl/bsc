@@ -17,11 +17,12 @@
 #include <core/signal/DefaultExecutionPolicy.h>
 #include <core/signal/ThreadExecutor.h>
 
+
 using namespace std::chrono_literals;
 
 class ISource;
 
-MAP_POLICY_TO_EXECUTOR(DefaultExecutionPolicy, ThreadExecutor)
+BSC_MAP_POLICY_TO_EXECUTOR(bsc::DefaultExecutionPolicy, bsc::ThreadExecutor)
 
 class SourceManager {
 public:
@@ -32,7 +33,7 @@ public:
     typedef std::list<SourcePtr> SourceList;
 
     template<typename T, typename... Args>
-    using SignalType = Signal<const T &, Args...>;
+    using SignalType = bsc::Signal<const T&, Args...>;
 
     //@todo dlaczego właściwie te sygnały w mapie są jako pointery?
     /// jeśli mogą być niezdefiniowane, no to trzeba robic std::optional
@@ -45,28 +46,29 @@ public:
 
 protected:
     class ExecutorManager {
-        StaticUber<std::shared_ptr < Executor>> executors;
+        bsc::StaticUber<std::shared_ptr<bsc::Executor>> executors;
     public:
         template<typename ExecutorPolicyType>
-        std::shared_ptr <Executor> getExecutorForPolicy() {
-            using ExecutorType = typename ExecutorPolicyTraits<ExecutorPolicyType>::ExecutorType;
-            auto &executor = executors.get<ExecutorType>();
+        std::shared_ptr<bsc::Executor> getExecutorForPolicy() {
+            using ExecutorType = typename bsc::ExecutorPolicyTraits<ExecutorPolicyType>::ExecutorType;
+            auto& executor = executors.get<ExecutorType>();
             if (executor == nullptr) {
                 executor = std::make_shared<ExecutorType>();
             }
             return executor;
         }
     };
+
 private:
-    Uber<std::map> signalMap;
-    Uber<Type> globalSignal;
+    bsc::Uber<std::map> signalMap;
+    bsc::Uber<Type> globalSignal;
     std::mutex signalMapMutex;
     ExecutorManager executorManager;
 
 protected:
 
     template<typename EventType>
-    std::shared_ptr <Executor> getExecutorForEvent() {
+    std::shared_ptr<bsc::Executor> getExecutorForEvent() {
         using ExecutionPolicyType = typename EventType::ExecutionPolicy;
         return executorManager.getExecutorForPolicy<ExecutionPolicyType>();
     }
@@ -82,7 +84,7 @@ public:
     template<typename EventType, typename... Args>
     void event(const EventType &event, Args... args) {
 
-        SetLocalContext localContext(event.context());
+        bsc::SetLocalContext localContext(event.context());
         auto executor = getExecutorForEvent<EventType>();
         const auto& signalGlobal = this->getSignal<EventType, Args...>();
         const auto& signal = this->getSignal<EventType, Args...>(event.getEventId());
@@ -156,9 +158,9 @@ public:
 private:
     SourceList sources;
     //@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
-    Uber<Type> sourcesByType;
+    bsc::Uber<Type> sourcesByType;
     //@todo it would appear that the common context is not actually used - it is replaced by context from events.
-    Context::OwnPtr commonContext = Context::makeContext();
+    bsc::Context::OwnPtr commonContext = bsc::Context::makeContext();
 public:
 
 
@@ -219,7 +221,7 @@ public:
 //            it->setContext(context);
 //        }
 //    }
-    void setContext(const Context::Ptr &context);
+    void setContext(const bsc::Context::Ptr& context);
 
 
 };

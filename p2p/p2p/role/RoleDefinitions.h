@@ -10,10 +10,11 @@
 #include <core/log/Logger.h>
 #include "Role.h"
 
+
 class RoleDefinitions {
 
 private:
-    StaticUber<RoleList> requiredRoles;
+    bsc::StaticUber<RoleList> requiredRoles;
 
 public:
 

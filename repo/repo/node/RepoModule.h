@@ -16,6 +16,7 @@
 #include <repo/repository/storage/StorageFactorySpecialization.h>
 
 
+
 class RepoModule : public NodeModuleDependent<RepoModule> {
 public:
     class Configuration : public IConfig {
@@ -91,8 +92,8 @@ public:
 
     RepositoryPtr createRepository(const IRepository::RepoIdType &repoId);
 
-    IStoragePtr createStorage(const Factory<IStoragePtr, StorageFactoryByType>::SelectorType &storageType,
-                              const IStorage::StorageId &storageId);
+    IStoragePtr createStorage(const bsc::Factory<IStoragePtr, bsc::StorageFactoryByType>::SelectorType& storageType,
+                              const IStorage::StorageId& storageId);
 
     void saveRepository(const IRepository::RepoIdType &repoId);
 

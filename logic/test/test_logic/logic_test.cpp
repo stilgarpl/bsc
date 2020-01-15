@@ -10,6 +10,7 @@
 #include <logic/LogicObject.h>
 
 
+
 class Ping : public IEvent<int> {
 
 };
@@ -150,8 +151,8 @@ void waitFor(const std::function<bool(void)>& expression, std::chrono::milliseco
 TEST_CASE("Basic logic test") {
 
 //before
-    Context::OwnPtr context = Context::makeContext();
-    Context::setActiveContext(context);
+    bsc::Context::OwnPtr context = bsc::Context::makeContext();
+    bsc::Context::setActiveContext(context);
     LogicManager logicManager;
     logicManager.setContexts(context);
 //@todo think about it, doesn't it seem backwards? maybe logicManager should call setupLogic on all of its logic objects? or maybe not. Node calls setup logic on its modules in specific moment
@@ -178,8 +179,8 @@ TEST_CASE("Basic logic test") {
 TEST_CASE("Chain logic test") {
     const int count = 1000;
 //before
-    Context::OwnPtr context = Context::makeContext();
-    Context::setActiveContext(context);
+    bsc::Context::OwnPtr context = bsc::Context::makeContext();
+    bsc::Context::setActiveContext(context);
     LogicManager logicManager;
     logicManager.setContexts(context);
 //@todo think about it, doesn't it seem backwards? maybe logicManager should call setupLogic on all of its logic objects? or maybe not. Node calls setup logic on its modules in specific moment. But it would be better. Right now setupLogic() can be called many times, breaking logic.
@@ -205,8 +206,8 @@ TEST_CASE("Chain logic test") {
 }
 
 TEST_CASE("Invalid chain logic test") {
-    Context::OwnPtr context = Context::makeContext();
-    Context::setActiveContext(context);
+    bsc::Context::OwnPtr context = bsc::Context::makeContext();
+    bsc::Context::setActiveContext(context);
     LogicManager logicManager;
     logicManager.setContexts(context);
     SetupInvalidChainAction setupLogic(logicManager);
@@ -215,8 +216,8 @@ TEST_CASE("Invalid chain logic test") {
 
 
 TEST_CASE("Logic exceptions test") {
-    Context::OwnPtr context = Context::makeContext();
-    Context::setActiveContext(context);
+    bsc::Context::OwnPtr context = bsc::Context::makeContext();
+    bsc::Context::setActiveContext(context);
     LogicManager logicManager;
     logicManager.setContexts(context);
     SetupInvalidAssignment setupLogic(logicManager);

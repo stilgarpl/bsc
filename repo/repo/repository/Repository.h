@@ -18,6 +18,7 @@
 #include "IRepository.h"
 #include "RepositoryAttributes.h"
 
+
 class Repository : public IRepository {
 
 public:
@@ -261,8 +262,8 @@ private:
         RepoDeployMap d;
         IStorage::StorageId storageId;
         ar(r, j, d, storageId);
-        auto& factoryContext = Context::getActiveContext()->get<FactoryContext>();
-        auto storageFactory = factoryContext.getFactory<IStoragePtr, StorageFactoryByName>();
+        auto& factoryContext = bsc::Context::getActiveContext()->get<bsc::FactoryContext>();
+        auto storageFactory = factoryContext.getFactory<IStoragePtr, bsc::StorageFactoryByName>();
         auto storagePtr = storageFactory->create(storageId);
         construct(r, storagePtr, j, d);
     }

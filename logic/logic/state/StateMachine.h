@@ -11,6 +11,7 @@
 #include <core/log/Logger.h>
 #include <atomic>
 
+
 template<typename StateIdType>
 class StateMachine {
 

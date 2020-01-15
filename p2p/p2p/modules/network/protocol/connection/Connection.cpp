@@ -11,6 +11,7 @@
 #include <Poco/Net/NetException.h>
 #include "ConnectionException.h"
 
+
 using namespace std::chrono_literals;
 
 void Connection::send(BasePacketPtr np) {
@@ -45,7 +46,7 @@ BasePacketPtr Connection::receive() {
 
 void Connection::workSend(Poco::Net::StreamSocket &socket) {
     Poco::Net::SocketOutputStream os(socket);
-    Context::setActiveContext(getConnectionContext());
+    bsc::Context::setActiveContext(getConnectionContext());
     auto& lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc.getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
@@ -115,7 +116,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
 
 void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
-    Context::setActiveContext(getConnectionContext());
+    bsc::Context::setActiveContext(getConnectionContext());
     auto& lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc.getLogicManager();
     //@todo totally replace all connection source references here with observer pattern
@@ -247,10 +248,10 @@ void Connection::stopReceiving() {
     //  processor.stop();
 }
 
-Connection::Connection(const Context::Ptr &context) : LogicStateMachine(*this), processor(*this),
-                                                      connectionContext(Context::makeContext(context)) {
+Connection::Connection(const bsc::Context::Ptr& context) : LogicStateMachine(*this), processor(*this),
+                                                           connectionContext(bsc::Context::makeContext(context)) {
 
-    connectionContext->set<ConnectionContext, Connection &>(*this);
+    connectionContext->set<ConnectionContext, Connection&>(*this);
 
     //@todo when state machine global definition setting is implemented, move this out of the constructor:
 
@@ -265,7 +266,7 @@ ConnectionProcessor &Connection::getProcessor() {
     return processor;
 }
 
-Context::Ptr Connection::getConnectionContext() {
+bsc::Context::Ptr Connection::getConnectionContext() {
     return connectionContext;
 }
 

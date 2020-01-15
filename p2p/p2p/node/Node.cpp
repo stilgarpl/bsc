@@ -52,15 +52,15 @@ void Node::stop() {
 
 Node::Node() {
     LOGGER("default node constructor")
-    nodeContext->set<NodeContext, Node &, NodeInfo &>(*this, this->thisNodeInfo);
-    nodeContext->set<LoggerContext>([&] { return thisNodeInfo.getNodeId(); });
-    nodeContext->setDirect<InputOutputContext>(std::make_shared<StandardInputOutputContext>());
+    nodeContext->set<NodeContext, Node&, NodeInfo&>(*this, this->thisNodeInfo);
+    nodeContext->set<bsc::LoggerContext>([&] { return thisNodeInfo.getNodeId(); });
+    nodeContext->setDirect<bsc::InputOutputContext>(std::make_shared<bsc::StandardInputOutputContext>());
 
     //this creates common context for role definitions across the entire node.
     nodeContext->set<RoleDefinitionsContext>();
     nodeContext->setDebugId("node contxt");
 
-    nodeContext->set<FactoryContext>();
+    nodeContext->set<bsc::FactoryContext>();
 
     logicManager.setContexts(nodeContext);
 

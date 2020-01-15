@@ -9,6 +9,7 @@
 #include <parser/cast/templateCast.h>
 
 
+
 TEST_CASE("Template Cast Test") {
     struct testStruct {
         int integer = 0;
@@ -25,8 +26,9 @@ TEST_CASE("Template Cast Test") {
         testResult.vectorOfInts = v;
     };
 
-    runStandardFunction<void, int, std::string, std::pair<std::string, int>, std::vector<int>>(func, explode(testString,
-                                                                                                             ' '));
+    bsc::runStandardFunction<void, int, std::string, std::pair<std::string, int>, std::vector<int>>(func, bsc::explode(
+            testString,
+            ' '));
 
     REQUIRE(testResult.integer == 12);
     REQUIRE(testResult.string == "test_string");

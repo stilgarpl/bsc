@@ -12,15 +12,15 @@
 #include "ClientConnection.h"
 
 
-ClientConnection::ClientConnection(const Poco::Net::SocketAddress &a, const Context::Ptr &context) : Connection(
+ClientConnection::ClientConnection(const Poco::Net::SocketAddress& a, const bsc::Context::Ptr& context) : Connection(
         context),
-                                                                                                     socket(a) {
+                                                                                                          socket(a) {
 
     auto& lm = getConnectionContext()->get<LogicContext>();
 
-        LOGGER("adding new connection, triggering connection established event")
+    LOGGER("adding new connection, triggering connection established event")
 
-        lm.getLogicManager().getSource<ConnectionSource>()->connectionEstablished(this);
+    lm.getLogicManager().getSource<ConnectionSource>()->connectionEstablished(this);
 
 
 }
@@ -79,7 +79,7 @@ Poco::Net::StreamSocket &ClientConnection::getSocket() {
     return socket;
 }
 
-ClientConnection::ClientConnection(const std::string &a, Context::Ptr ptr) : ClientConnection(
+ClientConnection::ClientConnection(const std::string& a, bsc::Context::Ptr ptr) : ClientConnection(
         Poco::Net::SocketAddress(a),
         std::move(ptr)) {
 

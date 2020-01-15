@@ -7,6 +7,7 @@
 
 #include "LogicStateMachine.h"
 
+
 template<typename StateObject, typename stateIdType>
 class DirectNotify {
     using ObserverType = Observer<StateObject, stateIdType>;

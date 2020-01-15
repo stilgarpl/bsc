@@ -4,21 +4,22 @@
 
 #include <iostream>
 #include "InputOutputContext.h"
+
 #include <core/context/Context.h>
 
-std::ostream& StandardInputOutputContext::out() {
+std::ostream& bsc::StandardInputOutputContext::out() {
     return std::cout;
 }
 
-std::istream& StandardInputOutputContext::in() {
+std::istream& bsc::StandardInputOutputContext::in() {
     return std::cin;
 }
 
-std::ostream& StandardInputOutputContext::err() {
+std::ostream& bsc::StandardInputOutputContext::err() {
     return std::cerr;
 }
 
-InputOutputContext& InputOutputContext::active() {
-    return Context::getActiveContext()->get<InputOutputContext>();
+bsc::InputOutputContext& bsc::InputOutputContext::active() {
+    return bsc::Context::getActiveContext()->get<bsc::InputOutputContext>();
 
 }

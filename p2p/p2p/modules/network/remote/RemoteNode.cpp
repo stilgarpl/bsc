@@ -6,6 +6,8 @@
 #include <p2p/node/NodeInfo.h>
 #include "RemoteNode.h"
 #include "RemoteNodeContext.h"
+
+
 #include <Poco/Net/NetException.h>
 #include <p2p/modules/network/protocol/connection/ConnectionException.h>
 #include <p2p/modules/network/protocol/packet/ConnectionControl.h>
@@ -29,7 +31,7 @@ bool RemoteNode::connectTo(const NetAddressType &address) {
     //std::shared_ptr<Poco::Net::StreamSocket> socket = std::make_shared<Poco::Net::StreamSocket>(address);
     //@todo check for problems and handle them
     try {
-        SetLocalContext localContext(_context); //RAII
+        bsc::SetLocalContext localContext(_context); //RAII
         auto conn = std::make_shared<ClientConnection>(address,
                                                        _context);
 

@@ -6,6 +6,8 @@
 #include <map>
 #include <parser/parser/fromString.h>
 
+using namespace bsc;
+
 TEST_CASE("FromString parser test") {
     int five = fromString<int>("5");
     float sixAndHalf = fromString<float>("6.5");

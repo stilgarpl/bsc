@@ -14,15 +14,16 @@
 #include "core/log/Logger.h"
 
 
+
 class Connection;
 
-class ConnectionProcessor : public Runnable {
+class ConnectionProcessor : public bsc::Runnable {
 
 private:
-    Logger logger = Logger("Connection Processor");
+    bsc::Logger logger = bsc::Logger("Connection Processor");
 
 protected:
-    Connection &connection;
+    Connection& connection;
     //@todo initialize packet filter from AuthModule or configuration or sth.
     std::unique_ptr<PacketFilter> packetFilter = std::make_unique<RoleFilter>();
 

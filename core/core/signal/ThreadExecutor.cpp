@@ -6,12 +6,13 @@
 #include <thread>
 #include "ThreadExecutor.h"
 
-void ThreadExecutor::execute(const std::function<void(void)> task) {
 
-    Context::Ptr origContext = Context::getActiveContext();
+void bsc::ThreadExecutor::execute(const std::function<void(void)> task) {
+
+    bsc::Context::Ptr origContext = bsc::Context::getActiveContext();
     std::thread(
             [=]() {
-                Context::setActiveContext(origContext);
+                bsc::Context::setActiveContext(origContext);
                 task();
             }
     ).detach();
@@ -19,6 +20,6 @@ void ThreadExecutor::execute(const std::function<void(void)> task) {
 
 }
 
-void ThreadExecutor::stop() {
+void bsc::ThreadExecutor::stop() {
 
 }

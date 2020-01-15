@@ -8,9 +8,10 @@
 #include "Logger.h"
 #include "LoggerContext.h"
 
+
 #include <utility>
 
-Logger::Logger(std::string name) : loggerName(std::move(name)) {
+bsc::Logger::Logger(std::string name) : loggerName(std::move(name)) {
 
 //    Poco::ConsoleChannel *consoleChannel = new Poco::ConsoleChannel();
     // logger.setLevel(Poco::Message::Priority::PRIO_DEBUG);
@@ -19,33 +20,33 @@ Logger::Logger(std::string name) : loggerName(std::move(name)) {
     spdlog::set_pattern("[%T]%L:%v");
 }
 
-void Logger::error(const std::string& txt) {
+void bsc::Logger::error(const std::string& txt) {
 
 //    logger.error(txt);
 }
 
-void Logger::debug(const std::string& txt) {
+void bsc::Logger::debug(const std::string& txt) {
     std::lock_guard<std::mutex> g(getLock());
 //    logger.debug(txt);
 //    std::clog << loggerName << " : " << txt << std::endl;
     spdlog::debug(txt);
 }
 
-void Logger::info(const std::string& txt) {
+void bsc::Logger::info(const std::string& txt) {
 //    logger.information(txt);
 }
 
-void Logger::debug(int line, const std::string& txt) {
+void bsc::Logger::debug(int line, const std::string& txt) {
 
     std::lock_guard<std::mutex> g(getLock());
     static std::string::size_type instanceLength = 0;
 //@todo optimize this call:
-    if (Context::hasActiveContext() && Context::getActiveContext()->has<LoggerContext>() &&
-        Context::getActiveContext()->get<LoggerContext>().getInstance().size() > instanceLength) {
-        instanceLength = Context::getActiveContext()->get<LoggerContext>().getInstance().size();
+    if (bsc::Context::hasActiveContext() && bsc::Context::getActiveContext()->has<bsc::LoggerContext>() &&
+        bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance().size() > instanceLength) {
+        instanceLength = bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance().size();
     }
-    if (Context::hasActiveContext() && Context::getActiveContext()->has<LoggerContext>()) {
-        spdlog::info("[{:<{}}] [{}:{}]: {}", Context::getActiveContext()->get<LoggerContext>().getInstance(),
+    if (bsc::Context::hasActiveContext() && bsc::Context::getActiveContext()->has<bsc::LoggerContext>()) {
+        spdlog::info("[{:<{}}] [{}:{}]: {}", bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance(),
                      instanceLength,
                      loggerName, std::to_string(line), txt);
     } else {
@@ -55,17 +56,17 @@ void Logger::debug(int line, const std::string& txt) {
 //    spdlog::info(txt);
 }
 
-void Logger::error(int line, const std::string& txt) {
+void bsc::Logger::error(int line, const std::string& txt) {
 
     std::lock_guard<std::mutex> g(getLock());
     static std::string::size_type instanceLength = 0;
 //@todo optimize this call:
-    if (Context::hasActiveContext() && Context::getActiveContext()->has<LoggerContext>() &&
-        Context::getActiveContext()->get<LoggerContext>().getInstance().size() > instanceLength) {
-        instanceLength = Context::getActiveContext()->get<LoggerContext>().getInstance().size();
+    if (bsc::Context::hasActiveContext() && bsc::Context::getActiveContext()->has<bsc::LoggerContext>() &&
+        bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance().size() > instanceLength) {
+        instanceLength = bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance().size();
     }
-    if (Context::hasActiveContext() && Context::getActiveContext()->has<LoggerContext>()) {
-        spdlog::error("[{:<{}}] [{}:{}]: {}", Context::getActiveContext()->get<LoggerContext>().getInstance(),
+    if (bsc::Context::hasActiveContext() && bsc::Context::getActiveContext()->has<bsc::LoggerContext>()) {
+        spdlog::error("[{:<{}}] [{}:{}]: {}", bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance(),
                       instanceLength,
                       loggerName, std::to_string(line), txt);
     } else {

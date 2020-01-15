@@ -6,10 +6,11 @@
 #include <p2p/modules/network/remote/RemoteNodeContext.h>
 #include "ConnectionProcessors.h"
 
+
 ConnectionControl::Response::Ptr
 ConnectionProcessors::processConnectionControl(ConnectionControl::Request::Ptr request) {
     LOGGER("diconnection processor")
-    Context::getActiveContext()->get<RemoteNodeContext>().getRemoteNode().disconnect();
+    bsc::Context::getActiveContext()->get<RemoteNodeContext>().getRemoteNode().disconnect();
 
     return nullptr;
 }

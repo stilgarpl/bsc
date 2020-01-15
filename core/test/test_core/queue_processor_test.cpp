@@ -9,7 +9,8 @@
 #include <functional>
 #include <utility>
 
-class TestProcessor : public ThreadQueueProcessor<int, int> {
+
+class TestProcessor : public bsc::ThreadQueueProcessor<int, int> {
 //    std::function<void(int,int)> func ;
 public:
     explicit TestProcessor(UpdateFuncType func) : ThreadQueueProcessor(std::move(func)) {}
@@ -17,7 +18,7 @@ public:
 };
 
 TEST_CASE("Queue processor test") {
-    Context::setActiveContext(Context::makeContext());
+    bsc::Context::setActiveContext(bsc::Context::makeContext());
     int lastToken = 0;
     int lastSender = 0;
     int token = 5;

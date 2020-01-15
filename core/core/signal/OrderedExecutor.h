@@ -9,31 +9,35 @@
 #include <condition_variable>
 #include <queue>
 #include <core/context/Context.h>
-#include "Executor.h"
+
+
 #include <thread>
 #include <atomic>
+#include "Executor.h"
 
-class OrderedExecutor : public Executor {
-private:
-    std::unique_ptr<std::thread> orderedExecutorThread;
-    std::condition_variable taskReady;
-    std::atomic<bool> working = false;
-    std::mutex queueLock;
-    std::queue<std::pair<std::function<void(void)>, Context::Ptr>> runQueue;
-public:
-    void execute(std::function<void(void)> task) override;
+namespace bsc {
+    class OrderedExecutor : public Executor {
+    private:
+        std::unique_ptr<std::thread> orderedExecutorThread;
+        std::condition_variable taskReady;
+        std::atomic<bool> working = false;
+        std::mutex queueLock;
+        std::queue<std::pair<std::function<void(void)>, Context::Ptr>> runQueue;
+    public:
+        void execute(std::function<void(void)> task) override;
 
-protected:
-public:
-    virtual ~OrderedExecutor();
+    protected:
+    public:
+        virtual ~OrderedExecutor();
 
-protected:
-    void run();
+    protected:
+        void run();
 
-public:
-    void stop() override;
+    public:
+        void stop() override;
 
-};
+    };
+}
 
 
 #endif //BASYCO_ORDEREDEXECUTOR_H

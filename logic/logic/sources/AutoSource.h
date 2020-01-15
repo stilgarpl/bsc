@@ -8,13 +8,14 @@
 #include "../ISource.h"
 #include "EventQueueSource.h"
 
+
 /**
  * source used by automated event generation from smart logic system
  */
 class AutoSource : public ISource {
 
 private:
-    Uber<EventQueueSource> eventQueueSources;
+    bsc::Uber<EventQueueSource> eventQueueSources;
     std::mutex sourcesLock;
     bool active = true;
 public:

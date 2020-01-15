@@ -5,6 +5,7 @@
 #include <p2p/node/context/NodeContext.h>
 #include "GravitonProtocol.h"
 
+
 void GravitonProtocol::onPacketSent(const PacketEvent &event) {
     std::lock_guard<std::mutex> g(responseMapLock);
 //    LOGGER("onPacketSent" + std::to_string(event.getPacket()->getId()));

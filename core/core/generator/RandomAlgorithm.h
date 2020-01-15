@@ -8,22 +8,24 @@
 #include <random>
 #include <utility>
 
-class RandomAlgorithm {
-private:
-    std::random_device randomDevice;
-public:
-    using ValueType = std::random_device::result_type;
+namespace bsc {
+    class RandomAlgorithm {
+    private:
+        std::random_device randomDevice;
+    public:
+        using ValueType = std::random_device::result_type;
 
-    auto nextValue() {
-        return randomDevice();
-    }
+        auto nextValue() {
+            return randomDevice();
+        }
 
-    static void reset(ValueType newValue) {
-        //do nothing, can't reset random device.
-    }
+        static void reset(ValueType newValue) {
+            //do nothing, can't reset random device.
+        }
 
 
-};
+    };
+}
 
 
 #endif //BASYCO_RANDOMALGORITHM_H

@@ -10,6 +10,7 @@
 #include "p2p/node/Node.h"
 #include "p2p/modules/network/protocol/context/IContextSetup.h"
 
+
 class NodeContext {
 public:
 
@@ -27,7 +28,7 @@ public:
 
     //shortcut method for getting node from active context
     static Node &getNodeFromActiveContext() {
-         return Context::getActiveContext()->get<NodeContext>().getNode();
+        return bsc::Context::getActiveContext()->get<NodeContext>().getNode();
     }
 };
 

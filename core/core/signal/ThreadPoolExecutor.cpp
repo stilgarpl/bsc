@@ -5,13 +5,14 @@
 #include <core/context/Context.h>
 #include "ThreadPoolExecutor.h"
 
+
 using namespace std::chrono_literals;
 
-void ThreadPoolExecutor::execute(std::function<void(void)> task) {
+void bsc::ThreadPoolExecutor::execute(std::function<void(void)> task) {
     if (running.load()) {
-        Context::Ptr origContext = Context::getActiveContext();
+        bsc::Context::Ptr origContext = bsc::Context::getActiveContext();
         std::unique_lock<std::mutex> g(queueLock);
-        taskQueue.push(std::make_pair(task, Context::getActiveContext()));
+        taskQueue.push(std::make_pair(task, bsc::Context::getActiveContext()));
         if (getActiveWorkerCount() < maxWorker) {
             startWorker();
         }
@@ -20,7 +21,7 @@ void ThreadPoolExecutor::execute(std::function<void(void)> task) {
 
 }
 
-void ThreadPoolExecutor::startWorker() {
+void bsc::ThreadPoolExecutor::startWorker() {
 
     std::shared_ptr<std::thread> worker = std::make_shared<std::thread>([this] {
         std::unique_lock<std::mutex> g(queueLock);
@@ -33,7 +34,7 @@ void ThreadPoolExecutor::startWorker() {
                 auto[task, contextPtr] = taskQueue.front();
                 taskQueue.pop();
                 g.unlock();
-                Context::setActiveContext(contextPtr);
+                bsc::Context::setActiveContext(contextPtr);
                 task();
                 g.lock();
 
@@ -44,11 +45,11 @@ void ThreadPoolExecutor::startWorker() {
 
 }
 
-auto ThreadPoolExecutor::getActiveWorkerCount() -> decltype(runners.size()) {
+auto bsc::ThreadPoolExecutor::getActiveWorkerCount() -> decltype(runners.size()) {
     return runners.size();
 }
 
-void ThreadPoolExecutor::stop() {
+void bsc::ThreadPoolExecutor::stop() {
     running.store(false);
     queueReady.notify_all();
     for (auto& runner : runners) {
@@ -57,7 +58,7 @@ void ThreadPoolExecutor::stop() {
 
 }
 
-ThreadPoolExecutor::~ThreadPoolExecutor() {
+bsc::ThreadPoolExecutor::~ThreadPoolExecutor() {
     stop();
 
 }

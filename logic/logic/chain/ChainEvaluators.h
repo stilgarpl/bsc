@@ -11,12 +11,13 @@
 #include "ChainDefinitions.h"
 #include "ChainContext.h"
 
+
 struct ChainEvaluators {
 
     template<typename T>
     static auto chainResult(const ChainIdType &id) {
         return [id](auto e, auto ... args) {
-            return Context::getActiveContext()->get<ChainContext>().getChainResult<T>(id);
+            return bsc::Context::getActiveContext()->get<ChainContext>().getChainResult<T>(id);
         };
     }
 
@@ -24,7 +25,7 @@ struct ChainEvaluators {
     static auto chainResult(const Stage &stage) {
         auto id = *stage.getChainId();
         return [id](auto e, auto ... args) {
-            auto activeContext = Context::getActiveContext();
+            auto activeContext = bsc::Context::getActiveContext();
             auto& chainContext = activeContext->get<ChainContext>();
             auto& result = chainContext.getChainResult<T>(id);
             return result;
@@ -34,7 +35,8 @@ struct ChainEvaluators {
     template<typename T>
     static auto genericChainResult(const ChainIdType &id) {
         return [id](auto e, auto ... args) {
-            return Context::getActiveContext()->get<ChainContext>().getChainResult<EventWrapper<T>>(id).getPayload();
+            return bsc::Context::getActiveContext()->get<ChainContext>().getChainResult<EventWrapper<T>>(
+                    id).getPayload();
         };
     }
 
@@ -45,7 +47,8 @@ struct ChainEvaluators {
         auto id = *stage.getChainId();
         return [id](auto e, auto ... args) {
             //@todo maybe wait if no result in context (if result is from another branch, but don't wait for too long!)
-            return Context::getActiveContext()->get<ChainContext>().getChainResult<EventWrapper<T>>(id).getPayload();
+            return bsc::Context::getActiveContext()->get<ChainContext>().getChainResult<EventWrapper<T>>(
+                    id).getPayload();
         };
     }
 

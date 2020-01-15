@@ -4,6 +4,7 @@
 #include <logic/context/LogicContext.h>
 #include "LogicManager.h"
 
+
 void LogicManager::onStop() {
     LOGGER("LOGIC MANAGER IS STOPPING")
     sourceManager.stopSources();
@@ -20,8 +21,8 @@ void LogicManager::run() {
 
 }
 
-void LogicManager::setContexts(const Context::Ptr &context) {
-    context->set<LogicContext, LogicManager &>(*this);
+void LogicManager::setContexts(const bsc::Context::Ptr& context) {
+    context->set<LogicContext, LogicManager&>(*this);
     sourceManager.setContext(context);
 }
 

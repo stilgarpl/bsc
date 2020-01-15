@@ -11,12 +11,12 @@
 #include "StorageFactorySpecialization.h"
 
 
-class StorageFactory : public Factory<IStoragePtr,StorageFactoryByType>{
+class StorageFactory : public bsc::Factory<IStoragePtr, bsc::StorageFactoryByType> {
 private:
     fs::path storagePath;
 public:
 
-    IStoragePtr create(const SelectorType &selector, const ArgumentType &argument) override;
+    IStoragePtr create(const SelectorType& selector, const ArgumentType& argument) override;
 
     explicit StorageFactory(fs::path storagePath);
 

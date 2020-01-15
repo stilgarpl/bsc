@@ -7,23 +7,23 @@
 #include "CommandLineParameters.h"
 
 
-CommandLineParameters::CommandLineParameters() : parser(parserBuilder().make()) {
+bsc::CommandLineParameters::CommandLineParameters() : parser(parserBuilder().make()) {
 
 }
 
-std::shared_ptr<CommandLineParameters::Parser> CommandLineParameters::ParserBuilder::make() {
+std::shared_ptr<bsc::CommandLineParameters::Parser> bsc::CommandLineParameters::ParserBuilder::make() {
     reset();
     return parser;
 }
 
-void CommandLineParameters::ParserBuilder::reset() {
+void bsc::CommandLineParameters::ParserBuilder::reset() {
     //reset internal state of builder
     parser = std::make_shared<Parser>();
     currentKey = 1000;
 
 }
 
-error_t CommandLineParameters::Parser::parseArgument(int key, char* arg, struct argp_state* state) {
+error_t bsc::CommandLineParameters::Parser::parseArgument(int key, char* arg, struct argp_state* state) {
     auto* self = static_cast<Parser*>(state->input);
     switch (key) {
         case ARGP_KEY_INIT:
@@ -79,14 +79,16 @@ error_t CommandLineParameters::Parser::parseArgument(int key, char* arg, struct 
     return 0;
 }
 
-void CommandLineParameters::Parser::parse(int argc, char** argv) {
+void bsc::CommandLineParameters::Parser::parse(int argc, char** argv) {
 
     argp_parse(&argParams, argc, argv, flags, nullptr, this);
 }
 
 void
-CommandLineParameters::Parser::prepareParser(std::vector<std::string> usage, const std::optional<std::string>& before,
-                                             const std::optional<std::string>& after, bool exitOnFailure, bool silent) {
+bsc::CommandLineParameters::Parser::prepareParser(std::vector<std::string> usage,
+                                                  const std::optional<std::string>& before,
+                                                  const std::optional<std::string>& after, bool exitOnFailure,
+                                                  bool silent) {
     using namespace std::string_literals;
     //close argOptions:
     argpOptions.push_back({nullptr, 0, nullptr, 0, nullptr, 0});
@@ -113,7 +115,7 @@ CommandLineParameters::Parser::prepareParser(std::vector<std::string> usage, con
     argParams = {argpOptions.data(), Parser::parseArgument, argDoc.c_str(), doc.c_str(), nullptr, nullptr, nullptr};
 }
 
-char* CommandLineParameters::Parser::helpFilter(int key, const char* text, void* input) {
+char* bsc::CommandLineParameters::Parser::helpFilter(int key, const char* text, void* input) {
     if (text != nullptr) {
         using namespace std::string_literals;
 //        LOGGER("TEXT FILTER IS : "s + text);

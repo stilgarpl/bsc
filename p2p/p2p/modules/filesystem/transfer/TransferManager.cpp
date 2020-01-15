@@ -13,6 +13,8 @@
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include "TransferManager.h"
 #include "TransferException.h"
+
+
 #include <p2p/modules/filesystem/network/packet/BeginTransfer.h>
 
 //const ResourceIdentificatorPtr &TransferManager::RemoteTransferDescriptor::getResourceIdentificatorPtr() const {
@@ -162,14 +164,14 @@ TransferManager::initiateTransfer(const NodeIdType &nodeId, const ResourceIdenti
     auto networkModule = node.getModule<NetworkModule>();
     LocalTransferDescriptorPtr ret = std::make_shared<LocalTransferDescriptor>();
 
-    Context::Ptr activeContext = Context::getActiveContext();
+    bsc::Context::Ptr activeContext = bsc::Context::getActiveContext();
 
     ret->setSource(source);
     ret->setDestination(destination);
     ret->setSourceNode(nodeId);
     ret->setPayload([=](LocalTransferDescriptor &descriptorPtr) {
         //before anything, setDirect active context
-        Context::setActiveContext(activeContext);
+        bsc::Context::setActiveContext(activeContext);
         LOGGER("starting transfer...")
 
         const TransferSize MAX_CHUNK_SIZE = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>()->configuration().maxChunkSize;

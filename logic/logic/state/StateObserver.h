@@ -9,6 +9,7 @@
 #include <mutex>
 #include <memory>
 
+
 template<typename StateObject, typename stateIdType>
 class Observer;
 

@@ -10,18 +10,20 @@
 #include <p2p/dependency/IDependencyManaged.h>
 #include "p2p/node/INode.h"
 #include "ModuleState.h"
+
+
 #include <any>
 #include <p2p/node/configuration/IConfig.h>
 
-class INodeModule : public virtual IDependencyManaged, public Runnable {
+class INodeModule : public virtual IDependencyManaged, public bsc::Runnable {
 private:
-    Uber<Type> submodule;
+    bsc::Uber<Type> submodule;
 protected:
-    INode &node;
+    INode& node;
     std::shared_ptr<void> _config;
 
     template<typename ModuleType>
-    typename ModuleType::Configuration &getConfiguration() {
+    typename ModuleType::Configuration& getConfiguration() {
         if (_config == nullptr) {
             _config = std::make_shared<typename ModuleType::Configuration>();
         }

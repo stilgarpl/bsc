@@ -42,7 +42,7 @@ FileData::FileData(const fs::path& path) {
         } else {
             size = fs::file_size(fs::path(path));
             isDirectory = false;
-            sha256hash = calculateSha1OfFile(path);
+            sha256hash = bsc::calculateSha1OfFile(path);
         }
     } else {
         //@todo throw? or just leave it empty? or setDirect an "empty flag? i think it should be left empty, it will work nicely with deleting files in JournalState

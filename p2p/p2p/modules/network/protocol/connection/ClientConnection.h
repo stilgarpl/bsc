@@ -9,16 +9,17 @@
 #include <Poco/Net/StreamSocket.h>
 #include "Connection.h"
 
+
 class ClientConnection : public Connection {
 
 private:
     Poco::Net::StreamSocket socket;
 
 protected:
-    ClientConnection(const Poco::Net::SocketAddress &a, const Context::Ptr &);
+    ClientConnection(const Poco::Net::SocketAddress& a, const bsc::Context::Ptr&);
 
 public:
-    ClientConnection(const std::string &a, Context::Ptr);
+    ClientConnection(const std::string& a, bsc::Context::Ptr);
 
     //@todo think about the Connection interface and those method names.
     void startReceivingImpl();

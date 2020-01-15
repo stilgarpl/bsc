@@ -12,9 +12,10 @@
 #include "StorageResourceIdentificator.h"
 
 
+
 void InternalStorage::store(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) {
 
-    auto realChecksum = calculateSha1OfFile(fs::path(sourcePath));
+    auto realChecksum = bsc::calculateSha1OfFile(fs::path(sourcePath));
     auto realFileSize = fs::file_size(sourcePath);
     if (realChecksum == checksum && realFileSize == size) {
         //file IS OK
@@ -22,7 +23,7 @@ void InternalStorage::store(const ResourceId& checksum, const size_t& size, cons
         fs::copy_options options = fs::copy_options::none;
         //check if file is already in storage
         if (fs::exists(getResourcePath(getResourceId(checksum, size)))) {
-            auto hasChecksum = calculateSha1OfFile(getResourcePath(getResourceId(checksum, size)));
+            auto hasChecksum = bsc::calculateSha1OfFile(getResourcePath(getResourceId(checksum, size)));
             if (hasChecksum != checksum) {
                 //file in storage was corrupted!
                 options = fs::copy_options::overwrite_existing;

@@ -10,22 +10,23 @@
 #include "SourceManager.h"
 
 
-class ISource : public Runnable {
+class ISource : public bsc::Runnable {
 protected:
-    SourceManager &sourceManager;
+    SourceManager& sourceManager;
 public:
-    explicit ISource(SourceManager &sourceManager);
+    explicit ISource(SourceManager& sourceManager);
 
 protected:
 
 
     template<typename T, typename... Args>
-    void event(const T &event, Args... args) {
+    void event(const T& event, Args... args) {
         sourceManager.event(event, args...);
     }
+
 public:
 
-    void setContext(Context &context) {};
+    void setContext(bsc::Context& context) {};
 
     ~ISource() override = default;
 

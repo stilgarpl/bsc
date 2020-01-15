@@ -7,9 +7,9 @@
 #include "LoggerContext.h"
 
 
-std::string LoggerContext::getInstance() {
+std::string bsc::LoggerContext::getInstance() {
     return instanceFetcher();
 }
 
-LoggerContext::LoggerContext(std::function<std::string()> instanceFetcher) : instanceFetcher(
+bsc::LoggerContext::LoggerContext(std::function<std::string()> instanceFetcher) : instanceFetcher(
         std::move(instanceFetcher)) {}

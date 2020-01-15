@@ -7,6 +7,7 @@
 #include <p2p/node/context/NodeContext.h>
 #include "SimpleJournalMetaDataFetcher.h"
 
+
 JournalMetaData SimpleJournalMetaDataFetcher::makeMetaData() {
     auto operatingSystem = Poco::Environment::osName();
     std::string userId;
@@ -15,7 +16,7 @@ JournalMetaData SimpleJournalMetaDataFetcher::makeMetaData() {
     if (auto userValue = getenv("USER"); userValue != nullptr) {
         userId = userValue;
     }
-    if (Context::hasActiveContext()) {
+    if (bsc::Context::hasActiveContext()) {
         nodeId = NodeContext::getNodeFromActiveContext().getNodeInfo().getNodeId();
     }
     return JournalMetaData(nodeId, userId, operatingSystem);

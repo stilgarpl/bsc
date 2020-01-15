@@ -4,6 +4,7 @@
 
 #include "ConnectionSource.h"
 
+
 void ConnectionSource::newConnection(Connection *con) {
 
     LOGGER("queue connection event");

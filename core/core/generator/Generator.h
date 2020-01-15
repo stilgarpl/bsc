@@ -7,21 +7,23 @@
 
 #include <utility>
 
-template<typename GeneratorAlgorithm>
-class Generator {
-private:
-    GeneratorAlgorithm algorithm;
-public:
-    using ValueType = typename GeneratorAlgorithm::ValueType;
+namespace bsc {
+    template<typename GeneratorAlgorithm>
+    class Generator {
+    private:
+        GeneratorAlgorithm algorithm;
+    public:
+        using ValueType = typename GeneratorAlgorithm::ValueType;
 
-    auto nextValue() {
-        return algorithm.nextValue();
-    }
+        auto nextValue() {
+            return algorithm.nextValue();
+        }
 
-    void reset(ValueType value) {
-        algorithm.reset(std::move(value));
-    }
-};
+        void reset(ValueType value) {
+            algorithm.reset(std::move(value));
+        }
+    };
+}
 
 
 #endif //BASYCO_GENERATOR_H

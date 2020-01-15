@@ -9,15 +9,16 @@
 #include <core/signal/DefaultExecutionPolicy.h>
 #include <core/log/Logger.h>
 
+
 template<typename idType>
 class IEvent {
 public:
     typedef idType IdType;
-    using ExecutionPolicy = DefaultExecutionPolicy;
+    using ExecutionPolicy = bsc::DefaultExecutionPolicy;
 private:
     IdType eventId;
     bool eventValid = true;
-    Context::OwnPtr eventContext;
+    bsc::Context::OwnPtr eventContext;
 public:
     IdType getEventId() const {
         return eventId;
@@ -44,18 +45,18 @@ public:
     }
 
 
-    [[nodiscard]] Context::Ptr context() {
+    [[nodiscard]] bsc::Context::Ptr context() {
         return eventContext;
     }
 
-    [[nodiscard]] Context::Ptr context() const {
+    [[nodiscard]] bsc::Context::Ptr context() const {
         return eventContext;
     }
 
 };
 
 template<typename idType>
-IEvent<idType>::IEvent() : eventContext(Context::makeContext(Context::getActiveContext())) {
+IEvent<idType>::IEvent() : eventContext(bsc::Context::makeContext(bsc::Context::getActiveContext())) {
 
     eventContext->setDebugId("event context");
 

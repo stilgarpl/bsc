@@ -4,11 +4,11 @@
 
 #include "SimpleExecutor.h"
 
-void SimpleExecutor::execute(const std::function<void(void)> task) {
+void bsc::SimpleExecutor::execute(const std::function<void(void)> task) {
 
     task();
 }
 
-void SimpleExecutor::stop() {
+void bsc::SimpleExecutor::stop() {
 
 }

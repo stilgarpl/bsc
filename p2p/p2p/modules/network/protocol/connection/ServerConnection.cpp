@@ -15,13 +15,14 @@
 #include <p2p/modules/network/NetworkModule.h>
 #include "ServerConnection.h"
 
+
 using namespace std::chrono_literals;
 
 void ServerConnection::run() {
     // std::cout << "opening server connection" << std::endl;
     // LOGGER("Opening server connection");
     //run is already in a separate thread, so there is no need to start a new one
-    Context::setActiveContext(getConnectionContext());
+    bsc::Context::setActiveContext(getConnectionContext());
 //    socket().setReceiveTimeout(Poco::Timespan(150, 1));
 //    socket().setSendTimeout(Poco::Timespan(150, 1));
 //    socket().setKeepAlive(true);
@@ -46,12 +47,12 @@ void ServerConnection::run() {
 
 }
 
-ServerConnection::ServerConnection(const Poco::Net::StreamSocket &socket, Context::Ptr context)
+ServerConnection::ServerConnection(const Poco::Net::StreamSocket& socket, bsc::Context::Ptr context)
         : TCPServerConnection(
         socket),
           IServerConnection(std::move(context)) {
 
-    Context::setActiveContext(getConnectionContext());
+    bsc::Context::setActiveContext(getConnectionContext());
     auto& lc = getConnectionContext()->get<LogicContext>();
     auto &logicManager = lc.getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
@@ -104,8 +105,8 @@ Poco::Net::StreamSocket &ServerConnection::getSocket() {
 
 Poco::Net::TCPServerConnection *ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket &socket) {
     LOGGER("creating server connection");
-    Context::Ptr connectionContext = contextGetter();
-    SetLocalContext localContext(connectionContext); //RAII
+    bsc::Context::Ptr connectionContext = contextGetter();
+    bsc::SetLocalContext localContext(connectionContext); //RAII
     ServerConnection* connection = new ServerConnection(socket, connectionContext);
     for (const auto& observer : observers) {
         connection->registerStateObserver(observer);
@@ -113,6 +114,6 @@ Poco::Net::TCPServerConnection *ServerConnectionFactory::createConnection(const 
     return connection;
 }
 
-ServerConnectionFactory::ServerConnectionFactory(std::function<Context::OwnPtr(void)> contextGetter,
+ServerConnectionFactory::ServerConnectionFactory(std::function<bsc::Context::OwnPtr(void)> contextGetter,
                                                  std::list<std::reference_wrapper<Connection::ObserverType>> observers)
         : contextGetter(std::move(contextGetter)), observers(std::move(observers)) {}

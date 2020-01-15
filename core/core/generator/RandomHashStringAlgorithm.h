@@ -9,13 +9,15 @@
 #include <utility>
 #include <string>
 
-class RandomHashStringAlgorithm {
+namespace bsc {
+    class RandomHashStringAlgorithm {
 
-public:
-    using ValueType = std::string;
+    public:
+        using ValueType = std::string;
 
-    ValueType nextValue();
-};
+        ValueType nextValue();
+    };
+}
 
 
 #endif //BASYCO_RANDOMHASHSTRINGALGORITHM_H

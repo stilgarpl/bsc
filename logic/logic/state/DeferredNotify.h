@@ -8,21 +8,23 @@
 #include "LogicStateMachine.h"
 
 
+
 template<typename StateObject, typename stateIdType>
 class DeferredNotify {
     using ObserverType = Observer<StateObject, stateIdType>;
     std::list<std::shared_ptr<ObserverType>> observers;
-    std::unique_ptr<ThreadQueueProcessor<stateIdType, StateObject>> processor;
+    std::unique_ptr<bsc::ThreadQueueProcessor<stateIdType, StateObject>> processor;
     std::mutex observerLock;
 public:
 
     DeferredNotify() {
-        processor = std::make_unique<ThreadQueueProcessor<stateIdType, StateObject>>([this](auto state, auto& object) {
-            auto observersCopy = observers;
-            for (const auto& observer : observersCopy) {
-                observer->update(object, state);
-            }
-        });
+        processor = std::make_unique<bsc::ThreadQueueProcessor<stateIdType, StateObject>>(
+                [this](auto state, auto& object) {
+                    auto observersCopy = observers;
+                    for (const auto& observer : observersCopy) {
+                        observer->update(object, state);
+                    }
+                });
     }
 
     void registerObserver(ObserverType& observer) {

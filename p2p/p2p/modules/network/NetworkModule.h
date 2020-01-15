@@ -23,6 +23,7 @@
 #include "p2p/modules/network/remote/exception/RemoteNodeNotFoundException.h"
 
 
+
 struct NodeConnectionInfo {
     ConnectionPtr connection;
     std::optional<NodeIdType> nodeId;
@@ -284,7 +285,7 @@ public: // @todo should be public or shouldn't ?
 
     static std::string testingMethod1xs(std::string s) {
         LOGGER("ret testin XXXXXXXXX 1s ! " + s)
-        auto activeContext = Context::getActiveContext();
+        auto activeContext = bsc::Context::getActiveContext();
         return s;
     }
 

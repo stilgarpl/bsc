@@ -23,7 +23,7 @@ const std::string& JournalMetaData::getOperatingSystem() const {
 ChecksumType JournalMetaData::getChecksum() {
     std::stringstream ss;
     ss << nodeId << userId << operatingSystem;
-    return calculateSha1OfString(ss.str());
+    return bsc::calculateSha1OfString(ss.str());
 }
 
 JournalMetaData::JournalMetaData(NodeIdType nodeId, std::string userId,

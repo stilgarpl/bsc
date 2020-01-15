@@ -7,14 +7,16 @@
 
 #include <functional>
 
-class Executor {
+namespace bsc {
+    class Executor {
 
-public:
-    virtual void execute(std::function<void(void)> task) = 0;
+    public:
+        virtual void execute(std::function<void(void)> task) = 0;
 
-    virtual void stop() = 0;
+        virtual void stop() = 0;
 
-    virtual ~Executor();
-};
+        virtual ~Executor() = default;
+    };
+}
 
 #endif //BASYCO_EXECUTOR_H

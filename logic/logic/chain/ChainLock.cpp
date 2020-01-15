@@ -5,6 +5,7 @@
 #include <core/log/Logger.h>
 #include "ChainLock.h"
 
+
 using namespace std::chrono_literals;
 
 bool ChainLock::isLocked() const {

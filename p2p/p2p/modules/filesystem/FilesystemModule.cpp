@@ -4,6 +4,7 @@
 
 #include <p2p/modules/filesystem/network/packet/TransferQuery.h>
 #include "FilesystemModule.h"
+
 #include <p2p/modules/basic/BasicModule.h>
 #include <p2p/modules/filesystem/network/processor/FilesystemNetworkProcessors.h>
 #include <p2p/modules/filesystem/network/packet/BeginTransfer.h>

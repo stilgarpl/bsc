@@ -6,9 +6,11 @@
 #define BASYCO_DEFAULTEXECUTIONPOLICY_H
 
 
-class DefaultExecutionPolicy {
+namespace bsc {
+    class DefaultExecutionPolicy {
 
-};
+    };
+}
 
 
 #endif //BASYCO_DEFAULTEXECUTIONPOLICY_H

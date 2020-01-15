@@ -12,17 +12,18 @@
 #include "ActionManager.h"
 #include "core/thread/Runnable.h"
 
-class LogicManager : public Runnable {
+
+class LogicManager : public bsc::Runnable {
 
 private:
     SourceManager sourceManager;
     ActionManager actionManager;
 protected:
-    SourceManager &getSourceManager() {
+    SourceManager& getSourceManager() {
         return sourceManager;
     }
 
-    ActionManager &getActionManager() {
+    ActionManager& getActionManager() {
         return actionManager;
     }
 
@@ -126,7 +127,7 @@ public:
 
     void onStart() override;
 
-    void setContexts(const Context::Ptr &context);
+    void setContexts(const bsc::Context::Ptr& context);
 
     ~LogicManager() override;
 

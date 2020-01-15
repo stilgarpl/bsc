@@ -12,6 +12,7 @@
 #include "RoleInvalidException.h"
 #include "RoleScope.h"
 
+
 class Roles {
 
 private:
@@ -56,12 +57,12 @@ public:
     template<typename T>
     static void defineRequiredRole(const Role::IdType &roleId) {
         //@todo nullptr check?
-        Context::getActiveContext()->get<RoleDefinitionsContext>().roleDefinitionsPtr->addRole<T>(roleId);
+        bsc::Context::getActiveContext()->get<RoleDefinitionsContext>().roleDefinitionsPtr->addRole<T>(roleId);
     }
 
     template<typename T>
     static const RoleList &getRequiredRolesDefinitions() {
-        return Context::getActiveContext()->get<RoleDefinitionsContext>().roleDefinitionsPtr->getRequiredRoles<T>();
+        return bsc::Context::getActiveContext()->get<RoleDefinitionsContext>().roleDefinitionsPtr->getRequiredRoles<T>();
     }
 
 };

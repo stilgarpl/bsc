@@ -10,6 +10,7 @@
 #include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
 
 
+
 const NetworkIdType &NetworkInfo::getNetworkId() const {
     std::unique_lock g(networkInfoLock);
     return networkId;
@@ -23,7 +24,7 @@ void NetworkInfo::setNetworkId(const NetworkIdType &networkId) {
 void NetworkInfo::addKnownNode(const NodeInfo &nodeInfo) {
     std::unique_lock g(networkInfoLock);
 
-    Context::Ptr context = Context::getActiveContext();
+    bsc::Context::Ptr context = bsc::Context::getActiveContext();
     auto& nodeContext = context->get<NodeContext>();
     auto &node = nodeContext.getNode();
     //  LOGGER(node.getNetworkInfo()->getNetworkId());

@@ -5,9 +5,11 @@
 #ifndef BASYCO_ORDEREDEXECUTIONPOLICY_H
 #define BASYCO_ORDEREDEXECUTIONPOLICY_H
 
-class OrderedExecutionPolicy {
+namespace bsc {
+    class OrderedExecutionPolicy {
 
-};
+    };
+}
 
 
 #endif //BASYCO_ORDEREDEXECUTIONPOLICY_H

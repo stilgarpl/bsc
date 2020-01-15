@@ -8,6 +8,7 @@
 
 #include "ChainDefinitions.h"
 #include "InstanceGenerator.h"
+
 #include <map>
 #include <core/uber/Uber.h>
 
@@ -17,7 +18,7 @@ private:
     ChainIdType chainId;
     template<typename ...T>
     using ChainMap = std::map<ChainIdType, T...>;
-    Uber<ChainMap> chainData;
+    bsc::Uber<ChainMap> chainData;
     InstanceGenerator chainInstanceGenerator;
 
 public:

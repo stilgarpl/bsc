@@ -13,6 +13,8 @@
 #include <Poco/Net/NetException.h>
 #include "NetworkModule.h"
 #include "p2p/modules/basic/BasicModule.h"
+
+
 #include <Poco/Net/SocketStream.h>
 #include <p2p/modules/network/protocol/connection/ServerConnection.h>
 #include <p2p/node/context/NodeContext.h>
@@ -260,7 +262,7 @@ void NetworkModule::purgeDuplicateConnections() {
 
 void NetworkModule::printConnections() {
     std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    auto& out = Context::getActiveContext()->get<InputOutputContext>().out();
+    auto& out = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>().out();
     out << "[" << node.getNodeInfo().getNodeId() << "]:" << std::to_string(acceptedConnections.size())
         << std::endl;
     for (auto&& item : remoteNodes) {
@@ -403,7 +405,7 @@ void NetworkModule::update(Connection &connection, ConnectionState type) {
         case ConnectionState::NEW:
             break;
         case ConnectionState::CONNECTED:
-            Context::getActiveContext()->get<RemoteNodeContext>().getRemoteNode().connect(&connection);
+            bsc::Context::getActiveContext()->get<RemoteNodeContext>().getRemoteNode().connect(&connection);
 //            getRemoteNode().connect(&connection);
             break;
         case ConnectionState::DISCONNECTED:

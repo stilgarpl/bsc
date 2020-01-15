@@ -19,6 +19,7 @@
 #include <logic/state/LogicStateMachine.h>
 #include <logic/state/DirectNotify.h>
 
+
 enum class ConnectionState {
     NEW,
     CONNECTED,
@@ -37,7 +38,7 @@ private:
     std::queue<std::shared_ptr<BasePacket>> receiveQueue;
     std::condition_variable sendReady;
     std::condition_variable receiveReady;
-    Context::OwnPtr connectionContext = nullptr; //initialized from node context in constructor
+    bsc::Context::OwnPtr connectionContext = nullptr; //initialized from node context in constructor
 private:
 
     std::unique_ptr<std::thread> sendThread;
@@ -85,11 +86,11 @@ public:
 
     BasePacketPtr receive();
 
-    explicit Connection(const Context::Ptr &context);
+    explicit Connection(const bsc::Context::Ptr& context);
 
     ConnectionProcessor &getProcessor();
 
-    Context::Ptr getConnectionContext();
+    bsc::Context::Ptr getConnectionContext();
 
     virtual ~Connection();
 

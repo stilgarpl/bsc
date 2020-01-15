@@ -8,6 +8,7 @@
 
 #include <core/log/Logger.h>
 
+
 struct TriggerEvaluators {
     static constexpr auto triggerValue = [](auto e, auto ... args) {
         LOGGER("getting trigger value " + e.getValue())

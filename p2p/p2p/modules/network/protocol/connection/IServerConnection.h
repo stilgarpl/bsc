@@ -8,10 +8,11 @@
 
 #include "Connection.h"
 
+
 class IServerConnection : public Connection {
 
 public:
-    IServerConnection(Context::Ptr context) : Connection(context) {}
+    IServerConnection(bsc::Context::Ptr context) : Connection(context) {}
 
     virtual void stop() = 0;
 

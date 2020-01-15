@@ -5,16 +5,17 @@
 #include <catch2/catch.hpp>
 #include <core/getset/GetSet.h>
 
+using namespace bsc;
 class TestClass {
 public:
     int _x, _y;
 
     auto x() {
-        return GetSet(_x);
+        return bsc::GetSet(_x);
     }
 
     auto y() {
-        return GetSet(_y);
+        return bsc::GetSet(_y);
     }
 };
 

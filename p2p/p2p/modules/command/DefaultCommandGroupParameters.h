@@ -9,8 +9,9 @@
 #include <parser/parameters/CommandLineParameters.h>
 #include "CommandModule.h"
 
-struct DefaultCommandGroupParameters : CommandLineParameters {
-    Flag help = {'h', "help", "Shows help", false};
+
+struct DefaultCommandGroupParameters : bsc::CommandLineParameters {
+    bsc::Flag help = {'h', "help", "Shows help", false};
 };
 
 CommandModule::CommandExecutionStatus

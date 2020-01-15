@@ -5,6 +5,7 @@
 #include <p2p/modules/network/protocol/packet/NetworkInfoRequest.h>
 #include "AuthModule.h"
 
+
 AuthModule::AuthModule(INode &node) : NodeModuleDependent<AuthModule>(node, "auth") {}
 
 void AuthModule::setupActions(LogicObject::SetupActionHelper &actionHelper) {

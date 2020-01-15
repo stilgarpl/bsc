@@ -8,6 +8,7 @@
 #include <utility>
 #include "StorageResourceIdentificator.h"
 
+
 std::shared_ptr<std::istream> StorageResourceIdentificator::getResourceInputStream() {
 
     auto repoModule = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();

@@ -13,6 +13,7 @@
 #include "logic/LogicManager.h"
 #include "INode.h"
 
+
 #include <memory>
 #include <p2p/dependency/DependencyManager.h>
 #include <p2p/role/RoleScope.h>
@@ -35,20 +36,20 @@ private:
     ConfigurationManager configurationManager;
     Configuration nodeConfiguration;
     LogicManager logicManager;
-    Context::Ptr nodeContext = Context::makeContext();
+    bsc::Context::Ptr nodeContext = bsc::Context::makeContext();
     //if somehow start is called from start or wait from start or stop from... change this to recursive mutex.
     std::recursive_mutex startMutex;
     std::condition_variable_any startedReady;
     bool started = false;
 public:
-    Context::Ptr getContext() override {
+    bsc::Context::Ptr getContext() override {
         return nodeContext;
     }
 
 public:
     //@todo testing...
     void setNodeContextActive() override {
-        Context::setActiveContext(nodeContext);
+        bsc::Context::setActiveContext(nodeContext);
     }
 
 private:

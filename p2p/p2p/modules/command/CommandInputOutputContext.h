@@ -9,7 +9,8 @@
 #include <core/io/InputOutputContext.h>
 #include <sstream>
 
-class CommandInputOutputContext : public InputOutputContext {
+
+class CommandInputOutputContext : public bsc::InputOutputContext {
 private:
     std::stringstream inputStream;
     std::stringstream outputStream;
