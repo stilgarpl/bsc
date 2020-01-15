@@ -11,6 +11,7 @@
 #include <logic/events/Tick.h>
 #include "core/context/Context.h"
 
+
 class NodeActions {
 
 public:
@@ -24,7 +25,7 @@ public:
 
     static void newNodeDiscovered(const NodeInfoEvent &event);
 
-    static void triggerUpdateNode(const Tick &tick);
+    static void triggerUpdateNode(const bsc::Tick& tick);
 
 };
 

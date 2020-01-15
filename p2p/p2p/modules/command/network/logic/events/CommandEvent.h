@@ -9,12 +9,13 @@
 #include <vector>
 #include <logic/IEvent.h>
 
+
 enum class CommandEventId {
     EXECUTE_COMMAND,
     DUMMY_COMMAND,
 };
 
-class CommandEvent : public IEvent<CommandEventId> {
+class CommandEvent : public bsc::IEvent<CommandEventId> {
 
 private:
     std::string commandName;

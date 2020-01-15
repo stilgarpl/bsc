@@ -9,6 +9,7 @@
 #include "logic/IEvent.h"
 
 
+
 enum class ConnectionEventId {
     NEW_CONNECTION,
     CONNECTION_REFUSED,
@@ -23,15 +24,15 @@ enum class ConnectionEventId {
 };
 
 
-class ConnectionEvent : public IEvent<ConnectionEventId> {
+class ConnectionEvent : public bsc::IEvent<ConnectionEventId> {
 
 private:
-    Connection *connection;
+    Connection* connection;
 
 public:
-    Connection *getConnection() const;
+    Connection* getConnection() const;
 
-    void setConnection(Connection *connection);
+    void setConnection(Connection* connection);
 };
 
 

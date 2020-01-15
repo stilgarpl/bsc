@@ -10,6 +10,7 @@
 #include "logic/IEvent.h"
 
 
+
 enum class NodeEventId {
     NEW_NODE_DISCOVERED,
     NODE_CONNECTED,
@@ -17,15 +18,15 @@ enum class NodeEventId {
     NODE_INFO_RECEIVED,
 };
 
-class NodeInfoEvent : public IEvent<NodeEventId> {
+class NodeInfoEvent : public bsc::IEvent<NodeEventId> {
 private:
     NodeInfo nodeInfo;
 
 
 public:
-    const NodeInfo &getNodeInfo() const;
+    const NodeInfo& getNodeInfo() const;
 
-    void setNodeInfo(const NodeInfo &nodeInfo);
+    void setNodeInfo(const NodeInfo& nodeInfo);
 
 
 };

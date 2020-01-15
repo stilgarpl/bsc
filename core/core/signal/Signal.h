@@ -18,7 +18,7 @@ namespace bsc {
     public:
         typedef std::function<void(Args...)> Func;
         typedef std::shared_ptr<Func> FuncPtr;
-        typedef std::__cxx11::list<FuncPtr> FuncList;
+        typedef std::list<FuncPtr> FuncList;
         //@todo think about removing this mutex:
         mutable std::recursive_mutex signalLock;
     private:

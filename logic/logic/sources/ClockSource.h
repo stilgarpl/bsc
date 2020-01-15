@@ -6,27 +6,29 @@
 #define BASYCO_CLOCKSOURCE_H
 
 #include <chrono>
-#include "../ISource.h"
-#include "../events/Tick.h"
+#include <logic/events/Tick.h>
+#include <logic/ISource.h>
 
-class ClockSource : public ISource {
-    typedef Tick::Clock Clock;
-    typedef std::chrono::time_point<Clock> TimePoint;
-    typedef Tick::Duration Duration;
-private:
-    std::map<Duration, TimePoint> lastTick;
-protected:
-    TimePoint getLastTick(Duration d);
+namespace bsc {
+    class ClockSource : public ISource {
+        typedef Tick::Clock Clock;
+        typedef std::chrono::time_point<Clock> TimePoint;
+        typedef Tick::Duration Duration;
+    private:
+        std::map<Duration, TimePoint> lastTick;
+    protected:
+        TimePoint getLastTick(Duration d);
 
-    void setLastTick(Duration d, TimePoint t);
+        void setLastTick(Duration d, TimePoint t);
 
-public:
-    explicit ClockSource(SourceManager& sourceManager);
+    public:
+        explicit ClockSource(SourceManager& sourceManager);
 
-    void run() override;
+        void run() override;
 
 
-};
+    };
+}
 
 
 #endif //BASYCO_CLOCKSOURCE_H

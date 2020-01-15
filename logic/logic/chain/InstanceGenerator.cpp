@@ -5,7 +5,7 @@
 #include "InstanceGenerator.h"
 #include <atomic>
 
-InstanceGenerator::InstanceType InstanceGenerator::nextValue() {
+bsc::InstanceGenerator::InstanceType bsc::InstanceGenerator::nextValue() {
     std::lock_guard<std::mutex> g(valueLock);
     //@todo how to make it node-local?
     static std::atomic<InstanceType> globalValue = 2;

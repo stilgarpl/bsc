@@ -9,19 +9,22 @@
 #include "../LogicObject.h"
 #include "../events/TriggerEvent.h"
 
-struct TriggerConditions {
 
-    template<typename TriggerIdType>
-    static auto trigger(TriggerIdType triggerId) {
-        return LogicObject::event<TriggerEvent<TriggerIdType>>(triggerId);
-    }
+namespace bsc {
+    struct TriggerConditions {
 
-    template<typename TriggerIdType, typename TriggerValue>
-    static auto trigger(TriggerIdType triggerId) {
-        return LogicObject::event<TriggerEvent<TriggerIdType, TriggerValue>>(triggerId);
-    }
+        template<typename TriggerIdType>
+        static auto trigger(TriggerIdType triggerId) {
+            return LogicObject::event < TriggerEvent < TriggerIdType >> (triggerId);
+        }
 
-};
+        template<typename TriggerIdType, typename TriggerValue>
+        static auto trigger(TriggerIdType triggerId) {
+            return LogicObject::event < TriggerEvent < TriggerIdType, TriggerValue >> (triggerId);
+        }
+
+    };
+}
 
 
 #endif //BASYCO_TRIGGERCONDITIONS_H

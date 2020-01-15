@@ -11,14 +11,14 @@
 #include "logic/sources/EventQueueSource.h"
 
 
-class NetworkSource : public EventQueueSource<NetworkInfoEvent> {
+class NetworkSource : public bsc::EventQueueSource<NetworkInfoEvent> {
 
 public:
-    NetworkSource(SourceManager &sourceManager);
+    NetworkSource(bsc::SourceManager& sourceManager);
 
-    void networkInfoReceived(const NetworkInfo &networkInfo);
+    void networkInfoReceived(const NetworkInfo& networkInfo);
 
-    void saveNetworkInfo(const NetworkInfo &networkInfo);
+    void saveNetworkInfo(const NetworkInfo& networkInfo);
 };
 
 

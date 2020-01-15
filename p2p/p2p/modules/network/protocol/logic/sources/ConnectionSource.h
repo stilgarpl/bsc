@@ -11,22 +11,23 @@
 #include <logic/sources/EventQueueSource.h>
 #include <logic/sources/AutoSource.h>
 
-class ConnectionSource : public ISource {
+
+class ConnectionSource : public bsc::ISource {
 
 private:
-    EventQueueSource<ConnectionEvent, ConnectionSource> connSource;
-    EventQueueSource<PacketEvent, ConnectionSource> packetSource;
-    AutoSource advancedPacketSource;
+    bsc::EventQueueSource<ConnectionEvent, ConnectionSource> connSource;
+    bsc::EventQueueSource<PacketEvent, ConnectionSource> packetSource;
+    bsc::AutoSource advancedPacketSource;
 public:
 
 
-    explicit ConnectionSource(SourceManager &sourceManager);
+    explicit ConnectionSource(bsc::SourceManager& sourceManager);
 
-    void newConnection(Connection *con);
+    void newConnection(Connection* con);
 
-    void sentPacket(std::shared_ptr<BasePacket> p, Connection *connection);
+    void sentPacket(std::shared_ptr<BasePacket> p, Connection* connection);
 
-    void receivedPacket(std::shared_ptr<BasePacket> p, Connection *connection);
+    void receivedPacket(std::shared_ptr<BasePacket> p, Connection* connection);
 
     void droppedPacket(std::shared_ptr<BasePacket> p, Connection *connection);
 

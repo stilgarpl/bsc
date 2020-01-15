@@ -4,8 +4,9 @@
 
 #include "LogicContext.h"
 
-LogicContext::LogicContext(LogicManager &logicManager) : logicManager(logicManager) {}
 
-LogicManager &LogicContext::getLogicManager() const {
+bsc::LogicContext::LogicContext(LogicManager& logicManager) : logicManager(logicManager) {}
+
+bsc::LogicManager& bsc::LogicContext::getLogicManager() const {
     return logicManager;
 }

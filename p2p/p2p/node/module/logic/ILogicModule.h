@@ -15,8 +15,11 @@
 #include <logic/LogicObject.h>
 #include <logic/state/DirectNotify.h>
 
+
 class ILogicModule
-        : public INodeModule, public LogicObject, public LogicStateMachine<ILogicModule, ModuleState, DirectNotify> {
+        : public INodeModule,
+          public bsc::LogicObject,
+          public bsc::LogicStateMachine<ILogicModule, ModuleState, bsc::DirectNotify> {
 
 public:
 
@@ -24,7 +27,7 @@ public:
         return LogicObject::setupLogic();
     }
 
-    explicit ILogicModule(INode &node) : INodeModule(node), LogicObject(node.getLogicManager()),
+    explicit ILogicModule(INode& node) : INodeModule(node), LogicObject(node.getLogicManager()),
                                          LogicStateMachine(*this) {
         //@todo move to state definition when I figure it out
         addState(ModuleState::UNINITIALIZED, ModuleState::INITIALIZED, ModuleState::LOGIC_READY,
@@ -66,14 +69,16 @@ public:
             return *this;
         }
 
-        ModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, LogicObject &lo,
-                               INode &node)
+        ModuleLogicChainHelper(const EventHelper<EventType, Args...>& eventHelper, bsc::LogicManager& l,
+                               LogicObject& lo,
+                               INode& node)
                 : SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...>(eventHelper, l, lo),
                   node(node) {}
 
         template<typename NewThisType>
-        ModuleLogicChainHelper(const EventHelper<EventType, Args...> &eventHelper, LogicManager &l, LogicObject &lo,
-                               const NewThisType &self)
+        ModuleLogicChainHelper(const EventHelper<EventType, Args...>& eventHelper, bsc::LogicManager& l,
+                               LogicObject& lo,
+                               const NewThisType& self)
                 : SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...>(eventHelper, l, lo, self),
                   node(self.node) {
 

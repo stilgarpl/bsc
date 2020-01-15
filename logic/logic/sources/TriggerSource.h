@@ -6,39 +6,40 @@
 #define BASYCO_TRIGGERSOURCE_H
 
 
-#include "../ISource.h"
-#include "../events/TriggerEvent.h"
-#include "AutoSource.h"
+#include <logic/events/TriggerEvent.h>
+#include <logic/ISource.h>
+#include <logic/sources/AutoSource.h>
 
+namespace bsc {
+    class TriggerSource : public ISource {
 
-class TriggerSource : public ISource {
+    private:
+        AutoSource source;
 
-private:
-    AutoSource source;
+    public:
 
-public:
+        explicit TriggerSource(SourceManager& sourceManager);
 
-    explicit TriggerSource(SourceManager &sourceManager);
+        template<typename TriggerIdType>
+        void fireTrigger(TriggerIdType triggerId) {
+            LOGGER("firing trigger " + triggerId)
+            source.generateEvent<TriggerEvent<TriggerIdType>>(triggerId);
+        }
 
-    template<typename TriggerIdType>
-    void fireTrigger(TriggerIdType triggerId) {
-        LOGGER("firing trigger " + triggerId)
-        source.generateEvent<TriggerEvent<TriggerIdType>>(triggerId);
-    }
+        template<typename TriggerIdType, typename TriggerValueType>
+        void fireTrigger(TriggerIdType triggerId, TriggerValueType value) {
+            LOGGER("firing trigger " + triggerId + " with value " + value)
+            source.generateEvent<TriggerEvent<TriggerIdType, TriggerValueType>>(triggerId, value);
+        }
 
-    template<typename TriggerIdType, typename TriggerValueType>
-    void fireTrigger(TriggerIdType triggerId, TriggerValueType value) {
-        LOGGER("firing trigger " + triggerId + " with value " + value)
-        source.generateEvent<TriggerEvent<TriggerIdType, TriggerValueType>>(triggerId, value);
-    }
+        void run() override;
 
-    void run() override;
+        void onStop() override;
 
-    void onStop() override;
+        void onStart() override;
 
-    void onStart() override;
-
-};
+    };
+}
 
 
 #endif //BASYCO_TRIGGERSOURCE_H

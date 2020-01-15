@@ -7,36 +7,38 @@
 
 #include "../IEvent.h"
 
-template<typename TriggerIdType, typename TriggerValueType = void>
-class TriggerEvent : public IEvent<TriggerIdType> {
 
-private:
-    TriggerValueType value;
+namespace bsc {
+    template<typename TriggerIdType, typename TriggerValueType = void>
+    class TriggerEvent : public bsc::IEvent<TriggerIdType> {
 
-public:
+    private:
+        TriggerValueType value;
 
-    explicit TriggerEvent(TriggerValueType value) : value(value) {}
+    public:
 
-    TriggerEvent(TriggerIdType e, TriggerValueType value) : IEvent<TriggerIdType>(e), value(value) {}
+        explicit TriggerEvent(TriggerValueType value) : value(value) {}
 
-    TriggerValueType getValue() const {
-        return value;
-    }
+        TriggerEvent(TriggerIdType e, TriggerValueType value) : IEvent<TriggerIdType>(e), value(value) {}
 
-};
+        TriggerValueType getValue() const {
+            return value;
+        }
 
+    };
 
-template<typename TriggerIdType>
-class TriggerEvent<TriggerIdType, void> : public IEvent<TriggerIdType> {
+    template<typename TriggerIdType>
+    class TriggerEvent<TriggerIdType, void> : public bsc::IEvent<TriggerIdType> {
 
-public:
-    explicit TriggerEvent(TriggerIdType e) : IEvent<TriggerIdType>(e) {}
+    public:
+        explicit TriggerEvent(TriggerIdType e) : IEvent<TriggerIdType>(e) {}
 
-    TriggerEvent() = default;
+        TriggerEvent() = default;
 
-public:
+    public:
 
-};
+    };
+}
 
 
 #endif //BASYCO_TRIGGEREVENT_H

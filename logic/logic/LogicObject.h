@@ -19,24 +19,22 @@
 #include "LogicExceptions.h"
 
 
-//@todo maybe move this to another file
-class InvalidChainException : public std::domain_error {
-public:
-    InvalidChainException(const std::string& arg);
-};
-
-
+namespace bsc {
+    //@todo maybe move this to another file
+    class InvalidChainException : public std::domain_error {
+    public:
+        InvalidChainException(const std::string& arg);
+    };
 
 //@todo replace Args... with AdditionalEventArgs... or sth
+    class LogicObject {
+    protected:
+        LogicManager& logicManager;
 
-class LogicObject {
-protected:
-    LogicManager& logicManager;
+    public:
+        explicit LogicObject(LogicManager& logicManager);
 
-public:
-    explicit LogicObject(LogicManager& logicManager);
-
-public:
+    public:
 
     class SetupActionHelper {
         LogicManager& logicManager;
@@ -188,7 +186,7 @@ public:
                 return;
             }
             LOGGER("chain lock id " + *chainLockId)
-            auto& chainContext = bsc::Context::getActiveContext()->get<GlobalChainContext>();
+            auto& chainContext = Context::getActiveContext()->get<GlobalChainContext>();
             auto& chainLock = chainContext.getChainLock(*chainLockId);
             //@todo maybe use different mutex than chainLock mutex?
             std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
@@ -211,7 +209,7 @@ public:
         static void releaseChainLock(const std::optional<ChainLockIdType>& chainLockId, InstanceType instance) {
             //@todo mutex synchronize this whole method? on mutex from chainLock?
             if (chainLockId) {
-                auto& chainContext = bsc::Context::getActiveContext()->get<GlobalChainContext>();
+                auto& chainContext = Context::getActiveContext()->get<GlobalChainContext>();
                 auto& chainLock = chainContext.getChainLock(*chainLockId);
                 LOGGER("RELEASE BEFORE " + *chainLockId)
                 std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
@@ -551,7 +549,7 @@ public:
                                                            chainedEvent.getInstance(), value,
                                                            chainedEvent.getChainLockId());
 //                            LOGGER("storing chain result in chain context " + std::to_string(Context::getActiveContext()->get<ChainContext>().use_count()) )
-                                bsc::Context::getActiveContext()->get<ChainContext>().storeChainResult<RetType>(
+                                Context::getActiveContext()->get<ChainContext>().storeChainResult<RetType>(
                                         generatedChainId, value);
                                 return result;
                             } else {
@@ -631,13 +629,13 @@ public:
             return transform<ChainEvent<EventType>>([=](const auto& event) {
 //                LOGGER("starting chain " + id)
                 //@todo be careful - if new chain starts before previous one has finished, the chain context will be overwritten. !!!! --- but is it really? I think active context should belong to an event.
-                auto& chainContext = bsc::Context::getActiveContext()->set<ChainContext>(id);
+                auto& chainContext = Context::getActiveContext()->set<ChainContext>(id);
 
                 ChainEvent r(id, id, chainContext.instanceGenerator().nextValue(), event, std::nullopt);
 //                LOGGER("new chain: " + id + " storing initial result " + r.getEventId())
                 chainContext.storeChainResult<EventType>(r.getEventId(), *r.getActualEvent());
                 //debug stuff @todo remove
-                auto activeContext = bsc::Context::getActiveContext();
+                auto activeContext = Context::getActiveContext();
                 activeContext->setDebugId(id);
                 return r;
             });
@@ -807,6 +805,7 @@ public:
     virtual bool setupSources(SetupSourceHelper& sourceHelper) = 0;
 
 };
+}
 
 
 #endif //BASYCO_LOGICOBJECT_H

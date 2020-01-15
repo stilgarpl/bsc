@@ -34,12 +34,12 @@ void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
 }
 
 
-void GravitonProtocol::work(const Tick &tick) {
+void GravitonProtocol::work(const bsc::Tick& tick) {
     std::lock_guard<std::mutex> g(responseMapLock);
 //    LOGGER("gravi work " + std::to_string(responseMap.size()))
     auto it = std::begin(responseMap);
     while (it != std::end(responseMap)) {
-        auto &value = it->second;
+        auto& value = it->second;
 //        LOGGER("in loop")
         if (tick.getNow() - value->getTimeSent() > MAX_TIMEOUT) {
             if (value->getRetry() >= MAX_RETRY) {
@@ -105,4 +105,4 @@ void GravitonProtocol::onConnectionEvent(const ConnectionEvent &event) {
 
 }
 
-GravitonProtocol::GravitonProtocol(LogicManager &logicManager) : IProtocol(logicManager) {}
+GravitonProtocol::GravitonProtocol(bsc::LogicManager& logicManager) : IProtocol(logicManager) {}

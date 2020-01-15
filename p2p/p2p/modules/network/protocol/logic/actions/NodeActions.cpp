@@ -9,6 +9,7 @@
 #include "NodeActions.h"
 
 
+
 #include <p2p/modules/network/NetworkModule.h>
 #include <p2p/modules/network/protocol/packet/NodeInfoGroup.h>
 #include <p2p/modules/network/protocol/connection/ConnectionException.h>
@@ -72,7 +73,7 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
 
 }
 
-void NodeActions::triggerUpdateNode(const Tick &tick) {
+void NodeActions::triggerUpdateNode(const bsc::Tick& tick) {
     bsc::Context::Ptr context = bsc::Context::getActiveContext();
 //    auto& nodeContext = context->get<NodeContext>();
     //@todo imp[lement with RemoteNodes

@@ -9,16 +9,17 @@
 #include <p2p/node/NodeInfo.h>
 #include <logic/IEvent.h>
 
-class AuthHelloEvent : public IEvent<int> {
+
+class AuthHelloEvent : public bsc::IEvent<int> {
     NodeIdType nodeId;
     std::string authData;
 
 public:
-    [[nodiscard]] const NodeIdType &getNodeId() const;
+    [[nodiscard]] const NodeIdType& getNodeId() const;
 
-    void setNodeId(const NodeIdType &nodeId);
+    void setNodeId(const NodeIdType& nodeId);
 
-    [[nodiscard]] const std::string &getAuthData() const;
+    [[nodiscard]] const std::string& getAuthData() const;
 
     void setAuthData(const std::string &authData);
 };

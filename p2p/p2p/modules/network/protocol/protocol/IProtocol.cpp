@@ -23,7 +23,7 @@ void DummyProtocol::onPacketReceived(const PacketEvent &event) {
     LOGGER("on packet received")
 }
 
-void DummyProtocol::work(const Tick &tick) {
+void DummyProtocol::work(const bsc::Tick& tick) {
     LOGGER("on work")
 }
 
@@ -37,7 +37,7 @@ void DummyProtocol::onConnectionEvent(const ConnectionEvent &event) {
 
 }
 
-DummyProtocol::DummyProtocol(LogicManager &logicManager) : IProtocol(logicManager) {}
+DummyProtocol::DummyProtocol(bsc::LogicManager& logicManager) : IProtocol(logicManager) {}
 
 
 void IProtocol::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
@@ -49,7 +49,7 @@ bool IProtocol::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     bool result = true;
     when(event<PacketEvent>(PacketEvent::IdType::PACKET_SENT)).runMethod(&IProtocol::onPacketSent);
     when(event<PacketEvent>(PacketEvent::IdType::PACKET_RECEIVED)).runMethod(&IProtocol::onPacketReceived);
-    when(event<Tick>(800ms)).runMethod(&IProtocol::work);
+    when(event<bsc::Tick>(800ms)).runMethod(&IProtocol::work);
     when(event<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED)).runMethod(&IProtocol::onConnectionEvent);
 
 //    when(event<Tick>(800ms)).runGenericMethod(&IProtocol::testMethod, CommonEvaluators::value("PROTO"));
@@ -58,12 +58,12 @@ bool IProtocol::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
 }
 
 bool IProtocol::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
-    sourceHelper.requireSource<ClockSource>();
+    sourceHelper.requireSource<bsc::ClockSource>();
     sourceHelper.requireSource<ConnectionSource>();
     return true;
 }
 
-IProtocol::IProtocol(LogicManager &logicManager) : LogicObject(logicManager) {}
+IProtocol::IProtocol(bsc::LogicManager& logicManager) : bsc::LogicObject(logicManager) {}
 
 std::future<BasePacketPtr> IProtocol::send(Connection *conn, BasePacketPtr p) {
     return this->send(conn, std::move(p), Status::response);

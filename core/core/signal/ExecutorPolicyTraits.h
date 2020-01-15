@@ -14,7 +14,7 @@ namespace bsc {
 }
 
 //@todo think of better way of initializing policy to executor map.
-#define BSC_MAP_POLICY_TO_EXECUTOR(policy, executor) template <> struct bsc::ExecutorPolicyTraits<policy> { using ExecutorType = executor; };
+#define BSC_MAP_POLICY_TO_EXECUTOR(policy, executor) template <> struct ExecutorPolicyTraits<policy> { using ExecutorType = executor; };
 
 
 #endif //BASYCO_EXECUTORPOLICYTRAITS_H

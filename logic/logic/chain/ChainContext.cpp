@@ -5,15 +5,15 @@
 #include "ChainContext.h"
 
 
-const ChainIdType &ChainContext::getChainId() const {
+const bsc::ChainIdType& bsc::ChainContext::getChainId() const {
     return chainId;
 }
 
-ChainContext::ChainContext(const ChainIdType &chainId) : chainId(chainId) {
+bsc::ChainContext::ChainContext(const ChainIdType& chainId) : chainId(chainId) {
 
 //    LOGGER("chain context construct " + chainId)
 }
 
-ChainContext::~ChainContext() {
+bsc::ChainContext::~ChainContext() {
 //    LOGGER("chain context destruct " + chainId)
 }

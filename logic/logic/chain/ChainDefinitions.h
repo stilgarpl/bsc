@@ -7,9 +7,9 @@
 
 
 #include <string>
-
-using ChainIdType = std::string;
-using ChainLockIdType = ChainIdType;
-using InstanceType = unsigned long;
-
+namespace bsc {
+    using ChainIdType = std::string;
+    using ChainLockIdType = ChainIdType;
+    using InstanceType = unsigned long;
+}
 #endif //BASYCO_CHAINDEFINITIONS_H

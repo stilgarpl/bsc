@@ -2,11 +2,10 @@
 // Created by stilgar on 23.08.17.
 //
 
-#include "SourceManager.h"
 #include "ISource.h"
 
 
-ISource::ISource(SourceManager &sourceManager) : sourceManager(sourceManager) {}
+bsc::ISource::ISource(SourceManager& sourceManager) : sourceManager(sourceManager) {}
 
 //void ISource::registerProviders(SourceManager *sourceManager) {
 ////implement in derived classes as

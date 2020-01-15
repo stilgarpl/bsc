@@ -32,7 +32,7 @@ void NetworkInfo::addKnownNode(const NodeInfo &nodeInfo) {
     if (node.getModule<NetworkModule>()->getNetworkInfo()->getNetworkId() == nodeInfo.getNetworkId() &&
         !isNodeKnown(nodeInfo.getNodeId())) {
 
-        auto &lc = context->get<LogicContext>();
+        auto& lc = context->get<bsc::LogicContext>();
         lc.getLogicManager().getSource<NodeSource>()->nodeDiscovered(nodeInfo);
 
     }

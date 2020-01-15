@@ -11,37 +11,39 @@
 #include <condition_variable>
 #include "ChainDefinitions.h"
 
-class LogicObject;
 
+namespace bsc {
+    class LogicObject;
 
-class ChainLock {
+    class ChainLock {
 
-private:
-    std::recursive_mutex mutexLock;
-    bool lockedFlag = false;
-    std::optional<InstanceType> instance = std::nullopt;
-    std::condition_variable_any chainReady;
+    private:
+        std::recursive_mutex mutexLock;
+        bool lockedFlag = false;
+        std::optional<InstanceType> instance = std::nullopt;
+        std::condition_variable_any chainReady;
 
-public:
-    [[nodiscard]] bool isLocked() const;
+    public:
+        [[nodiscard]] bool isLocked() const;
 
-    [[nodiscard]] const std::optional<InstanceType>& getInstance() const;
+        [[nodiscard]] const std::optional<InstanceType>& getInstance() const;
 
-    void lock(InstanceType newInstance);
+        void lock(InstanceType newInstance);
 
-    void unlock();
+        void unlock();
 
-    void waitForUnlock();
+        void waitForUnlock();
 
-    friend class LogicObject;
+        friend class LogicObject;
 
-private:
+    private:
 
-    decltype(mutexLock)& getMutex() {
-        return mutexLock;
-    }
+        decltype(mutexLock)& getMutex() {
+            return mutexLock;
+        }
 
-};
+    };
+}
 
 
 #endif //BASYCO_CHAINLOCK_H

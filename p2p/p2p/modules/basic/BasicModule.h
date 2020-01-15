@@ -11,6 +11,7 @@
 #include <logic/sources/TriggerSource.h>
 
 
+
 class BasicModule : public NodeModuleDependent<BasicModule> {
 public:
     BasicModule(INode &node);
@@ -34,12 +35,12 @@ public:
 
     template<typename TriggerIdType>
     void fireTrigger(TriggerIdType id) {
-        node.getLogicManager().getSource<TriggerSource>()->fireTrigger<TriggerIdType>(id);
+        node.getLogicManager().getSource<bsc::TriggerSource>()->fireTrigger<TriggerIdType>(id);
     }
 
     template<typename TriggerIdType, typename TriggerValueType>
     void fireTriggerValue(TriggerIdType id, TriggerValueType value) {
-        node.getLogicManager().getSource<TriggerSource>()->fireTrigger<TriggerIdType, TriggerValueType>(id, value);
+        node.getLogicManager().getSource<bsc::TriggerSource>()->fireTrigger<TriggerIdType, TriggerValueType>(id, value);
     }
 
     ///IMPORTANT: DO NOT NAME COMMANDS LIKE THE METHOD THEY CALL FROM OTHER MODULES. I HAD THIS PROBLEM WITH SHUTDOWN, STOP AND SAVECONFIGURATION.

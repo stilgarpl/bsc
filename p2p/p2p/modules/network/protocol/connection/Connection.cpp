@@ -47,8 +47,8 @@ BasePacketPtr Connection::receive() {
 void Connection::workSend(Poco::Net::StreamSocket &socket) {
     Poco::Net::SocketOutputStream os(socket);
     bsc::Context::setActiveContext(getConnectionContext());
-    auto& lc = getConnectionContext()->get<LogicContext>();
-    auto &logicManager = lc.getLogicManager();
+    auto& lc = getConnectionContext()->get<bsc::LogicContext>();
+    auto& logicManager = lc.getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
     while (sending || !sendQueue.empty()) {
@@ -117,8 +117,8 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
 void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 
     bsc::Context::setActiveContext(getConnectionContext());
-    auto& lc = getConnectionContext()->get<LogicContext>();
-    auto &logicManager = lc.getLogicManager();
+    auto& lc = getConnectionContext()->get<bsc::LogicContext>();
+    auto& logicManager = lc.getLogicManager();
     //@todo totally replace all connection source references here with observer pattern
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 

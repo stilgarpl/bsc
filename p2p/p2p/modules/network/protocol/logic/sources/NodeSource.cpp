@@ -4,6 +4,7 @@
 
 #include "NodeSource.h"
 
+
 void NodeSource::nodeInfoReceived(const NodeInfo &nodeInfo) {
     auto event = newEvent();
     event->setNodeInfo(nodeInfo);
@@ -20,4 +21,4 @@ void NodeSource::nodeDiscovered(const NodeInfo &nodeInfo) {
     queueEvent(event);
 }
 
-NodeSource::NodeSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}
+NodeSource::NodeSource(bsc::SourceManager& sourceManager) : EventQueueSource(sourceManager) {}

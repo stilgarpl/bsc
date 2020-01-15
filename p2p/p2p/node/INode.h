@@ -13,6 +13,7 @@
 #include <logic/LogicManager.h>
 
 
+
 class INodeModule;
 
 template<typename ModuleType>
@@ -24,7 +25,7 @@ class INode {
 
 public:
     //is this necessary?
-    virtual LogicManager &getLogicManager() =0;
+    virtual bsc::LogicManager& getLogicManager() = 0;
 
     virtual ConfigurationManager &getConfigurationManager() =0;
 

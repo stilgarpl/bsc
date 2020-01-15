@@ -4,7 +4,8 @@
 
 #include "LogicObject.h"
 
-LogicObject::LogicObject(LogicManager &logicManager) : logicManager(logicManager) {}
+
+bsc::LogicObject::LogicObject(bsc::LogicManager& logicManager) : logicManager(logicManager) {}
 
 
-InvalidChainException::InvalidChainException(const std::string& arg) : domain_error(arg) {}
+bsc::InvalidChainException::InvalidChainException(const std::string& arg) : domain_error(arg) {}

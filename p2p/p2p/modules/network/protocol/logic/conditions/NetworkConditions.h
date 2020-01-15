@@ -8,15 +8,16 @@
 #include <logic/LogicObject.h>
 #include <p2p/modules/network/protocol/logic/events/PacketEvent.h>
 
+
 struct NetworkConditions {
 
     static auto packet(PacketEventId id) {
-        return LogicObject::event<PacketEvent>(id);
+        return bsc::LogicObject::event<PacketEvent>(id);
     }
 
     template<typename PacketType>
     static auto packet(typename SpecificPacketEvent<PacketType>::IdType id) {
-        return LogicObject::event<SpecificPacketEvent<PacketType>>(id);
+        return bsc::LogicObject::event<SpecificPacketEvent<PacketType>>(id);
     }
 
 

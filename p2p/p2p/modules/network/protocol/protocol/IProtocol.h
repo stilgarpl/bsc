@@ -36,7 +36,7 @@ public:
 };
 
 
-class IProtocol : public LogicObject {
+class IProtocol : public bsc::LogicObject {
 public:
 
     enum class Actions {
@@ -46,7 +46,7 @@ public:
         onWork,
     };
 
-    explicit IProtocol(LogicManager &logicManager);
+    explicit IProtocol(bsc::LogicManager& logicManager);
 
     ProtocolWrapper wrap(ConnectionPtr conn) {
         return ProtocolWrapper(std::move(conn), this);
@@ -58,7 +58,7 @@ public:
 
     virtual void onConnectionEvent(const ConnectionEvent &event) =0;
 
-    virtual void work(const Tick &tick)= 0;
+    virtual void work(const bsc::Tick& tick) = 0;
     //virtual void send(Connection *conn, BasePacketPtr p)= 0;
 
     virtual std::future<BasePacketPtr>
@@ -138,10 +138,10 @@ class DummyProtocol : public IProtocol {
 
     void onPacketReceived(const PacketEvent &event) override;
 
-    void work(const Tick &tick) override;
+    void work(const bsc::Tick& tick) override;
 
 public:
-    explicit DummyProtocol(LogicManager &logicManager);
+    explicit DummyProtocol(bsc::LogicManager& logicManager);
 
     std::future<BasePacketPtr> send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) override;
 

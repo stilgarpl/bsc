@@ -5,19 +5,19 @@
 #include "TriggerSource.h"
 
 
-TriggerSource::TriggerSource(SourceManager &sourceManager) : ISource(sourceManager), source(sourceManager) {
+bsc::TriggerSource::TriggerSource(SourceManager& sourceManager) : ISource(sourceManager), source(sourceManager) {
 
 }
 
-void TriggerSource::run() {
+void bsc::TriggerSource::run() {
     waitForStop();
 }
 
-void TriggerSource::onStop() {
+void bsc::TriggerSource::onStop() {
     source.stop();
     source.join();
 }
 
-void TriggerSource::onStart() {
+void bsc::TriggerSource::onStart() {
     source.start();
 }

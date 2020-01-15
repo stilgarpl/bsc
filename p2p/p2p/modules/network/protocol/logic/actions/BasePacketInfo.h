@@ -11,6 +11,7 @@
 #include "logic/events/Tick.h"
 
 
+
 class BasePacketInfo {
 private:
     unsigned int retry = 0;
@@ -18,27 +19,27 @@ private:
     Connection* connection = nullptr;
     //@todo is Tick reference necessary? maybe some global Clock function? or just std::steady_clock ?
     Status expectedStatus = Status::response; //@todo what if we expect more than one response? error for example?
-    Tick::Clock::time_point timeSent;
+    bsc::Tick::Clock::time_point timeSent;
     std::promise<BasePacketPtr> responsePromise;
 
 public:
     BasePacketInfo(const BasePacketPtr& packetPtr, Connection* connection,
-                   const std::chrono::time_point<Tick::Clock>& timeSent);
+                   const std::chrono::time_point<bsc::Tick::Clock>& timeSent);
 
 public:
     const BasePacketPtr& getPacketPtr() const;
 
     void setPacketPtr(const BasePacketPtr &packetPtr);
 
-    const std::chrono::time_point<Tick::Clock>& getTimeSent() const;
+    const std::chrono::time_point<bsc::Tick::Clock>& getTimeSent() const;
 
-    void setTimeSent(const std::chrono::time_point<Tick::Clock>& timeSent);
+    void setTimeSent(const std::chrono::time_point<bsc::Tick::Clock>& timeSent);
 
 public:
-    BasePacketInfo(const BasePacketPtr& packetPtr, const std::chrono::time_point<Tick::Clock>& timeSent);
+    BasePacketInfo(const BasePacketPtr& packetPtr, const std::chrono::time_point<bsc::Tick::Clock>& timeSent);
 
     BasePacketInfo(const BasePacketPtr& packetPtr, Connection* connection,
-                   const std::chrono::time_point<Tick::Clock>& timeSent, Status expectedStatus);
+                   const std::chrono::time_point<bsc::Tick::Clock>& timeSent, Status expectedStatus);
 
     Connection *getConnection() const;
 

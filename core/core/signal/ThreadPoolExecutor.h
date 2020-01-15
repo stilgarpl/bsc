@@ -20,7 +20,7 @@ namespace bsc {
         std::queue<std::pair<std::function<void(void)>, Context::Ptr>> taskQueue;
         std::mutex queueLock;
         std::condition_variable queueReady;
-        std::__cxx11::list<std::shared_ptr<std::thread>> runners;
+        std::list<std::shared_ptr<std::thread>> runners;
         std::atomic<bool> running = true;
         unsigned maxWorker = 500;
 

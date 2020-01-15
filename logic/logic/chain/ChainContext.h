@@ -12,40 +12,42 @@
 #include <map>
 #include <core/uber/Uber.h>
 
-class ChainContext {
+namespace bsc {
+    class ChainContext {
 
-private:
-    ChainIdType chainId;
-    template<typename ...T>
-    using ChainMap = std::map<ChainIdType, T...>;
-    bsc::Uber<ChainMap> chainData;
-    InstanceGenerator chainInstanceGenerator;
+    private:
+        ChainIdType chainId;
+        template<typename ...T>
+        using ChainMap = std::map<ChainIdType, T...>;
+        Uber <ChainMap> chainData;
+        InstanceGenerator chainInstanceGenerator;
 
-public:
-    explicit ChainContext(const ChainIdType &chainId);
+    public:
+        explicit ChainContext(const ChainIdType& chainId);
 
-public:
-    const ChainIdType &getChainId() const;
+    public:
+        const ChainIdType& getChainId() const;
 
-    template<typename EventType>
-    void storeChainResult(ChainIdType id, const EventType &e) {
-        chainData.get<std::shared_ptr<EventType>>()[id] = std::make_shared<EventType>(e);
-    }
+        template<typename EventType>
+        void storeChainResult(ChainIdType id, const EventType& e) {
+            chainData.get<std::shared_ptr<EventType>>()[id] = std::make_shared<EventType>(e);
+        }
 
-    template<typename EventType>
-    EventType& getChainResult(const ChainIdType& id) {
-        auto result = chainData.get<std::shared_ptr<EventType>>()[id];
-        return *result;
-    }
+        template<typename EventType>
+        EventType& getChainResult(const ChainIdType& id) {
+            auto result = chainData.get<std::shared_ptr<EventType>>()[id];
+            return *result;
+        }
 
-    virtual ~ChainContext();
+        virtual ~ChainContext();
 
-    //@todo maybe move it somewhere from context? or not.
-    InstanceGenerator &instanceGenerator() {
-        return chainInstanceGenerator;
-    }
+        //@todo maybe move it somewhere from context? or not.
+        InstanceGenerator& instanceGenerator() {
+            return chainInstanceGenerator;
+        }
 
-};
+    };
+}
 
 
 #endif //BASYCO_CHAINCONTEXT_H

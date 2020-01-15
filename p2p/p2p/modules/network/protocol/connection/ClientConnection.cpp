@@ -12,11 +12,12 @@
 #include "ClientConnection.h"
 
 
+
 ClientConnection::ClientConnection(const Poco::Net::SocketAddress& a, const bsc::Context::Ptr& context) : Connection(
         context),
                                                                                                           socket(a) {
 
-    auto& lm = getConnectionContext()->get<LogicContext>();
+    auto& lm = getConnectionContext()->get<bsc::LogicContext>();
 
     LOGGER("adding new connection, triggering connection established event")
 
@@ -68,8 +69,8 @@ void ClientConnection::shutdown() {
         }
     }
     changeState(ConnectionState::DISCONNECTED);
-    auto& lc = getConnectionContext()->get<LogicContext>();
-    auto &logicManager = lc.getLogicManager();
+    auto& lc = getConnectionContext()->get<bsc::LogicContext>();
+    auto& logicManager = lc.getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
     connectionSourcePtr->connectionClosedClient(this);
 

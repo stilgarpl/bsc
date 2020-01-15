@@ -9,22 +9,23 @@
 #include <p2p/modules/network/protocol/connection/Connection.h>
 #include "logic/IEvent.h"
 
+
 enum class PacketEventId {
     PACKET_SENT,
     PACKET_RECEIVED,
     PACKET_DROPPED,
 };
 
-class PacketEvent : public IEvent<PacketEventId> {
+class PacketEvent : public bsc::IEvent<PacketEventId> {
 private:
     //@todo maybe merge with ConnectionEvent?
     BasePacketPtr packet;
-    Connection *connection;
+    Connection* connection;
 
 public:
-    const BasePacketPtr &getPacket() const;
+    const BasePacketPtr& getPacket() const;
 
-    void setPacket(const BasePacketPtr &packet);
+    void setPacket(const BasePacketPtr& packet);
 
     Connection *getConnection() const;
 
@@ -33,17 +34,17 @@ public:
 };
 
 template<typename PacketType>
-class SpecificPacketEvent : public IEvent<PacketEventId> {
+class SpecificPacketEvent : public bsc::IEvent<PacketEventId> {
 private:
     NetworkPacketPointer<PacketType> packet;
-    Connection *connection;
+    Connection* connection;
 
 public:
-    const NetworkPacketPointer<PacketType> &getPacket() const {
+    const NetworkPacketPointer<PacketType>& getPacket() const {
         return packet;
     }
 
-    void setPacket(const NetworkPacketPointer<PacketType> &packet) {
+    void setPacket(const NetworkPacketPointer<PacketType>& packet) {
         SpecificPacketEvent::packet = packet;
     }
 

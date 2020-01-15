@@ -13,6 +13,7 @@
 #include <logic/state/DeferredNotify.h>
 #include <p2p/modules/filesystem/identification/TransferTypes.h>
 
+
 class TransferManager {
     /**
      * transfer descriptor on server side. created when beginTransfer is used, deleted when finishTransfer is used
@@ -47,7 +48,7 @@ public:
      * transfer descriptor on local side, with its own thread that handles the downloading of the entire source stream from the other node
      */
     class LocalTransferDescriptor
-            : protected LogicStateMachine<LocalTransferDescriptor, TransferState, DeferredNotify> {
+            : protected bsc::LogicStateMachine<LocalTransferDescriptor, TransferState, bsc::DeferredNotify> {
 
         ResourceIdentificatorPtr destination;
         ResourceIdentificatorPtr source;
@@ -128,10 +129,10 @@ public:
      */
     class TransferQueue
             : public LocalTransferDescriptor::ObserverType,
-              public LogicStateMachine<TransferQueue, TransferState, DeferredNotify> {
+              public bsc::LogicStateMachine<TransferQueue, TransferState, bsc::DeferredNotify> {
     private:
         std::list<LocalTransferDescriptorPtr> transfers;
-        TransferManager &manager;
+        TransferManager& manager;
         const decltype(transfers.size()) MAX_CONCURRENT_TRANSFERS = 2;
         std::mutex finishLock;
         std::condition_variable finishReady;

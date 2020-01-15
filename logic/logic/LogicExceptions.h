@@ -7,19 +7,21 @@
 
 #include <stdexcept>
 
-class LogicAssignmentException : public std::domain_error {
+namespace bsc {
+    class LogicAssignmentException : public std::domain_error {
 
-public:
-    explicit LogicAssignmentException(const std::string& arg);
+    public:
+        explicit LogicAssignmentException(const std::string& arg);
 
-    explicit LogicAssignmentException(const char* string);
-};
+        explicit LogicAssignmentException(const char* string);
+    };
 
-class LogicContextInvalid : public std::domain_error {
-public:
-    explicit LogicContextInvalid(const std::string& arg);
+    class LogicContextInvalid : public std::domain_error {
+    public:
+        explicit LogicContextInvalid(const std::string& arg);
 
-    explicit LogicContextInvalid(const char* string);
-};
+        explicit LogicContextInvalid(const char* string);
+    };
+}
 
 #endif //BASYCO_LOGICEXCEPTIONS_H

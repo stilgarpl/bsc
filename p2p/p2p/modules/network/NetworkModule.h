@@ -23,7 +23,6 @@
 #include "p2p/modules/network/remote/exception/RemoteNodeNotFoundException.h"
 
 
-
 struct NodeConnectionInfo {
     ConnectionPtr connection;
     std::optional<NodeIdType> nodeId;
@@ -263,17 +262,17 @@ public: // @todo should be public or shouldn't ?
         return "aaa";
     }
 
-    void testingMethod2(const LogicStateEvent<NetworkModule, int> &event) {
+    void testingMethod2(const bsc::LogicStateEvent<NetworkModule, int>& event) {
         int a = event.getEventId();
         LOGGER("Command testing method " + std::to_string(a));
     }
 
-    static Tick testingMethod3(const Tick &tick) {
+    static bsc::Tick testingMethod3(const bsc::Tick& tick) {
         LOGGER("testing method 3!")
         return tick;
     }
 
-    static Tick testingMethod3s(const Tick &tick, std::string s) {
+    static bsc::Tick testingMethod3s(const bsc::Tick& tick, std::string s) {
         LOGGER("testing method 3! " + s)
         return tick;
     }
@@ -293,12 +292,12 @@ public: // @todo should be public or shouldn't ?
         LOGGER("testing method 1i ! " + std::to_string(a));
     }
 
-    static IEvent<int> testingMethod4(const IEvent<std::string> &se) {
-        IEvent<int> a;
+    static bsc::IEvent<int> testingMethod4(const bsc::IEvent<std::string>& se) {
+        bsc::IEvent<int> a;
         return a;
     }
 
-    template <typename EvenType>
+    template<typename EvenType>
     static EvenType evaluatorTest(const EvenType& e) {
         return e;
     }

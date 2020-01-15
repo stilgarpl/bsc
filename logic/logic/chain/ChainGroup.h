@@ -8,17 +8,19 @@
 
 #include "ChainDefinitions.h"
 
-class ChainGroup {
+namespace bsc {
+    class ChainGroup {
 
-private:
-    ChainIdType chainGroupId;
+    private:
+        ChainIdType chainGroupId;
 
-public:
-    ChainGroup(ChainIdType chainIdType);
+    public:
+        ChainGroup(ChainIdType chainIdType);
 
-    const ChainIdType &getChainGroupId() const;
+        const ChainIdType& getChainGroupId() const;
 
-};
+    };
+}
 
 
 #endif //BASYCO_CHAINGROUP_H

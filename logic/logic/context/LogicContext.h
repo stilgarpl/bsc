@@ -9,21 +9,23 @@
 #include <logic/LogicManager.h>
 
 
-class LogicContext {
+namespace bsc {
+    class LogicContext {
 
-private:
-    LogicManager &logicManager;
+    private:
+        LogicManager& logicManager;
 
-public:
-    LogicContext(LogicManager &logicManager);
+    public:
+        LogicContext(LogicManager& logicManager);
 
-    LogicManager &getLogicManager() const;
+        LogicManager& getLogicManager() const;
 
-    //shortcut method for getting logic manager from active context
-    static LogicManager &getLogicManagerFromActiveContext() {
-        return bsc::Context::getActiveContext()->get<LogicContext>().getLogicManager();
-    }
-};
+        //shortcut method for getting logic manager from active context
+        static LogicManager& getLogicManagerFromActiveContext() {
+            return Context::getActiveContext()->get<LogicContext>().getLogicManager();
+        }
+    };
+}
 
 
 #endif //BASYCO_LOGICCONTEXT_H

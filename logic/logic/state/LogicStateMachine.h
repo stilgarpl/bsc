@@ -13,92 +13,93 @@
 #include "StateMachine.h"
 #include "StateObserver.h"
 
+namespace bsc {
+    template<typename StateObject, typename stateIdType, template<typename, typename> typename NotifyMethodType>
+    class LogicStateMachine : public bsc::StateMachine<stateIdType>, public bsc::Observee<StateObject, stateIdType> {
+    public:
+        using StateIdType = stateIdType;
+        using EventType = LogicStateEvent<StateObject, stateIdType>;
+    protected:
+        using ThisType = LogicStateMachine<StateObject, StateIdType, NotifyMethodType>;
+        using NotifyMethod = NotifyMethodType<StateObject, StateIdType>;
 
-template<typename StateObject, typename stateIdType, template<typename, typename> typename NotifyMethodType>
-class LogicStateMachine : public StateMachine<stateIdType>, public Observee<StateObject, stateIdType> {
-public:
-    using StateIdType = stateIdType;
-    using EventType = LogicStateEvent<StateObject, stateIdType>;
-protected:
-    using ThisType = LogicStateMachine<StateObject, StateIdType, NotifyMethodType>;
-    using NotifyMethod = NotifyMethodType<StateObject, StateIdType>;
+    public:
 
-public:
+        using ObserverType = Observer<StateObject, StateIdType>;
 
-    using ObserverType = Observer<StateObject, StateIdType>;
-
-private:
-    StateObject &object;
-    //ObserverType objects have to exist.
-    std::unique_ptr<NotifyMethod> notifyMethod;
-
-
-    void notify(StateIdType state) {
-        notifyMethod->notify(object, state);
-    }
-
-public:
-
-    void registerStateObserver(ObserverType& observer) {
-        observer.setObservee(this);
-        notifyMethod->registerObserver(observer);
-    }
-
-    void unregisterStateObserver(ObserverType& observer) {
-
-        LOGGER("unregistering observer ")
-        observer.setObservee(nullptr);
-        notifyMethod->unregisterObserver(observer);
-
-    }
+    private:
+        StateObject& object;
+        //ObserverType objects have to exist.
+        std::unique_ptr<NotifyMethod> notifyMethod;
 
 
-    void onEnter(const StateIdType &id) {
-//        LOGGER("LOGIC MACHINE ON ENTER" + std::to_string(id));
-        //@todo handle no logic manager!
-        auto &lm = LogicContext::getLogicManagerFromActiveContext();
-        auto &source = lm.requireSource<LogicStateSource>();
-        source.stateEntered(object, id);
-        notify(id);
-    }
+        void notify(StateIdType state) {
+            notifyMethod->notify(object, state);
+        }
 
-    void onLeave(const StateIdType &id) {
-//        LOGGER("LOGIC MACHINE ON LEAVE" + std::to_string(id));
-        //@todo handle no logic manager!
-        auto &lm = LogicContext::getLogicManagerFromActiveContext();
-        auto &source = lm.requireSource<LogicStateSource>();
-        source.stateLeft(object, id);
-    }
+    public:
 
-    void onInvalidChange(const StateIdType &id) {
-//        LOGGER("LOGIC MACHINE ON invalid CHANGE" + std::to_string(id));
-    }
+        void registerStateObserver(ObserverType& observer) {
+            observer.setObservee(this);
+            notifyMethod->registerObserver(observer);
+        }
 
-    void onInvalidState(const StateIdType &id) {
-//        LOGGER("LOGIC MACHINE ON invalid STATE" + std::to_string(id));
-    }
+        void unregisterStateObserver(ObserverType& observer) {
 
-//    LogicStateMachine() : StateMachine<StateIdType>(onEnter, onLeave) {};
+            LOGGER("unregistering observer ")
+            observer.setObservee(nullptr);
+            notifyMethod->unregisterObserver(observer);
 
-    explicit LogicStateMachine(StateObject &object) : StateMachine<StateIdType>(
-            std::bind(&ThisType::onEnter, this, std::placeholders::_1),
-            std::bind(&ThisType::onLeave, this, std::placeholders::_1),
-            std::bind(&ThisType::onInvalidState, this, std::placeholders::_1),
-            std::bind(&ThisType::onInvalidChange, this, std::placeholders::_1)),
-                                                      object(object) {
+        }
 
-        //@todo handle no logic manager!
-//        auto &lm = LogicContext::getLogicManagerFromActiveContext();
-//        lm.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
-        notifyMethod = std::make_unique<NotifyMethod>();
-    }
 
-    virtual ~LogicStateMachine() {
-        //this should perform cleanup of observers held in notifyMethod. may join notifyMethod thread if threaded
-        notifyMethod = nullptr;
-    }
+        void onEnter(const StateIdType& id) {
+            //        LOGGER("LOGIC MACHINE ON ENTER" + std::to_string(id));
+            //@todo handle no logic manager!
+            auto& lm = LogicContext::getLogicManagerFromActiveContext();
+            auto& source = lm.requireSource<LogicStateSource>();
+            source.stateEntered(object, id);
+            notify(id);
+        }
 
-};
+        void onLeave(const StateIdType& id) {
+            //        LOGGER("LOGIC MACHINE ON LEAVE" + std::to_string(id));
+            //@todo handle no logic manager!
+            auto& lm = LogicContext::getLogicManagerFromActiveContext();
+            auto& source = lm.requireSource<LogicStateSource>();
+            source.stateLeft(object, id);
+        }
+
+        void onInvalidChange(const StateIdType& id) {
+            //        LOGGER("LOGIC MACHINE ON invalid CHANGE" + std::to_string(id));
+        }
+
+        void onInvalidState(const StateIdType& id) {
+            //        LOGGER("LOGIC MACHINE ON invalid STATE" + std::to_string(id));
+        }
+
+        //    LogicStateMachine() : StateMachine<StateIdType>(onEnter, onLeave) {};
+
+        explicit LogicStateMachine(StateObject& object) : StateMachine<StateIdType>(
+                std::bind(&ThisType::onEnter, this, std::placeholders::_1),
+                std::bind(&ThisType::onLeave, this, std::placeholders::_1),
+                std::bind(&ThisType::onInvalidState, this, std::placeholders::_1),
+                std::bind(&ThisType::onInvalidChange, this, std::placeholders::_1)),
+                                                          object(object) {
+
+            //@todo handle no logic manager!
+            //        auto &lm = LogicContext::getLogicManagerFromActiveContext();
+            //        lm.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
+            notifyMethod = std::make_unique<NotifyMethod>();
+        }
+
+        virtual ~LogicStateMachine() {
+            //this should perform cleanup of observers held in notifyMethod. may join notifyMethod thread if threaded
+            notifyMethod = nullptr;
+        }
+
+    };
+}
 
 
 #endif //BASYCO_LOGICSTATEMACHINE_H

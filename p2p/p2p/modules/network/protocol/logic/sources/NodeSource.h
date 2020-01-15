@@ -9,14 +9,15 @@
 #include <p2p/modules/network/protocol/logic/events/NodeInfoEvent.h>
 #include "logic/sources/EventQueueSource.h"
 
-class NodeSource : public EventQueueSource<NodeInfoEvent> {
+
+class NodeSource : public bsc::EventQueueSource<NodeInfoEvent> {
 public:
 
-    NodeSource(SourceManager &sourceManager);
+    NodeSource(bsc::SourceManager& sourceManager);
 
-    void nodeInfoReceived(const NodeInfo &nodeInfo);
+    void nodeInfoReceived(const NodeInfo& nodeInfo);
 
-    void nodeDiscovered(const NodeInfo &nodeInfo);
+    void nodeDiscovered(const NodeInfo& nodeInfo);
 };
 
 

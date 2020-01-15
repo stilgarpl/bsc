@@ -10,14 +10,15 @@
 #include <logic/sources/EventQueueSource.h>
 #include <p2p/modules/auth/logic/events/AuthHelloEvent.h>
 
-class AuthSource : public EventQueueSource<AuthHelloEvent> {
+
+class AuthSource : public bsc::EventQueueSource<AuthHelloEvent> {
 
 
 public:
 
-    explicit AuthSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}
+    explicit AuthSource(bsc::SourceManager& sourceManager) : EventQueueSource(sourceManager) {}
 
-    void hello(const NodeIdType &nodeId, const std::string &authData) {
+    void hello(const NodeIdType& nodeId, const std::string& authData) {
         auto event = newEvent();
         event->setNodeId(nodeId);
         event->setAuthData(authData);

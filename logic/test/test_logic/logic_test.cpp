@@ -9,15 +9,15 @@
 #include <logic/sources/EventQueueSource.h>
 #include <logic/LogicObject.h>
 
+using namespace bsc;
 
-
-class Ping : public IEvent<int> {
+class Ping : public bsc::IEvent<int> {
 
 };
 
-class PingSource : public EventQueueSource<Ping> {
+class PingSource : public bsc::EventQueueSource<Ping> {
 public:
-    explicit PingSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}
+    explicit PingSource(SourceManager& sourceManager) : EventQueueSource(sourceManager) {}
 
     void ping() {
         auto event = newEvent();
@@ -26,17 +26,17 @@ public:
 };
 
 
-class SetupSimpleAction : public LogicObject {
+class SetupSimpleAction : public bsc::LogicObject {
     std::atomic_int counter = 0;
 public:
-    explicit SetupSimpleAction(LogicManager &logicManager) : LogicObject(logicManager) {
+    explicit SetupSimpleAction(bsc::LogicManager& logicManager) : LogicObject(logicManager) {
     }
 
-    void setupActions(SetupActionHelper &actionHelper) override {
+    void setupActions(SetupActionHelper& actionHelper) override {
         when(event<Ping>()).fireNewAction([&](auto event) { counter++; });
     }
 
-    bool assignActions(AssignActionHelper &actionHelper) override {
+    bool assignActions(AssignActionHelper& actionHelper) override {
         return true;
     }
 
@@ -49,11 +49,11 @@ public:
 
 };
 
-class SetupChainAction : public LogicObject {
+class SetupChainAction : public bsc::LogicObject {
     std::atomic_int firstCounter = 0;
     std::atomic_int secondCounter = 0;
 public:
-    explicit SetupChainAction(LogicManager& logicManager) : LogicObject(logicManager) {
+    explicit SetupChainAction(bsc::LogicManager& logicManager) : LogicObject(logicManager) {
     }
 
     void setupActions(SetupActionHelper& actionHelper) override {
@@ -85,11 +85,11 @@ public:
 };
 
 
-class SetupInvalidChainAction : public LogicObject {
+class SetupInvalidChainAction : public bsc::LogicObject {
     std::atomic_int firstCounter = 0;
     std::atomic_int secondCounter = 0;
 public:
-    explicit SetupInvalidChainAction(LogicManager& logicManager) : LogicObject(logicManager) {
+    explicit SetupInvalidChainAction(bsc::LogicManager& logicManager) : LogicObject(logicManager) {
     }
 
     void setupActions(SetupActionHelper& actionHelper) override {
@@ -120,9 +120,9 @@ public:
 
 };
 
-class SetupInvalidAssignment : public LogicObject {
+class SetupInvalidAssignment : public bsc::LogicObject {
 public:
-    SetupInvalidAssignment(LogicManager& logicManager) : LogicObject(logicManager) {}
+    SetupInvalidAssignment(bsc::LogicManager& logicManager) : LogicObject(logicManager) {}
 
 public:
     void setupActions(SetupActionHelper& actionHelper) override {
@@ -153,7 +153,7 @@ TEST_CASE("Basic logic test") {
 //before
     bsc::Context::OwnPtr context = bsc::Context::makeContext();
     bsc::Context::setActiveContext(context);
-    LogicManager logicManager;
+    bsc::LogicManager logicManager;
     logicManager.setContexts(context);
 //@todo think about it, doesn't it seem backwards? maybe logicManager should call setupLogic on all of its logic objects? or maybe not. Node calls setup logic on its modules in specific moment
     SetupSimpleAction setupLogic(logicManager);
@@ -181,7 +181,7 @@ TEST_CASE("Chain logic test") {
 //before
     bsc::Context::OwnPtr context = bsc::Context::makeContext();
     bsc::Context::setActiveContext(context);
-    LogicManager logicManager;
+    bsc::LogicManager logicManager;
     logicManager.setContexts(context);
 //@todo think about it, doesn't it seem backwards? maybe logicManager should call setupLogic on all of its logic objects? or maybe not. Node calls setup logic on its modules in specific moment. But it would be better. Right now setupLogic() can be called many times, breaking logic.
     SetupChainAction setupLogic(logicManager);
@@ -208,18 +208,18 @@ TEST_CASE("Chain logic test") {
 TEST_CASE("Invalid chain logic test") {
     bsc::Context::OwnPtr context = bsc::Context::makeContext();
     bsc::Context::setActiveContext(context);
-    LogicManager logicManager;
+    bsc::LogicManager logicManager;
     logicManager.setContexts(context);
     SetupInvalidChainAction setupLogic(logicManager);
-    REQUIRE_THROWS_AS(setupLogic.setupLogic(), InvalidChainException);
+    REQUIRE_THROWS_AS(setupLogic.setupLogic(), bsc::InvalidChainException);
 }
 
 
 TEST_CASE("Logic exceptions test") {
     bsc::Context::OwnPtr context = bsc::Context::makeContext();
     bsc::Context::setActiveContext(context);
-    LogicManager logicManager;
+    bsc::LogicManager logicManager;
     logicManager.setContexts(context);
     SetupInvalidAssignment setupLogic(logicManager);
-    REQUIRE_THROWS_AS(setupLogic.setupLogic(), LogicAssignmentException);
+    REQUIRE_THROWS_AS(setupLogic.setupLogic(), bsc::LogicAssignmentException);
 }

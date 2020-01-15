@@ -27,7 +27,7 @@ enum class ConnectionState {
 };
 
 
-class Connection : public RoleScope, public LogicStateMachine<Connection, ConnectionState, DirectNotify> {
+class Connection : public RoleScope, public bsc::LogicStateMachine<Connection, ConnectionState, bsc::DirectNotify> {
 
 protected:
     ConnectionProcessor processor;

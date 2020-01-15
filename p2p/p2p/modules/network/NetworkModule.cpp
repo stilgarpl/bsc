@@ -13,8 +13,6 @@
 #include <Poco/Net/NetException.h>
 #include "NetworkModule.h"
 #include "p2p/modules/basic/BasicModule.h"
-
-
 #include <Poco/Net/SocketStream.h>
 #include <p2p/modules/network/protocol/connection/ServerConnection.h>
 #include <p2p/node/context/NodeContext.h>
@@ -31,7 +29,7 @@
 #include <p2p/modules/network/protocol/packet/NetworkInfoRequest.h>
 #include <p2p/modules/network/protocol/packet/NetworkInfoResponse.h>
 #include <p2p/modules/auth/network/packet/AuthHelloPacket.h>
-
+#include <logic/events/LogicStateEvent.h>
 
 using namespace Poco::Net;
 
@@ -45,7 +43,7 @@ void NetworkModule::setupActions(ILogicModule::SetupActionHelper& actionHelper) 
     actionHelper.setAction<NodeInfoEvent>("upNoI", NodeActions::updateNodeInfo);
     actionHelper.setAction<NetworkInfoEvent>("upNeI", NetworkActions::updateNetworkInfo);
     actionHelper.setAction<NodeInfoEvent>("addKnownNode", NodeActions::addKnownNode);
-    actionHelper.setAction<Tick>("trigNodeUp", NodeActions::triggerUpdateNode);
+    actionHelper.setAction<bsc::Tick>("trigNodeUp", NodeActions::triggerUpdateNode);
     actionHelper.setAction<NodeInfoEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
 
 
@@ -81,7 +79,7 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
             });
 
 
-    when(event<Tick>(5s)).fireNewAction([this](auto e) {
+    when(event<bsc::Tick>(5s)).fireNewAction([this](auto e) {
         if (server != nullptr) {
             using namespace std::string_literals;
             LOGGER("SERVER DETAILS >>> ")
@@ -98,7 +96,7 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
 //    when(event<ConnectionEvent>().withId(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).
 
     //send keepalives - I tried using it to help with the packet loss, but it didn't work.
-    when(event<Tick>(120s)).fireNewAction(
+    when(event<bsc::Tick>(120s)).fireNewAction(
             [&, this](auto e) { this->broadcastPacket(KeepAlivePacket::Request::getNew()); });
 
     when(event<ModuleEvent<NetworkModule>>(ModuleState::READY)).fireNewAction(
@@ -150,10 +148,10 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
 //    when(state<NetworkModule, int>(4).entered()/*.left()*/).fireStateChangeReaction([](auto &netMod, auto a) {
 //        LOGGER("net mode test.. " + std::to_string(a) + "  " + netMod.testingMethod())
 //    });//.fireModuleAction(&NetworkModule::testingMethod);
-    when(event < LogicStateEvent<NetworkModule, int>>
+    when(event < bsc::LogicStateEvent<NetworkModule, int>>
     ()).fireNewAction([](auto event) {
         LOGGER("logic state event " + std::to_string(event.getState()) +
-               (event.getMethod() == LogicStateMethod::entered ? " entered" : " left"))
+               (event.getMethod() == bsc::LogicStateMethod::entered ? " entered" : " left"))
     });
 
 //    Tick tick;

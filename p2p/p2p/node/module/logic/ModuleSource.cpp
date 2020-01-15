@@ -5,7 +5,7 @@
 #include "ModuleSource.h"
 
 
-ModuleSource::ModuleSource(SourceManager &sourceManager) : ISource(sourceManager), source(sourceManager) {
+ModuleSource::ModuleSource(bsc::SourceManager& sourceManager) : bsc::ISource(sourceManager), source(sourceManager) {
 
 }
 

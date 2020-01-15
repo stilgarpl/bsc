@@ -8,50 +8,53 @@
 
 #include "../IEvent.h"
 
-template<typename Type>
-class EventWrapper : public IEvent<int> {
-public:
-    using PayloadType = Type;
-private:
-    Type payload;
 
-public:
-    explicit EventWrapper(Type payload) : payload(payload) {}
+namespace bsc {
+    template<typename Type>
+    class EventWrapper : public IEvent<int> {
+    public:
+        using PayloadType = Type;
+    private:
+        Type payload;
 
-    Type &getPayload() {
-        return payload;
-    }
+    public:
+        explicit EventWrapper(Type payload) : payload(payload) {}
 
-    operator Type &() {
-        return payload;
-    }
+        Type& getPayload() {
+            return payload;
+        }
 
-    operator Type() {
-        return payload;
-    }
-};
+        operator Type&() {
+            return payload;
+        }
 
-template<>
-struct EventWrapper<void> : public IEvent<int> {
+        operator Type() {
+            return payload;
+        }
+    };
 
-public:
-    template<typename ... T>
-    explicit EventWrapper(T... t) {}
-};
+    template<>
+    struct EventWrapper<void> : public IEvent<int> {
 
-template<typename EventType, typename ValueType>
-class ConditionalEventWrapper : public EventWrapper<EventType> {
-private:
-    ValueType otherValue;
-public:
-    ConditionalEventWrapper(EventType payload, ValueType otherValue) : EventWrapper<EventType>(payload),
-                                                                       otherValue(otherValue) {}
+    public:
+        template<typename ... T>
+        explicit EventWrapper(T... t) {}
+    };
 
-public:
-    const ValueType &getOtherValue() const {
-        return otherValue;
-    }
-};
+    template<typename EventType, typename ValueType>
+    class ConditionalEventWrapper : public EventWrapper<EventType> {
+    private:
+        ValueType otherValue;
+    public:
+        ConditionalEventWrapper(EventType payload, ValueType otherValue) : EventWrapper<EventType>(payload),
+                                                                           otherValue(otherValue) {}
+
+    public:
+        const ValueType& getOtherValue() const {
+            return otherValue;
+        }
+    };
+}
 
 
 #endif //BASYCO_EVENTWRAPPER_H

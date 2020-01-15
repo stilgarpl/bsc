@@ -7,19 +7,20 @@
 
 
 #include "logic/IEvent.h"
+
 #include <string>
 
 
-class AuthEvent : public IEvent<int> {
+class AuthEvent : public bsc::IEvent<int> {
 
 private:
     std::string login;
     std::string password;
 
 public:
-    const std::string &getLogin() const;
+    const std::string& getLogin() const;
 
-    void setLogin(const std::string &login);
+    void setLogin(const std::string& login);
 
     const std::string &getPassword() const;
 

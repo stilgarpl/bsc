@@ -6,6 +6,7 @@
 #include <p2p/node/module/logic/ModuleSource.h>
 #include "BasicModule.h"
 
+
 BasicModule::BasicModule(INode &node) : NodeModuleDependent<BasicModule>(node, "basic") {
 
 }
@@ -20,7 +21,7 @@ bool BasicModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) 
 }
 
 bool BasicModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
-    sourceHelper.requireSource<ClockSource>();
+    sourceHelper.requireSource<bsc::ClockSource>();
     sourceHelper.requireSource<ModuleSource>();
     return true;
 }

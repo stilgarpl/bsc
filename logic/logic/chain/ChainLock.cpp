@@ -8,15 +8,15 @@
 
 using namespace std::chrono_literals;
 
-bool ChainLock::isLocked() const {
+bool bsc::ChainLock::isLocked() const {
     return lockedFlag;
 }
 
-const std::optional<InstanceType> &ChainLock::getInstance() const {
+const std::optional<bsc::InstanceType>& bsc::ChainLock::getInstance() const {
     return instance;
 }
 
-void ChainLock::lock(InstanceType newInstance) {
+void bsc::ChainLock::lock(InstanceType newInstance) {
     LOGGER("LOCK " + std::to_string(newInstance))
     std::unique_lock<std::recursive_mutex> guard(mutexLock);
     if (lockedFlag) {
@@ -28,7 +28,7 @@ void ChainLock::lock(InstanceType newInstance) {
     instance = newInstance;
 }
 
-void ChainLock::waitForUnlock() {
+void bsc::ChainLock::waitForUnlock() {
     LOGGER("WAIT LOCK")
     std::unique_lock<std::recursive_mutex> guard(mutexLock);
     if (lockedFlag) {
@@ -36,7 +36,7 @@ void ChainLock::waitForUnlock() {
     }
 }
 
-void ChainLock::unlock() {
+void bsc::ChainLock::unlock() {
     LOGGER("UNLOCK")
     std::unique_lock<std::recursive_mutex> guard(mutexLock);
     lockedFlag = false;

@@ -8,19 +8,20 @@
 
 #include <p2p/node/module/ModuleState.h>
 #include "p2p/node/module/logic/events/ModuleEvent.h"
-#include "logic/sources/AutoSource.h"
+#include <logic/sources/AutoSource.h>
 
-class ModuleSource : public ISource {
+
+class ModuleSource : public bsc::ISource {
 
 private:
-    AutoSource source;
+    bsc::AutoSource source;
 
 public:
 
-    explicit ModuleSource(SourceManager &sourceManager);
+    explicit ModuleSource(bsc::SourceManager& sourceManager);
 
     template<typename ModuleType>
-    void moduleStateChanged(const ModuleState &state, ModuleType &module) {
+    void moduleStateChanged(const ModuleState& state, ModuleType& module) {
         ModuleEvent<ModuleType> event(module);
         event.setEventId(state);
         source.generateEvent<ModuleEvent<ModuleType>>(event);

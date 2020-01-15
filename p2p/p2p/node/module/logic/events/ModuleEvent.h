@@ -11,17 +11,17 @@
 
 
 template<typename ModuleType>
-class ModuleEvent : public IEvent<ModuleState> {
+class ModuleEvent : public bsc::IEvent<ModuleState> {
 public:
     typedef ModuleType Type;
 private:
-    ModuleType &module;
+    ModuleType& module;
 public:
-    ModuleType &getModule() const {
+    ModuleType& getModule() const {
         return module;
     }
 
-    explicit ModuleEvent(ModuleType &module) : module(module) {}
+    explicit ModuleEvent(ModuleType& module) : module(module) {}
 
     ModuleState getState() {
         return getEventId();

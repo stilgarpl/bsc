@@ -16,6 +16,7 @@
 #include "ServerConnection.h"
 
 
+
 using namespace std::chrono_literals;
 
 void ServerConnection::run() {
@@ -53,8 +54,8 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket& socket, bsc::C
           IServerConnection(std::move(context)) {
 
     bsc::Context::setActiveContext(getConnectionContext());
-    auto& lc = getConnectionContext()->get<LogicContext>();
-    auto &logicManager = lc.getLogicManager();
+    auto& lc = getConnectionContext()->get<bsc::LogicContext>();
+    auto& logicManager = lc.getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
     connectionSourcePtr->connectionAccepted(this);
 }

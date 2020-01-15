@@ -5,6 +5,7 @@
 #include "NodeSource.h"
 #include "NetworkSource.h"
 
+
 void NetworkSource::networkInfoReceived(const NetworkInfo &networkInfo) {
     auto event = newEvent();
     event->setNetworkInfo(networkInfo);
@@ -14,7 +15,7 @@ void NetworkSource::networkInfoReceived(const NetworkInfo &networkInfo) {
 
 }
 
-NetworkSource::NetworkSource(SourceManager &sourceManager) : EventQueueSource(sourceManager) {}
+NetworkSource::NetworkSource(bsc::SourceManager& sourceManager) : EventQueueSource(sourceManager) {}
 
 void NetworkSource::saveNetworkInfo(const NetworkInfo &networkInfo) {
     auto event = newEvent();

@@ -14,6 +14,7 @@
 #include "INode.h"
 
 
+
 #include <memory>
 #include <p2p/dependency/DependencyManager.h>
 #include <p2p/role/RoleScope.h>
@@ -35,7 +36,7 @@ private:
 
     ConfigurationManager configurationManager;
     Configuration nodeConfiguration;
-    LogicManager logicManager;
+    bsc::LogicManager logicManager;
     bsc::Context::Ptr nodeContext = bsc::Context::makeContext();
     //if somehow start is called from start or wait from start or stop from... change this to recursive mutex.
     std::recursive_mutex startMutex;
@@ -89,7 +90,7 @@ public:
 
     Node(Node &&) = delete;
 
-    LogicManager &getLogicManager() override {
+    bsc::LogicManager& getLogicManager() override {
         return logicManager;
     }
 

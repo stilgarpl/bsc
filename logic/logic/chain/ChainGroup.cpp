@@ -7,9 +7,9 @@
 #include <utility>
 #include "ChainGroup.h"
 
-ChainGroup::ChainGroup(ChainIdType chainIdType) : chainGroupId(std::move(chainIdType)) {}
+bsc::ChainGroup::ChainGroup(ChainIdType chainIdType) : chainGroupId(std::move(chainIdType)) {}
 
-const ChainIdType &ChainGroup::getChainGroupId() const {
+const bsc::ChainIdType& bsc::ChainGroup::getChainGroupId() const {
     return chainGroupId;
 }
 

@@ -10,20 +10,21 @@
 #include "logic/IEvent.h"
 
 
+
 enum class NetworInfoEventId {
     NETWORK_INFO_RECEIVED,
     SAVE_NETWORK_INFO,
 
 };
 
-class NetworkInfoEvent : public IEvent<NetworInfoEventId> {
+class NetworkInfoEvent : public bsc::IEvent<NetworInfoEventId> {
 private:
     NetworkInfo networkInfo;
 
 public:
-    const NetworkInfo &getNetworkInfo() const;
+    const NetworkInfo& getNetworkInfo() const;
 
-    void setNetworkInfo(const NetworkInfo &networkInfo);
+    void setNetworkInfo(const NetworkInfo& networkInfo);
 };
 
 
