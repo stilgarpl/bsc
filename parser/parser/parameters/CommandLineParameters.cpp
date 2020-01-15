@@ -4,28 +4,26 @@
 
 #include <memory>
 #include <numeric>
-#include <core/log/Logger.h>
-#include "ProgramParameters.h"
+#include "CommandLineParameters.h"
 
 
-
-ProgramParameters::ProgramParameters() : parser(parserBuilder().make()) {
+CommandLineParameters::CommandLineParameters() : parser(parserBuilder().make()) {
 
 }
 
-std::shared_ptr<ProgramParameters::Parser> ProgramParameters::ParserBuilder::make() {
+std::shared_ptr<CommandLineParameters::Parser> CommandLineParameters::ParserBuilder::make() {
     reset();
     return parser;
 }
 
-void ProgramParameters::ParserBuilder::reset() {
+void CommandLineParameters::ParserBuilder::reset() {
     //reset internal state of builder
     parser = std::make_shared<Parser>();
     currentKey = 1000;
 
 }
 
-error_t ProgramParameters::Parser::parseArgument(int key, char* arg, struct argp_state* state) {
+error_t CommandLineParameters::Parser::parseArgument(int key, char* arg, struct argp_state* state) {
     auto* self = static_cast<Parser*>(state->input);
     switch (key) {
         case ARGP_KEY_INIT:
@@ -81,14 +79,14 @@ error_t ProgramParameters::Parser::parseArgument(int key, char* arg, struct argp
     return 0;
 }
 
-void ProgramParameters::Parser::parse(int argc, char** argv) {
+void CommandLineParameters::Parser::parse(int argc, char** argv) {
 
-//@todo add ARGP_SILENT to prevent parsing in CommandModule from crashing the app.
-    argp_parse(&argParams, argc, argv, ARGP_IN_ORDER, nullptr, this);
+    argp_parse(&argParams, argc, argv, flags, nullptr, this);
 }
 
-void ProgramParameters::Parser::prepareParser(std::vector<std::string> usage, const std::optional<std::string>& before,
-                                              const std::optional<std::string>& after) {
+void
+CommandLineParameters::Parser::prepareParser(std::vector<std::string> usage, const std::optional<std::string>& before,
+                                             const std::optional<std::string>& after, bool exitOnFailure, bool silent) {
     using namespace std::string_literals;
     //close argOptions:
     argpOptions.push_back({nullptr, 0, nullptr, 0, nullptr, 0});
@@ -104,10 +102,18 @@ void ProgramParameters::Parser::prepareParser(std::vector<std::string> usage, co
             return a + "\n" + b;
         }
     });
+    flags = ARGP_IN_ORDER;
+    if (!exitOnFailure) {
+        flags |= ARGP_NO_EXIT;
+    }
+    if (silent) {
+        flags |= ARGP_SILENT;
+    }
+
     argParams = {argpOptions.data(), Parser::parseArgument, argDoc.c_str(), doc.c_str(), nullptr, nullptr, nullptr};
 }
 
-char* ProgramParameters::Parser::helpFilter(int key, const char* text, void* input) {
+char* CommandLineParameters::Parser::helpFilter(int key, const char* text, void* input) {
     if (text != nullptr) {
         using namespace std::string_literals;
 //        LOGGER("TEXT FILTER IS : "s + text);

@@ -23,22 +23,22 @@ private:
 public:
 
     //@todo think about this global locking: Is it necessary?
-    static std::mutex &getLock() {
+    static std::mutex& getLock() {
         static std::mutex lock;
         return lock;
     }
 
     explicit Logger(std::string name);
 
-    void debug(const std::string &txt);
+    void debug(const std::string& txt);
 
-    void debug(int line, const std::string &txt);
+    void debug(int line, const std::string& txt);
 
-    void error(int line, const std::string &txt);
+    void error(int line, const std::string& txt);
 
-    void error(const std::string &txt);
+    void error(const std::string& txt);
 
-    void info(const std::string &txt);
+    void info(const std::string& txt);
 };
 
 

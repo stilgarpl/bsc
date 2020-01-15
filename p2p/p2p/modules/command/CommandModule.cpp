@@ -205,7 +205,6 @@ CommandModule::CommandGroup& CommandModule::CommandGroup::group(std::string name
         newGroup->groupHandler = parent.defaultGroupHandler;
 
     }
-
     return *groups[name];
 }
 

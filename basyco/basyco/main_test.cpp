@@ -1,6 +1,6 @@
 #include <iostream>
 #include <thread>
-#include <core/parameters/ProgramParameters.h>
+#include <parser/parameters/CommandLineParameters.h>
 #include <list>
 #include <set>
 #include <filesystem>
@@ -10,7 +10,7 @@ using namespace std::chrono_literals;
 
 
 
-struct TestProgramParameters : public ProgramParameters {
+struct TestProgramParameters : public CommandLineParameters {
     Parameter<int> a = {'a', "test", "NUM", "Int value",};
     Group g1 = {"Group 1"};
     Flag b = {'b', "bool", "Bool value"};
@@ -35,7 +35,8 @@ int main(int argc, char* argv[]) {
 //    parameters.before("qewwqewewq");
 //    parameters.after("ewrefesfezfse");
 
-    auto parameters = ProgramParameters::parse<TestProgramParameters>(argc, argv, {{"lallala"}, std::nullopt, "qqww"});
+    auto parameters = CommandLineParameters::parse<TestProgramParameters>(argc, argv,
+                                                                          {{"lallala"}, std::nullopt, "qqww"});
     std::cout << "b is " << (parameters.b() ? "true" : "false ") << " with count "
               << std::to_string(parameters.b.count()) << std::endl;
     std::cout << "a is " << std::to_string(parameters.a().value_or(-1)) << std::endl;

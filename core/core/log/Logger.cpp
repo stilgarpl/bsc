@@ -19,23 +19,23 @@ Logger::Logger(std::string name) : loggerName(std::move(name)) {
     spdlog::set_pattern("[%T]%L:%v");
 }
 
-void Logger::error(const std::string &txt) {
+void Logger::error(const std::string& txt) {
 
 //    logger.error(txt);
 }
 
-void Logger::debug(const std::string &txt) {
+void Logger::debug(const std::string& txt) {
     std::lock_guard<std::mutex> g(getLock());
 //    logger.debug(txt);
 //    std::clog << loggerName << " : " << txt << std::endl;
     spdlog::debug(txt);
 }
 
-void Logger::info(const std::string &txt) {
+void Logger::info(const std::string& txt) {
 //    logger.information(txt);
 }
 
-void Logger::debug(int line, const std::string &txt) {
+void Logger::debug(int line, const std::string& txt) {
 
     std::lock_guard<std::mutex> g(getLock());
     static std::string::size_type instanceLength = 0;
@@ -55,7 +55,7 @@ void Logger::debug(int line, const std::string &txt) {
 //    spdlog::info(txt);
 }
 
-void Logger::error(int line, const std::string &txt) {
+void Logger::error(int line, const std::string& txt) {
 
     std::lock_guard<std::mutex> g(getLock());
     static std::string::size_type instanceLength = 0;

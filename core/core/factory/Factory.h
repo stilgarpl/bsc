@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 
-template<typename ProducedObjectType,typename ...  FactorySpecialization>
+template<typename ProducedObjectType, typename ...  FactorySpecialization>
 struct FactoryTraits {
     using SelectorType = std::string;
     //using ArgumentType = ...
@@ -36,10 +36,11 @@ struct BaseFactory {
 
 };
 
-template<typename ProducedObjectType,typename ...  FactorySpecialization>
+template<typename ProducedObjectType, typename ...  FactorySpecialization>
 struct BaseFactory<false, ProducedObjectType, FactorySpecialization...> {
-    using SelectorType = typename FactoryTraits<ProducedObjectType,FactorySpecialization...>::SelectorType;
-    virtual ProducedObjectType create(const SelectorType& selector)=0;
+    using SelectorType = typename FactoryTraits<ProducedObjectType, FactorySpecialization...>::SelectorType;
+
+    virtual ProducedObjectType create(const SelectorType& selector) = 0;
 };
 
 template<typename ProducedObjectType, typename ...  FactorySpecialization>
@@ -47,7 +48,7 @@ struct BaseFactory<true, ProducedObjectType, FactorySpecialization...> {
     using SelectorType = typename FactoryTraits<ProducedObjectType, FactorySpecialization...>::SelectorType;
     using ArgumentType = typename FactoryTraits<ProducedObjectType, FactorySpecialization...>::ArgumentType;
 
-    virtual ProducedObjectType create(const SelectorType &selector, const ArgumentType &argument) = 0;
+    virtual ProducedObjectType create(const SelectorType& selector, const ArgumentType& argument) = 0;
 };
 
 
@@ -56,9 +57,8 @@ struct Factory
         : public BaseFactory<HasArgumentType<FactoryTraits<ProducedObjectType, FactorySpecialization...>>::value, ProducedObjectType, FactorySpecialization...> {
 };
 
-template<typename ProducedObjectType,typename ...  FactorySpecialization>
-using FactoryPtr = std::shared_ptr<Factory<ProducedObjectType,FactorySpecialization...>>;
-
+template<typename ProducedObjectType, typename ...  FactorySpecialization>
+using FactoryPtr = std::shared_ptr<Factory<ProducedObjectType, FactorySpecialization...>>;
 
 
 #endif //BASYCO_FACTORY_H

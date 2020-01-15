@@ -11,13 +11,12 @@
 #include <p2p/dependency/DependencyManaged.h>
 #include <p2p/node/module/NodeModule.h>
 #include <p2p/node/Node.h>
-#include <core/utils/from_string.h>
 #include <p2p/modules/network/remote/RemoteNode.h>
 #include <p2p/modules/network/NetworkModule.h>
 #include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/command/ICommandsDirectory.h>
-#include <core/utils/template_cast.h>
-#include <core/parameters/ProgramParameters.h>
+#include <parser/cast/template_cast.h>
+#include <parser/parameters/CommandLineParameters.h>
 
 
 class CommandModule : public NodeModuleDependent<CommandModule, NetworkModule> {
@@ -165,7 +164,10 @@ public:
         void handler(std::function<CommandExecutionStatus(const ParametersType&)> handlerFunc) {
             groupHandler = [handlerFunc](ArgumentContainerTypeRef arguments,
                                          const CommandModule::CommandGroup& group) -> GroupHandlerResult {
-                auto parameters = ProgramParameters::parse<ParametersType>(arguments);
+                auto parameters = CommandLineParameters::parse<ParametersType>(arguments, {{},
+                                                                                           {},
+                                                                                           {},
+                                                                                           {false, true}});
                 auto status = handlerFunc(parameters, group);
                 return {status, parameters.arguments()};
 
@@ -196,7 +198,7 @@ public:
             mapCommand(" ", commandName,
                        [f, mod, commandName, params](CommandModule::ArgumentContainerTypeRef vals) {
 
-                           ParametersType localParams = ProgramParameters::parse<ParametersType>(commandName, vals);
+                           ParametersType localParams = CommandLineParameters::parse<ParametersType>(commandName, vals);
                            std::function<RetType(Args...)> func = [mod, localParams, f](Args... args) -> RetType {
                                ((mod.get())->*f)(localParams, args...);
                            };
@@ -323,7 +325,7 @@ public:
         //@todo unify duplicated code with CommandGroup
         defaultGroupHandler = [handlerFunc](ArgumentContainerTypeRef arguments,
                                             const CommandModule::CommandGroup& group) -> GroupHandlerResult {
-            auto parameters = ProgramParameters::parse<ParametersType>(arguments);
+            auto parameters = CommandLineParameters::parse<ParametersType>(arguments);
             auto status = handlerFunc(parameters, group);
             return {status, parameters.arguments()};
 
@@ -483,7 +485,7 @@ public:
         LOGGER("Command testing method INT FLOAT " + std::to_string(a) + " " + std::to_string(b));
     }
 
-    struct CommandPP : public ProgramParameters {
+    struct CommandPP : public CommandLineParameters {
         Parameter<int> a = {'a', "aaa", "NUM", "IntegerParameter"};
     };
 

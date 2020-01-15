@@ -6,10 +6,10 @@
 #define BASYCO_DEFAULTCOMMANDGROUPPARAMETERS_H
 
 
-#include <core/parameters/ProgramParameters.h>
+#include <parser/parameters/CommandLineParameters.h>
 #include "CommandModule.h"
 
-struct DefaultCommandGroupParameters : ProgramParameters {
+struct DefaultCommandGroupParameters : CommandLineParameters {
     Flag help = {'h', "help", "Shows help", false};
 };
 

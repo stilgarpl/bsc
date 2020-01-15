@@ -25,12 +25,12 @@ public:
 
 class InvalidContextValueException : public std::invalid_argument {
 public:
-    InvalidContextValueException(const std::string &arg);
+    InvalidContextValueException(const std::string& arg);
 };
 
 class ContextLoopException : public std::domain_error {
 public:
-    ContextLoopException(const std::string &arg);
+    ContextLoopException(const std::string& arg);
 };
 
 
@@ -94,7 +94,6 @@ private:
     std::map<TypeIdType, std::map<KeyType, std::shared_ptr<void>>> data;
 
 
-
 public:
     template<typename T, typename CustomKeyType>
     bool has(const CustomKeyType& id) {
@@ -152,7 +151,7 @@ public:
 
     template<typename T>
     T& get() {
-      return get<T>(defaultKey);
+        return get<T>(defaultKey);
     }
 
     template<typename T>
@@ -275,8 +274,6 @@ public:
         Context::setActiveContext(prevContext);
     }
 };
-
-
 
 
 #endif //BASYCO_CONTEXT_H

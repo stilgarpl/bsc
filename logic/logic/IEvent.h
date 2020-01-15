@@ -14,7 +14,6 @@ class IEvent {
 public:
     typedef idType IdType;
     using ExecutionPolicy = DefaultExecutionPolicy;
-    //static const bool OriginDefined = constexpr if (originType)
 private:
     IdType eventId;
     bool eventValid = true;
@@ -36,10 +35,6 @@ public:
     void setEventValid(bool v) {
         eventValid = v;
     }
-
-    static void setup(IEvent *event) {
-//        LOGGER("IEVENT SETUP");
-    };
 
 
     IEvent();
@@ -63,8 +58,6 @@ template<typename idType>
 IEvent<idType>::IEvent() : eventContext(Context::makeContext(Context::getActiveContext())) {
 
     eventContext->setDebugId("event context");
-//    eventContext = Context::makeContext(Context::getActiveContext());
-//    eventContext = Context::getActiveContext();
 
 }
 

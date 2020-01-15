@@ -105,5 +105,5 @@ TEST_CASE("Context loop test") {
     context2->setParentContext(context1);
     Context::OwnPtr context3 = Context::makeContext();
     context3->setParentContext(context2);
-    REQUIRE_THROWS_AS(context1->setParentContext(context3),ContextLoopException);
+    REQUIRE_THROWS_AS(context1->setParentContext(context3), ContextLoopException);
 }

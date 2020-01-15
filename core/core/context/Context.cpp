@@ -36,9 +36,9 @@ void Context::setActiveContext(Context::Ptr ctx) {
     activeContext = std::move(ctx);
 }
 
-Context::Context(const Context &other) {
+Context::Context(const Context& other) {
     std::scoped_lock g(contextLock, other.contextLock);
-    for (auto &&item : other.data) {
+    for (auto&& item : other.data) {
         this->data[item.first] = item.second;
     }
     this->parentContext = other.parentContext;
@@ -54,10 +54,10 @@ Context::Context(const Context &other) {
 //    return *this;
 //}
 
-Context &Context::operator+=(const Context::Ptr &other) {
+Context& Context::operator+=(const Context::Ptr& other) {
     std::lock_guard<std::recursive_mutex> guard(contextLock);
 
-    for (auto &&item : other->data) {
+    for (auto&& item : other->data) {
         //std::clog << "Context::+= copying id " << item.first << std::endl;
         this->data[item.first] = item.second;
     }
@@ -66,7 +66,7 @@ Context &Context::operator+=(const Context::Ptr &other) {
     return *this;
 }
 
-Context::Context(const Context::Ptr &ptr) : Context(*ptr) {}
+Context::Context(const Context::Ptr& ptr) : Context(*ptr) {}
 
 Context::ContextPtr Context::makeContext() {
     struct ContextMakeSharedWorkaround : public Context {
@@ -125,6 +125,6 @@ InvalidContextException::InvalidContextException(const std::string& arg) : inval
 
 InvalidContextException::InvalidContextException(const char* string) : invalid_argument(string) {}
 
-ContextLoopException::ContextLoopException(const std::string &arg) : domain_error(arg) {}
+ContextLoopException::ContextLoopException(const std::string& arg) : domain_error(arg) {}
 
-InvalidContextValueException::InvalidContextValueException(const std::string &arg) : invalid_argument(arg) {}
+InvalidContextValueException::InvalidContextValueException(const std::string& arg) : invalid_argument(arg) {}

@@ -24,6 +24,7 @@ protected:
     std::condition_variable shutdownSignal;
 
     void waitForStop();
+
 public:
 
     virtual void run() = 0;

@@ -19,7 +19,7 @@ void OrderedExecutor::execute(std::function<void(void)> task) {
 }
 
 void OrderedExecutor::run() {
-    std::unique_lock <std::mutex> g(queueLock);
+    std::unique_lock<std::mutex> g(queueLock);
     while (working) {
         while (runQueue.empty() && working) {
 //            LOGGER("executor waiting")

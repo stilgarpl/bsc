@@ -66,11 +66,11 @@ public:
      * @param func
      */
     template<typename BaseClass>
-    void forEach(std::function<void(BaseClass &)> func) {
+    void forEach(std::function<void(BaseClass&)> func) {
         std::unique_lock<std::mutex> lock(containerLock);
         for (auto &&[key, it] : containers) {
             if (it != nullptr) {
-                BaseClass &result = *std::static_pointer_cast<BaseClass>(it);
+                BaseClass& result = *std::static_pointer_cast<BaseClass>(it);
                 func(result);
             }
         }
@@ -98,7 +98,7 @@ public:
             ref = std::make_shared<ContainerType>();
 
         }
-        ContainerType &result = *std::static_pointer_cast<ContainerType>(ref);
+        ContainerType& result = *std::static_pointer_cast<ContainerType>(ref);
         return result;
 
     }
@@ -120,16 +120,16 @@ class Type {
 private:
     T t;
 public:
-    operator T &() {
+    operator T&() {
         return t;
     }
 
-    Type &operator=(const T &other) {
+    Type& operator=(const T& other) {
         t = other;
         return *this;
     }
 
-    T &getType() {
+    T& getType() {
         return t;
     }
 };

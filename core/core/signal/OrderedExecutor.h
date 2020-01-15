@@ -15,11 +15,11 @@
 
 class OrderedExecutor : public Executor {
 private:
-    std::unique_ptr <std::thread> orderedExecutorThread;
+    std::unique_ptr<std::thread> orderedExecutorThread;
     std::condition_variable taskReady;
     std::atomic<bool> working = false;
     std::mutex queueLock;
-    std::queue <std::pair<std::function < void(void)>, Context::Ptr>> runQueue;
+    std::queue<std::pair<std::function<void(void)>, Context::Ptr>> runQueue;
 public:
     void execute(std::function<void(void)> task) override;
 

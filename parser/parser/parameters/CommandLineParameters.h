@@ -2,8 +2,8 @@
 // Created by stilgar on 07.01.2020.
 //
 
-#ifndef BASYCO_PROGRAMPARAMETERS_H
-#define BASYCO_PROGRAMPARAMETERS_H
+#ifndef BASYCO_COMMANDLINEPARAMETERS_H
+#define BASYCO_COMMANDLINEPARAMETERS_H
 
 
 #include <optional>
@@ -13,15 +13,15 @@
 #include <map>
 #include <utility>
 #include <memory>
-#include "core/parser/FromString.h"
+#include "parser/parser/FromString.h"
 
 
-class ProgramParameters;
+class CommandLineParameters;
 
 template<typename T>
-concept ParametersClass = std::is_base_of_v<ProgramParameters, T>;
+concept ParametersClass = std::is_base_of_v<CommandLineParameters, T>;
 
-class ProgramParameters {
+class CommandLineParameters {
 private:
     class ParserBuilder;
 
@@ -33,6 +33,7 @@ private:
         std::string doc;
         std::string argDoc;
         argp argParams;
+        unsigned flags;
         std::map<decltype(argp_option::key), ParseFunc> parseMap;
         std::vector<std::string> parsedArguments;
 
@@ -41,7 +42,7 @@ private:
 
         void
         prepareParser(std::vector<std::string> usage, const std::optional<std::string>& before,
-                      const std::optional<std::string>& after);
+                      const std::optional<std::string>& after, bool exitOnFailure, bool silent);
 
         void parse(int argc, char* argv[]);
 
@@ -52,7 +53,7 @@ private:
             return parsedArguments;
         }
 
-        friend class ProgramParameters::ParserBuilder;
+        friend class CommandLineParameters::ParserBuilder;
 
 
     };
@@ -137,30 +138,36 @@ private:
     friend class Alias;
 
 public:
-    ProgramParameters();
+    CommandLineParameters();
 
     struct DocsAndInfo {
-        std::vector<std::string> usageDocs;
-        std::optional<std::string> beforeInfo;
-        std::optional<std::string> afterInfo;
+        std::vector<std::string> usageDocs = {};
+        std::optional<std::string> beforeInfo = std::nullopt;
+        std::optional<std::string> afterInfo = std::nullopt;
+        struct Options {
+            bool exitOnFailure = true;
+            bool silent = false;
+        } options = {};
     };
 
     template<ParametersClass T>
-    [[nodiscard]] static T parse(int argc, char* argv[], DocsAndInfo docsAndInfo = {}) {
+    [[nodiscard]] static T parse(int argc, char* argv[], const DocsAndInfo& docsAndInfo = {}) {
         T t;
-        t.parser->prepareParser(docsAndInfo.usageDocs, docsAndInfo.beforeInfo, docsAndInfo.afterInfo);
+        t.parser->prepareParser(docsAndInfo.usageDocs, docsAndInfo.beforeInfo, docsAndInfo.afterInfo,
+                                docsAndInfo.options.exitOnFailure, docsAndInfo.options.silent);
         t.parser->parse(argc, argv);
         return t;
     }
 
     template<ParametersClass T>
-    [[nodiscard]] static T parse(const std::vector<std::string>& vals) {
+    [[nodiscard]] static T parse(const std::vector<std::string>& vals, const DocsAndInfo& docsAndInfo = {}) {
         std::string empty;
         return parse<T>(empty, vals);
     }
 
     template<ParametersClass T>
-    [[nodiscard]] static T parse(const std::string& commandName, const std::vector<std::string>& vals) {
+    [[nodiscard]] static T
+    parse(const std::string& commandName, const std::vector<std::string>& vals, const DocsAndInfo& docsAndInfo = {}) {
         // guarantee contiguous, null terminated strings
         std::vector<std::vector<char>> vstrings;
         // pointers to those strings
@@ -206,7 +213,7 @@ protected:
 private:
     int counter = 0;
 
-    ProgramParameters::Parser::ParseFunc makeParseFunction() {
+    CommandLineParameters::Parser::ParseFunc makeParseFunction() {
         return [this](const char* input) {
             std::string text = input != nullptr ? input : "";
             if (!value) {
@@ -242,23 +249,23 @@ public:
     BaseParameter(char shortKey, const char* longKey, const char* argumentName, const char* doc,
                   std::optional<T> defaultValue, bool optional, bool hidden) {
         value = defaultValue;
-        auto& builder = ProgramParameters::parserBuilder();
+        auto& builder = CommandLineParameters::parserBuilder();
         builder.addOption(shortKey, longKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
     }
 
     BaseParameter(char shortKey, const char* longKey, const char* doc, const char* argumentName, bool optional,
                   bool hidden) {
-        auto& builder = ProgramParameters::parserBuilder();
+        auto& builder = CommandLineParameters::parserBuilder();
         builder.addOption(shortKey, longKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
     }
 
     BaseParameter(char shortKey, const char* doc, const char* argumentName, bool optional, bool hidden) {
-        auto& builder = ProgramParameters::parserBuilder();
+        auto& builder = CommandLineParameters::parserBuilder();
         builder.addOption(shortKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
     }
 
     BaseParameter(const char* longKey, const char* doc, const char* argumentName, bool optional, bool hidden) {
-        auto& builder = ProgramParameters::parserBuilder();
+        auto& builder = CommandLineParameters::parserBuilder();
         builder.addOption(longKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
     }
 
@@ -383,7 +390,7 @@ class Group {
 
 public:
     Group(const char* doc) {
-        auto& builder = ProgramParameters::parserBuilder();
+        auto& builder = CommandLineParameters::parserBuilder();
         builder.addGroup(doc);
     }
 
@@ -394,19 +401,19 @@ class Alias {
 public:
 
     Alias(char key) {
-        auto& builder = ProgramParameters::parserBuilder();
+        auto& builder = CommandLineParameters::parserBuilder();
         builder.addAlias(key);
     }
 
     Alias(const char* longKey) {
-        auto& builder = ProgramParameters::parserBuilder();
+        auto& builder = CommandLineParameters::parserBuilder();
         builder.addAlias(longKey);
     }
 
     Alias(char key, const char* longKey) {
-        auto& builder = ProgramParameters::parserBuilder();
+        auto& builder = CommandLineParameters::parserBuilder();
         builder.addAlias(key, longKey);
     }
 };
 
-#endif //BASYCO_PROGRAMPARAMETERS_H
+#endif //BASYCO_COMMANDLINEPARAMETERS_H

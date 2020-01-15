@@ -3,8 +3,8 @@
 //
 
 #include <catch2/catch.hpp>
-#include <core/parser/FromString.h>
 #include <map>
+#include <parser/parser/FromString.h>
 
 TEST_CASE("FromString parser test") {
     int five = fromString<int>("5");

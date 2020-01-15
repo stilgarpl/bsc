@@ -15,14 +15,14 @@ private:
 public:
     //@todo maybe allow for FactorySpecialization to affect SelectorType? I think it should
     template<typename ProducedObjectType, typename ...  FactorySpecialization>
-    FactoryPtr<ProducedObjectType,FactorySpecialization...> getFactory(){
+    FactoryPtr<ProducedObjectType, FactorySpecialization...> getFactory() {
 
-        return factories.get<FactoryPtr<ProducedObjectType,FactorySpecialization...>>();
+        return factories.get<FactoryPtr<ProducedObjectType, FactorySpecialization...>>();
     }
 
     template<typename ProducedObjectType, typename ...  FactorySpecialization>
-    void setFactory(FactoryPtr<ProducedObjectType,FactorySpecialization...> ptr) {
-        factories.get<FactoryPtr<ProducedObjectType,FactorySpecialization...>>() = ptr;
+    void setFactory(FactoryPtr<ProducedObjectType, FactorySpecialization...> ptr) {
+        factories.get<FactoryPtr<ProducedObjectType, FactorySpecialization...>>() = ptr;
     }
 };
 

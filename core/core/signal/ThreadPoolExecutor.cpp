@@ -51,7 +51,7 @@ auto ThreadPoolExecutor::getActiveWorkerCount() -> decltype(runners.size()) {
 void ThreadPoolExecutor::stop() {
     running.store(false);
     queueReady.notify_all();
-    for (auto &runner : runners) {
+    for (auto& runner : runners) {
         runner->join();
     }
 
