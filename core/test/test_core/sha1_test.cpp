@@ -4,7 +4,7 @@
 
 #include <catch2/catch.hpp>
 #include <core/utils/crypto.h>
-
+using namespace bsc;
 TEST_CASE("Sha1 test") {
 
     std::string sha1 = calculateSha1OfString("TEST STRING");
