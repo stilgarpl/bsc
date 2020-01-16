@@ -5,10 +5,10 @@
 #ifndef BASYCO_PARTIALJOURNAL_H
 #define BASYCO_PARTIALJOURNAL_H
 
+namespace bsc {
+    class PartialJournal {
 
-class PartialJournal {
-
-};
-
+    };
+}
 
 #endif //BASYCO_PARTIALJOURNAL_H

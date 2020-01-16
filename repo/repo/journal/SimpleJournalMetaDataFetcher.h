@@ -6,23 +6,23 @@
 #define BASYCO_SIMPLEJOURNALMETADATAFETCHER_H
 
 #include "JournalMetaDataFetcher.h"
+namespace bsc {
+    class SimpleJournalMetaDataFetcher : public JournalMetaDataFetcher {
+    public:
+        JournalMetaData makeMetaData() override;
 
-class SimpleJournalMetaDataFetcher : public JournalMetaDataFetcher {
-public:
-    JournalMetaData makeMetaData() override;
-
-private:
-    template<class Archive>
-    void serialize(Archive& ar) {
-        ar(cereal::base_class<JournalMetaDataFetcher>(this));
-    }
+    private:
+        template<class Archive>
+        void serialize(Archive& ar) {
+            ar(cereal::base_class<JournalMetaDataFetcher>(this));
+        }
 
 
-    friend class cereal::access;
-};
-
-CEREAL_REGISTER_TYPE(SimpleJournalMetaDataFetcher)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(JournalMetaDataFetcher, SimpleJournalMetaDataFetcher)
+        friend class cereal::access;
+    };
+}
+CEREAL_REGISTER_TYPE(bsc::SimpleJournalMetaDataFetcher)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::JournalMetaDataFetcher, bsc::SimpleJournalMetaDataFetcher)
 
 
 #endif //BASYCO_SIMPLEJOURNALMETADATAFETCHER_H

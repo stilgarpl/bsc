@@ -4,14 +4,15 @@
 
 #include "ManagedStorageFactory.h"
 #include "InternalStorage.h"
-
+namespace bsc {
 //IStoragePtr ManagedStorageFactory::create(const int &selector) {
 //    return IStoragePtr();
 //}
 
-IStoragePtr ManagedStorageFactory::create(const SelectorType &selector) {
-    //@todo throw if null? or not?
-    return manager.findStorage(selector);
-}
+    IStoragePtr ManagedStorageFactory::create(const SelectorType& selector) {
+        //@todo throw if null? or not?
+        return manager.findStorage(selector);
+    }
 
-ManagedStorageFactory::ManagedStorageFactory(StorageManager &manager) : manager(manager) {}
+    ManagedStorageFactory::ManagedStorageFactory(StorageManager& manager) : manager(manager) {}
+}

@@ -3,30 +3,31 @@
 //
 
 #include "PathTransformer.h"
-
-std::filesystem::path PathTransformer::transformToJournalFormat(fs::path path) const {
-    for (const auto &rule : rules) {
-        path = rule->transformToJournalFormat(path);
+namespace bsc {
+    std::filesystem::path PathTransformer::transformToJournalFormat(fs::path path) const {
+        for (const auto& rule : rules) {
+            path = rule->transformToJournalFormat(path);
+        }
+        return path;
     }
-    return path;
-}
 
-std::filesystem::path PathTransformer::transformFromJournalFormat(fs::path path) const {
-    for (auto rule = rules.rbegin(); rule != rules.rend(); rule++) {
-        path = (*rule)->transformFromJournalFormat(path);
+    std::filesystem::path PathTransformer::transformFromJournalFormat(fs::path path) const {
+        for (auto rule = rules.rbegin(); rule != rules.rend(); rule++) {
+            path = (*rule)->transformFromJournalFormat(path);
+        }
+        return path;
     }
-    return path;
-}
 
-void PathTransformer::addRule(ITransformRulePtr rule) {
-    rules.insert(rule);
+    void PathTransformer::addRule(ITransformRulePtr rule) {
+        rules.insert(rule);
 
-}
+    }
 
-void PathTransformer::removeRule(ITransformRulePtr rule) {
-    rules.erase(rule);
-}
+    void PathTransformer::removeRule(ITransformRulePtr rule) {
+        rules.erase(rule);
+    }
 
-IPathTransformer::RuleSet PathTransformer::getRules() {
-    return rules;
+    IPathTransformer::RuleSet PathTransformer::getRules() {
+        return rules;
+    }
 }

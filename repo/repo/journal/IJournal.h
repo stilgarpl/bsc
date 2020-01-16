@@ -14,17 +14,17 @@
 #include <optional>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/vector.hpp>
+namespace bsc {
 
+    class IJournal {
+    public:
 
-class IJournal {
-public:
-
-public:
-    typedef std::function<void(const JournalStateData &)> Func;
-    typedef std::map<std::pair<JournalMethod, JournalTarget>, std::optional<Func>> FuncMap;
-    //@todo I'm not sure this should be in the interface...
-    typedef std::shared_ptr<JournalState> JournalStatePtr;
-    typedef std::vector<JournalStatePtr> JournalHistory;
+    public:
+        typedef std::function<void(const JournalStateData&)> Func;
+        typedef std::map<std::pair<JournalMethod, JournalTarget>, std::optional<Func>> FuncMap;
+        //@todo I'm not sure this should be in the interface...
+        typedef std::shared_ptr<JournalState> JournalStatePtr;
+        typedef std::vector<JournalStatePtr> JournalHistory;
     typedef std::shared_ptr<IJournal> JournalPtr;
 public:
     virtual ChecksumId getChecksum() const = 0;
@@ -54,16 +54,16 @@ public:
     //@todo setfunc and clearfunc should be replaced with passing a funcmap object to replay()
     virtual void setFunc(const JournalMethod &method, const JournalTarget &target, Func func) = 0;
 
-    virtual void clearFunc() = 0;
+        virtual void clearFunc() = 0;
 
-    virtual JournalStatePtr getState(const CommitTimeType &commitTime, const ChecksumType &checksumType) = 0;
+        virtual JournalStatePtr getState(const CommitTimeType& commitTime, const ChecksumType& checksumType) = 0;
 
-    virtual ~IJournal() = default;
-};
+        virtual ~IJournal() = default;
+    };
 
-typedef std::shared_ptr<IJournal> JournalPtr;
-typedef std::shared_ptr<const IJournal> JournalPtrConst;
-
-CEREAL_REGISTER_TYPE(IJournal)
+    typedef std::shared_ptr<IJournal> JournalPtr;
+    typedef std::shared_ptr<const IJournal> JournalPtrConst;
+}
+CEREAL_REGISTER_TYPE(bsc::IJournal)
 
 #endif //BASYCO_IJOURNAL_H

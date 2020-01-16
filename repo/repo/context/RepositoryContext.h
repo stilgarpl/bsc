@@ -7,15 +7,15 @@
 
 
 #include <repo/repository/RepositoryManager.h>
+namespace bsc {
+    class RepositoryContext {
 
-class RepositoryContext {
+        RepositoryManager& repositoryManager;
 
-    RepositoryManager &repositoryManager;
+    public:
+        explicit RepositoryContext(RepositoryManager& repositoryManager);
 
-public:
-    explicit RepositoryContext(RepositoryManager& repositoryManager);
+    };
 
-};
-
-
+}
 #endif //BASYCO_REPOSITORYCONTEXT_H

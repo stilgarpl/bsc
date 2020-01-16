@@ -3,3 +3,6 @@
 //
 
 #include "RepositoryManager.h"
+namespace bsc {
+
+}

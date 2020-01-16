@@ -7,21 +7,22 @@
 
 
 #include <repo/repository/transformer/ITransformRule.h>
+namespace bsc {
+    class CustomRule : public ITransformRule {
 
-class CustomRule : public ITransformRule {
+    private:
+        std::string from;
+        std::string to;
 
-private:
-    std::string from;
-    std::string to;
+    public:
+        CustomRule(std::string from, std::string to);
 
-public:
-    CustomRule(std::string from, std::string to);
+        std::filesystem::path transformToJournalFormat(fs::path path) override;
 
-    std::filesystem::path transformToJournalFormat(fs::path path) override;
+        std::filesystem::path transformFromJournalFormat(fs::path path) override;
 
-    std::filesystem::path transformFromJournalFormat(fs::path path) override;
-    ~CustomRule() override = default;
-};
-
+        ~CustomRule() override = default;
+    };
+}
 
 #endif //BASYCO_CUSTOMRULE_H

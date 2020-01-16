@@ -5,7 +5,7 @@
 #include <repo/journal/SimpleJournal.h>
 #include <fstream>
 
-
+using namespace bsc;
 class FakeMetaDataFetcher : public JournalMetaDataFetcher {
     JournalMetaData metaData;
 public:

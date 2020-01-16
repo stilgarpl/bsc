@@ -7,34 +7,34 @@
 
 
 #include "IRepository.h"
+namespace bsc {
+    class RepositoryManager {
 
-class RepositoryManager {
+        //@todo this probably should be a map repoId -> repoPtr
+        std::list<RepositoryPtr> repositories;
 
-    //@todo this probably should be a map repoId -> repoPtr
-    std::list<RepositoryPtr> repositories;
+    public:
+        RepositoryPtr getRepository(IRepository::RepoIdType id) {
+            auto it = std::find_if(repositories.begin(), repositories.end(),
+                                   [&](const RepositoryPtr& rep) -> bool { return rep->getRepositoryId() == id; });
+            if (it != repositories.end()) {
+                return *it;
+            } else {
+                return nullptr;
+            }
 
-public:
-    RepositoryPtr getRepository(IRepository::RepoIdType id) {
-        auto it = std::find_if(repositories.begin(), repositories.end(),
-                               [&](const RepositoryPtr &rep) -> bool { return rep->getRepositoryId() == id; });
-        if (it != repositories.end()) {
-            return *it;
-        } else {
-            return nullptr;
         }
 
-    }
-
-    void addRepository(const RepositoryPtr &ptr) {
-        if (getRepository(ptr->getRepositoryId()) == nullptr) {
-            repositories.push_back(ptr);
+        void addRepository(const RepositoryPtr& ptr) {
+            if (getRepository(ptr->getRepositoryId()) == nullptr) {
+                repositories.push_back(ptr);
+            }
         }
-    }
 
-    [[nodiscard]] const std::list<RepositoryPtr> &getRepositories() const {
-        return repositories;
-    }
-};
-
+        [[nodiscard]] const std::list<RepositoryPtr>& getRepositories() const {
+            return repositories;
+        }
+    };
+}
 
 #endif //BASYCO_REPOSITORYMANAGER_H

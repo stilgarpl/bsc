@@ -9,18 +9,18 @@
 #include <core/factory/Factory.h>
 #include "IStorage.h"
 #include "StorageFactorySpecialization.h"
+namespace bsc {
 
+    class StorageFactory : public bsc::Factory<IStoragePtr, bsc::StorageFactoryByType> {
+    private:
+        fs::path storagePath;
+    public:
 
-class StorageFactory : public bsc::Factory<IStoragePtr, bsc::StorageFactoryByType> {
-private:
-    fs::path storagePath;
-public:
+        IStoragePtr create(const SelectorType& selector, const ArgumentType& argument) override;
 
-    IStoragePtr create(const SelectorType& selector, const ArgumentType& argument) override;
+        explicit StorageFactory(fs::path storagePath);
 
-    explicit StorageFactory(fs::path storagePath);
-
-};
-
+    };
+}
 
 #endif //BASYCO_STORAGEFACTORY_H

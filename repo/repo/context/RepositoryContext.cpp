@@ -3,5 +3,6 @@
 //
 
 #include "RepositoryContext.h"
-
-RepositoryContext::RepositoryContext(RepositoryManager &repositoryManager) : repositoryManager(repositoryManager) {}
+namespace bsc {
+    RepositoryContext::RepositoryContext(RepositoryManager& repositoryManager) : repositoryManager(repositoryManager) {}
+}

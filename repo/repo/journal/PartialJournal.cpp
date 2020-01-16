@@ -3,3 +3,7 @@
 //
 
 #include "PartialJournal.h"
+namespace bsc {
+
+
+}

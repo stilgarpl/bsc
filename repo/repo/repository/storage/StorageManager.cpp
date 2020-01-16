@@ -5,13 +5,15 @@
 #include <p2p/node/context/NodeContext.h>
 #include "StorageManager.h"
 #include "InternalStorage.h"
+namespace bsc {
+    StorageManager::StorageManager() {
 
-StorageManager::StorageManager() {
 
+    }
 
-}
+    void StorageManager::setDefaultStorage(const IStorage::StorageId& id, const IStoragePtr& defaultStorage) {
+        StorageManager::defaultStorage = defaultStorage;
+        addStorage(id, defaultStorage);
+    }
 
-void StorageManager::setDefaultStorage(const IStorage::StorageId &id, const IStoragePtr &defaultStorage) {
-    StorageManager::defaultStorage = defaultStorage;
-    addStorage(id, defaultStorage);
 }

@@ -9,31 +9,32 @@
 #include <map>
 #include "IStorage.h"
 
-class StorageManager {
+namespace bsc {
+    class StorageManager {
 //@todo should manager have access to factory and create storages by itself?
-    std::map<IStorage::StorageId, IStoragePtr> storages;
+        std::map<IStorage::StorageId, IStoragePtr> storages;
 
-    IStoragePtr defaultStorage = nullptr;
-public:
-    void addStorage(const IStorage::StorageId &id, const IStoragePtr &storage) {
-        storages[id] = storage;
-    }
+        IStoragePtr defaultStorage = nullptr;
+    public:
+        void addStorage(const IStorage::StorageId& id, const IStoragePtr& storage) {
+            storages[id] = storage;
+        }
 
-    [[nodiscard]] IStoragePtr &findStorage(const IStorage::StorageId &id) {
-        //@todo check if exists first?
-        return storages[id];
-    }
+        [[nodiscard]] IStoragePtr& findStorage(const IStorage::StorageId& id) {
+            //@todo check if exists first?
+            return storages[id];
+        }
 
 
-    [[nodiscard]] const IStoragePtr &getDefaultStorage() const {
-        return defaultStorage;
-    }
+        [[nodiscard]] const IStoragePtr& getDefaultStorage() const {
+            return defaultStorage;
+        }
 
-    StorageManager();
+        StorageManager();
 
-    void setDefaultStorage(const IStorage::StorageId &id, const IStoragePtr &defaultStorage);
+        void setDefaultStorage(const IStorage::StorageId& id, const IStoragePtr& defaultStorage);
 
-};
-
+    };
+}
 
 #endif //BASYCO_STORAGEMANAGER_H

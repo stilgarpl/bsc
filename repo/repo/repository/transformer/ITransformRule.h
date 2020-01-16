@@ -8,25 +8,25 @@
 #include <filesystem>
 #include <set>
 
+namespace bsc {
+    namespace fs = std::filesystem;
 
-namespace fs = std::filesystem;
+    class ITransformRule {
 
-class ITransformRule {
+    private:
+        int priority = 10;
+    public:
+        virtual fs::path transformToJournalFormat(fs::path path) = 0;
 
-private:
-    int priority = 10;
-public:
-    virtual fs::path transformToJournalFormat(fs::path path) = 0;
+        virtual fs::path transformFromJournalFormat(fs::path path) = 0;
 
-    virtual fs::path transformFromJournalFormat(fs::path path) = 0;
+        int getPriority() const {
+            return priority;
+        }
 
-    int getPriority() const {
-        return priority;
-    }
+        virtual ~ITransformRule() = default;
+    };
 
-    virtual ~ITransformRule() = default;
-};
-
-typedef std::shared_ptr<ITransformRule> ITransformRulePtr;
-
+    typedef std::shared_ptr<ITransformRule> ITransformRulePtr;
+}
 #endif //BASYCO_ITRANSFORMRULE_H

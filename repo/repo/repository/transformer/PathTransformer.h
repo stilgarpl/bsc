@@ -7,28 +7,29 @@
 
 
 #include "IPathTransformer.h"
+namespace bsc {
+    class PathTransformer : public IPathTransformer {
 
-class PathTransformer : public IPathTransformer {
+        RuleSet rules;
 
-    RuleSet rules;
+    public:
 
-public:
+    private:
+        [[nodiscard]] std::filesystem::path transformToJournalFormat(fs::path path) const override;
 
-private:
-    [[nodiscard]] std::filesystem::path transformToJournalFormat(fs::path path) const override;
+        [[nodiscard]] std::filesystem::path transformFromJournalFormat(fs::path path) const override;
 
-    [[nodiscard]] std::filesystem::path transformFromJournalFormat(fs::path path) const override;
+        void addRule(ITransformRulePtr rule) override;
 
-    void addRule(ITransformRulePtr rule) override;
+        void removeRule(ITransformRulePtr rule) override;
 
-    void removeRule(ITransformRulePtr rule) override;
+        RuleSet getRules() override;
 
-    RuleSet getRules() override;
-public:
-    ~PathTransformer() override = default;
+    public:
+        ~PathTransformer() override = default;
 
 
-};
-
+    };
+}
 
 #endif //BASYCO_PATHTRANSFORMER_H

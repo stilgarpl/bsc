@@ -7,12 +7,12 @@
 
 
 #include "RepoQuery.h"
+namespace bsc {
+    struct RepoProcessors {
 
-struct RepoProcessors {
+        static std::function<RepoQuery::Response::Ptr(RepoQuery::Request::Ptr)> queryProcessor;
 
-    static std::function<RepoQuery::Response::Ptr(RepoQuery::Request::Ptr)> queryProcessor;
-
-};
-
+    };
+}
 
 #endif //BASYCO_REPOPROCESSORS_H

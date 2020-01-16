@@ -8,26 +8,26 @@
 
 #include "JournalMetaData.h"
 #include <core/utils/cereal_include.h>
-
-class JournalMetaDataFetcher {
-public:
-    virtual JournalMetaData makeMetaData() = 0;
+namespace bsc {
+    class JournalMetaDataFetcher {
+    public:
+        virtual JournalMetaData makeMetaData() = 0;
 
 //protected:
 //    JournalMetaData createMetaDataObject(const NodeIdType& nodeId, const std::string& userId, const std::string& operatingSystem) {
 //        return JournalMetaData(nodeId,userId,operatingSystem);
 //    }
 
-private:
-    template<class Archive>
-    void serialize(Archive& ar) {
-    }
+    private:
+        template<class Archive>
+        void serialize(Archive& ar) {
+        }
 
 
-    friend class cereal::access;
+        friend class cereal::access;
 
-};
-
-CEREAL_REGISTER_TYPE(JournalMetaDataFetcher)
+    };
+}
+CEREAL_REGISTER_TYPE(bsc::JournalMetaDataFetcher)
 
 #endif //BASYCO_JOURNALMETADATAFETCHER_H

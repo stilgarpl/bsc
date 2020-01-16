@@ -7,7 +7,6 @@
 #include <repo/node/RepoModule.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/modules/basic/BasicModule.h>
-#include <p2p/modules/auth/AuthModule.h>
 using namespace bsc;
 
 

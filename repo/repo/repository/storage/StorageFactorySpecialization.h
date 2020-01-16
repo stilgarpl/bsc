@@ -17,7 +17,7 @@ namespace bsc {
     };
 
     template<>
-    struct FactoryTraits<IStoragePtr, bsc::StorageFactoryByType> {
+    struct FactoryTraits<IStoragePtr, StorageFactoryByType> {
         using SelectorType = std::string;
         using ArgumentType = std::string;
     };

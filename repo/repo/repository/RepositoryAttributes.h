@@ -10,38 +10,38 @@
 #include <repo/repository/storage/IStorage.h>
 #include <repo/journal/JournalState.h>
 
+namespace bsc {
+    namespace fs = std::filesystem;
 
-namespace fs = std::filesystem;
+    class RepositoryAttributes {
+        fs::perms permissions = fs::perms::none;
+        uintmax_t size = 0;
+        fs::file_time_type modificationTime = fs::file_time_type::min();
+        ChecksumId checksum; //checksum of the file.
+        bool directory = false;
+        IStorage::ResourceId resourceId;
+    public:
+        fs::perms getPermissions() const;
 
-class RepositoryAttributes  {
-    fs::perms permissions = fs::perms::none;
-    uintmax_t size = 0;
-    fs::file_time_type modificationTime = fs::file_time_type::min();
-    ChecksumId checksum; //checksum of the file.
-    bool directory = false;
-    IStorage::ResourceId resourceId;
-public:
-    fs::perms getPermissions() const;
+        uintmax_t getSize() const;
 
-    uintmax_t getSize() const;
+        fs::file_time_type getModificationTime() const;
 
-    fs::file_time_type getModificationTime() const;
+        const ChecksumId& getChecksum() const;
 
-    const ChecksumId& getChecksum() const;
+        const IStorage::ResourceId& getResourceId() const;
 
-    const IStorage::ResourceId& getResourceId() const;
+        RepositoryAttributes() = default;
 
-    RepositoryAttributes() = default;
+        explicit RepositoryAttributes(const JournalStateData& data);
 
-    explicit RepositoryAttributes(const JournalStateData& data);
+        bool isDirectory() const;
 
-    bool isDirectory() const;
+        bsc::FileData toFileData(const fs::path& path) {
+            return bsc::FileData(path, checksum, permissions, size, modificationTime, directory);
+        }
 
-    bsc::FileData toFileData(const fs::path& path) {
-        return bsc::FileData(path, checksum, permissions, size, modificationTime, directory);
-    }
-
-};
-
+    };
+}
 
 #endif //BASYCO_REPOSITORYATTRIBUTES_H

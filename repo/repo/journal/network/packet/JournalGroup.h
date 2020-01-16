@@ -9,60 +9,60 @@
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 #include <repo/journal/SimpleJournal.h>
 
-
-class JournalGroup : public bsc::PacketGroup {
-public:
-    class Request : public bsc::Packet<JournalGroup, Request> {
-        std::string repoId; //repository with journal we're requesting
-
-    private:
-        template<class Archive>
-        void serialize(Archive& ar) {
-
-            ar(cereal::base_class<Packet < JournalGroup, JournalGroup::Request> > (this), repoId);
-        }
-
+namespace bsc {
+    class JournalGroup : public bsc::PacketGroup {
     public:
-        const std::string &getRepoId() const;
+        class Request : public bsc::Packet<JournalGroup, Request> {
+            std::string repoId; //repository with journal we're requesting
 
-        void setRepoId(const std::string &repoId);
+        private:
+            template<class Archive>
+            void serialize(Archive& ar) {
 
-    private:
-        friend class cereal::access;
+                ar(cereal::base_class<Packet<JournalGroup, JournalGroup::Request> >(this), repoId);
+            }
 
+        public:
+            const std::string& getRepoId() const;
+
+            void setRepoId(const std::string& repoId);
+
+        private:
+            friend class cereal::access;
+
+
+        };
+
+        class Response : public bsc::Packet<JournalGroup, Response> {
+            std::string repoId;
+            JournalPtr journal;
+
+        private:
+            template<class Archive>
+            void serialize(Archive& ar) {
+                ar(cereal::base_class<Packet<JournalGroup, JournalGroup::Response> >(this), journal);
+            }
+
+        public:
+            const std::string& getRepoId() const;
+
+            void setRepoId(const std::string& repoId);
+
+            JournalPtr getJournal() const;
+
+            void setJournal(JournalPtr journal);
+
+        private:
+            friend class cereal::access;
+
+        };
 
     };
-
-    class Response : public bsc::Packet<JournalGroup, Response> {
-        std::string repoId;
-        JournalPtr journal;
-
-    private:
-        template<class Archive>
-        void serialize(Archive& ar) {
-            ar(cereal::base_class<Packet < JournalGroup, JournalGroup::Response> > (this), journal);
-        }
-
-    public:
-        const std::string &getRepoId() const;
-
-        void setRepoId(const std::string &repoId);
-
-        JournalPtr getJournal() const;
-
-        void setJournal(JournalPtr journal);
-
-    private:
-        friend class cereal::access;
-
-    };
-
-};
-
-CEREAL_REGISTER_TYPE(JournalGroup::Request)
-CEREAL_REGISTER_TYPE(JournalGroup::Response)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, JournalGroup::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, JournalGroup::Response)
+}
+CEREAL_REGISTER_TYPE(bsc::JournalGroup::Request)
+CEREAL_REGISTER_TYPE(bsc::JournalGroup::Response)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::JournalGroup::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::JournalGroup::Response)
 
 
 #endif //BASYCO_JOURNALGROUP_H

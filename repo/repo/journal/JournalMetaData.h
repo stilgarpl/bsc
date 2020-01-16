@@ -10,39 +10,39 @@
 #include <core/utils/crypto.h>
 #include <p2p/node/NodeInfo.h>
 #include "JournalTypes.h"
+namespace bsc {
 
+    class JournalMetaData {
+    private:
+        bsc::NodeIdType nodeId;
+        std::string userId;
+        std::string operatingSystem;
 
-class JournalMetaData {
-private:
-    bsc::NodeIdType nodeId;
-    std::string userId;
-    std::string operatingSystem;
+    public:
+        [[nodiscard]] const bsc::NodeIdType& getNodeId() const;
 
-public:
-    [[nodiscard]] const bsc::NodeIdType& getNodeId() const;
+        [[nodiscard]] const std::string& getUserId() const;
 
-    [[nodiscard]] const std::string& getUserId() const;
+        [[nodiscard]] const std::string& getOperatingSystem() const;
 
-    [[nodiscard]] const std::string& getOperatingSystem() const;
+    private:
+        template<class Archive>
+        void serialize(Archive& ar) {
+            ar(CEREAL_NVP(nodeId), CEREAL_NVP(userId), CEREAL_NVP(operatingSystem));
+        }
 
-private:
-    template<class Archive>
-    void serialize(Archive& ar) {
-        ar(CEREAL_NVP(nodeId), CEREAL_NVP(userId), CEREAL_NVP(operatingSystem));
-    }
+    public:
+        JournalMetaData() = default;
 
-public:
-    JournalMetaData() = default;
+        JournalMetaData(bsc::NodeIdType nodeId, std::string userId, std::string operatingSystem);
 
-    JournalMetaData(bsc::NodeIdType nodeId, std::string userId, std::string operatingSystem);
+        ChecksumType getChecksum();
 
-    ChecksumType getChecksum();
+    private:
 
-private:
+        friend class cereal::access;
 
-    friend class cereal::access;
-
-    friend class JournalMetaDataFetcher;
-};
-
+        friend class JournalMetaDataFetcher;
+    };
+}
 #endif //BASYCO_JOURNALMETADATA_H

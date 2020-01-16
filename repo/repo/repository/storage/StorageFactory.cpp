@@ -6,12 +6,13 @@
 
 #include <utility>
 #include "InternalStorage.h"
+namespace bsc {
 
+    IStoragePtr StorageFactory::create(const SelectorType& selector, const ArgumentType& storageName) {
+        //@todo implement actual identifiers and different storages
+        LOGGER("creating storage with path " + (storagePath / storageName).string())
+        return std::make_shared<InternalStorage>(storageName, storagePath / storageName);
+    }
 
-IStoragePtr StorageFactory::create(const SelectorType& selector, const ArgumentType& storageName) {
-    //@todo implement actual identifiers and different storages
-    LOGGER("creating storage with path " + (storagePath / storageName).string())
-    return std::make_shared<InternalStorage>(storageName, storagePath / storageName);
+    StorageFactory::StorageFactory(fs::path storagePath) : storagePath(std::move(storagePath)) {}
 }
-
-StorageFactory::StorageFactory(fs::path storagePath) : storagePath(std::move(storagePath)) {}

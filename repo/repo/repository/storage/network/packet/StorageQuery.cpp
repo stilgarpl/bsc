@@ -5,3 +5,6 @@
 #include "StorageQuery.h"
 #include <logic/context/LogicContext.h>
 
+namespace bsc {
+
+}

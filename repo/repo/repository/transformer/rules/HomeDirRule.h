@@ -7,21 +7,21 @@
 
 
 #include <repo/repository/transformer/ITransformRule.h>
+namespace bsc {
+    class HomeDirRule : public ITransformRule {
 
-class HomeDirRule : public ITransformRule {
+    private:
+        std::string HOME_DIR = getenv("HOME");
+        std::string HOME_PATTERN = "<HOME>";
 
-private:
-    std::string HOME_DIR = getenv("HOME");
-    std::string HOME_PATTERN = "<HOME>";
+    public:
+        std::filesystem::path transformToJournalFormat(fs::path path) override;
 
-public:
-    std::filesystem::path transformToJournalFormat(fs::path path) override;
+        std::filesystem::path transformFromJournalFormat(fs::path path) override;
 
-    std::filesystem::path transformFromJournalFormat(fs::path path) override;
+        ~HomeDirRule() override = default;
 
-    ~HomeDirRule() override = default;
-
-};
-
+    };
+}
 
 #endif //BASYCO_HOMEDIRRULE_H

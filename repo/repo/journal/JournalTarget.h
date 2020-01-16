@@ -4,12 +4,12 @@
 
 #ifndef BASYCO_JOURNALTARGET_H
 #define BASYCO_JOURNALTARGET_H
+namespace bsc {
+    enum class JournalTarget {
+        none,
+        file,
+        directory,
+    };
 
-enum class JournalTarget {
-    none,
-    file,
-    directory,
-};
-
-
+}
 #endif //BASYCO_JOURNALTARGET_H

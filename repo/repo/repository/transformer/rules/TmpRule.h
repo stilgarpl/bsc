@@ -7,19 +7,19 @@
 
 
 #include <repo/repository/transformer/ITransformRule.h>
+namespace bsc {
+    class TmpRule : public ITransformRule {
+    private:
+        const std::string TEMP_PATTERN = "<TEMP>";
 
-class TmpRule : public ITransformRule {
-private:
-    const std::string TEMP_PATTERN = "<TEMP>";
+    public:
+        std::filesystem::path transformToJournalFormat(fs::path path) override;
 
-public:
-    std::filesystem::path transformToJournalFormat(fs::path path) override;
+        std::filesystem::path transformFromJournalFormat(fs::path path) override;
 
-    std::filesystem::path transformFromJournalFormat(fs::path path) override;
+        ~TmpRule() override = default;
 
-    ~TmpRule() override = default;
-
-};
-
+    };
+}
 
 #endif //BASYCO_TMPRULE_H

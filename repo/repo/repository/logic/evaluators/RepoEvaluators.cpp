@@ -3,3 +3,6 @@
 //
 
 #include "RepoEvaluators.h"
+namespace bsc {
+
+}

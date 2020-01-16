@@ -3,3 +3,6 @@
 //
 
 #include "StorageManifest.h"
+namespace bsc {
+
+}

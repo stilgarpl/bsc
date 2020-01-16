@@ -5,3 +5,6 @@
 #include "IStorage.h"
 
 //IStorage::IStorage(IRepository *repository) : repository(repository) {}
+namespace bsc {
+
+}
