@@ -12,7 +12,6 @@
 #include "StorageResourceIdentificator.h"
 
 
-
 void InternalStorage::store(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) {
 
     auto realChecksum = bsc::calculateSha1OfFile(fs::path(sourcePath));
@@ -44,7 +43,7 @@ void InternalStorage::update(const ResourceId& checksum, const size_t& size, con
 
 }
 
-void InternalStorage::sync(const NodeIdType &nodeID) {
+void InternalStorage::sync(const bsc::NodeIdType& nodeID) {
 
 }
 
@@ -83,7 +82,7 @@ std::shared_ptr<std::iostream> InternalStorage::getResourceStream(const Resource
 
 bool InternalStorage::acquireResource(const ResourceId &resourceId) {
 //    auto netModule = NodeContext::getNodeFromActiveContext().getModule<NetworkModule>();
-    auto fileModule = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>();
+    auto fileModule = bsc::NodeContext::getNodeFromActiveContext().getModule<bsc::FilesystemModule>();
 //    StorageQuery::Request::Ptr req = StorageQuery::Request::getNew();
 //    req->setRepositoryId(repository->getRepositoryId());
 //    req->setObjectId(resourceId);
@@ -118,7 +117,7 @@ void InternalStorage::restore(const ResourceId& resourceId, const fs::path& dest
     }
 }
 
-TransferManager::TransferQueuePtr InternalStorage::getTransferQueue() {
+bsc::TransferManager::TransferQueuePtr InternalStorage::getTransferQueue() {
     return transferQueue;
 }
 

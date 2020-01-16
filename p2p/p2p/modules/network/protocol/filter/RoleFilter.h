@@ -8,12 +8,14 @@
 
 #include "PacketFilter.h"
 
-class RoleFilter : public PacketFilter {
-public:
-    bool filter(BasePacketPtr packet) override;
+namespace bsc {
+    class RoleFilter : public bsc::PacketFilter {
+    public:
+        bool filter(BasePacketPtr packet) override;
 
-    ~RoleFilter() override = default;
-};
+        ~RoleFilter() override = default;
+    };
+}
 
 
 #endif //BASYCO_ROLEFILTER_H

@@ -5,7 +5,7 @@
 #include "NodeSource.h"
 
 
-void NodeSource::nodeInfoReceived(const NodeInfo &nodeInfo) {
+void bsc::NodeSource::nodeInfoReceived(const bsc::NodeInfo& nodeInfo) {
     auto event = newEvent();
     event->setNodeInfo(nodeInfo);
     event->setEventId(EventType::IdType::NODE_INFO_RECEIVED);
@@ -13,7 +13,7 @@ void NodeSource::nodeInfoReceived(const NodeInfo &nodeInfo) {
     queueEvent(event);
 }
 
-void NodeSource::nodeDiscovered(const NodeInfo &nodeInfo) {
+void bsc::NodeSource::nodeDiscovered(const bsc::NodeInfo& nodeInfo) {
     auto event = newEvent();
     event->setNodeInfo(nodeInfo);
     event->setEventId(EventType::IdType::NEW_NODE_DISCOVERED);
@@ -21,4 +21,4 @@ void NodeSource::nodeDiscovered(const NodeInfo &nodeInfo) {
     queueEvent(event);
 }
 
-NodeSource::NodeSource(bsc::SourceManager& sourceManager) : EventQueueSource(sourceManager) {}
+bsc::NodeSource::NodeSource(bsc::SourceManager& sourceManager) : EventQueueSource(sourceManager) {}

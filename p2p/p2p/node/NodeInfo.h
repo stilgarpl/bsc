@@ -10,45 +10,48 @@
 #include <iostream>
 #include <core/utils/cereal_include.h>
 
-typedef std::string NodeIdType;
-typedef std::string NetworkIdType;
 
-class NodeInfo {
+namespace bsc {
+    typedef std::string NodeIdType;
+    typedef std::string NetworkIdType;
 
-    NodeIdType nodeId;
-    NetworkIdType networkId;
-    //typename Node::IdType id;
-public:
-    const std::string &getNetworkId() const;
+    class NodeInfo {
 
-    //
-//    Node::IdType getId() const;
-//
-//    void setId(Node::IdType id);
+        NodeIdType nodeId;
+        NetworkIdType networkId;
+        //typename Node::IdType id;
+    public:
+        const std::string& getNetworkId() const;
 
-private:
-    template<class Archive>
-    void serialize(Archive &ar) {
-        ar(nodeId, networkId);
-    }
+        //
+        //    Node::IdType getId() const;
+        //
+        //    void setId(Node::IdType id);
+
+    private:
+        template<class Archive>
+        void serialize(Archive& ar) {
+            ar(nodeId, networkId);
+        }
 
 
-    friend class cereal::access;
+        friend class cereal::access;
 
-public:
-    const NodeIdType &getNodeId() const;
+    public:
+        const NodeIdType& getNodeId() const;
 
-    void setNodeId(const NodeIdType &nodeId);
+        void setNodeId(const NodeIdType& nodeId);
 
-    void printAll() const {
-        std::cout << ":::NODE INFO:::" << std::endl
-                  << "id : " << nodeId << std::endl
-                  << "net id:" << networkId << std::endl;
+        void printAll() const {
+            std::cout << ":::NODE INFO:::" << std::endl
+                      << "id : " << nodeId << std::endl
+                      << "net id:" << networkId << std::endl;
 
-    }
+        }
 
-    void setNetworkId(const NetworkIdType &networkId);
-};
+        void setNetworkId(const NetworkIdType& networkId);
+    };
+}
 
 
 #endif //BASYCO_NODEINFO_H

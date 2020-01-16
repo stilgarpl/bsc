@@ -7,7 +7,6 @@
 
 
 #include "IStorage.h"
-
 #include <filesystem>
 #include <p2p/modules/filesystem/transfer/TransferManager.h>
 
@@ -18,13 +17,13 @@ class InternalStorage : public IStorage {
 private:
     // std::string storageId;
     const fs::path storagePath;
-    TransferManager::TransferQueuePtr transferQueue = nullptr;
+    bsc::TransferManager::TransferQueuePtr transferQueue = nullptr;
 public:
     void store(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) override;
 
     void update(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) override;
 
-    void sync(const NodeIdType &nodeID) override;
+    void sync(const bsc::NodeIdType& nodeID) override;
 
     void initStorage();
 
@@ -44,7 +43,7 @@ public:
     void restore(const ResourceId& resourceId, const fs::path& destinationPath) override;
     ~InternalStorage() override = default;
 
-    TransferManager::TransferQueuePtr getTransferQueue() override;
+    bsc::TransferManager::TransferQueuePtr getTransferQueue() override;
 };
 
 

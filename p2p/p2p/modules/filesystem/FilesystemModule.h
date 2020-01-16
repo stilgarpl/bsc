@@ -19,109 +19,111 @@
 
 #include "p2p/modules/network/NetworkModule.h"
 
-namespace fs = std::filesystem;
+namespace bsc {
 
-class FilesystemModule : public NodeModuleDependent<FilesystemModule, NetworkModule> {
-public:
+    namespace fs = std::filesystem;
 
-    class Configuration {
+    class FilesystemModule : public NodeModuleDependent<FilesystemModule, NetworkModule> {
     public:
-        unsigned int maxChunkSize = 20000;
+
+        class Configuration {
+        public:
+            unsigned int maxChunkSize = 20000;
+
+        private:
+            template<class Archive>
+            void serialize(Archive& ar) {
+                ar(maxChunkSize);
+            }
+
+
+            friend class cereal::access;
+
+        };
 
     private:
-        template<class Archive>
-        void serialize(Archive &ar) {
-            ar(maxChunkSize);
+
+        fs::path currentPath = fs::current_path();
+        std::list<std::shared_ptr<TransferManager::LocalTransferDescriptor>> currentTransfers;
+
+        TransferManager transferManager;
+
+    public:
+        explicit FilesystemModule(INode& node);
+
+        void setupActions(ILogicModule::SetupActionHelper& actionHelper) override;
+
+        bool assignActions(ILogicModule::AssignActionHelper& actionHelper) override;
+
+        bool setupSources(ILogicModule::SetupSourceHelper& sourceHelper) override;
+
+        const std::filesystem::path& getCurrentPath() const;
+
+        void prepareSubmodules() override;
+
+
+    public:
+        ////////////////////////////////
+        /// Commands section
+        ////////////////////////////////
+
+        void changeDirectory(std::string change) {
+            fs::path newPath = change;
+            fs::path prev = currentPath;
+            if (newPath.is_absolute()) {
+                currentPath = std::move(newPath);
+            } else {
+                currentPath /= change;
+            }
+
+            if (!fs::exists(currentPath)) {
+                currentPath = prev;
+            }
+
+            currentPath = fs::canonical(currentPath);
+            fs::current_path(currentPath);
+
+        }
+
+        void printWorkingDirectory() {
+            std::cout << currentPath << std::endl;
+        }
+
+        void listCurrentDirectory() {
+            for (auto&& item : fs::directory_iterator(currentPath)) {
+                std::cout << item << std::endl;
+            }
         }
 
 
-        friend class cereal::access;
-
-    };
-
-private:
-
-    fs::path currentPath = fs::current_path();
-    std::list<std::shared_ptr<TransferManager::LocalTransferDescriptor>> currentTransfers;
-
-    TransferManager transferManager;
-
-public:
-    explicit FilesystemModule(INode &node);
-
-    void setupActions(ILogicModule::SetupActionHelper &actionHelper) override;
-
-    bool assignActions(ILogicModule::AssignActionHelper &actionHelper) override;
-
-    bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
-
-    const std::filesystem::path &getCurrentPath() const;
-
-    void prepareSubmodules() override;
-
-
-public:
-    ////////////////////////////////
-    /// Commands section
-    ////////////////////////////////
-
-    void changeDirectory(std::string change) {
-        fs::path newPath = change;
-        fs::path prev = currentPath;
-        if (newPath.is_absolute()) {
-            currentPath = std::move(newPath);
-        } else {
-            currentPath /= change;
-        }
-
-        if (!fs::exists(currentPath)) {
-            currentPath = prev;
-        }
-
-        currentPath = fs::canonical(currentPath);
-        fs::current_path(currentPath);
-
-    }
-
-    void printWorkingDirectory() {
-        std::cout << currentPath << std::endl;
-    }
-
-    void listCurrentDirectory() {
-        for (auto &&item : fs::directory_iterator(currentPath)) {
-            std::cout << item << std::endl;
-        }
-    }
-
-
-    /**
-     * @todo possible upgrades
-     * this method could return download descriptor
-     * with file size
-     * downloaded size
-     * status - download started, finished, error occurred etc.
-     * wait() function to finish downloading
-     * stop() function to interrupt download
-     *
-     * if the file is big enough it should download it in chunks in other thread.
-     *
-     *
-     */
+        /**
+         * @todo possible upgrades
+         * this method could return download descriptor
+         * with file size
+         * downloaded size
+         * status - download started, finished, error occurred etc.
+         * wait() function to finish downloading
+         * stop() function to interrupt download
+         *
+         * if the file is big enough it should download it in chunks in other thread.
+         *
+         *
+         */
 //    FileTransferDescriptorPtr remoteGetFile(const NodeIdType &nodeId, fs::path from, fs::path to);
 
-    auto remoteGetFile(const NodeIdType &nodeId, fs::path from, fs::path to) {
-        return transferManager.initiateTransfer(nodeId, std::make_shared<SimplePathRI>(from),
-                                                std::make_shared<SimplePathRI>(to));
-    }
+        auto remoteGetFile(const NodeIdType& nodeId, fs::path from, fs::path to) {
+            return transferManager.initiateTransfer(nodeId, std::make_shared<SimplePathRI>(from),
+                                                    std::make_shared<SimplePathRI>(to));
+        }
 
-    auto remoteGetStream(const NodeIdType &nodeId, ResourceIdentificatorPtr from, ResourceIdentificatorPtr to) {
-        return transferManager.initiateTransfer(nodeId, std::move(from), std::move(to));
-    }
+        auto remoteGetStream(const NodeIdType& nodeId, ResourceIdentificatorPtr from, ResourceIdentificatorPtr to) {
+            return transferManager.initiateTransfer(nodeId, std::move(from), std::move(to));
+        }
 
-    //@todo name of this method does not indicate that it creates stuff.
-    auto transferQueue() {
-        return transferManager.transferQueue();
-    }
+        //@todo name of this method does not indicate that it creates stuff.
+        auto transferQueue() {
+            return transferManager.transferQueue();
+        }
 
 
 //    void printCurrentTransfers() {
@@ -164,7 +166,7 @@ public:
 //        auto res = node.getModule<NetworkModule>()->sendPacketToNode(nodeId, req);
 //        LOGGER("received begin " + std::to_string(res->getTransferId()))
 //    }
-};
-
+    };
+}
 
 #endif //BASYCO_FILESYSTEMMODULE_H

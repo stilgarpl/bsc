@@ -11,15 +11,17 @@
 #include "logic/sources/EventQueueSource.h"
 
 
-class NetworkSource : public bsc::EventQueueSource<NetworkInfoEvent> {
+namespace bsc {
+    class NetworkSource : public bsc::EventQueueSource<NetworkInfoEvent> {
 
-public:
-    NetworkSource(bsc::SourceManager& sourceManager);
+    public:
+        NetworkSource(SourceManager& sourceManager);
 
-    void networkInfoReceived(const NetworkInfo& networkInfo);
+        void networkInfoReceived(const NetworkInfo& networkInfo);
 
-    void saveNetworkInfo(const NetworkInfo& networkInfo);
-};
+        void saveNetworkInfo(const NetworkInfo& networkInfo);
+    };
+}
 
 
 #endif //BASYCO_NETWORKSOURCE_H

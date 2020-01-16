@@ -11,100 +11,101 @@
 #include "IDependency.h"
 #include "DependencyManager.h"
 
-template<typename T, typename ... Args>
-class Dependency : public IDependency {
+namespace bsc {
+    template<typename T, typename ... Args>
+    class Dependency : public IDependency {
 
-public:
-    // typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
-    typedef DependencyManager::ArrayType ArrayType;
-private:
-    // ArrayType dependency;
-public:
-    //@todo constexpr?
-    static ArrayType getDependencyIds() {
-        ArrayType ret;
-        ret.reserve(1 + sizeof...(Args));
-        ret.push_back(DependencyManager::getClassId<T>());
-        auto rest = Dependency<Args...>::getDependencyIds();
-        ret.insert(ret.end(), rest.begin(), rest.end());
-        return ret;
-    }
+    public:
+        // typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
+        typedef DependencyManager::ArrayType ArrayType;
+    private:
+        // ArrayType dependency;
+    public:
+        //@todo constexpr?
+        static ArrayType getDependencyIds() {
+            ArrayType ret;
+            ret.reserve(1 + sizeof...(Args));
+            ret.push_back(DependencyManager::getClassId<T>());
+            auto rest = Dependency<Args...>::getDependencyIds();
+            ret.insert(ret.end(), rest.begin(), rest.end());
+            return ret;
+        }
 
-public:
-    ArrayType getDependencyIdents() override {
-        return getDependencyIds();
-    }
+    public:
+        ArrayType getDependencyIdents() override {
+            return getDependencyIds();
+        }
 
-    ~Dependency() override = default;
-};
+        ~Dependency() override = default;
+    };
 
-template<typename T>
-class Dependency<T> : public IDependency {
+    template<typename T>
+    class Dependency<T> : public IDependency {
 
-public:
-    typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
+    public:
+        typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
 
-    //@todo constexpr?
-     static ArrayType getDependencyIds() {
-        ArrayType ret;
-        ret.push_back(DependencyManager::getClassId<T>());
-        return ret;
-    }
+        //@todo constexpr?
+        static ArrayType getDependencyIds() {
+            ArrayType ret;
+            ret.push_back(DependencyManager::getClassId<T>());
+            return ret;
+        }
 
-    ArrayType getDependencyIdents() override {
-        return getDependencyIds();
-    }
-};
+        ArrayType getDependencyIdents() override {
+            return getDependencyIds();
+        }
+    };
 
-
-class DependencyPack : public IDependency {
-    typedef DependencyManager::ArrayType ArrayType;
-private:
-    ArrayType dependency;
-
-
-public:
-    template<typename... Arrays>
-    void addDependency(const ArrayType &a, Arrays... arrays) {
-        addDependency(a);
-        addDependency(arrays...);
-
-    }
-
-    void addDependency(const ArrayType &a) {
-        dependency.insert(dependency.end(), a.begin(), a.end());
-    }
-
-    DependencyPack(const ArrayType &dependency) : dependency(dependency) {
-
-    }
-
-    DependencyPack() = default;
-
-public:
-    ArrayType getDependencyIdents() override {
-        return dependency;
-    }
-
-};
+    class DependencyPack : public IDependency {
+        typedef DependencyManager::ArrayType ArrayType;
+    private:
+        ArrayType dependency;
 
 
-//@todo how to empty template?
-class Dependency1 : public IDependency {
+    public:
+        template<typename... Arrays>
+        void addDependency(const ArrayType& a, Arrays... arrays) {
+            addDependency(a);
+            addDependency(arrays...);
 
-public:
-    typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
+        }
 
-    static ArrayType getDependencyIds() {
-        const ArrayType ret;
-        //ret.push_back(DependencyManager::getClassId<T>());
-        return ret;
-    }
+        void addDependency(const ArrayType& a) {
+            dependency.insert(dependency.end(), a.begin(), a.end());
+        }
 
-    ArrayType getDependencyIdents() override {
-        return getDependencyIds();
-    }
-};
+        DependencyPack(const ArrayType& dependency) : dependency(dependency) {
+
+        }
+
+        DependencyPack() = default;
+
+    public:
+        ArrayType getDependencyIdents() override {
+            return dependency;
+        }
+
+    };
+
+    //@todo how to empty template?
+    class Dependency1 : public IDependency {
+
+    public:
+        typedef std::vector<typename DependencyManager::TypeIdType/*, 1+sizeof... (Args)*/> ArrayType;
+
+        static ArrayType getDependencyIds() {
+            const ArrayType ret;
+            //ret.push_back(DependencyManager::getClassId<T>());
+            return ret;
+        }
+
+        ArrayType getDependencyIdents() override {
+            return getDependencyIds();
+        }
+    };
+
+}
 
 
 #endif //BASYCO_DEPENDENCY_H

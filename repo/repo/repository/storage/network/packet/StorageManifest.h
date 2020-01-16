@@ -9,22 +9,24 @@
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 #include <repo/repository/IRepository.h>
 
-struct StorageManifest : public PacketGroup {
+
+struct StorageManifest : public bsc::PacketGroup {
 
 public:
 
 
-    class Request : public Packet<StorageManifest, StorageManifest::Request> {
+    class Request : public bsc::Packet<StorageManifest, StorageManifest::Request> {
         IStorage::StorageId repositoryId;
 
     private:
         template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<StorageManifest, StorageManifest::Request>>(this), repositoryId);
+        void serialize(Archive& ar) {
+            ar(cereal::base_class<Packet < StorageManifest, StorageManifest::Request>>
+            (this), repositoryId);
         }
 
     public:
-        [[nodiscard]] const IStorage::StorageId &getRepositoryId() const {
+        [[nodiscard]] const IStorage::StorageId& getRepositoryId() const {
             return repositoryId;
         }
 
@@ -38,11 +40,12 @@ public:
         friend class cereal::access;
     };
 
-    class Response : public Packet<StorageManifest, StorageManifest::Response> {
+    class Response : public bsc::Packet<StorageManifest, StorageManifest::Response> {
     private:
         template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<StorageManifest, StorageManifest::Response>>(this));
+        void serialize(Archive& ar) {
+            ar(cereal::base_class<Packet < StorageManifest, StorageManifest::Response>>
+            (this));
         }
 
 
@@ -55,7 +58,7 @@ public:
 CEREAL_REGISTER_TYPE(StorageManifest::Request)
 CEREAL_REGISTER_TYPE(StorageManifest::Response)
 
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageManifest::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageManifest::Response)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, StorageManifest::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, StorageManifest::Response)
 
 #endif //BASYCO_STORAGEMANIFEST_H

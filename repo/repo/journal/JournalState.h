@@ -44,7 +44,7 @@ private:
     bool processed = false; //this does not go into the checksum
 private:
     template<class Archive>
-    void serialize(Archive &ar) {
+    void serialize(Archive& ar) {
         ar(CEREAL_NVP(method), CEREAL_NVP(target), CEREAL_NVP(path), CEREAL_NVP(size), CEREAL_NVP(checksum),
            CEREAL_NVP(modificationTime),
            CEREAL_NVP(permissions), CEREAL_NVP(directory));
@@ -54,10 +54,11 @@ private:
     friend class cereal::access;
 
 public:
-    JournalStateData(JournalMethod method, JournalTarget target, PathType path, FileData fileData) : method(method),
-                                                                                                     target(target),
-                                                                                                     path(std::move(
-                                                                                                             path)) {
+    JournalStateData(JournalMethod method, JournalTarget target, PathType path, bsc::FileData fileData) : method(
+            method),
+                                                                                                          target(target),
+                                                                                                          path(std::move(
+                                                                                                                  path)) {
         update(std::move(fileData));
     };
 
@@ -77,7 +78,7 @@ public:
         return path;
     }
 
-    void update(FileData data);
+    void update(bsc::FileData data);
 
     const ChecksumType &getChecksum() const {
         return checksum;

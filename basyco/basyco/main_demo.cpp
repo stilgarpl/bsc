@@ -25,19 +25,19 @@ using namespace std::chrono_literals;
 #include <p2p/modules/command/CommandModule.h>
 #include <p2p/modules/basic/BasicModule.h>
 #include <p2p/modules/command/DefaultCommandGroupParameters.h>
+using namespace bsc;
 
-
-void setupModules(Node &node) {
-    node.addModule<BasicModule>();
+void setupModules(bsc::Node& node) {
+    node.addModule<bsc::BasicModule>();
     node.addModule<FilesystemModule>();
-    node.addModule<NetworkModule>();
+    node.addModule<bsc::NetworkModule>();
     node.addModule<RepoModule>();
     node.addModule<CommandModule>();
 }
 
 void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("t2", &CommandModule::testingMethodInt);
-    cmd->setDefaultGroupHandler<DefaultCommandGroupParameters>(defaultCommandGroupHandler);
+    cmd->setDefaultGroupHandler<bsc::DefaultCommandGroupParameters>(defaultCommandGroupHandler);
     cmd->group("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->group("tt").group("xx").mapCommand("tx", &CommandModule::testingMethodInt);
 //    cmd->group("tt").handler<CommandModule::CommandPP>([](auto properties) {
@@ -46,17 +46,17 @@ void setupCommands(CommandModule *cmd) {
 //    });
 
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-    cmd->mapCommand("connect", &NetworkModule::connectTo);
-    cmd->mapCommand("connectTo", &NetworkModule::connectToNode);
-    cmd->mapCommand<NetworkModule, RemoteNode&, const NodeIdType&>("getnode", &NetworkModule::getRemoteNode);
-    cmd->mapCommand("disconnect", &NetworkModule::disconnect);
-    cmd->mapCommand("print", &NetworkModule::printConnections);
+    cmd->mapCommand("connect", &bsc::NetworkModule::connectTo);
+    cmd->mapCommand("connectTo", &bsc::NetworkModule::connectToNode);
+    cmd->mapCommand<bsc::NetworkModule, RemoteNode&, const NodeIdType&>("getnode", &bsc::NetworkModule::getRemoteNode);
+    cmd->mapCommand("disconnect", &bsc::NetworkModule::disconnect);
+    cmd->mapCommand("print", &bsc::NetworkModule::printConnections);
 //    cmd->mapCommand("update", &network:prin:updateNodeConnectionInfo);
 //    cmd->mapCommand("purgeD", &NetworkModule::purgeDuplicateConnections);
 //    cmd->mapCommand("purgeI", &NetworkModule::purgeInactiveConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
     cmd->mapRawCommand("broadcast", &CommandModule::broadcastRemoteCommand);
-    cmd->mapCommand("shutdown", &BasicModule::shutdownNode);
+    cmd->mapCommand("shutdown", &bsc::BasicModule::shutdownNode);
     cmd->mapCommand("cd", &FilesystemModule::changeDirectory);
     cmd->mapCommand("pwd", &FilesystemModule::printWorkingDirectory);
     cmd->mapCommand("ls", &FilesystemModule::listCurrentDirectory);
@@ -77,10 +77,10 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("deploy", &RepoModule::deployAllFiles);
     cmd->mapCommand("run", &CommandModule::runScript);
     cmd->mapCommand("sleep", &CommandModule::sleep);
-    cmd->mapCommand("saveConf", &BasicModule::saveAllConfiguration);
+    cmd->mapCommand("saveConf", &bsc::BasicModule::saveAllConfiguration);
     cmd->mapRawCommand("bg", &CommandModule::runInBackground);
-    cmd->mapCommand("fireTrigV", &BasicModule::fireTriggerValue<std::string, std::string>);
-    cmd->mapCommand("fireTrig", &BasicModule::fireTrigger<std::string>);
+    cmd->mapCommand("fireTrigV", &bsc::BasicModule::fireTriggerValue<std::string, std::string>);
+    cmd->mapCommand("fireTrig", &bsc::BasicModule::fireTrigger<std::string>);
     cmd->mapCommand("aaa", &CommandModule::parametersTestingCommand, CommandModule::CommandPP{});
 //    cmd->mapCommand("requestResource", &RepoModule::requestStoragePath);
 //    cmd->mapCommand("beginTransfer", &FilesystemModule::beginTransferTest);
@@ -93,6 +93,7 @@ void setupCommands(CommandModule *cmd) {
 #include "spdlog/sinks/basic_file_sink.h"
 
 
+
 int main(int argc, char* argv[]) {
 
     auto file_logger = spdlog::basic_logger_mt("basic_logger", "/tmp/basyco.log");
@@ -101,16 +102,16 @@ int main(int argc, char* argv[]) {
 
     spdlog::info("lala");
 
-    Node thisNode;
+    bsc::Node thisNode;
 
     thisNode.getNodeInfo().setNodeId("first Node");
 
     setupModules(thisNode);
-    thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
-    thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
-    thisNode.addModule<AuthModule>();
-    thisNode.getModule<AuthModule>()->getSubModule<AuthModule>().a = 5;
-    thisNode.getModule<CommandModule>()->getSubModule<AuthModule>().a = 2;
+    thisNode.getModule<bsc::NetworkModule>()->addToNetwork("TheNetwork");
+    thisNode.getModule<bsc::NetworkModule>()->configuration().setPort(9191);
+    thisNode.addModule<bsc::AuthModule>();
+    thisNode.getModule<bsc::AuthModule>()->getSubModule<bsc::AuthModule>().a = 5;
+    thisNode.getModule<CommandModule>()->getSubModule<bsc::AuthModule>().a = 2;
 
     auto cmdN = thisNode.getModule<CommandModule>();
 
@@ -120,25 +121,25 @@ int main(int argc, char* argv[]) {
     thisNode.start();
 //    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
 
-    Node otherNode;
+    bsc::Node otherNode;
     otherNode.getNodeInfo().setNodeId("second");
 
 
     setupModules(otherNode);
-    otherNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
-    otherNode.getModule<NetworkModule>()->configuration().setPort(9999);
+    otherNode.getModule<bsc::NetworkModule>()->addToNetwork("TheNetwork");
+    otherNode.getModule<bsc::NetworkModule>()->configuration().setPort(9999);
     cmdN = otherNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
 
     otherNode.start();
 //    setupProtocolLogic(otherNode.getLogicManager(), transmissionControl);
 
-    Node thirdNode;
+    bsc::Node thirdNode;
     thirdNode.getNodeInfo().setNodeId("third");
 
     setupModules(thirdNode);
-    thirdNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
-    thirdNode.getModule<NetworkModule>()->configuration().setPort(9898);
+    thirdNode.getModule<bsc::NetworkModule>()->addToNetwork("TheNetwork");
+    thirdNode.getModule<bsc::NetworkModule>()->configuration().setPort(9898);
     cmdN = thirdNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
     cmdN = nullptr;
@@ -148,7 +149,7 @@ int main(int argc, char* argv[]) {
     thisNode.waitUntilStarted();
     otherNode.waitUntilStarted();
     thirdNode.waitUntilStarted();
-    thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
+    thisNode.getModule<bsc::NetworkModule>()->connectTo("127.0.0.1:9999");
     //    thisNode.waitToFinish();
     //auto fdes = FileTransferControl::initiateTransfer(thisNode, "second", "/tmp/zsh", "/tmp/copied_zsh");
 //    thisNode.stop();

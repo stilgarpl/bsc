@@ -7,5 +7,5 @@
 
 #include <string>
 
-typedef std::string NetAddressType;
+namespace bsc { typedef std::string NetAddressType; }
 #endif //BASYCO_NETADDRESSTYPE_H

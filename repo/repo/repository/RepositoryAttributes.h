@@ -10,6 +10,7 @@
 #include <repo/repository/storage/IStorage.h>
 #include <repo/journal/JournalState.h>
 
+
 namespace fs = std::filesystem;
 
 class RepositoryAttributes  {
@@ -26,18 +27,18 @@ public:
 
     fs::file_time_type getModificationTime() const;
 
-    const ChecksumId &getChecksum() const;
+    const ChecksumId& getChecksum() const;
 
-    const IStorage::ResourceId &getResourceId() const;
+    const IStorage::ResourceId& getResourceId() const;
 
     RepositoryAttributes() = default;
 
-    explicit RepositoryAttributes(const JournalStateData &data);
+    explicit RepositoryAttributes(const JournalStateData& data);
 
     bool isDirectory() const;
 
-    FileData toFileData(const fs::path &path) {
-        return FileData(path, checksum, permissions, size, modificationTime, directory);
+    bsc::FileData toFileData(const fs::path& path) {
+        return bsc::FileData(path, checksum, permissions, size, modificationTime, directory);
     }
 
 };

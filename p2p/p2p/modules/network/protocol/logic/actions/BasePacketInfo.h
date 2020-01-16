@@ -11,52 +11,53 @@
 #include "logic/events/Tick.h"
 
 
+namespace bsc {
+    class BasePacketInfo {
+    private:
+        unsigned int retry = 0;
+        BasePacketPtr packetPtr;
+        Connection* connection = nullptr;
+        //@todo is Tick reference necessary? maybe some global Clock function? or just std::steady_clock ?
+        Status expectedStatus = Status::response; //@todo what if we expect more than one response? error for example?
+        bsc::Tick::Clock::time_point timeSent;
+        std::promise<BasePacketPtr> responsePromise;
 
-class BasePacketInfo {
-private:
-    unsigned int retry = 0;
-    BasePacketPtr packetPtr;
-    Connection* connection = nullptr;
-    //@todo is Tick reference necessary? maybe some global Clock function? or just std::steady_clock ?
-    Status expectedStatus = Status::response; //@todo what if we expect more than one response? error for example?
-    bsc::Tick::Clock::time_point timeSent;
-    std::promise<BasePacketPtr> responsePromise;
+    public:
+        BasePacketInfo(const BasePacketPtr& packetPtr, Connection* connection,
+                       const std::chrono::time_point<Tick::Clock>& timeSent);
 
-public:
-    BasePacketInfo(const BasePacketPtr& packetPtr, Connection* connection,
-                   const std::chrono::time_point<bsc::Tick::Clock>& timeSent);
+    public:
+        const BasePacketPtr& getPacketPtr() const;
 
-public:
-    const BasePacketPtr& getPacketPtr() const;
+        void setPacketPtr(const BasePacketPtr& packetPtr);
 
-    void setPacketPtr(const BasePacketPtr &packetPtr);
+        const std::chrono::time_point<Tick::Clock>& getTimeSent() const;
 
-    const std::chrono::time_point<bsc::Tick::Clock>& getTimeSent() const;
+        void setTimeSent(const std::chrono::time_point<Tick::Clock>& timeSent);
 
-    void setTimeSent(const std::chrono::time_point<bsc::Tick::Clock>& timeSent);
+    public:
+        BasePacketInfo(const BasePacketPtr& packetPtr, const std::chrono::time_point<Tick::Clock>& timeSent);
 
-public:
-    BasePacketInfo(const BasePacketPtr& packetPtr, const std::chrono::time_point<bsc::Tick::Clock>& timeSent);
+        BasePacketInfo(const BasePacketPtr& packetPtr, Connection* connection,
+                       const std::chrono::time_point<Tick::Clock>& timeSent, Status expectedStatus);
 
-    BasePacketInfo(const BasePacketPtr& packetPtr, Connection* connection,
-                   const std::chrono::time_point<bsc::Tick::Clock>& timeSent, Status expectedStatus);
+        Connection* getConnection() const;
 
-    Connection *getConnection() const;
+        void setConnection(Connection* connection);
 
-    void setConnection(Connection *connection);
+        //@todo or simply get future?
+        std::promise<BasePacketPtr>& getResponsePromise();
 
-    //@todo or simply get future?
-    std::promise<BasePacketPtr> &getResponsePromise();
+        Status getExpectedStatus() const;
 
-    Status getExpectedStatus() const;
+        void setExpectedStatus(Status expectedStatus);
 
-    void setExpectedStatus(Status expectedStatus);
+        unsigned int getRetry() const;
 
-    unsigned int getRetry() const;
+        void setRetry(unsigned int retry);
 
-    void setRetry(unsigned int retry);
-
-};
+    };
+}
 
 
 #endif //BASYCO_NETWORKPACKETINFO_H

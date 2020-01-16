@@ -8,16 +8,18 @@
 
 #include "RemoteNode.h"
 
-class RemoteNodeContext {
-private:
-    RemoteNode &_remoteNode;
-public:
-    RemoteNode &getRemoteNode() {
-        return _remoteNode;
-    }
+namespace bsc {
+    class RemoteNodeContext {
+    private:
+        RemoteNode& _remoteNode;
+    public:
+        RemoteNode& getRemoteNode() {
+            return _remoteNode;
+        }
 
-    explicit RemoteNodeContext(RemoteNode &_remoteNode) : _remoteNode(_remoteNode) {}
-};
+        explicit RemoteNodeContext(RemoteNode& _remoteNode) : _remoteNode(_remoteNode) {}
+    };
+}
 
 
 #endif //BASYCO_REMOTENODECONTEXT_H

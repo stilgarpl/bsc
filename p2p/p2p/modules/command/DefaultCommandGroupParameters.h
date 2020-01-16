@@ -10,12 +10,15 @@
 #include "CommandModule.h"
 
 
-struct DefaultCommandGroupParameters : bsc::CommandLineParameters {
-    bsc::Flag help = {'h', "help", "Shows help", false};
-};
+namespace bsc {
+    struct DefaultCommandGroupParameters : bsc::CommandLineParameters {
+        Flag help = {'h', "help", "Shows help", false};
+    };
 
-CommandModule::CommandExecutionStatus
-defaultCommandGroupHandler(const DefaultCommandGroupParameters& params, const CommandModule::CommandGroup& group);
+    CommandModule::CommandExecutionStatus
+    defaultCommandGroupHandler(const bsc::DefaultCommandGroupParameters& params,
+                               const CommandModule::CommandGroup& group);
+}
 
 
 #endif //BASYCO_DEFAULTCOMMANDGROUPPARAMETERS_H

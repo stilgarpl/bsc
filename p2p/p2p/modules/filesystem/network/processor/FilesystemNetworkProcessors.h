@@ -7,10 +7,12 @@
 
 #include <p2p/modules/filesystem/network/packet/TransferQuery.h>
 
-struct FilesystemNetworkProcessors {
+namespace bsc {
+    struct FilesystemNetworkProcessors {
 
-    static std::function<TransferQuery::Response::Ptr(TransferQuery::Request::Ptr)> queryProcessor;
-};
+        static std::function<TransferQuery::Response::Ptr(TransferQuery::Request::Ptr)> queryProcessor;
+    };
+}
 
 
 #endif //BASYCO_FILESYSTEMNETWORKPROCESSORS_H

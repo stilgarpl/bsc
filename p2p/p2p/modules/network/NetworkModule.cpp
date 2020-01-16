@@ -33,79 +33,81 @@
 
 using namespace Poco::Net;
 
-NetworkModule::NetworkModule(INode& node) : NodeModuleDependent(node, "network") {
+namespace bsc {
+
+    NetworkModule::NetworkModule(INode& node) : NodeModuleDependent(node, "network") {
 //    setRequired<BasicModule>();
-}
+    }
 
-void NetworkModule::setupActions(ILogicModule::SetupActionHelper& actionHelper) {
-    actionHelper.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
-    actionHelper.setAction<ConnectionEvent>("reqNeI", NodeActions::sendNetworkInfoRequest);
-    actionHelper.setAction<NodeInfoEvent>("upNoI", NodeActions::updateNodeInfo);
-    actionHelper.setAction<NetworkInfoEvent>("upNeI", NetworkActions::updateNetworkInfo);
-    actionHelper.setAction<NodeInfoEvent>("addKnownNode", NodeActions::addKnownNode);
-    actionHelper.setAction<bsc::Tick>("trigNodeUp", NodeActions::triggerUpdateNode);
-    actionHelper.setAction<NodeInfoEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
-
-
-    actionHelper.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent& event) {
-        // std::clog << "Debug: connection event!" << std::endl;
-    });
-
-    actionHelper.setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
+    void NetworkModule::setupActions(ILogicModule::SetupActionHelper& actionHelper) {
+        actionHelper.setAction<ConnectionEvent>("reqNoI", NodeActions::sendNodeInfoRequest);
+        actionHelper.setAction<ConnectionEvent>("reqNeI", NodeActions::sendNetworkInfoRequest);
+        actionHelper.setAction<NodeInfoEvent>("upNoI", NodeActions::updateNodeInfo);
+        actionHelper.setAction<NetworkInfoEvent>("upNeI", NetworkActions::updateNetworkInfo);
+        actionHelper.setAction<NodeInfoEvent>("addKnownNode", NodeActions::addKnownNode);
+        actionHelper.setAction<bsc::Tick>("trigNodeUp", NodeActions::triggerUpdateNode);
+        actionHelper.setAction<NodeInfoEvent>("nodeDiscovered", NodeActions::newNodeDiscovered);
 
 
-}
+        actionHelper.setAction<ConnectionEvent>("connDebug", [](const ConnectionEvent& event) {
+            // std::clog << "Debug: connection event!" << std::endl;
+        });
 
-bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
-
-    when(event<ConnectionEvent>()).fireAction("connDebug");
-    when(event<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).fireAction("reqNoI");
-    when(event<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ACCEPTED)).fireAction("reqNoI");
-    when(event<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).fireAction("reqNeI");
-    when(event<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED)).fireAction("upNoI");
-    when(event<NetworkInfoEvent>(NetworkInfoEvent::IdType::NETWORK_INFO_RECEIVED)).fireAction("upNeI");
-    //@todo upNoI powinno cos takiego robic, addKnownNode powinien byc wywolany tylko w przypadku
-    when(event<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED)).fireAction("addKnownNode");
-    when(event<NodeInfoEvent>(NodeInfoEvent::IdType::NEW_NODE_DISCOVERED)).fireAction("nodeDiscovered");
-
-    //register packet processors from submodules
-
-    when(state<ILogicModule>(ModuleState::SUBMODULES_PREPARED).entered()).fireStateChangeReaction(
-            [&](ILogicModule& module) {
-                //@todo move this mechanism to NodeModule to auto collect all submodules from other modules.
-                //  submodules probably have to be optional or sth.
-                auto& networkSub = module.getSubModule<NetworkModule>();
-                networkSub.setupPacketProcessing(*this);
-            });
+        actionHelper.setAction<ConnectionEvent>("onConnect", ProtocolActions::onNewConnection);
 
 
-    when(event<bsc::Tick>(5s)).fireNewAction([this](auto e) {
-        if (server != nullptr) {
-            using namespace std::string_literals;
-            LOGGER("SERVER DETAILS >>> ")
-            LOGGER(" rejected connections : "s + std::to_string(server->refusedConnections()))
-            LOGGER(" queued connections : "s + std::to_string(server->queuedConnections()))
-            LOGGER(" current connections : "s + std::to_string(server->currentConnections()))
-            LOGGER(" max threads : "s + std::to_string(server->maxThreads()))
-            LOGGER(">>>>>>")
-        }
-    });
+    }
 
-    //high level logic:
+    bool NetworkModule::assignActions(ILogicModule::AssignActionHelper& actionHelper) {
+
+        when(event<ConnectionEvent>()).fireAction("connDebug");
+        when(event<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).fireAction("reqNoI");
+        when(event<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ACCEPTED)).fireAction("reqNoI");
+        when(event<ConnectionEvent>(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).fireAction("reqNeI");
+        when(event<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED)).fireAction("upNoI");
+        when(event<NetworkInfoEvent>(NetworkInfoEvent::IdType::NETWORK_INFO_RECEIVED)).fireAction("upNeI");
+        //@todo upNoI powinno cos takiego robic, addKnownNode powinien byc wywolany tylko w przypadku
+        when(event<NodeInfoEvent>(NodeInfoEvent::IdType::NODE_INFO_RECEIVED)).fireAction("addKnownNode");
+        when(event<NodeInfoEvent>(NodeInfoEvent::IdType::NEW_NODE_DISCOVERED)).fireAction("nodeDiscovered");
+
+        //register packet processors from submodules
+
+        when(state<ILogicModule>(ModuleState::SUBMODULES_PREPARED).entered()).fireStateChangeReaction(
+                [&](ILogicModule& module) {
+                    //@todo move this mechanism to NodeModule to auto collect all submodules from other modules.
+                    //  submodules probably have to be optional or sth.
+                    auto& networkSub = module.getSubModule<NetworkModule>();
+                    networkSub.setupPacketProcessing(*this);
+                });
+
+
+        when(event<bsc::Tick>(5s)).fireNewAction([this](auto e) {
+            if (server != nullptr) {
+                using namespace std::string_literals;
+                LOGGER("SERVER DETAILS >>> ")
+                LOGGER(" rejected connections : "s + std::to_string(server->refusedConnections()))
+                LOGGER(" queued connections : "s + std::to_string(server->queuedConnections()))
+                LOGGER(" current connections : "s + std::to_string(server->currentConnections()))
+                LOGGER(" max threads : "s + std::to_string(server->maxThreads()))
+                LOGGER(">>>>>>")
+            }
+        });
+
+        //high level logic:
 
 //    when(event<ConnectionEvent>().withId(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).
 
-    //send keepalives - I tried using it to help with the packet loss, but it didn't work.
-    when(event<bsc::Tick>(120s)).fireNewAction(
-            [&, this](auto e) { this->broadcastPacket(KeepAlivePacket::Request::getNew()); });
+        //send keepalives - I tried using it to help with the packet loss, but it didn't work.
+        when(event<bsc::Tick>(120s)).fireNewAction(
+                [&, this](auto e) { this->broadcastPacket(KeepAlivePacket::Request::getNew()); });
 
-    when(event<ModuleEvent<NetworkModule>>(ModuleState::READY)).fireNewAction(
-            NetworkActions::loadNetworkInfo);
+        when(event<ModuleEvent<NetworkModule>>(ModuleState::READY)).fireNewAction(
+                NetworkActions::loadNetworkInfo);
 
-    when(event<ModuleEvent<NetworkModule>>(ModuleState::SHUTDOWN)).fireNewAction(
-            NetworkActions::saveNetworkInfo);
+        when(event<ModuleEvent<NetworkModule>>(ModuleState::SHUTDOWN)).fireNewAction(
+                NetworkActions::saveNetworkInfo);
 
-    when(event<ModuleEvent<NetworkModule>>()).fireNewAction([](auto event) { LOGGER("module event NNM") });
+        when(event<ModuleEvent<NetworkModule>>()).fireNewAction([](auto event) { LOGGER("module event NNM") });
 
 //    auto list = {88, 77, 44, 101};
 //    auto list2 = {99, 10};
@@ -136,7 +138,7 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
 //    stage1.fireNewChainAction(testingMethod3s, "x");
 
 
-    //@todo move to more appropriate method
+        //@todo move to more appropriate method
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole");
 //    Roles::defineRequiredRole<NodeInfoGroup::Request>("testRole2");
 
@@ -148,11 +150,11 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
 //    when(state<NetworkModule, int>(4).entered()/*.left()*/).fireStateChangeReaction([](auto &netMod, auto a) {
 //        LOGGER("net mode test.. " + std::to_string(a) + "  " + netMod.testingMethod())
 //    });//.fireModuleAction(&NetworkModule::testingMethod);
-    when(event < bsc::LogicStateEvent<NetworkModule, int>>
-    ()).fireNewAction([](auto event) {
-        LOGGER("logic state event " + std::to_string(event.getState()) +
-               (event.getMethod() == bsc::LogicStateMethod::entered ? " entered" : " left"))
-    });
+        when(event < bsc::LogicStateEvent<NetworkModule, int>>
+        ()).fireNewAction([](auto event) {
+            LOGGER("logic state event " + std::to_string(event.getState()) +
+                   (event.getMethod() == bsc::LogicStateMethod::entered ? " entered" : " left"))
+        });
 
 //    Tick tick;
 //    tick.getNow().time_since_epoch().
@@ -171,53 +173,55 @@ bool NetworkModule::assignActions(ILogicModule::AssignActionHelper &actionHelper
 
 
 
-    //@todo real value
-    return true;
-}
+        //@todo real value
+        return true;
+    }
 
-bool NetworkModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
-
-
-    sourceHelper.requireSource<ConnectionSource>();
-    auto& networkSource = sourceHelper.requireSource<NetworkSource>();
-    auto& nodeSource = sourceHelper.requireSource<NodeSource>();
-    //@todo move this somewhere more appropriate
-    // response packets processing:
-    when(NetworkConditions::packetReceived<NetworkInfoGroup::Response>()).fireNewAction([&networkSource](auto& event) {
-        auto packet = event.getPacket();
-        if (packet->getNetworkInfo() != nullptr) {
-            networkSource.networkInfoReceived(*packet->getNetworkInfo());
-            LOGGER("Network response received " + std::to_string(packet->getId()) + " " +
-                   packet->getNetworkInfo()->getNetworkId());
-        } else {
-            LOGGER("Empty network response")
-        }
-    });
-
-    when(NetworkConditions::packetReceived<NodeInfoGroup::Response>()).fireNewAction([&nodeSource](auto& event) {
-        auto packet = event.getPacket();
-
-        nodeSource.nodeInfoReceived(packet->getNodeInfo());
-        LOGGER("Node response received " + packet->getNodeInfo().getNodeId() + "  " + std::to_string(packet->getId()));
-    });
-
-    return true;
-}
-
-bool NetworkModule::setupLogic() {
-
-    bool ret = ILogicModule::setupLogic();
-    ret &= protocol->setupLogic();
-    return ret;
-}
+    bool NetworkModule::setupSources(ILogicModule::SetupSourceHelper& sourceHelper) {
 
 
-void NetworkModule::updateNodeConnectionInfo() {
-    //@todo this is wrong, it blocks connections until its done.
-    std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    //   std::lock_guard<std::mutex> g1(node.getLock());
-    // std::thread([&]() {
-    //    //this is meant to be run from a thread
+        sourceHelper.requireSource<ConnectionSource>();
+        auto& networkSource = sourceHelper.requireSource<NetworkSource>();
+        auto& nodeSource = sourceHelper.requireSource<NodeSource>();
+        //@todo move this somewhere more appropriate
+        // response packets processing:
+        when(NetworkConditions::packetReceived<NetworkInfoGroup::Response>()).fireNewAction(
+                [&networkSource](auto& event) {
+                    auto packet = event.getPacket();
+                    if (packet->getNetworkInfo() != nullptr) {
+                        networkSource.networkInfoReceived(*packet->getNetworkInfo());
+                        LOGGER("Network response received " + std::to_string(packet->getId()) + " " +
+                               packet->getNetworkInfo()->getNetworkId());
+                    } else {
+                        LOGGER("Empty network response")
+                    }
+                });
+
+        when(NetworkConditions::packetReceived<NodeInfoGroup::Response>()).fireNewAction([&nodeSource](auto& event) {
+            auto packet = event.getPacket();
+
+            nodeSource.nodeInfoReceived(packet->getNodeInfo());
+            LOGGER("Node response received " + packet->getNodeInfo().getNodeId() + "  " +
+                   std::to_string(packet->getId()));
+        });
+
+        return true;
+    }
+
+    bool NetworkModule::setupLogic() {
+
+        bool ret = ILogicModule::setupLogic();
+        ret &= protocol->setupLogic();
+        return ret;
+    }
+
+
+    void NetworkModule::updateNodeConnectionInfo() {
+        //@todo this is wrong, it blocks connections until its done.
+        std::lock_guard<std::mutex> g(activeConnectionsMutex);
+        //   std::lock_guard<std::mutex> g1(node.getLock());
+        // std::thread([&]() {
+        //    //this is meant to be run from a thread
 //    LOGGER("update node ")
 //        for (auto &&item : activeClientConnections) {
 //            LOGGER("update connection " + (item->nodeId ? *item->nodeId : " ?? "));
@@ -238,10 +242,10 @@ void NetworkModule::updateNodeConnectionInfo() {
 //            }
 //        }
 
-    //}).detach();
-}
+        //}).detach();
+    }
 
-void NetworkModule::purgeDuplicateConnections() {
+    void NetworkModule::purgeDuplicateConnections() {
 //    std::lock_guard<std::mutex> g(activeConnectionsMutex);
 //    for (auto &&item : activeClientConnections) {
 //        if (item->nodeId) {
@@ -256,105 +260,105 @@ void NetworkModule::purgeDuplicateConnections() {
 //            //activeClientConnections.erase(duplicate);
 //        }
 //    }
-}
+    }
 
-void NetworkModule::printConnections() {
-    std::lock_guard<std::mutex> g(activeConnectionsMutex);
-    auto& out = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>().out();
-    out << "[" << node.getNodeInfo().getNodeId() << "]:" << std::to_string(acceptedConnections.size())
-        << std::endl;
-    for (auto&& item : remoteNodes) {
-        std::string pre = "[ ]";
-        if (item->isConnected()) {
-            pre = "[X]";
-        }
-        if (!item->getNodeId()) {
-            out << pre << "Connection: NO ID" << std::endl;
-        } else {
-            out << pre << "Connection: " << *item->getNodeId() << std::endl;
+    void NetworkModule::printConnections() {
+        std::lock_guard<std::mutex> g(activeConnectionsMutex);
+        auto& out = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>().out();
+        out << "[" << node.getNodeInfo().getNodeId() << "]:" << std::to_string(acceptedConnections.size())
+            << std::endl;
+        for (auto&& item : remoteNodes) {
+            std::string pre = "[ ]";
+            if (item->isConnected()) {
+                pre = "[X]";
+            }
+            if (!item->getNodeId()) {
+                out << pre << "Connection: NO ID" << std::endl;
+            } else {
+                out << pre << "Connection: " << *item->getNodeId() << std::endl;
+            }
         }
     }
-}
 
-void NetworkModule::purgeInactiveConnections() {
+    void NetworkModule::purgeInactiveConnections() {
 //    std::lock_guard<std::mutex> g(activeConnectionsMutex);
 //    activeClientConnections.remove_if([&](NodeConnectionInfoPtr it) -> bool {
 //        return it->connection == nullptr || !it->connection->isActive();
 //    });
 
-}
-
-
-void NetworkModule::removeAcceptedConnection(IServerConnection *c) {
-    // LOGGER("REMOVE REMOVE REMOVE");
-    std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
-    acceptedConnections.remove(c);
-}
-
-void NetworkModule::addAcceptedConnection(IServerConnection *c) {
-    std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
-    acceptedConnections.push_back(c);
-}
-
-void NetworkModule::stopAcceptedConnections() {
-    std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
-    //@todo this segfaults, why bother stopping those connections? stopping the poco server should stop them anyway.
-    for (auto &&it : acceptedConnections) {
-        if (it != nullptr)
-            it->stop();
     }
+
+
+    void NetworkModule::removeAcceptedConnection(IServerConnection* c) {
+        // LOGGER("REMOVE REMOVE REMOVE");
+        std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
+        acceptedConnections.remove(c);
+    }
+
+    void NetworkModule::addAcceptedConnection(IServerConnection* c) {
+        std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
+        acceptedConnections.push_back(c);
+    }
+
+    void NetworkModule::stopAcceptedConnections() {
+        std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
+        //@todo this segfaults, why bother stopping those connections? stopping the poco server should stop them anyway.
+        for (auto&& it : acceptedConnections) {
+            if (it != nullptr)
+                it->stop();
+        }
 //    acceptedConnections.erase(acceptedConnections.remove_if([](auto) { return true; }),acceptedConnections.end());
-    acceptedConnections.clear();
-}
+        acceptedConnections.clear();
+    }
 
 
-void NetworkModule::listen() {
-    //SocketAddress address("127.0.0.1:6777");
-    if (serverSocket == nullptr) {
+    void NetworkModule::listen() {
+        //SocketAddress address("127.0.0.1:6777");
+        if (serverSocket == nullptr) {
 
 //        //@todo debug
 //        node.getModule<ConfigurationModule>()->save("network", loadedConfig);
-        serverSocket = std::make_shared<ServerSocket>(configuration().getPort());
-        LOGGER(std::string("Opening port") + std::to_string(configuration().getPort()));
-    }
+            serverSocket = std::make_shared<ServerSocket>(configuration().getPort());
+            LOGGER(std::string("Opening port") + std::to_string(configuration().getPort()));
+        }
 
-    Poco::AutoPtr<Poco::Net::TCPServerParams> p(new Poco::Net::TCPServerParams());
-    //@todo make this magic number a configuration property
-    p->setMaxThreads(256);
-    p->setMaxQueued(256);
-    server = std::make_shared<TCPServer>(
-            new ServerConnectionFactory([&] { return getRemoteNode().context(); }, {*this}),
-            *serverSocket, p);
-    server->start();
-    using namespace std::string_literals;
-    LOGGER("server connections max: "s + std::to_string(server->maxConcurrentConnections()))
+        Poco::AutoPtr<Poco::Net::TCPServerParams> p(new Poco::Net::TCPServerParams());
+        //@todo make this magic number a configuration property
+        p->setMaxThreads(256);
+        p->setMaxQueued(256);
+        server = std::make_shared<TCPServer>(
+                new ServerConnectionFactory([&] { return getRemoteNode().context(); }, {*this}),
+                *serverSocket, p);
+        server->start();
+        using namespace std::string_literals;
+        LOGGER("server connections max: "s + std::to_string(server->maxConcurrentConnections()))
 
-}
-
-
-void NetworkModule::stopListening() {
-    stopAcceptedConnections();
-    if (server != nullptr) {
-        server->stop();
     }
 
 
-}
-
-void NetworkModule::onStop() {
-    stopListening();
-    disconnectAll();
-}
-
-void NetworkModule::onStart() {
-    Runnable::onStart();
-    listen();
-}
+    void NetworkModule::stopListening() {
+        stopAcceptedConnections();
+        if (server != nullptr) {
+            server->stop();
+        }
 
 
-void NetworkModule::run() {
-    waitForStop();
-}
+    }
+
+    void NetworkModule::onStop() {
+        stopListening();
+        disconnectAll();
+    }
+
+    void NetworkModule::onStart() {
+        Runnable::onStart();
+        listen();
+    }
+
+
+    void NetworkModule::run() {
+        waitForStop();
+    }
 //
 //bool NetworkModule::sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet) {
 //    ConnectionPtr conn = nullptr;
@@ -378,114 +382,115 @@ void NetworkModule::run() {
 //    }
 //}
 
-void NetworkModule::disconnect(const NodeIdType &id) {
+    void NetworkModule::disconnect(const NodeIdType& id) {
         getRemoteNode(id).disconnect();
-}
-
-void NetworkModule::disconnectAll() {
-    for (const auto &remoteNode : remoteNodes) {
-        remoteNode->disconnect();
     }
 
-}
+    void NetworkModule::disconnectAll() {
+        for (const auto& remoteNode : remoteNodes) {
+            remoteNode->disconnect();
+        }
 
-const std::shared_ptr<IProtocol> &NetworkModule::getProtocol() const {
-    return protocol;
-}
+    }
 
-std::shared_ptr<NetworkInfo> &NetworkModule::getNetworkInfo() {
-    return networkInfo;
-}
+    const std::shared_ptr<IProtocol>& NetworkModule::getProtocol() const {
+        return protocol;
+    }
 
-void NetworkModule::update(Connection &connection, ConnectionState type) {
-    //@todo maybe RemoteNode should be watching this...
-    switch (type) {
-        case ConnectionState::NEW:
-            break;
-        case ConnectionState::CONNECTED:
-            bsc::Context::getActiveContext()->get<RemoteNodeContext>().getRemoteNode().connect(&connection);
+    std::shared_ptr<NetworkInfo>& NetworkModule::getNetworkInfo() {
+        return networkInfo;
+    }
+
+    void NetworkModule::update(Connection& connection, ConnectionState type) {
+        //@todo maybe RemoteNode should be watching this...
+        switch (type) {
+            case ConnectionState::NEW:
+                break;
+            case ConnectionState::CONNECTED:
+                bsc::Context::getActiveContext()->get<RemoteNodeContext>().getRemoteNode().connect(&connection);
 //            getRemoteNode().connect(&connection);
-            break;
-        case ConnectionState::DISCONNECTED:
-            break;
+                break;
+            case ConnectionState::DISCONNECTED:
+                break;
+        }
+
     }
 
-}
-
-RemoteNode& NetworkModule::connectTo(const NetAddressType& address) {
-    RemoteNode& remoteNode = getRemoteNode();
-    if (!remoteNode.connectTo(address)) {
-        throw RemoteNodeConnectionException("Unable to connect to remote node");
+    RemoteNode& NetworkModule::connectTo(const NetAddressType& address) {
+        RemoteNode& remoteNode = getRemoteNode();
+        if (!remoteNode.connectTo(address)) {
+            throw RemoteNodeConnectionException("Unable to connect to remote node");
+        }
+        return remoteNode;
     }
-    return remoteNode;
-}
 
-RemoteNode& NetworkModule::getRemoteNode(const NodeIdType& nodeId) {
-    auto iter = std::find_if(remoteNodes.begin(), remoteNodes.end(), [&](const std::shared_ptr<RemoteNode> obj) {
-        return (obj->getNodeId() && *obj->getNodeId() == nodeId);
-    });
-    if (iter != remoteNodes.end()) {
-        return **iter;
-    } else {
-        //there is no active remote node with this id, let's see if it is known in network information
-//            auto networkInfo = getNetworkInfo();
-        if (networkInfo->isNodeKnown(nodeId)) {
-            auto& remoteNode = getRemoteNode();
-            remoteNode.setRemoteNodeInfo(networkInfo->getRemoteNodeInfo(nodeId));
-            return remoteNode;
+    RemoteNode& NetworkModule::getRemoteNode(const NodeIdType& nodeId) {
+        auto iter = std::find_if(remoteNodes.begin(), remoteNodes.end(), [&](const std::shared_ptr<RemoteNode> obj) {
+            return (obj->getNodeId() && *obj->getNodeId() == nodeId);
+        });
+        if (iter != remoteNodes.end()) {
+            return **iter;
         } else {
-            throw RemoteNodeNotFoundException("Remote node unknown");
+            //there is no active remote node with this id, let's see if it is known in network information
+//            auto networkInfo = getNetworkInfo();
+            if (networkInfo->isNodeKnown(nodeId)) {
+                auto& remoteNode = getRemoteNode();
+                remoteNode.setRemoteNodeInfo(networkInfo->getRemoteNodeInfo(nodeId));
+                return remoteNode;
+            } else {
+                throw RemoteNodeNotFoundException("Remote node unknown");
+            }
         }
     }
-}
 
-RemoteNode& NetworkModule::getRemoteNode() {
-    std::shared_ptr<RemoteNode> remoteNode = std::make_shared<RemoteNode>(protocol);
-    remoteNode->context()->setParentContext(node.getContext());
-    remoteNodes.push_back(remoteNode);
-    return *remoteNode;
-}
-
-RemoteNode& NetworkModule::connectToNode(const NodeIdType& nodeId) {
-    //@todo catch exception
-    RemoteNode& remoteNode = getRemoteNode(nodeId);
-    remoteNode.connect();
-    return remoteNode;
-}
-
-void NetworkModule::prepareSubmodules() {
-    auto& networkSub = getSubModule<NetworkModule>();
-    networkSub.registerPacketProcessor<ConnectionControl>(ConnectionProcessors::processConnectionControl);
-    networkSub.registerPacketProcessor<NetworkInfoGroup>([this](NetworkInfoRequest::Ptr request) {
-        auto response = request->getNew<Status::response>();
-        // LOGGER("processing network info request id" + std::to_string(this->getId()));
-
-        if (this->getNetworkInfo() == nullptr) {
-            //@todo actual error handling
-            LOGGER("empty network info! ")
-        }
-        response->setNetworkInfo(this->getNetworkInfo());
-        return response;
-    });
-
-    networkSub.registerPacketProcessor<NodeInfoGroup>([this](NodeInfoGroup::Request::Ptr request) {
-        auto response = request->getNew<Status::response>();
-        // LOGGER("processing network info request id" + std::to_string(this->getId()));
-
-
-        response->setNodeInfo(node.getNodeInfo());
-        return response;
-    });
-    networkSub.registerPacketProcessor<KeepAlivePacket>([this](KeepAlivePacket::Request::Ptr request) {
-        auto response = request->getNew<Status::response>();
-        return response;
-    });
-}
-
-void NetworkModule::SubModule::setupPacketProcessing(NetworkModule& node) {
-
-    for (const auto& processingItem : processingList) {
-        processingItem->registerPacketProcessor(node);
+    RemoteNode& NetworkModule::getRemoteNode() {
+        std::shared_ptr<RemoteNode> remoteNode = std::make_shared<RemoteNode>(protocol);
+        remoteNode->context()->setParentContext(node.getContext());
+        remoteNodes.push_back(remoteNode);
+        return *remoteNode;
     }
 
+    RemoteNode& NetworkModule::connectToNode(const NodeIdType& nodeId) {
+        //@todo catch exception
+        RemoteNode& remoteNode = getRemoteNode(nodeId);
+        remoteNode.connect();
+        return remoteNode;
+    }
+
+    void NetworkModule::prepareSubmodules() {
+        auto& networkSub = getSubModule<NetworkModule>();
+        networkSub.registerPacketProcessor<ConnectionControl>(ConnectionProcessors::processConnectionControl);
+        networkSub.registerPacketProcessor<NetworkInfoGroup>([this](NetworkInfoRequest::Ptr request) {
+            auto response = request->getNew<Status::response>();
+            // LOGGER("processing network info request id" + std::to_string(this->getId()));
+
+            if (this->getNetworkInfo() == nullptr) {
+                //@todo actual error handling
+                LOGGER("empty network info! ")
+            }
+            response->setNetworkInfo(this->getNetworkInfo());
+            return response;
+        });
+
+        networkSub.registerPacketProcessor<NodeInfoGroup>([this](NodeInfoGroup::Request::Ptr request) {
+            auto response = request->getNew<Status::response>();
+            // LOGGER("processing network info request id" + std::to_string(this->getId()));
+
+
+            response->setNodeInfo(node.getNodeInfo());
+            return response;
+        });
+        networkSub.registerPacketProcessor<KeepAlivePacket>([this](KeepAlivePacket::Request::Ptr request) {
+            auto response = request->getNew<Status::response>();
+            return response;
+        });
+    }
+
+    void NetworkModule::SubModule::setupPacketProcessing(NetworkModule& node) {
+
+        for (const auto& processingItem : processingList) {
+            processingItem->registerPacketProcessor(node);
+        }
+
+    }
 }

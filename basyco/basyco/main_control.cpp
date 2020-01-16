@@ -5,15 +5,16 @@
 #include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
 #include "p2p/modules/network/protocol/logic/actions/NodeActions.h"
 #include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"
+
 #include <cereal/types/memory.hpp>
 #include <p2p/modules/command/CommandModule.h>
 #include <spdlog/sinks/basic_file_sink.h>
-
+using namespace bsc;
 
 using namespace std::chrono_literals;
 
 
-void setupModules(Node& node) {
+void setupModules(bsc::Node& node) {
     node.addModule<CommandModule>();
 }
 
@@ -34,14 +35,14 @@ int main(int argc, char* argv[]) {
     if (argc <= 1) {
         return 0;
     }
-    Node thisNode;
+    bsc::Node thisNode;
 
     //@todo load node info from file? or sth?
     thisNode.getNodeInfo().setNodeId("control");
 
     setupModules(thisNode);
-    thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
-    thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
+    thisNode.getModule<bsc::NetworkModule>()->addToNetwork("TheNetwork");
+    thisNode.getModule<bsc::NetworkModule>()->configuration().setPort(9191);
 
     auto cmdN = thisNode.getModule<CommandModule>();
     cmdN->setInteractive(false);
@@ -56,10 +57,10 @@ int main(int argc, char* argv[]) {
     thisNode.waitUntilStarted();
 //@todo get actual daemon address from configuration
     try {
-        auto& daemonNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
+        auto& daemonNode = thisNode.getModule<bsc::NetworkModule>()->connectTo("127.0.0.1:9999");
         cmdN->sendCommandToRemoteNode(daemonNode, commands);
         daemonNode.disconnect();
-    } catch (const RemoteNodeConnectionException& e) {
+    } catch (const bsc::RemoteNodeConnectionException& e) {
         //@todo formatting, localization and stuff...
         std::cerr << " Unable to connect to remote daemon node. Are you sure it's running?" << std::endl;
     }

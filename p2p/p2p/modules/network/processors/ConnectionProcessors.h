@@ -8,11 +8,13 @@
 
 #include <p2p/modules/network/protocol/packet/ConnectionControl.h>
 
-struct ConnectionProcessors {
+namespace bsc {
+    struct ConnectionProcessors {
 
-    static ConnectionControl::Response::Ptr processConnectionControl(ConnectionControl::Request::Ptr request);
+        static ConnectionControl::Response::Ptr processConnectionControl(ConnectionControl::Request::Ptr request);
 
-};
+    };
+}
 
 
 #endif //BASYCO_CONNECTIONPROCESSORS_H

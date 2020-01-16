@@ -8,12 +8,14 @@
 
 #include <stdexcept>
 
-class ConnectionException : public std::domain_error {
+namespace bsc {
+    class ConnectionException : public std::domain_error {
 
-public:
-    ConnectionException(const std::string& arg);
+    public:
+        ConnectionException(const std::string& arg);
 
-};
+    };
+}
 
 
 #endif //BASYCO_CONNECTIONEXCEPTION_H

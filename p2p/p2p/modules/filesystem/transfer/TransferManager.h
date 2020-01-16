@@ -12,198 +12,200 @@
 #include <algorithm>
 #include <logic/state/DeferredNotify.h>
 #include <p2p/modules/filesystem/identification/TransferTypes.h>
+namespace bsc {
 
+    class TransferManager {
+        /**
+         * transfer descriptor on server side. created when beginTransfer is used, deleted when finishTransfer is used
+         */
+        class RemoteTransferDescriptor {
+            std::shared_ptr<std::istream> inputStream;
+            TransferSize size;
 
-class TransferManager {
-    /**
-     * transfer descriptor on server side. created when beginTransfer is used, deleted when finishTransfer is used
-     */
-    class RemoteTransferDescriptor {
-        std::shared_ptr<std::istream> inputStream;
-        TransferSize size;
+        public:
+            const std::shared_ptr<std::istream>& getInputStream() const;
 
-    public:
-        const std::shared_ptr<std::istream> &getInputStream() const;
+            void setInputStream(const std::shared_ptr<std::istream>& inputStream);
 
-        void setInputStream(const std::shared_ptr<std::istream> &inputStream);
+            TransferSize getSize() const;
 
-        TransferSize getSize() const;
-
-        void setSize(TransferSize size);
-    };
-
-public:
-
-    enum class TransferState {
-        NOT_STARTED,
-        PREPARED,
-        STARTED,
-        ATTRIBUTES_ACCQUIRED,
-        DOWNLOADING,
-        FINISHED,
-        ERROR,
-    };
-
-    /**
-     * transfer descriptor on local side, with its own thread that handles the downloading of the entire source stream from the other node
-     */
-    class LocalTransferDescriptor
-            : protected bsc::LogicStateMachine<LocalTransferDescriptor, TransferState, bsc::DeferredNotify> {
-
-        ResourceIdentificatorPtr destination;
-        ResourceIdentificatorPtr source;
-        NodeIdType sourceNode;
-        TransferSize size;
-        TransferSize transferredSize;
-        std::mutex threadStartMutex;
-        std::chrono::time_point<std::chrono::steady_clock> startTime, endTime;
-
-        //very private, no getters:
-
-        std::unique_ptr<std::thread> thread = nullptr;
-
-        std::function<void(LocalTransferDescriptor &)> payload;
-
-    protected:
-
-        void setPayload(const std::function<void(LocalTransferDescriptor &)> &p);
-
-        void startThread();
-
-        friend class TransferManager;
+            void setSize(TransferSize size);
+        };
 
     public:
-        const ResourceIdentificatorPtr &getDestination() const;
 
-        void setDestination(const ResourceIdentificatorPtr &destination);
+        enum class TransferState {
+            NOT_STARTED,
+            PREPARED,
+            STARTED,
+            ATTRIBUTES_ACCQUIRED,
+            DOWNLOADING,
+            FINISHED,
+            ERROR,
+        };
 
-        const ResourceIdentificatorPtr &getSource() const;
+        /**
+         * transfer descriptor on local side, with its own thread that handles the downloading of the entire source stream from the other node
+         */
+        class LocalTransferDescriptor
+                : protected bsc::LogicStateMachine<LocalTransferDescriptor, TransferState, bsc::DeferredNotify> {
 
-        void setSource(const ResourceIdentificatorPtr &source);
+            ResourceIdentificatorPtr destination;
+            ResourceIdentificatorPtr source;
+            NodeIdType sourceNode;
+            TransferSize size;
+            TransferSize transferredSize;
+            std::mutex threadStartMutex;
+            std::chrono::time_point<std::chrono::steady_clock> startTime, endTime;
 
-        const NodeIdType &getSourceNode() const;
+            //very private, no getters:
 
-        void setSourceNode(const NodeIdType &sourceNode);
+            std::unique_ptr<std::thread> thread = nullptr;
 
-        bool isStarted();
+            std::function<void(LocalTransferDescriptor&)> payload;
 
-        TransferSize getSize() const {
-            return size;
-        }
+        protected:
 
-        void setSize(TransferSize size) {
-            LocalTransferDescriptor::size = size;
-        }
+            void setPayload(const std::function<void(LocalTransferDescriptor&)>& p);
 
-        TransferSize getTransferredSize() const {
-            return transferredSize;
-        }
+            void startThread();
 
-        void setTransferredSize(TransferSize transferredSize) {
-            LocalTransferDescriptor::transferredSize = transferredSize;
-        }
+            friend class TransferManager;
 
-        const std::chrono::time_point<std::chrono::steady_clock> &getStartTime() const;
+        public:
+            const ResourceIdentificatorPtr& getDestination() const;
 
-        void setStartTime(const std::chrono::time_point<std::chrono::steady_clock> &startTime);
+            void setDestination(const ResourceIdentificatorPtr& destination);
 
-        const std::chrono::time_point<std::chrono::steady_clock> &getEndTime() const;
+            const ResourceIdentificatorPtr& getSource() const;
 
-        void setEndTime(const std::chrono::time_point<std::chrono::steady_clock> &endTime);
+            void setSource(const ResourceIdentificatorPtr& source);
 
-        ~LocalTransferDescriptor() override;
+            const NodeIdType& getSourceNode() const;
 
-        void wait();
+            void setSourceNode(const NodeIdType& sourceNode);
 
-        friend class TransferQueue;
+            bool isStarted();
 
-        LocalTransferDescriptor();
-    };
+            TransferSize getSize() const {
+                return size;
+            }
+
+            void setSize(TransferSize size) {
+                LocalTransferDescriptor::size = size;
+            }
+
+            TransferSize getTransferredSize() const {
+                return transferredSize;
+            }
+
+            void setTransferredSize(TransferSize transferredSize) {
+                LocalTransferDescriptor::transferredSize = transferredSize;
+            }
+
+            const std::chrono::time_point<std::chrono::steady_clock>& getStartTime() const;
+
+            void setStartTime(const std::chrono::time_point<std::chrono::steady_clock>& startTime);
+
+            const std::chrono::time_point<std::chrono::steady_clock>& getEndTime() const;
+
+            void setEndTime(const std::chrono::time_point<std::chrono::steady_clock>& endTime);
+
+            ~LocalTransferDescriptor() override;
+
+            void wait();
+
+            friend class TransferQueue;
+
+            LocalTransferDescriptor();
+        };
 
 
-public:
-    typedef std::shared_ptr<LocalTransferDescriptor> LocalTransferDescriptorPtr;
+    public:
+        typedef std::shared_ptr<LocalTransferDescriptor> LocalTransferDescriptorPtr;
 
-    /**
-     * a collection of transfers, downloading them sequentially or more at a time
-     */
-    class TransferQueue
-            : public LocalTransferDescriptor::ObserverType,
-              public bsc::LogicStateMachine<TransferQueue, TransferState, bsc::DeferredNotify> {
+        /**
+         * a collection of transfers, downloading them sequentially or more at a time
+         */
+        class TransferQueue
+                : public LocalTransferDescriptor::ObserverType,
+                  public bsc::LogicStateMachine<TransferQueue, TransferState, bsc::DeferredNotify> {
+        private:
+            std::list<LocalTransferDescriptorPtr> transfers;
+            TransferManager& manager;
+            const decltype(transfers.size()) MAX_CONCURRENT_TRANSFERS = 2;
+            std::mutex finishLock;
+            std::condition_variable finishReady;
+            std::recursive_mutex startLock;
+
+
+        public:
+            explicit TransferQueue(TransferManager& manager);
+
+            void update(LocalTransferDescriptor& object, TransferState type) override;
+
+        protected:
+
+            //@todo this method probably can be made more efficient or omitted entirely
+            auto countUnfinishedTransfers() -> decltype(transfers.size());
+
+            auto countTransfersInState(TransferState state) -> decltype(transfers.size());
+
+            auto countTransfersNotInState(TransferState state) -> decltype(transfers.size());
+
+        public:
+            void
+            queueTransfer(const NodeIdType& nodeId, const ResourceIdentificatorPtr& source,
+                          const ResourceIdentificatorPtr& destination);
+
+            void queueTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
+
+            void start();
+
+            void waitToFinishAllTransfers();
+        };
+
+        using TransferQueuePtr = std::shared_ptr<TransferQueue>;
+
+
     private:
-        std::list<LocalTransferDescriptorPtr> transfers;
-        TransferManager& manager;
-        const decltype(transfers.size()) MAX_CONCURRENT_TRANSFERS = 2;
-        std::mutex finishLock;
-        std::condition_variable finishReady;
-        std::recursive_mutex startLock;
+        TransferId generateTransferId();
 
+        std::map<TransferId, std::shared_ptr<RemoteTransferDescriptor>> transfers;
+        std::list<LocalTransferDescriptorPtr> localTransfers;
 
     public:
-        explicit TransferQueue(TransferManager &manager);
+        TransferId beginTransfer(ResourceIdentificatorPtr resourceIdentificatorPtr);
 
-        void update(LocalTransferDescriptor &object, TransferState type) override;
+        void finishTransfer(TransferId transferId);
 
-    protected:
+        //@todo this function now doesn't actually sends anything, rename to something more appropriate
+        //@todo also, return actual type.
+        std::tuple<std::vector<char>, TransferSize, TransferSize>
+        sendData(const TransferId& transferId, const TransferSize& begin, const TransferSize& end);
 
-        //@todo this method probably can be made more efficient or omitted entirely
-        auto countUnfinishedTransfers() -> decltype(transfers.size());
+        TransferSize transferProperties(const TransferId& transferId);
 
-        auto countTransfersInState(TransferState state) -> decltype(transfers.size());
+        static void
+        saveDataChunk(const std::shared_ptr<std::ostream>& outputStream, const TransferSize& begin,
+                      const TransferSize& end,
+                      const RawDataType& data);
 
-        auto countTransfersNotInState(TransferState state) -> decltype(transfers.size());
+        std::shared_ptr<TransferQueue> transferQueue() {
+            //@todo store this transfer queue somewhere?
+            return std::make_shared<TransferQueue>(*this);
+        }
 
-    public:
-        void
-        queueTransfer(const NodeIdType &nodeId, const ResourceIdentificatorPtr &source,
-                      const ResourceIdentificatorPtr &destination);
+        [[nodiscard]]  LocalTransferDescriptorPtr
+        initiateTransfer(const NodeIdType& nodeId, const ResourceIdentificatorPtr& source,
+                         const ResourceIdentificatorPtr& destination,
+                         bool start = true);
 
-        void queueTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination);
-        void start();
+        [[nodiscard]]  LocalTransferDescriptorPtr
+        initiateTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination,
+                         bool start = true);
 
-        void waitToFinishAllTransfers();
     };
-
-    using TransferQueuePtr = std::shared_ptr<TransferQueue>;
-
-
-private:
-    TransferId generateTransferId();
-
-    std::map<TransferId, std::shared_ptr<RemoteTransferDescriptor>> transfers;
-    std::list<LocalTransferDescriptorPtr> localTransfers;
-
-public:
-    TransferId beginTransfer(ResourceIdentificatorPtr resourceIdentificatorPtr);
-
-    void finishTransfer(TransferId transferId);
-
-    //@todo this function now doesn't actually sends anything, rename to something more appropriate
-    //@todo also, return actual type.
-    std::tuple<std::vector<char>, TransferSize, TransferSize>
-    sendData(const TransferId& transferId, const TransferSize& begin, const TransferSize& end);
-
-    TransferSize transferProperties(const TransferId& transferId);
-
-    static void
-    saveDataChunk(const std::shared_ptr<std::ostream>& outputStream, const TransferSize& begin, const TransferSize& end,
-                  const RawDataType& data);
-
-    std::shared_ptr<TransferQueue> transferQueue() {
-        //@todo store this transfer queue somewhere?
-        return std::make_shared<TransferQueue>(*this);
-    }
-
-    [[nodiscard]]  LocalTransferDescriptorPtr
-    initiateTransfer(const NodeIdType &nodeId, const ResourceIdentificatorPtr &source,
-                     const ResourceIdentificatorPtr &destination,
-                     bool start = true);
-
-    [[nodiscard]]  LocalTransferDescriptorPtr
-    initiateTransfer(ResourceIdentificatorPtr source, ResourceIdentificatorPtr destination,
-                     bool start = true);
-
-};
-
+}
 
 #endif //BASYCO_TRANSFERMANAGER_H

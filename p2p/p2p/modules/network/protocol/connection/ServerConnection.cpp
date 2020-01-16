@@ -15,11 +15,12 @@
 #include <p2p/modules/network/NetworkModule.h>
 #include "ServerConnection.h"
 
+#include "IServerConnection.h"
 
 
 using namespace std::chrono_literals;
 
-void ServerConnection::run() {
+void bsc::ServerConnection::run() {
     // std::cout << "opening server connection" << std::endl;
     // LOGGER("Opening server connection");
     //run is already in a separate thread, so there is no need to start a new one
@@ -48,10 +49,10 @@ void ServerConnection::run() {
 
 }
 
-ServerConnection::ServerConnection(const Poco::Net::StreamSocket& socket, bsc::Context::Ptr context)
+bsc::ServerConnection::ServerConnection(const Poco::Net::StreamSocket& socket, bsc::Context::Ptr context)
         : TCPServerConnection(
         socket),
-          IServerConnection(std::move(context)) {
+          bsc::IServerConnection(std::move(context)) {
 
     bsc::Context::setActiveContext(getConnectionContext());
     auto& lc = getConnectionContext()->get<bsc::LogicContext>();
@@ -60,26 +61,26 @@ ServerConnection::ServerConnection(const Poco::Net::StreamSocket& socket, bsc::C
     connectionSourcePtr->connectionAccepted(this);
 }
 
-void ServerConnection::startReceiving(Poco::Net::StreamSocket &socket) {
+void bsc::ServerConnection::startReceiving(Poco::Net::StreamSocket& socket) {
 
 
 }
 
-void ServerConnection::stopReceiving() {
+void bsc::ServerConnection::stopReceiving() {
     Connection::stopReceiving();
 }
 
-ServerConnection::~ServerConnection() {
+bsc::ServerConnection::~ServerConnection() {
     //  LOGGER("Server conn dest");
     changeState(ConnectionState::DISCONNECTED);
 }
 
-void ServerConnection::stop() {
+void bsc::ServerConnection::stop() {
     //  LOGGER("stop");
     shutdown();
 }
 
-void ServerConnection::shutdown() {
+void bsc::ServerConnection::shutdown() {
     Connection::shutdown();
     try {
         socket().shutdown();
@@ -88,7 +89,7 @@ void ServerConnection::shutdown() {
 //        auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 //        connectionSourcePtr->connectionClosedServer(this);
     }
-    catch (const Poco::Net::NetException &e) {
+    catch (const Poco::Net::NetException& e) {
         LOGGER("net exception")
         e.displayText();
         auto nested = e.nested();
@@ -99,22 +100,22 @@ void ServerConnection::shutdown() {
     }
 }
 
-Poco::Net::StreamSocket &ServerConnection::getSocket() {
+Poco::Net::StreamSocket& bsc::ServerConnection::getSocket() {
     return socket();
 }
 
 
-Poco::Net::TCPServerConnection *ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket &socket) {
+Poco::Net::TCPServerConnection* bsc::ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket& socket) {
     LOGGER("creating server connection");
     bsc::Context::Ptr connectionContext = contextGetter();
     bsc::SetLocalContext localContext(connectionContext); //RAII
-    ServerConnection* connection = new ServerConnection(socket, connectionContext);
+    bsc::ServerConnection* connection = new bsc::ServerConnection(socket, connectionContext);
     for (const auto& observer : observers) {
         connection->registerStateObserver(observer);
     }
     return connection;
 }
 
-ServerConnectionFactory::ServerConnectionFactory(std::function<bsc::Context::OwnPtr(void)> contextGetter,
-                                                 std::list<std::reference_wrapper<Connection::ObserverType>> observers)
+bsc::ServerConnectionFactory::ServerConnectionFactory(std::function<bsc::Context::OwnPtr(void)> contextGetter,
+                                                      std::list<std::reference_wrapper<bsc::Connection::ObserverType>> observers)
         : contextGetter(std::move(contextGetter)), observers(std::move(observers)) {}

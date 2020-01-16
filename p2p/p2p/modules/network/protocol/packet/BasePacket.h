@@ -16,92 +16,98 @@
 #include <p2p/role/Roles.h>
 
 
-struct PacketGroup;
+namespace bsc {
 
-class PacketSourceWorker;
+    struct PacketGroup;
 
-class BasePacket;
+    class PacketSourceWorker;
 
-template<typename NetworkPacketType = BasePacket>
-using NetworkPacketPointer = std::shared_ptr<NetworkPacketType>;
+    class BasePacket;
 
-class BasePacket {
-public:
-    typedef unsigned int IdType;
-    typedef std::shared_ptr<BasePacket> Ptr;
-    typedef PacketGroup BaseType;
-    std::mutex idLock;
-private:
-    //@fixme Ids are not unique across nodes! Is that a problem for Transmission Control or Graviton? Probably not, but investigate
-    /// what if A sends id 5 to B and then C sends id 5 to B ? would that work?
-    IdType nextId();
-    Status status;
-    IdType id;
-    bool retry = false;
+    template<typename NetworkPacketType = BasePacket>
+    using NetworkPacketPointer = std::shared_ptr<NetworkPacketType>;
 
-private:
-    template<class Archive>
-    void serialize(Archive &ar) {
-        ar(status, id, retry);
-    }
+    class BasePacket {
+    public:
+        typedef unsigned int IdType;
+        typedef std::shared_ptr<BasePacket> Ptr;
+        typedef PacketGroup BaseType;
+        std::mutex idLock;
+    private:
+        //@fixme Ids are not unique across nodes! Is that a problem for Transmission Control or Graviton? Probably not, but investigate
+        /// what if A sends id 5 to B and then C sends id 5 to B ? would that work?
+        IdType nextId();
 
-    friend class cereal::access;
+        Status status;
+        IdType id;
+        bool retry = false;
 
-public:
+    private:
+        template<class Archive>
+        void serialize(Archive& ar) {
+            ar(status, id, retry);
+        }
 
+        friend class cereal::access;
 
-    [[nodiscard]] Status getStatus() const;
-
-    void setStatus(Status status);
-
-    [[nodiscard]] IdType getId() const;
-
-    void setId(IdType id);
-
-    //I don't remember why it was deleted, probably because of serialization bug(fixed) or maybe to not waste ids (who cares about ids?)
-    // BasePacket(const BasePacket &) = delete;
-
-    BasePacket() : status(Status::request), id(nextId()) {};
-
-    [[nodiscard]] bool isRetry() const;
-
-    void setRetry(bool retry);
-
-    virtual const RoleList& requiredRoles() = 0;
-
-    void resetId() {
-        setId(nextId());
-    }
+    public:
 
 
-protected:
+        [[nodiscard]] Status getStatus() const;
 
-    virtual void _operate(PacketSourceWorker &f, std::shared_ptr<BasePacket>) = 0;
+        void setStatus(Status status);
 
-    friend class ConnectionSource;
+        [[nodiscard]] IdType getId() const;
 
-    virtual ~BasePacket() = default;
-};
+        void setId(IdType id);
 
-typedef std::shared_ptr<BasePacket> BasePacketPtr;
+        //I don't remember why it was deleted, probably because of serialization bug(fixed) or maybe to not waste ids (who cares about ids?)
+        // BasePacket(const BasePacket &) = delete;
 
+        BasePacket() : status(Status::request), id(nextId()) {};
 
-template<typename... T1>
-using Fu = std::function<void(T1 &...)>;
+        [[nodiscard]] bool isRetry() const;
 
-class TypeOperator {
+        void setRetry(bool retry);
 
-    template<typename T>
-    void operate(NetworkPacketPointer<T> ptr) {
-        LOGGER("do shit")
-        //@todo somehow invoke logic engine. preferably without including logic manager here.
-        //  if only somehow I could pass a lambda or sth that would be invoked here.
+        virtual const RoleList& requiredRoles() = 0;
 
-    }
-};
+        void resetId() {
+            setId(nextId());
+        }
 
 
+    protected:
 
-CEREAL_REGISTER_TYPE(BasePacket)
+        virtual void _operate(PacketSourceWorker& f, std::shared_ptr<BasePacket>) = 0;
+
+        friend class ConnectionSource;
+
+        virtual ~BasePacket() = default;
+    };
+
+    typedef std::shared_ptr<bsc::BasePacket> BasePacketPtr;
+
+
+    template<typename... T1>
+    using Fu = std::function<void(T1& ...)>;
+
+    //@todo I think this class is not used, remove it.
+    class TypeOperator {
+
+        template<typename T>
+        void operate(NetworkPacketPointer<T> ptr) {
+            LOGGER("do shit")
+            //@todo somehow invoke logic engine. preferably without including logic manager here.
+            //  if only somehow I could pass a lambda or sth that would be invoked here.
+
+        }
+    };
+
+
+}
+
+
+CEREAL_REGISTER_TYPE(bsc::BasePacket)
 
 #endif //BASYCO_BASEPACKET_H

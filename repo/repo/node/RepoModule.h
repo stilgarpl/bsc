@@ -16,10 +16,9 @@
 #include <repo/repository/storage/StorageFactorySpecialization.h>
 
 
-
-class RepoModule : public NodeModuleDependent<RepoModule> {
+class RepoModule : public bsc::NodeModuleDependent<RepoModule> {
 public:
-    class Configuration : public IConfig {
+    class Configuration : public bsc::IConfig {
     private:
         //@todo cereal fix path type to path!
         PathType repositoryDataPath = fs::path("repository").string();
@@ -57,13 +56,13 @@ private:
     StorageManager storageManager;
     RepositoryPtr selectedRepository = nullptr;
 public:
-    explicit RepoModule(INode &node);
+    explicit RepoModule(bsc::INode& node);
 
-    void setupActions(ILogicModule::SetupActionHelper &actionHelper) override;
+    void setupActions(bsc::ILogicModule::SetupActionHelper& actionHelper) override;
 
-    bool assignActions(ILogicModule::AssignActionHelper &actionHelper) override;
+    bool assignActions(bsc::ILogicModule::AssignActionHelper& actionHelper) override;
 
-    bool setupSources(ILogicModule::SetupSourceHelper &sourceHelper) override;
+    bool setupSources(bsc::ILogicModule::SetupSourceHelper& sourceHelper) override;
 
     RepositoryPtr findRepository(const IRepository::RepoIdType &repoId);
 
@@ -103,7 +102,7 @@ public:
 
     void printHistory();
 
-    void downloadRemoteRepository(const NodeIdType &remoteId, const IRepository::RepoIdType &repoId);
+    void downloadRemoteRepository(const bsc::NodeIdType& remoteId, const IRepository::RepoIdType& repoId);
 
     void downloadRepository(const IRepository::RepoIdType &repoId);
 

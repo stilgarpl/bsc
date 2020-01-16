@@ -4,4 +4,4 @@
 
 #include "ConnectionException.h"
 
-ConnectionException::ConnectionException(const std::string& arg) : domain_error(arg) {}
+bsc::ConnectionException::ConnectionException(const std::string& arg) : domain_error(arg) {}

@@ -12,6 +12,7 @@
 #include <repo/node/RepoModule.h>
 
 
+
 struct RepoEvaluators {
 
     //@todo actual parameter types, this isn't auto, it's SpecificPacket Repo Query Response.
@@ -26,7 +27,7 @@ struct RepoEvaluators {
     static constexpr auto currentJournalFromRepoQueryResponse = [](auto e) {
         LOGGER("currentJournalFromRepoQueryResponse event")
         //@todo error handling.
-        return NodeContext::getNodeFromActiveContext().getModule<RepoModule>()->findRepository(
+        return bsc::NodeContext::getNodeFromActiveContext().getModule<RepoModule>()->findRepository(
                 e.getPacket()->getRepoId())->getJournal();
     };
 

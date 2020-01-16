@@ -4,26 +4,26 @@
 
 #include "CommandInputOutputContext.h"
 
-std::ostream& CommandInputOutputContext::out() {
+std::ostream& bsc::CommandInputOutputContext::out() {
     return outputStream;
 }
 
-std::istream& CommandInputOutputContext::in() {
+std::istream& bsc::CommandInputOutputContext::in() {
     return inputStream;
 }
 
-const std::stringstream& CommandInputOutputContext::getInputStream() const {
+const std::stringstream& bsc::CommandInputOutputContext::getInputStream() const {
     return inputStream;
 }
 
-const std::stringstream& CommandInputOutputContext::getOutputStream() const {
+const std::stringstream& bsc::CommandInputOutputContext::getOutputStream() const {
     return outputStream;
 }
 
-std::ostream& CommandInputOutputContext::err() {
+std::ostream& bsc::CommandInputOutputContext::err() {
     return errorStream;
 }
 
-const std::stringstream& CommandInputOutputContext::getErrorStream() const {
+const std::stringstream& bsc::CommandInputOutputContext::getErrorStream() const {
     return errorStream;
 }

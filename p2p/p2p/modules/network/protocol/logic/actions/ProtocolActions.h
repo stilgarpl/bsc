@@ -10,11 +10,13 @@
 #include "core/context/Context.h"
 
 
-class ProtocolActions {
+namespace bsc {
+    class ProtocolActions {
 
-public:
-    static void onNewConnection(const ConnectionEvent &connectionEvent);
-};
+    public:
+        static void onNewConnection(const ConnectionEvent& connectionEvent);
+    };
+}
 
 
 #endif //BASYCO_PROTOCOLACTIONS_H

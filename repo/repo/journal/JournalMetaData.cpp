@@ -26,6 +26,6 @@ ChecksumType JournalMetaData::getChecksum() {
     return bsc::calculateSha1OfString(ss.str());
 }
 
-JournalMetaData::JournalMetaData(NodeIdType nodeId, std::string userId,
+JournalMetaData::JournalMetaData(bsc::NodeIdType nodeId, std::string userId,
                                  std::string operatingSystem) : nodeId(std::move(nodeId)), userId(std::move(userId)),
                                                                 operatingSystem(std::move(operatingSystem)) {}

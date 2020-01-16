@@ -10,11 +10,12 @@
 #include <p2p/node/context/NodeContext.h>
 #include <Poco/Net/NetException.h>
 #include "ConnectionException.h"
+#include "Connection.h"
 
 
 using namespace std::chrono_literals;
 
-void Connection::send(BasePacketPtr np) {
+void bsc::Connection::send(BasePacketPtr np) {
     std::lock_guard<std::mutex> g(sendQueueLock);
     // std::cout << "Adding packet ..." << std::endl;
     if (sending) {
@@ -24,7 +25,7 @@ void Connection::send(BasePacketPtr np) {
 
 }
 
-BasePacketPtr Connection::receive() {
+bsc::BasePacketPtr bsc::Connection::receive() {
     std::unique_lock<std::mutex> g(receiveQueueLock);
     while (receiveQueue.empty() && receiving) {
         // std::cout << "work::receive waiting " << receiveQueue.size() << std::endl;
@@ -44,7 +45,7 @@ BasePacketPtr Connection::receive() {
 
 }
 
-void Connection::workSend(Poco::Net::StreamSocket &socket) {
+void bsc::Connection::workSend(Poco::Net::StreamSocket& socket) {
     Poco::Net::SocketOutputStream os(socket);
     bsc::Context::setActiveContext(getConnectionContext());
     auto& lc = getConnectionContext()->get<bsc::LogicContext>();
@@ -114,7 +115,7 @@ void Connection::workSend(Poco::Net::StreamSocket &socket) {
 
 }
 
-void Connection::workReceive(Poco::Net::StreamSocket &socket) {
+void bsc::Connection::workReceive(Poco::Net::StreamSocket& socket) {
 
     bsc::Context::setActiveContext(getConnectionContext());
     auto& lc = getConnectionContext()->get<bsc::LogicContext>();
@@ -197,7 +198,7 @@ void Connection::workReceive(Poco::Net::StreamSocket &socket) {
 }
 
 
-void Connection::startSending(Poco::Net::StreamSocket &socket) {
+void bsc::Connection::startSending(Poco::Net::StreamSocket& socket) {
     std::unique_lock<std::recursive_mutex> g(sendThreadLock);
     sending = true;
     //startWorker(socket);
@@ -206,7 +207,7 @@ void Connection::startSending(Poco::Net::StreamSocket &socket) {
     }
 }
 
-void Connection::stopSending() {
+void bsc::Connection::stopSending() {
     std::unique_lock<std::recursive_mutex> g(sendThreadLock);
     sending = false;
     if (sendThread != nullptr && sendThread->joinable() && std::this_thread::get_id() != sendThread->get_id()) {
@@ -218,7 +219,7 @@ void Connection::stopSending() {
 }
 
 
-void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
+void bsc::Connection::startReceiving(Poco::Net::StreamSocket& socket) {
     std::unique_lock<std::recursive_mutex> g(receiveThreadLock);
     receiving = true;
 //    socket.setBlocking(false);
@@ -229,12 +230,12 @@ void Connection::startReceiving(Poco::Net::StreamSocket &socket) {
 
 }
 
-void Connection::stopReceiving() {
+void bsc::Connection::stopReceiving() {
     std::unique_lock<std::recursive_mutex> g(receiveThreadLock);
     receiving = false;
     try {
         getSocket().shutdown();
-    } catch (const Poco::Net::NetException &e) {
+    } catch (const Poco::Net::NetException& e) {
         LOGGER(e.what());
     }
     if (receiveThread != nullptr && receiveThread->joinable() &&
@@ -248,10 +249,10 @@ void Connection::stopReceiving() {
     //  processor.stop();
 }
 
-Connection::Connection(const bsc::Context::Ptr& context) : LogicStateMachine(*this), processor(*this),
-                                                           connectionContext(bsc::Context::makeContext(context)) {
+bsc::Connection::Connection(const bsc::Context::Ptr& context) : LogicStateMachine(*this), processor(*this),
+                                                                connectionContext(bsc::Context::makeContext(context)) {
 
-    connectionContext->set<ConnectionContext, Connection&>(*this);
+    connectionContext->set<ConnectionContext, bsc::Connection&>(*this);
 
     //@todo when state machine global definition setting is implemented, move this out of the constructor:
 
@@ -262,15 +263,15 @@ Connection::Connection(const bsc::Context::Ptr& context) : LogicStateMachine(*th
     setState(ConnectionState::NEW);
 }
 
-ConnectionProcessor &Connection::getProcessor() {
+bsc::ConnectionProcessor& bsc::Connection::getProcessor() {
     return processor;
 }
 
-bsc::Context::Ptr Connection::getConnectionContext() {
+bsc::Context::Ptr bsc::Connection::getConnectionContext() {
     return connectionContext;
 }
 
-Connection::~Connection() {
+bsc::Connection::~Connection() {
 
     //   LOGGER("Closing connection")
 //    shutdown();
@@ -278,14 +279,14 @@ Connection::~Connection() {
 
 }
 
-void Connection::shutdown() {
+void bsc::Connection::shutdown() {
     stopReceiving();
     stopSending();
     processor.stop();
     processor.join();
 }
 
-NetAddressType Connection::getAddress() {
+bsc::NetAddressType bsc::Connection::getAddress() {
     //@todo if getSocket is removed, just make it pure virtual and implement in client and server connections
     try {
         return getSocket().peerAddress().toString();

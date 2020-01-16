@@ -2,16 +2,16 @@
 // Created by stilgar on 21.08.17.
 //
 
+
 #include "NodeContext.h"
 
+bsc::NodeContext::NodeContext(bsc::Node& node, bsc::NodeInfo& nodeInfo) : node(node), nodeInfo(nodeInfo) {}
 
-NodeContext::NodeContext(Node &node, NodeInfo &nodeInfo) : node(node), nodeInfo(nodeInfo) {}
-
-Node &NodeContext::getNode() const {
+bsc::Node& bsc::NodeContext::getNode() const {
     return node;
 }
 
-NodeInfo &NodeContext::getNodeInfo() const {
+bsc::NodeInfo& bsc::NodeContext::getNodeInfo() const {
     return nodeInfo;
 }
 

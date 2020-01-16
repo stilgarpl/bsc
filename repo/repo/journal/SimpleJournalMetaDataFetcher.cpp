@@ -8,6 +8,7 @@
 #include "SimpleJournalMetaDataFetcher.h"
 
 
+
 JournalMetaData SimpleJournalMetaDataFetcher::makeMetaData() {
     auto operatingSystem = Poco::Environment::osName();
     std::string userId;
@@ -17,7 +18,7 @@ JournalMetaData SimpleJournalMetaDataFetcher::makeMetaData() {
         userId = userValue;
     }
     if (bsc::Context::hasActiveContext()) {
-        nodeId = NodeContext::getNodeFromActiveContext().getNodeInfo().getNodeId();
+        nodeId = bsc::NodeContext::getNodeFromActiveContext().getNodeInfo().getNodeId();
     }
     return JournalMetaData(nodeId, userId, operatingSystem);
 

@@ -11,25 +11,29 @@
 
 
 
-enum class NodeEventId {
-    NEW_NODE_DISCOVERED,
-    NODE_CONNECTED,
-    NODE_DISCONNECTED,
-    NODE_INFO_RECEIVED,
-};
+namespace bsc {
+    enum class NodeEventId {
+        NEW_NODE_DISCOVERED,
+        NODE_CONNECTED,
+        NODE_DISCONNECTED,
+        NODE_INFO_RECEIVED,
+    };
 
-class NodeInfoEvent : public bsc::IEvent<NodeEventId> {
-private:
-    NodeInfo nodeInfo;
-
-
-public:
-    const NodeInfo& getNodeInfo() const;
-
-    void setNodeInfo(const NodeInfo& nodeInfo);
+    class NodeInfoEvent : public bsc::IEvent<NodeEventId> {
+    private:
+        NodeInfo nodeInfo;
 
 
-};
+    public:
+        const NodeInfo& getNodeInfo() const;
+
+        void setNodeInfo(const NodeInfo& nodeInfo);
+
+
+    };
+
+
+}
 
 
 #endif //BASYCO_NODEEVENT_H

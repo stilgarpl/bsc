@@ -4,18 +4,18 @@
 
 #include "AuthHelloEvent.h"
 
-const NodeIdType &AuthHelloEvent::getNodeId() const {
+const bsc::NodeIdType& bsc::AuthHelloEvent::getNodeId() const {
     return nodeId;
 }
 
-void AuthHelloEvent::setNodeId(const NodeIdType &nodeId) {
+void bsc::AuthHelloEvent::setNodeId(const NodeIdType& nodeId) {
     AuthHelloEvent::nodeId = nodeId;
 }
 
-const std::string &AuthHelloEvent::getAuthData() const {
+const std::string& bsc::AuthHelloEvent::getAuthData() const {
     return authData;
 }
 
-void AuthHelloEvent::setAuthData(const std::string &authData) {
+void bsc::AuthHelloEvent::setAuthData(const std::string& authData) {
     AuthHelloEvent::authData = authData;
 }

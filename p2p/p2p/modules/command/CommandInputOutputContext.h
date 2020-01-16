@@ -10,25 +10,27 @@
 #include <sstream>
 
 
-class CommandInputOutputContext : public bsc::InputOutputContext {
-private:
-    std::stringstream inputStream;
-    std::stringstream outputStream;
-    std::stringstream errorStream;
-public:
-    std::ostream& out() override;
+namespace bsc {
+    class CommandInputOutputContext : public bsc::InputOutputContext {
+    private:
+        std::stringstream inputStream;
+        std::stringstream outputStream;
+        std::stringstream errorStream;
+    public:
+        std::ostream& out() override;
 
-    std::ostream& err() override;
+        std::ostream& err() override;
 
-    std::istream& in() override;
+        std::istream& in() override;
 
-    const std::stringstream& getInputStream() const;
+        const std::stringstream& getInputStream() const;
 
-    const std::stringstream& getErrorStream() const;
+        const std::stringstream& getErrorStream() const;
 
-    const std::stringstream& getOutputStream() const;
+        const std::stringstream& getOutputStream() const;
 
-};
+    };
+}
 
 
 #endif //BASYCO_COMMANDINPUTOUTPUTCONTEXT_H

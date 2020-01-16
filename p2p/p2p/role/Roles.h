@@ -13,59 +13,61 @@
 #include "RoleScope.h"
 
 
-class Roles {
+namespace bsc {
+    class Roles {
 
-private:
-    static thread_local RoleScope *activeScope;
+    private:
+        static thread_local RoleScope* activeScope;
 
-public:
+    public:
 
-    static bool isRoleValid(const Role &role) {
-        if (activeScope == nullptr) return false;
+        static bool isRoleValid(const Role& role) {
+            if (activeScope == nullptr) return false;
 
-        return activeScope->findRole(role.getRoleId()) != nullptr;
-    }
-
-    template<typename ... Args>
-    static void allowed(const Role::IdType &role, Args... args) {
-        allowed(Role(role), args...);
-    }
-
-    template<typename ... Args>
-    static void allowed(const Role &role, Args... args) {
-        //@todo check if id is valid, if not throw exception
-        LOGGER("Role is " + role.getRoleId());
-        if (isRoleValid(role)) {
-            allowed(args...);
-        } else {
-            throw RoleInvalidException("No such role");
+            return activeScope->findRole(role.getRoleId()) != nullptr;
         }
-    }
 
-    static void allowed() {
+        template<typename ... Args>
+        static void allowed(const Role::IdType& role, Args... args) {
+            allowed(Role(role), args...);
+        }
 
-    }
+        template<typename ... Args>
+        static void allowed(const Role& role, Args... args) {
+            //@todo check if id is valid, if not throw exception
+            LOGGER("Role is " + role.getRoleId());
+            if (isRoleValid(role)) {
+                allowed(args...);
+            } else {
+                throw RoleInvalidException("No such role");
+            }
+        }
 
-    static RoleScope *getActiveScope() {
-        return activeScope;
-    }
+        static void allowed() {
 
-    static void setActiveScope(RoleScope *activeScope) {
-        Roles::activeScope = activeScope;
-    }
+        }
 
-    template<typename T>
-    static void defineRequiredRole(const Role::IdType &roleId) {
-        //@todo nullptr check?
-        bsc::Context::getActiveContext()->get<RoleDefinitionsContext>().roleDefinitionsPtr->addRole<T>(roleId);
-    }
+        static RoleScope* getActiveScope() {
+            return activeScope;
+        }
 
-    template<typename T>
-    static const RoleList &getRequiredRolesDefinitions() {
-        return bsc::Context::getActiveContext()->get<RoleDefinitionsContext>().roleDefinitionsPtr->getRequiredRoles<T>();
-    }
+        static void setActiveScope(RoleScope* activeScope) {
+            Roles::activeScope = activeScope;
+        }
 
-};
+        template<typename T>
+        static void defineRequiredRole(const Role::IdType& roleId) {
+            //@todo nullptr check?
+            Context::getActiveContext()->get<RoleDefinitionsContext>().roleDefinitionsPtr->addRole<T>(roleId);
+        }
+
+        template<typename T>
+        static const RoleList& getRequiredRolesDefinitions() {
+            return Context::getActiveContext()->get<RoleDefinitionsContext>().roleDefinitionsPtr->getRequiredRoles<T>();
+        }
+
+    };
+}
 
 
 #endif //BASYCO_ROLES_H

@@ -8,6 +8,7 @@
 #include <repo/repository/transformer/rules/HomeDirRule.h>
 #include "Repository.h"
 
+
 #include <repo/repository/storage/InternalStorage.h>
 
 using namespace std::chrono_literals;
@@ -118,7 +119,7 @@ void Repository::persist(fs::path path) {
         //@todo check if file was actually changed.
         journal->append(JournalMethod::modified, target,
                         pathTransformer->transformToJournalFormat(path).string(),
-                        FileData(path));
+                        bsc::FileData(path));
 
 
     } else {
@@ -127,7 +128,7 @@ void Repository::persist(fs::path path) {
 
         journal->append(JournalMethod::added, target,
                         pathTransformer->transformToJournalFormat(path).string(),
-                        FileData(path));
+                        bsc::FileData(path));
 
 
     }
@@ -365,12 +366,12 @@ void Repository::ignore(fs::path path) {
     if (!fs::is_directory(path)) {
         journal->append(JournalMethod::ignored, JournalTarget::file,
                         pathTransformer->transformToJournalFormat(path).string(),
-                        FileData(path));
+                        bsc::FileData(path));
 
     } else {
         journal->append(JournalMethod::ignored, JournalTarget::directory,
                         pathTransformer->transformToJournalFormat(path).string(),
-                        FileData(path));
+                        bsc::FileData(path));
     }
 }
 

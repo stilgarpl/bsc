@@ -7,16 +7,18 @@
 
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 
-class NetworkInfoRequest;
 
-class NetworkInfoResponse;
+namespace bsc {
+    class NetworkInfoRequest;
 
-struct NetworkInfoGroup : public PacketGroup {
+    class NetworkInfoResponse;
 
-    typedef NetworkInfoRequest Request;
-    typedef NetworkInfoResponse Response;
+    struct NetworkInfoGroup : public bsc::PacketGroup {
 
-};
+        typedef NetworkInfoRequest Request;
+        typedef NetworkInfoResponse Response;
 
+    };
+}
 
 #endif //BASYCO_NETWORKINFOGROUP_H

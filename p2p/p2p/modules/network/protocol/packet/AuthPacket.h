@@ -6,27 +6,29 @@
 #define BASYCO_AUTHPACKET_H
 
 
-#include "BasePacket.h"
+namespace bsc {
+    class AuthPacket : public BasePacket {
+    private:
+        //@todo zmienic to na jakis sensowny sposob autentykacji
+        std::string login;
+        std::string password;
 
-class AuthPacket : public BasePacket {
-private:
-    //@todo zmienic to na jakis sensowny sposob autentykacji
-    std::string login;
-    std::string password;
-
-private:
-    template<class Archive>
-    void serialize(Archive &ar) {
-        ar & cereal::base_class<BasePacket>(this);
-    }
+    private:
+        template<class Archive>
+        void serialize(Archive& ar) {
+            ar & cereal::base_class<BasePacket>(this);
+        }
 
 
-    friend class cereal::access;
+        friend class cereal::access;
 
-};
+    };
+}
 
-CEREAL_REGISTER_TYPE(AuthPacket);
+CEREAL_REGISTER_TYPE(bsc::AuthPacket);
 
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, AuthPacket);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::AuthPacket
+)
+bsc::;
 
 #endif //BASYCO_AUTHPACKET_H

@@ -7,12 +7,14 @@
 
 #include <stdexcept>
 
-class RemoteNodeConnectionException : public std::domain_error {
+namespace bsc {
+    class RemoteNodeConnectionException : public std::domain_error {
 
-public:
-    RemoteNodeConnectionException(const std::string& arg);
+    public:
+        RemoteNodeConnectionException(const std::string& arg);
 
-};
+    };
+}
 
 
 #endif //BASYCO_REMOTENODECONNECTIONEXCEPTION_H

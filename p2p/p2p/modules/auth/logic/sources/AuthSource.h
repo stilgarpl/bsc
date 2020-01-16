@@ -11,20 +11,22 @@
 #include <p2p/modules/auth/logic/events/AuthHelloEvent.h>
 
 
-class AuthSource : public bsc::EventQueueSource<AuthHelloEvent> {
+namespace bsc {
+    class AuthSource : public EventQueueSource<AuthHelloEvent> {
 
 
-public:
+    public:
 
-    explicit AuthSource(bsc::SourceManager& sourceManager) : EventQueueSource(sourceManager) {}
+        explicit AuthSource(SourceManager& sourceManager) : EventQueueSource(sourceManager) {}
 
-    void hello(const NodeIdType& nodeId, const std::string& authData) {
-        auto event = newEvent();
-        event->setNodeId(nodeId);
-        event->setAuthData(authData);
-        queueEvent(event);
-    }
-};
+        void hello(const NodeIdType& nodeId, const std::string& authData) {
+            auto event = newEvent();
+            event->setNodeId(nodeId);
+            event->setAuthData(authData);
+            queueEvent(event);
+        }
+    };
+}
 
 
 #endif //BASYCO_AUTHSOURCE_H

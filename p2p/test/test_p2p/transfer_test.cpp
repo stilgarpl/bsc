@@ -7,18 +7,20 @@
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/modules/basic/BasicModule.h>
 
-void setupModules(Node &node) {
-    node.addModule<BasicModule>();
-    node.addModule<NetworkModule>();
+using namespace bsc;
+
+void setupModules(bsc::Node& node) {
+    node.addModule<bsc::BasicModule>();
+    node.addModule<bsc::NetworkModule>();
     node.addModule<FilesystemModule>();
 }
 
-void createFile(fs::path path, const std::string &content) {
+void createFile(fs::path path, const std::string& content) {
     std::ofstream file(path);
     file << content;
 }
 
-std::string readFile(const fs::path &path) {
+std::string readFile(const fs::path& path) {
     std::ifstream t(path);
     std::string str((std::istreambuf_iterator<char>(t)),
                     std::istreambuf_iterator<char>());
@@ -57,19 +59,19 @@ TEST_CASE("Transfer test") {
 
     const int TEST_FILES_NUM = 10;
 
-    Node thisNode;
+    bsc::Node thisNode;
 
     thisNode.getNodeInfo().setNodeId("firstNode");
 
     setupModules(thisNode);
-    thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
-    thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
+    thisNode.getModule<bsc::NetworkModule>()->addToNetwork("TheNetwork");
+    thisNode.getModule<bsc::NetworkModule>()->configuration().setPort(9191);
 
-    Node otherNode;
+    bsc::Node otherNode;
     otherNode.getNodeInfo().setNodeId("second");
     setupModules(otherNode);
-    otherNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
-    otherNode.getModule<NetworkModule>()->configuration().setPort(9192);
+    otherNode.getModule<bsc::NetworkModule>()->addToNetwork("TheNetwork");
+    otherNode.getModule<bsc::NetworkModule>()->configuration().setPort(9192);
 
     thisNode.start();
     otherNode.start();
@@ -78,7 +80,7 @@ TEST_CASE("Transfer test") {
     otherNode.waitUntilStarted();
     //@todo if possible, wait for otherNode to start listening.
     std::this_thread::sleep_for(500ms);
-    auto& remoteSecondNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9192");
+    auto& remoteSecondNode = thisNode.getModule<bsc::NetworkModule>()->connectTo("127.0.0.1:9192");
     bool connectedToSecond = remoteSecondNode.isConnected();
     INFO("testing require")
     REQUIRE(connectedToSecond);
@@ -108,15 +110,18 @@ TEST_CASE("Transfer test") {
 
         for (int i = 0; i < TEST_FILES_NUM; ++i) {
             INFO("downloading files for " + std::to_string(i))
-            transferQueue->queueTransfer(std::make_shared<SimplePathRI>(testPath / ("l" + std::to_string(i) + ".txt")),
-                                         std::make_shared<SimplePathRI>(
-                                                 destinationPath / ("l" + std::to_string(i) + ".txt")));
-            transferQueue->queueTransfer(std::make_shared<SimplePathRI>(testPath / ("v" + std::to_string(i) + ".txt")),
-                                         std::make_shared<SimplePathRI>(
-                                                 destinationPath / ("v" + std::to_string(i) + ".txt")));
-            transferQueue->queueTransfer(std::make_shared<SimplePathRI>(testPath / ("e" + std::to_string(i) + ".txt")),
-                                         std::make_shared<SimplePathRI>(
-                                                 destinationPath / ("e" + std::to_string(i) + ".txt")));
+            transferQueue->queueTransfer(
+                    std::make_shared<bsc::SimplePathRI>(testPath / ("l" + std::to_string(i) + ".txt")),
+                    std::make_shared<bsc::SimplePathRI>(
+                            destinationPath / ("l" + std::to_string(i) + ".txt")));
+            transferQueue->queueTransfer(
+                    std::make_shared<bsc::SimplePathRI>(testPath / ("v" + std::to_string(i) + ".txt")),
+                    std::make_shared<bsc::SimplePathRI>(
+                            destinationPath / ("v" + std::to_string(i) + ".txt")));
+            transferQueue->queueTransfer(
+                    std::make_shared<bsc::SimplePathRI>(testPath / ("e" + std::to_string(i) + ".txt")),
+                    std::make_shared<bsc::SimplePathRI>(
+                            destinationPath / ("e" + std::to_string(i) + ".txt")));
         }
 
         transferQueue->start();

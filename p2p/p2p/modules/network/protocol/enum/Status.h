@@ -5,13 +5,15 @@
 #ifndef BASYCO_STATUS_H
 #define BASYCO_STATUS_H
 
-
-enum class Status {
-    request,
-    response,
-    ack,
-    error,
-};
+namespace bsc {
+    //@todo consider renaming this to something with better name PacketType? PacketSth? ...
+    enum class Status {
+        request,
+        response,
+        ack,
+        error,
+    };
+}
 
 
 #endif //BASYCO_STATUS_H

@@ -13,6 +13,7 @@
 #include "JournalMetaDataFetcher.h"
 
 
+
 class SimpleJournal : public IJournal {
 
 private:
@@ -59,7 +60,7 @@ public:
 
 
     //@todo hmm hmm variadic template? - moved may have two paths for example?
-    void append(JournalMethod method, JournalTarget target, PathType path, FileData data) override;
+    void append(JournalMethod method, JournalTarget target, PathType path, bsc::FileData data) override;
 
     void replay() override;
 

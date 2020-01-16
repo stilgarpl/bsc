@@ -7,11 +7,13 @@
 
 #include <stdexcept>
 
-class DataFileNotFoundException : public std::domain_error {
+namespace bsc {
+    class DataFileNotFoundException : public std::domain_error {
 
-public:
-    explicit DataFileNotFoundException(const std::string& arg);
-};
+    public:
+        explicit DataFileNotFoundException(const std::string& arg);
+    };
+}
 
 
 #endif //BASYCO_DATAFILENOTFOUNDEXCEPTION_H

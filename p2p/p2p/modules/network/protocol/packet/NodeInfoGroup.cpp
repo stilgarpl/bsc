@@ -7,14 +7,15 @@
 #include <p2p/node/context/NodeContext.h>
 #include <p2p/modules/network/protocol/context/ConnectionContext.h>
 #include "NodeInfoGroup.h"
+
 #include <logic/context/LogicContext.h>
 #include <p2p/modules/network/protocol/logic/sources/NodeSource.h>
 
 
-const NodeInfo &NodeInfoGroup::Response::getNodeInfo() const {
+const bsc::NodeInfo& bsc::NodeInfoGroup::Response::getNodeInfo() const {
     return nodeInfo;
 }
 
-void NodeInfoGroup::Response::setNodeInfo(const NodeInfo &nodeInfo) {
+void bsc::NodeInfoGroup::Response::setNodeInfo(const bsc::NodeInfo& nodeInfo) {
     Response::nodeInfo = nodeInfo;
 }

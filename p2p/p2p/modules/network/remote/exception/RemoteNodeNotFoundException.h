@@ -7,11 +7,13 @@
 
 #include <stdexcept>
 
-class RemoteNodeNotFoundException : public std::domain_error {
+namespace bsc {
+    class RemoteNodeNotFoundException : public std::domain_error {
 
-public:
-    RemoteNodeNotFoundException(const std::string& arg);
-};
+    public:
+        RemoteNodeNotFoundException(const std::string& arg);
+    };
+}
 
 
 #endif //BASYCO_REMOTENODENOTFOUNDEXCEPTION_H

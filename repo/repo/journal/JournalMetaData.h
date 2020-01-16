@@ -14,12 +14,12 @@
 
 class JournalMetaData {
 private:
-    NodeIdType nodeId;
+    bsc::NodeIdType nodeId;
     std::string userId;
     std::string operatingSystem;
 
 public:
-    [[nodiscard]] const NodeIdType& getNodeId() const;
+    [[nodiscard]] const bsc::NodeIdType& getNodeId() const;
 
     [[nodiscard]] const std::string& getUserId() const;
 
@@ -34,7 +34,7 @@ private:
 public:
     JournalMetaData() = default;
 
-    JournalMetaData(NodeIdType nodeId, std::string userId, std::string operatingSystem);
+    JournalMetaData(bsc::NodeIdType nodeId, std::string userId, std::string operatingSystem);
 
     ChecksumType getChecksum();
 

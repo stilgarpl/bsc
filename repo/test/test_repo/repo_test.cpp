@@ -8,12 +8,13 @@
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/modules/basic/BasicModule.h>
 #include <p2p/modules/auth/AuthModule.h>
+using namespace bsc;
 
 
-void remoteServerTestModuleSetup(Node &node) {
-    node.addModule<BasicModule>();
+void remoteServerTestModuleSetup(bsc::Node& node) {
+    node.addModule<bsc::BasicModule>();
     node.addModule<FilesystemModule>();
-    node.addModule<NetworkModule>();
+    node.addModule<bsc::NetworkModule>();
     node.addModule<RepoModule>();
     node.addModule<CommandModule>();
 }
@@ -23,17 +24,17 @@ void setupCommands(CommandModule *cmd) {
     cmd->group("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->group("tt").group("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-    cmd->mapCommand("connect", &NetworkModule::connectTo);
-    cmd->mapCommand("connectTo", &NetworkModule::connectToNode);
-    cmd->mapCommand<NetworkModule, RemoteNode&, const NodeIdType&>("getnode", &NetworkModule::getRemoteNode);
-    cmd->mapCommand("disconnect", &NetworkModule::disconnect);
-    cmd->mapCommand("print", &NetworkModule::printConnections);
+    cmd->mapCommand("connect", &bsc::NetworkModule::connectTo);
+    cmd->mapCommand("connectTo", &bsc::NetworkModule::connectToNode);
+    cmd->mapCommand<bsc::NetworkModule, RemoteNode&, const NodeIdType&>("getnode", &bsc::NetworkModule::getRemoteNode);
+    cmd->mapCommand("disconnect", &bsc::NetworkModule::disconnect);
+    cmd->mapCommand("print", &bsc::NetworkModule::printConnections);
 //    cmd->mapCommand("update", &NetworkModule:prin:updateNodeConnectionInfo);
 //    cmd->mapCommand("purgeD", &NetworkModule::purgeDuplicateConnections);
 //    cmd->mapCommand("purgeI", &NetworkModule::purgeInactiveConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
     cmd->mapRawCommand("broadcast", &CommandModule::broadcastRemoteCommand);
-    cmd->mapCommand("shutdown", &BasicModule::shutdownNode);
+    cmd->mapCommand("shutdown", &bsc::BasicModule::shutdownNode);
     cmd->mapCommand("cd", &FilesystemModule::changeDirectory);
     cmd->mapCommand("pwd", &FilesystemModule::printWorkingDirectory);
     cmd->mapCommand("ls", &FilesystemModule::listCurrentDirectory);
@@ -56,8 +57,8 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("run", &CommandModule::runScript);
     cmd->mapCommand("sleep", &CommandModule::sleep);
     cmd->mapRawCommand("bg", &CommandModule::runInBackground);
-    cmd->mapCommand("fireTrigV", &BasicModule::fireTriggerValue<std::string, std::string>);
-    cmd->mapCommand("fireTrig", &BasicModule::fireTrigger<std::string>);
+    cmd->mapCommand("fireTrigV", &bsc::BasicModule::fireTriggerValue<std::string, std::string>);
+    cmd->mapCommand("fireTrig", &bsc::BasicModule::fireTrigger<std::string>);
 //    cmd->mapCommand("requestResource", &RepoModule::requestStoragePath);
 //    cmd->mapCommand("beginTransfer", &FilesystemModule::beginTransferTest);
 //    cmd->submodule("help").mapCommand("cmdList",&CommandModule::listCommands);
@@ -99,28 +100,28 @@ public:
 
 TEST_CASE("Repo module test") {
 
-    Node thisNode;
+    bsc::Node thisNode;
 
     thisNode.getNodeInfo().setNodeId("first Node");
 
     remoteServerTestModuleSetup(thisNode);
-    thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
-    thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
+    thisNode.getModule<bsc::NetworkModule>()->addToNetwork("TheNetwork");
+    thisNode.getModule<bsc::NetworkModule>()->configuration().setPort(9191);
     auto cmdN = thisNode.getModule<CommandModule>();
 
     setupCommands(cmdN.get());
     auto thisRepoMod = thisNode.getModule<RepoModule>();
     thisRepoMod->configuration().setAutoProcess(false);
 
-    Node otherNode;
+    bsc::Node otherNode;
     otherNode.getNodeInfo().setNodeId("second");
     remoteServerTestModuleSetup(otherNode);
     auto otherRepoMod = otherNode.getModule<RepoModule>();
     otherRepoMod->configuration().setRepositoryDataPath("repo");
     otherRepoMod->configuration().setAutoProcess(false);
 
-    otherNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
-    otherNode.getModule<NetworkModule>()->configuration().setPort(9999);
+    otherNode.getModule<bsc::NetworkModule>()->addToNetwork("TheNetwork");
+    otherNode.getModule<bsc::NetworkModule>()->configuration().setPort(9999);
     cmdN = otherNode.getModule<CommandModule>();
     setupCommands(cmdN.get());
 
@@ -130,7 +131,7 @@ TEST_CASE("Repo module test") {
     otherNode.waitUntilStarted();
     //@todo if possible, wait for otherNode to start listening.
     std::this_thread::sleep_for(500ms);
-    auto& secondNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9999");
+    auto& secondNode = thisNode.getModule<bsc::NetworkModule>()->connectTo("127.0.0.1:9999");
     bool connectedToSecond = secondNode.isConnected();
 
     REQUIRE(connectedToSecond);

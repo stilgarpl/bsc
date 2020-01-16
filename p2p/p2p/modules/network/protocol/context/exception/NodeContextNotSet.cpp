@@ -4,4 +4,4 @@
 
 #include "NodeContextNotSet.h"
 
-NodeContextNotSet::NodeContextNotSet(const std::string& arg) : domain_error(arg) {}
+bsc::NodeContextNotSet::NodeContextNotSet(const std::string& arg) : domain_error(arg) {}

@@ -4,11 +4,11 @@
 
 #include "RoleFilter.h"
 
-bool RoleFilter::filter(BasePacketPtr packet) {
+bool bsc::RoleFilter::filter(BasePacketPtr packet) {
 
     auto requiredRoles = packet->requiredRoles();
     bool roleValid = true;
-    for (auto &&item : requiredRoles) {
+    for (auto&& item : requiredRoles) {
         roleValid &= Roles::isRoleValid(*item);
     }
     return roleValid;

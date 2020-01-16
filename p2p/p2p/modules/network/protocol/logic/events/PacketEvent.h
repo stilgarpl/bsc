@@ -10,52 +10,54 @@
 #include "logic/IEvent.h"
 
 
-enum class PacketEventId {
-    PACKET_SENT,
-    PACKET_RECEIVED,
-    PACKET_DROPPED,
-};
+namespace bsc {
+    enum class PacketEventId {
+        PACKET_SENT,
+        PACKET_RECEIVED,
+        PACKET_DROPPED,
+    };
 
-class PacketEvent : public bsc::IEvent<PacketEventId> {
-private:
-    //@todo maybe merge with ConnectionEvent?
-    BasePacketPtr packet;
-    Connection* connection;
+    class PacketEvent : public bsc::IEvent<PacketEventId> {
+    private:
+        //@todo maybe merge with ConnectionEvent?
+        BasePacketPtr packet;
+        Connection* connection;
 
-public:
-    const BasePacketPtr& getPacket() const;
+    public:
+        const BasePacketPtr& getPacket() const;
 
-    void setPacket(const BasePacketPtr& packet);
+        void setPacket(const BasePacketPtr& packet);
 
-    Connection *getConnection() const;
+        Connection* getConnection() const;
 
-    void setConnection(Connection *connection);
+        void setConnection(Connection* connection);
 
-};
+    };
 
-template<typename PacketType>
-class SpecificPacketEvent : public bsc::IEvent<PacketEventId> {
-private:
-    NetworkPacketPointer<PacketType> packet;
-    Connection* connection;
+    template<typename PacketType>
+    class SpecificPacketEvent : public bsc::IEvent<PacketEventId> {
+    private:
+        NetworkPacketPointer<PacketType> packet;
+        Connection* connection;
 
-public:
-    const NetworkPacketPointer<PacketType>& getPacket() const {
-        return packet;
-    }
+    public:
+        const NetworkPacketPointer<PacketType>& getPacket() const {
+            return packet;
+        }
 
-    void setPacket(const NetworkPacketPointer<PacketType>& packet) {
-        SpecificPacketEvent::packet = packet;
-    }
+        void setPacket(const NetworkPacketPointer<PacketType>& packet) {
+            SpecificPacketEvent::packet = packet;
+        }
 
-    Connection *getConnection() const {
-        return connection;
-    }
+        Connection* getConnection() const {
+            return connection;
+        }
 
-    void setConnection(Connection *connection) {
-        SpecificPacketEvent::connection = connection;
-    }
-};
+        void setConnection(Connection* connection) {
+            SpecificPacketEvent::connection = connection;
+        }
+    };
+}
 
 
 #endif //BASYCO_PACKETEVENT_H

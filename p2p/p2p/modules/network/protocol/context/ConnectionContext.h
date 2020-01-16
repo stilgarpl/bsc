@@ -7,22 +7,24 @@
 
 
 #include <p2p/modules/network/protocol/connection/Connection.h>
-#include "IContextSetup.h"
-
-class ConnectionContext {
-public:
-
-private:
-    Connection& connection;
 
 
-public:
-    explicit ConnectionContext(Connection& connection);
+namespace bsc {
+    class ConnectionContext {
+    public:
 
-    Connection& getConnection() const;
+    private:
+        Connection& connection;
 
 
-};
+    public:
+        explicit ConnectionContext(Connection& connection);
+
+        Connection& getConnection() const;
+
+
+    };
+}
 
 
 #endif //BASYCO_CONNECTIONCONTEXTINFO_H

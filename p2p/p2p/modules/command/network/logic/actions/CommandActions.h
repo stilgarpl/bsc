@@ -9,16 +9,18 @@
 #include <p2p/modules/command/network/logic/events/CommandEvent.h>
 
 
-class CommandActions {
-public:
-    enum Actions {
-        RUN_COMMAND,
+namespace bsc {
+    class CommandActions {
+    public:
+        enum Actions {
+            RUN_COMMAND,
+        };
+
+
+        static void runRemoteCommand(const CommandEvent& commandEvent);
+
     };
-
-
-    static void runRemoteCommand(const CommandEvent& commandEvent);
-
-};
+}
 
 
 #endif //BASYCO_COMMANDACTIONS_H

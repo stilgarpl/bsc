@@ -7,11 +7,13 @@
 
 #include <stdexcept>
 
-class RoleInvalidException : public std::domain_error {
+namespace bsc {
+    class RoleInvalidException : public std::domain_error {
 
-public:
-    RoleInvalidException(const std::string& arg);
-};
+    public:
+        RoleInvalidException(const std::string& arg);
+    };
+}
 
 
 #endif //BASYCO_ROLEINVALIDEXCEPTION_H

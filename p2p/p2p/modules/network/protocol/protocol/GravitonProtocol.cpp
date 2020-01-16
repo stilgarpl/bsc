@@ -5,19 +5,18 @@
 #include <p2p/node/context/NodeContext.h>
 #include "GravitonProtocol.h"
 
-
-void GravitonProtocol::onPacketSent(const PacketEvent &event) {
+void bsc::GravitonProtocol::onPacketSent(const PacketEvent& event) {
     std::lock_guard<std::mutex> g(responseMapLock);
 //    LOGGER("onPacketSent" + std::to_string(event.getPacket()->getId()));
     //@todo maybe check if packet is in the response map?
 }
 
-void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
+void bsc::GravitonProtocol::onPacketReceived(const PacketEvent& event) {
     std::lock_guard<std::mutex> g(responseMapLock);
 //    LOGGER("onPacketReceived" + std::to_string(event.getPacket()->getId()));
 //@todo optimize if ((auto ptr = ) != null)
     if (responseMap.contains(event.getPacket()->getId())) {
-        auto &ptr = responseMap[event.getPacket()->getId()];
+        auto& ptr = responseMap[event.getPacket()->getId()];
         if (ptr != nullptr) { //not all packets are from this protocol...
             if (event.getPacket()->getStatus() == ptr->getExpectedStatus()) {
                 ptr->getResponsePromise().set_value(event.getPacket());
@@ -34,7 +33,7 @@ void GravitonProtocol::onPacketReceived(const PacketEvent &event) {
 }
 
 
-void GravitonProtocol::work(const bsc::Tick& tick) {
+void bsc::GravitonProtocol::work(const bsc::Tick& tick) {
     std::lock_guard<std::mutex> g(responseMapLock);
 //    LOGGER("gravi work " + std::to_string(responseMap.size()))
     auto it = std::begin(responseMap);
@@ -58,7 +57,8 @@ void GravitonProtocol::work(const bsc::Tick& tick) {
     //  LOGGER("onWork");
 }
 
-std::future<BasePacketPtr> GravitonProtocol::send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) {
+std::future<bsc::BasePacketPtr>
+bsc::GravitonProtocol::send(Connection* conn, BasePacketPtr p, const Status& expectedStatus) {
     std::lock_guard<std::mutex> g(responseMapLock);
     //  LOGGER("send");
     std::shared_ptr<BasePacketInfo> ptr = std::make_shared<BasePacketInfo>(p, conn,
@@ -83,7 +83,7 @@ std::future<BasePacketPtr> GravitonProtocol::send(Connection *conn, BasePacketPt
 //    return ptr->getResponsePromise().get_future();
 //}
 
-void GravitonProtocol::onConnectionEvent(const ConnectionEvent &event) {
+void bsc::GravitonProtocol::onConnectionEvent(const ConnectionEvent& event) {
 
     //remove all waiting packets for broken connections
     if (event.getEventId() == ConnectionEvent::IdType::CONNECTION_CLOSED) {
@@ -92,7 +92,7 @@ void GravitonProtocol::onConnectionEvent(const ConnectionEvent &event) {
 //        }
 
         auto item = std::begin(responseMap);
-        while(item != std::end(responseMap))
+        while (item != std::end(responseMap))
             if (item->second == nullptr || item->second->getConnection() == event.getConnection()) {
                 item = responseMap.erase(item);
             } else {
@@ -105,4 +105,4 @@ void GravitonProtocol::onConnectionEvent(const ConnectionEvent &event) {
 
 }
 
-GravitonProtocol::GravitonProtocol(bsc::LogicManager& logicManager) : IProtocol(logicManager) {}
+bsc::GravitonProtocol::GravitonProtocol(bsc::LogicManager& logicManager) : IProtocol(logicManager) {}

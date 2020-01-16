@@ -11,19 +11,21 @@
 #include <repo/repository/IRepository.h>
 #include <repo/journal/IJournal.h>
 
-struct RepoQuery : public PacketGroup {
+
+struct RepoQuery : public bsc::PacketGroup {
 
 public:
 
 
-    class Request : public Packet<RepoQuery, RepoQuery::Request> {
+    class Request : public bsc::Packet<RepoQuery, RepoQuery::Request> {
     private:
         IRepository::RepoIdType repoId;
 
     private:
         template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<RepoQuery, RepoQuery::Request>>(this));
+        void serialize(Archive& ar) {
+            ar(cereal::base_class<Packet < RepoQuery, RepoQuery::Request>>
+            (this));
             ar(repoId);
         }
 
@@ -39,15 +41,16 @@ public:
     public:
     };
 
-    class Response : public Packet<RepoQuery, RepoQuery::Response> {
+    class Response : public bsc::Packet<RepoQuery, RepoQuery::Response> {
         IRepository::RepoIdType repoId;
         bool exists;
         //@todo maybe just some journal descriptor instead of full journal?
         JournalPtr journal;
     private:
         template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<RepoQuery, RepoQuery::Response>>(this));
+        void serialize(Archive& ar) {
+            ar(cereal::base_class<Packet < RepoQuery, RepoQuery::Response>>
+            (this));
             ar(repoId, exists, journal);
         }
 
@@ -88,7 +91,7 @@ public:
 CEREAL_REGISTER_TYPE(RepoQuery::Request)
 CEREAL_REGISTER_TYPE(RepoQuery::Response)
 
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, RepoQuery::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, RepoQuery::Response)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, RepoQuery::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, RepoQuery::Response)
 
 #endif //BASYCO_REPOQUERY_H

@@ -9,32 +9,35 @@
 #include <memory>
 #include <list>
 
-class Role;
 
-typedef std::shared_ptr<Role> RolePtr;
-typedef std::list<RolePtr> RoleList;
+namespace bsc {
+    class Role;
 
-class Role {
-public:
-    typedef std::string IdType;
+    typedef std::shared_ptr<Role> RolePtr;
+    typedef std::list<RolePtr> RoleList;
 
-private:
+    class Role {
+    public:
+        typedef std::string IdType;
 
-    IdType roleId;
+    private:
 
-public:
-    Role(const IdType &roleId);
+        IdType roleId;
 
-    const IdType &getRoleId() const;
+    public:
+        Role(const IdType& roleId);
 
-    static RolePtr makeRole(const IdType &id) {
-        return std::make_shared<Role>(id);
-    }
+        const IdType& getRoleId() const;
 
-    bool operator==(const Role &rhs) const;
+        static RolePtr makeRole(const IdType& id) {
+            return std::make_shared<Role>(id);
+        }
 
-    bool operator!=(const Role &rhs) const;
-};
+        bool operator==(const Role& rhs) const;
+
+        bool operator!=(const Role& rhs) const;
+    };
+}
 
 
 /**

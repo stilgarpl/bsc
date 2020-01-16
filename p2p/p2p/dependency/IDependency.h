@@ -7,15 +7,17 @@
 
 #include <vector>
 
-class IDependency {
-public:
-    typedef unsigned int TypeIdType;
-    typedef std::vector<TypeIdType> ArrayType;
+namespace bsc {
+    class IDependency {
+    public:
+        typedef unsigned int TypeIdType;
+        typedef std::vector<TypeIdType> ArrayType;
 
-    virtual ArrayType getDependencyIdents() =0;
+        virtual ArrayType getDependencyIdents() = 0;
 
-    virtual ~IDependency() = default;
-};
+        virtual ~IDependency() = default;
+    };
+}
 
 
 #endif //BASYCO_IDEPENDENCY_H

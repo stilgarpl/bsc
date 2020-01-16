@@ -12,22 +12,24 @@
 #include "core/context/Context.h"
 
 
-class NodeActions {
+namespace bsc {
+    class NodeActions {
 
-public:
-    static void sendNodeInfoRequest(ConnectionEvent connectionEvent);
+    public:
+        static void sendNodeInfoRequest(ConnectionEvent connectionEvent);
 
-    static void sendNetworkInfoRequest(ConnectionEvent connectionEvent);
+        static void sendNetworkInfoRequest(ConnectionEvent connectionEvent);
 
-    static void updateNodeInfo(const NodeInfoEvent &event);
+        static void updateNodeInfo(const NodeInfoEvent& event);
 
-    static void addKnownNode(const NodeInfoEvent &event);
+        static void addKnownNode(const NodeInfoEvent& event);
 
-    static void newNodeDiscovered(const NodeInfoEvent &event);
+        static void newNodeDiscovered(const NodeInfoEvent& event);
 
-    static void triggerUpdateNode(const bsc::Tick& tick);
+        static void triggerUpdateNode(const Tick& tick);
 
-};
+    };
+}
 
 
 #endif //BASYCO_NODEACTIONS_H

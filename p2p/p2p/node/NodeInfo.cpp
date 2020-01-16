@@ -5,19 +5,19 @@
 #include "NodeInfo.h"
 
 
-const std::string &NodeInfo::getNetworkId() const {
+const std::string& bsc::NodeInfo::getNetworkId() const {
     return networkId;
 }
 
-const NodeIdType &NodeInfo::getNodeId() const {
+const bsc::NodeIdType& bsc::NodeInfo::getNodeId() const {
     return nodeId;
 }
 
-void NodeInfo::setNodeId(const NodeIdType &nodeId) {
+void bsc::NodeInfo::setNodeId(const NodeIdType& nodeId) {
     NodeInfo::nodeId = nodeId;
 }
 
-void NodeInfo::setNetworkId(const NetworkIdType &networkId) {
+void bsc::NodeInfo::setNetworkId(const NetworkIdType& networkId) {
     NodeInfo::networkId = networkId;
 }
 

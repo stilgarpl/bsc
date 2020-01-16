@@ -4,8 +4,9 @@
 
 #include "ConnectionContext.h"
 
-ConnectionContext::ConnectionContext(Connection &connection) : connection(connection) {}
 
-Connection &ConnectionContext::getConnection() const {
+bsc::ConnectionContext::ConnectionContext(bsc::Connection& connection) : connection(connection) {}
+
+bsc::Connection& bsc::ConnectionContext::getConnection() const {
     return connection;
 }

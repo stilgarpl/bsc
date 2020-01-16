@@ -9,17 +9,20 @@
 #include <p2p/modules/network/protocol/logic/events/NetworkInfoEvent.h>
 #include <p2p/modules/network/NetworkModule.h>
 
-class NetworkActions {
 
-public:
-    static void updateNetworkInfo(const NetworkInfoEvent &event);
+namespace bsc {
+    class NetworkActions {
 
-    static void saveNetworkInfo(const ModuleEvent<NetworkModule> &event);
+    public:
+        static void updateNetworkInfo(const NetworkInfoEvent& event);
 
-    static void loadNetworkInfo(const ModuleEvent<NetworkModule> &event);
+        static void saveNetworkInfo(const ModuleEvent<NetworkModule>& event);
 
-    static void broadcastPacket(BasePacketPtr packet);
-};
+        static void loadNetworkInfo(const ModuleEvent<NetworkModule>& event);
+
+        static void broadcastPacket(BasePacketPtr packet);
+    };
+}
 
 
 #endif //BASYCO_NETWORKACTIONS_H

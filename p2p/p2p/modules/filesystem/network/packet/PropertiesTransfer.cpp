@@ -6,10 +6,10 @@
 #include "PropertiesTransfer.h"
 
 
-TransferId PropertiesTransfer::Request::getTransferId() const {
+bsc::TransferId bsc::PropertiesTransfer::Request::getTransferId() const {
     return transferId;
 }
 
-void PropertiesTransfer::Request::setTransferId(TransferId transferId) {
+void bsc::PropertiesTransfer::Request::setTransferId(TransferId transferId) {
     Request::transferId = transferId;
 }

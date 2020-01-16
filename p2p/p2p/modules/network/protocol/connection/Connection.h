@@ -27,79 +27,81 @@ enum class ConnectionState {
 };
 
 
-class Connection : public RoleScope, public bsc::LogicStateMachine<Connection, ConnectionState, bsc::DirectNotify> {
+namespace bsc {
+    class Connection : public RoleScope, public bsc::LogicStateMachine<Connection, ConnectionState, DirectNotify> {
 
-protected:
-    ConnectionProcessor processor;
-private:
-    std::mutex sendQueueLock;
-    std::mutex receiveQueueLock;
-    std::queue<std::shared_ptr<BasePacket>> sendQueue;
-    std::queue<std::shared_ptr<BasePacket>> receiveQueue;
-    std::condition_variable sendReady;
-    std::condition_variable receiveReady;
-    bsc::Context::OwnPtr connectionContext = nullptr; //initialized from node context in constructor
-private:
+    protected:
+        ConnectionProcessor processor;
+    private:
+        std::mutex sendQueueLock;
+        std::mutex receiveQueueLock;
+        std::queue<std::shared_ptr<BasePacket>> sendQueue;
+        std::queue<std::shared_ptr<BasePacket>> receiveQueue;
+        std::condition_variable sendReady;
+        std::condition_variable receiveReady;
+        Context::OwnPtr connectionContext = nullptr; //initialized from node context in constructor
+    private:
 
-    std::unique_ptr<std::thread> sendThread;
-    std::unique_ptr<std::thread> receiveThread;
-    std::recursive_mutex sendThreadLock;
-    std::recursive_mutex receiveThreadLock;
-    std::atomic<bool> sending = true;
-    std::atomic<bool> receiving = true;
+        std::unique_ptr<std::thread> sendThread;
+        std::unique_ptr<std::thread> receiveThread;
+        std::recursive_mutex sendThreadLock;
+        std::recursive_mutex receiveThreadLock;
+        std::atomic<bool> sending = true;
+        std::atomic<bool> receiving = true;
 
-protected:
+    protected:
 
-    void workSend(Poco::Net::StreamSocket &socket);
+        void workSend(Poco::Net::StreamSocket& socket);
 
-    void workReceive(Poco::Net::StreamSocket &socket);
+        void workReceive(Poco::Net::StreamSocket& socket);
 
-    //@todo if possible try to remove this method. we should hide Poco
-    virtual Poco::Net::StreamSocket &getSocket()=0;
+        //@todo if possible try to remove this method. we should hide Poco
+        virtual Poco::Net::StreamSocket& getSocket() = 0;
 
-public:
-    //@todo why do those methods need socket as parameter?
-    virtual void startSending(Poco::Net::StreamSocket &s);
+    public:
+        //@todo why do those methods need socket as parameter?
+        virtual void startSending(Poco::Net::StreamSocket& s);
 
-    virtual void stopSending();
+        virtual void stopSending();
 
-    virtual void startReceiving(Poco::Net::StreamSocket &socket);
+        virtual void startReceiving(Poco::Net::StreamSocket& socket);
 
-    virtual void stopReceiving();
+        virtual void stopReceiving();
 
-    virtual NetAddressType getAddress();
+        virtual NetAddressType getAddress();
 
-    //most likely temporary address, not really useful
-    virtual NetAddressType getOwnAddress() {
-        return getSocket().address().toString();
-    }
+        //most likely temporary address, not really useful
+        virtual NetAddressType getOwnAddress() {
+            return getSocket().address().toString();
+        }
 
-    bool isActive() {
-        return sending && receiving;
-    }
+        bool isActive() {
+            return sending && receiving;
+        }
 
-protected:
+    protected:
 
-public:
-    //@todo @fixme there is a problem, that sometimes last packet is not being sent. flushing doesn't help. Poco is stupid. Consider replacing poco with different lib
-    void send(BasePacketPtr np);
+    public:
+        //@todo @fixme there is a problem, that sometimes last packet is not being sent. flushing doesn't help. Poco is stupid. Consider replacing poco with different lib
+        void send(BasePacketPtr np);
 
-    BasePacketPtr receive();
+        BasePacketPtr receive();
 
-    explicit Connection(const bsc::Context::Ptr& context);
+        explicit Connection(const Context::Ptr& context);
 
-    ConnectionProcessor &getProcessor();
+        ConnectionProcessor& getProcessor();
 
-    bsc::Context::Ptr getConnectionContext();
+        Context::Ptr getConnectionContext();
 
-    virtual ~Connection();
+        virtual ~Connection();
 
-    virtual void shutdown();
-
-
-};
+        virtual void shutdown();
 
 
-typedef std::shared_ptr<Connection> ConnectionPtr;
+    };
+
+    typedef std::shared_ptr<bsc::Connection> ConnectionPtr;
+}
+
 
 #endif //BASYCO_CONNECTION_H

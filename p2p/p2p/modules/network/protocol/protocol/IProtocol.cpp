@@ -8,46 +8,47 @@
 #include "IProtocol.h"
 
 
-ProtocolWrapper::ProtocolWrapper(ConnectionPtr connection, IProtocol *protocol) : connection(connection),
-                                                                                  protocol(protocol) {}
+bsc::ProtocolWrapper::ProtocolWrapper(ConnectionPtr connection, IProtocol* protocol) : connection(connection),
+                                                                                       protocol(protocol) {}
 
-std::future<BasePacketPtr> ProtocolWrapper::send(BasePacketPtr p) {
-    return protocol->send(connection.get(),p);
+std::future<bsc::BasePacketPtr> bsc::ProtocolWrapper::send(BasePacketPtr p) {
+    return protocol->send(connection.get(), p);
 }
 
-void DummyProtocol::onPacketSent(const PacketEvent &event) {
+void bsc::DummyProtocol::onPacketSent(const PacketEvent& event) {
     LOGGER("on packet sent")
 }
 
-void DummyProtocol::onPacketReceived(const PacketEvent &event) {
+void bsc::DummyProtocol::onPacketReceived(const PacketEvent& event) {
     LOGGER("on packet received")
 }
 
-void DummyProtocol::work(const bsc::Tick& tick) {
+void bsc::DummyProtocol::work(const bsc::Tick& tick) {
     LOGGER("on work")
 }
 
-std::future<BasePacketPtr> DummyProtocol::send(Connection *conn, BasePacketPtr p, const Status &expectedStatus) {
+std::future<bsc::BasePacketPtr>
+bsc::DummyProtocol::send(Connection* conn, BasePacketPtr p, const Status& expectedStatus) {
     conn->send(p);
     return std::future<BasePacketPtr>();
 
 }
 
-void DummyProtocol::onConnectionEvent(const ConnectionEvent &event) {
+void bsc::DummyProtocol::onConnectionEvent(const ConnectionEvent& event) {
 
 }
 
-DummyProtocol::DummyProtocol(bsc::LogicManager& logicManager) : IProtocol(logicManager) {}
+bsc::DummyProtocol::DummyProtocol(bsc::LogicManager& logicManager) : IProtocol(logicManager) {}
 
 
-void IProtocol::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
+void bsc::IProtocol::setupActions(bsc::ILogicModule::SetupActionHelper& actionHelper) {
 
 
 }
 
-bool IProtocol::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
+bool bsc::IProtocol::assignActions(bsc::ILogicModule::AssignActionHelper& actionHelper) {
     bool result = true;
-    when(event<PacketEvent>(PacketEvent::IdType::PACKET_SENT)).runMethod(&IProtocol::onPacketSent);
+    when(event<PacketEvent>(PacketEvent::IdType::PACKET_SENT)).runMethod(&bsc::IProtocol::onPacketSent);
     when(event<PacketEvent>(PacketEvent::IdType::PACKET_RECEIVED)).runMethod(&IProtocol::onPacketReceived);
     when(event<bsc::Tick>(800ms)).runMethod(&IProtocol::work);
     when(event<ConnectionEvent>(ConnectionEventId::CONNECTION_CLOSED)).runMethod(&IProtocol::onConnectionEvent);
@@ -57,19 +58,19 @@ bool IProtocol::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
     return result;
 }
 
-bool IProtocol::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
+bool bsc::IProtocol::setupSources(bsc::ILogicModule::SetupSourceHelper& sourceHelper) {
     sourceHelper.requireSource<bsc::ClockSource>();
     sourceHelper.requireSource<ConnectionSource>();
     return true;
 }
 
-IProtocol::IProtocol(bsc::LogicManager& logicManager) : bsc::LogicObject(logicManager) {}
+bsc::IProtocol::IProtocol(bsc::LogicManager& logicManager) : bsc::LogicObject(logicManager) {}
 
-std::future<BasePacketPtr> IProtocol::send(Connection *conn, BasePacketPtr p) {
+std::future<bsc::BasePacketPtr> bsc::IProtocol::send(Connection* conn, BasePacketPtr p) {
     return this->send(conn, std::move(p), Status::response);
 }
 
-void IProtocol::testMethod(std::string a) {
+void bsc::IProtocol::testMethod(std::string a) {
     LOGGER("test method " + a);
 
 }

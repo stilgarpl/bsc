@@ -4,4 +4,4 @@
 
 #include "RemoteNodeNotFoundException.h"
 
-RemoteNodeNotFoundException::RemoteNodeNotFoundException(const std::string& arg) : domain_error(arg) {}
+bsc::RemoteNodeNotFoundException::RemoteNodeNotFoundException(const std::string& arg) : domain_error(arg) {}

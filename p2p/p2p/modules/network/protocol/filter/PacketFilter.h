@@ -8,13 +8,15 @@
 
 #include <p2p/modules/network/protocol/packet/BasePacket.h>
 
-class PacketFilter {
+namespace bsc {
+    class PacketFilter {
 
-public:
-    virtual bool filter(BasePacketPtr packet) =0;
+    public:
+        virtual bool filter(BasePacketPtr packet) = 0;
 
-    virtual ~PacketFilter() = default;
-};
+        virtual ~PacketFilter() = default;
+    };
+}
 
 
 #endif //BASYCO_PACKETFILTER_H

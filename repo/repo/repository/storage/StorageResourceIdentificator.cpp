@@ -9,9 +9,10 @@
 #include "StorageResourceIdentificator.h"
 
 
+
 std::shared_ptr<std::istream> StorageResourceIdentificator::getResourceInputStream() {
 
-    auto repoModule = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
+    auto repoModule = bsc::NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
     auto storage = repoModule->findStorage(storageId);
     if (storage != nullptr) {
         return storage->getResourceStream(objectId);
@@ -21,7 +22,7 @@ std::shared_ptr<std::istream> StorageResourceIdentificator::getResourceInputStre
 }
 
 std::shared_ptr<std::ostream> StorageResourceIdentificator::getResourceOutputStream() {
-    auto repoModule = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
+    auto repoModule = bsc::NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
     auto storage = repoModule->findStorage(storageId);
     if (storage != nullptr) {
         return storage->getResourceStream(objectId);
@@ -31,7 +32,7 @@ std::shared_ptr<std::ostream> StorageResourceIdentificator::getResourceOutputStr
 }
 
 uintmax_t StorageResourceIdentificator::getResourceSize() {
-    auto repoModule = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
+    auto repoModule = bsc::NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
     auto storage = repoModule->findStorage(storageId);
     if (storage != nullptr) {
         return fs::file_size(storage->getResourcePath(objectId));
@@ -43,7 +44,7 @@ uintmax_t StorageResourceIdentificator::getResourceSize() {
 
 bool StorageResourceIdentificator::exists() {
     LOGGER("storage resource exists")
-    auto repoModule = NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
+    auto repoModule = bsc::NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
     auto storage = repoModule->findStorage(storageId);
     if (storage != nullptr) {
         LOGGER("storage isn't null")

@@ -5,6 +5,7 @@
 #include <repo/journal/SimpleJournal.h>
 #include <fstream>
 
+
 class FakeMetaDataFetcher : public JournalMetaDataFetcher {
     JournalMetaData metaData;
 public:
@@ -23,7 +24,7 @@ public:
 TEST_CASE("Journal deterministic hash test") {
     SimpleJournal journal(std::make_unique<FakeMetaDataFetcher>("node", "user", "system"));
     journal.append(JournalMethod::added, JournalTarget::file, "/tmp/dupa.txt",
-                   FileData("/tmp/dupa.txt", "hash", {}, 100, fs::file_time_type::min(), false));
+                   bsc::FileData("/tmp/dupa.txt", "hash", {}, 100, fs::file_time_type::min(), false));
     journal.commitState(CommitTimeType::clock::from_time_t(0));
     REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("426675e4107b908d73623485eaf76ec0e6c0a022"));
 }
@@ -32,10 +33,11 @@ TEST_CASE("Journal deterministic hash test") {
 TEST_CASE("Journal merge test") {
     SimpleJournal journal;
     journal.append(JournalMethod::added, JournalTarget::file, "/tmp/THIS_IS_OTHER_TEST.txt",
-                   FileData("/tmp/THIS_IS_OTHER_TEST.txt"));
-    journal.append(JournalMethod::deleted, JournalTarget::file, "/tmp/to_remove.txt", FileData("/tmp/to_remove.txt"));
+                   bsc::FileData("/tmp/THIS_IS_OTHER_TEST.txt"));
+    journal.append(JournalMethod::deleted, JournalTarget::file, "/tmp/to_remove.txt",
+                   bsc::FileData("/tmp/to_remove.txt"));
     journal.commitState(CommitTimeType::clock::now());
-    journal.append(JournalMethod::modified, JournalTarget::file, "/tmp/dupa.txt", FileData("/tmp/to_remove.txt"));
+    journal.append(JournalMethod::modified, JournalTarget::file, "/tmp/dupa.txt", bsc::FileData("/tmp/to_remove.txt"));
     journal.replay();
     journal.commitState(CommitTimeType::clock::now());
     {
@@ -55,7 +57,7 @@ TEST_CASE("Journal merge test") {
         }
 
 
-        journal1->append(JournalMethod::added, JournalTarget::file, "/bin/zsh", FileData("/bin/zsh"));
+        journal1->append(JournalMethod::added, JournalTarget::file, "/bin/zsh", bsc::FileData("/bin/zsh"));
         journal1->commitState(CommitTimeType::clock::now());
 
 
@@ -66,7 +68,8 @@ TEST_CASE("Journal merge test") {
     SECTION("fail merge") {
 
         std::shared_ptr<SimpleJournal> journal2 = std::make_shared<SimpleJournal>();
-        journal2->append(JournalMethod::added, JournalTarget::file, "/tmp/journal.xml", FileData("/tmp/journal.xml"));
+        journal2->append(JournalMethod::added, JournalTarget::file, "/tmp/journal.xml",
+                         bsc::FileData("/tmp/journal.xml"));
         journal2->commitState(CommitTimeType::clock::now());
 
 

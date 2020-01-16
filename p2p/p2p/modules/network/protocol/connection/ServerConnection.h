@@ -12,40 +12,41 @@
 #include "IServerConnection.h"
 
 
-class ServerConnection : public Poco::Net::TCPServerConnection, public IServerConnection {
+namespace bsc {
+    class ServerConnection : public Poco::Net::TCPServerConnection, public bsc::IServerConnection {
 
-public:
-    void run() override;
+    public:
+        void run() override;
 
-    ServerConnection(const Poco::Net::StreamSocket& socket, bsc::Context::Ptr context);
+        ServerConnection(const Poco::Net::StreamSocket& socket, Context::Ptr context);
 
-    void startReceiving(Poco::Net::StreamSocket &socket) override;
+        void startReceiving(Poco::Net::StreamSocket& socket) override;
 
-    void stopReceiving() override;
+        void stopReceiving() override;
 
-    virtual ~ServerConnection();
+        virtual ~ServerConnection();
 
-    void stop() override;
+        void stop() override;
 
-    void shutdown() override;
+        void shutdown() override;
 
-protected:
-    Poco::Net::StreamSocket &getSocket() override;
-};
+    protected:
+        Poco::Net::StreamSocket& getSocket() override;
+    };
 
+    class ServerConnectionFactory : public Poco::Net::TCPServerConnectionFactory {
+    private:
+        std::function<Context::OwnPtr(void)> contextGetter;
+        std::list<std::reference_wrapper<Connection::ObserverType>> observers;
+    public:
 
-class ServerConnectionFactory : public Poco::Net::TCPServerConnectionFactory {
-private:
-    std::function<bsc::Context::OwnPtr(void)> contextGetter;
-    std::list<std::reference_wrapper<Connection::ObserverType>> observers;
-public:
+        ServerConnectionFactory(std::function<bsc::Context::OwnPtr(void)> contextGetter,
+                                std::list<std::reference_wrapper<Connection::ObserverType>> observers);
 
-    ServerConnectionFactory(std::function<bsc::Context::OwnPtr(void)> contextGetter,
-                            std::list<std::reference_wrapper<Connection::ObserverType>> observers);
+        Poco::Net::TCPServerConnection* createConnection(const Poco::Net::StreamSocket& socket) override;
 
-    Poco::Net::TCPServerConnection *createConnection(const Poco::Net::StreamSocket &socket) override;
-
-};
+    };
+}
 
 
 #endif //BASYCO_SERVER_CONNECTION_H

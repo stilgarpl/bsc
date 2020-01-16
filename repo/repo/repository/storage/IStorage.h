@@ -39,7 +39,7 @@ public:
     virtual void update(const ResourceId& checksum, const size_t& size, const fs::path& path) = 0;
 
     //syncs whole repository to corresponding repository from other node
-    virtual void sync(const NodeIdType &nodeID)=0;
+    virtual void sync(const bsc::NodeIdType& nodeID) = 0;
 
 
     //@todo remove, I think - this is required for resource transfer between nodes, but streams should do that.
@@ -56,7 +56,7 @@ public:
 
     virtual ~IStorage() = default;
 
-    virtual TransferManager::TransferQueuePtr getTransferQueue() = 0;
+    virtual bsc::TransferManager::TransferQueuePtr getTransferQueue() = 0;
 
     [[nodiscard]] const StorageId &getStorageId() const {
         return storageId;

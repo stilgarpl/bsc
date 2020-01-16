@@ -7,14 +7,11 @@
 #include <p2p/modules/network/NetworkModule.h>
 #include <p2p/modules/network/remote/RemoteNodeContext.h>
 #include "NodeActions.h"
-
-
-
 #include <p2p/modules/network/NetworkModule.h>
 #include <p2p/modules/network/protocol/packet/NodeInfoGroup.h>
 #include <p2p/modules/network/protocol/connection/ConnectionException.h>
 
-void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
+void bsc::NodeActions::newNodeDiscovered(const NodeInfoEvent& event) {
     bsc::Context::Ptr context = bsc::Context::getActiveContext();
 //    auto &nodeContext = context->get<NodeContext>();
 
@@ -26,12 +23,12 @@ void NodeActions::newNodeDiscovered(const NodeInfoEvent &event) {
 
 }
 
-void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
+void bsc::NodeActions::updateNodeInfo(const NodeInfoEvent& event) {
     LOGGER("update node info")
     bsc::Context::Ptr context = bsc::Context::getActiveContext();
     auto remoteNodeContext = context->get<RemoteNodeContext>();
 
-    auto &remoteNode = remoteNodeContext.getRemoteNode();
+    auto& remoteNode = remoteNodeContext.getRemoteNode();
     remoteNode.setNodeInfo(event.getNodeInfo());
 
 //    auto& nodeContext = context->get<NodeContext>();
@@ -43,17 +40,17 @@ void NodeActions::updateNodeInfo(const NodeInfoEvent &event) {
 //    }
 }
 
-void NodeActions::addKnownNode(const NodeInfoEvent &event) {
+void bsc::NodeActions::addKnownNode(const NodeInfoEvent& event) {
     bsc::Context::Ptr context = bsc::Context::getActiveContext();
     auto& nodeContext = context->get<NodeContext>();
 
     // LOGGER(                "Adding known node " + event.getNodeInfo().getNodeId() + " ... " + event.getNodeInfo().getNetworkId())
-    auto &node = nodeContext.getNode();
+    auto& node = nodeContext.getNode();
     if (event.getNodeInfo().getNetworkId() == node.getNodeInfo().getNetworkId()) {
         node.getModule<NetworkModule>()->getNetworkInfo()->addKnownNode(event.getNodeInfo());
 
         //@todo do it better way, this is quick and dirty
-        auto &remoteNodeContext = context->get<RemoteNodeContext>();
+        auto& remoteNodeContext = context->get<RemoteNodeContext>();
 
         auto &remoteNode = remoteNodeContext.getRemoteNode();
         try {
@@ -63,7 +60,7 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
                         *remoteNode.getAddress());
 
             }
-        } catch (const ConnectionException &e) {
+        } catch (const bsc::ConnectionException& e) {
             ERROR("Error while adding known node.")
         }
 
@@ -73,7 +70,7 @@ void NodeActions::addKnownNode(const NodeInfoEvent &event) {
 
 }
 
-void NodeActions::triggerUpdateNode(const bsc::Tick& tick) {
+void bsc::NodeActions::triggerUpdateNode(const bsc::Tick& tick) {
     bsc::Context::Ptr context = bsc::Context::getActiveContext();
 //    auto& nodeContext = context->get<NodeContext>();
     //@todo imp[lement with RemoteNodes
@@ -89,13 +86,13 @@ void NodeActions::triggerUpdateNode(const bsc::Tick& tick) {
 //    }
 }
 
-void NodeActions::sendNetworkInfoRequest(ConnectionEvent connectionEvent) {
+void bsc::NodeActions::sendNetworkInfoRequest(ConnectionEvent connectionEvent) {
     LOGGER("send network info request")
-    auto req = std::make_shared<NetworkInfoRequest>();
+    auto req = std::make_shared<bsc::NetworkInfoRequest>();
     connectionEvent.getConnection()->send(req);
 }
 
-void NodeActions::sendNodeInfoRequest(ConnectionEvent connectionEvent) {
+void bsc::NodeActions::sendNodeInfoRequest(ConnectionEvent connectionEvent) {
 
     LOGGER("send node info request")
     NodeInfoRequest::Ptr req = NodeInfoRequest::getNew();

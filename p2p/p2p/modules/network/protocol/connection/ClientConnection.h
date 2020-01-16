@@ -10,29 +10,32 @@
 #include "Connection.h"
 
 
-class ClientConnection : public Connection {
+namespace bsc {
+    class ClientConnection : public Connection {
 
-private:
-    Poco::Net::StreamSocket socket;
+    private:
+        Poco::Net::StreamSocket socket;
 
-protected:
-    ClientConnection(const Poco::Net::SocketAddress& a, const bsc::Context::Ptr&);
+    protected:
+        ClientConnection(const Poco::Net::SocketAddress& a, const Context::Ptr&);
 
-public:
-    ClientConnection(const std::string& a, bsc::Context::Ptr);
+    public:
+        ClientConnection(const std::string& a, Context::Ptr);
 
-    //@todo think about the Connection interface and those method names.
-    void startReceivingImpl();
-    void startSendingImpl();
+        //@todo think about the Connection interface and those method names.
+        void startReceivingImpl();
 
-    ~ClientConnection() override;
+        void startSendingImpl();
 
-    void shutdown() override;
+        ~ClientConnection() override;
 
-protected:
-    Poco::Net::StreamSocket &getSocket() override;
+        void shutdown() override;
 
-};
+    protected:
+        Poco::Net::StreamSocket& getSocket() override;
+
+    };
+}
 
 
 #endif //BASYCO_CLIENTCONNECTION_H

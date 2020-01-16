@@ -16,50 +16,48 @@
 #include <p2p/modules/network/network/RemoteNodeInfo.h>
 #include "p2p/modules/network/remote/exception/NotRequestException.h"
 
-
 #include <atomic>
 #include <variant>
 
 
-class ConnectionFetcher : public Connection::ObserverType {
-private:
-    std::variant<std::shared_ptr<Connection>/*client connection*/, Connection * /*server connection*/> connectionPtr = nullptr;
-    std::recursive_mutex connectionLock;
-    std::atomic_bool valid = false;
+namespace bsc {
+    class ConnectionFetcher : public Connection::ObserverType {
+    private:
+        std::variant<std::shared_ptr<Connection>/*client connection*/, Connection* /*server connection*/> connectionPtr = nullptr;
+        std::recursive_mutex connectionLock;
+        std::atomic_bool valid = false;
 
-    class visitor {
+        class visitor {
+        public:
+            Connection* operator()(Connection* p) {
+                return p;
+            }
+
+            Connection* operator()(std::shared_ptr<Connection> p) {
+                return p.get();
+            }
+        };
+
     public:
-        Connection *operator()(Connection *p) {
-            return p;
+
+
+    public:
+        void setConnection(std::shared_ptr<Connection> p);
+
+        void setConnection(Connection* p);
+
+        Connection* getConnection();
+
+        void update(Connection& connection, ConnectionState state) override;
+
+        void lock() {
+            connectionLock.lock();
         }
 
-        Connection *operator()(std::shared_ptr<Connection> p) {
-            return p.get();
+        void unlock() {
+            connectionLock.unlock();
         }
     };
-
-public:
-
-
-
-public:
-    void setConnection(std::shared_ptr<Connection> p);
-
-    void setConnection(Connection *p);
-
-    Connection *getConnection();
-
-    void update(Connection &connection, ConnectionState state) override;
-
-    void lock() {
-        connectionLock.lock();
-    }
-
-    void unlock() {
-        connectionLock.unlock();
-    }
-};
-
 
 /**
  * a representation of remote nodes.
@@ -69,7 +67,7 @@ class RemoteNode {
 private:
     RemoteNodeInfo remoteNodeInfo;
     std::shared_ptr<ConnectionFetcher> connectionFetcher = std::make_shared<ConnectionFetcher>(); //it's shared ptr because it's Connection::Observer.
-    bsc::Context::OwnPtr _context = bsc::Context::makeContext();
+    Context::OwnPtr _context = Context::makeContext();
     std::shared_ptr<IProtocol> protocol;
 
 public:
@@ -98,7 +96,7 @@ public:
 
     bool isConnected();
 
-    explicit RemoteNode(std::shared_ptr<IProtocol> protocol);
+    explicit RemoteNode(std::shared_ptr<bsc::IProtocol> protocol);
 
     template<typename SendType>
     void sendPacketToNode(NetworkPacketPointer<SendType> p) {
@@ -120,9 +118,9 @@ public:
     template<enum Status status = Status::response, typename SendType>
     auto sendRequestToNode(NetworkPacketPointer<SendType> p) {
         std::unique_lock g(*connectionFetcher);
-        typedef typename PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
+        typedef typename bsc::PacketInfo<typename SendType::BaseType, status>::Type ReturnType;
         if (p->getStatus() != Status::request) {
-            throw NotRequestException("Packed has different status than request.");
+            throw bsc::NotRequestException("Packed has different status than request.");
         }
         if (connectionFetcher->getConnection() != nullptr) {
 
@@ -140,7 +138,7 @@ public:
         }
     }
 
-    void setNodeInfo(const NodeInfo &ni);
+    void setNodeInfo(const bsc::NodeInfo& ni);
 
     const RemoteNodeInfo &getRemoteNodeInfo() const;
 
@@ -149,6 +147,7 @@ public:
     std::optional<NetAddressType> getAddress();
 
 };
+}
 
 
 #endif //BASYCO_REMOTENODE_H

@@ -5,4 +5,4 @@
 #include "NotRequestException.h"
 
 
-NotRequestException::NotRequestException(const std::string& arg) : invalid_argument(arg) {}
+bsc::NotRequestException::NotRequestException(const std::string& arg) : invalid_argument(arg) {}

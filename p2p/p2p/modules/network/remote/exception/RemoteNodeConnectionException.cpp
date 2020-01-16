@@ -4,5 +4,5 @@
 
 #include "RemoteNodeConnectionException.h"
 
-RemoteNodeConnectionException::RemoteNodeConnectionException(const std::string& arg)
+bsc::RemoteNodeConnectionException::RemoteNodeConnectionException(const std::string& arg)
         : domain_error(arg) {}

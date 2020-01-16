@@ -11,6 +11,7 @@
 #include "JournalState.h"
 
 
+
 void JournalState::add(const JournalStateData& data) {
     auto same = std::find_if(dataList.begin(), dataList.end(), [&](auto i) {
         //@todo about that method and target... shouldn't this be an error if we have more than one method on one file?
@@ -105,7 +106,7 @@ void JournalState::clearProcessed() {
 
 JournalState::JournalState(JournalMetaData metaData) : metaData(std::move(metaData)) {}
 
-void JournalStateData::update(FileData data) {
+void JournalStateData::update(bsc::FileData data) {
 
     // if (!data.isIsDirectory()) {
     size = data.getSize();

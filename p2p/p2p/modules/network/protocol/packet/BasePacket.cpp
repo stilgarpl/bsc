@@ -7,32 +7,32 @@
 #include "BasePacket.h"
 
 
-Status BasePacket::getStatus() const {
+bsc::Status bsc::BasePacket::getStatus() const {
     return status;
 }
 
 
-void BasePacket::setStatus(Status status) {
-    BasePacket::status = status;
+void bsc::BasePacket::setStatus(Status status) {
+    bsc::BasePacket::status = status;
 }
 
-BasePacket::IdType BasePacket::getId() const {
+bsc::BasePacket::IdType bsc::BasePacket::getId() const {
     return id;
 }
 
-void BasePacket::setId(BasePacket::IdType id) {
+void bsc::BasePacket::setId(BasePacket::IdType id) {
     BasePacket::id = id;
 }
 
-bool BasePacket::isRetry() const {
+bool bsc::BasePacket::isRetry() const {
     return retry;
 }
 
-void BasePacket::setRetry(bool retry) {
+void bsc::BasePacket::setRetry(bool retry) {
     BasePacket::retry = retry;
 }
 
-BasePacket::IdType BasePacket::nextId() {
+bsc::BasePacket::IdType bsc::BasePacket::nextId() {
     std::lock_guard<std::mutex> g(idLock);
     static std::atomic<IdType> val = 0;
     return val++;

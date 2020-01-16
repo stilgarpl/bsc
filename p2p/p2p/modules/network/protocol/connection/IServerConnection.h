@@ -6,17 +6,16 @@
 #define BASYCO_ISERVERCONNECTION_H
 
 
-#include "Connection.h"
+namespace bsc {
+    class IServerConnection : public bsc::Connection {
 
+    public:
+        IServerConnection(Context::Ptr context) : Connection(context) {}
 
-class IServerConnection : public Connection {
+        virtual void stop() = 0;
 
-public:
-    IServerConnection(bsc::Context::Ptr context) : Connection(context) {}
-
-    virtual void stop() = 0;
-
-};
+    };
+}
 
 
 #endif //BASYCO_ISERVERCONNECTION_H

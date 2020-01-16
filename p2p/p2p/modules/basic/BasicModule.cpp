@@ -7,21 +7,21 @@
 #include "BasicModule.h"
 
 
-BasicModule::BasicModule(INode &node) : NodeModuleDependent<BasicModule>(node, "basic") {
+bsc::BasicModule::BasicModule(bsc::INode& node) : NodeModuleDependent<BasicModule>(node, "basic") {
 
 }
 
-void BasicModule::setupActions(ILogicModule::SetupActionHelper &actionHelper) {
+void bsc::BasicModule::setupActions(bsc::ILogicModule::SetupActionHelper& actionHelper) {
 
 
 }
 
-bool BasicModule::assignActions(ILogicModule::AssignActionHelper &actionHelper) {
+bool bsc::BasicModule::assignActions(bsc::ILogicModule::AssignActionHelper& actionHelper) {
     return true;
 }
 
-bool BasicModule::setupSources(ILogicModule::SetupSourceHelper &sourceHelper) {
+bool bsc::BasicModule::setupSources(bsc::ILogicModule::SetupSourceHelper& sourceHelper) {
     sourceHelper.requireSource<bsc::ClockSource>();
-    sourceHelper.requireSource<ModuleSource>();
+    sourceHelper.requireSource<bsc::ModuleSource>();
     return true;
 }

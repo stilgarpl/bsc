@@ -5,19 +5,20 @@
 #include "ModuleSource.h"
 
 
-ModuleSource::ModuleSource(bsc::SourceManager& sourceManager) : bsc::ISource(sourceManager), source(sourceManager) {
+bsc::ModuleSource::ModuleSource(bsc::SourceManager& sourceManager) : bsc::ISource(sourceManager),
+                                                                     source(sourceManager) {
 
 }
 
-void ModuleSource::run() {
+void bsc::ModuleSource::run() {
     waitForStop();
 }
 
-void ModuleSource::onStop() {
+void bsc::ModuleSource::onStop() {
     source.stop();
     source.join();
 }
 
-void ModuleSource::onStart() {
+void bsc::ModuleSource::onStart() {
     source.start();
 }

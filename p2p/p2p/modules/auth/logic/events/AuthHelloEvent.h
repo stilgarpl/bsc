@@ -10,19 +10,21 @@
 #include <logic/IEvent.h>
 
 
-class AuthHelloEvent : public bsc::IEvent<int> {
-    NodeIdType nodeId;
-    std::string authData;
+namespace bsc {
+    class AuthHelloEvent : public IEvent<int> {
+        NodeIdType nodeId;
+        std::string authData;
 
-public:
-    [[nodiscard]] const NodeIdType& getNodeId() const;
+    public:
+        [[nodiscard]] const NodeIdType& getNodeId() const;
 
-    void setNodeId(const NodeIdType& nodeId);
+        void setNodeId(const NodeIdType& nodeId);
 
-    [[nodiscard]] const std::string& getAuthData() const;
+        [[nodiscard]] const std::string& getAuthData() const;
 
-    void setAuthData(const std::string &authData);
-};
+        void setAuthData(const std::string& authData);
+    };
+}
 
 
 #endif //BASYCO_AUTHHELLOEVENT_H

@@ -6,52 +6,52 @@
 #define BASYCO_KEEPALIVEPACKET_H
 
 
-#include "BasePacket.h"
-
 #include <core/utils/cereal_include.h>
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 #include <p2p/modules/network/protocol/context/ConnectionContext.h>
 
-struct KeepAlivePacket : public PacketGroup {
-
-public:
-
-
-    class Request : public Packet<KeepAlivePacket, KeepAlivePacket::Request> {
-
-    private:
-        template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<KeepAlivePacket, KeepAlivePacket::Request>>
-                       (this));
-        }
+namespace bsc {
+    struct KeepAlivePacket : public bsc::PacketGroup {
 
     public:
 
 
-    private:
-        friend class cereal::access;
+        class Request : public bsc::Packet<KeepAlivePacket, KeepAlivePacket::Request> {
+
+        private:
+            template<class Archive>
+            void serialize(Archive& ar) {
+                ar(cereal::base_class<Packet<KeepAlivePacket, KeepAlivePacket::Request>>
+                           (this));
+            }
+
+        public:
+
+
+        private:
+            friend class cereal::access;
+        };
+
+        class Response : public bsc::Packet<KeepAlivePacket, KeepAlivePacket::Response> {
+        private:
+            template<class Archive>
+            void serialize(Archive& ar) {
+                ar(cereal::base_class<Packet<KeepAlivePacket, KeepAlivePacket::Response>>
+                           (this));
+            }
+
+        private:
+
+            friend class cereal::access;
+
+        };
     };
+}
 
-    class Response : public Packet<KeepAlivePacket, KeepAlivePacket::Response> {
-    private:
-        template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<KeepAlivePacket, KeepAlivePacket::Response>>
-                       (this));
-        }
+CEREAL_REGISTER_TYPE(bsc::KeepAlivePacket::Request)
+CEREAL_REGISTER_TYPE(bsc::KeepAlivePacket::Response)
 
-    private:
-
-        friend class cereal::access;
-
-    };
-};
-
-CEREAL_REGISTER_TYPE(KeepAlivePacket::Request)
-CEREAL_REGISTER_TYPE(KeepAlivePacket::Response)
-
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, KeepAlivePacket::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, KeepAlivePacket::Response)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::KeepAlivePacket::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::KeepAlivePacket::Response)
 
 #endif //BASYCO_KEEPALIVEPACKET_H

@@ -8,10 +8,10 @@
 #include <p2p/modules/basic/BasicModule.h>
 
 #include <chrono>
+using namespace bsc;
 
-
-void remoteServerTestModuleSetup(Node &node) {
-    node.addModule<BasicModule>();
+void remoteServerTestModuleSetup(bsc::Node& node) {
+    node.addModule<bsc::BasicModule>();
     node.addModule<NetworkModule>();
     node.addModule<FilesystemModule>();
 }
@@ -27,7 +27,7 @@ void waitFor(const std::function<bool(void)> &expression, std::chrono::milliseco
 
 TEST_CASE("Remote node test") {
 
-    Node thisNode;
+    bsc::Node thisNode;
 
     thisNode.getNodeInfo().setNodeId("firstNodeR");
 
@@ -35,7 +35,7 @@ TEST_CASE("Remote node test") {
     thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
     thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
 
-    Node otherNode;
+    bsc::Node otherNode;
     otherNode.getNodeInfo().setNodeId("secondR");
     remoteServerTestModuleSetup(otherNode);
     otherNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");

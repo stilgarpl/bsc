@@ -15,53 +15,55 @@
 #include "p2p/node/INode.h"
 #include "INodeModule.h"
 
+
 #include <p2p/node/module/logic/ModuleSource.h>
 
-class NodeModule : public ILogicModule {
-private:
-    const ModuleIdType moduleId;
+namespace bsc {
+    class NodeModule : public bsc::ILogicModule {
+    private:
+        const ModuleIdType moduleId;
 
-public:
+    public:
 
-    using Configuration = IConfig;
+        using Configuration = IConfig;
 
-    //@todo pure or not?
-    void initialize() override {};
+        //@todo pure or not?
+        void initialize() override {};
 
-    void ready() override {};
+        void ready() override {};
 
-    void shutdown() override {};
+        void shutdown() override {};
 
-    void run() override {
-        //do nothing, just so modules do not have to implement this if they don't want to
-    }
+        void run() override {
+            //do nothing, just so modules do not have to implement this if they don't want to
+        }
 
-protected:
-    ConfigurationManager &getConfigurationManager() {
-        return node.getConfigurationManager();
-    }
+    protected:
+        ConfigurationManager& getConfigurationManager() {
+            return node.getConfigurationManager();
+        }
 
-public:
-    const ModuleIdType &getModuleId() const override {
-        return moduleId;
-    }
+    public:
+        const ModuleIdType& getModuleId() const override {
+            return moduleId;
+        }
 
-    NodeModule(INode &node, ModuleIdType moduleId) : ILogicModule(node), moduleId(std::move(moduleId)) {}
-};
+        NodeModule(INode& node, ModuleIdType moduleId) : ILogicModule(node), moduleId(std::move(moduleId)) {}
+    };
 
 //@todo maybe remove DependencyManaged, I don't think it's required. modules are now async, they don't have to be sorted
 template<typename T, typename ... Args>
-class NodeModuleDependent : public NodeModule, public DependencyManaged<T> {
-public:
-    auto &getOwnSubModule() {
-        return getSubModule<T>();
-    }
+    class NodeModuleDependent : public bsc::NodeModule, public DependencyManaged<T> {
+    public:
+        auto& getOwnSubModule() {
+            return getSubModule<T>();
+        }
 
-private:
-    template<typename T1, typename... Args1>
-    void checkAndAddModules() {
-        if (!node.hasModule<T1>()) {
-            node.addModule<T1>();
+    private:
+        template<typename T1, typename... Args1>
+        void checkAndAddModules() {
+            if (!node.hasModule<T1>()) {
+                node.addModule<T1>();
             LOGGER(std::string("MODULE NOT FOUND, ADDING MODULE") + typeid(T1).name());
         }
         if constexpr (sizeof...(Args1) > 0) {
@@ -112,5 +114,6 @@ public:
         }
     }
 };
+}
 
 #endif //BASYCO_NODEMODULE_H

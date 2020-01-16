@@ -11,31 +11,34 @@
 #include "Role.h"
 
 
-class RoleDefinitions {
+namespace bsc {
+    class RoleDefinitions {
 
-private:
-    bsc::StaticUber<RoleList> requiredRoles;
+    private:
+        StaticUber<RoleList> requiredRoles;
 
-public:
+    public:
 
-    template<typename T>
-    const RoleList &getRequiredRoles() {
-        return requiredRoles.get<T>();
-    }
+        template<typename T>
+        const RoleList& getRequiredRoles() {
+            return requiredRoles.get<T>();
+        }
 
-    template<typename T>
-    void addRole(const Role::IdType &roleId) {
-        //@todo check if role is already present
-        requiredRoles.get<T>().push_back(Role::makeRole(roleId));
-    }
-};
+        template<typename T>
+        void addRole(const Role::IdType& roleId) {
+            //@todo check if role is already present
+            requiredRoles.get<T>().push_back(Role::makeRole(roleId));
+        }
+    };
 
-typedef std::shared_ptr<RoleDefinitions> RoleDefinitionsPtr;
+    typedef std::shared_ptr<RoleDefinitions> RoleDefinitionsPtr;
 
-class RoleDefinitionsContext {
-public:
-    RoleDefinitionsPtr roleDefinitionsPtr = std::make_shared<RoleDefinitions>();
-};
+    class RoleDefinitionsContext {
+    public:
+        RoleDefinitionsPtr roleDefinitionsPtr = std::make_shared<RoleDefinitions>();
+    };
+
+}
 
 
 #endif //BASYCO_ROLEDEFINITIONS_H

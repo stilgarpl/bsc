@@ -10,16 +10,16 @@
 #include <repo/journal/SimpleJournal.h>
 
 
-class JournalGroup : public PacketGroup {
+class JournalGroup : public bsc::PacketGroup {
 public:
-    class Request : public Packet<JournalGroup, Request> {
+    class Request : public bsc::Packet<JournalGroup, Request> {
         std::string repoId; //repository with journal we're requesting
 
     private:
         template<class Archive>
-        void serialize(Archive &ar) {
+        void serialize(Archive& ar) {
 
-            ar(cereal::base_class<Packet<JournalGroup, JournalGroup::Request> >(this), repoId);
+            ar(cereal::base_class<Packet < JournalGroup, JournalGroup::Request> > (this), repoId);
         }
 
     public:
@@ -33,14 +33,14 @@ public:
 
     };
 
-    class Response : public Packet<JournalGroup, Response> {
+    class Response : public bsc::Packet<JournalGroup, Response> {
         std::string repoId;
         JournalPtr journal;
 
     private:
         template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<JournalGroup, JournalGroup::Response> >(this), journal);
+        void serialize(Archive& ar) {
+            ar(cereal::base_class<Packet < JournalGroup, JournalGroup::Response> > (this), journal);
         }
 
     public:
@@ -61,8 +61,8 @@ public:
 
 CEREAL_REGISTER_TYPE(JournalGroup::Request)
 CEREAL_REGISTER_TYPE(JournalGroup::Response)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, JournalGroup::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, JournalGroup::Response)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, JournalGroup::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, JournalGroup::Response)
 
 
 #endif //BASYCO_JOURNALGROUP_H

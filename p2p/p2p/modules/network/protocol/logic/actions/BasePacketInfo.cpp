@@ -4,62 +4,63 @@
 #include "BasePacketInfo.h"
 
 
-BasePacketInfo::BasePacketInfo(const BasePacketPtr& packetPtr,
-                               const std::chrono::time_point<bsc::Tick::Clock>& timeSent)
+bsc::BasePacketInfo::BasePacketInfo(const BasePacketPtr& packetPtr,
+                                    const std::chrono::time_point<bsc::Tick::Clock>& timeSent)
         : packetPtr(packetPtr), timeSent(timeSent) {}
 
-const BasePacketPtr &BasePacketInfo::getPacketPtr() const {
+const bsc::BasePacketPtr& bsc::BasePacketInfo::getPacketPtr() const {
     return packetPtr;
 }
 
-void BasePacketInfo::setPacketPtr(const BasePacketPtr &packetPtr) {
+void bsc::BasePacketInfo::setPacketPtr(const BasePacketPtr& packetPtr) {
     BasePacketInfo::packetPtr = packetPtr;
 }
 
-const std::chrono::time_point<bsc::Tick::Clock>& BasePacketInfo::getTimeSent() const {
+const std::chrono::time_point<bsc::Tick::Clock>& bsc::BasePacketInfo::getTimeSent() const {
     return timeSent;
 }
 
-void BasePacketInfo::setTimeSent(const std::chrono::time_point<bsc::Tick::Clock>& timeSent) {
+void bsc::BasePacketInfo::setTimeSent(const std::chrono::time_point<bsc::Tick::Clock>& timeSent) {
     BasePacketInfo::timeSent = timeSent;
 }
 
-BasePacketInfo::BasePacketInfo(const BasePacketPtr& packetPtr, Connection* connection,
-                               const std::chrono::time_point<bsc::Tick::Clock>& timeSent, Status expectedStatus)
+bsc::BasePacketInfo::BasePacketInfo(const BasePacketPtr& packetPtr, bsc::Connection* connection,
+                                    const std::chrono::time_point<bsc::Tick::Clock>& timeSent,
+                                    bsc::Status expectedStatus)
         : packetPtr(packetPtr),
           connection(connection), expectedStatus(expectedStatus),
           timeSent(timeSent) {}
 
-Connection *BasePacketInfo::getConnection() const {
+bsc::Connection* bsc::BasePacketInfo::getConnection() const {
     return connection;
 }
 
-void BasePacketInfo::setConnection(Connection *connection) {
+void bsc::BasePacketInfo::setConnection(bsc::Connection* connection) {
     BasePacketInfo::connection = connection;
 }
 
-std::promise<BasePacketPtr> &BasePacketInfo::getResponsePromise() {
+std::promise<bsc::BasePacketPtr>& bsc::BasePacketInfo::getResponsePromise() {
     return responsePromise;
 }
 
-Status BasePacketInfo::getExpectedStatus() const {
+bsc::Status bsc::BasePacketInfo::getExpectedStatus() const {
     return expectedStatus;
 }
 
-void BasePacketInfo::setExpectedStatus(Status expectedStatus) {
-    BasePacketInfo::expectedStatus = expectedStatus;
+void bsc::BasePacketInfo::setExpectedStatus(bsc::Status expectedStatus) {
+    bsc::BasePacketInfo::expectedStatus = expectedStatus;
 }
 
-BasePacketInfo::BasePacketInfo(const BasePacketPtr& packetPtr, Connection* connection,
-                               const std::chrono::time_point<bsc::Tick::Clock>& timeSent) : packetPtr(packetPtr),
-                                                                                            connection(connection),
-                                                                                            timeSent(timeSent) {}
+bsc::BasePacketInfo::BasePacketInfo(const BasePacketPtr& packetPtr, bsc::Connection* connection,
+                                    const std::chrono::time_point<bsc::Tick::Clock>& timeSent) : packetPtr(packetPtr),
+                                                                                                 connection(connection),
+                                                                                                 timeSent(timeSent) {}
 
-unsigned int BasePacketInfo::getRetry() const {
+unsigned int bsc::BasePacketInfo::getRetry() const {
     return retry;
 }
 
-void BasePacketInfo::setRetry(unsigned int retry) {
+void bsc::BasePacketInfo::setRetry(unsigned int retry) {
     BasePacketInfo::retry = retry;
 }
 

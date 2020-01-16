@@ -12,38 +12,38 @@
 #include "ClientConnection.h"
 
 
-
-ClientConnection::ClientConnection(const Poco::Net::SocketAddress& a, const bsc::Context::Ptr& context) : Connection(
+bsc::ClientConnection::ClientConnection(const Poco::Net::SocketAddress& a, const bsc::Context::Ptr& context)
+        : bsc::Connection(
         context),
-                                                                                                          socket(a) {
+          socket(a) {
 
     auto& lm = getConnectionContext()->get<bsc::LogicContext>();
 
     LOGGER("adding new connection, triggering connection established event")
 
-    lm.getLogicManager().getSource<ConnectionSource>()->connectionEstablished(this);
+    lm.getLogicManager().getSource<bsc::ConnectionSource>()->connectionEstablished(this);
 
 
 }
 
-void ClientConnection::startReceivingImpl() {
-    Connection::startReceiving(socket);
+void bsc::ClientConnection::startReceivingImpl() {
+    bsc::Connection::startReceiving(socket);
     changeState(ConnectionState::CONNECTED);
 
 }
 
-void ClientConnection::startSendingImpl() {
-    Connection::startSending(socket);
+void bsc::ClientConnection::startSendingImpl() {
+    bsc::Connection::startSending(socket);
 
 }
 
-ClientConnection::~ClientConnection() {
+bsc::ClientConnection::~ClientConnection() {
 
     //@todo this socket is closed twice when client connection is destroyed. do something about it.
     try {
 //        socket.shutdown();
         ClientConnection::shutdown();
-    } catch (const Poco::Net::NetException &e) {
+    } catch (const Poco::Net::NetException& e) {
         LOGGER("net exception")
         LOGGER(e.displayText());
         auto nested = e.nested();
@@ -55,11 +55,11 @@ ClientConnection::~ClientConnection() {
 
 }
 
-void ClientConnection::shutdown() {
-    Connection::shutdown();
+void bsc::ClientConnection::shutdown() {
+    bsc::Connection::shutdown();
     try {
         socket.shutdown();
-    } catch (const Poco::Net::NetException &e) {
+    } catch (const Poco::Net::NetException& e) {
         LOGGER("net exception")
         e.displayText();
         auto nested = e.nested();
@@ -71,16 +71,16 @@ void ClientConnection::shutdown() {
     changeState(ConnectionState::DISCONNECTED);
     auto& lc = getConnectionContext()->get<bsc::LogicContext>();
     auto& logicManager = lc.getLogicManager();
-    auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
+    auto connectionSourcePtr = logicManager.getSource<bsc::ConnectionSource>();
     connectionSourcePtr->connectionClosedClient(this);
 
 }
 
-Poco::Net::StreamSocket &ClientConnection::getSocket() {
+Poco::Net::StreamSocket& bsc::ClientConnection::getSocket() {
     return socket;
 }
 
-ClientConnection::ClientConnection(const std::string& a, bsc::Context::Ptr ptr) : ClientConnection(
+bsc::ClientConnection::ClientConnection(const std::string& a, bsc::Context::Ptr ptr) : ClientConnection(
         Poco::Net::SocketAddress(a),
         std::move(ptr)) {
 

@@ -4,10 +4,11 @@
 
 #include "ConnectionEvent.h"
 
-Connection *ConnectionEvent::getConnection() const {
+
+bsc::Connection* bsc::ConnectionEvent::getConnection() const {
     return connection;
 }
 
-void ConnectionEvent::setConnection(Connection *connection) {
+void bsc::ConnectionEvent::setConnection(bsc::Connection* connection) {
     ConnectionEvent::connection = connection;
 }

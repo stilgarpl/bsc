@@ -6,14 +6,16 @@
 #define BASYCO_BROADCASTSCOPE_H
 
 
-enum class BroadcastScope {
-    ALL,
-    CONNECTED,
-    DISCONNECTED,
-    SERVER,
-    CLIENT,
+namespace bsc {
+    enum class BroadcastScope {
+        ALL,
+        CONNECTED,
+        DISCONNECTED,
+        SERVER,
+        CLIENT,
 
-};
+    };
+}
 
 
 #endif //BASYCO_BROADCASTSCOPE_H

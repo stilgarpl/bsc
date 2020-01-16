@@ -10,51 +10,53 @@
 #include <p2p/modules/filesystem/identification/TransferTypes.h>
 
 
-struct FinishTransfer : public PacketGroup {
-
-public:
-
-
-    class Request : public Packet<FinishTransfer, FinishTransfer::Request> {
-        TransferId transferId;
-    private:
-        template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<FinishTransfer, FinishTransfer::Request>>(this), transferId);
-        }
+namespace bsc {
+    struct FinishTransfer : public PacketGroup {
 
     public:
-        TransferId getTransferId() const {
-            return transferId;
-        }
-
-        void setTransferId(TransferId transferId) {
-            Request::transferId = transferId;
-        }
 
 
-    private:
-        friend class cereal::access;
+        class Request : public bsc::Packet<FinishTransfer, FinishTransfer::Request> {
+            TransferId transferId;
+        private:
+            template<class Archive>
+            void serialize(Archive& ar) {
+                ar(cereal::base_class<Packet<FinishTransfer, FinishTransfer::Request>>(this), transferId);
+            }
+
+        public:
+            TransferId getTransferId() const {
+                return transferId;
+            }
+
+            void setTransferId(TransferId transferId) {
+                Request::transferId = transferId;
+            }
+
+
+        private:
+            friend class cereal::access;
+        };
+
+        class Response : public bsc::Packet<FinishTransfer, FinishTransfer::Response> {
+        private:
+            template<class Archive>
+            void serialize(Archive& ar) {
+                ar(cereal::base_class<Packet<FinishTransfer, FinishTransfer::Response>>(this));
+            }
+
+
+            friend class cereal::access;
+
+        };
     };
-
-    class Response : public Packet<FinishTransfer, FinishTransfer::Response> {
-    private:
-        template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<FinishTransfer, FinishTransfer::Response>>(this));
-        }
+}
 
 
-        friend class cereal::access;
+CEREAL_REGISTER_TYPE(bsc::FinishTransfer::Request)
+CEREAL_REGISTER_TYPE(bsc::FinishTransfer::Response)
 
-    };
-};
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::FinishTransfer::Request)
 
-
-CEREAL_REGISTER_TYPE(FinishTransfer::Request)
-CEREAL_REGISTER_TYPE(FinishTransfer::Response)
-
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, FinishTransfer::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, FinishTransfer::Response)
-
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::FinishTransfer::Response)
 #endif //BASYCO_FINISHTRANSFER_H

@@ -19,23 +19,24 @@
 //#define CONFIG_NAME(TYPE, NAME)  template<> inline constexpr const auto getConfigName<TYPE>() { return NAME; }
 
 
-class IConfig {
+namespace bsc {
+    class IConfig {
 
 
+    private:
+        template<class Archive>
+        void serialize(Archive& ar) {
 
-private:
-    template<class Archive>
-    void serialize(Archive &ar) {
-
-    }
+        }
 
 
-    friend class cereal::access;
+        friend class cereal::access;
 
-public:
+    public:
 
-};
+    };
+}
 
-//CEREAL_REGISTER_TYPE(IConfig)
+//CEREAL_REGISTER_TYPE(bsc::IConfig)
 
 #endif //BASYCO_ICONFIG_H

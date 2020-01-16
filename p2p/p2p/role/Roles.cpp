@@ -3,5 +3,6 @@
 //
 
 #include "Roles.h"
+#include "RoleScope.h"
 
-thread_local RoleScope *Roles::activeScope = nullptr;
+thread_local bsc::RoleScope* bsc::Roles::activeScope = nullptr;

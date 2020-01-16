@@ -4,16 +4,16 @@
 
 #include "Role.h"
 
-Role::Role(const Role::IdType &roleId) : roleId(roleId) {}
+bsc::Role::Role(const Role::IdType& roleId) : roleId(roleId) {}
 
-const Role::IdType &Role::getRoleId() const {
+const bsc::Role::IdType& bsc::Role::getRoleId() const {
     return roleId;
 }
 
-bool Role::operator==(const Role &rhs) const {
+bool bsc::Role::operator==(const bsc::Role& rhs) const {
     return roleId == rhs.roleId;
 }
 
-bool Role::operator!=(const Role &rhs) const {
+bool bsc::Role::operator!=(const bsc::Role& rhs) const {
     return !(rhs == *this);
 }

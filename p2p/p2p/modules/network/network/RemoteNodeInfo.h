@@ -12,52 +12,54 @@
 #include <mutex>
 
 
-class RemoteNodeInfo {
+namespace bsc {
+    class RemoteNodeInfo {
 
-    mutable std::mutex nodeInfoLock;
+        mutable std::mutex nodeInfoLock;
 
-    //@todo C++20 std::atomic<std::shared_ptr<NodeInfo>>
-    std::shared_ptr<NodeInfo> nodeInfo;
-///@todo structure instead of string? we can store info like last successful connection to that address or sth
-    std::set<NetAddressType> knownAddresses;
+        //@todo C++20 std::atomic<std::shared_ptr<NodeInfo>>
+        std::shared_ptr<NodeInfo> nodeInfo;
+        ///@todo structure instead of string? we can store info like last successful connection to that address or sth
+        std::set<NetAddressType> knownAddresses;
 
-public:
-    [[nodiscard]] const std::set<NetAddressType>& getKnownAddresses() const;
+    public:
+        [[nodiscard]] const std::set<NetAddressType>& getKnownAddresses() const;
 
-    void addKnownAddress(const NetAddressType& address) {
-        std::unique_lock g(nodeInfoLock);
-        knownAddresses.insert(address);
-    }
-
-    RemoteNodeInfo& operator=(const RemoteNodeInfo& ni) {
-        std::unique_lock g(nodeInfoLock);
-        //@todo I don't like this method. See who uses it and why. Maybe remove it.
-        if (this != &ni) {
-            this->nodeInfo = ni.nodeInfo;
-            this->knownAddresses = ni.knownAddresses;
+        void addKnownAddress(const NetAddressType& address) {
+            std::unique_lock g(nodeInfoLock);
+            knownAddresses.insert(address);
         }
-        return *this;
-    }
 
-    [[nodiscard]] std::shared_ptr<NodeInfo> getNodeInfo() const;
+        RemoteNodeInfo& operator=(const RemoteNodeInfo& ni) {
+            std::unique_lock g(nodeInfoLock);
+            //@todo I don't like this method. See who uses it and why. Maybe remove it.
+            if (this != &ni) {
+                this->nodeInfo = ni.nodeInfo;
+                this->knownAddresses = ni.knownAddresses;
+            }
+            return *this;
+        }
 
-    void setNodeInfo(const std::shared_ptr<NodeInfo>& nodeInfo);
+        [[nodiscard]] std::shared_ptr<NodeInfo> getNodeInfo() const;
 
-private:
-    template<class Archive>
-    void serialize(Archive& ar) {
-        std::unique_lock g(nodeInfoLock);
-        ar & nodeInfo;
-        ar & knownAddresses;
-    }
+        void setNodeInfo(const std::shared_ptr<NodeInfo>& nodeInfo);
+
+    private:
+        template<class Archive>
+        void serialize(Archive& ar) {
+            std::unique_lock g(nodeInfoLock);
+            ar & nodeInfo;
+            ar & knownAddresses;
+        }
 
 
-    friend class cereal::access;
+        friend class cereal::access;
 
-public:
-    typedef std::shared_ptr<RemoteNodeInfo> Ptr;
+    public:
+        typedef std::shared_ptr<RemoteNodeInfo> Ptr;
 
-};
+    };
+}
 
 
 #endif //BASYCO_REMOTENODEINFO_H

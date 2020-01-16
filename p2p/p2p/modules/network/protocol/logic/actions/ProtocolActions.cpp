@@ -4,7 +4,8 @@
 
 #include "ProtocolActions.h"
 
-void ProtocolActions::onNewConnection(const ConnectionEvent &connectionEvent) {
+
+void bsc::ProtocolActions::onNewConnection(const ConnectionEvent& connectionEvent) {
 
     std::clog << __func__ << std::endl;
 

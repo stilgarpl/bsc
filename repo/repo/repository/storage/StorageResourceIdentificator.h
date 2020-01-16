@@ -8,7 +8,8 @@
 
 #include <p2p/modules/filesystem/identification/ResourceIdentificator.h>
 
-class StorageResourceIdentificator : public ResourceIdentificator {
+
+class StorageResourceIdentificator : public bsc::ResourceIdentificator {
 private:
     IStorage::StorageId storageId;
     IStorage::ResourceId objectId;

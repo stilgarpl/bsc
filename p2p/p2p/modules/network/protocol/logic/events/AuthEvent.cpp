@@ -4,18 +4,18 @@
 
 #include "AuthEvent.h"
 
-const std::string &AuthEvent::getLogin() const {
+const std::string& bsc::AuthEvent::getLogin() const {
     return login;
 }
 
-void AuthEvent::setLogin(const std::string &login) {
+void bsc::AuthEvent::setLogin(const std::string& login) {
     AuthEvent::login = login;
 }
 
-const std::string &AuthEvent::getPassword() const {
+const std::string& bsc::AuthEvent::getPassword() const {
     return password;
 }
 
-void AuthEvent::setPassword(const std::string &password) {
+void bsc::AuthEvent::setPassword(const std::string& password) {
     AuthEvent::password = password;
 }

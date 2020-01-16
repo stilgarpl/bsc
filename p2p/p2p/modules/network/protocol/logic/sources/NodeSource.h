@@ -10,15 +10,17 @@
 #include "logic/sources/EventQueueSource.h"
 
 
-class NodeSource : public bsc::EventQueueSource<NodeInfoEvent> {
-public:
+namespace bsc {
+    class NodeSource : public bsc::EventQueueSource<NodeInfoEvent> {
+    public:
 
-    NodeSource(bsc::SourceManager& sourceManager);
+        NodeSource(SourceManager& sourceManager);
 
-    void nodeInfoReceived(const NodeInfo& nodeInfo);
+        void nodeInfoReceived(const NodeInfo& nodeInfo);
 
-    void nodeDiscovered(const NodeInfo& nodeInfo);
-};
+        void nodeDiscovered(const NodeInfo& nodeInfo);
+    };
+}
 
 
 #endif //BASYCO_NODESOURCE_H

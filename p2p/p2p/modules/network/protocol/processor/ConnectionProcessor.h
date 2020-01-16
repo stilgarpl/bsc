@@ -14,27 +14,28 @@
 #include "core/log/Logger.h"
 
 
+namespace bsc {
+    class Connection;
 
-class Connection;
+    class ConnectionProcessor : public bsc::Runnable {
 
-class ConnectionProcessor : public bsc::Runnable {
+    private:
+        Logger logger = Logger("Connection Processor");
 
-private:
-    bsc::Logger logger = bsc::Logger("Connection Processor");
+    protected:
+        Connection& connection;
+        //@todo initialize packet filter from AuthModule or configuration or sth.
+        std::unique_ptr<PacketFilter> packetFilter = std::make_unique<RoleFilter>();
 
-protected:
-    Connection& connection;
-    //@todo initialize packet filter from AuthModule or configuration or sth.
-    std::unique_ptr<PacketFilter> packetFilter = std::make_unique<RoleFilter>();
+        void run() override;
 
-    void run() override;
+    public:
+        explicit ConnectionProcessor(Connection& connection);
 
-public:
-    explicit ConnectionProcessor(Connection &connection);
+        ~ConnectionProcessor() = default;
 
-    ~ConnectionProcessor() = default;
-
-};
+    };
+}
 
 
 #endif //BASYCO_CONNECTIONPROCESSOR_H

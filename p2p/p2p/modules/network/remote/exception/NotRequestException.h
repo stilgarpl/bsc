@@ -7,11 +7,13 @@
 
 #include <stdexcept>
 
-class NotRequestException : public std::invalid_argument {
+namespace bsc {
+    class NotRequestException : public std::invalid_argument {
 
-public:
-    NotRequestException(const std::string& arg);
-};
+    public:
+        NotRequestException(const std::string& arg);
+    };
+}
 
 
 #endif //BASYCO_NOTREQUESTEXCEPTION_H

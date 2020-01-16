@@ -5,34 +5,35 @@
 
 #include "INodeModule.h"
 
-void INodeModule::doInitialize() {
+
+void bsc::INodeModule::doInitialize() {
     initialize();
     changeModuleState(ModuleState::INITIALIZED);
 }
 
-void INodeModule::doSetupLogic() {
+void bsc::INodeModule::doSetupLogic() {
     if (setupLogic()) {
         changeModuleState(ModuleState::LOGIC_READY);
     }
 
 }
 
-void INodeModule::doReady() {
+void bsc::INodeModule::doReady() {
     ready();
     changeModuleState(ModuleState::READY);
 }
 
-void INodeModule::doShutdown() {
+void bsc::INodeModule::doShutdown() {
     shutdown();
     changeModuleState(ModuleState::SHUTDOWN);
 }
 
-void INodeModule::doPrepareSubmodules() {
+void bsc::INodeModule::doPrepareSubmodules() {
     prepareSubmodules();
     changeModuleState(ModuleState::SUBMODULES_PREPARED);
 }
 
-void INodeModule::doSaveConfiguration() {
+void bsc::INodeModule::doSaveConfiguration() {
     saveConfiguration();
 
 }

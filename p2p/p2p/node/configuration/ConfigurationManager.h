@@ -11,18 +11,18 @@
 #include <core/utils/cereal_include.h>
 #include "DataFileNotFoundException.h"
 
-
-namespace fs = std::filesystem;
+namespace bsc {
+    namespace fs = std::filesystem;
 
 //@todo consider changing name to IOManager or sth like that, because it doesn't just do configuration but everything that goes into private node directory
-class ConfigurationManager {
-public:
-    typedef std::string IdType;
-private:
-    fs::path rootPath;
+    class ConfigurationManager {
+    public:
+        typedef std::string IdType;
+    private:
+        fs::path rootPath;
 
 
-public:
+    public:
     fs::path getConfigPath();
 
     fs::path getDataPath();
@@ -40,7 +40,7 @@ public:
         fs::path fname;//("test");
         fname = this->filenameFromId(id);
         fs::path filePath = getConfigPath() / fname;
-        fs::create_directories(filePath.parent_path());
+        ::std::filesystem::create_directories(filePath.parent_path());
         LOGGER("saving: " + filePath.string());
         std::ofstream os(filePath);
         cereal::JSONOutputArchive archive(os);
@@ -53,7 +53,7 @@ public:
         fs::path fname = this->filenameFromId(id);
         fs::path filePath = getConfigPath() / fname;
         LOGGER("loading: " + filePath.string());
-        if (fs::exists(filePath)) {
+        if (::std::filesystem::exists(filePath)) {
             ConfigType temp;
             try {
                 std::ifstream is(filePath);
@@ -76,7 +76,7 @@ public:
     template<typename DataType /* @todo Concept: DataType is serializable*/>
     void saveData(const fs::path &fname, const DataType &data) {
         fs::path filePath = getFullDataPath(fname);
-        fs::create_directories(filePath.parent_path());
+            ::std::filesystem::create_directories(filePath.parent_path());
         std::ofstream os(filePath);
         cereal::XMLOutputArchive archive(os);
         archive << data;
@@ -87,7 +87,7 @@ public:
     DataType loadData(const fs::path &fname) {
         DataType data;
         fs::path filePath = getFullDataPath(fname);
-        if (fs::exists(filePath)) {
+        if (::std::filesystem::exists(filePath)) {
             std::ifstream is(filePath);
             cereal::XMLInputArchive archive(is);
             archive >> data;
@@ -104,7 +104,7 @@ protected:
 
 private:
     void initializeRootPath() {
-        fs::create_directories(rootPath);
+        ::std::filesystem::create_directories(rootPath);
     }
 
 public:
@@ -116,6 +116,7 @@ public:
 
     void setRootPath(const std::filesystem::path &rootPath);
 };
+}
 
 
 #endif //BASYCO_CONFIGURATIONMANAGER_H

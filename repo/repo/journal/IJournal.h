@@ -45,7 +45,7 @@ private:
     friend class cereal::access;
 
 public:
-    virtual void append(JournalMethod method, JournalTarget target, PathType path, FileData data) = 0;
+    virtual void append(JournalMethod method, JournalTarget target, PathType path, bsc::FileData data) = 0;
 
     virtual void printHistory()=0;
 

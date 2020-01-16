@@ -8,11 +8,13 @@
 
 #include <stdexcept>
 
-class NodeContextNotSet : public std::domain_error {
+namespace bsc {
+    class NodeContextNotSet : public std::domain_error {
 
-public:
-    NodeContextNotSet(const std::string& arg);
-};
+    public:
+        NodeContextNotSet(const std::string& arg);
+    };
+}
 
 
 #endif //BASYCO_NODECONTEXTNOTSET_H

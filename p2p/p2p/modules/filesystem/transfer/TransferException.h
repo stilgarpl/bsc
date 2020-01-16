@@ -7,12 +7,14 @@
 
 #include <stdexcept>
 
-//@todo move this somewhere where it belongs
-class TransferException : public std::domain_error {
+namespace bsc {
+    //@todo move this somewhere where it belongs
+    class TransferException : public std::domain_error {
 
-public:
-    explicit TransferException(const std::string& arg);
-};
+    public:
+        explicit TransferException(const std::string& arg);
+    };
+}
 
 
 #endif //BASYCO_TRANSFEREXCEPTION_H

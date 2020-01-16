@@ -11,23 +11,22 @@
 #include "p2p/node/module/NodeModule.h"
 
 
-Node::~Node() {
-    std::unique_lock <std::recursive_mutex> g(startMutex);
+bsc::Node::~Node() {
+    std::unique_lock<std::recursive_mutex> g(startMutex);
     //setting node context to active - if more than one node is created in a single thread, things may get mixed up.
     Node::setNodeContextActive();
     if (started) {
         ERROR("stopping in destructor is usually too late. stop and wait!")
         Node::stop();
-        Node::waitToFinish();
+        bsc::Node::waitToFinish();
     }
 
 
 }
 
 
-
-void Node::start() {
-    std::unique_lock <std::recursive_mutex> g(startMutex);
+void bsc::Node::start() {
+    std::unique_lock<std::recursive_mutex> g(startMutex);
     setNodeContextActive();
     initialize();
     logicManager.start();
@@ -37,9 +36,9 @@ void Node::start() {
 
 }
 
-void Node::stop() {
+void bsc::Node::stop() {
     LOGGER("node stop")
-    std::unique_lock <std::recursive_mutex> g(startMutex);
+    std::unique_lock<std::recursive_mutex> g(startMutex);
     setNodeContextActive();
     started = false;
     shutdownModules();
@@ -50,7 +49,7 @@ void Node::stop() {
 }
 
 
-Node::Node() {
+bsc::Node::Node() {
     LOGGER("default node constructor")
     nodeContext->set<NodeContext, Node&, NodeInfo&>(*this, this->thisNodeInfo);
     nodeContext->set<bsc::LoggerContext>([&] { return thisNodeInfo.getNodeId(); });
@@ -69,11 +68,11 @@ Node::Node() {
 }
 
 
-void Node::startModules() {
-    forEachModule<void>(&NodeModule::start);
+void bsc::Node::startModules() {
+    forEachModule<void>(&bsc::NodeModule::start);
 }
 
-void Node::initialize() {
+void bsc::Node::initialize() {
     setNodeContextActive();
 
 //    //@todo debug values
@@ -82,48 +81,48 @@ void Node::initialize() {
     //this slightly changed the order of execution - instead of being initialized and setupLogic module by module,
     //now all modules are initialized and then all modules are setupLogiced
     //hope it doesn't break anything
-    forEachModule(&INodeModule::initializeConfiguration);
-    forEachModule(&INodeModule::doInitialize);
-    forEachModule(&INodeModule::doSetupLogic);
-    forEachModule(&INodeModule::doPrepareSubmodules);
-    forEachModule(&INodeModule::doReady);
+    forEachModule(&bsc::INodeModule::initializeConfiguration);
+    forEachModule(&bsc::INodeModule::doInitialize);
+    forEachModule(&bsc::INodeModule::doSetupLogic);
+    forEachModule(&bsc::INodeModule::doPrepareSubmodules);
+    forEachModule(&bsc::INodeModule::doReady);
 
 }
 
-void Node::stopModules() {
-    forEachModule(&NodeModule::stop);
+void bsc::Node::stopModules() {
+    forEachModule(&bsc::NodeModule::stop);
 
 }
 
-void Node::joinModules() {
-    forEachModule(&NodeModule::join);
+void bsc::Node::joinModules() {
+    forEachModule(&bsc::NodeModule::join);
 
 }
 
-void Node::waitToFinish() {
-    std::unique_lock <std::recursive_mutex> g(startMutex);
+void bsc::Node::waitToFinish() {
+    std::unique_lock<std::recursive_mutex> g(startMutex);
     logicManager.join();
     joinModules();
 
 }
 
-void Node::shutdownModules() {
-    forEachModule(&INodeModule::doShutdown);
+void bsc::Node::shutdownModules() {
+    forEachModule(&bsc::INodeModule::doShutdown);
 
 
 }
 
-void Node::saveConfiguration() {
-    forEachModule(&INodeModule::doSaveConfiguration);
+void bsc::Node::saveConfiguration() {
+    forEachModule(&bsc::INodeModule::doSaveConfiguration);
 
 }
 
-void Node::waitUntilStarted() {
-    std::unique_lock <std::recursive_mutex> g(startMutex);
+void bsc::Node::waitUntilStarted() {
+    std::unique_lock<std::recursive_mutex> g(startMutex);
     startedReady.wait(g, [this] { return started; });
 }
 
-Node::Configuration::Configuration() {
+bsc::Node::Configuration::Configuration() {
 
     //@todo constant or sth for project name
     rootPath = fs::path(std::getenv("HOME")) / ".basyco";

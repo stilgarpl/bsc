@@ -4,20 +4,20 @@
 
 #include "CommandEvent.h"
 
-const std::string &CommandEvent::getCommandName() const {
+const std::string& bsc::CommandEvent::getCommandName() const {
     return commandName;
 }
 
-void CommandEvent::setCommandName(const std::string &commandName) {
+void bsc::CommandEvent::setCommandName(const std::string& commandName) {
     CommandEvent::commandName = commandName;
 }
 
 
-const std::vector<std::string> &CommandEvent::getData() const {
+const std::vector<std::string>& bsc::CommandEvent::getData() const {
     return data;
 }
 
-void CommandEvent::setData(const std::vector<std::string> &data) {
+void bsc::CommandEvent::setData(const std::vector<std::string>& data) {
     CommandEvent::data = data;
 }
 

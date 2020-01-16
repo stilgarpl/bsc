@@ -2,12 +2,13 @@
 // Created by stilgar on 06.10.17.
 //
 
+
 #include "NetworkInfoEvent.h"
 
-const NetworkInfo &NetworkInfoEvent::getNetworkInfo() const {
+const bsc::NetworkInfo& bsc::NetworkInfoEvent::getNetworkInfo() const {
     return networkInfo;
 }
 
-void NetworkInfoEvent::setNetworkInfo(const NetworkInfo &networkInfo) {
+void bsc::NetworkInfoEvent::setNetworkInfo(const NetworkInfo& networkInfo) {
     NetworkInfoEvent::networkInfo = networkInfo;
 }

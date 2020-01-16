@@ -10,8 +10,9 @@
 #include <repo/repository/IRepository.h>
 #include <repo/journal/JournalTypes.h>
 
+
 //@todo to be deleted
-class StorageQuery : public PacketGroup {
+class StorageQuery : public bsc::PacketGroup {
 
 public:
 //    enum class Query {
@@ -20,7 +21,7 @@ public:
 //
 //    };
 
-    class Request : public Packet<StorageQuery, StorageQuery::Request> {
+    class Request : public bsc::Packet<StorageQuery, StorageQuery::Request> {
 
     private:
         IStorage::StorageId storageId;
@@ -28,8 +29,9 @@ public:
 
 
         template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<StorageQuery, StorageQuery::Request>>(this), storageId, objectId);
+        void serialize(Archive& ar) {
+            ar(cereal::base_class<Packet < StorageQuery, StorageQuery::Request>>
+            (this), storageId, objectId);
         }
 
 
@@ -56,14 +58,15 @@ public:
     };
 
 
-    class Response : public Packet<StorageQuery, StorageQuery::Response> {
+    class Response : public bsc::Packet<StorageQuery, StorageQuery::Response> {
     private:
         //@todo C++17 path when cereal is ready
         bool exists;
 
         template<class Archive>
-        void serialize(Archive &ar) {
-            ar(cereal::base_class<Packet<StorageQuery, StorageQuery::Response>>(this), exists);
+        void serialize(Archive& ar) {
+            ar(cereal::base_class<Packet < StorageQuery, StorageQuery::Response>>
+            (this), exists);
         }
 
 
@@ -82,8 +85,8 @@ public:
 };
 
 CEREAL_REGISTER_TYPE(StorageQuery::Request)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageQuery::Request)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, StorageQuery::Request)
 CEREAL_REGISTER_TYPE(StorageQuery::Response)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(BasePacket, StorageQuery::Response)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, StorageQuery::Response)
 
 #endif //BASYCO_STORAGEQUERY_H

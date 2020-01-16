@@ -11,21 +11,23 @@
 #include <string>
 
 
-class AuthEvent : public bsc::IEvent<int> {
+namespace bsc {
+    class AuthEvent : public bsc::IEvent<int> {
 
-private:
-    std::string login;
-    std::string password;
+    private:
+        std::string login;
+        std::string password;
 
-public:
-    const std::string& getLogin() const;
+    public:
+        const std::string& getLogin() const;
 
-    void setLogin(const std::string& login);
+        void setLogin(const std::string& login);
 
-    const std::string &getPassword() const;
+        const std::string& getPassword() const;
 
-    void setPassword(const std::string &password);
-};
+        void setPassword(const std::string& password);
+    };
+}
 
 
 #endif //BASYCO_AUTHEVENT_H

@@ -40,29 +40,29 @@
 //
 //}
 
-ConfigurationManager::ConfigurationManager(std::filesystem::path rootPath) : rootPath(std::move(rootPath)) {}
+bsc::ConfigurationManager::ConfigurationManager(std::filesystem::path rootPath) : rootPath(std::move(rootPath)) {}
 
-const std::filesystem::path &ConfigurationManager::getRootPath() const {
+const std::filesystem::path& bsc::ConfigurationManager::getRootPath() const {
     return rootPath;
 }
 
-void ConfigurationManager::setRootPath(const std::filesystem::path &rootPath) {
+void bsc::ConfigurationManager::setRootPath(const std::filesystem::path& rootPath) {
     ConfigurationManager::rootPath = rootPath;
     initializeRootPath();
 }
 
-fs::path ConfigurationManager::filenameFromId(const ConfigurationManager::IdType &id) {
+fs::path bsc::ConfigurationManager::filenameFromId(const ConfigurationManager::IdType& id) {
     //@todo do something with it
     fs::path ret = (id + ".cfg");
     return ret;
 }
 
-fs::path ConfigurationManager::getConfigPath() {
+fs::path bsc::ConfigurationManager::getConfigPath() {
     //@todo replace "config" with variable
     return rootPath / fs::path("config");
 }
 
-fs::path ConfigurationManager::getDataPath() {
+fs::path bsc::ConfigurationManager::getDataPath() {
     //@todo replace "data" with variable
     return rootPath / fs::path("data");
 }

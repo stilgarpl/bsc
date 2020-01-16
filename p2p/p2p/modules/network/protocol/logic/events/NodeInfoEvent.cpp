@@ -4,11 +4,12 @@
 
 #include "NodeInfoEvent.h"
 
-const NodeInfo &NodeInfoEvent::getNodeInfo() const {
+
+const bsc::NodeInfo& bsc::NodeInfoEvent::getNodeInfo() const {
     return nodeInfo;
 }
 
-void NodeInfoEvent::setNodeInfo(const NodeInfo &nodeInfo) {
+void bsc::NodeInfoEvent::setNodeInfo(const bsc::NodeInfo& nodeInfo) {
     NodeInfoEvent::nodeInfo = nodeInfo;
 }
 
