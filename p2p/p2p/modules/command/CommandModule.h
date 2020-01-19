@@ -167,10 +167,8 @@ namespace bsc {
             )> handlerFunc) {
                 groupHandler = [handlerFunc](ArgumentContainerTypeRef arguments,
                                              const CommandModule::CommandGroup& group) -> GroupHandlerResult {
-                    auto parameters = bsc::CommandLineParameters::parse<ParametersType>(arguments, {{},
-                                                                                                    {},
-                                                                                                    {},
-                                                                                                    {false, true}});
+                    auto parameters = bsc::CommandLineParameters::parse<ParametersType>(arguments,
+                                                                                        ParseConfiguration::silent);
                     auto status = handlerFunc(parameters, group);
                     return {status, parameters.arguments()};
 

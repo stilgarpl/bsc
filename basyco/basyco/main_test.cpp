@@ -37,8 +37,7 @@ int main(int argc, char* argv[]) {
 //    parameters.before("qewwqewewq");
 //    parameters.after("ewrefesfezfse");
 
-    auto parameters = bsc::CommandLineParameters::parse<TestProgramParameters>(argc, argv,
-                                                                               {{"lallala"}, std::nullopt, "qqww"});
+    auto parameters = bsc::CommandLineParameters::parse<TestProgramParameters>(argc, argv);
     std::cout << "b is " << (parameters.b() ? "true" : "false ") << " with count "
               << std::to_string(parameters.b.count()) << std::endl;
     std::cout << "a is " << std::to_string(parameters.a().value_or(-1)) << std::endl;

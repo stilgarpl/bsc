@@ -23,6 +23,70 @@ void bsc::CommandLineParameters::ParserBuilder::reset() {
 
 }
 
+void bsc::CommandLineParameters::ParserBuilder::addOption(char shortKey, const char* longKey, const char* argumentName,
+                                                          int flags, const char* doc,
+                                                          bsc::CommandLineParameters::Parser::ParseFunc parserFunction) {
+    parser->argpOptions.push_back(argp_option{longKey, shortKey, argumentName, flags, doc, 0});
+    parser->parseMap[shortKey] = std::move(parserFunction);
+}
+
+void bsc::CommandLineParameters::ParserBuilder::addOption(char shortKey, const char* argumentName, int flags,
+                                                          const char* doc,
+                                                          bsc::CommandLineParameters::Parser::ParseFunc parserFunction) {
+    parser->argpOptions.push_back(argp_option{nullptr, shortKey, argumentName, flags, doc, 0});
+    parser->parseMap[shortKey] = std::move(parserFunction);
+}
+
+void bsc::CommandLineParameters::ParserBuilder::addOption(const char* longKey, const char* argumentName, int flags,
+                                                          const char* doc,
+                                                          bsc::CommandLineParameters::Parser::ParseFunc parserFunction) {
+    auto arg = argp_option{longKey, ++currentKey, argumentName, flags, doc, 0};
+    parser->argpOptions.push_back(arg);
+    parser->parseMap[arg.key] = std::move(parserFunction);
+}
+
+void bsc::CommandLineParameters::ParserBuilder::addGroup(const char* doc) {
+    auto arg = argp_option{nullptr, 0, nullptr, 0, doc, 0};
+    parser->argpOptions.push_back(arg);
+}
+
+void bsc::CommandLineParameters::ParserBuilder::addAlias(char shortKey) {
+    auto arg = argp_option{nullptr, shortKey, nullptr, OPTION_ALIAS, nullptr, 0};
+    parser->argpOptions.push_back(arg);
+}
+
+void bsc::CommandLineParameters::ParserBuilder::addAlias(char shortKey, const char* longKey) {
+    auto arg = argp_option{longKey, shortKey, nullptr, OPTION_ALIAS, nullptr, 0};
+    parser->argpOptions.push_back(arg);
+}
+
+void bsc::CommandLineParameters::ParserBuilder::addAlias(const char* longKey) {
+    auto arg = argp_option{longKey, ++currentKey, nullptr, OPTION_ALIAS, nullptr, 0};
+    parser->argpOptions.push_back(arg);
+}
+
+void bsc::CommandLineParameters::ParserBuilder::addDoc(std::string doc) {
+    if (parser->argpOptions.size() == 0) {
+        auto& before = parser->beforeInfo;
+        if (before.has_value()) {
+            *before += "\n" + doc;
+        } else {
+            before = doc;
+        }
+    } else {
+        auto& after = parser->afterInfo;
+        if (after.has_value()) {
+            *after += "\n" + doc;
+        } else {
+            after = doc;
+        }
+    }
+}
+
+void bsc::CommandLineParameters::ParserBuilder::addUsage(std::string usage) {
+    parser->usageDocs.push_back(usage);
+}
+
 error_t bsc::CommandLineParameters::Parser::parseArgument(int key, char* arg, struct argp_state* state) {
     auto* self = static_cast<Parser*>(state->input);
     switch (key) {
@@ -85,19 +149,16 @@ void bsc::CommandLineParameters::Parser::parse(int argc, char** argv) {
 }
 
 void
-bsc::CommandLineParameters::Parser::prepareParser(std::vector<std::string> usage,
-                                                  const std::optional<std::string>& before,
-                                                  const std::optional<std::string>& after, bool exitOnFailure,
-                                                  bool silent) {
+bsc::CommandLineParameters::Parser::prepareParser(ParseConfiguration parseConfiguration) {
     using namespace std::string_literals;
     //close argOptions:
     argpOptions.push_back({nullptr, 0, nullptr, 0, nullptr, 0});
-    if (before || after) {
-        doc = before.value_or(" ") + "\v" + after.value_or("");
+    if (beforeInfo || afterInfo) {
+        doc = beforeInfo.value_or(" ") + "\v" + afterInfo.value_or("");
     }
 
 
-    argDoc = std::accumulate(usage.begin(), usage.end(), ""s, [](const auto& a, const auto& b) {
+    argDoc = std::accumulate(usageDocs.begin(), usageDocs.end(), ""s, [](const auto& a, const auto& b) {
         if (a.empty()) {
             return b;
         } else {
@@ -105,11 +166,13 @@ bsc::CommandLineParameters::Parser::prepareParser(std::vector<std::string> usage
         }
     });
     flags = ARGP_IN_ORDER;
-    if (!exitOnFailure) {
-        flags |= ARGP_NO_EXIT;
-    }
-    if (silent) {
-        flags |= ARGP_SILENT;
+    switch (parseConfiguration) {
+        case ParseConfiguration::simple :
+            break;
+
+        case ParseConfiguration::silent:
+            flags |= ARGP_SILENT;
+            break;
     }
 
     argParams = {argpOptions.data(), Parser::parseArgument, argDoc.c_str(), doc.c_str(), nullptr, nullptr, nullptr};

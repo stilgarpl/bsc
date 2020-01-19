@@ -316,16 +316,13 @@ namespace bsc {
         //SocketAddress address("127.0.0.1:6777");
         if (serverSocket == nullptr) {
 
-//        //@todo debug
-//        node.getModule<ConfigurationModule>()->save("network", loadedConfig);
             serverSocket = std::make_shared<ServerSocket>(configuration().getPort());
-            LOGGER(std::string("Opening port") + std::to_string(configuration().getPort()));
+            LOGGER(std::string("Opening port ") + std::to_string(configuration().getPort()));
         }
 
         Poco::AutoPtr<Poco::Net::TCPServerParams> p(new Poco::Net::TCPServerParams());
-        //@todo make this magic number a configuration property
-        p->setMaxThreads(256);
-        p->setMaxQueued(256);
+        p->setMaxThreads(configuration().getMaxConcurrentThreads());
+        p->setMaxQueued(configuration().getMaxConcurrentThreads());
         server = std::make_shared<TCPServer>(
                 new ServerConnectionFactory([&] { return getRemoteNode().context(); }, {*this}),
                 *serverSocket, p);
@@ -417,6 +414,8 @@ namespace bsc {
     }
 
     RemoteNode& NetworkModule::connectTo(const NetAddressType& address) {
+        using namespace std::string_literals;
+        std::cout << "Trying to connect to "s + address.c_str() << std::endl;
         RemoteNode& remoteNode = getRemoteNode();
         if (!remoteNode.connectTo(address)) {
             throw RemoteNodeConnectionException("Unable to connect to remote node");

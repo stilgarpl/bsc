@@ -38,6 +38,7 @@ namespace bsc {
         class Configuration {
         private:
             unsigned short port = 6667;
+            unsigned short maxConcurrentThreads = 256;
         public:
             unsigned short getPort() const {
                 return port;
@@ -47,10 +48,18 @@ namespace bsc {
                 Configuration::port = port;
             }
 
+            unsigned short getMaxConcurrentThreads() const {
+                return maxConcurrentThreads;
+            }
+
+            void setMaxConcurrentThreads(unsigned short maxConcurrentThreads) {
+                Configuration::maxConcurrentThreads = maxConcurrentThreads;
+            }
+
         private:
             template<class Archive>
             void serialize(Archive& ar) {
-                ar & CEREAL_NVP(port);
+                ar & CEREAL_NVP(port) & CEREAL_NVP(maxConcurrentThreads);
             }
 
         private:

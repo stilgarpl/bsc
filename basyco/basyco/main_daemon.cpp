@@ -1,21 +1,16 @@
 
-//#define CEREAL_THREAD_SAFE 1
 #include "p2p/node/Node.h"
 #include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
 #include "p2p/modules/network/protocol/logic/actions/NodeActions.h"
 #include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"
-
-
-
-using namespace std::chrono_literals;
-using namespace bsc;
-
 #include <repo/node/RepoModule.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/modules/command/CommandModule.h>
 #include <p2p/modules/basic/BasicModule.h>
 #include <Poco/Environment.h>
 
+using namespace std::chrono_literals;
+using namespace bsc;
 
 void setupModules(bsc::Node& node) {
     node.addModule<bsc::BasicModule>();
@@ -63,9 +58,16 @@ void setupCommands(CommandModule *cmd) {
 
 }
 
-int main(int argc, char *argv[]) {
+struct BscControlProgramParameters : CommandLineParameters {
+    DefaultParameter<int> port = {'P', "port", "PORT", "Port opened for incoming connections",
+                                  9999};//@todo control should not open any port, I should add client-only option for NetworkModule.
+    DefaultParameter<std::string> networkName = {'N', "network", "NETWORK", "Network id", "TheNetwork"};
 
+};
 
+int main(int argc, char* argv[]) {
+
+    auto parameters = CommandLineParameters::parse<BscControlProgramParameters>(argc, argv);
     bsc::Node thisNode;
 
 //    auto host_name = boost::asio::ip::host_name();
@@ -73,8 +75,8 @@ int main(int argc, char *argv[]) {
     thisNode.getNodeInfo().setNodeId(Poco::Environment::nodeName());
 
     setupModules(thisNode);
-    thisNode.getModule<bsc::NetworkModule>()->addToNetwork("TheNetwork");
-    thisNode.getModule<bsc::NetworkModule>()->configuration().setPort(9999);
+    thisNode.getModule<bsc::NetworkModule>()->addToNetwork(parameters.networkName());
+    thisNode.getModule<bsc::NetworkModule>()->configuration().setPort(parameters.port());
 
     auto cmdN = thisNode.getModule<CommandModule>();
 
