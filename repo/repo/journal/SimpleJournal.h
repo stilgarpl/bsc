@@ -2,8 +2,8 @@
 // Created by stilgar on 17.10.17.
 //
 
-#ifndef BASYCO_SIMPLEJOURNAL_H
-#define BASYCO_SIMPLEJOURNAL_H
+#ifndef BSC_SIMPLEJOURNAL_H
+#define BSC_SIMPLEJOURNAL_H
 
 #include <core/utils/cereal_include.h>
 
@@ -11,6 +11,7 @@
 #include "IJournal.h"
 #include "JournalTypes.h"
 #include "JournalMetaDataFetcher.h"
+
 namespace bsc {
 
 
@@ -117,4 +118,4 @@ CEREAL_REGISTER_TYPE(bsc::SimpleJournal)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::IJournal, bsc::SimpleJournal)
 
-#endif //BASYCO_SIMPLEJOURNAL_H
+#endif //BSC_SIMPLEJOURNAL_H

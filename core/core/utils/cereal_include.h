@@ -2,8 +2,8 @@
 // Created by stilgar on 08.09.17.
 //
 
-#ifndef BASYCO_CEREAL_INCLUDE_H
-#define BASYCO_CEREAL_INCLUDE_H
+#ifndef BSC_CEREAL_INCLUDE_H
+#define BSC_CEREAL_INCLUDE_H
 
 
 #include <cereal/cereal.hpp>
@@ -62,4 +62,4 @@ namespace cereal {
 
 #endif // CEREAL_TYPES_STD_OPTIONAL
 
-#endif //BASYCO_CEREAL_INCLUDE_H
+#endif //BSC_CEREAL_INCLUDE_H

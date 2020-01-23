@@ -2,8 +2,8 @@
 // Created by stilgar on 12.07.18.
 //
 
-#ifndef BASYCO_KEEPALIVEPACKET_H
-#define BASYCO_KEEPALIVEPACKET_H
+#ifndef BSC_KEEPALIVEPACKET_H
+#define BSC_KEEPALIVEPACKET_H
 
 
 #include <core/utils/cereal_include.h>
@@ -54,4 +54,4 @@ CEREAL_REGISTER_TYPE(bsc::KeepAlivePacket::Response)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::KeepAlivePacket::Request)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::KeepAlivePacket::Response)
 
-#endif //BASYCO_KEEPALIVEPACKET_H
+#endif //BSC_KEEPALIVEPACKET_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 21.08.17.
 //
 
-#ifndef BASYCO_CONNECTIONCONTEXTINFO_H
-#define BASYCO_CONNECTIONCONTEXTINFO_H
+#ifndef BSC_CONNECTIONCONTEXTINFO_H
+#define BSC_CONNECTIONCONTEXTINFO_H
 
 
 #include <p2p/modules/network/protocol/connection/Connection.h>
@@ -27,4 +27,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CONNECTIONCONTEXTINFO_H
+#endif //BSC_CONNECTIONCONTEXTINFO_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 06.09.17.
 //
 
-#ifndef BASYCO_GRAVITONPROTOCOL_H
-#define BASYCO_GRAVITONPROTOCOL_H
+#ifndef BSC_GRAVITONPROTOCOL_H
+#define BSC_GRAVITONPROTOCOL_H
 
 
 #include <p2p/modules/network/protocol/logic/actions/BasePacketInfo.h>
@@ -36,4 +36,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_GRAVITONPROTOCOL_H
+#endif //BSC_GRAVITONPROTOCOL_H

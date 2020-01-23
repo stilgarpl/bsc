@@ -4,8 +4,8 @@
 // Created by stilgar on 17.10.17.
 //
 
-#ifndef BASYCO_REPOSITORY_H
-#define BASYCO_REPOSITORY_H
+#ifndef BSC_REPOSITORY_H
+#define BSC_REPOSITORY_H
 
 
 #include <repo/journal/SimpleJournal.h>
@@ -281,4 +281,4 @@ namespace bsc {
 CEREAL_REGISTER_TYPE(bsc::Repository)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::IRepository, bsc::Repository)
 
-#endif //BASYCO_REPOSITORY_H
+#endif //BSC_REPOSITORY_H

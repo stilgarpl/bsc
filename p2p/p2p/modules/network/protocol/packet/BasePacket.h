@@ -2,8 +2,8 @@
 // Created by stilgar on 01.08.17.
 //
 
-#ifndef BASYCO_BASEPACKET_H
-#define BASYCO_BASEPACKET_H
+#ifndef BSC_BASEPACKET_H
+#define BSC_BASEPACKET_H
 //#define CEREAL_THREAD_SAFE 1
 
 
@@ -110,4 +110,4 @@ namespace bsc {
 
 CEREAL_REGISTER_TYPE(bsc::BasePacket)
 
-#endif //BASYCO_BASEPACKET_H
+#endif //BSC_BASEPACKET_H

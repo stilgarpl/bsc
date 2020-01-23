@@ -2,8 +2,8 @@
 // Created by stilgar on 01.08.17.
 //
 
-#ifndef BASYCO_COMMAND_H
-#define BASYCO_COMMAND_H
+#ifndef BSC_COMMAND_H
+#define BSC_COMMAND_H
 
 
 namespace bsc {
@@ -16,4 +16,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_COMMAND_H
+#endif //BSC_COMMAND_H

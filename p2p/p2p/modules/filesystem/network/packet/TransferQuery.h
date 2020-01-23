@@ -2,8 +2,8 @@
 // Created by stilgar on 19.03.19.
 //
 
-#ifndef BASYCO_TRANSFERQUERY_H
-#define BASYCO_TRANSFERQUERY_H
+#ifndef BSC_TRANSFERQUERY_H
+#define BSC_TRANSFERQUERY_H
 
 
 #include <core/utils/cereal_include.h>
@@ -83,4 +83,4 @@ CEREAL_REGISTER_TYPE(bsc::TransferQuery::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::TransferQuery::Request)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::TransferQuery::Response)
-#endif //BASYCO_TRANSFERQUERY_H
+#endif //BSC_TRANSFERQUERY_H

@@ -2,10 +2,8 @@
 // Created by stilgar on 31.07.17.
 //
 
-#ifndef BASYCO_NODE_H
-#define BASYCO_NODE_H
-
-
+#ifndef BSC_NODE_H
+#define BSC_NODE_H
 
 
 #include "p2p/node/configuration/IConfig.h"
@@ -112,4 +110,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_NODE_H
+#endif //BSC_NODE_H

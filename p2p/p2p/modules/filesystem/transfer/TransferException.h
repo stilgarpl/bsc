@@ -2,8 +2,8 @@
 // Created by stilgar on 19.06.19.
 //
 
-#ifndef BASYCO_TRANSFEREXCEPTION_H
-#define BASYCO_TRANSFEREXCEPTION_H
+#ifndef BSC_TRANSFEREXCEPTION_H
+#define BSC_TRANSFEREXCEPTION_H
 
 #include <stdexcept>
 
@@ -17,4 +17,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_TRANSFEREXCEPTION_H
+#endif //BSC_TRANSFEREXCEPTION_H

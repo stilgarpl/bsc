@@ -6,8 +6,8 @@
 // Created by stilgar on 17.10.17.
 //
 
-#ifndef BASYCO_JOURNALSTATE_H
-#define BASYCO_JOURNALSTATE_H
+#ifndef BSC_JOURNALSTATE_H
+#define BSC_JOURNALSTATE_H
 
 #include <list>
 #include <string>
@@ -157,4 +157,4 @@ namespace bsc {
     };
 
 }
-#endif //BASYCO_JOURNALSTATE_H
+#endif //BSC_JOURNALSTATE_H

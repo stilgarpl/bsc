@@ -2,8 +2,8 @@
 // Created by stilgar on 08.01.2020.
 //
 
-#ifndef BASYCO_FROMSTRING_H
-#define BASYCO_FROMSTRING_H
+#ifndef BSC_FROMSTRING_H
+#define BSC_FROMSTRING_H
 
 #include <type_traits>
 #include <limits>
@@ -194,4 +194,4 @@ namespace bsc {
 
 }
 
-#endif //BASYCO_FROMSTRING_H
+#endif //BSC_FROMSTRING_H

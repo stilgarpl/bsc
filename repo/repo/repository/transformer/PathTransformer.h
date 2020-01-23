@@ -2,11 +2,12 @@
 // Created by stilgar on 04.11.18.
 //
 
-#ifndef BASYCO_PATHTRANSFORMER_H
-#define BASYCO_PATHTRANSFORMER_H
+#ifndef BSC_PATHTRANSFORMER_H
+#define BSC_PATHTRANSFORMER_H
 
 
 #include "IPathTransformer.h"
+
 namespace bsc {
     class PathTransformer : public IPathTransformer {
 
@@ -32,4 +33,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_PATHTRANSFORMER_H
+#endif //BSC_PATHTRANSFORMER_H

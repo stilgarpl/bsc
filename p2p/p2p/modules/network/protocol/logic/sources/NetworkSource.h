@@ -2,8 +2,8 @@
 // Created by stilgar on 06.10.17.
 //
 
-#ifndef BASYCO_NETWORKSOURCE_H
-#define BASYCO_NETWORKSOURCE_H
+#ifndef BSC_NETWORKSOURCE_H
+#define BSC_NETWORKSOURCE_H
 
 
 #include <p2p/modules/network/protocol/logic/events/NetworkInfoEvent.h>
@@ -24,4 +24,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NETWORKSOURCE_H
+#endif //BSC_NETWORKSOURCE_H

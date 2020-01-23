@@ -2,8 +2,8 @@
 // Created by stilgar on 06.10.17.
 //
 
-#ifndef BASYCO_NETWORKINFOREQUEST_H
-#define BASYCO_NETWORKINFOREQUEST_H
+#ifndef BSC_NETWORKINFOREQUEST_H
+#define BSC_NETWORKINFOREQUEST_H
 
 
 #include "NetworkInfoGroup.h"
@@ -27,4 +27,4 @@ namespace bsc {
 
 CEREAL_REGISTER_TYPE(bsc::NetworkInfoRequest)
 
-#endif //BASYCO_NETWORKINFOREQUEST_H
+#endif //BSC_NETWORKINFOREQUEST_H

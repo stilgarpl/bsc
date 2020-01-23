@@ -2,8 +2,8 @@
 // Created by stilgar on 31.12.17.
 //
 
-#ifndef BASYCO_DATATRANSFER_H
-#define BASYCO_DATATRANSFER_H
+#ifndef BSC_DATATRANSFER_H
+#define BSC_DATATRANSFER_H
 
 
 #include <core/utils/cereal_include.h>
@@ -91,4 +91,4 @@ CEREAL_REGISTER_TYPE(bsc::DataTransfer::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::DataTransfer::Request)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::DataTransfer::Response)
-#endif //BASYCO_DATATRANSFER_H
+#endif //BSC_DATATRANSFER_H

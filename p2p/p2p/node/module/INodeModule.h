@@ -2,8 +2,8 @@
 // Created by stilgar on 17.11.17.
 //
 
-#ifndef BASYCO_INODEMODULE_H
-#define BASYCO_INODEMODULE_H
+#ifndef BSC_INODEMODULE_H
+#define BSC_INODEMODULE_H
 
 
 #include <core/thread/Runnable.h>
@@ -91,4 +91,4 @@ namespace bsc {
 
 
 
-#endif //BASYCO_INODEMODULE_H
+#endif //BSC_INODEMODULE_H

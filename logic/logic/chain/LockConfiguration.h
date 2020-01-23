@@ -2,8 +2,8 @@
 // Created by stilgar on 4/18/19.
 //
 
-#ifndef BASYCO_LOCKCONFIGURATION_H
-#define BASYCO_LOCKCONFIGURATION_H
+#ifndef BSC_LOCKCONFIGURATION_H
+#define BSC_LOCKCONFIGURATION_H
 
 
 #include "ChainDefinitions.h"
@@ -46,4 +46,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_LOCKCONFIGURATION_H
+#endif //BSC_LOCKCONFIGURATION_H

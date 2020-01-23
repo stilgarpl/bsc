@@ -2,8 +2,8 @@
 // Created by stilgar on 01.01.18.
 //
 
-#ifndef BASYCO_BROADCASTSCOPE_H
-#define BASYCO_BROADCASTSCOPE_H
+#ifndef BSC_BROADCASTSCOPE_H
+#define BSC_BROADCASTSCOPE_H
 
 
 namespace bsc {
@@ -18,4 +18,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_BROADCASTSCOPE_H
+#endif //BSC_BROADCASTSCOPE_H

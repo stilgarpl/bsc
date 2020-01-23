@@ -2,14 +2,15 @@
 // Created by stilgar on 05.02.19.
 //
 
-#ifndef BASYCO_REPOQUERY_H
-#define BASYCO_REPOQUERY_H
+#ifndef BSC_REPOQUERY_H
+#define BSC_REPOQUERY_H
 
 
 #include <core/utils/cereal_include.h>
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 #include <repo/repository/IRepository.h>
 #include <repo/journal/IJournal.h>
+
 namespace bsc {
 
     struct RepoQuery : public bsc::PacketGroup {
@@ -94,4 +95,4 @@ CEREAL_REGISTER_TYPE(bsc::RepoQuery::Response)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::RepoQuery::Request)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::RepoQuery::Response)
 
-#endif //BASYCO_REPOQUERY_H
+#endif //BSC_REPOQUERY_H

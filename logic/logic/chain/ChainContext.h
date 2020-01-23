@@ -2,8 +2,8 @@
 // Created by stilgar on 11.02.19.
 //
 
-#ifndef BASYCO_CHAINCONTEXT_H
-#define BASYCO_CHAINCONTEXT_H
+#ifndef BSC_CHAINCONTEXT_H
+#define BSC_CHAINCONTEXT_H
 
 
 #include "ChainDefinitions.h"
@@ -50,4 +50,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CHAINCONTEXT_H
+#endif //BSC_CHAINCONTEXT_H

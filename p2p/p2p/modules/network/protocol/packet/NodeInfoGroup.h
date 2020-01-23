@@ -2,8 +2,8 @@
 // Created by stilgar on 08.10.17.
 //
 
-#ifndef BASYCO_NODEINFOGROUP_H
-#define BASYCO_NODEINFOGROUP_H
+#ifndef BSC_NODEINFOGROUP_H
+#define BSC_NODEINFOGROUP_H
 
 
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
@@ -64,4 +64,4 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::NodeInfoGroup::Reques
 CEREAL_REGISTER_TYPE(bsc::NodeInfoGroup::Response)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::NodeInfoGroup::Response)
 
-#endif //BASYCO_NODEINFOGROUP_H
+#endif //BSC_NODEINFOGROUP_H

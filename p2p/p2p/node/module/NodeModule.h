@@ -4,8 +4,8 @@
 // Created by stilgar on 20.10.17.
 //
 
-#ifndef BASYCO_NODEMODULE_H
-#define BASYCO_NODEMODULE_H
+#ifndef BSC_NODEMODULE_H
+#define BSC_NODEMODULE_H
 
 
 #include <p2p/node/module/logic/ILogicModule.h>
@@ -116,4 +116,4 @@ public:
 };
 }
 
-#endif //BASYCO_NODEMODULE_H
+#endif //BSC_NODEMODULE_H

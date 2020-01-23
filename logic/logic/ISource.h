@@ -2,8 +2,8 @@
 // Created by stilgar on 23.08.17.
 //
 
-#ifndef BASYCO_SOURCE_H
-#define BASYCO_SOURCE_H
+#ifndef BSC_SOURCE_H
+#define BSC_SOURCE_H
 
 
 #include <core/thread/Runnable.h>
@@ -36,4 +36,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_SOURCE_H
+#endif //BSC_SOURCE_H

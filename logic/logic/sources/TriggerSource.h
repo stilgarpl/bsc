@@ -2,8 +2,8 @@
 // Created by stilgar on 24.03.19.
 //
 
-#ifndef BASYCO_TRIGGERSOURCE_H
-#define BASYCO_TRIGGERSOURCE_H
+#ifndef BSC_TRIGGERSOURCE_H
+#define BSC_TRIGGERSOURCE_H
 
 
 #include <logic/events/TriggerEvent.h>
@@ -42,4 +42,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_TRIGGERSOURCE_H
+#endif //BSC_TRIGGERSOURCE_H

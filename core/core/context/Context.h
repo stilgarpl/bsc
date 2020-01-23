@@ -4,8 +4,8 @@
 // Created by stilgar on 20.08.17.
 //
 
-#ifndef BASYCO_CONTEXT_H
-#define BASYCO_CONTEXT_H
+#ifndef BSC_CONTEXT_H
+#define BSC_CONTEXT_H
 
 
 #include <map>
@@ -277,4 +277,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CONTEXT_H
+#endif //BSC_CONTEXT_H

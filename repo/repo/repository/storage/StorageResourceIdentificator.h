@@ -2,11 +2,12 @@
 // Created by stilgar on 03.01.18.
 //
 
-#ifndef BASYCO_STORAGERESOURCEIDENTIFICATOR_H
-#define BASYCO_STORAGERESOURCEIDENTIFICATOR_H
+#ifndef BSC_STORAGERESOURCEIDENTIFICATOR_H
+#define BSC_STORAGERESOURCEIDENTIFICATOR_H
 
 
 #include <p2p/modules/filesystem/identification/ResourceIdentificator.h>
+
 namespace bsc {
 
     class StorageResourceIdentificator : public bsc::ResourceIdentificator {
@@ -44,4 +45,4 @@ namespace bsc {
 CEREAL_REGISTER_TYPE(bsc::StorageResourceIdentificator)
 
 
-#endif //BASYCO_STORAGERESOURCEIDENTIFICATOR_H
+#endif //BSC_STORAGERESOURCEIDENTIFICATOR_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 04.11.18.
 //
 
-#ifndef BASYCO_FILEDATA_H
-#define BASYCO_FILEDATA_H
+#ifndef BSC_FILEDATA_H
+#define BSC_FILEDATA_H
 
 
 #include <filesystem>
@@ -44,4 +44,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_FILEDATA_H
+#endif //BSC_FILEDATA_H

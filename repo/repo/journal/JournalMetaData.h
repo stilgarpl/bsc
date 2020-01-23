@@ -2,14 +2,15 @@
 // Created by stilgar on 21.11.2019.
 //
 
-#ifndef BASYCO_JOURNALMETADATA_H
-#define BASYCO_JOURNALMETADATA_H
+#ifndef BSC_JOURNALMETADATA_H
+#define BSC_JOURNALMETADATA_H
 
 
 #include <core/utils/cereal_include.h>
 #include <core/utils/crypto.h>
 #include <p2p/node/NodeInfo.h>
 #include "JournalTypes.h"
+
 namespace bsc {
 
     class JournalMetaData {
@@ -45,4 +46,4 @@ namespace bsc {
         friend class JournalMetaDataFetcher;
     };
 }
-#endif //BASYCO_JOURNALMETADATA_H
+#endif //BSC_JOURNALMETADATA_H

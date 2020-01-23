@@ -2,8 +2,8 @@
 // Created by stilgar on 09.12.2019.
 //
 
-#ifndef BASYCO_CONNECTIONEXCEPTION_H
-#define BASYCO_CONNECTIONEXCEPTION_H
+#ifndef BSC_CONNECTIONEXCEPTION_H
+#define BSC_CONNECTIONEXCEPTION_H
 
 
 #include <stdexcept>
@@ -18,4 +18,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CONNECTIONEXCEPTION_H
+#endif //BSC_CONNECTIONEXCEPTION_H

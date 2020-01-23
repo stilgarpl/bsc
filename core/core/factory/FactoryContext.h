@@ -2,8 +2,8 @@
 // Created by stilgar on 30.08.2019.
 //
 
-#ifndef BASYCO_FACTORYCONTEXT_H
-#define BASYCO_FACTORYCONTEXT_H
+#ifndef BSC_FACTORYCONTEXT_H
+#define BSC_FACTORYCONTEXT_H
 
 
 #include <core/uber/Uber.h>
@@ -30,4 +30,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_FACTORYCONTEXT_H
+#endif //BSC_FACTORYCONTEXT_H

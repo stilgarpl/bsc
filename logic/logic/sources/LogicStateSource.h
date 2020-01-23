@@ -2,8 +2,8 @@
 // Created by stilgar on 26.11.18.
 //
 
-#ifndef BASYCO_LOGICSTATESOURCE_H
-#define BASYCO_LOGICSTATESOURCE_H
+#ifndef BSC_LOGICSTATESOURCE_H
+#define BSC_LOGICSTATESOURCE_H
 
 
 #include <core/signal/OrderedExecutor.h>
@@ -20,15 +20,6 @@ namespace bsc {
 
     private:
         AutoSource source;
-    private:
-        template<typename EventType>
-        void selectExecutionPolicy() {
-            //@todo think of better way of selecting it, so it isn't run on every event.
-            //  probably the best way would be to have init metod in autosource that would run once on creation of every container.
-            //  so Uber should have that one init method.
-            //@todo remove this function
-//        sourceManager.setExecutionPolicy<EventType>(std::make_shared<OrderedExecutionPolicy>());
-        }
 
     public:
 
@@ -61,4 +52,4 @@ namespace bsc {
     };
 
 }
-#endif //BASYCO_LOGICSTATESOURCE_H
+#endif //BSC_LOGICSTATESOURCE_H

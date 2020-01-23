@@ -2,8 +2,8 @@
 // Created by stilgar on 03.08.17.
 //
 
-#ifndef BASYCO_CONNECTION_H
-#define BASYCO_CONNECTION_H
+#ifndef BSC_CONNECTION_H
+#define BSC_CONNECTION_H
 
 
 #include <Poco/Net/SocketStream.h>
@@ -104,4 +104,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CONNECTION_H
+#endif //BSC_CONNECTION_H

@@ -4,8 +4,8 @@
 // Created by stilgar on 14.11.17.
 //
 
-#ifndef BASYCO_COMMANDMODULE_H
-#define BASYCO_COMMANDMODULE_H
+#ifndef BSC_COMMANDMODULE_H
+#define BSC_COMMANDMODULE_H
 
 
 #include <p2p/dependency/DependencyManaged.h>
@@ -500,4 +500,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_COMMANDMODULE_H
+#endif //BSC_COMMANDMODULE_H

@@ -4,8 +4,8 @@
 // Created by stilgar on 1/7/19.
 //
 
-#ifndef BASYCO_LOGICBUILDER_H
-#define BASYCO_LOGICBUILDER_H
+#ifndef BSC_LOGICBUILDER_H
+#define BSC_LOGICBUILDER_H
 
 
 #include <string>
@@ -58,4 +58,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_LOGICBUILDER_H
+#endif //BSC_LOGICBUILDER_H

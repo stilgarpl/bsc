@@ -2,8 +2,8 @@
 // Created by stilgar on 04.07.18.
 //
 
-#ifndef BASYCO_AUTOSOURCE_H
-#define BASYCO_AUTOSOURCE_H
+#ifndef BSC_AUTOSOURCE_H
+#define BSC_AUTOSOURCE_H
 
 #include "../ISource.h"
 #include "EventQueueSource.h"
@@ -46,4 +46,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_AUTOSOURCE_H
+#endif //BSC_AUTOSOURCE_H

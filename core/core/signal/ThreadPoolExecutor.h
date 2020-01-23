@@ -2,8 +2,8 @@
 // Created by stilgar on 29.07.2019.
 //
 
-#ifndef BASYCO_THREADPOOLEXECUTOR_H
-#define BASYCO_THREADPOOLEXECUTOR_H
+#ifndef BSC_THREADPOOLEXECUTOR_H
+#define BSC_THREADPOOLEXECUTOR_H
 
 
 #include <queue>
@@ -40,4 +40,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_THREADPOOLEXECUTOR_H
+#endif //BSC_THREADPOOLEXECUTOR_H

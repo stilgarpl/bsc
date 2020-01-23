@@ -2,11 +2,12 @@
 // Created by stilgar on 18.10.17.
 //
 
-#ifndef BASYCO_JOURNALTYPES_H
-#define BASYCO_JOURNALTYPES_H
+#ifndef BSC_JOURNALTYPES_H
+#define BSC_JOURNALTYPES_H
 
 #include <string>
 #include <chrono>
+
 namespace bsc {
 //typedef std::string ResourceId;
     using ChecksumId = std::string;
@@ -18,4 +19,4 @@ namespace bsc {
     typedef std::string PathType;
 }
 
-#endif //BASYCO_JOURNALTYPES_H
+#endif //BSC_JOURNALTYPES_H

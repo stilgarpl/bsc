@@ -2,8 +2,8 @@
 // Created by stilgar on 23.08.17.
 //
 
-#ifndef BASYCO_CLOCKSOURCE_H
-#define BASYCO_CLOCKSOURCE_H
+#ifndef BSC_CLOCKSOURCE_H
+#define BSC_CLOCKSOURCE_H
 
 #include <chrono>
 #include <logic/events/Tick.h>
@@ -31,4 +31,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CLOCKSOURCE_H
+#endif //BSC_CLOCKSOURCE_H

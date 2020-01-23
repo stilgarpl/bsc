@@ -2,8 +2,8 @@
 // Created by stilgar on 05.12.2019.
 //
 
-#ifndef BASYCO_LOGICEXCEPTIONS_H
-#define BASYCO_LOGICEXCEPTIONS_H
+#ifndef BSC_LOGICEXCEPTIONS_H
+#define BSC_LOGICEXCEPTIONS_H
 
 #include <stdexcept>
 
@@ -24,4 +24,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_LOGICEXCEPTIONS_H
+#endif //BSC_LOGICEXCEPTIONS_H

@@ -2,11 +2,12 @@
 // Created by stilgar on 04.11.18.
 //
 
-#ifndef BASYCO_TMPRULE_H
-#define BASYCO_TMPRULE_H
+#ifndef BSC_TMPRULE_H
+#define BSC_TMPRULE_H
 
 
 #include <repo/repository/transformer/ITransformRule.h>
+
 namespace bsc {
     class TmpRule : public ITransformRule {
     private:
@@ -22,4 +23,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_TMPRULE_H
+#endif //BSC_TMPRULE_H

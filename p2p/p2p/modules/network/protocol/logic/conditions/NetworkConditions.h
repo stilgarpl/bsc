@@ -2,8 +2,8 @@
 // Created by stilgar on 05.02.19.
 //
 
-#ifndef BASYCO_NETWORKCONDITIONS_H
-#define BASYCO_NETWORKCONDITIONS_H
+#ifndef BSC_NETWORKCONDITIONS_H
+#define BSC_NETWORKCONDITIONS_H
 
 #include <logic/LogicObject.h>
 #include <p2p/modules/network/protocol/logic/events/PacketEvent.h>
@@ -53,4 +53,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NETWORKCONDITIONS_H
+#endif //BSC_NETWORKCONDITIONS_H

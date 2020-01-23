@@ -2,8 +2,8 @@
 // Created by stilgar on 05.12.2019.
 //
 
-#ifndef BASYCO_INPUTOUTPUTCONTEXT_H
-#define BASYCO_INPUTOUTPUTCONTEXT_H
+#ifndef BSC_INPUTOUTPUTCONTEXT_H
+#define BSC_INPUTOUTPUTCONTEXT_H
 
 
 #include <iosfwd>
@@ -33,4 +33,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_INPUTOUTPUTCONTEXT_H
+#endif //BSC_INPUTOUTPUTCONTEXT_H

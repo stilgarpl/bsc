@@ -2,8 +2,8 @@
 // Created by stilgar on 29.08.17.
 //
 
-#ifndef BASYCO_AUTHPACKET_H
-#define BASYCO_AUTHPACKET_H
+#ifndef BSC_AUTHPACKET_H
+#define BSC_AUTHPACKET_H
 
 
 namespace bsc {
@@ -31,4 +31,4 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::AuthPacket
 )
 bsc::;
 
-#endif //BASYCO_AUTHPACKET_H
+#endif //BSC_AUTHPACKET_H

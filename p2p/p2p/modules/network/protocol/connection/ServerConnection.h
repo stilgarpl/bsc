@@ -2,8 +2,8 @@
 // Created by stilgar on 31.07.17.
 //
 
-#ifndef BASYCO_SERVER_CONNECTION_H
-#define BASYCO_SERVER_CONNECTION_H
+#ifndef BSC_SERVER_CONNECTION_H
+#define BSC_SERVER_CONNECTION_H
 
 #include <Poco/Net/TCPServerConnection.h>
 #include <Poco/Net/TCPServerConnectionFactory.h>
@@ -49,4 +49,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_SERVER_CONNECTION_H
+#endif //BSC_SERVER_CONNECTION_H

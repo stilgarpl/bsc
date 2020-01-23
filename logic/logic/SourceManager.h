@@ -2,8 +2,8 @@
 // Created by stilgar on 23.08.17.
 //
 
-#ifndef BASYCO_SOURCEMANAGER_H
-#define BASYCO_SOURCEMANAGER_H
+#ifndef BSC_SOURCEMANAGER_H
+#define BSC_SOURCEMANAGER_H
 
 
 #include <list>
@@ -228,4 +228,4 @@ namespace bsc {
 
     };
 }
-#endif //BASYCO_SOURCEMANAGER_H
+#endif //BSC_SOURCEMANAGER_H

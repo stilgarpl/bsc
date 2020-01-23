@@ -2,8 +2,8 @@
 // Created by stilgar on 12.11.17.
 //
 
-#ifndef BASYCO_ROLES_H
-#define BASYCO_ROLES_H
+#ifndef BSC_ROLES_H
+#define BSC_ROLES_H
 
 
 #include <core/log/Logger.h>
@@ -70,4 +70,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_ROLES_H
+#endif //BSC_ROLES_H

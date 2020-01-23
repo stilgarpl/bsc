@@ -5,8 +5,10 @@ set(SOURCE_FILES logic/ISource.cpp logic/ISource.h logic/IEvent.h logic/SourceMa
 
 
 add_library(logic ${SOURCE_FILES})
-target_include_directories(logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRIVATE SYSTEM spdlog::spdlog)
-target_link_libraries(logic PUBLIC core PRIVATE ${LIBS} spdlog::spdlog)
-install(TARGETS logic COMPONENT logic)
+target_include_directories(logic PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:${BSC_DESTINATION_INCLUDE}>)
+target_link_libraries(logic PUBLIC core PRIVATE ${LIBS})
+install(DIRECTORY logic DESTINATION ${BSC_DESTINATION_INCLUDE}
+        FILES_MATCHING PATTERN "*.h")
+install(TARGETS logic COMPONENT logic DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)
 
 add_subdirectory(test)

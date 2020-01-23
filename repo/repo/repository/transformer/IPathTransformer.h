@@ -2,8 +2,8 @@
 // Created by stilgar on 04.11.18.
 //
 
-#ifndef BASYCO_IPATHTRANSFORMER_H
-#define BASYCO_IPATHTRANSFORMER_H
+#ifndef BSC_IPATHTRANSFORMER_H
+#define BSC_IPATHTRANSFORMER_H
 
 #include <filesystem>
 #include <set>
@@ -44,4 +44,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_IPATHTRANSFORMER_H
+#endif //BSC_IPATHTRANSFORMER_H

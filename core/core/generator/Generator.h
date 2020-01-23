@@ -2,8 +2,8 @@
 // Created by stilgar on 13.12.2019.
 //
 
-#ifndef BASYCO_GENERATOR_H
-#define BASYCO_GENERATOR_H
+#ifndef BSC_GENERATOR_H
+#define BSC_GENERATOR_H
 
 #include <utility>
 
@@ -26,4 +26,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_GENERATOR_H
+#endif //BSC_GENERATOR_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 16.11.17.
 //
 
-#ifndef BASYCO_COMMANDPACKET_H
-#define BASYCO_COMMANDPACKET_H
+#ifndef BSC_COMMANDPACKET_H
+#define BSC_COMMANDPACKET_H
 
 
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
@@ -75,4 +75,4 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::CommandPacket::Reques
 CEREAL_REGISTER_TYPE(bsc::CommandPacket::Response)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::CommandPacket::Response)
 
-#endif //BASYCO_COMMANDPACKET_H
+#endif //BSC_COMMANDPACKET_H

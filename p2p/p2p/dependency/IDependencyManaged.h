@@ -2,8 +2,8 @@
 // Created by stilgar on 07.11.17.
 //
 
-#ifndef BASYCO_IDEPENDENCYMANAGED_H
-#define BASYCO_IDEPENDENCYMANAGED_H
+#ifndef BSC_IDEPENDENCYMANAGED_H
+#define BSC_IDEPENDENCYMANAGED_H
 
 #include "IDependency.h"
 #include <memory>
@@ -18,4 +18,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_IDEPENDENCYMANAGED_H
+#endif //BSC_IDEPENDENCYMANAGED_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 05.02.19.
 //
 
-#ifndef BASYCO_TIMECONDITIONS_H
-#define BASYCO_TIMECONDITIONS_H
+#ifndef BSC_TIMECONDITIONS_H
+#define BSC_TIMECONDITIONS_H
 
 
 #include "../LogicObject.h"
@@ -21,4 +21,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_TIMECONDITIONS_H
+#endif //BSC_TIMECONDITIONS_H

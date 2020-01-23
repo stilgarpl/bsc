@@ -4,8 +4,8 @@
 // Created by stilgar on 05.09.17.
 //
 
-#ifndef BASYCO_IPROTOCOL_H
-#define BASYCO_IPROTOCOL_H
+#ifndef BSC_IPROTOCOL_H
+#define BSC_IPROTOCOL_H
 
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 #include <future>
@@ -150,4 +150,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_IPROTOCOL_H
+#endif //BSC_IPROTOCOL_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 19.07.18.
 //
 
-#ifndef BASYCO_AUTHMODULE_H
-#define BASYCO_AUTHMODULE_H
+#ifndef BSC_AUTHMODULE_H
+#define BSC_AUTHMODULE_H
 
 
 #include <p2p/node/module/NodeModule.h>
@@ -88,4 +88,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_AUTHMODULE_H
+#endif //BSC_AUTHMODULE_H

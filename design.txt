@@ -534,7 +534,7 @@ idea jest taka, ze chainy sie lockuja zgodnie z zadana konfiguracja. chainy ze w
 
 @todo maybe add timeout to chainlocking - for example, if chains are triggered more often than it takes to process them, they will pile up. kolejka będzie się nawarstwiać aż ram sie skończy. zamiast tego chain po czekaniu na locka zbyt długo powinien przerwać chain.
 
-done: basyco-control ma miec tylko Command module który w dodatku wszystkie komendy zmienia w "remote daemon $@"
+done: bsc-control ma miec tylko Command module który w dodatku wszystkie komendy zmienia w "remote daemon $@"
 
 
 
@@ -586,7 +586,7 @@ Trzebaby dodać pakiet ConnectionControl. w ten sposob moznaby powiedziec serwer
 
 wrapper do GNU argp. łatwe użycie, typy w parametrach, std::optional dla opcjonalnych
 
-struct BasycoProgramOptions :  ProgramParameters {
+struct BscProgramOptions :  ProgramParameters {
 Parameter<int> value ={"v","value",0};
 Parameter<std::string> text = {"t","text",getText};
 OptionalParameter<std::string> optionalText;
@@ -594,7 +594,7 @@ OptionalParameter<std::string> optionalText;
 
 main (argc, argv) {
 
-BasycoProgramArguments arguments;
+BscProgramArguments arguments;
 arguments.parse(argc,argv);
 
 idea jest taka, ze konstruktor ProgramParameters ustawi thread_local kontekst dla parsera, a konstruktory Parameter<> beda ustawiac w nim odpowiednie rzeczy dla gnu argp. w ten sposob wystarczy tylko sdefiniowac strukture ktora sama napełni się danymi.
@@ -614,5 +614,4 @@ bsc remote "second" --list-commands
 
 ciekawy problem - mozna pobrać komendy z CommandModule dopiero jak Node wstał i CoMo ma już wszystkie komendy wpisane (niektóre są dodawane przez logikę submodule) - ale same parametry są potrzebne do uruchomienia Node ( sciezka z configiem etc.). W sumie mozna to sobie zapisać z configiem i ładować, albo generować przy kompilacji... Albo po prostu podstawowe komendy ładować statycznie bez uruchamiania node i te wpisywać. resztę user zobaczy po odpaleniu list-commands.
 
-
-95
+@todo p2p_core powinno być w p2p/p2p/core, przez co nie mieszałoby się z modułami

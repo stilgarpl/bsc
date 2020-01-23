@@ -18,7 +18,6 @@ bsc::Context::Ptr bsc::Context::getParentContext() const {
 
 void bsc::Context::setParentContext(bsc::Context::Ptr parentContext) {
     std::lock_guard<std::recursive_mutex> guard(contextLock);
-    //@todo maybe we need to make sure here that we are not making a loop and throw exeption if we are?
     Context::parentContext = std::move(parentContext);
     validateParentContext();
 }

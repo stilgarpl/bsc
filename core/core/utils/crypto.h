@@ -2,8 +2,8 @@
 // Created by stilgar on 11.12.17.
 //
 
-#ifndef BASYCO_CRYPTO_H
-#define BASYCO_CRYPTO_H
+#ifndef BSC_CRYPTO_H
+#define BSC_CRYPTO_H
 
 
 #include <filesystem>
@@ -17,4 +17,4 @@ namespace bsc {
 
 }
 
-#endif //BASYCO_CRYPTO_H
+#endif //BSC_CRYPTO_H

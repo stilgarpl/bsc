@@ -2,8 +2,8 @@
 // Created by stilgar on 24.03.19.
 //
 
-#ifndef BASYCO_TRIGGEREVENT_H
-#define BASYCO_TRIGGEREVENT_H
+#ifndef BSC_TRIGGEREVENT_H
+#define BSC_TRIGGEREVENT_H
 
 #include "../IEvent.h"
 
@@ -41,4 +41,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_TRIGGEREVENT_H
+#endif //BSC_TRIGGEREVENT_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 21.08.17.
 //
 
-#ifndef BASYCO_STATUS_H
-#define BASYCO_STATUS_H
+#ifndef BSC_STATUS_H
+#define BSC_STATUS_H
 
 namespace bsc {
     //@todo consider renaming this to something with better name PacketType? PacketSth? ...
@@ -16,4 +16,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_STATUS_H
+#endif //BSC_STATUS_H

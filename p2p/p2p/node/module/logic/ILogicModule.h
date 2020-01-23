@@ -2,8 +2,8 @@
 // Created by stilgar on 12.10.17.
 //
 
-#ifndef BASYCO_ILOGICMODULE_H
-#define BASYCO_ILOGICMODULE_H
+#ifndef BSC_ILOGICMODULE_H
+#define BSC_ILOGICMODULE_H
 
 
 #include <logic/sources/AutoSource.h>
@@ -128,4 +128,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_ILOGICMODULE_H
+#endif //BSC_ILOGICMODULE_H

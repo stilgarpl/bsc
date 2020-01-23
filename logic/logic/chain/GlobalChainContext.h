@@ -2,8 +2,8 @@
 // Created by stilgar on 21.03.19.
 //
 
-#ifndef BASYCO_GLOBALCHAINCONTEXT_H
-#define BASYCO_GLOBALCHAINCONTEXT_H
+#ifndef BSC_GLOBALCHAINCONTEXT_H
+#define BSC_GLOBALCHAINCONTEXT_H
 
 
 #include <map>
@@ -24,4 +24,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_GLOBALCHAINCONTEXT_H
+#endif //BSC_GLOBALCHAINCONTEXT_H

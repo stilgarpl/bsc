@@ -2,8 +2,8 @@
 // Created by stilgar on 20.07.18.
 //
 
-#ifndef BASYCO_STATEMACHINE_H
-#define BASYCO_STATEMACHINE_H
+#ifndef BSC_STATEMACHINE_H
+#define BSC_STATEMACHINE_H
 
 #include <set>
 #include <map>
@@ -136,4 +136,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_STATEMACHINE_H
+#endif //BSC_STATEMACHINE_H

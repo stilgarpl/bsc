@@ -2,8 +2,8 @@
 // Created by stilgar on 12.11.17.
 //
 
-#ifndef BASYCO_ROLEINVALIDEXCEPTION_H
-#define BASYCO_ROLEINVALIDEXCEPTION_H
+#ifndef BSC_ROLEINVALIDEXCEPTION_H
+#define BSC_ROLEINVALIDEXCEPTION_H
 
 #include <stdexcept>
 
@@ -16,4 +16,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_ROLEINVALIDEXCEPTION_H
+#endif //BSC_ROLEINVALIDEXCEPTION_H

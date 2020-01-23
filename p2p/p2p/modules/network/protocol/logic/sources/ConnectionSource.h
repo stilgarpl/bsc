@@ -2,8 +2,8 @@
 // Created by stilgar on 29.08.17.
 //
 
-#ifndef BASYCO_CONNECTIONSOURCE_H
-#define BASYCO_CONNECTIONSOURCE_H
+#ifndef BSC_CONNECTIONSOURCE_H
+#define BSC_CONNECTIONSOURCE_H
 
 
 #include <p2p/modules/network/protocol/logic/events/ConnectionEvent.h>
@@ -82,4 +82,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CONNECTIONSOURCE_H
+#endif //BSC_CONNECTIONSOURCE_H

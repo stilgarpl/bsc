@@ -7,14 +7,15 @@ set(SOURCE_FILES p2p/node/NodeInfo.cpp p2p/node/NodeInfo.h p2p/node/Node.cpp p2p
 
 
 add_library(p2p_core ${SOURCE_FILES})
-add_library(p2p p2p/dummy.cpp)
-target_include_directories(p2p_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PRIVATE SYSTEM spdlog::spdlog ${Poco_INCLUDE_DIRS} cereal::cereal)
-message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(p2p_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:${BSC_DESTINATION_INCLUDE}>)
 target_link_libraries(p2p_core logic ${Poco_LIBRARIES} ${LIBS})
-install(TARGETS p2p_core COMPONENT p2p_core)
-
+install(TARGETS p2p_core COMPONENT p2p DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)
+install(DIRECTORY p2p DESTINATION ${BSC_DESTINATION_INCLUDE}
+        FILES_MATCHING PATTERN "*.h")
 add_subdirectory(test)
-
 add_subdirectory(p2p/modules)
 
+
+add_library(p2p p2p/dummy.cpp)
 target_link_libraries(p2p PUBLIC p2p_core logic module_auth module_basic module_filesystem module_command PRIVATE ${Poco_LIBRARIES} ${LIBS} spdlog::spdlog)
+install(TARGETS p2p COMPONENT p2p DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)

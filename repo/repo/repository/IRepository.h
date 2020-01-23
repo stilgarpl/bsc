@@ -2,13 +2,14 @@
 // Created by stilgar on 22.12.17.
 //
 
-#ifndef BASYCO_IREPOSITORY_H
-#define BASYCO_IREPOSITORY_H
+#ifndef BSC_IREPOSITORY_H
+#define BSC_IREPOSITORY_H
 
 
 #include <memory>
 #include <repo/journal/IJournal.h>
 #include "RepositoryAttributes.h"
+
 namespace bsc {
     class IStorage;
 
@@ -137,4 +138,4 @@ namespace bsc {
 }
 CEREAL_REGISTER_TYPE(bsc::IRepository)
 
-#endif //BASYCO_IREPOSITORY_H
+#endif //BSC_IREPOSITORY_H

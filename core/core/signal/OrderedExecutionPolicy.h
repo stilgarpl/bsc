@@ -2,8 +2,8 @@
 // Created by stilgar on 29.11.18.
 //
 
-#ifndef BASYCO_ORDEREDEXECUTIONPOLICY_H
-#define BASYCO_ORDEREDEXECUTIONPOLICY_H
+#ifndef BSC_ORDEREDEXECUTIONPOLICY_H
+#define BSC_ORDEREDEXECUTIONPOLICY_H
 
 namespace bsc {
     class OrderedExecutionPolicy {
@@ -12,4 +12,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_ORDEREDEXECUTIONPOLICY_H
+#endif //BSC_ORDEREDEXECUTIONPOLICY_H

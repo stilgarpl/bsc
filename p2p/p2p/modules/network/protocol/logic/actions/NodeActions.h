@@ -2,8 +2,8 @@
 // Created by stilgar on 08.09.17.
 //
 
-#ifndef BASYCO_NODEACTIONS_H
-#define BASYCO_NODEACTIONS_H
+#ifndef BSC_NODEACTIONS_H
+#define BSC_NODEACTIONS_H
 
 
 #include <p2p/modules/network/protocol/logic/events/ConnectionEvent.h>
@@ -32,4 +32,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NODEACTIONS_H
+#endif //BSC_NODEACTIONS_H

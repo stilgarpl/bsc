@@ -2,14 +2,15 @@
 // Created by stilgar on 30.08.2019.
 //
 
-#ifndef BASYCO_MANAGEDSTORAGEFACTORY_H
-#define BASYCO_MANAGEDSTORAGEFACTORY_H
+#ifndef BSC_MANAGEDSTORAGEFACTORY_H
+#define BSC_MANAGEDSTORAGEFACTORY_H
 
 #include "IStorage.h"
 
 #include "StorageManager.h"
 #include "StorageFactorySpecialization.h"
 #include <core/factory/Factory.h>
+
 namespace bsc {
 
     class ManagedStorageFactory : public bsc::Factory<IStoragePtr, bsc::StorageFactoryByName> {
@@ -23,4 +24,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_MANAGEDSTORAGEFACTORY_H
+#endif //BSC_MANAGEDSTORAGEFACTORY_H

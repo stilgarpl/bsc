@@ -2,8 +2,8 @@
 // Created by stilgar on 12.11.17.
 //
 
-#ifndef BASYCO_ROLE_H
-#define BASYCO_ROLE_H
+#ifndef BSC_ROLE_H
+#define BSC_ROLE_H
 
 #include <string>
 #include <memory>
@@ -85,4 +85,4 @@ namespace bsc {
  */
 
 
-#endif //BASYCO_ROLE_H
+#endif //BSC_ROLE_H

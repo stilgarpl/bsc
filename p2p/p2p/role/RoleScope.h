@@ -2,8 +2,8 @@
 // Created by stilgar on 12.11.17.
 //
 
-#ifndef BASYCO_ROLESCOPE_H
-#define BASYCO_ROLESCOPE_H
+#ifndef BSC_ROLESCOPE_H
+#define BSC_ROLESCOPE_H
 
 #include <list>
 #include <memory>
@@ -42,4 +42,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_ROLESCOPE_H
+#endif //BSC_ROLESCOPE_H

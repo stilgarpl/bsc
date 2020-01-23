@@ -2,8 +2,8 @@
 // Created by stilgar on 12.11.17.
 //
 
-#ifndef BASYCO_PACKETFILTER_H
-#define BASYCO_PACKETFILTER_H
+#ifndef BSC_PACKETFILTER_H
+#define BSC_PACKETFILTER_H
 
 
 #include <p2p/modules/network/protocol/packet/BasePacket.h>
@@ -19,4 +19,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_PACKETFILTER_H
+#endif //BSC_PACKETFILTER_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 27.10.18.
 //
 
-#ifndef BASYCO_MODULESTATE_H
-#define BASYCO_MODULESTATE_H
+#ifndef BSC_MODULESTATE_H
+#define BSC_MODULESTATE_H
 
 
 namespace bsc {
@@ -18,4 +18,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_MODULESTATE_H
+#endif //BSC_MODULESTATE_H

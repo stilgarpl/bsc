@@ -2,8 +2,8 @@
 // Created by stilgar on 10.12.2019.
 //
 
-#ifndef BASYCO_CONNECTIONCONTROL_H
-#define BASYCO_CONNECTIONCONTROL_H
+#ifndef BSC_CONNECTIONCONTROL_H
+#define BSC_CONNECTIONCONTROL_H
 
 
 #include <core/utils/cereal_include.h>
@@ -80,4 +80,4 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::ConnectionControl::Re
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::ConnectionControl::Response)
 
 
-#endif //BASYCO_CONNECTIONCONTROL_H
+#endif //BSC_CONNECTIONCONTROL_H

@@ -2,10 +2,8 @@
 // Created by stilgar on 14.10.2019.
 //
 
-#ifndef BASYCO_DEFERREDNOTIFY_H
-#define BASYCO_DEFERREDNOTIFY_H
-
-
+#ifndef BSC_DEFERREDNOTIFY_H
+#define BSC_DEFERREDNOTIFY_H
 
 
 namespace bsc {
@@ -62,4 +60,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_DEFERREDNOTIFY_H
+#endif //BSC_DEFERREDNOTIFY_H

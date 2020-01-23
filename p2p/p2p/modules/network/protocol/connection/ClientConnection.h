@@ -2,8 +2,8 @@
 // Created by stilgar on 01.08.17.
 //
 
-#ifndef BASYCO_CLIENTCONNECTION_H
-#define BASYCO_CLIENTCONNECTION_H
+#ifndef BSC_CLIENTCONNECTION_H
+#define BSC_CLIENTCONNECTION_H
 
 
 #include <Poco/Net/StreamSocket.h>
@@ -38,4 +38,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CLIENTCONNECTION_H
+#endif //BSC_CLIENTCONNECTION_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 29.07.2019.
 //
 
-#ifndef BASYCO_THREADEXECUTOR_H
-#define BASYCO_THREADEXECUTOR_H
+#ifndef BSC_THREADEXECUTOR_H
+#define BSC_THREADEXECUTOR_H
 
 
 #include "Executor.h"
@@ -21,4 +21,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_THREADEXECUTOR_H
+#endif //BSC_THREADEXECUTOR_H

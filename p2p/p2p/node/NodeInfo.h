@@ -2,8 +2,8 @@
 // Created by stilgar on 31.07.17.
 //
 
-#ifndef BASYCO_NODEINFO_H
-#define BASYCO_NODEINFO_H
+#ifndef BSC_NODEINFO_H
+#define BSC_NODEINFO_H
 
 
 #include <string>
@@ -54,4 +54,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NODEINFO_H
+#endif //BSC_NODEINFO_H

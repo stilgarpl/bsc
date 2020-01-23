@@ -2,8 +2,8 @@
 // Created by stilgar on 06.11.18.
 //
 
-#ifndef BASYCO_JOURNALTARGET_H
-#define BASYCO_JOURNALTARGET_H
+#ifndef BSC_JOURNALTARGET_H
+#define BSC_JOURNALTARGET_H
 namespace bsc {
     enum class JournalTarget {
         none,
@@ -12,4 +12,4 @@ namespace bsc {
     };
 
 }
-#endif //BASYCO_JOURNALTARGET_H
+#endif //BSC_JOURNALTARGET_H

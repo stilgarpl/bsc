@@ -2,8 +2,8 @@
 // Created by stilgar on 20.08.17.
 //
 
-#ifndef BASYCO_CONNECTIONPROCESSOR_H
-#define BASYCO_CONNECTIONPROCESSOR_H
+#ifndef BSC_CONNECTIONPROCESSOR_H
+#define BSC_CONNECTIONPROCESSOR_H
 
 
 #include <thread>
@@ -38,4 +38,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CONNECTIONPROCESSOR_H
+#endif //BSC_CONNECTIONPROCESSOR_H

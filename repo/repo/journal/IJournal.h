@@ -2,8 +2,8 @@
 // Created by stilgar on 17.10.17.
 //
 
-#ifndef BASYCO_IJOURNAL_H
-#define BASYCO_IJOURNAL_H
+#ifndef BSC_IJOURNAL_H
+#define BSC_IJOURNAL_H
 
 
 #include "JournalMethod.h"
@@ -66,4 +66,4 @@ public:
 }
 CEREAL_REGISTER_TYPE(bsc::IJournal)
 
-#endif //BASYCO_IJOURNAL_H
+#endif //BSC_IJOURNAL_H

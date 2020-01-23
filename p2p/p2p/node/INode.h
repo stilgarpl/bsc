@@ -2,8 +2,8 @@
 // Created by stilgar on 05.11.17.
 //
 
-#ifndef BASYCO_INODE_H
-#define BASYCO_INODE_H
+#ifndef BSC_INODE_H
+#define BSC_INODE_H
 
 
 #include <p2p/dependency/DependencyManager.h>
@@ -98,4 +98,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_INODE_H
+#endif //BSC_INODE_H

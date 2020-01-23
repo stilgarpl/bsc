@@ -2,8 +2,8 @@
 // Created by stilgar on 11.02.19.
 //
 
-#ifndef BASYCO_CHAINEVALUATORS_H
-#define BASYCO_CHAINEVALUATORS_H
+#ifndef BSC_CHAINEVALUATORS_H
+#define BSC_CHAINEVALUATORS_H
 
 
 #include <core/context/Context.h>
@@ -57,4 +57,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CHAINEVALUATORS_H
+#endif //BSC_CHAINEVALUATORS_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 19.11.17.
 //
 
-#ifndef BASYCO_COMMANDACTIONS_H
-#define BASYCO_COMMANDACTIONS_H
+#ifndef BSC_COMMANDACTIONS_H
+#define BSC_COMMANDACTIONS_H
 
 
 #include <p2p/modules/command/network/logic/events/CommandEvent.h>
@@ -23,4 +23,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_COMMANDACTIONS_H
+#endif //BSC_COMMANDACTIONS_H

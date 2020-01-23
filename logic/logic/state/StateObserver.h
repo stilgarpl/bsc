@@ -2,8 +2,8 @@
 // Created by stilgar on 14.10.2019.
 //
 
-#ifndef BASYCO_STATEOBSERVER_H
-#define BASYCO_STATEOBSERVER_H
+#ifndef BSC_STATEOBSERVER_H
+#define BSC_STATEOBSERVER_H
 
 
 #include <mutex>
@@ -51,4 +51,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_STATEOBSERVER_H
+#endif //BSC_STATEOBSERVER_H

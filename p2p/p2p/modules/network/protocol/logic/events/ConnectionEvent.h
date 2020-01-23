@@ -2,12 +2,11 @@
 // Created by stilgar on 29.08.17.
 //
 
-#ifndef BASYCO_CONNECTIONEVENT_H
-#define BASYCO_CONNECTIONEVENT_H
+#ifndef BSC_CONNECTIONEVENT_H
+#define BSC_CONNECTIONEVENT_H
 
 #include <p2p/modules/network/protocol/connection/Connection.h>
 #include "logic/IEvent.h"
-
 
 
 namespace bsc {
@@ -39,4 +38,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CONNECTIONEVENT_H
+#endif //BSC_CONNECTIONEVENT_H

@@ -12,7 +12,7 @@
 
 //void ConfigurationManager::save(const ConfigurationManager::IdType &id, std::shared_ptr<IConfig> config) {
 //    //@todo implement saving config to file
-////      fs::path configPath("~/.basyco/");
+////      fs::path configPath("~/.bsc/");
 //
 //    fs::path fname;//("test");
 //    fname = this->filenameFromId(id);

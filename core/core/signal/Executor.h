@@ -2,8 +2,8 @@
 // Created by stilgar on 19.11.17.
 //
 
-#ifndef BASYCO_EXECUTOR_H
-#define BASYCO_EXECUTOR_H
+#ifndef BSC_EXECUTOR_H
+#define BSC_EXECUTOR_H
 
 #include <functional>
 
@@ -19,4 +19,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_EXECUTOR_H
+#endif //BSC_EXECUTOR_H

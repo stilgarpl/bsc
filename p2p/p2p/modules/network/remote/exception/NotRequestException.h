@@ -2,8 +2,8 @@
 // Created by stilgar on 09.07.18.
 //
 
-#ifndef BASYCO_NOTREQUESTEXCEPTION_H
-#define BASYCO_NOTREQUESTEXCEPTION_H
+#ifndef BSC_NOTREQUESTEXCEPTION_H
+#define BSC_NOTREQUESTEXCEPTION_H
 
 #include <stdexcept>
 
@@ -16,4 +16,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NOTREQUESTEXCEPTION_H
+#endif //BSC_NOTREQUESTEXCEPTION_H

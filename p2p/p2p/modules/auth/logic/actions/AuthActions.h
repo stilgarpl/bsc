@@ -2,8 +2,8 @@
 // Created by stilgar on 19.07.18.
 //
 
-#ifndef BASYCO_AUTHACTIONS_H
-#define BASYCO_AUTHACTIONS_H
+#ifndef BSC_AUTHACTIONS_H
+#define BSC_AUTHACTIONS_H
 
 
 #include <p2p/modules/auth/logic/events/AuthHelloEvent.h>
@@ -22,4 +22,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_AUTHACTIONS_H
+#endif //BSC_AUTHACTIONS_H

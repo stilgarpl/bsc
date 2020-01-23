@@ -2,8 +2,8 @@
 // Created by stilgar on 01.01.18.
 //
 
-#ifndef BASYCO_STORAGEMANIFEST_H
-#define BASYCO_STORAGEMANIFEST_H
+#ifndef BSC_STORAGEMANIFEST_H
+#define BSC_STORAGEMANIFEST_H
 
 #include <core/utils/cereal_include.h>
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
@@ -61,4 +61,4 @@ CEREAL_REGISTER_TYPE(bsc::StorageManifest::Response)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::StorageManifest::Request)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::StorageManifest::Response)
 
-#endif //BASYCO_STORAGEMANIFEST_H
+#endif //BSC_STORAGEMANIFEST_H

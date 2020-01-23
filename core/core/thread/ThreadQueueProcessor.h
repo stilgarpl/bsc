@@ -2,8 +2,8 @@
 // Created by stilgar on 14.10.2019.
 //
 
-#ifndef BASYCO_THREADQUEUEPROCESSOR_H
-#define BASYCO_THREADQUEUEPROCESSOR_H
+#ifndef BSC_THREADQUEUEPROCESSOR_H
+#define BSC_THREADQUEUEPROCESSOR_H
 
 #include <utility>
 #include <queue>
@@ -85,4 +85,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_THREADQUEUEPROCESSOR_H
+#endif //BSC_THREADQUEUEPROCESSOR_H

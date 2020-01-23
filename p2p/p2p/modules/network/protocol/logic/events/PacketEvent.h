@@ -2,8 +2,8 @@
 // Created by stilgar on 03.09.17.
 //
 
-#ifndef BASYCO_PACKETEVENT_H
-#define BASYCO_PACKETEVENT_H
+#ifndef BSC_PACKETEVENT_H
+#define BSC_PACKETEVENT_H
 
 #include <p2p/modules/network/protocol/packet/BasePacket.h>
 #include <p2p/modules/network/protocol/connection/Connection.h>
@@ -60,4 +60,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_PACKETEVENT_H
+#endif //BSC_PACKETEVENT_H

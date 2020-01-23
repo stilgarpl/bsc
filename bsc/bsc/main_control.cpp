@@ -30,7 +30,7 @@ struct BscControlProgramParameters : CommandLineParameters {
 
 int main(int argc, char* argv[]) {
     //@todo hide initialization of spdlog in Node or sth.
-    auto file_logger = spdlog::basic_logger_mt("basic_logger", "/tmp/basyco_control.log");
+    auto file_logger = spdlog::basic_logger_mt("basic_logger", "/tmp/bsc_control.log");
     spdlog::set_default_logger(file_logger);
     spdlog::flush_every(std::chrono::seconds(5));
 

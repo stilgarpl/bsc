@@ -2,8 +2,8 @@
 // Created by stilgar on 04.04.19.
 //
 
-#ifndef BASYCO_STRATEGY_H
-#define BASYCO_STRATEGY_H
+#ifndef BSC_STRATEGY_H
+#define BSC_STRATEGY_H
 
 namespace bsc {
     enum class Strategy {
@@ -18,4 +18,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_STRATEGY_H
+#endif //BSC_STRATEGY_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 07.11.17.
 //
 
-#ifndef BASYCO_NETWORKMODULE_H
-#define BASYCO_NETWORKMODULE_H
+#ifndef BSC_NETWORKMODULE_H
+#define BSC_NETWORKMODULE_H
 
 
 #include <p2p/node/module/NodeModule.h>
@@ -317,4 +317,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NETWORKMODULE_H
+#endif //BSC_NETWORKMODULE_H

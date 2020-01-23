@@ -2,8 +2,8 @@
 // Created by stilgar on 20.08.17.
 //
 
-#ifndef BASYCO_RUNNABLE_H
-#define BASYCO_RUNNABLE_H
+#ifndef BSC_RUNNABLE_H
+#define BSC_RUNNABLE_H
 
 
 #include <thread>
@@ -52,4 +52,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_RUNNABLE_H
+#endif //BSC_RUNNABLE_H

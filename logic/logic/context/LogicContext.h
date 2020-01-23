@@ -2,8 +2,8 @@
 // Created by stilgar on 29.08.17.
 //
 
-#ifndef BASYCO_LOGICCONTEXT_H
-#define BASYCO_LOGICCONTEXT_H
+#ifndef BSC_LOGICCONTEXT_H
+#define BSC_LOGICCONTEXT_H
 
 
 #include <logic/LogicManager.h>
@@ -28,4 +28,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_LOGICCONTEXT_H
+#endif //BSC_LOGICCONTEXT_H

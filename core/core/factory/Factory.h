@@ -2,8 +2,8 @@
 // Created by stilgar on 30.08.2019.
 //
 
-#ifndef BASYCO_FACTORY_H
-#define BASYCO_FACTORY_H
+#ifndef BSC_FACTORY_H
+#define BSC_FACTORY_H
 
 
 #include <memory>
@@ -63,4 +63,4 @@ namespace bsc {
 
 }
 
-#endif //BASYCO_FACTORY_H
+#endif //BSC_FACTORY_H

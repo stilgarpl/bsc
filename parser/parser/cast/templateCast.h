@@ -2,8 +2,8 @@
 // Created by stilgar on 18.11.17.
 //
 
-#ifndef BASYCO_TEMPLATECAST_H
-#define BASYCO_TEMPLATECAST_H
+#ifndef BSC_TEMPLATECAST_H
+#define BSC_TEMPLATECAST_H
 
 #include <cstddef>
 #include <utility>
@@ -107,4 +107,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_TEMPLATECAST_H
+#endif //BSC_TEMPLATECAST_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 31.12.17.
 //
 
-#ifndef BASYCO_PROPERTIESTRANSFER_H
-#define BASYCO_PROPERTIESTRANSFER_H
+#ifndef BSC_PROPERTIESTRANSFER_H
+#define BSC_PROPERTIESTRANSFER_H
 
 #include <core/utils/cereal_include.h>
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
@@ -64,4 +64,4 @@ CEREAL_REGISTER_TYPE(bsc::PropertiesTransfer::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::PropertiesTransfer::Request)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::PropertiesTransfer::Response)
-#endif //BASYCO_PROPERTIESTRANSFER_H
+#endif //BSC_PROPERTIESTRANSFER_H

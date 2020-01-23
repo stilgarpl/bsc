@@ -2,8 +2,8 @@
 // Created by stilgar on 19.11.17.
 //
 
-#ifndef BASYCO_COMMANDEVENT_H
-#define BASYCO_COMMANDEVENT_H
+#ifndef BSC_COMMANDEVENT_H
+#define BSC_COMMANDEVENT_H
 
 #include <string>
 #include <vector>
@@ -37,4 +37,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_COMMANDEVENT_H
+#endif //BSC_COMMANDEVENT_H

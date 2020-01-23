@@ -2,8 +2,8 @@
 // Created by stilgar on 16.07.18.
 //
 
-#ifndef BASYCO_ROLEFILTER_H
-#define BASYCO_ROLEFILTER_H
+#ifndef BSC_ROLEFILTER_H
+#define BSC_ROLEFILTER_H
 
 
 #include "PacketFilter.h"
@@ -18,4 +18,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_ROLEFILTER_H
+#endif //BSC_ROLEFILTER_H

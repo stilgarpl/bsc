@@ -2,8 +2,8 @@
 // Created by stilgar on 07.01.2020.
 //
 
-#ifndef BASYCO_COMMANDLINEPARAMETERS_H
-#define BASYCO_COMMANDLINEPARAMETERS_H
+#ifndef BSC_COMMANDLINEPARAMETERS_H
+#define BSC_COMMANDLINEPARAMETERS_H
 
 
 #include <optional>
@@ -487,4 +487,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_COMMANDLINEPARAMETERS_H
+#endif //BSC_COMMANDLINEPARAMETERS_H

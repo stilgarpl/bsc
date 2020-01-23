@@ -2,9 +2,8 @@
 // Created by stilgar on 23.08.17.
 //
 
-#ifndef BASYCO_TICK_H
-#define BASYCO_TICK_H
-
+#ifndef BSC_TICK_H
+#define BSC_TICK_H
 
 
 #include <chrono>
@@ -32,4 +31,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_TICK_H
+#endif //BSC_TICK_H

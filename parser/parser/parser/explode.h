@@ -2,8 +2,8 @@
 // Created by stilgar on 15.01.2020.
 //
 
-#ifndef BASYCO_EXPLODE_H
-#define BASYCO_EXPLODE_H
+#ifndef BSC_EXPLODE_H
+#define BSC_EXPLODE_H
 
 #include <vector>
 #include <string>
@@ -22,4 +22,4 @@ namespace bsc {
     }
 }
 
-#endif //BASYCO_EXPLODE_H
+#endif //BSC_EXPLODE_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 21.08.17.
 //
 
-#ifndef BASYCO_ICONFIG_H
-#define BASYCO_ICONFIG_H
+#ifndef BSC_ICONFIG_H
+#define BSC_ICONFIG_H
 
 
 #include <core/utils/cereal_include.h>
@@ -39,4 +39,4 @@ namespace bsc {
 
 //CEREAL_REGISTER_TYPE(bsc::IConfig)
 
-#endif //BASYCO_ICONFIG_H
+#endif //BSC_ICONFIG_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 21.03.19.
 //
 
-#ifndef BASYCO_CHAINLOCK_H
-#define BASYCO_CHAINLOCK_H
+#ifndef BSC_CHAINLOCK_H
+#define BSC_CHAINLOCK_H
 
 
 #include <mutex>
@@ -46,4 +46,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CHAINLOCK_H
+#endif //BSC_CHAINLOCK_H

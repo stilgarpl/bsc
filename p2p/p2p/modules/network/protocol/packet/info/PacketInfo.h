@@ -2,8 +2,8 @@
 // Created by stilgar on 08.10.17.
 //
 
-#ifndef BASYCO_PACKETINFO_H
-#define BASYCO_PACKETINFO_H
+#ifndef BSC_PACKETINFO_H
+#define BSC_PACKETINFO_H
 
 #include <p2p/modules/network/protocol/enum/Status.h>
 #include <p2p/modules/network/protocol/packet/BasePacket.h>
@@ -186,4 +186,4 @@ CEREAL_REGISTER_TYPE(bsc::PacketGroup::Response)
 CEREAL_REGISTER_TYPE(bsc::PacketGroup::Error)
 CEREAL_REGISTER_TYPE(bsc::PacketGroup::Ack)
 
-#endif //BASYCO_PACKETINFO_H
+#endif //BSC_PACKETINFO_H

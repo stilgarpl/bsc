@@ -2,8 +2,8 @@
 // Created by stilgar on 19.07.18.
 //
 
-#ifndef BASYCO_AUTHHELLOPACKET_H
-#define BASYCO_AUTHHELLOPACKET_H
+#ifndef BSC_AUTHHELLOPACKET_H
+#define BSC_AUTHHELLOPACKET_H
 
 
 #include <core/utils/cereal_include.h>
@@ -62,4 +62,4 @@ CEREAL_REGISTER_TYPE(bsc::AuthHelloPacket::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::AuthHelloPacket::Request)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::AuthHelloPacket::Response)
-#endif //BASYCO_AUTHHELLOPACKET_H
+#endif //BSC_AUTHHELLOPACKET_H

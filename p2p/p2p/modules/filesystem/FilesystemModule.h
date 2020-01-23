@@ -6,8 +6,8 @@
 // Created by stilgar on 07.11.17.
 //
 
-#ifndef BASYCO_FILESYSTEMMODULE_H
-#define BASYCO_FILESYSTEMMODULE_H
+#ifndef BSC_FILESYSTEMMODULE_H
+#define BSC_FILESYSTEMMODULE_H
 
 
 #include <p2p/node/module/NodeModule.h>
@@ -169,4 +169,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_FILESYSTEMMODULE_H
+#endif //BSC_FILESYSTEMMODULE_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 30.12.17.
 //
 
-#ifndef BASYCO_FINISHTRANSFER_H
-#define BASYCO_FINISHTRANSFER_H
+#ifndef BSC_FINISHTRANSFER_H
+#define BSC_FINISHTRANSFER_H
 
 
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
@@ -59,4 +59,4 @@ CEREAL_REGISTER_TYPE(bsc::FinishTransfer::Response)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::FinishTransfer::Request)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::FinishTransfer::Response)
-#endif //BASYCO_FINISHTRANSFER_H
+#endif //BSC_FINISHTRANSFER_H

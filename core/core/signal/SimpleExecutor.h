@@ -2,8 +2,8 @@
 // Created by stilgar on 29.07.2019.
 //
 
-#ifndef BASYCO_SIMPLEEXECUTOR_H
-#define BASYCO_SIMPLEEXECUTOR_H
+#ifndef BSC_SIMPLEEXECUTOR_H
+#define BSC_SIMPLEEXECUTOR_H
 
 
 #include "Executor.h"
@@ -21,4 +21,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_SIMPLEEXECUTOR_H
+#endif //BSC_SIMPLEEXECUTOR_H

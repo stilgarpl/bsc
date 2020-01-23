@@ -2,8 +2,8 @@
 // Created by stilgar on 07.11.17.
 //
 
-#ifndef BASYCO_DEPENDENCY_H
-#define BASYCO_DEPENDENCY_H
+#ifndef BSC_DEPENDENCY_H
+#define BSC_DEPENDENCY_H
 
 
 #include <vector>
@@ -108,4 +108,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_DEPENDENCY_H
+#endif //BSC_DEPENDENCY_H

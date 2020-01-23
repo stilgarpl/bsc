@@ -2,8 +2,8 @@
 // Created by stilgar on 18.10.17.
 //
 
-#ifndef BASYCO_JOURNALMETHOD_H
-#define BASYCO_JOURNALMETHOD_H
+#ifndef BSC_JOURNALMETHOD_H
+#define BSC_JOURNALMETHOD_H
 namespace bsc {
     enum JournalMethod {
         //@todo add some real numbers here, in case I need to add more stuff
@@ -18,5 +18,5 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_JOURNALMETHOD_H
+#endif //BSC_JOURNALMETHOD_H
 

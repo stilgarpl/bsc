@@ -2,8 +2,8 @@
 // Created by stilgar on 31.07.17.
 //
 
-#ifndef BASYCO_NETWORKINFO_H
-#define BASYCO_NETWORKINFO_H
+#ifndef BSC_NETWORKINFO_H
+#define BSC_NETWORKINFO_H
 
 
 #include <list>
@@ -75,4 +75,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NETWORKINFO_H
+#endif //BSC_NETWORKINFO_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 14.10.2019.
 //
 
-#ifndef BASYCO_DIRECTNOTIFY_H
-#define BASYCO_DIRECTNOTIFY_H
+#ifndef BSC_DIRECTNOTIFY_H
+#define BSC_DIRECTNOTIFY_H
 
 
 namespace bsc {
@@ -51,4 +51,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_DIRECTNOTIFY_H
+#endif //BSC_DIRECTNOTIFY_H

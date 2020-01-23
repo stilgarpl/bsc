@@ -2,8 +2,8 @@
 // Created by stilgar on 19.07.18.
 //
 
-#ifndef BASYCO_AUTHHELLOEVENT_H
-#define BASYCO_AUTHHELLOEVENT_H
+#ifndef BSC_AUTHHELLOEVENT_H
+#define BSC_AUTHHELLOEVENT_H
 
 
 #include <p2p/node/NodeInfo.h>
@@ -27,4 +27,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_AUTHHELLOEVENT_H
+#endif //BSC_AUTHHELLOEVENT_H

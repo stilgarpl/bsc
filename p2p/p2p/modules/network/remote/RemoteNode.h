@@ -6,8 +6,8 @@
 // Created by stilgar on 06.07.18.
 //
 
-#ifndef BASYCO_REMOTENODE_H
-#define BASYCO_REMOTENODE_H
+#ifndef BSC_REMOTENODE_H
+#define BSC_REMOTENODE_H
 
 #include <p2p/modules/network/protocol/connection/ClientConnection.h>
 #include <Poco/Net/SocketAddress.h>
@@ -150,4 +150,4 @@ public:
 }
 
 
-#endif //BASYCO_REMOTENODE_H
+#endif //BSC_REMOTENODE_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 21.08.17.
 //
 
-#ifndef BASYCO_SIGNAL_H
-#define BASYCO_SIGNAL_H
+#ifndef BSC_SIGNAL_H
+#define BSC_SIGNAL_H
 
 #include <memory>
 #include <list>
@@ -59,4 +59,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_SIGNAL_H
+#endif //BSC_SIGNAL_H

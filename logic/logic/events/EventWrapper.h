@@ -2,8 +2,8 @@
 // Created by stilgar on 30.01.19.
 //
 
-#ifndef BASYCO_EVENTWRAPPER_H
-#define BASYCO_EVENTWRAPPER_H
+#ifndef BSC_EVENTWRAPPER_H
+#define BSC_EVENTWRAPPER_H
 
 
 #include "../IEvent.h"
@@ -57,4 +57,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_EVENTWRAPPER_H
+#endif //BSC_EVENTWRAPPER_H

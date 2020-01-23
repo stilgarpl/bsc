@@ -2,8 +2,8 @@
 // Created by stilgar on 05.11.17.
 //
 
-#ifndef BASYCO_REPOMODULE_H
-#define BASYCO_REPOMODULE_H
+#ifndef BSC_REPOMODULE_H
+#define BSC_REPOMODULE_H
 
 
 #include <p2p/node/module/NodeModule.h>
@@ -125,4 +125,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_REPOMODULE_H
+#endif //BSC_REPOMODULE_H

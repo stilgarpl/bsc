@@ -2,8 +2,8 @@
 // Created by stilgar on 21.08.17.
 //
 
-#ifndef BASYCO_LOGGER_H
-#define BASYCO_LOGGER_H
+#ifndef BSC_LOGGER_H
+#define BSC_LOGGER_H
 
 #include <string>
 #include <mutex>
@@ -44,4 +44,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_LOGGER_H
+#endif //BSC_LOGGER_H

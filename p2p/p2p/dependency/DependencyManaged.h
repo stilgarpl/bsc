@@ -2,8 +2,8 @@
 // Created by stilgar on 07.11.17.
 //
 
-#ifndef BASYCO_DEPENDECYMANAGED_H
-#define BASYCO_DEPENDECYMANAGED_H
+#ifndef BSC_DEPENDECYMANAGED_H
+#define BSC_DEPENDECYMANAGED_H
 
 //
 //#include "DependencyManager.h"
@@ -102,4 +102,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_DEPENDECYMANAGED_H
+#endif //BSC_DEPENDECYMANAGED_H

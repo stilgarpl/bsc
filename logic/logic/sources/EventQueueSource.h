@@ -2,8 +2,8 @@
 // Created by stilgar on 29.08.17.
 //
 
-#ifndef BASYCO_EVENTQUEUESOURCE_H
-#define BASYCO_EVENTQUEUESOURCE_H
+#ifndef BSC_EVENTQUEUESOURCE_H
+#define BSC_EVENTQUEUESOURCE_H
 
 
 #include <queue>
@@ -81,4 +81,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_EVENTQUEUESOURCE_H
+#endif //BSC_EVENTQUEUESOURCE_H

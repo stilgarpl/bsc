@@ -2,10 +2,11 @@
 // Created by stilgar on 02.12.2019.
 //
 
-#ifndef BASYCO_SIMPLEJOURNALMETADATAFETCHER_H
-#define BASYCO_SIMPLEJOURNALMETADATAFETCHER_H
+#ifndef BSC_SIMPLEJOURNALMETADATAFETCHER_H
+#define BSC_SIMPLEJOURNALMETADATAFETCHER_H
 
 #include "JournalMetaDataFetcher.h"
+
 namespace bsc {
     class SimpleJournalMetaDataFetcher : public JournalMetaDataFetcher {
     public:
@@ -25,4 +26,4 @@ CEREAL_REGISTER_TYPE(bsc::SimpleJournalMetaDataFetcher)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::JournalMetaDataFetcher, bsc::SimpleJournalMetaDataFetcher)
 
 
-#endif //BASYCO_SIMPLEJOURNALMETADATAFETCHER_H
+#endif //BSC_SIMPLEJOURNALMETADATAFETCHER_H

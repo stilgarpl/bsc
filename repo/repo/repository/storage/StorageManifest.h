@@ -2,11 +2,12 @@
 // Created by stilgar on 01.01.18.
 //
 
-#ifndef BASYCO_STORAGEMANIFEST_H
-#define BASYCO_STORAGEMANIFEST_H
+#ifndef BSC_STORAGEMANIFEST_H
+#define BSC_STORAGEMANIFEST_H
 
 
 #include "IStorage.h"
+
 namespace bsc {
     class StorageManifest {
     private:
@@ -15,4 +16,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_STORAGEMANIFEST_H
+#endif //BSC_STORAGEMANIFEST_H

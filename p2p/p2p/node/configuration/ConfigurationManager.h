@@ -2,8 +2,8 @@
 // Created by stilgar on 21.08.17.
 //
 
-#ifndef BASYCO_CONFIGURATIONMANAGER_H
-#define BASYCO_CONFIGURATIONMANAGER_H
+#ifndef BSC_CONFIGURATIONMANAGER_H
+#define BSC_CONFIGURATIONMANAGER_H
 
 #include <filesystem>
 #include <fstream>
@@ -119,4 +119,4 @@ public:
 }
 
 
-#endif //BASYCO_CONFIGURATIONMANAGER_H
+#endif //BSC_CONFIGURATIONMANAGER_H

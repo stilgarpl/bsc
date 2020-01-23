@@ -2,8 +2,8 @@
 // Created by stilgar on 30.12.17.
 //
 
-#ifndef BASYCO_TRANSFERID_H
-#define BASYCO_TRANSFERID_H
+#ifndef BSC_TRANSFERID_H
+#define BSC_TRANSFERID_H
 
 #include <vector>
 #include <cstdint>
@@ -29,4 +29,4 @@ namespace bsc {
     };
 
 }
-#endif //BASYCO_TRANSFERID_H
+#endif //BSC_TRANSFERID_H

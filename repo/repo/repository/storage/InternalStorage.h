@@ -2,13 +2,14 @@
 // Created by stilgar on 10.12.17.
 //
 
-#ifndef BASYCO_INTERNALSTORAGE_H
-#define BASYCO_INTERNALSTORAGE_H
+#ifndef BSC_INTERNALSTORAGE_H
+#define BSC_INTERNALSTORAGE_H
 
 
 #include "IStorage.h"
 #include <filesystem>
 #include <p2p/modules/filesystem/transfer/TransferManager.h>
+
 namespace bsc {
     namespace fs = std::filesystem;
 
@@ -48,4 +49,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_INTERNALSTORAGE_H
+#endif //BSC_INTERNALSTORAGE_H

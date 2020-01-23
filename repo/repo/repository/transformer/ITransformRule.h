@@ -2,8 +2,8 @@
 // Created by stilgar on 04.11.18.
 //
 
-#ifndef BASYCO_ITRANSFORMRULE_H
-#define BASYCO_ITRANSFORMRULE_H
+#ifndef BSC_ITRANSFORMRULE_H
+#define BSC_ITRANSFORMRULE_H
 
 #include <filesystem>
 #include <set>
@@ -29,4 +29,4 @@ namespace bsc {
 
     typedef std::shared_ptr<ITransformRule> ITransformRulePtr;
 }
-#endif //BASYCO_ITRANSFORMRULE_H
+#endif //BSC_ITRANSFORMRULE_H

@@ -2,14 +2,15 @@
 // Created by stilgar on 26.02.19.
 //
 
-#ifndef BASYCO_REPOEVALUATORS_H
-#define BASYCO_REPOEVALUATORS_H
+#ifndef BSC_REPOEVALUATORS_H
+#define BSC_REPOEVALUATORS_H
 
 
 #include <core/log/Logger.h>
 #include <repo/repository/network/RepoQuery.h>
 #include <p2p/node/context/NodeContext.h>
 #include <repo/node/RepoModule.h>
+
 namespace bsc {
 
 
@@ -40,4 +41,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_REPOEVALUATORS_H
+#endif //BSC_REPOEVALUATORS_H

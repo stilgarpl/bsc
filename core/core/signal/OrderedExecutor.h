@@ -2,8 +2,8 @@
 // Created by stilgar on 09.07.19.
 //
 
-#ifndef BASYCO_ORDEREDEXECUTOR_H
-#define BASYCO_ORDEREDEXECUTOR_H
+#ifndef BSC_ORDEREDEXECUTOR_H
+#define BSC_ORDEREDEXECUTOR_H
 
 #include <memory>
 #include <condition_variable>
@@ -40,4 +40,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_ORDEREDEXECUTOR_H
+#endif //BSC_ORDEREDEXECUTOR_H

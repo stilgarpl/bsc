@@ -8,8 +8,8 @@
 // Created by stilgar on 01.01.19.
 //
 
-#ifndef BASYCO_CHAINEVENT_H
-#define BASYCO_CHAINEVENT_H
+#ifndef BSC_CHAINEVENT_H
+#define BSC_CHAINEVENT_H
 
 #include <string>
 #include "ChainDefinitions.h"
@@ -63,4 +63,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CHAINEVENT_H
+#endif //BSC_CHAINEVENT_H

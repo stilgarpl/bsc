@@ -2,8 +2,8 @@
 // Created by stilgar on 25.08.17.
 //
 
-#ifndef BASYCO_ACTIONMANAGER_H
-#define BASYCO_ACTIONMANAGER_H
+#ifndef BSC_ACTIONMANAGER_H
+#define BSC_ACTIONMANAGER_H
 
 
 #include <map>
@@ -40,7 +40,7 @@ namespace bsc {
         template<typename... Args, typename ActionIdType>
         void setAction(ActionIdType id, ActionType<Args...> action) {
             auto& map = actionMap.get<ActionIdType, ActionType<Args...>>();
-            //@todo what if map[id] was already setDirect?
+            //@todo what if map[id] was already set?
             map[id] = action;
         }
 
@@ -49,4 +49,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_ACTIONMANAGER_H
+#endif //BSC_ACTIONMANAGER_H

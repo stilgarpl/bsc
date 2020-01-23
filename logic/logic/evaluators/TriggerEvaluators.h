@@ -2,8 +2,8 @@
 // Created by stilgar on 30.04.19.
 //
 
-#ifndef BASYCO_TRIGGEREVALUATORS_H
-#define BASYCO_TRIGGEREVALUATORS_H
+#ifndef BSC_TRIGGEREVALUATORS_H
+#define BSC_TRIGGEREVALUATORS_H
 
 
 #include <core/log/Logger.h>
@@ -19,4 +19,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_TRIGGEREVALUATORS_H
+#endif //BSC_TRIGGEREVALUATORS_H

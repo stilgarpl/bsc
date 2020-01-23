@@ -2,12 +2,11 @@
 // Created by stilgar on 03.02.19.
 //
 
-#ifndef BASYCO_COMMONACTIONS_H
-#define BASYCO_COMMONACTIONS_H
+#ifndef BSC_COMMONACTIONS_H
+#define BSC_COMMONACTIONS_H
 
 #include <core/context/Context.h>
 #include "../common/ForeachContext.h"
-
 
 
 namespace bsc {
@@ -44,4 +43,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_COMMONACTIONS_H
+#endif //BSC_COMMONACTIONS_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 03.02.19.
 //
 
-#ifndef BASYCO_FOREACHCONTEXT_H
-#define BASYCO_FOREACHCONTEXT_H
+#ifndef BSC_FOREACHCONTEXT_H
+#define BSC_FOREACHCONTEXT_H
 
 
 namespace bsc {
@@ -24,4 +24,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_FOREACHCONTEXT_H
+#endif //BSC_FOREACHCONTEXT_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 07.11.17.
 //
 
-#ifndef BASYCO_BASICMODULE_H
-#define BASYCO_BASICMODULE_H
+#ifndef BSC_BASICMODULE_H
+#define BSC_BASICMODULE_H
 
 
 #include <p2p/node/module/NodeModule.h>
@@ -54,4 +54,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_BASICMODULE_H
+#endif //BSC_BASICMODULE_H

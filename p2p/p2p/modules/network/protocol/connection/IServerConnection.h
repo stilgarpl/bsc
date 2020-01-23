@@ -2,8 +2,8 @@
 // Created by stilgar on 09.10.17.
 //
 
-#ifndef BASYCO_ISERVERCONNECTION_H
-#define BASYCO_ISERVERCONNECTION_H
+#ifndef BSC_ISERVERCONNECTION_H
+#define BSC_ISERVERCONNECTION_H
 
 
 namespace bsc {
@@ -18,4 +18,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_ISERVERCONNECTION_H
+#endif //BSC_ISERVERCONNECTION_H

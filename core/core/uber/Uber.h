@@ -2,8 +2,8 @@
 // Created by stilgar on 23.08.17.
 //
 
-#ifndef BASYCO_UBER_H
-#define BASYCO_UBER_H
+#ifndef BSC_UBER_H
+#define BSC_UBER_H
 
 #include <map>
 #include <memory>
@@ -137,4 +137,4 @@ public:
 };
 
 
-#endif //BASYCO_UBER_H
+#endif //BSC_UBER_H

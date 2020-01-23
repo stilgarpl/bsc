@@ -2,8 +2,8 @@
 // Created by stilgar on 10.12.2019.
 //
 
-#ifndef BASYCO_CONNECTIONPROCESSORS_H
-#define BASYCO_CONNECTIONPROCESSORS_H
+#ifndef BSC_CONNECTIONPROCESSORS_H
+#define BSC_CONNECTIONPROCESSORS_H
 
 
 #include <p2p/modules/network/protocol/packet/ConnectionControl.h>
@@ -17,4 +17,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CONNECTIONPROCESSORS_H
+#endif //BSC_CONNECTIONPROCESSORS_H

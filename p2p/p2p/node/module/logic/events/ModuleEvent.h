@@ -2,8 +2,8 @@
 // Created by stilgar on 27.10.18.
 //
 
-#ifndef BASYCO_MODULEEVENT_H
-#define BASYCO_MODULEEVENT_H
+#ifndef BSC_MODULEEVENT_H
+#define BSC_MODULEEVENT_H
 
 #include <p2p/node/module/ModuleState.h>
 #include "logic/IEvent.h"
@@ -30,4 +30,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_MODULEEVENT_H
+#endif //BSC_MODULEEVENT_H

@@ -2,11 +2,12 @@
 // Created by stilgar on 20.10.17.
 //
 
-#ifndef BASYCO_REPOSITORYMANAGER_H
-#define BASYCO_REPOSITORYMANAGER_H
+#ifndef BSC_REPOSITORYMANAGER_H
+#define BSC_REPOSITORYMANAGER_H
 
 
 #include "IRepository.h"
+
 namespace bsc {
     class RepositoryManager {
 
@@ -37,4 +38,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_REPOSITORYMANAGER_H
+#endif //BSC_REPOSITORYMANAGER_H

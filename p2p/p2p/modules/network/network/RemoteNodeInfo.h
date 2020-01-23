@@ -2,8 +2,8 @@
 // Created by stilgar on 24.10.18.
 //
 
-#ifndef BASYCO_REMOTENODEINFO_H
-#define BASYCO_REMOTENODEINFO_H
+#ifndef BSC_REMOTENODEINFO_H
+#define BSC_REMOTENODEINFO_H
 
 
 #include <p2p/node/NodeInfo.h>
@@ -62,4 +62,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_REMOTENODEINFO_H
+#endif //BSC_REMOTENODEINFO_H

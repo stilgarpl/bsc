@@ -2,8 +2,8 @@
 // Created by stilgar on 27.10.18.
 //
 
-#ifndef BASYCO_MODULESOURCE_H
-#define BASYCO_MODULESOURCE_H
+#ifndef BSC_MODULESOURCE_H
+#define BSC_MODULESOURCE_H
 
 
 #include <p2p/node/module/ModuleState.h>
@@ -40,4 +40,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_MODULESOURCE_H
+#endif //BSC_MODULESOURCE_H

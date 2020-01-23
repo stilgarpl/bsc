@@ -2,11 +2,12 @@
 // Created by stilgar on 20.10.17.
 //
 
-#ifndef BASYCO_REPOSITORYCONTEXT_H
-#define BASYCO_REPOSITORYCONTEXT_H
+#ifndef BSC_REPOSITORYCONTEXT_H
+#define BSC_REPOSITORYCONTEXT_H
 
 
 #include <repo/repository/RepositoryManager.h>
+
 namespace bsc {
     class RepositoryContext {
 
@@ -18,4 +19,4 @@ namespace bsc {
     };
 
 }
-#endif //BASYCO_REPOSITORYCONTEXT_H
+#endif //BSC_REPOSITORYCONTEXT_H

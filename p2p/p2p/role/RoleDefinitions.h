@@ -2,8 +2,8 @@
 // Created by stilgar on 16.07.18.
 //
 
-#ifndef BASYCO_ROLEDEFINITIONS_H
-#define BASYCO_ROLEDEFINITIONS_H
+#ifndef BSC_ROLEDEFINITIONS_H
+#define BSC_ROLEDEFINITIONS_H
 
 
 #include <core/uber/Uber.h>
@@ -41,4 +41,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_ROLEDEFINITIONS_H
+#endif //BSC_ROLEDEFINITIONS_H

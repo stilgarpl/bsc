@@ -4,9 +4,8 @@
 // Created by stilgar on 25.08.17.
 //
 
-#ifndef BASYCO_LOGICMANAGER_H
-#define BASYCO_LOGICMANAGER_H
-
+#ifndef BSC_LOGICMANAGER_H
+#define BSC_LOGICMANAGER_H
 
 
 #include "ActionManager.h"
@@ -137,4 +136,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_LOGICMANAGER_H
+#endif //BSC_LOGICMANAGER_H

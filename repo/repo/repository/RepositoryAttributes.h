@@ -2,8 +2,8 @@
 // Created by stilgar on 30.08.2019.
 //
 
-#ifndef BASYCO_REPOSITORYATTRIBUTES_H
-#define BASYCO_REPOSITORYATTRIBUTES_H
+#ifndef BSC_REPOSITORYATTRIBUTES_H
+#define BSC_REPOSITORYATTRIBUTES_H
 
 #include <filesystem>
 #include <repo/journal/JournalTypes.h>
@@ -44,4 +44,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_REPOSITORYATTRIBUTES_H
+#endif //BSC_REPOSITORYATTRIBUTES_H

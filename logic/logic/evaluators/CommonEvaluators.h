@@ -2,8 +2,8 @@
 // Created by stilgar on 2/1/19.
 //
 
-#ifndef BASYCO_COMMONEVALUATORS_H
-#define BASYCO_COMMONEVALUATORS_H
+#ifndef BSC_COMMONEVALUATORS_H
+#define BSC_COMMONEVALUATORS_H
 
 
 #include <core/log/Logger.h>
@@ -65,4 +65,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_COMMONEVALUATORS_H
+#endif //BSC_COMMONEVALUATORS_H

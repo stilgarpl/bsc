@@ -2,8 +2,8 @@
 // Created by stilgar on 21.08.17.
 //
 
-#ifndef BASYCO_NODECONTEXTINFO_H
-#define BASYCO_NODECONTEXTINFO_H
+#ifndef BSC_NODECONTEXTINFO_H
+#define BSC_NODECONTEXTINFO_H
 
 
 #include <p2p/modules/network/protocol/context/exception/NodeContextNotSet.h>
@@ -34,4 +34,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NODECONTEXTINFO_H
+#endif //BSC_NODECONTEXTINFO_H

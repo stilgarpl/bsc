@@ -2,13 +2,12 @@
 // Created by stilgar on 08.09.17.
 //
 
-#ifndef BASYCO_NODEEVENT_H
-#define BASYCO_NODEEVENT_H
+#ifndef BSC_NODEEVENT_H
+#define BSC_NODEEVENT_H
 
 
 #include <p2p/node/NodeInfo.h>
 #include "logic/IEvent.h"
-
 
 
 namespace bsc {
@@ -36,4 +35,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NODEEVENT_H
+#endif //BSC_NODEEVENT_H

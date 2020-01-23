@@ -2,8 +2,8 @@
 // Created by stilgar on 21.03.19.
 //
 
-#ifndef BASYCO_INSTANCEGENERATOR_H
-#define BASYCO_INSTANCEGENERATOR_H
+#ifndef BSC_INSTANCEGENERATOR_H
+#define BSC_INSTANCEGENERATOR_H
 
 #include <mutex>
 
@@ -22,4 +22,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_INSTANCEGENERATOR_H
+#endif //BSC_INSTANCEGENERATOR_H

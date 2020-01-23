@@ -2,8 +2,8 @@
 // Created by stilgar on 13.12.2019.
 //
 
-#ifndef BASYCO_RANDOMALGORITHM_H
-#define BASYCO_RANDOMALGORITHM_H
+#ifndef BSC_RANDOMALGORITHM_H
+#define BSC_RANDOMALGORITHM_H
 
 #include <random>
 #include <utility>
@@ -28,4 +28,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_RANDOMALGORITHM_H
+#endif //BSC_RANDOMALGORITHM_H

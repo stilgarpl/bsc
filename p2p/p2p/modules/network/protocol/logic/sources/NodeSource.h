@@ -2,8 +2,8 @@
 // Created by stilgar on 08.09.17.
 //
 
-#ifndef BASYCO_NODESOURCE_H
-#define BASYCO_NODESOURCE_H
+#ifndef BSC_NODESOURCE_H
+#define BSC_NODESOURCE_H
 
 
 #include <p2p/modules/network/protocol/logic/events/NodeInfoEvent.h>
@@ -23,4 +23,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NODESOURCE_H
+#endif //BSC_NODESOURCE_H

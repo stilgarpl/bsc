@@ -2,11 +2,12 @@
 // Created by stilgar on 04.11.18.
 //
 
-#ifndef BASYCO_CUSTOMRULE_H
-#define BASYCO_CUSTOMRULE_H
+#ifndef BSC_CUSTOMRULE_H
+#define BSC_CUSTOMRULE_H
 
 
 #include <repo/repository/transformer/ITransformRule.h>
+
 namespace bsc {
     class CustomRule : public ITransformRule {
 
@@ -25,4 +26,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_CUSTOMRULE_H
+#endif //BSC_CUSTOMRULE_H

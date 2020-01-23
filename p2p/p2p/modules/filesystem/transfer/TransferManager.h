@@ -4,14 +4,15 @@
 // Created by stilgar on 30.12.17.
 //
 
-#ifndef BASYCO_TRANSFERMANAGER_H
-#define BASYCO_TRANSFERMANAGER_H
+#ifndef BSC_TRANSFERMANAGER_H
+#define BSC_TRANSFERMANAGER_H
 
 #include <p2p/modules/filesystem/identification/ResourceIdentificator.h>
 #include <logic/state/LogicStateMachine.h>
 #include <algorithm>
 #include <logic/state/DeferredNotify.h>
 #include <p2p/modules/filesystem/identification/TransferTypes.h>
+
 namespace bsc {
 
     class TransferManager {
@@ -208,4 +209,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_TRANSFERMANAGER_H
+#endif //BSC_TRANSFERMANAGER_H

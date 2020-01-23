@@ -2,8 +2,8 @@
 // Created by stilgar on 30.01.19.
 //
 
-#ifndef BASYCO_REPOSITORYACTIONS_H
-#define BASYCO_REPOSITORYACTIONS_H
+#ifndef BSC_REPOSITORYACTIONS_H
+#define BSC_REPOSITORYACTIONS_H
 
 namespace bsc {
     struct RepositoryActions {
@@ -24,4 +24,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_REPOSITORYACTIONS_H
+#endif //BSC_REPOSITORYACTIONS_H

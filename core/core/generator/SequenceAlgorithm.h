@@ -2,8 +2,8 @@
 // Created by stilgar on 13.12.2019.
 //
 
-#ifndef BASYCO_SEQUENCEALGORITHM_H
-#define BASYCO_SEQUENCEALGORITHM_H
+#ifndef BSC_SEQUENCEALGORITHM_H
+#define BSC_SEQUENCEALGORITHM_H
 
 #include <utility>
 
@@ -28,4 +28,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_SEQUENCEALGORITHM_H
+#endif //BSC_SEQUENCEALGORITHM_H

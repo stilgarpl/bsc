@@ -2,8 +2,8 @@
 // Created by stilgar on 10.12.17.
 //
 
-#ifndef BASYCO_ISTORAGE_H
-#define BASYCO_ISTORAGE_H
+#ifndef BSC_ISTORAGE_H
+#define BSC_ISTORAGE_H
 
 
 #include <repo/journal/JournalTypes.h>
@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <utility>
 #include <p2p/modules/filesystem/transfer/TransferManager.h>
+
 namespace bsc {
     namespace fs = std::filesystem;
 
@@ -67,4 +68,4 @@ namespace bsc {
     using IStoragePtr = std::shared_ptr<IStorage>;
 
 }
-#endif //BASYCO_ISTORAGE_H
+#endif //BSC_ISTORAGE_H

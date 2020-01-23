@@ -2,8 +2,8 @@
 // Created by stilgar on 01.07.19.
 //
 
-#ifndef BASYCO_LOGGERCONTEXT_H
-#define BASYCO_LOGGERCONTEXT_H
+#ifndef BSC_LOGGERCONTEXT_H
+#define BSC_LOGGERCONTEXT_H
 
 
 #include <functional>
@@ -25,4 +25,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_LOGGERCONTEXT_H
+#endif //BSC_LOGGERCONTEXT_H

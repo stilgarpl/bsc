@@ -2,8 +2,8 @@
 // Created by stilgar on 20.07.18.
 //
 
-#ifndef BASYCO_LOGICSTATEMACHINE_H
-#define BASYCO_LOGICSTATEMACHINE_H
+#ifndef BSC_LOGICSTATEMACHINE_H
+#define BSC_LOGICSTATEMACHINE_H
 
 
 #include <core/log/Logger.h>
@@ -102,4 +102,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_LOGICSTATEMACHINE_H
+#endif //BSC_LOGICSTATEMACHINE_H

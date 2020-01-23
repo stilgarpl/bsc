@@ -2,8 +2,8 @@
 // Created by stilgar on 06.09.17.
 //
 
-#ifndef BASYCO_NETWORKPACKETINFO_H
-#define BASYCO_NETWORKPACKETINFO_H
+#ifndef BSC_NETWORKPACKETINFO_H
+#define BSC_NETWORKPACKETINFO_H
 
 #include <future>
 #include <p2p/modules/network/protocol/packet/BasePacket.h>
@@ -60,4 +60,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_NETWORKPACKETINFO_H
+#endif //BSC_NETWORKPACKETINFO_H

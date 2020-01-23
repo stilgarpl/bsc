@@ -2,8 +2,8 @@
 // Created by stilgar on 19.08.2019.
 //
 
-#ifndef BASYCO_STORAGEMANAGER_H
-#define BASYCO_STORAGEMANAGER_H
+#ifndef BSC_STORAGEMANAGER_H
+#define BSC_STORAGEMANAGER_H
 
 
 #include <map>
@@ -37,4 +37,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_STORAGEMANAGER_H
+#endif //BSC_STORAGEMANAGER_H

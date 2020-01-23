@@ -2,12 +2,13 @@
 // Created by stilgar on 02.12.2019.
 //
 
-#ifndef BASYCO_JOURNALMETADATAFETCHER_H
-#define BASYCO_JOURNALMETADATAFETCHER_H
+#ifndef BSC_JOURNALMETADATAFETCHER_H
+#define BSC_JOURNALMETADATAFETCHER_H
 
 
 #include "JournalMetaData.h"
 #include <core/utils/cereal_include.h>
+
 namespace bsc {
     class JournalMetaDataFetcher {
     public:
@@ -30,4 +31,4 @@ namespace bsc {
 }
 CEREAL_REGISTER_TYPE(bsc::JournalMetaDataFetcher)
 
-#endif //BASYCO_JOURNALMETADATAFETCHER_H
+#endif //BSC_JOURNALMETADATAFETCHER_H

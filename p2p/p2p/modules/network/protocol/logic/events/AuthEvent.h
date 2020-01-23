@@ -2,8 +2,8 @@
 // Created by stilgar on 29.08.17.
 //
 
-#ifndef BASYCO_AUTHEVENT_H
-#define BASYCO_AUTHEVENT_H
+#ifndef BSC_AUTHEVENT_H
+#define BSC_AUTHEVENT_H
 
 
 #include "logic/IEvent.h"
@@ -30,4 +30,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_AUTHEVENT_H
+#endif //BSC_AUTHEVENT_H

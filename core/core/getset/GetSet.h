@@ -2,8 +2,8 @@
 // Created by stilgar on 12.12.2019.
 //
 
-#ifndef BASYCO_GETSET_H
-#define BASYCO_GETSET_H
+#ifndef BSC_GETSET_H
+#define BSC_GETSET_H
 
 namespace bsc {
     template<typename T>
@@ -26,4 +26,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_GETSET_H
+#endif //BSC_GETSET_H

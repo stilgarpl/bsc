@@ -2,8 +2,8 @@
 // Created by stilgar on 4/18/19.
 //
 
-#ifndef BASYCO_CHAINGROUP_H
-#define BASYCO_CHAINGROUP_H
+#ifndef BSC_CHAINGROUP_H
+#define BSC_CHAINGROUP_H
 
 
 #include "ChainDefinitions.h"
@@ -23,4 +23,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_CHAINGROUP_H
+#endif //BSC_CHAINGROUP_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 30.12.17.
 //
 
-#ifndef BASYCO_BEGINTRANSFER_H
-#define BASYCO_BEGINTRANSFER_H
+#ifndef BSC_BEGINTRANSFER_H
+#define BSC_BEGINTRANSFER_H
 
 
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
@@ -71,4 +71,4 @@ CEREAL_REGISTER_TYPE(bsc::BeginTransfer::Response)
 
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::BeginTransfer::Request)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::BeginTransfer::Response)
-#endif //BASYCO_BEGINTRANSFER_H
+#endif //BSC_BEGINTRANSFER_H

@@ -2,8 +2,8 @@
 // Created by stilgar on 06.07.18.
 //
 
-#ifndef BASYCO_LOGICOBJECT_H
-#define BASYCO_LOGICOBJECT_H
+#ifndef BSC_LOGICOBJECT_H
+#define BSC_LOGICOBJECT_H
 
 #include <utility>
 #include "LogicManager.h"
@@ -808,4 +808,4 @@ public:
 }
 
 
-#endif //BASYCO_LOGICOBJECT_H
+#endif //BSC_LOGICOBJECT_H

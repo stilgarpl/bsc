@@ -2,8 +2,8 @@
 // Created by stilgar on 07.11.17.
 //
 
-#ifndef BASYCO_DEPENDENCYMANAGER_H
-#define BASYCO_DEPENDENCYMANAGER_H
+#ifndef BSC_DEPENDENCYMANAGER_H
+#define BSC_DEPENDENCYMANAGER_H
 
 #include <vector>
 #include <memory>
@@ -95,4 +95,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_DEPENDENCYMANAGER_H
+#endif //BSC_DEPENDENCYMANAGER_H

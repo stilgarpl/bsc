@@ -2,8 +2,8 @@
 // Created by stilgar on 07.07.18.
 //
 
-#ifndef BASYCO_REMOTENODECONTEXT_H
-#define BASYCO_REMOTENODECONTEXT_H
+#ifndef BSC_REMOTENODECONTEXT_H
+#define BSC_REMOTENODECONTEXT_H
 
 
 #include "RemoteNode.h"
@@ -22,4 +22,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_REMOTENODECONTEXT_H
+#endif //BSC_REMOTENODECONTEXT_H

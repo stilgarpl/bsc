@@ -2,8 +2,8 @@
 // Created by stilgar on 17.10.17.
 //
 
-#ifndef BASYCO_PARTIALJOURNAL_H
-#define BASYCO_PARTIALJOURNAL_H
+#ifndef BSC_PARTIALJOURNAL_H
+#define BSC_PARTIALJOURNAL_H
 
 namespace bsc {
     class PartialJournal {
@@ -11,4 +11,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_PARTIALJOURNAL_H
+#endif //BSC_PARTIALJOURNAL_H

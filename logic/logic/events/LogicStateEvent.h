@@ -2,8 +2,8 @@
 // Created by stilgar on 26.11.18.
 //
 
-#ifndef BASYCO_LOGICSTATEEVENT_H
-#define BASYCO_LOGICSTATEEVENT_H
+#ifndef BSC_LOGICSTATEEVENT_H
+#define BSC_LOGICSTATEEVENT_H
 
 #include <core/signal/OrderedExecutionPolicy.h>
 #include "../IEvent.h"
@@ -48,4 +48,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_LOGICSTATEEVENT_H
+#endif //BSC_LOGICSTATEEVENT_H

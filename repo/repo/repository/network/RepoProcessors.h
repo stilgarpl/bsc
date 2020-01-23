@@ -2,11 +2,12 @@
 // Created by stilgar on 28.02.19.
 //
 
-#ifndef BASYCO_REPOPROCESSORS_H
-#define BASYCO_REPOPROCESSORS_H
+#ifndef BSC_REPOPROCESSORS_H
+#define BSC_REPOPROCESSORS_H
 
 
 #include "RepoQuery.h"
+
 namespace bsc {
     struct RepoProcessors {
 
@@ -15,4 +16,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_REPOPROCESSORS_H
+#endif //BSC_REPOPROCESSORS_H

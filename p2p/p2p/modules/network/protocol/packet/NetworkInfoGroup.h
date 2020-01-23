@@ -2,8 +2,8 @@
 // Created by stilgar on 08.10.17.
 //
 
-#ifndef BASYCO_NETWORKINFOGROUP_H
-#define BASYCO_NETWORKINFOGROUP_H
+#ifndef BSC_NETWORKINFOGROUP_H
+#define BSC_NETWORKINFOGROUP_H
 
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
 
@@ -21,4 +21,4 @@ namespace bsc {
     };
 }
 
-#endif //BASYCO_NETWORKINFOGROUP_H
+#endif //BSC_NETWORKINFOGROUP_H

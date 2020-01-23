@@ -2,8 +2,8 @@
 // Created by stilgar on 23.08.17.
 //
 
-#ifndef BASYCO_IEVENT_H
-#define BASYCO_IEVENT_H
+#ifndef BSC_IEVENT_H
+#define BSC_IEVENT_H
 
 #include <core/context/Context.h>
 #include <core/signal/DefaultExecutionPolicy.h>
@@ -64,4 +64,4 @@ namespace bsc {
 
     }
 }
-#endif //BASYCO_IEVENT_H
+#endif //BSC_IEVENT_H

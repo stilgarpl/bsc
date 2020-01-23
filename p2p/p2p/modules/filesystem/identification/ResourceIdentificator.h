@@ -2,8 +2,8 @@
 // Created by stilgar on 29.12.17.
 //
 
-#ifndef BASYCO_RESOURCEIDENTIFICATOR_H
-#define BASYCO_RESOURCEIDENTIFICATOR_H
+#ifndef BSC_RESOURCEIDENTIFICATOR_H
+#define BSC_RESOURCEIDENTIFICATOR_H
 
 #include <filesystem>
 #include <cereal/access.hpp>
@@ -54,4 +54,4 @@ namespace bsc {
 CEREAL_REGISTER_TYPE(bsc::ResourceIdentificator)
 
 
-#endif //BASYCO_RESOURCEIDENTIFICATOR_H
+#endif //BSC_RESOURCEIDENTIFICATOR_H

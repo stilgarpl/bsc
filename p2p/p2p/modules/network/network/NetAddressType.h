@@ -2,10 +2,10 @@
 // Created by stilgar on 29.10.18.
 //
 
-#ifndef BASYCO_NETADDRESSTYPE_H
-#define BASYCO_NETADDRESSTYPE_H
+#ifndef BSC_NETADDRESSTYPE_H
+#define BSC_NETADDRESSTYPE_H
 
 #include <string>
 
 namespace bsc { typedef std::string NetAddressType; }
-#endif //BASYCO_NETADDRESSTYPE_H
+#endif //BSC_NETADDRESSTYPE_H

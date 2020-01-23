@@ -2,8 +2,8 @@
 // Created by stilgar on 18.10.17.
 //
 
-#ifndef BASYCO_JOURNALGROUP_H
-#define BASYCO_JOURNALGROUP_H
+#ifndef BSC_JOURNALGROUP_H
+#define BSC_JOURNALGROUP_H
 
 
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
@@ -65,4 +65,4 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::JournalGroup::Request
 CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::BasePacket, bsc::JournalGroup::Response)
 
 
-#endif //BASYCO_JOURNALGROUP_H
+#endif //BSC_JOURNALGROUP_H

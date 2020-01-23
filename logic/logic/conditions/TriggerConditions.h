@@ -2,8 +2,8 @@
 // Created by stilgar on 24.03.19.
 //
 
-#ifndef BASYCO_TRIGGERCONDITIONS_H
-#define BASYCO_TRIGGERCONDITIONS_H
+#ifndef BSC_TRIGGERCONDITIONS_H
+#define BSC_TRIGGERCONDITIONS_H
 
 
 #include "../LogicObject.h"
@@ -27,4 +27,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_TRIGGERCONDITIONS_H
+#endif //BSC_TRIGGERCONDITIONS_H

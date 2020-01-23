@@ -2,8 +2,8 @@
 // Created by stilgar on 19.07.18.
 //
 
-#ifndef BASYCO_AUTHSOURCE_H
-#define BASYCO_AUTHSOURCE_H
+#ifndef BSC_AUTHSOURCE_H
+#define BSC_AUTHSOURCE_H
 
 
 #include <p2p/node/NodeInfo.h>
@@ -29,4 +29,4 @@ namespace bsc {
 }
 
 
-#endif //BASYCO_AUTHSOURCE_H
+#endif //BSC_AUTHSOURCE_H

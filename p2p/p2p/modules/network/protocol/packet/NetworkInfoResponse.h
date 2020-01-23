@@ -2,8 +2,8 @@
 // Created by stilgar on 06.10.17.
 //
 
-#ifndef BASYCO_NETWORKINFORESPONSE_H
-#define BASYCO_NETWORKINFORESPONSE_H
+#ifndef BSC_NETWORKINFORESPONSE_H
+#define BSC_NETWORKINFORESPONSE_H
 
 
 #include "NetworkInfoGroup.h"
@@ -44,4 +44,4 @@ namespace bsc {
 
 CEREAL_REGISTER_TYPE(bsc::NetworkInfoResponse)
 
-#endif //BASYCO_NETWORKINFORESPONSE_H
+#endif //BSC_NETWORKINFORESPONSE_H
