@@ -5,7 +5,7 @@
 #ifndef BSC_MODULEEVENT_H
 #define BSC_MODULEEVENT_H
 
-#include <p2p/node/module/ModuleState.h>
+#include <p2p/core/node/module/ModuleState.h>
 #include "logic/IEvent.h"
 
 

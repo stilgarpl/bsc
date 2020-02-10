@@ -2,7 +2,7 @@
 // Created by stilgar on 19.08.2019.
 //
 
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include "StorageManager.h"
 #include "InternalStorage.h"
 namespace bsc {

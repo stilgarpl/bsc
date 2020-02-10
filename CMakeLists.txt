@@ -37,7 +37,6 @@ if (EXISTS ${conan})
             BASIC_SETUP
             BUILD_TYPE "Debug"
             BUILD missing)
-    set(LIBS ${LIBS} ${CONAN_LIBS})
     set(INCLUDES ${CONAN_INCLUDE_DIRS})
 
 else ()

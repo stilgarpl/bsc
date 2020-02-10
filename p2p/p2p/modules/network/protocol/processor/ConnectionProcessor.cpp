@@ -6,8 +6,8 @@
 #include <p2p/modules/network/protocol/connection/Connection.h>
 #include <logic/context/LogicContext.h>
 #include <p2p/modules/network/protocol/logic/sources/ConnectionSource.h>
-#include <p2p/role/Roles.h>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/role/Roles.h>
+#include <p2p/core/node/context/NodeContext.h>
 
 
 namespace bsc {

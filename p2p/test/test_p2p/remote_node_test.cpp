@@ -3,7 +3,7 @@
 //
 
 #include <catch2/catch.hpp>
-#include <p2p/node/Node.h>
+#include <p2p/core/node/Node.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/modules/basic/BasicModule.h>
 

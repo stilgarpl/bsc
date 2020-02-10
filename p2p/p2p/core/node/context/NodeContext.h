@@ -6,8 +6,7 @@
 #define BSC_NODECONTEXTINFO_H
 
 
-#include <p2p/modules/network/protocol/context/exception/NodeContextNotSet.h>
-#include "p2p/node/Node.h"
+#include "p2p/core/node/Node.h"
 
 
 namespace bsc {

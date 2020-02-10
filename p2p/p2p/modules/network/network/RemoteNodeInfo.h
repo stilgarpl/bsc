@@ -6,7 +6,7 @@
 #define BSC_REMOTENODEINFO_H
 
 
-#include <p2p/node/NodeInfo.h>
+#include <p2p/core/node/NodeInfo.h>
 #include <p2p/modules/network/network/NetAddressType.h>
 #include <atomic>
 #include <mutex>

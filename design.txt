@@ -615,5 +615,3 @@ bsc remote "second" --list-commands
 ciekawy problem - mozna pobrać komendy z CommandModule dopiero jak Node wstał i CoMo ma już wszystkie komendy wpisane (niektóre są dodawane przez logikę submodule) - ale same parametry są potrzebne do uruchomienia Node ( sciezka z configiem etc.). W sumie mozna to sobie zapisać z configiem i ładować, albo generować przy kompilacji... Albo po prostu podstawowe komendy ładować statycznie bez uruchamiania node i te wpisywać. resztę user zobaczy po odpaleniu list-commands.
 
 @todo p2p_core powinno być w p2p/p2p/core, przez co nie mieszałoby się z modułami
-
-moze context powinien zwracac zamiast T&, ContextEntry<T> i mieć member std::shared_ptr i przeciążony operator T&() i -> - to unika sytuacji null z pointerów, jednocześnie unikając przypadkowych kopii.  @todo

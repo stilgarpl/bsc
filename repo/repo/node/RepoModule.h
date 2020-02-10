@@ -6,9 +6,9 @@
 #define BSC_REPOMODULE_H
 
 
-#include <p2p/node/module/NodeModule.h>
+#include <p2p/core/node/module/NodeModule.h>
 #include <repo/repository/RepositoryManager.h>
-#include <p2p/dependency/DependencyManaged.h>
+#include <p2p/core/dependency/DependencyManaged.h>
 #include <p2p/modules/network/NetworkModule.h>
 #include <repo/journal/network/packet/JournalGroup.h>
 #include <repo/repository/storage/network/packet/StorageQuery.h>

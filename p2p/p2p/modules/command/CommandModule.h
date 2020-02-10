@@ -8,12 +8,12 @@
 #define BSC_COMMANDMODULE_H
 
 
-#include <p2p/dependency/DependencyManaged.h>
-#include <p2p/node/module/NodeModule.h>
-#include <p2p/node/Node.h>
+#include <p2p/core/dependency/DependencyManaged.h>
+#include <p2p/core/node/module/NodeModule.h>
+#include <p2p/core/node/Node.h>
 #include <p2p/modules/network/remote/RemoteNode.h>
 #include <p2p/modules/network/NetworkModule.h>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include <parser/cast/templateCast.h>
 #include <parser/parameters/CommandLineParameters.h>
 #include <parser/parser/explode.h>

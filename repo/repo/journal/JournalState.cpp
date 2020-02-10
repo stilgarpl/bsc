@@ -4,7 +4,7 @@
 #include <Poco/SHA1Engine.h>
 #include <core/log/Logger.h>
 #include <Poco/Environment.h>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include <core/utils/crypto.h>
 
 #include <utility>

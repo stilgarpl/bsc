@@ -15,7 +15,7 @@
 #include "p2p/modules/basic/BasicModule.h"
 #include <Poco/Net/SocketStream.h>
 #include <p2p/modules/network/protocol/connection/ServerConnection.h>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include <p2p/modules/network/protocol/packet/KeepAlivePacket.h>
 #include <p2p/modules/network/protocol/packet/NodeInfoGroup.h>
 #include <logic/state/LogicStateMachine.h>

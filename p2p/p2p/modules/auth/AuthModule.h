@@ -6,8 +6,8 @@
 #define BSC_AUTHMODULE_H
 
 
-#include <p2p/node/module/NodeModule.h>
-#include <p2p/role/Roles.h>
+#include <p2p/core/node/module/NodeModule.h>
+#include <p2p/core/role/Roles.h>
 
 
 namespace bsc {

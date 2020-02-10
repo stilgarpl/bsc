@@ -11,7 +11,7 @@
 
 #include <p2p/modules/network/protocol/connection/ClientConnection.h>
 #include <Poco/Net/SocketAddress.h>
-#include <p2p/node/NodeInfo.h>
+#include <p2p/core/node/NodeInfo.h>
 #include <p2p/modules/network/protocol/protocol/IProtocol.h>
 #include <p2p/modules/network/network/RemoteNodeInfo.h>
 #include "p2p/modules/network/remote/exception/NotRequestException.h"

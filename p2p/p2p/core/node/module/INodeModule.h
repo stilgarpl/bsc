@@ -7,13 +7,13 @@
 
 
 #include <core/thread/Runnable.h>
-#include <p2p/dependency/IDependencyManaged.h>
-#include "p2p/node/INode.h"
+#include <p2p/core/dependency/IDependencyManaged.h>
+#include "p2p/core/node/INode.h"
 #include "ModuleState.h"
 
 
 #include <any>
-#include <p2p/node/configuration/IConfig.h>
+#include <p2p/core/node/configuration/IConfig.h>
 
 namespace bsc {
     class INodeModule : public virtual IDependencyManaged, public Runnable {

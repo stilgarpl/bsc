@@ -8,7 +8,7 @@
 
 #include <core/utils/cereal_include.h>
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
-#include <p2p/node/NodeInfo.h>
+#include <p2p/core/node/NodeInfo.h>
 
 
 namespace bsc {

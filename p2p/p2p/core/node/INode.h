@@ -6,10 +6,10 @@
 #define BSC_INODE_H
 
 
-#include <p2p/dependency/DependencyManager.h>
-#include <p2p/node/NodeInfo.h>
+#include <p2p/core/dependency/DependencyManager.h>
+#include <p2p/core/node/NodeInfo.h>
 #include <core/context/Context.h>
-#include <p2p/node/configuration/ConfigurationManager.h>
+#include <p2p/core/node/configuration/ConfigurationManager.h>
 #include <logic/LogicManager.h>
 
 

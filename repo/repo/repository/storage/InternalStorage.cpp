@@ -7,7 +7,7 @@
 #include <p2p/modules/filesystem/FilesystemModule.h>
 
 #include <utility>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include "InternalStorage.h"
 #include "StorageResourceIdentificator.h"
 

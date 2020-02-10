@@ -10,8 +10,8 @@
 #define BSC_FILESYSTEMMODULE_H
 
 
-#include <p2p/node/module/NodeModule.h>
-#include <p2p/dependency/DependencyManaged.h>
+#include <p2p/core/node/module/NodeModule.h>
+#include <p2p/core/dependency/DependencyManaged.h>
 
 #include <filesystem>
 #include <p2p/modules/filesystem/transfer/TransferManager.h>

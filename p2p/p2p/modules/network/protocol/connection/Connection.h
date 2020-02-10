@@ -14,7 +14,7 @@
 #include <condition_variable>
 #include <p2p/modules/network/protocol/processor/ConnectionProcessor.h>
 #include <p2p/modules/network/protocol/packet/BasePacket.h>
-#include <p2p/role/RoleScope.h>
+#include <p2p/core/role/RoleScope.h>
 #include <p2p/modules/network/network/NetAddressType.h>
 #include <logic/state/LogicStateMachine.h>
 #include <logic/state/DirectNotify.h>

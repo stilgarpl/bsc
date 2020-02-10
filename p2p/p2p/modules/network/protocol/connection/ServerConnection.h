@@ -7,7 +7,7 @@
 
 #include <Poco/Net/TCPServerConnection.h>
 #include <Poco/Net/TCPServerConnectionFactory.h>
-#include <p2p/node/Node.h>
+#include <p2p/core/node/Node.h>
 #include "Connection.h"
 #include "IServerConnection.h"
 

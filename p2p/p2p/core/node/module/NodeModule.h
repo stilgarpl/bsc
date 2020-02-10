@@ -8,15 +8,15 @@
 #define BSC_NODEMODULE_H
 
 
-#include <p2p/node/module/logic/ILogicModule.h>
-#include <p2p/dependency/IDependencyManaged.h>
-#include <p2p/dependency/DependencyManaged.h>
-#include <p2p/node/configuration/ConfigurationManager.h>
-#include "p2p/node/INode.h"
+#include <p2p/core/node/module/logic/ILogicModule.h>
+#include <p2p/core/dependency/IDependencyManaged.h>
+#include <p2p/core/dependency/DependencyManaged.h>
+#include <p2p/core/node/configuration/ConfigurationManager.h>
+#include "p2p/core/node/INode.h"
 #include "INodeModule.h"
 
 
-#include <p2p/node/module/logic/ModuleSource.h>
+#include <p2p/core/node/module/logic/ModuleSource.h>
 
 namespace bsc {
     class NodeModule : public bsc::ILogicModule {

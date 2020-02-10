@@ -5,7 +5,7 @@
 
 #include <p2p/modules/network/NetworkModule.h>
 
-#include "p2p/node/context/NodeContext.h"
+#include "p2p/core/node/context/NodeContext.h"
 #include "logic/context/LogicContext.h"
 #include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
 

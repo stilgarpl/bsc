@@ -6,8 +6,8 @@
 #define BSC_NETWORKMODULE_H
 
 
-#include <p2p/node/module/NodeModule.h>
-#include <p2p/dependency/DependencyManaged.h>
+#include <p2p/core/node/module/NodeModule.h>
+#include <p2p/core/dependency/DependencyManaged.h>
 #include <Poco/Net/ServerSocket.h>
 #include <Poco/Net/TCPServer.h>
 
@@ -16,7 +16,7 @@
 #include <p2p/modules/network/protocol/broadcast/BroadcastScope.h>
 #include <p2p/modules/network/network/NetworkInfo.h>
 #include <p2p/modules/network/remote/RemoteNode.h>
-#include <p2p/role/RoleScope.h>
+#include <p2p/core/role/RoleScope.h>
 #include <logic/events/LogicStateEvent.h>
 #include <p2p/modules/network/protocol/logic/conditions/NetworkConditions.h>
 #include <p2p/modules/network/remote/exception/RemoteNodeConnectionException.h>

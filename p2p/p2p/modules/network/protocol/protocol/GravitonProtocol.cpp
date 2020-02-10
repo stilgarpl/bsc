@@ -2,7 +2,7 @@
 // Created by stilgar on 06.09.17.
 //
 
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include "GravitonProtocol.h"
 
 void bsc::GravitonProtocol::onPacketSent(const PacketEvent& event) {

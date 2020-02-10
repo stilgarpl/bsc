@@ -6,4 +6,4 @@ add_executable(test_core ${SOURCE_FILES})
 catch_discover_tests(test_core)
 
 #target_include_directories(test_core PUBLIC test_core)
-target_link_libraries(test_core PUBLIC core PRIVATE ${LIBS})
+target_link_libraries(test_core PUBLIC core PRIVATE)

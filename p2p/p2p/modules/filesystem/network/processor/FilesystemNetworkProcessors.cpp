@@ -3,7 +3,7 @@
 //
 
 #include <p2p/modules/filesystem/FilesystemModule.h>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include "FilesystemNetworkProcessors.h"
 
 namespace bsc {

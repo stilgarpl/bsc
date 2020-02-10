@@ -6,14 +6,14 @@
 #define BSC_NODE_H
 
 
-#include "p2p/node/configuration/IConfig.h"
+#include "p2p/core/node/configuration/IConfig.h"
 #include "logic/SourceManager.h"
 #include "logic/LogicManager.h"
 #include "INode.h"
 #include <memory>
-#include <p2p/dependency/DependencyManager.h>
-#include <p2p/role/RoleScope.h>
-#include <p2p/node/configuration/ConfigurationManager.h>
+#include <p2p/core/dependency/DependencyManager.h>
+#include <p2p/core/role/RoleScope.h>
+#include <p2p/core/node/configuration/ConfigurationManager.h>
 
 
 namespace bsc {

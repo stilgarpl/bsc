@@ -5,7 +5,7 @@
 #include <core/log/Logger.h>
 #include <p2p/modules/network/protocol/logic/sources/NetworkSource.h>
 #include <logic/context/LogicContext.h>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include "NetworkInfoResponse.h"
 
 

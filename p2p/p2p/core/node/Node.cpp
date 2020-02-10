@@ -4,11 +4,11 @@
 
 
 #include "Node.h"
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include <core/log/LoggerContext.h>
 #include <core/factory/FactoryContext.h>
 #include <core/io/InputOutputContext.h>
-#include "p2p/node/module/NodeModule.h"
+#include "p2p/core/node/module/NodeModule.h"
 
 
 bsc::Node::~Node() {

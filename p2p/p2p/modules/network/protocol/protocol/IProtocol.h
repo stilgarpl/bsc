@@ -11,7 +11,7 @@
 #include <future>
 #include <p2p/modules/network/protocol/connection/Connection.h>
 #include <p2p/modules/network/protocol/logic/events/PacketEvent.h>
-#include <p2p/node/module/logic/ILogicModule.h>
+#include <p2p/core/node/module/logic/ILogicModule.h>
 #include <p2p/modules/network/protocol/logic/events/ConnectionEvent.h>
 #include <p2p/modules/network/protocol/logic/events/ConnectionEvent.h>
 

@@ -2,7 +2,7 @@
 #include <thread>
 
 //#define CEREAL_THREAD_SAFE 1
-#include "p2p/node/Node.h"
+#include "p2p/core/node/Node.h"
 #include "logic/sources/ClockSource.h"
 #include "p2p/modules/network/protocol/logic/sources/ConnectionSource.h"
 #include "p2p/modules/network/protocol/logic/actions/ProtocolActions.h"

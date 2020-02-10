@@ -4,7 +4,7 @@
 
 #include <p2p/modules/network/protocol/packet/BasePacket.h>
 #include <core/context/Context.h>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include <p2p/modules/network/protocol/context/ConnectionContext.h>
 #include "NodeInfoGroup.h"
 

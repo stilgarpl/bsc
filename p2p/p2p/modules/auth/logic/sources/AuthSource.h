@@ -6,7 +6,7 @@
 #define BSC_AUTHSOURCE_H
 
 
-#include <p2p/node/NodeInfo.h>
+#include <p2p/core/node/NodeInfo.h>
 #include <logic/sources/EventQueueSource.h>
 #include <p2p/modules/auth/logic/events/AuthHelloEvent.h>
 

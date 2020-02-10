@@ -4,7 +4,7 @@
 
 #include <Poco/Environment.h>
 #include <core/context/Context.h>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include "SimpleJournalMetaDataFetcher.h"
 namespace bsc {
 

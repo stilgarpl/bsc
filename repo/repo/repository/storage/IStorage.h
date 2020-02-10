@@ -7,7 +7,7 @@
 
 
 #include <repo/journal/JournalTypes.h>
-#include <p2p/node/NodeInfo.h>
+#include <p2p/core/node/NodeInfo.h>
 #include <filesystem>
 #include <utility>
 #include <p2p/modules/filesystem/transfer/TransferManager.h>

@@ -7,7 +7,7 @@
 
 
 #include <core/log/Logger.h>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include <repo/node/RepoModule.h>
 namespace bsc {
 

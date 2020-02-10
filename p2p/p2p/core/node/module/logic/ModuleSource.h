@@ -6,8 +6,8 @@
 #define BSC_MODULESOURCE_H
 
 
-#include <p2p/node/module/ModuleState.h>
-#include "p2p/node/module/logic/events/ModuleEvent.h"
+#include <p2p/core/node/module/ModuleState.h>
+#include "p2p/core/node/module/logic/events/ModuleEvent.h"
 
 
 #include <logic/sources/AutoSource.h>

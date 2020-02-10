@@ -8,7 +8,7 @@
 
 #include <core/utils/cereal_include.h>
 #include <core/utils/crypto.h>
-#include <p2p/node/NodeInfo.h>
+#include <p2p/core/node/NodeInfo.h>
 #include "JournalTypes.h"
 
 namespace bsc {

@@ -13,7 +13,7 @@
 #include <core/log/Logger.h>
 
 #include <core/context/Context.h>
-#include <p2p/role/Roles.h>
+#include <p2p/core/role/Roles.h>
 
 
 namespace bsc {

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "p2p/node/Node.h"
+#include "p2p/core/node/Node.h"
 #include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
 #include "p2p/modules/network/protocol/logic/actions/NodeActions.h"
 #include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"

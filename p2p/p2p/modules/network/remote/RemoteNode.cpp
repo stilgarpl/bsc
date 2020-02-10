@@ -3,7 +3,7 @@
 //
 
 #include <optional>
-#include <p2p/node/NodeInfo.h>
+#include <p2p/core/node/NodeInfo.h>
 #include "RemoteNode.h"
 #include "RemoteNodeContext.h"
 #include <Poco/Net/NetException.h>

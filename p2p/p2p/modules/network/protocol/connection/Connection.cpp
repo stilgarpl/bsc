@@ -7,7 +7,7 @@
 #include <logic/context/LogicContext.h>
 #include <p2p/modules/network/protocol/context/ConnectionContext.h>
 #include <Poco/Exception.h>
-#include <p2p/node/context/NodeContext.h>
+#include <p2p/core/node/context/NodeContext.h>
 #include <Poco/Net/NetException.h>
 #include "ConnectionException.h"
 #include "Connection.h"
