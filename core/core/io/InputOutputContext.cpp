@@ -20,6 +20,6 @@ std::ostream& bsc::StandardInputOutputContext::err() {
 }
 
 bsc::InputOutputContext& bsc::InputOutputContext::active() {
-    return bsc::Context::getActiveContext()->get<bsc::InputOutputContext>();
+    return Context::getActiveContext()->get<bsc::InputOutputContext>();
 
 }

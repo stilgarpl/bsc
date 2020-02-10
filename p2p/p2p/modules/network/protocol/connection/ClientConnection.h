@@ -20,7 +20,7 @@ namespace bsc {
         ClientConnection(const Poco::Net::SocketAddress& a, const Context::Ptr&);
 
     public:
-        ClientConnection(const std::string& a, Context::Ptr);
+        ClientConnection(const std::string& a, const Context::Ptr&);
 
         //@todo think about the Connection interface and those method names.
         void startReceivingImpl();

@@ -83,7 +83,7 @@ namespace bsc {
 
             if (res && res->isRunStatus()) {
                 LOGGER("remote run successful")
-                auto& out = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>().out();
+                auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
 //            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
                 out << res->getOutput();
             } else {
@@ -112,7 +112,7 @@ namespace bsc {
 
             if (res && res->isRunStatus()) {
                 LOGGER("remote run successful")
-                auto& out = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>().out();
+                auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
 //            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
                 out << res->getOutput();
             } else {
@@ -157,10 +157,10 @@ namespace bsc {
         if (args.size() >= 1) {
             std::string command = args[0];
             std::vector<std::string> rest(args.begin() + 1, args.end());
-            auto activeContext = bsc::Context::getActiveContext();
+            auto activeContext = Context::getActiveContext();
             //@todo think about mutexes and thread safety
             std::thread([this, command, rest, activeContext] {
-                bsc::Context::setActiveContext(activeContext);
+                Context::setActiveContext(activeContext);
                 this->runCommand(command, rest);
             }).detach();
 
@@ -176,7 +176,7 @@ namespace bsc {
 
             //setting up remote command context.
             //@todo simplify context making
-            bsc::Context::OwnPtr remoteCommandContext = bsc::Context::makeContext(bsc::Context::getActiveContext());
+            Context::OwnPtr remoteCommandContext = Context::makeContext(Context::getActiveContext());
             auto ioContext = std::make_shared<bsc::CommandInputOutputContext>();
             remoteCommandContext->setDirect<bsc::InputOutputContext>(ioContext);
             {
@@ -195,13 +195,13 @@ namespace bsc {
     }
 
     void CommandModule::parametersTestingCommand(const CommandModule::CommandPP& params) {
-        auto& io = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>();
+        auto io = Context::getActiveContext()->get<bsc::InputOutputContext>();
 
-        io.out() << std::string("got params " + std::to_string(params.a().value_or(-1)));
+        io->out() << std::string("got params " + std::to_string(params.a().value_or(-1)));
     }
 
 
-    CommandModule::CommandGroup& CommandModule::CommandGroup::group(std::string name) {
+    CommandModule::CommandGroup& CommandModule::CommandGroup::group(const std::string& name) {
         if (groups.count(name) == 0) {
             auto newGroup = std::make_shared<CommandGroup>(parent);
             groups[name] = newGroup;

@@ -18,11 +18,11 @@ namespace bsc {
     void ConnectionProcessor::run() {
 
         //setDirect up context
-        bsc::Context::Ptr context = connection.getConnectionContext();
-        bsc::Context::setActiveContext(context);
-        logger.info("ConnectionProcessor start " + context->get<NodeContext>().getNodeInfo().getNodeId());
-        auto& lc = context->get<bsc::LogicContext>();
-        auto& logicManager = lc.getLogicManager();
+        Context::Ptr context = connection.getConnectionContext();
+        Context::setActiveContext(context);
+        logger.info("ConnectionProcessor start " + context->get<NodeContext>()->getNodeInfo().getNodeId());
+        auto lc = context->get<bsc::LogicContext>();
+        auto& logicManager = lc->getLogicManager();
         auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
         Roles::setActiveScope(&connection);

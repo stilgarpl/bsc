@@ -28,7 +28,7 @@ namespace bsc {
 
         //shortcut method for getting node from active context
         static Node& getNodeFromActiveContext() {
-            return Context::getActiveContext()->get<NodeContext>().getNode();
+            return Context::getActiveContext()->get<NodeContext>()->getNode();
         }
     };
 }

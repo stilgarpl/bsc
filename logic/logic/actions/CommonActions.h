@@ -33,7 +33,7 @@ namespace bsc {
                 for (const auto& it : containerGetter()) {
                     const auto& transformIt = transformer(it);
                     Context::getActiveContext()->get < ForeachContext <
-                    std::decay_t<decltype(transformIt)>>>().setValue(
+                    std::decay_t<decltype(transformIt)>>>()->setValue(
                             transformIt);
                     func(param...);
                 }

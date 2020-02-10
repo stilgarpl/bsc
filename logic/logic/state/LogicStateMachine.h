@@ -15,7 +15,7 @@
 
 namespace bsc {
     template<typename StateObject, typename stateIdType, template<typename, typename> typename NotifyMethodType>
-    class LogicStateMachine : public bsc::StateMachine<stateIdType>, public bsc::Observee<StateObject, stateIdType> {
+    class LogicStateMachine : public StateMachine<stateIdType>, public Observee<StateObject, stateIdType> {
     public:
         using StateIdType = stateIdType;
         using EventType = LogicStateEvent<StateObject, stateIdType>;

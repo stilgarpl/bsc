@@ -162,7 +162,7 @@ namespace bsc {
         //@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
         bsc::Uber<Type> sourcesByType;
         //@todo it would appear that the common context is not actually used - it is replaced by context from events.
-        bsc::Context::OwnPtr commonContext = bsc::Context::makeContext();
+        Context::OwnPtr commonContext = Context::makeContext();
     public:
 
 
@@ -223,7 +223,7 @@ namespace bsc {
 //            it->setContext(context);
 //        }
 //    }
-        void setContext(const bsc::Context::Ptr& context);
+        void setContext(const Context::Ptr& context);
 
 
     };

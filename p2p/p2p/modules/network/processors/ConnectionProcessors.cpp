@@ -10,7 +10,7 @@ namespace bsc {
     ConnectionControl::Response::Ptr
     ConnectionProcessors::processConnectionControl(ConnectionControl::Request::Ptr request) {
         LOGGER("diconnection processor")
-        bsc::Context::getActiveContext()->get<RemoteNodeContext>().getRemoteNode().disconnect();
+        Context::getActiveContext()->get<RemoteNodeContext>()->getRemoteNode().disconnect();
 
         return nullptr;
     }

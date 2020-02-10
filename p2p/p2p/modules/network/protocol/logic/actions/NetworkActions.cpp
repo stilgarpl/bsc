@@ -10,37 +10,37 @@
 
 
 void bsc::NetworkActions::updateNetworkInfo(const NetworkInfoEvent& event) {
-    bsc::Context::Ptr context = bsc::Context::getActiveContext();
-    auto& nodeContext = context->get<NodeContext>();
+    Context::Ptr context = Context::getActiveContext();
+    auto nodeContext = context->get<NodeContext>();
 
-    auto& node = nodeContext.getNode();
+    auto& node = nodeContext->getNode();
     if (node.getModule<NetworkModule>()->getNetworkInfo() != nullptr &&
         node.getModule<NetworkModule>()->getNetworkInfo()->getNetworkId() ==
         event.getNetworkInfo().getNetworkId()) {
         //     LOGGER("SAME NETWORK! " + event.getNetworkInfo().getNetworkId());
         *node.getModule<NetworkModule>()->getNetworkInfo() += event.getNetworkInfo();
 
-        }
-        // LOGGER("received network info: " + event.getNetworkInfo().getNetworkId());
+    }
+    // LOGGER("received network info: " + event.getNetworkInfo().getNetworkId());
 
 }
 
 void bsc::NetworkActions::saveNetworkInfo(const ModuleEvent<NetworkModule>& event) {
-    bsc::Context::Ptr context = bsc::Context::getActiveContext();
+    Context::Ptr context = Context::getActiveContext();
 //    LOGGER("SAVE NETWORK INFO")
-    auto& nodeContext = context->get<NodeContext>();
+    auto nodeContext = context->get<NodeContext>();
 
-    auto& node = nodeContext.getNode();
+    auto& node = nodeContext->getNode();
     node.getConfigurationManager().saveData<NetworkInfo>("networkInfo.dat", *event.getModule().getNetworkInfo());
 
 }
 
 void bsc::NetworkActions::loadNetworkInfo(const ModuleEvent<NetworkModule>& event) {
-    bsc::Context::Ptr context = bsc::Context::getActiveContext();
+    Context::Ptr context = Context::getActiveContext();
 //    LOGGER("LOAD NETWORK INFO")
-    auto& nodeContext = context->get<NodeContext>();
+    auto nodeContext = context->get<NodeContext>();
 
-    auto& node = nodeContext.getNode();
+    auto& node = nodeContext->getNode();
     try {
         event.getModule().getNetworkInfo() = std::make_shared<NetworkInfo>(
                 node.getConfigurationManager().loadData<NetworkInfo>("networkInfo.dat"));
@@ -54,11 +54,11 @@ void bsc::NetworkActions::loadNetworkInfo(const ModuleEvent<NetworkModule>& even
 }
 
 void bsc::NetworkActions::broadcastPacket(BasePacketPtr packet) {
-    bsc::Context::Ptr context = bsc::Context::getActiveContext();
+    Context::Ptr context = Context::getActiveContext();
     LOGGER("BROADCAST PACKET")
-    auto& nodeContext = context->get<NodeContext>();
+    auto nodeContext = context->get<NodeContext>();
 
-    auto& node = nodeContext.getNode();
+    auto& node = nodeContext->getNode();
     //@todo null handle
     node.getModule<NetworkModule>()->broadcastPacket(std::move(packet));
 

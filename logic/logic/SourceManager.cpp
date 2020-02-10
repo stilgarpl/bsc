@@ -14,7 +14,7 @@ namespace bsc {
     }
 
 
-    void SourceManager::setContext(const bsc::Context::Ptr& context) {
+    void SourceManager::setContext(const Context::Ptr& context) {
 //    *commonContext += context;
         commonContext->setParentContext(context);
         commonContext->setDebugId("source manager common context");
@@ -24,7 +24,7 @@ namespace bsc {
     }
 
     void SourceManager::startSources() {
-        bsc::Context::setActiveContext(commonContext);
+        Context::setActiveContext(commonContext);
         for (auto&& source : sources) {
             source->start();
         }

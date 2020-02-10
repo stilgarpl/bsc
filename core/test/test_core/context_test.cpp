@@ -8,31 +8,32 @@
 #include <core/io/InputOutputContext.h>
 #include <sstream>
 
+using namespace bsc;
 
 TEST_CASE("Context test") {
     const std::string contextName = "context field name";
     const int value = 5;
 
-    bsc::Context::OwnPtr localContext = bsc::Context::makeContext();
+    Context::OwnPtr localContext = Context::makeContext();
     SECTION("active context test") {
-        REQUIRE(!bsc::Context::hasActiveContext());
-        bsc::Context::setActiveContext(localContext);
-        REQUIRE(bsc::Context::getActiveContext() == localContext);
+        REQUIRE(!Context::hasActiveContext());
+        Context::setActiveContext(localContext);
+        REQUIRE(Context::getActiveContext() == localContext);
 
         SECTION("active context thread test") {
-            REQUIRE(bsc::Context::getActiveContext() == localContext);
-            bsc::Context::OwnPtr otherContext = bsc::Context::makeContext(localContext);
+            REQUIRE(Context::getActiveContext() == localContext);
+            Context::OwnPtr otherContext = Context::makeContext(localContext);
             //each thread has its own context, so new thread won't have an active context until setDirect.
             std::thread([&otherContext]() {
-                REQUIRE(!bsc::Context::hasActiveContext());
-                bsc::Context::setActiveContext(otherContext);
-                REQUIRE(bsc::Context::getActiveContext() == otherContext);
+                REQUIRE(!Context::hasActiveContext());
+                Context::setActiveContext(otherContext);
+                REQUIRE(Context::getActiveContext() == otherContext);
             }).join();
-            REQUIRE(bsc::Context::getActiveContext() == localContext);
+            REQUIRE(Context::getActiveContext() == localContext);
         }
 
     }
-    bsc::Context::OwnPtr childContext = bsc::Context::makeContext(localContext);
+    Context::OwnPtr childContext = Context::makeContext(localContext);
 
     SECTION("parent context value") {
         REQUIRE(!localContext->has<int>(contextName));
@@ -40,8 +41,8 @@ TEST_CASE("Context test") {
         localContext->setKey<int>(contextName, value);
         REQUIRE(localContext->has<int>(contextName));
         REQUIRE(childContext->has<int>(contextName));
-        REQUIRE(localContext->get<int>(contextName) == value);
-        REQUIRE(childContext->get<int>(contextName) == value);
+        REQUIRE(*localContext->get<int>(contextName) == value);
+        REQUIRE(*childContext->get<int>(contextName) == value);
     }
 
     SECTION("child context value") {
@@ -50,7 +51,7 @@ TEST_CASE("Context test") {
         childContext->setKey<int>(contextName, value);
         REQUIRE(!localContext->has<int>(contextName));
         REQUIRE(childContext->has<int>(contextName));
-        REQUIRE(childContext->get<int>(contextName) == value);
+        REQUIRE(*childContext->get<int>(contextName) == value);
     }
 
 
@@ -78,13 +79,14 @@ public:
 };
 
 TEST_CASE("InputOutput Context test") {
-    bsc::Context::OwnPtr context = bsc::Context::makeContext();
-    bsc::Context::setActiveContext(context);
-    context->setDirect<bsc::InputOutputContext>(std::make_shared<TestInputOutputContext>());
+    Context::OwnPtr context = Context::makeContext();
+    Context::setActiveContext(context);
+    auto ctx = std::make_shared<TestInputOutputContext>();
+    context->setDirect<bsc::InputOutputContext>(ctx);
 
-    auto& out = context->get<bsc::InputOutputContext>().out();
-    auto& in = context->get<bsc::InputOutputContext>().in();
-    auto& stream = static_cast<TestInputOutputContext&>(context->get<bsc::InputOutputContext>()).getStream();
+    auto& out = context->get<InputOutputContext>()->out();
+    auto& in = context->get<InputOutputContext>()->in();
+    auto& stream = ctx->getStream();
 
     const std::string testString = "TEST STRING";
     out << testString;
@@ -96,16 +98,16 @@ TEST_CASE("InputOutput Context test") {
 }
 
 TEST_CASE("Invalid context test") {
-    bsc::Context::OwnPtr context = bsc::Context::makeContext();
+    Context::OwnPtr context = Context::makeContext();
     REQUIRE_THROWS_AS(context->setDirect<bsc::InputOutputContext>(std::make_shared<int>()),
                       bsc::InvalidContextException);
 }
 
 TEST_CASE("Context loop test") {
-    bsc::Context::OwnPtr context1 = bsc::Context::makeContext();
-    bsc::Context::OwnPtr context2 = bsc::Context::makeContext();
+    Context::OwnPtr context1 = Context::makeContext();
+    Context::OwnPtr context2 = Context::makeContext();
     context2->setParentContext(context1);
-    bsc::Context::OwnPtr context3 = bsc::Context::makeContext();
+    Context::OwnPtr context3 = Context::makeContext();
     context3->setParentContext(context2);
     REQUIRE_THROWS_AS(context1->setParentContext(context3), bsc::ContextLoopException);
 }

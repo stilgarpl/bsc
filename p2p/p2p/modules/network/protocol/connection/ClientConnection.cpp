@@ -12,16 +12,16 @@
 #include "ClientConnection.h"
 
 
-bsc::ClientConnection::ClientConnection(const Poco::Net::SocketAddress& a, const bsc::Context::Ptr& context)
+bsc::ClientConnection::ClientConnection(const Poco::Net::SocketAddress& a, const Context::Ptr& context)
         : bsc::Connection(
         context),
           socket(a) {
 
-    auto& lm = getConnectionContext()->get<bsc::LogicContext>();
+    auto lm = getConnectionContext()->get<LogicContext>();
 
     LOGGER("adding new connection, triggering connection established event")
 
-    lm.getLogicManager().getSource<bsc::ConnectionSource>()->connectionEstablished(this);
+    lm->getLogicManager().getSource<bsc::ConnectionSource>()->connectionEstablished(this);
 
 
 }
@@ -69,8 +69,8 @@ void bsc::ClientConnection::shutdown() {
         }
     }
     changeState(ConnectionState::DISCONNECTED);
-    auto& lc = getConnectionContext()->get<bsc::LogicContext>();
-    auto& logicManager = lc.getLogicManager();
+    auto lc = getConnectionContext()->get<bsc::LogicContext>();
+    auto& logicManager = lc->getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<bsc::ConnectionSource>();
     connectionSourcePtr->connectionClosedClient(this);
 
@@ -80,8 +80,8 @@ Poco::Net::StreamSocket& bsc::ClientConnection::getSocket() {
     return socket;
 }
 
-bsc::ClientConnection::ClientConnection(const std::string& a, bsc::Context::Ptr ptr) : ClientConnection(
+bsc::ClientConnection::ClientConnection(const std::string& a, const Context::Ptr& ptr) : ClientConnection(
         Poco::Net::SocketAddress(a),
-        std::move(ptr)) {
+        ptr) {
 
 }

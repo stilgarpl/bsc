@@ -24,7 +24,7 @@ void bsc::ServerConnection::run() {
     // std::cout << "opening server connection" << std::endl;
     // LOGGER("Opening server connection");
     //run is already in a separate thread, so there is no need to start a new one
-    bsc::Context::setActiveContext(getConnectionContext());
+    Context::setActiveContext(getConnectionContext());
 //    socket().setReceiveTimeout(Poco::Timespan(150, 1));
 //    socket().setSendTimeout(Poco::Timespan(150, 1));
 //    socket().setKeepAlive(true);
@@ -49,14 +49,14 @@ void bsc::ServerConnection::run() {
 
 }
 
-bsc::ServerConnection::ServerConnection(const Poco::Net::StreamSocket& socket, bsc::Context::Ptr context)
+bsc::ServerConnection::ServerConnection(const Poco::Net::StreamSocket& socket, Context::Ptr context)
         : TCPServerConnection(
         socket),
           bsc::IServerConnection(std::move(context)) {
 
-    bsc::Context::setActiveContext(getConnectionContext());
-    auto& lc = getConnectionContext()->get<bsc::LogicContext>();
-    auto& logicManager = lc.getLogicManager();
+    Context::setActiveContext(getConnectionContext());
+    auto lc = getConnectionContext()->get<bsc::LogicContext>();
+    auto& logicManager = lc->getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
     connectionSourcePtr->connectionAccepted(this);
 }
@@ -85,7 +85,7 @@ void bsc::ServerConnection::shutdown() {
     try {
         socket().shutdown();
 //        auto lc = getConnectionContext().get<LogicContext>();
-//        auto &logicManager = lc.getLogicManager();
+//        auto &logicManager = lc->getLogicManager();
 //        auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 //        connectionSourcePtr->connectionClosedServer(this);
     }
@@ -107,7 +107,7 @@ Poco::Net::StreamSocket& bsc::ServerConnection::getSocket() {
 
 Poco::Net::TCPServerConnection* bsc::ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket& socket) {
     LOGGER("creating server connection");
-    bsc::Context::Ptr connectionContext = contextGetter();
+    Context::Ptr connectionContext = contextGetter();
     bsc::SetLocalContext localContext(connectionContext); //RAII
     bsc::ServerConnection* connection = new bsc::ServerConnection(socket, connectionContext);
     for (const auto& observer : observers) {
@@ -116,6 +116,6 @@ Poco::Net::TCPServerConnection* bsc::ServerConnectionFactory::createConnection(c
     return connection;
 }
 
-bsc::ServerConnectionFactory::ServerConnectionFactory(std::function<bsc::Context::OwnPtr(void)> contextGetter,
+bsc::ServerConnectionFactory::ServerConnectionFactory(std::function<Context::OwnPtr(void)> contextGetter,
                                                       std::list<std::reference_wrapper<bsc::Connection::ObserverType>> observers)
         : contextGetter(std::move(contextGetter)), observers(std::move(observers)) {}

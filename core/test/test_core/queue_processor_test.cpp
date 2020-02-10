@@ -9,6 +9,7 @@
 #include <functional>
 #include <utility>
 
+using namespace bsc;
 
 class TestProcessor : public bsc::ThreadQueueProcessor<int, int> {
 //    std::function<void(int,int)> func ;
@@ -18,7 +19,7 @@ public:
 };
 
 TEST_CASE("Queue processor test") {
-    bsc::Context::setActiveContext(bsc::Context::makeContext());
+    Context::setActiveContext(Context::makeContext());
     int lastToken = 0;
     int lastSender = 0;
     int token = 5;

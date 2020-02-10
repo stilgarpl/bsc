@@ -47,9 +47,9 @@ bsc::BasePacketPtr bsc::Connection::receive() {
 
 void bsc::Connection::workSend(Poco::Net::StreamSocket& socket) {
     Poco::Net::SocketOutputStream os(socket);
-    bsc::Context::setActiveContext(getConnectionContext());
-    auto& lc = getConnectionContext()->get<bsc::LogicContext>();
-    auto& logicManager = lc.getLogicManager();
+    Context::setActiveContext(getConnectionContext());
+    auto lc = getConnectionContext()->get<bsc::LogicContext>();
+    auto& logicManager = lc->getLogicManager();
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
     while (sending || !sendQueue.empty()) {
@@ -117,9 +117,9 @@ void bsc::Connection::workSend(Poco::Net::StreamSocket& socket) {
 
 void bsc::Connection::workReceive(Poco::Net::StreamSocket& socket) {
 
-    bsc::Context::setActiveContext(getConnectionContext());
-    auto& lc = getConnectionContext()->get<bsc::LogicContext>();
-    auto& logicManager = lc.getLogicManager();
+    Context::setActiveContext(getConnectionContext());
+    auto lc = getConnectionContext()->get<bsc::LogicContext>();
+    auto& logicManager = lc->getLogicManager();
     //@todo totally replace all connection source references here with observer pattern
     auto connectionSourcePtr = logicManager.getSource<ConnectionSource>();
 
@@ -249,8 +249,8 @@ void bsc::Connection::stopReceiving() {
     //  processor.stop();
 }
 
-bsc::Connection::Connection(const bsc::Context::Ptr& context) : LogicStateMachine(*this), processor(*this),
-                                                                connectionContext(bsc::Context::makeContext(context)) {
+bsc::Connection::Connection(const Context::Ptr& context) : LogicStateMachine(*this), processor(*this),
+                                                           connectionContext(Context::makeContext(context)) {
 
     connectionContext->set<ConnectionContext, bsc::Connection&>(*this);
 

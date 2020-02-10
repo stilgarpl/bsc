@@ -20,7 +20,7 @@ void bsc::LogicManager::run() {
 
 }
 
-void bsc::LogicManager::setContexts(const bsc::Context::Ptr& context) {
+void bsc::LogicManager::setContexts(const Context::Ptr& context) {
     context->set<bsc::LogicContext, LogicManager&>(*this);
     sourceManager.setContext(context);
 }

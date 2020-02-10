@@ -22,7 +22,7 @@ namespace bsc {
 
         //shortcut method for getting logic manager from active context
         static LogicManager& getLogicManagerFromActiveContext() {
-            return Context::getActiveContext()->get<LogicContext>().getLogicManager();
+            return Context::getActiveContext()->get<LogicContext>()->getLogicManager();
         }
     };
 }

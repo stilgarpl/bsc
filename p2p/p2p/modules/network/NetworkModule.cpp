@@ -264,7 +264,7 @@ namespace bsc {
 
     void NetworkModule::printConnections() {
         std::lock_guard<std::mutex> g(activeConnectionsMutex);
-        auto& out = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>().out();
+        auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
         out << "[" << node.getNodeInfo().getNodeId() << "]:" << std::to_string(acceptedConnections.size())
             << std::endl;
         for (auto&& item : remoteNodes) {
@@ -404,7 +404,7 @@ namespace bsc {
             case ConnectionState::NEW:
                 break;
             case ConnectionState::CONNECTED:
-                bsc::Context::getActiveContext()->get<RemoteNodeContext>().getRemoteNode().connect(&connection);
+                Context::getActiveContext()->get<RemoteNodeContext>()->getRemoteNode().connect(&connection);
 //            getRemoteNode().connect(&connection);
                 break;
             case ConnectionState::DISCONNECTED:

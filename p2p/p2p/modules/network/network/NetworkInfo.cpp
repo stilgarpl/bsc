@@ -24,16 +24,16 @@ void bsc::NetworkInfo::setNetworkId(const NetworkIdType& networkId) {
 void bsc::NetworkInfo::addKnownNode(const bsc::NodeInfo& nodeInfo) {
     std::unique_lock g(networkInfoLock);
 
-    bsc::Context::Ptr context = bsc::Context::getActiveContext();
-    auto& nodeContext = context->get<NodeContext>();
-    auto& node = nodeContext.getNode();
+    Context::Ptr context = Context::getActiveContext();
+    auto nodeContext = context->get<NodeContext>();
+    auto& node = nodeContext->getNode();
     //  LOGGER(node.getNetworkInfo()->getNetworkId());
     //  LOGGER(nodeInfo.getNetworkId());
     if (node.getModule<NetworkModule>()->getNetworkInfo()->getNetworkId() == nodeInfo.getNetworkId() &&
         !isNodeKnown(nodeInfo.getNodeId())) {
 
-        auto& lc = context->get<bsc::LogicContext>();
-        lc.getLogicManager().getSource<bsc::NodeSource>()->nodeDiscovered(nodeInfo);
+        auto lc = context->get<bsc::LogicContext>();
+        lc->getLogicManager().getSource<bsc::NodeSource>()->nodeDiscovered(nodeInfo);
 
     }
 

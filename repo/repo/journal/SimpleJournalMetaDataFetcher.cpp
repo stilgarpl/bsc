@@ -17,7 +17,7 @@ namespace bsc {
         if (auto userValue = getenv("USER"); userValue != nullptr) {
             userId = userValue;
         }
-        if (bsc::Context::hasActiveContext()) {
+        if (Context::hasActiveContext()) {
             nodeId = bsc::NodeContext::getNodeFromActiveContext().getNodeInfo().getNodeId();
         }
         return JournalMetaData(nodeId, userId, operatingSystem);

@@ -87,7 +87,7 @@ public:
 
     bool connect();
 
-    bsc::Context::Ptr context() { return _context; };
+    Context::Ptr context() { return _context; };
 protected:
     RemoteNode();
 

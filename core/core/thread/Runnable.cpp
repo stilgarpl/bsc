@@ -11,13 +11,13 @@
 void bsc::Runnable::start() {
     std::lock_guard g(startMutex);
     if (thread == nullptr) {
-        thread = std::make_unique<std::thread>(std::ref(*this), bsc::Context::getActiveContext());
+        thread = std::make_unique<std::thread>(std::ref(*this), Context::getActiveContext());
     }
 
 }
 
-void bsc::Runnable::operator()(bsc::Context::Ptr contextPtr) {
-    bsc::Context::setActiveContext(std::move(contextPtr));
+void bsc::Runnable::operator()(Context::Ptr contextPtr) {
+    Context::setActiveContext(std::move(contextPtr));
     onStart();
     run();
     onStop();

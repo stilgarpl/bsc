@@ -9,10 +9,10 @@
 
 void bsc::ThreadExecutor::execute(const std::function<void(void)> task) {
 
-    bsc::Context::Ptr origContext = bsc::Context::getActiveContext();
+    Context::Ptr origContext = Context::getActiveContext();
     std::thread(
             [=]() {
-                bsc::Context::setActiveContext(origContext);
+                Context::setActiveContext(origContext);
                 task();
             }
     ).detach();

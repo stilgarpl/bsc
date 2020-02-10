@@ -41,12 +41,12 @@ void bsc::Logger::debug(int line, const std::string& txt) {
     std::lock_guard<std::mutex> g(getLock());
     static std::string::size_type instanceLength = 0;
 //@todo optimize this call:
-    if (bsc::Context::hasActiveContext() && bsc::Context::getActiveContext()->has<bsc::LoggerContext>() &&
-        bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance().size() > instanceLength) {
-        instanceLength = bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance().size();
+    if (Context::hasActiveContext() && Context::getActiveContext()->has<bsc::LoggerContext>() &&
+        Context::getActiveContext()->get<LoggerContext>()->getInstance().size() > instanceLength) {
+        instanceLength = Context::getActiveContext()->get<LoggerContext>()->getInstance().size();
     }
-    if (bsc::Context::hasActiveContext() && bsc::Context::getActiveContext()->has<bsc::LoggerContext>()) {
-        spdlog::info("[{:<{}}] [{}:{}]: {}", bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance(),
+    if (Context::hasActiveContext() && Context::getActiveContext()->has<bsc::LoggerContext>()) {
+        spdlog::info("[{:<{}}] [{}:{}]: {}", Context::getActiveContext()->get<LoggerContext>()->getInstance(),
                      instanceLength,
                      loggerName, std::to_string(line), txt);
     } else {
@@ -61,12 +61,12 @@ void bsc::Logger::error(int line, const std::string& txt) {
     std::lock_guard<std::mutex> g(getLock());
     static std::string::size_type instanceLength = 0;
 //@todo optimize this call:
-    if (bsc::Context::hasActiveContext() && bsc::Context::getActiveContext()->has<bsc::LoggerContext>() &&
-        bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance().size() > instanceLength) {
-        instanceLength = bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance().size();
+    if (Context::hasActiveContext() && Context::getActiveContext()->has<bsc::LoggerContext>() &&
+        Context::getActiveContext()->get<LoggerContext>()->getInstance().size() > instanceLength) {
+        instanceLength = Context::getActiveContext()->get<LoggerContext>()->getInstance().size();
     }
-    if (bsc::Context::hasActiveContext() && bsc::Context::getActiveContext()->has<bsc::LoggerContext>()) {
-        spdlog::error("[{:<{}}] [{}:{}]: {}", bsc::Context::getActiveContext()->get<bsc::LoggerContext>().getInstance(),
+    if (Context::hasActiveContext() && Context::getActiveContext()->has<bsc::LoggerContext>()) {
+        spdlog::error("[{:<{}}] [{}:{}]: {}", Context::getActiveContext()->get<LoggerContext>()->getInstance(),
                       instanceLength,
                       loggerName, std::to_string(line), txt);
     } else {

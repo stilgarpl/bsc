@@ -14,7 +14,7 @@ void bsc::OrderedExecutor::execute(std::function<void(void)> task) {
         orderedExecutorThread = std::make_unique<std::thread>(&OrderedExecutor::run, this);
     }
     std::lock_guard<std::mutex> lockGuard(queueLock);
-    runQueue.push(std::make_pair(task, bsc::Context::getActiveContext()));
+    runQueue.push(std::make_pair(task, Context::getActiveContext()));
 
     taskReady.notify_all();
 }
@@ -30,7 +30,7 @@ void bsc::OrderedExecutor::run() {
 //            LOGGER("processing task")
             auto&[task, contextPtr] = runQueue.front();
 
-            bsc::Context::setActiveContext(contextPtr);
+            Context::setActiveContext(contextPtr);
             task();
 
             runQueue.pop();

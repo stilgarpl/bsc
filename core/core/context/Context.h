@@ -34,11 +34,35 @@ namespace bsc {
         explicit ContextLoopException(const std::string& arg);
     };
 
+
     class Context {
     public:
         typedef std::shared_ptr<Context> ContextPtr;
         typedef ContextPtr Ptr;
         typedef const ContextPtr OwnPtr;
+
+        template<typename T>
+        class Entry {
+        private:
+            std::shared_ptr<T> obj;
+            //@todo throw exception if obj == null?
+            explicit Entry(const std::shared_ptr<T>& obj) : obj(obj) {}
+        public:
+            operator T&() {
+                return *obj;
+            }
+
+            T* operator->() {
+                return obj.get();
+            }
+
+            T& operator*() {
+                return *obj;
+            }
+
+            friend class Context;
+        };
+
     private:
         typedef unsigned int KeyType;
         typedef unsigned int TypeIdType;
@@ -128,7 +152,7 @@ namespace bsc {
          * @return
          */
         template<typename T, typename CustomKeyType>
-        T& get(const CustomKeyType& id) {
+        Entry<T> get(const CustomKeyType& id) {
             std::lock_guard guard(contextLock);
             const static auto typeId = getTypeId<T>();
             auto ret = std::static_pointer_cast<T>(data[typeId][getKey(id)]);
@@ -143,19 +167,19 @@ namespace bsc {
                     }
                 }
             } else {
-                return *ret;
+                return Entry<T>(ret);
             }
 
 
         }
 
         template<typename T>
-        T& get() {
+        auto get() {
             return get<T>(defaultKey);
         }
 
         template<typename T>
-        T& getSafe() {
+        auto getSafe() {
             std::lock_guard guard(contextLock);
             if (has<T>()) {
                 return get<T>();
@@ -182,25 +206,25 @@ namespace bsc {
         }
 
         template<typename ContextValueType, typename... Vals>
-        auto& set(Vals... values) {
+        Entry<ContextValueType> set(Vals... values) {
             std::lock_guard<std::recursive_mutex> guard(contextLock);
             //@todo assert that data[typeId][getKey(0)] is null
             static auto typeId = getTypeId<ContextValueType>();
             //std::clog << "Context::setDirect type id " << typeId << std::endl;
             auto ret = std::make_shared<ContextValueType>(values...);
             data[typeId][getKey(defaultKey)] = ret;
-            return *ret;
+            return Entry<ContextValueType>(ret);
         }
 
         //todo this version may be a problem if someone tries to use the ordinary setDirect and std::shared_ptr is one of vals.
         template<typename ContextValueType, typename RealValueType>
-        auto setDirect(std::shared_ptr<RealValueType> valuePtr) {
+        Entry<ContextValueType> setDirect(std::shared_ptr<RealValueType> valuePtr) {
             std::lock_guard<std::recursive_mutex> guard(contextLock);
             if constexpr (std::is_base_of_v<ContextValueType, RealValueType>) {
                 auto ret = std::static_pointer_cast<ContextValueType>(valuePtr);
                 static auto typeId = getTypeId<ContextValueType>();
                 data[typeId][getKey(defaultKey)] = ret;
-                return ret;
+                return Entry<ContextValueType>(ret);
             } else {
                 using namespace std::string_literals;
                 throw InvalidContextException(

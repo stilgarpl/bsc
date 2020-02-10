@@ -12,11 +12,11 @@ namespace bsc {
                                const CommandModule::CommandGroup& group) {
 
         if (params.help().value_or(false) || params.arguments().empty()) {
-            auto& io = bsc::Context::getActiveContext()->get<bsc::InputOutputContext>();
+            auto io = Context::getActiveContext()->get<bsc::InputOutputContext>();
             //@todo text formatting.
-            io.err() << "No commands given, listing available commands" << std::endl;
+            io->err() << "No commands given, listing available commands" << std::endl;
             for (const auto& item : group.getCommands()) {
-                io.err() << " [ " << item << " ] " << std::endl;
+                io->err() << " [ " << item << " ] " << std::endl;
             }
             return CommandModule::CommandExecutionStatus::noCommand;
         }

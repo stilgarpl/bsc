@@ -159,7 +159,7 @@ namespace bsc {
             explicit CommandGroup(CommandModule& parent) : parent(parent) {
             }
 
-            CommandGroup& group(std::string name);
+            CommandGroup& group(const std::string& name);
 
             template<bsc::ParametersClass ParametersType>
             void handler(std::function<CommandExecutionStatus( const ParametersType&

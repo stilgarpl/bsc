@@ -164,14 +164,14 @@ namespace bsc {
         auto networkModule = node.getModule<NetworkModule>();
         LocalTransferDescriptorPtr ret = std::make_shared<LocalTransferDescriptor>();
 
-        bsc::Context::Ptr activeContext = bsc::Context::getActiveContext();
+        Context::Ptr activeContext = Context::getActiveContext();
 
         ret->setSource(source);
         ret->setDestination(destination);
         ret->setSourceNode(nodeId);
         ret->setPayload([=](LocalTransferDescriptor& descriptorPtr) {
             //before anything, setDirect active context
-            bsc::Context::setActiveContext(activeContext);
+            Context::setActiveContext(activeContext);
             LOGGER("starting transfer...")
 
             const TransferSize MAX_CHUNK_SIZE = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>()->configuration().maxChunkSize;

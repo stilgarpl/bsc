@@ -13,7 +13,7 @@
 //    BasePacket::process(context);
 //
 //
-//    auto& lc = context->get<LogicContext>();
+//    auto lc = context->get<LogicContext>();
 //
 //
 //
