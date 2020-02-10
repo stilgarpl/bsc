@@ -38,13 +38,14 @@ if (EXISTS ${conan})
             BUILD_TYPE "Debug"
             BUILD missing)
     set(INCLUDES ${CONAN_INCLUDE_DIRS})
+    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
 else ()
     message("Conan not found")
 endif ()
 #end of conan setup
 
-find_package(Catch2 REQUIRED)
+find_package(Catch2 CONFIG REQUIRED)
 include(Catch)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
