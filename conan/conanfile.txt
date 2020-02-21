@@ -16,7 +16,6 @@ Poco:enable_data_sqlite=False
 
 [generators]
 cmake
-cmake_find_package
-cmake_paths
+
 
 

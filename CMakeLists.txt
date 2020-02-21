@@ -37,9 +37,9 @@ if (EXISTS ${conan})
             BASIC_SETUP
             BUILD_TYPE "Debug"
             BUILD missing)
-    set(INCLUDES ${CONAN_INCLUDE_DIRS})
-    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-
+    #    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+    #    conan_set_find_library_paths()
+    #    conan_set_find_paths()
 else ()
     message("Conan not found")
 endif ()

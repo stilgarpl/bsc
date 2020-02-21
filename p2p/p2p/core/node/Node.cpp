@@ -30,7 +30,7 @@ void bsc::Node::start() {
     setNodeContextActive();
     initialize();
     logicManager.start();
-    startModules();
+    startModules(); //@todo this should wait for at least onStart() phase to complete for all modules. IMPORTANT!!!
     started = true;
     startedReady.notify_all();
 
@@ -41,7 +41,7 @@ void bsc::Node::stop() {
     std::unique_lock<std::recursive_mutex> g(startMutex);
     setNodeContextActive();
     started = false;
-    shutdownModules();
+    shutdownModules(); //@todo as above, this should wait for completion of onStop() phase on Runnable IMPORTANT!!!
     //@todo wait for shutdown to complete, sleep will do for now
     std::this_thread::sleep_for(10ms);
     logicManager.stop();
@@ -70,6 +70,8 @@ bsc::Node::Node() {
 
 void bsc::Node::startModules() {
     forEachModule<void>(&bsc::NodeModule::start);
+    waitForModules(
+            [](const INodeModulePtr& modulePtr) { return modulePtr->isStarted(); }); //@todo wait for modules should take the same parameter as forEachModule for consistency, waitForModules(NodeModule::isStarted);
 }
 
 void bsc::Node::initialize() {
@@ -91,6 +93,8 @@ void bsc::Node::initialize() {
 
 void bsc::Node::stopModules() {
     forEachModule(&bsc::NodeModule::stop);
+    waitForModules(
+            [](const INodeModulePtr& modulePtr) { return modulePtr->isFinished(); }); //@todo wait for modules should take the same parameter as forEachModule for consistency, waitForModules(NodeModule::isFinished);
 
 }
 

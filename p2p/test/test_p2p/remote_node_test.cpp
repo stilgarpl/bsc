@@ -43,13 +43,14 @@ TEST_CASE("Remote node test") {
 
     thisNode.start();
     otherNode.start();
-
+//    //@todo without this, on heavy load, connection isn't listening yet before test begins. investigate why start() doesn't start network module to listening phase.
+//    std::this_thread::sleep_for(500ms);
     thisNode.waitUntilStarted();
     otherNode.waitUntilStarted();
 
     SECTION("Remote test") {
         thisNode.setNodeContextActive();
-        auto &remoteSecondNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9192");
+        auto& remoteSecondNode = thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9192");
         bool connectedToSecond = remoteSecondNode.isConnected();
         INFO("testing require")
         REQUIRE(connectedToSecond);
@@ -65,7 +66,7 @@ TEST_CASE("Remote node test") {
         REQUIRE(serverSideNodeId == "firstNodeR");
     }
     //finish and cleanup
-    std::this_thread::sleep_for(500ms);
+//    std::this_thread::sleep_for(500ms);
     INFO("stopping")
     thisNode.stop();
     otherNode.stop();

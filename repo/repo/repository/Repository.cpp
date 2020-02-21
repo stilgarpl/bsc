@@ -411,7 +411,7 @@ namespace bsc {
 
 //Repository::Repository() : Repository("", nullptr) {}
 
-    void Repository::RepoFileMap::prepareMap() {
+    void Repository::RepositoryFileMap::prepareMap() {
 //    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
 
         if (mapChecksum != journal->getChecksum()) {
@@ -487,31 +487,33 @@ namespace bsc {
         }
     }
 
-    auto Repository::RepoFileMap::operator[](const fs::path& path) -> decltype(attributesMap[fs::current_path()]) {
+    auto
+    Repository::RepositoryFileMap::operator[](const fs::path& path) -> decltype(attributesMap[fs::current_path()]) {
         //@todo future optimization: maybe this shouldn't be called every time? it has an if, but still...
         prepareMap();
         return attributesMap[path];
     }
 
-    auto Repository::RepoFileMap::begin() -> decltype(attributesMap.begin()) {
+    auto Repository::RepositoryFileMap::begin() -> decltype(attributesMap.begin()) {
         prepareMap();
         return attributesMap.begin();
     }
 
-    auto Repository::RepoFileMap::end() -> decltype(attributesMap.end()) {
+    auto Repository::RepositoryFileMap::end() -> decltype(attributesMap.end()) {
         return attributesMap.end();
     }
 
-    Repository::RepoFileMap::RepoFileMap(JournalPtr& journal, std::shared_ptr<IPathTransformer>& pathTransformer)
+    Repository::RepositoryFileMap::RepositoryFileMap(JournalPtr& journal,
+                                                     std::shared_ptr<IPathTransformer>& pathTransformer)
             : journal(
             journal), pathTransformer(pathTransformer) {}
 
-    auto Repository::RepoFileMap::getSize(const fs::path& path) {
+    auto Repository::RepositoryFileMap::getSize(const fs::path& path) {
         return attributesMap[path]->getSize();
     }
 
-    decltype(Repository::RepoFileMap::attributesMap) Repository::RepoFileMap::subMap(const fs::path& root) {
-        decltype(Repository::RepoFileMap::attributesMap) result;
+    decltype(Repository::RepositoryFileMap::attributesMap) Repository::RepositoryFileMap::subMap(const fs::path& root) {
+        decltype(Repository::RepositoryFileMap::attributesMap) result;
         for (const auto &[path, value] : attributesMap) {
             if (path.string().find(root.string()) != std::string::npos) {
                 result[path] = value;
@@ -520,28 +522,28 @@ namespace bsc {
         return result;
     }
 
-    fs::file_time_type Repository::RepoFileMap::getDeletionTime(const fs::path& path) {
+    fs::file_time_type Repository::RepositoryFileMap::getDeletionTime(const fs::path& path) {
         return deleteMap[path].getDeletionTime();
     }
 
-    auto Repository::RepoFileMap::isDeleted(const fs::path& path) -> decltype(deleteMap[path].isDeleted()) {
+    auto Repository::RepositoryFileMap::isDeleted(const fs::path& path) -> decltype(deleteMap[path].isDeleted()) {
         return deleteMap[path].isDeleted();
     }
 
 
-    bool Repository::RepoFileMap::DeleteInfo::isDeleted() const {
+    bool Repository::RepositoryFileMap::DeleteInfo::isDeleted() const {
         return deleted;
     }
 
-    fs::file_time_type Repository::RepoFileMap::DeleteInfo::getDeletionTime() const {
+    fs::file_time_type Repository::RepositoryFileMap::DeleteInfo::getDeletionTime() const {
         return deletionTime;
     }
 
-    void Repository::RepoFileMap::DeleteInfo::setDeletionTime(fs::file_time_type deletionTime) {
+    void Repository::RepositoryFileMap::DeleteInfo::setDeletionTime(fs::file_time_type deletionTime) {
         DeleteInfo::deletionTime = deletionTime;
     }
 
-    void Repository::RepoFileMap::DeleteInfo::setDeleted(bool deleted) {
+    void Repository::RepositoryFileMap::DeleteInfo::setDeleted(bool deleted) {
         DeleteInfo::deleted = deleted;
     }
 
@@ -554,17 +556,17 @@ namespace bsc {
     }
 
     auto
-    Repository::RepoDeployMap::operator[](const fs::path& path) -> decltype(deployMap[fs::current_path().string()]) {
-        return deployMap[path.string()];
+    Repository::RepoDeployMap::operator[](const fs::path& path) -> decltype(deployMap[fs::current_path()]) {
+        return deployMap[path];
     }
 
     void Repository::RepoDeployMap::markDeployed(const fs::path& path, Repository::DeployState deployState) {
         if (deployState == DeployState::deployed) {
             LOGGER("marking " + path.string() + " as deployed")
-            deployMap[path.string()] = true;
+            deployMap[path] = true;
         } else if (deployState == DeployState::notDeployed) {
             LOGGER("marking " + path.string() + " as not deployed")
-            deployMap[path.string()] = false;
+            deployMap[path] = false;
         } //else unchanged
     }
 

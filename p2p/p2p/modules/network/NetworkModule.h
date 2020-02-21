@@ -252,7 +252,6 @@ namespace bsc {
             //        }
         }
 
-        void run() override;
 
         const std::shared_ptr<IProtocol>& getProtocol() const;
 

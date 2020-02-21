@@ -393,49 +393,12 @@ namespace bsc {
     public:
 
 
-        void runLine(const std::string& line) {
-            LOGGER("Command: " + line);
-            //explode command into words
-            auto words = bsc::explode(line, ' ');
-
-            std::string groupOrCommandName = "";
-            //  std::string commandName = "";
-            std::vector<std::string> data;
-            if (!words.empty()) groupOrCommandName = words[0];
-            //if (words.size() > 1) commandName = words[1];
-            if (words.size() > 1) {
-                auto b = words.begin() + 1;
-                auto e = words.end();
-                data.insert(data.end(), b, e);
-            }
-
-            try {
-                runCommand(groupOrCommandName, data);
-            } catch (const bsc::IncorrectParametersException& e) {
-                LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " +
-                       std::to_string(e.gotParameters));
-            }
-        }
+        void runLine(const std::string& line);
 
 
-        void runInteractive() {
-            std::string line;
-            node.setNodeContextActive();
-            while (!isStopping() && std::getline(std::cin, line)) {
-                runLine(line);
+        void runInteractive();
 
-
-            }
-
-            LOGGER("Command Module has stopped")
-        }
-
-        void run() override {
-            //@todo restart this if flag changes later?
-            if (interactive) {
-                runInteractive();
-            }
-        }
+        void run() override;
 
         bool isInteractive() const;
 

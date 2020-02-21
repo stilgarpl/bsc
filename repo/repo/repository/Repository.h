@@ -23,7 +23,7 @@ namespace bsc {
 
     public:
 
-        class RepoFileMap {
+        class RepositoryFileMap {
         public:
 
 
@@ -75,7 +75,7 @@ namespace bsc {
 
             auto isDeleted(const fs::path& path) -> decltype(deleteMap[path].isDeleted());
 
-            RepoFileMap(JournalPtr& journal, std::shared_ptr<IPathTransformer>& pathTransformer);
+            RepositoryFileMap(JournalPtr& journal, std::shared_ptr<IPathTransformer>& pathTransformer);
         };
 
 
@@ -106,20 +106,19 @@ namespace bsc {
             };
 
         public:
-            //@todo C++17 cereal:
-//            std::map<fs::path, std::optional<DeployAttributes>> deployMap;
-            std::map<std::string, std::optional<DeployAttributes>> deployMap;
+            std::map<fs::path, std::optional<DeployAttributes>> deployMap;
+//            std::map<std::string, std::optional<DeployAttributes>> deployMap;
 
             auto begin() -> decltype(deployMap.begin());
 
             auto end() -> decltype(deployMap.end());
 
-            auto operator[](const fs::path& path) -> decltype(deployMap[fs::current_path().string()]);
+            auto operator[](const fs::path& path) -> decltype(deployMap[fs::current_path()]);
 
             void markDeployed(const fs::path& path, DeployState deployState);
 
             bool isDeployed(const fs::path& path) {
-                return deployMap[path.string()] && deployMap[path.string()]->isDeployed();
+                return deployMap[path] && deployMap[path]->isDeployed();
             }
 
         private:
@@ -132,18 +131,6 @@ namespace bsc {
             friend class cereal::access;
 
         };
-
-//    enum class RepositorySituation {
-//        UPDATED_IN_REPO,
-//        UPDATED_IN_FILESYSTEM,
-//        SAME,
-//        NEW_IN_REPO,
-//        NEW_IN_FILESYSTEM,
-//        DELETED_IN_REPO,
-//        DELETED_IN_FILESYSTEM,
-//    };
-
-
 
 
     public:
@@ -173,7 +160,7 @@ namespace bsc {
         const RepositoryActionStrategyPack fullPack;
 
     private:
-        RepoFileMap _repoFileMap = RepoFileMap(journal, pathTransformer);
+        RepositoryFileMap _repoFileMap = RepositoryFileMap(journal, pathTransformer);
         //@todo add saving and loading of a deployMap
         RepoDeployMap deployMap;
     public:
@@ -182,8 +169,8 @@ namespace bsc {
 
     protected:
 
-        //@todo move this function inside RepoFileMap. Store more data in RepoFileMap - it should know modification date of each path and type (dir/file)
-        RepoFileMap& getFileMap() {
+        //@todo move this function inside RepositoryFileMap. Store more data in RepositoryFileMap - it should know modification date of each path and type (dir/file)
+        RepositoryFileMap& getFileMap() {
             return _repoFileMap;
         }
 

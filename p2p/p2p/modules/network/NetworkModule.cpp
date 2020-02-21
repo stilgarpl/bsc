@@ -348,14 +348,9 @@ namespace bsc {
     }
 
     void NetworkModule::onStart() {
-        Runnable::onStart();
         listen();
     }
 
-
-    void NetworkModule::run() {
-        waitForStop();
-    }
 //
 //bool NetworkModule::sendPacketToNode(const NodeIdType &nodeId, BasePacketPtr packet) {
 //    ConnectionPtr conn = nullptr;

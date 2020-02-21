@@ -4,13 +4,10 @@
 
 #include <ios>
 #include <fstream>
+#include <utility>
 #include "SimplePathRI.h"
 
-//std::filesystem::path SimplePathRI::getPath() {
-//    return resourcePath;
-//}
-//@todo c++17 implemented -> remove .string()
-bsc::SimplePathRI::SimplePathRI(const fs::path& resourcePath) : resourcePath(resourcePath.string()) {}
+bsc::SimplePathRI::SimplePathRI(fs::path resourcePath) : resourcePath(std::move(resourcePath)) {}
 
 std::shared_ptr<std::istream> bsc::SimplePathRI::getResourceInputStream() {
     if (exists()) {

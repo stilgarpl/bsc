@@ -19,6 +19,7 @@ void bsc::Runnable::start() {
 void bsc::Runnable::operator()(Context::Ptr contextPtr) {
     Context::setActiveContext(std::move(contextPtr));
     onStart();
+    started = true;
     run();
     onStop();
     finished = true;
@@ -36,6 +37,7 @@ bsc::Runnable::~Runnable() {
 void bsc::Runnable::stop() {
     std::unique_lock<std::mutex> g(stopMutex);
     stopping = true;
+    started = false;
     shutdownSignal.notify_all();
     //@todo kill ? join?
 
@@ -55,5 +57,11 @@ void bsc::Runnable::waitForStop() {
     std::unique_lock<std::mutex> g(stopMutex);
     //@todo C++20 wait on atomic
     shutdownSignal.wait(g, [this] { return stopping.load(); });
+}
+bool bsc::Runnable::isStarted() const {
+    return started;
+}
+bool bsc::Runnable::isFinished() const {
+    return finished;
 }
 

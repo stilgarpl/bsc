@@ -614,4 +614,9 @@ bsc remote "second" --list-commands
 
 ciekawy problem - mozna pobrać komendy z CommandModule dopiero jak Node wstał i CoMo ma już wszystkie komendy wpisane (niektóre są dodawane przez logikę submodule) - ale same parametry są potrzebne do uruchomienia Node ( sciezka z configiem etc.). W sumie mozna to sobie zapisać z configiem i ładować, albo generować przy kompilacji... Albo po prostu podstawowe komendy ładować statycznie bez uruchamiania node i te wpisywać. resztę user zobaczy po odpaleniu list-commands.
 
-@todo p2p_core powinno być w p2p/p2p/core, przez co nie mieszałoby się z modułami
+
+Incoming
+w Repo metoda update() robi dużo w stały sposób. Możnaby to wydzielić do StandardDirectoryUpdateMethod. Katalog incoming by miał ustawione IncomingDirectoryUpdateMethod, które by przerzucało pliki w tym katalogu do innych katalogów docelowych.
+
+$ bsc repo persist file
+$ bsc repo persist --mark-as=incoming file

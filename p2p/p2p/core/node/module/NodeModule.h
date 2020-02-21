@@ -34,19 +34,13 @@ namespace bsc {
 
         void shutdown() override {};
 
-        void run() override {
-            //do nothing, just so modules do not have to implement this if they don't want to
-        }
+        void run() override;
 
     protected:
-        ConfigurationManager& getConfigurationManager() {
-            return node.getConfigurationManager();
-        }
+        ConfigurationManager& getConfigurationManager();
 
     public:
-        const ModuleIdType& getModuleId() const override {
-            return moduleId;
-        }
+        const ModuleIdType& getModuleId() const override;
 
         NodeModule(INode& node, ModuleIdType moduleId) : ILogicModule(node), moduleId(std::move(moduleId)) {}
     };

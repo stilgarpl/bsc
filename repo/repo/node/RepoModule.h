@@ -11,7 +11,6 @@
 #include <p2p/core/dependency/DependencyManaged.h>
 #include <p2p/modules/network/NetworkModule.h>
 #include <repo/journal/network/packet/JournalGroup.h>
-#include <repo/repository/storage/network/packet/StorageQuery.h>
 #include <repo/repository/storage/StorageManager.h>
 #include <repo/repository/storage/StorageFactorySpecialization.h>
 namespace bsc {

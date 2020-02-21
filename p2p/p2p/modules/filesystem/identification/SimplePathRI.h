@@ -11,11 +11,10 @@
 namespace bsc {
     class SimplePathRI : public bsc::ResourceIdentificator {
 
-        //@todo c++17 implemented -> change it to path
-        const std::string resourcePath;
+        const fs::path resourcePath;
 
     public:
-        SimplePathRI(const fs::path& resourcePath);
+        SimplePathRI(fs::path resourcePath);
 
     public:
         //    std::filesystem::path getPath() override;

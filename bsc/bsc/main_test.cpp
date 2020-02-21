@@ -29,65 +29,21 @@ struct TestProgramParameters : public bsc::CommandLineParameters {
     Parameter<std::filesystem::path> path = {'o', "path", "PATH", "paath"};
 };
 
+#include <core/utils/cereal_include.h>
+
 int main(int argc, char* argv[]) {
 
+    std::stringstream dataStorage;
+    cereal::BinaryOutputArchive oa(dataStorage);
+    cereal::BinaryInputArchive ia(dataStorage);
 
-//    parameters.usage("la xxx");
-//    parameters.usage("aaaaaa");
-//    parameters.before("qewwqewewq");
-//    parameters.after("ewrefesfezfse");
+    //given
+    std::filesystem::path path = "/home/";
 
-    auto parameters = bsc::CommandLineParameters::parse<TestProgramParameters>(argc, argv);
-    std::cout << "b is " << (parameters.b() ? "true" : "false ") << " with count "
-              << std::to_string(parameters.b.count()) << std::endl;
-    std::cout << "a is " << std::to_string(parameters.a().value_or(-1)) << std::endl;
-    std::cout << "d is [" << parameters.d().value_or("_") << "]" << std::endl;
-    std::cout << "path is [" << parameters.path().value_or("/").string() << "]" << std::endl;
-    if (parameters.pair()) {
-        std::cout << "Pair is " << parameters.pair()->first << "=[" << parameters.pair()->second << "]" << std::endl;
-    }
-    std::cout << "v elements are : " << std::endl;
-    if (parameters.vec()) {
-        for (const auto& v : *parameters.vec()) {
-            std::cout << "[" << v << "] ";
-        }
-    }
-    std::cout << std::endl;
-    std::cout << "list elements are : " << std::endl;
-    if (parameters.list()) {
-        for (const auto& v : *parameters.list()) {
-            std::cout << "[" << v << "] ";
-        }
-    }
-    std::cout << std::endl;
+    oa << path;
 
-    std::cout << "vin elements are : " << std::endl;
-    if (parameters.vin()) {
-        for (const auto& v : *parameters.vin()) {
-            std::cout << "[" << std::to_string(v) << "] ";
-        }
-    }
-    std::cout << std::endl;
-    std::cout << "set elements are : " << std::endl;
-    if (parameters.set()) {
-        for (const auto& v : *parameters.set()) {
-            std::cout << "[" << v << "] ";
-        }
-    }
-    std::cout << std::endl;
-
-    std::cout << "map elements are : " << std::endl;
-    if (parameters.map()) {
-        for (const auto& v : *parameters.map()) {
-            std::cout << v.first << "=[" << std::to_string(v.second) << "] ";
-        }
-    }
-    std::cout << std::endl;
-    std::cout << "arguments are : " << std::endl;
-    for (const auto& argument : parameters.arguments()) {
-        std::cout << "[" << argument << "] ";
-    }
-    std::cout << std::endl;
+    std::filesystem::path newPath;
+    ia >> newPath;
 
 
     return 0;

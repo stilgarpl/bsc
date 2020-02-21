@@ -126,10 +126,6 @@ TEST_CASE("Repo module test") {
 
     thisNode.start();
     otherNode.start();
-    thisNode.waitUntilStarted();
-    otherNode.waitUntilStarted();
-    //@todo if possible, wait for otherNode to start listening.
-    std::this_thread::sleep_for(500ms);
     auto& secondNode = thisNode.getModule<bsc::NetworkModule>()->connectTo("127.0.0.1:9999");
     bool connectedToSecond = secondNode.isConnected();
 
@@ -188,6 +184,7 @@ TEST_CASE("Repo module test") {
     bool noTestRepo = thisRepoMod->findRepository("test") != nullptr;
     REQUIRE_FALSE(noTestRepo);
     REQUIRE(secondNode.isConnected());
+    //wait for the logic to setup remote node ids and stuff
     std::this_thread::sleep_for(500ms);
     thisRepoMod->downloadRemoteRepository("second", "test");
     bool okTestRepo = thisRepoMod->findRepository("test") != nullptr;

@@ -40,7 +40,7 @@ namespace bsc {
         void forEachModule(Ret(ModuleType::*f)(Args...), Args... args) {
             std::list<INodeModulePtr> modulesList;
             modules.forEach(
-                    [&](INodeModulePtr ptr) {
+                    [&](const INodeModulePtr& ptr) {
                         if (ptr != nullptr) {
                             //ptr->initialize();
                             //ptr->setupLogic(logicManager);
@@ -51,6 +51,15 @@ namespace bsc {
             for (auto&& item : modulesList) {
                 ((*item).*f)(args...);
             }
+        }
+
+        void waitForModules(const std::function<bool(INodeModulePtr)>& predicate) {
+            modules.forEach([predicate](const INodeModulePtr& ptr) {
+                while (!predicate(ptr)) {
+                    //@todo C++20 wait on atomic - predicate should wait on atomic or return atomic to wait on.
+                    std::this_thread::sleep_for(5ms);
+                }
+            });
         }
 
     public:

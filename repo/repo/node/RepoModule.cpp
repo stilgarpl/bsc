@@ -312,20 +312,6 @@ namespace bsc {
             return response;
         });
 
-        networkSub.registerPacketProcessor<StorageQuery>([this](StorageQuery::Request::Ptr request) {
-            auto response = request->getNew<Status::response>();
-
-            auto repo = this->findRepository(request->getRepositoryId());
-            if (repo != nullptr) {
-                response->setExists(repo->getStorage()->hasResource(request->getObjectId()));
-            } else {
-                //@todo maybe add another response? repository not found?
-                response->setExists(false);
-            }
-
-            return response;
-        });
-
     }
 
     void RepoModule::downloadRepository(const IRepository::RepoIdType& repoId) {

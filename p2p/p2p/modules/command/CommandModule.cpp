@@ -199,6 +199,47 @@ namespace bsc {
 
         io->out() << std::string("got params " + std::to_string(params.a().value_or(-1)));
     }
+    void CommandModule::run() {
+        //@todo restart this if flag changes later?
+        if (interactive) {
+            runInteractive();
+        }
+        waitForStop();
+    }
+    void CommandModule::runInteractive() {
+        std::string line;
+        node.setNodeContextActive();
+        while (!isStopping() && std::getline(std::cin, line)) {
+            runLine(line);
+
+
+        }
+
+        LOGGER("Command Module has stopped")
+    }
+    void CommandModule::runLine(const std::string& line) {
+        LOGGER("Command: " + line);
+        //explode command into words
+        auto words = bsc::explode(line, ' ');
+
+        std::string groupOrCommandName = "";
+        //  std::string commandName = "";
+        std::vector<std::string> data;
+        if (!words.empty()) groupOrCommandName = words[0];
+        //if (words.size() > 1) commandName = words[1];
+        if (words.size() > 1) {
+            auto b = words.begin() + 1;
+            auto e = words.end();
+            data.insert(data.end(), b, e);
+        }
+
+        try {
+            runCommand(groupOrCommandName, data);
+        } catch (const bsc::IncorrectParametersException& e) {
+            LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " +
+                   std::to_string(e.gotParameters));
+        }
+    }
 
 
     CommandModule::CommandGroup& CommandModule::CommandGroup::group(const std::string& name) {

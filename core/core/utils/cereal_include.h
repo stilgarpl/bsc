@@ -29,6 +29,7 @@
 
 #include "cereal/cereal.hpp"
 #include <optional>
+#include <filesystem>
 
 namespace cereal {
     //! Saving for std::optional
@@ -57,6 +58,23 @@ namespace cereal {
             ar(CEREAL_NVP_("data", value));
             optional = std::move(value);
         }
+    }
+
+    //! Saving for std::filesystem::path
+    template<class Archive>
+    inline
+    void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const std::filesystem::path& path) {
+        ar(CEREAL_NVP_("path", path.string()));
+    }
+
+    //! Loading for std::filesystem::path
+    template<class Archive>
+    inline
+    void CEREAL_LOAD_FUNCTION_NAME(Archive& ar, std::filesystem::path& path) {
+        std::string pathAsString;
+        ar(CEREAL_NVP_("path", pathAsString));
+        std::filesystem::path newPath(pathAsString);
+        path = std::move(newPath);
     }
 } // namespace cereal
 
