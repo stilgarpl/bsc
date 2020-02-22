@@ -1,10 +1,8 @@
 //
 // Created by stilgar on 17.10.17.
 //
-#include <Poco/SHA1Engine.h>
 #include <core/log/Logger.h>
 #include <Poco/Environment.h>
-#include <p2p/core/node/context/NodeContext.h>
 #include <core/utils/crypto.h>
 
 #include <utility>
@@ -14,14 +12,14 @@ namespace bsc {
     void JournalState::add(const JournalStateData& data) {
         auto same = std::find_if(dataList.begin(), dataList.end(), [&](auto i) {
             //@todo about that method and target... shouldn't this be an error if we have more than one method on one file?
-            return data.getChecksum() == i.getChecksum() && data.getSize() == i.getSize() &&
+            return data.getResourceChecksum() == i.getResourceChecksum() && data.getSize() == i.getSize() &&
                    data.getMethod() == i.getMethod() && data.getTarget() == i.getTarget() &&
                    data.getPath() == i.getPath();
         });
         if (same == dataList.end()) {
             dataList.push_back(data);
         } else {
-            LOGGER("error: trying to add same data again!" + data.getPath())
+            LOGGER("error: trying to add same data again!" + data.getPath().string())
         }
 
     }
@@ -44,7 +42,6 @@ namespace bsc {
         //@todo make sure this is deterministic. instead of using cereal to get the string, just generate it yourself.
         checksum = "";
         std::stringstream ss;
-        std::string hash;
         {
             using namespace std::chrono;
             //@todo add journal utils that will do these conversions to strings and checksums
@@ -52,17 +49,13 @@ namespace bsc {
                << std::to_string(duration_cast<seconds>(commitTime.time_since_epoch()).count());
             //@todo this assumes dataList is sorted.
             for (const auto& data : dataList) {
-                ss << data.getChecksum();
+                ss << data.calculateChecksum();
             }
-//        cereal::PortableBinaryOutputArchive oa(ss);
-//        oa << *this;
         }
 
-        hash = bsc::calculateSha1OfString(ss.str());
+        checksum = bsc::calculateSha1OfString(ss.str());
 
-        // LOGGER("calculated hash " + hash);
-        checksum = hash;
-        return hash;
+        return checksum;
     }
 
     const std::shared_ptr<JournalState>& JournalState::getPreviousState() const {
@@ -113,8 +106,8 @@ namespace bsc {
         size = data.getSize();
         modificationTime = data.getModificationTime();
         permissions = data.getPermissions();
-        checksum = data.getSha256hash();
-        directory = data.isIsDirectory();
+        resourceChecksum = data.getSha256hash();
+        //@todo think if data.isDirectory, target = directory?
         //}
     }
 
@@ -129,11 +122,6 @@ namespace bsc {
     void JournalStateData::setProcessed(bool processed) {
         JournalStateData::processed = processed;
     }
-
-    bool JournalStateData::isDirectory() const {
-        return directory;
-    }
-
     JournalTarget JournalStateData::getTarget() const {
         return target;
     }

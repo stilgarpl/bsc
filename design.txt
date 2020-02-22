@@ -620,3 +620,27 @@ w Repo metoda update() robi dużo w stały sposób. Możnaby to wydzielić do St
 
 $ bsc repo persist file
 $ bsc repo persist --mark-as=incoming file
+
+Journal should not have setFunc to process. make a new class JournalProcessor or sth. Journal should be immutable.
+jesli nie bedziemy przechowywac wszystkich property w journalstatedata to wtedy RepositoryAttributes musza byc w wiekszosci optional. wtedy attrMap[i] += OptionalRepoAttrs(); - Optional odczytuja i sa nanoszone na attrMap
+tylko to jest głupie rozwiazanie, bo oprócz dodania property jeszcze wymaga aktualizacje dwóch klas, RepoAttr i OptionalRepoAttr
+
+trait propertyId => propertyType; PropertyType as id? zły pomysł z samym typem, póki nie ma refleksji bez makr nie ma jak zrobić niekolidujących i stałych idków.
+
+trait<> PropertyType<id>::type = fs::parms;
+
+state->propertyMap[propertyId]
+
+inna opcja, type erasure:
+
+property map processor, propertyId => setterFunction.
+
+
+processState(state,fieldMap); fieldMap = {{PARMS,RepoAttr::setParms},{SIZE,RepoAttr::setSize}};
+
+wywaliłem directory z Journal State. przecież już jest Target::directory, wiec po co to? teraz sie zastanawiam czy do incoming dir dodać osobny target czy własnie zamiast bool directory dać podrodzaj. tylko, ze podrodzaje byłyby rożne dla plików i katalogów... file->incoming nie ma sensu.
+
+operacje na kronice (tworzenie funcMap, operacje na plikach i katalogach powinne byc wydzielone z repository, teraz mamy actionPacki)
+@todo funcmap powinien byc osobnym obiektem przekazywanym do replay. obiekty te powinne byc stałe i używane jak actionPacki
+
+@todo użyte path transformery powinne byc zapisane w nagłówku Journala, inaczej dodanie transformera w jednym nodzie wychrzani journal w innym nodzie ktory go nie ma.

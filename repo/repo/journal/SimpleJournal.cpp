@@ -1,10 +1,10 @@
 //
 // Created by stilgar on 17.10.17.
 //
-#include <utility>
-#include <core/utils/crypto.h>
 #include "SimpleJournal.h"
 #include "SimpleJournalMetaDataFetcher.h"
+#include <core/utils/crypto.h>
+#include <utility>
 
 #include <core/log/Logger.h>
 
@@ -28,23 +28,20 @@ namespace bsc {
         }
     }
 
-    void SimpleJournal::replay() {
+    void SimpleJournal::replay(JournalFuncMap funcMap) {
 
         for (auto&& it : journalHistory) {
             //@todo I would like to remove getDataList and just pass the Func to it somehow
             for (auto&& jt : it->getDataList()) {
-                LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath());
-                auto& func = funcMap[std::make_pair(jt.getMethod(), jt.getTarget())];
-                if (func) {
-                    (*func)(jt);
-                }
+                LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath().string());
+                funcMap.execute(jt);
             }
         }
 
         //@todo think if clearFunc() should not be invoked here and replay should check if any functions are setDirect. this way, if someone changes some but not all functions, replay will not do stupid things.
     }
 
-    void SimpleJournal::replayCurrentState() {
+    void SimpleJournal::replayCurrentState(JournalFuncMap funcMap) {
         if (currentState) {
             int processingPass = 0;
             while (!currentState->isProcessed()) {
@@ -54,11 +51,8 @@ namespace bsc {
 
                 for (auto&& jt : currentState->getDataList()) {
                     if (!jt.isProcessed()) {
-                        LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath());
-                        auto& func = funcMap[std::make_pair(jt.getMethod(), jt.getTarget())];
-                        if (func) {
-                            (*func)(jt);
-                        }
+                        LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath().string());
+                        funcMap.execute(jt);
                         jt.setProcessed(true);
                     }
                 }
@@ -66,7 +60,6 @@ namespace bsc {
             //@todo I'm not very fond of this processed flag, but it's needed so changes to journal state will be in fact processed during replay.
             currentState->clearProcessed();
         }
-
     }
 
     void SimpleJournal::append(JournalMethod method, JournalTarget target, PathType path, bsc::FileData data) {
@@ -77,9 +70,9 @@ namespace bsc {
     void SimpleJournal::prepareState() {
         if (currentState == nullptr) {
             currentState = std::make_shared<JournalState>(metaDataFetcher->makeMetaData());
-//        if (journalHistory.size() > 0) {
-//            currentState->setPreviousState(journalHistory.back());
-//        }
+            //        if (journalHistory.size() > 0) {
+            //            currentState->setPreviousState(journalHistory.back());
+            //        }
             currentState->setPreviousState(findLastState());
         }
     }
@@ -98,9 +91,10 @@ namespace bsc {
             }
             //validate other history
             otherCopy.erase(std::remove_if(otherCopy.begin(), otherCopy.end(), [](auto i) -> bool {
-                auto checksum = i->getChecksum();
-                return checksum != i->calculateChecksum();
-            }), otherCopy.end());
+                                auto checksum = i->getChecksum();
+                                return checksum != i->calculateChecksum();
+                            }),
+                            otherCopy.end());
             //@todo check signature (when I add it)
 
 
@@ -115,8 +109,9 @@ namespace bsc {
 
             //erase duplicates
             thisCopy.erase(std::unique(thisCopy.begin(), thisCopy.end(), [](auto i, auto j) {
-                return (i->getCommitTime() == j->getCommitTime() && i->getChecksum() == j->getChecksum());
-            }), thisCopy.end());
+                               return (i->getCommitTime() == j->getCommitTime() && i->getChecksum() == j->getChecksum());
+                           }),
+                           thisCopy.end());
 
             //fix previous state pointing to the wrong tree
             for (auto&& item : thisCopy) {
@@ -125,8 +120,6 @@ namespace bsc {
                     auto ret = std::find_if(thisCopy.begin(), thisCopy.end(), [&](const JournalStatePtr& i) {
                         return i->getCommitTime() == item->getPreviousState()->getCommitTime() &&
                                i->getChecksum() == item->getPreviousState()->getChecksum();
-
-
                     });
                     if (ret != thisCopy.end()) {
                         if (item->getPreviousState() != *ret) {
@@ -159,19 +152,11 @@ namespace bsc {
             //no common root
             return false;
         }
-
-
     }
 
     bool SimpleJournal::merge(const JournalPtr& other) {
         //@todo error handling
         return merge(std::static_pointer_cast<SimpleJournal>(other));
-    }
-
-    void SimpleJournal::clearFunc() {
-
-        funcMap.clear();
-
     }
 
     IJournal::JournalStatePtr SimpleJournal::getState(const CommitTimeType& commitTime, const ChecksumType& checksum) {
@@ -185,7 +170,6 @@ namespace bsc {
         } else {
             return *ret;
         }
-
     }
 
     const std::string& SimpleJournal::calculateChecksum() {
@@ -197,19 +181,19 @@ namespace bsc {
             for (const auto& item : journalHistory) {
                 ss << item->getChecksum();
             }
-//        cereal::BinaryOutputArchive oa(ss);
-//        oa << *this;
+            //        cereal::BinaryOutputArchive oa(ss);
+            //        oa << *this;
         }
         std::string source = ss.str();
         hash = bsc::calculateSha1OfString(source);
-//    LOGGER("string is " + source)
-//    LOGGER("hash is " + hash);
+        //    LOGGER("string is " + source)
+        //    LOGGER("hash is " + hash);
         checksum = hash;
         return checksum;
     }
 
     SimpleJournal::SimpleJournal(std::unique_ptr<JournalMetaDataFetcher> metaDataFetcher) : metaDataFetcher(
-            std::move(metaDataFetcher)) {}
+                                                                                                    std::move(metaDataFetcher)) {}
 
     SimpleJournal::SimpleJournal() : metaDataFetcher(std::make_unique<SimpleJournalMetaDataFetcher>()) {}
-}
+}// namespace bsc

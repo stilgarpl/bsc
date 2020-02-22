@@ -9,6 +9,7 @@ namespace bsc {
         none,
         file,
         directory,
+        incoming_directory,
     };
 
 }

@@ -30,9 +30,9 @@ namespace bsc {
         size = data.getSize();
         permissions = data.getPermissions();
         modificationTime = data.getModificationTime();
-        checksum = data.getChecksum();
-        resourceId = IStorage::getResourceId(data.getChecksum(), data.getSize());
-        directory = data.isDirectory();
+        checksum = data.getResourceChecksum();
+        resourceId = IStorage::getResourceId(data.getResourceChecksum(), data.getSize());
+        directory = data.getTarget() == JournalTarget::directory;
     }
 
     bool RepositoryAttributes::isDirectory() const {

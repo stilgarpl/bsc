@@ -24,7 +24,6 @@ namespace bsc {
         //@todo I'd like this to be const... or not embedded in journal. there should be something like a service that makes journal, journal should be pure data.
         //  so move it somewhere else. When it's moved metadatafetcher won't have to be serializable
         std::unique_ptr<JournalMetaDataFetcher> metaDataFetcher;
-        FuncMap funcMap;
     private:
         template<class Archive>
         void serialize(Archive& ar) {
@@ -66,12 +65,7 @@ namespace bsc {
         //@todo hmm hmm variadic template? - moved may have two paths for example?
         void append(JournalMethod method, JournalTarget target, PathType path, bsc::FileData data) override;
 
-        void replay() override;
-
-        void setFunc(const JournalMethod& method, const JournalTarget& target, Func func) override {
-            funcMap[std::make_pair(method, target)] = func;
-        }
-
+        void replay(JournalFuncMap funcMap) override;
 
         const std::string& calculateChecksum();
 
@@ -100,9 +94,8 @@ namespace bsc {
 
         bool merge(const JournalPtr& other) override;
 
-        void clearFunc() override;
 
-        void replayCurrentState() override;
+        void replayCurrentState(JournalFuncMap funcMap) override;
 
         JournalStatePtr getState(const CommitTimeType& commitTime, const ChecksumType& checksumType) override;
 

@@ -19,9 +19,8 @@ namespace bsc {
     public:
         class Configuration : public bsc::IConfig {
         private:
-            //@todo cereal fix path type to path!
-            PathType repositoryDataPath = fs::path("repository").string();
-            PathType storagePath = fs::path("storage").string();
+            PathType repositoryDataPath = fs::path("repository");
+            PathType storagePath = fs::path("storage");
             bool autoProcess = true;
 
         public:

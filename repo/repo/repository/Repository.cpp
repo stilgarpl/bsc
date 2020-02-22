@@ -85,22 +85,23 @@ namespace bsc {
     }
 
     void Repository::commit() {
-        journal->clearFunc();
-        journal->setFunc(JournalMethod::added, JournalTarget::file, [&](auto& i) {
+        //@todo move this funcMap outside, so it's not remade every time
+        JournalFuncMap funcMap;
+        funcMap.setFunc(JournalMethod::added, JournalTarget::file, [&](auto& i) {
             storage->store(bsc::calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
                            fs::file_size(pathTransformer->transformFromJournalFormat(i.getPath())),
                            pathTransformer->transformFromJournalFormat(i.getPath()));
             LOGGER("commit: added file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())
         });
 
-        journal->setFunc(JournalMethod::modified, JournalTarget::file, [&](auto& i) {
+        funcMap.setFunc(JournalMethod::modified, JournalTarget::file, [&](auto& i) {
             storage->store(bsc::calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getPath())),
                            fs::file_size(pathTransformer->transformFromJournalFormat(i.getPath())),
                            pathTransformer->transformFromJournalFormat(i.getPath()));
             LOGGER("commit: modified file " + pathTransformer->transformFromJournalFormat(i.getPath()).string())
         });
 
-        journal->replayCurrentState();
+        journal->replayCurrentState(funcMap);
         journal->commitState(CommitTimeType::clock::now());
     }
 
@@ -415,75 +416,75 @@ namespace bsc {
 //    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
 
         if (mapChecksum != journal->getChecksum()) {
-            LOGGER("checksum different, recreate file map")
-            attributesMap.clear();
-            journal->clearFunc();
-            journal->setFunc(JournalMethod::added, JournalTarget::file, [&](auto& i) {
-                attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
-                LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
+    LOGGER("checksum different, recreate file map")
+    attributesMap.clear();
+    JournalFuncMap funcMap;
+    funcMap.setFunc(JournalMethod::added, JournalTarget::file, [&](auto& i) {
+        attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
+        LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getPath().string());
+    });
 
-            journal->setFunc(JournalMethod::modified, JournalTarget::file, [&](auto& i) {
-                attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
-                LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
+    funcMap.setFunc(JournalMethod::modified, JournalTarget::file, [&](auto& i) {
+        attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
+        LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getPath().string());
+    });
+
+    //@todo moved file should have two parameters - from to. or, just remove moved and use deleted/added
+    funcMap.setFunc(JournalMethod::moved, JournalTarget::file, [&](auto& i) {
+        attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
+    });
+
+    funcMap.setFunc(JournalMethod::deleted, JournalTarget::file, [&](auto& i) {
+        auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+        attributesMap[path] = std::nullopt;
+        deleteMap[path].setDeleted(true);
+        deleteMap[path].setDeletionTime(i.getModificationTime());
+        //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+    });
+
+    funcMap.setFunc(JournalMethod::forgotten, JournalTarget::file, [&](auto& i) {
+        auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+        attributesMap[path] = std::nullopt;
+        deleteMap[path].setDeleted(false);
+        deleteMap[path].setDeletionTime(fs::file_time_type::min());
+        //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+    });
+
+    funcMap.setFunc(JournalMethod::added, JournalTarget::directory, [&](auto& i) {
+        attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
+        LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getPath().string());
+    });
+
+    funcMap.setFunc(JournalMethod::modified, JournalTarget::directory, [&](auto& i) {
+        attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
+        LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getPath().string());
+    });
 
             //@todo moved file should have two parameters - from to. or, just remove moved and use deleted/added
-            journal->setFunc(JournalMethod::moved, JournalTarget::file, [&](auto& i) {
-                attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
-            });
+    funcMap.setFunc(JournalMethod::moved, JournalTarget::directory, [&](auto& i) {
+        attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
+    });
 
-            journal->setFunc(JournalMethod::deleted, JournalTarget::file, [&](auto& i) {
-                auto path = pathTransformer->transformFromJournalFormat(i.getPath());
-                attributesMap[path] = std::nullopt;
-                deleteMap[path].setDeleted(true);
-                deleteMap[path].setDeletionTime(i.getModificationTime());
-//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
+    funcMap.setFunc(JournalMethod::deleted, JournalTarget::directory, [&, this](auto& i) {
+        auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+        attributesMap[path] = std::nullopt;
+        deleteMap[path].setDeleted(true);
+        deleteMap[path].setDeletionTime(i.getModificationTime());
+        //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+    });
 
-            journal->setFunc(JournalMethod::forgotten, JournalTarget::file, [&](auto& i) {
-                auto path = pathTransformer->transformFromJournalFormat(i.getPath());
-                attributesMap[path] = std::nullopt;
-                deleteMap[path].setDeleted(false);
-                deleteMap[path].setDeletionTime(fs::file_time_type::min());
-//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
-
-            journal->setFunc(JournalMethod::added, JournalTarget::directory, [&](auto& i) {
-                attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
-                LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
-
-            journal->setFunc(JournalMethod::modified, JournalTarget::directory, [&](auto& i) {
-                attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
-                LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
-
-            //@todo moved file should have two parameters - from to. or, just remove moved and use deleted/added
-            journal->setFunc(JournalMethod::moved, JournalTarget::directory, [&](auto& i) {
-                attributesMap[pathTransformer->transformFromJournalFormat(i.getPath())] = RepositoryAttributes(i);
-            });
-
-            journal->setFunc(JournalMethod::deleted, JournalTarget::directory, [&, this](auto& i) {
-                auto path = pathTransformer->transformFromJournalFormat(i.getPath());
-                attributesMap[path] = std::nullopt;
-                deleteMap[path].setDeleted(true);
-                deleteMap[path].setDeletionTime(i.getModificationTime());
-//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
-
-            journal->setFunc(JournalMethod::forgotten, JournalTarget::directory, [&](auto& i) {
-                auto path = pathTransformer->transformFromJournalFormat(i.getPath());
-                attributesMap[path] = std::nullopt;
-                deleteMap[path].setDeleted(false);
-                deleteMap[path].setDeletionTime(fs::file_time_type::min());
-//            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
-            });
+    funcMap.setFunc(JournalMethod::forgotten, JournalTarget::directory, [&](auto& i) {
+        auto path = pathTransformer->transformFromJournalFormat(i.getPath());
+        attributesMap[path] = std::nullopt;
+        deleteMap[path].setDeleted(false);
+        deleteMap[path].setDeletionTime(fs::file_time_type::min());
+        //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getPath());
+    });
 
 
-            //@todo setDirect attributes for ignores.
-            journal->replay();
-            mapChecksum = journal->getChecksum();
+    //@todo set attributes for ignores.
+    journal->replay(funcMap);
+    mapChecksum = journal->getChecksum();
         }
     }
 

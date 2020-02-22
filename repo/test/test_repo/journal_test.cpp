@@ -26,7 +26,7 @@ TEST_CASE("Journal deterministic hash test") {
     journal.append(JournalMethod::added, JournalTarget::file, "/tmp/dupa.txt",
                    bsc::FileData("/tmp/dupa.txt", "hash", {}, 100, fs::file_time_type::min(), false));
     journal.commitState(CommitTimeType::clock::from_time_t(0));
-    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("426675e4107b908d73623485eaf76ec0e6c0a022"));
+    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("2607dcfcfc7ec965778d4387e60c1072cbf95dc1"));
 }
 
 
@@ -38,7 +38,8 @@ TEST_CASE("Journal merge test") {
                    bsc::FileData("/tmp/to_remove.txt"));
     journal.commitState(CommitTimeType::clock::now());
     journal.append(JournalMethod::modified, JournalTarget::file, "/tmp/dupa.txt", bsc::FileData("/tmp/to_remove.txt"));
-    journal.replay();
+    JournalFuncMap journalFuncMap;
+    journal.replay(journalFuncMap);
     journal.commitState(CommitTimeType::clock::now());
     {
         std::ofstream os("/tmp/journal.xml");

@@ -7,7 +7,7 @@
 namespace bsc {
     enum JournalMethod {
         //@todo add some real numbers here, in case I need to add more stuff
-                none,
+        none,
         added,
         modified,
         moved,
@@ -18,5 +18,4 @@ namespace bsc {
     };
 }
 
-#endif //BSC_JOURNALMETHOD_H
-
+#endif//BSC_JOURNALMETHOD_H

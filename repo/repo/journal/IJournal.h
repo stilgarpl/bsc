@@ -6,22 +6,18 @@
 #define BSC_IJOURNAL_H
 
 
+#include "JournalFuncMap.h"
 #include "JournalMethod.h"
-#include "JournalTypes.h"
 #include "JournalState.h"
-#include <map>
-#include <vector>
-#include <optional>
+#include "JournalTypes.h"
 #include <cereal/types/memory.hpp>
 #include <cereal/types/vector.hpp>
+
+
 namespace bsc {
 
     class IJournal {
     public:
-
-    public:
-        typedef std::function<void(const JournalStateData&)> Func;
-        typedef std::map<std::pair<JournalMethod, JournalTarget>, std::optional<Func>> FuncMap;
         //@todo I'm not sure this should be in the interface...
         typedef std::shared_ptr<JournalState> JournalStatePtr;
         typedef std::vector<JournalStatePtr> JournalHistory;
@@ -32,9 +28,9 @@ public:
     virtual void commitState(CommitTimeType now) = 0;
 
     //@todo add parameters, commit range or sth
-    virtual void replay() = 0;
+    virtual void replay(JournalFuncMap funcMap) = 0;
 
-    virtual void replayCurrentState() = 0;
+    virtual void replayCurrentState(JournalFuncMap funcMap) = 0;
 
 private:
     template<class Archive>
@@ -50,11 +46,6 @@ public:
     virtual void printHistory()=0;
 
     virtual bool merge(const JournalPtr &other) =0;
-
-    //@todo setfunc and clearfunc should be replaced with passing a funcmap object to replay()
-    virtual void setFunc(const JournalMethod &method, const JournalTarget &target, Func func) = 0;
-
-        virtual void clearFunc() = 0;
 
         virtual JournalStatePtr getState(const CommitTimeType& commitTime, const ChecksumType& checksumType) = 0;
 
