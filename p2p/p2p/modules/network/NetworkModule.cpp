@@ -72,37 +72,34 @@ namespace bsc {
 
         //register packet processors from submodules
 
-        when(state<ILogicModule>(ModuleState::SUBMODULES_PREPARED).entered()).fireStateChangeReaction(
-                [&](ILogicModule& module) {
-                    //@todo move this mechanism to NodeModule to auto collect all submodules from other modules.
-                    //  submodules probably have to be optional or sth.
-                    auto& networkSub = module.getSubModule<NetworkModule>();
-                    networkSub.setupPacketProcessing(*this);
-                });
-
-
-        when(event<bsc::Tick>(5s)).fireNewAction([this](auto e) {
-            if (server != nullptr) {
-                using namespace std::string_literals;
-                LOGGER("SERVER DETAILS >>> ")
-                LOGGER(" rejected connections : "s + std::to_string(server->refusedConnections()))
-                LOGGER(" queued connections : "s + std::to_string(server->queuedConnections()))
-                LOGGER(" current connections : "s + std::to_string(server->currentConnections()))
-                LOGGER(" max threads : "s + std::to_string(server->maxThreads()))
-                LOGGER(">>>>>>")
-            }
+        when(state<ILogicModule>(ModuleState::SUBMODULES_PREPARED).entered()).fireStateChangeReaction([&](ILogicModule& module) {
+            //@todo move this mechanism to NodeModule to auto collect all submodules from other modules.
+            //  submodules probably have to be optional or sth.
+            auto& networkSub = module.getSubModule<NetworkModule>();
+            networkSub.setupPacketProcessing(*this);
         });
+
+
+        //        when(event<bsc::Tick>(5s)).fireNewAction([this](auto e) {
+        //            if (server != nullptr) {
+        //                using namespace std::string_literals;
+        //                LOGGER("SERVER DETAILS >>> ")
+        //                LOGGER(" rejected connections : "s + std::to_string(server->refusedConnections()))
+        //                LOGGER(" queued connections : "s + std::to_string(server->queuedConnections()))
+        //                LOGGER(" current connections : "s + std::to_string(server->currentConnections()))
+        //                LOGGER(" max threads : "s + std::to_string(server->maxThreads()))
+        //                LOGGER(">>>>>>")
+        //            }
+        //        });
 
         //high level logic:
 
-//    when(event<ConnectionEvent>().withId(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).
+        //    when(event<ConnectionEvent>().withId(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).
 
         //send keepalives - I tried using it to help with the packet loss, but it didn't work.
-        when(event<bsc::Tick>(120s)).fireNewAction(
-                [&, this](auto e) { this->broadcastPacket(KeepAlivePacket::Request::getNew()); });
+        when(event<bsc::Tick>(120s)).fireNewAction([&, this](auto e) { this->broadcastPacket(KeepAlivePacket::Request::getNew()); });
 
-        when(event<ModuleEvent<NetworkModule>>(ModuleState::READY)).fireNewAction(
-                NetworkActions::loadNetworkInfo);
+        when(event<ModuleEvent<NetworkModule>>(ModuleState::READY)).fireNewAction(NetworkActions::loadNetworkInfo);
 
         when(event<ModuleEvent<NetworkModule>>(ModuleState::SHUTDOWN)).fireNewAction(
                 NetworkActions::saveNetworkInfo);

@@ -38,7 +38,6 @@ namespace bsc {
         fs::file_time_type modificationTime{};
         ChecksumType resourceChecksum{};//checksum of the file.
         ChecksumType checksum{};        // checksum of the whole structure
-        bool processed = false;         //this does not go into the checksum
     private:
         template<class Archive>
         void serialize(Archive& ar) {
@@ -96,10 +95,6 @@ namespace bsc {
             return size;
         }
 
-        bool isProcessed() const;
-
-        void setProcessed(bool processed);
-
         bool isDirectory() const;
 
         JournalTarget getTarget() const;
@@ -127,7 +122,7 @@ namespace bsc {
         void add(const JournalStateData& data);
 
         //@template change it to something else? probably some kind of replay mechanism?
-        std::list<JournalStateData>& getDataList();
+        const std::list<JournalStateData>& getDataList() const;
 
         void setDataList(const std::list<JournalStateData>& dataList);
 
@@ -159,9 +154,6 @@ namespace bsc {
 
         JournalState(JournalMetaData metaData);
 
-        bool isProcessed() const;
-
-        void clearProcessed();
     };
 
 }// namespace bsc

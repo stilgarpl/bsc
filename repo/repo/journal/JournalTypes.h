@@ -10,7 +10,8 @@
 #include <string>
 
 namespace bsc {
-//typedef std::string ResourceId;
+    //typedef std::string ResourceId;
+    //@todo why there is a ChecksumId and ChecksumType? what's the difference? If there is none, remove ChecksumId
     using ChecksumId = std::string;
 
 //@todo different Clock maybe? utc_clock?

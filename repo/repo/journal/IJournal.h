@@ -28,7 +28,7 @@ public:
     virtual void commitState(CommitTimeType now) = 0;
 
     //@todo add parameters, commit range or sth
-    virtual void replay(JournalFuncMap funcMap) = 0;
+    virtual void replay(JournalFuncMap funcMap) const = 0;
 
     virtual void replayCurrentState(JournalFuncMap funcMap) = 0;
 

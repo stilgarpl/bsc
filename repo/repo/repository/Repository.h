@@ -8,77 +8,21 @@
 #define BSC_REPOSITORY_H
 
 
-#include <repo/journal/SimpleJournal.h>
-#include <core/log/Logger.h>
-#include <repo/repository/storage/IStorage.h>
-#include <core/utils/crypto.h>
-#include <repo/repository/transformer/PathTransformer.h>
-#include <core/factory/FactoryContext.h>
-#include <repo/repository/storage/StorageFactorySpecialization.h>
 #include "IRepository.h"
 #include "RepositoryAttributes.h"
+#include "RepositoryFileMap.h"
+#include <core/factory/FactoryContext.h>
+#include <core/log/Logger.h>
+#include <core/utils/crypto.h>
+#include <repo/journal/SimpleJournal.h>
+#include <repo/repository/storage/IStorage.h>
+#include <repo/repository/storage/StorageFactorySpecialization.h>
+#include <repo/repository/transformer/PathTransformer.h>
 namespace bsc {
 
     class Repository : public IRepository {
 
     public:
-
-        class RepositoryFileMap {
-        public:
-
-
-            class DeleteInfo {
-            private:
-                bool deleted = false;
-                //@todo store utc_clock value instead of old time_t
-                fs::file_time_type deletionTime = fs::file_time_type::min();
-
-            public:
-                bool isDeleted() const;
-
-                void setDeleted(bool deleted);
-
-                fs::file_time_type getDeletionTime() const;
-
-                void setDeletionTime(fs::file_time_type deletionTime);
-            };
-
-        private:
-            std::map<fs::path, std::optional<RepositoryAttributes>> attributesMap;
-            std::map<fs::path, DeleteInfo> deleteMap;
-            JournalPtr& journal;
-            std::shared_ptr<IPathTransformer>& pathTransformer;
-            decltype(journal->getChecksum()) mapChecksum;
-        private:
-            void prepareMap();
-
-        public:
-            auto operator[](const fs::path& path) -> decltype(attributesMap[fs::current_path()]);
-
-            auto contains(const fs::path& path) {
-                return attributesMap.contains(path);
-            }
-
-            auto getSize(const fs::path& path);
-
-            decltype(attributesMap) subMap(const fs::path& root);
-
-        public:
-
-        public:
-
-            auto begin() -> decltype(attributesMap.begin());
-
-            auto end() -> decltype(attributesMap.end());
-
-            fs::file_time_type getDeletionTime(const fs::path& path);
-
-            auto isDeleted(const fs::path& path) -> decltype(deleteMap[path].isDeleted());
-
-            RepositoryFileMap(JournalPtr& journal, std::shared_ptr<IPathTransformer>& pathTransformer);
-        };
-
-
         class RepoDeployMap {
 
             class DeployAttributes {
@@ -160,19 +104,15 @@ namespace bsc {
         const RepositoryActionStrategyPack fullPack;
 
     private:
-        RepositoryFileMap _repoFileMap = RepositoryFileMap(journal, pathTransformer);
         //@todo add saving and loading of a deployMap
         RepoDeployMap deployMap;
+        RepositoryFileMapRenderer fileMapRenderer;
+
     public:
         Repository(const IRepository::RepoIdType& repositoryId, const std::shared_ptr<IStorage>& storage,
                    const JournalPtr& journal, const Repository::RepoDeployMap& deployMap);
 
     protected:
-
-        //@todo move this function inside RepositoryFileMap. Store more data in RepositoryFileMap - it should know modification date of each path and type (dir/file)
-        RepositoryFileMap& getFileMap() {
-            return _repoFileMap;
-        }
 
     public:
         const RepoIdType& getRepositoryId() const override;
@@ -256,13 +196,11 @@ namespace bsc {
     public:
         friend class cereal::access;
 
-        [[nodiscard]] const RepositoryActionStrategyPack& getDeployPack() const;
+        [[nodiscard]] const RepositoryActionStrategyPack& getDeployPack() const override;
 
-        [[nodiscard]] const RepositoryActionStrategyPack& getLocalSyncPack() const;
+        [[nodiscard]] const RepositoryActionStrategyPack& getLocalSyncPack() const override;
 
-        [[nodiscard]] const RepositoryActionStrategyPack& getFullPack() const;
-
-
+        [[nodiscard]] const RepositoryActionStrategyPack& getFullPack() const override;
     };
 }
 CEREAL_REGISTER_TYPE(bsc::Repository)

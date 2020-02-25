@@ -37,10 +37,9 @@ namespace bsc {
 
         bool isDirectory() const;
 
-        bsc::FileData toFileData(const fs::path& path) {
+        [[nodiscard]] bsc::FileData toFileData(const fs::path& path) const {
             return bsc::FileData(path, checksum, permissions, size, modificationTime, directory);
         }
-
     };
 }
 

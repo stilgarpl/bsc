@@ -24,7 +24,7 @@ namespace bsc {
 
     }
 
-    std::list<JournalStateData>& JournalState::getDataList() {
+    const std::list<JournalStateData>& JournalState::getDataList() const {
         return dataList;
     }
 
@@ -83,21 +83,6 @@ namespace bsc {
         return checksum;
     }
 
-    bool JournalState::isProcessed() const {
-        bool retVal = true;
-        for (const auto& item : dataList) {
-            retVal &= item.isProcessed();
-        }
-        return retVal;
-    }
-
-    void JournalState::clearProcessed() {
-        for (auto& item : dataList) {
-            item.setProcessed(false);
-        }
-
-    }
-
     JournalState::JournalState(JournalMetaData metaData) : metaData(std::move(metaData)) {}
 
     void JournalStateData::update(bsc::FileData data) {
@@ -115,13 +100,6 @@ namespace bsc {
         return permissions;
     }
 
-    bool JournalStateData::isProcessed() const {
-        return processed;
-    }
-
-    void JournalStateData::setProcessed(bool processed) {
-        JournalStateData::processed = processed;
-    }
     JournalTarget JournalStateData::getTarget() const {
         return target;
     }

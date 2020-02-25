@@ -28,11 +28,11 @@ namespace bsc {
         }
     }
 
-    void SimpleJournal::replay(JournalFuncMap funcMap) {
+    void SimpleJournal::replay(JournalFuncMap funcMap) const {
 
-        for (auto&& it : journalHistory) {
+        for (const auto& it : journalHistory) {
             //@todo I would like to remove getDataList and just pass the Func to it somehow
-            for (auto&& jt : it->getDataList()) {
+            for (const auto& jt : it->getDataList()) {
                 LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getDestination());
                 funcMap.execute(jt);
             }
@@ -43,23 +43,23 @@ namespace bsc {
 
     void SimpleJournal::replayCurrentState(JournalFuncMap funcMap) {
         if (currentState) {
-            int processingPass = 0;
-            while (!currentState->isProcessed()) {
-                processingPass++;
-                LOGGER("processing replay pass " + std::to_string(processingPass));
-                //@todo I would like to remove getDataList and just pass the Func to it somehow
+            //            int processingPass = 0;
+            //            while (!currentState->isProcessed()) {
+            //                processingPass++;
+            //                LOGGER("processing replay pass " + std::to_string(processingPass));
+            //@todo I would like to remove getDataList and just pass the Func to it somehow
 
-                for (auto&& jt : currentState->getDataList()) {
-                    if (!jt.isProcessed()) {
-                        LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getDestination());
-                        funcMap.execute(jt);
-                        jt.setProcessed(true);
-                    }
-                }
+            for (auto&& jt : currentState->getDataList()) {
+                //                    if (!jt.isProcessed()) {
+                LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getDestination());
+                funcMap.execute(jt);
+                //                        jt.setProcessed(true);
+                //                    }
             }
-            //@todo I'm not very fond of this processed flag, but it's needed so changes to journal state will be in fact processed during replay.
-            currentState->clearProcessed();
         }
+        //@todo I'm not very fond of this processed flag, but it's needed so changes to journal state will be in fact processed during replay.
+        //            currentState->clearProcessed();
+        //        }
     }
 
     void SimpleJournal::append(JournalMethod method, JournalTarget target, PathType path, bsc::FileData data) {

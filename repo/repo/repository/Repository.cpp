@@ -4,9 +4,9 @@
 // Created by stilgar on 17.10.17.
 //
 
-#include <repo/repository/transformer/rules/TmpRule.h>
-#include <repo/repository/transformer/rules/HomeDirRule.h>
 #include "Repository.h"
+#include <repo/repository/transformer/rules/HomeDirRule.h>
+#include <repo/repository/transformer/rules/TmpRule.h>
 
 
 #include <repo/repository/storage/InternalStorage.h>
@@ -30,7 +30,8 @@ namespace bsc {
                                                                               repositoryId(std::move(repositoryId)),
                                                                               storage(std::move(storagePtr)),
                                                                               deployPack(strategyFactory.createPack(
-                                                                                      {.updatedInRepo = RepositoryAction::restore,
+                                                                                      {
+                                                                                              .updatedInRepo = RepositoryAction::restore,
                                                                                               .updatedInFilesystem = RepositoryAction::nop,
                                                                                               .same = RepositoryAction::nop,
                                                                                               .newInRepo = RepositoryAction::restore,
@@ -39,7 +40,8 @@ namespace bsc {
                                                                                               .deletedInFilesystem = RepositoryAction::restore,
                                                                                       })),
                                                                               localSyncPack(strategyFactory.createPack(
-                                                                                      {.updatedInRepo = RepositoryAction::nop,
+                                                                                      {
+                                                                                              .updatedInRepo = RepositoryAction::nop,
                                                                                               .updatedInFilesystem = RepositoryAction::update,
                                                                                               .same = RepositoryAction::nop,
                                                                                               .newInRepo = RepositoryAction::nop,
@@ -48,14 +50,16 @@ namespace bsc {
                                                                                               .deletedInFilesystem = RepositoryAction::remove,
                                                                                       })),
                                                                               fullPack(strategyFactory.createPack(
-                                                                                      {.updatedInRepo = RepositoryAction::restore,
+                                                                                      {
+                                                                                              .updatedInRepo = RepositoryAction::restore,
                                                                                               .updatedInFilesystem = RepositoryAction::update,
                                                                                               .same = RepositoryAction::nop,
                                                                                               .newInRepo = RepositoryAction::restore,
                                                                                               .newInFilesystem = RepositoryAction::persist,
                                                                                               .deletedInRepo = RepositoryAction::trash,
                                                                                               .deletedInFilesystem = RepositoryAction::remove,
-                                                                                      })) {
+                                                                                      })),
+                                                                              fileMapRenderer(pathTransformer) {
         pathTransformer->addRule(std::make_shared<TmpRule>());
         pathTransformer->addRule(std::make_shared<HomeDirRule>());
     }
@@ -67,8 +71,8 @@ namespace bsc {
     void Repository::restoreAll() {
 
         //@todo this method kind of does the same as deploy() merge the two
-        auto& fileMap = getFileMap();
-        for (auto &&[path, value] :fileMap) {
+        auto& fileMap = fileMapRenderer.renderMap(journal);
+        for (auto&& [path, value] : fileMap) {
             if (value) {
                 LOGGER("restoring path " + path.string())
                 if (value->isDirectory()) {
@@ -107,7 +111,7 @@ namespace bsc {
 
     void Repository::persist(fs::path path) {
         LOGGER("persist: " + path.string())
-        auto& fileMap = getFileMap();
+        auto& fileMap = fileMapRenderer.renderMap(journal);
         if (path.is_relative()) {
             path = fs::canonical(fs::current_path() / path);
             LOGGER("after canonical: " + path.string())
@@ -130,17 +134,14 @@ namespace bsc {
             journal->append(JournalMethod::add, target,
                             pathTransformer->transformToJournalFormat(path).string(),
                             bsc::FileData(path));
-
-
         }
-
     }
 
     void Repository::downloadStorage() {
 
-        auto& fileMap = getFileMap();
+        auto& fileMap = fileMapRenderer.renderMap(journal);
         bool hasResources = true;
-        for (const auto &[path, value] : fileMap) {
+        for (const auto& [path, value] : fileMap) {
             LOGGER("file " + path.string() + " => " + (value ? value->getResourceId() : std::string(" [X] ")));
             //@todo change this bool to actual transfer management
 
@@ -152,14 +153,11 @@ namespace bsc {
                     hasResources &= storage->acquireResource(value->getResourceId());
                 }
             }
-
-
         }
         auto queue = storage->getTransferQueue();
         if (queue != nullptr) {
             queue->waitToFinishAllTransfers();
         }
-
     }
 
     void Repository::update(fs::path path, const RepositoryActionStrategyPack& strategyPack,
@@ -167,9 +165,9 @@ namespace bsc {
         //@todo change the name of this function to something else. it's about merging the state or journal and filesystem and updating one from the other or both
         LOGGER("update: " + path.string())
         path = fs::weakly_canonical(path);
-        auto& fileMap = getFileMap();
+        auto& fileMap = fileMapRenderer.renderMap(journal);
         //only update if the file is in the repository
-//    if (fileMap.contains(path)) {
+        //    if (fileMap.contains(path)) {
 
         if (fs::exists(path)) {
             if (fs::is_directory(path) || fs::is_regular_file(path)) {
@@ -213,7 +211,6 @@ namespace bsc {
                                     }
                                 }
                             }
-
                         }
                     }
                 } else {
@@ -233,8 +230,6 @@ namespace bsc {
                             deployMap.markDeployed(path, state);
                         }
                     }
-
-
                 }
                 //@todo this iterates over all directories and files in path, which means that it will probably call some methods twice or even more times on some files. make sure it doesn't
                 if (fs::is_directory(path) && updateOptions.contains(UpdateOptions::followDirectories)) {
@@ -281,23 +276,21 @@ namespace bsc {
             }
         }
 
-//    }
+        //    }
     }
 
     void Repository::syncLocalChanges() {
         //@todo process files from incoming directory here? or somewhere else?
         //@todo change the name of this function to updateAll or sth
-        for (const auto& i : getFileMap()) {
+        for (const auto& i : fileMapRenderer.renderMap(journal)) {
             LOGGER("update()" + i.first.string())
             update(i.first, localSyncPack, {UpdateOptions::followUpdatedDirectories});
         }
-
-
     }
 
     void Repository::restoreAttributes(const fs::path& path) {
 
-        auto& fileMap = getFileMap();
+        auto& fileMap = fileMapRenderer.renderMap(journal);
 
         if (fs::exists(path)) {
             if (fileMap.contains(path)) {
@@ -308,12 +301,11 @@ namespace bsc {
                 }
             }
         }
-
     }
 
     void Repository::forget(fs::path path) {
 
-        auto& fileMap = getFileMap();
+        auto& fileMap = fileMapRenderer.renderMap(journal);
         if (path.is_relative()) {
             //@todo not so sure about current path, i have to make sure this is always setDirect to the right value
             path = fs::canonical(fs::current_path() / path);
@@ -333,7 +325,7 @@ namespace bsc {
 
     void Repository::remove(fs::path path) {
 
-        auto& fileMap = getFileMap();
+        auto& fileMap = fileMapRenderer.renderMap(journal);
         if (path.is_relative()) {
             //@todo not so sure about current path, i have to make sure this is always setDirect to the right value
             path = fs::canonical(fs::current_path() / path);
@@ -351,7 +343,6 @@ namespace bsc {
                                     pathTransformer->transformToJournalFormat(path).string(),
                                     attr->toFileData(path));
                     //@todo delete everything recursively ... or maybe do it in replayCurrentState?
-
                 }
             } else {
                 //nothing to forget!
@@ -360,7 +351,7 @@ namespace bsc {
     }
 
     void Repository::ignore(fs::path path) {
-//    auto &fileMap = getFileMap();
+        //    auto &fileMap = getFileMap();
         if (path.is_relative()) {
             //@todo not so sure about current path, i have to make sure this is always setDirect to the right value
             path = fs::canonical(fs::current_path() / path);
@@ -381,20 +372,18 @@ namespace bsc {
 
         //@todo implement trashing
         fs::remove(path);
-
     }
 
     void Repository::deploy() {
-        for (const auto& i : getFileMap()) {
+        for (const auto& i : fileMapRenderer.renderMap(journal)) {
             //@todo add force level, by using different pack
             update(i.first, deployPack, {});
         }
     }
 
     Repository::Repository(const IRepository::RepoIdType& repositoryId, const std::shared_ptr<IStorage>& storage,
-                           const JournalPtr& journal, const Repository::RepoDeployMap& deployMap) : Repository(
-            repositoryId,
-            storage) {
+                           const JournalPtr& journal, const Repository::RepoDeployMap& deployMap) : Repository(repositoryId,
+                                                                                                               storage) {
         this->journal = journal;
         this->deployMap = deployMap;
     }
@@ -411,143 +400,8 @@ namespace bsc {
         return fullPack;
     }
 
-//Repository::Repository() : Repository("", nullptr) {}
+    //Repository::Repository() : Repository("", nullptr) {}
 
-    void Repository::RepositoryFileMap::prepareMap() {
-//    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
-
-        if (mapChecksum != journal->getChecksum()) {
-    LOGGER("checksum different, recreate file map")
-    attributesMap.clear();
-    JournalFuncMap funcMap;
-    funcMap.setFunc(JournalMethod::add, JournalTarget::file, [&](auto& i) {
-        attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
-        LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
-    });
-
-    funcMap.setFunc(JournalMethod::modify, JournalTarget::file, [&](auto& i) {
-        attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
-        LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
-    });
-
-    //@todo moved file should have two parameters - from to. or, just remove moved and use deleted/added
-    funcMap.setFunc(JournalMethod::move, JournalTarget::file, [&](auto& i) {
-        attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
-    });
-
-    funcMap.setFunc(JournalMethod::remove, JournalTarget::file, [&](auto& i) {
-        auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
-        attributesMap[path] = std::nullopt;
-        deleteMap[path].setDeleted(true);
-        deleteMap[path].setDeletionTime(i.getModificationTime());
-        //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
-    });
-
-    funcMap.setFunc(JournalMethod::forget, JournalTarget::file, [&](auto& i) {
-        auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
-        attributesMap[path] = std::nullopt;
-        deleteMap[path].setDeleted(false);
-        deleteMap[path].setDeletionTime(fs::file_time_type::min());
-        //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
-    });
-
-    funcMap.setFunc(JournalMethod::add, JournalTarget::directory, [&](auto& i) {
-        attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
-        LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
-    });
-
-    funcMap.setFunc(JournalMethod::modify, JournalTarget::directory, [&](auto& i) {
-        attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
-        LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
-    });
-
-    //@todo moved file should have two parameters - from to. or, just remove moved and use deleted/added
-    funcMap.setFunc(JournalMethod::move, JournalTarget::directory, [&](auto& i) {
-        attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
-    });
-
-    funcMap.setFunc(JournalMethod::remove, JournalTarget::directory, [&, this](auto& i) {
-        auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
-        attributesMap[path] = std::nullopt;
-        deleteMap[path].setDeleted(true);
-        deleteMap[path].setDeletionTime(i.getModificationTime());
-        //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
-    });
-
-    funcMap.setFunc(JournalMethod::forget, JournalTarget::directory, [&](auto& i) {
-        auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
-        attributesMap[path] = std::nullopt;
-        deleteMap[path].setDeleted(false);
-        deleteMap[path].setDeletionTime(fs::file_time_type::min());
-        //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
-    });
-
-
-    //@todo set attributes for ignores.
-    journal->replay(funcMap);
-    mapChecksum = journal->getChecksum();
-}
-    }
-
-    auto
-    Repository::RepositoryFileMap::operator[](const fs::path& path) -> decltype(attributesMap[fs::current_path()]) {
-        //@todo future optimization: maybe this shouldn't be called every time? it has an if, but still...
-        prepareMap();
-        return attributesMap[path];
-    }
-
-    auto Repository::RepositoryFileMap::begin() -> decltype(attributesMap.begin()) {
-        prepareMap();
-        return attributesMap.begin();
-    }
-
-    auto Repository::RepositoryFileMap::end() -> decltype(attributesMap.end()) {
-        return attributesMap.end();
-    }
-
-    Repository::RepositoryFileMap::RepositoryFileMap(JournalPtr& journal,
-                                                     std::shared_ptr<IPathTransformer>& pathTransformer)
-            : journal(
-            journal), pathTransformer(pathTransformer) {}
-
-    auto Repository::RepositoryFileMap::getSize(const fs::path& path) {
-        return attributesMap[path]->getSize();
-    }
-
-    decltype(Repository::RepositoryFileMap::attributesMap) Repository::RepositoryFileMap::subMap(const fs::path& root) {
-        decltype(Repository::RepositoryFileMap::attributesMap) result;
-        for (const auto &[path, value] : attributesMap) {
-            if (path.string().find(root.string()) != std::string::npos) {
-                result[path] = value;
-            }
-        }
-        return result;
-    }
-
-    fs::file_time_type Repository::RepositoryFileMap::getDeletionTime(const fs::path& path) {
-        return deleteMap[path].getDeletionTime();
-    }
-
-    auto Repository::RepositoryFileMap::isDeleted(const fs::path& path) -> decltype(deleteMap[path].isDeleted()) {
-        return deleteMap[path].isDeleted();
-    }
-
-
-    bool Repository::RepositoryFileMap::DeleteInfo::isDeleted() const {
-        return deleted;
-    }
-
-    fs::file_time_type Repository::RepositoryFileMap::DeleteInfo::getDeletionTime() const {
-        return deletionTime;
-    }
-
-    void Repository::RepositoryFileMap::DeleteInfo::setDeletionTime(fs::file_time_type deletionTime) {
-        DeleteInfo::deletionTime = deletionTime;
-    }
-
-    void Repository::RepositoryFileMap::DeleteInfo::setDeleted(bool deleted) {
-        DeleteInfo::deleted = deleted;
-    }
 
     auto Repository::RepoDeployMap::begin() -> decltype(deployMap.begin()) {
         return deployMap.begin();
@@ -558,7 +412,7 @@ namespace bsc {
     }
 
     auto
-    Repository::RepoDeployMap::operator[](const fs::path& path) -> decltype(deployMap[fs::current_path()]) {
+            Repository::RepoDeployMap::operator[](const fs::path& path) -> decltype(deployMap[fs::current_path()]) {
         return deployMap[path];
     }
 
@@ -569,7 +423,7 @@ namespace bsc {
         } else if (deployState == DeployState::notDeployed) {
             LOGGER("marking " + path.string() + " as not deployed")
             deployMap[path] = false;
-        } //else unchanged
+        }//else unchanged
     }
 
     bool Repository::RepoDeployMap::DeployAttributes::isDeployed() const {
@@ -585,20 +439,18 @@ namespace bsc {
 
     Repository::RepoDeployMap::DeployAttributes::DeployAttributes() = default;
 
-//@todo maybe move actual implementation code from methods like repository.persist, delete, trash... etc. to those strategies? just a thought
+    //@todo maybe move actual implementation code from methods like repository.persist, delete, trash... etc. to those strategies? just a thought
 
     class StrategyPersist : public Repository::RepositoryActionStrategy {
         Repository::DeployState
         apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes) override {
             repository.persist(path);
-            return Repository::DeployState::deployed; //it was UNCHANGED, but file is clearly in the filesystem, so it's deployed!
+            return Repository::DeployState::deployed;//it was UNCHANGED, but file is clearly in the filesystem, so it's deployed!
             //UNCHANGED made some sense, because persisting the file doesn't actually deploy it, but new files weren't marked as deployed, so update thought they were deleted. and new files go through persist, so it should return deployed.
         }
 
     public:
         StrategyPersist(Repository& repository) : RepositoryActionStrategy(repository) {}
-
-
     };
 
     class StrategyRestore : public Repository::RepositoryActionStrategy {
@@ -613,7 +465,6 @@ namespace bsc {
         }
 
         StrategyRestore(Repository& repository) : RepositoryActionStrategy(repository) {}
-
     };
 
     class StrategyTrash : public Repository::RepositoryActionStrategy {
@@ -625,7 +476,6 @@ namespace bsc {
         }
 
         StrategyTrash(Repository& repository) : RepositoryActionStrategy(repository) {}
-
     };
 
     class StrategyRemove : public Repository::RepositoryActionStrategy {
@@ -637,7 +487,6 @@ namespace bsc {
         }
 
         StrategyRemove(Repository& repository) : RepositoryActionStrategy(repository) {}
-
     };
 
     class StrategyDelete : public Repository::RepositoryActionStrategy {
@@ -649,7 +498,6 @@ namespace bsc {
         }
 
         StrategyDelete(Repository& repository) : RepositoryActionStrategy(repository) {}
-
     };
 
     class StrategyNull : public Repository::RepositoryActionStrategy {
@@ -660,7 +508,6 @@ namespace bsc {
         }
 
         StrategyNull(Repository& repository) : RepositoryActionStrategy(repository) {}
-
     };
 
     std::shared_ptr<Repository::RepositoryActionStrategy>
@@ -678,14 +525,14 @@ namespace bsc {
                 return std::make_shared<StrategyRemove>(repository);
             case RepositoryAction::restore:
                 return std::make_shared<StrategyRestore>(repository);
-            default: //<---- this is here just so that compiler won't complain about return reaching end of function.
+            default://<---- this is here just so that compiler won't complain about return reaching end of function.
             case RepositoryAction::nop:
                 return std::make_shared<StrategyNull>(repository);
         }
     }
 
     Repository::RepositoryActionStrategyFactory::RepositoryActionStrategyFactory(Repository& repository) : repository(
-            repository) {}
+                                                                                                                   repository) {}
 
     Repository::RepositoryActionStrategyPack
     Repository::RepositoryActionStrategyFactory::createPack(Repository::RepoActionPack actionPack) const {
@@ -699,4 +546,4 @@ namespace bsc {
         strategyPack.deletedInFilesystem = create(actionPack.deletedInFilesystem);
         return strategyPack;
     }
-}
+}// namespace bsc
