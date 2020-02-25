@@ -49,7 +49,7 @@ find_package(Catch2 CONFIG REQUIRED)
 include(Catch)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    add_compile_options(-Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic)
+    add_compile_options(-Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic -Wno-unused-but-set-variable)
     if (LINUX)
         add_compile_options(-pthread)
         add_link_options(-lpthread)

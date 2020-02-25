@@ -25,22 +25,26 @@ namespace bsc {
 
     template<typename T, typename RetType, typename Parameter, typename ... Args, typename ... Strings>
     static void runStringCast(T& t, RetType (T::*f)(Args...), Strings ... strings) {
-        (t.*f)(fromString<Args>(strings)...);
+        static Parser parser{};
+        (t.*f)(parser.fromString<Args>(strings)...);
     }
 
     template<typename T, typename RetType, typename ... Args, typename ... Strings>
     static void runStringCast(T& t, RetType (T::*f)(Args...), Strings ... strings) {
-        (t.*f)(fromString<Args>(strings)...);
+        static Parser parser{};
+        (t.*f)(parser.fromString<Args>(strings)...);
     }
 
     template<typename RetType, typename ... Args, typename ... Strings>
     static void runStringCast(RetType (* f)(Args...), Strings ... strings) {
-        (*f)(fromString<Args>(strings)...);
+        static Parser parser{};
+        (*f)(parser.fromString<Args>(strings)...);
     }
 
     template<typename RetType, typename ... Args, typename ... Strings>
     static void runStringCast(std::function<RetType(Args...)> f, Strings ... strings) {
-        f(fromString<Args>(strings)...);
+        static Parser parser{};
+        f(parser.fromString<Args>(strings)...);
     }
 
     template<size_t num_args>

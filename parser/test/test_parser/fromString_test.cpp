@@ -9,12 +9,13 @@
 using namespace bsc;
 
 TEST_CASE("FromString parser test") {
-    int five = fromString<int>("5");
-    float sixAndHalf = fromString<float>("6.5");
-    std::string text = fromString<std::string>("text");
-    auto pair = fromString<std::pair<std::string, int>>("text=99");
-    auto vector = fromString<std::vector<int>>("1,2,37");
-    auto map = fromString<std::map<int, int>>("2=5,9=13");
+    Parser parser;
+    int five = parser.fromString<int>("5");
+    float sixAndHalf = parser.fromString<float>("6.5");
+    std::string text = parser.fromString<std::string>("text");
+    auto pair = parser.fromString<std::pair<std::string, int>>("text=99");
+    auto vector = parser.fromString<std::vector<int>>("1,2,37");
+    auto map = parser.fromString<std::map<int, int>>("2=5,9=13");
 
     REQUIRE(five == 5);
     REQUIRE(sixAndHalf == 6.5f);
@@ -28,7 +29,7 @@ TEST_CASE("FromString parser test") {
     REQUIRE(map.size() == 2);
     REQUIRE(map.at(2) == 5);
     REQUIRE(map.at(9) == 13);
-    REQUIRE_THROWS_MATCHES(fromString<int>("qqq"), StringParseException,
+    REQUIRE_THROWS_MATCHES(parser.fromString<int>("qqq"), StringParseException,
                            Catch::Matchers::Message("Integer parsing failed for value: qqq"));
 
 }

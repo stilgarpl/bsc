@@ -5,11 +5,11 @@
 #ifndef BSC_FROMSTRING_H
 #define BSC_FROMSTRING_H
 
-#include <type_traits>
 #include <limits>
-#include <string>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
 
 
 //template<typename T>
@@ -22,8 +22,8 @@
 
 namespace bsc {
 
-//@todo instead of SFINAE maybe I should use just one function with constexpr if() that calls itself when needed? that would solve a problem of ambigious calls when more than one function fits
-//  basically, template<ParamType> ParamType fromString(value) {if ... return fromString<..>() else if ... else if.. }; and template specializations for specific types.
+    //@todo instead of SFINAE maybe I should use just one function with constexpr if() that calls itself when needed? that would solve a problem of ambigious calls when more than one function fits
+    //  basically, template<ParamType> ParamType fromString(value) {if ... return fromString<..>() else if ... else if.. }; and template specializations for specific types.
     template<typename T>
     struct is_pair : std::false_type {
     };
@@ -55,8 +55,7 @@ namespace bsc {
                     decltype(std::declval<T>().cend()),
                     std::enable_if_t<!std::is_convertible_v<T, std::string>>
 
-            >
-    > : public std::true_type {
+                    >> : public std::true_type {
     };
 
     class StringParseException : public std::invalid_argument {
@@ -64,46 +63,90 @@ namespace bsc {
         explicit StringParseException(const std::string& arg) : invalid_argument(arg) {}
     };
 
-    template<typename ParameterType>
-    std::remove_reference_t<ParameterType>
-    fromString(const std::string& value, std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) {
-        try {
-            return std::stol(value);
-        } catch (std::invalid_argument& e) {
-            throw StringParseException("Integer parsing failed for value: " + value);
-        }
-    }
+    class Parser {
+    public:
+        struct ParserConfiguration {
+            char csvDelimiter = ',';
+            char pairDelimiter = '=';
+        };
 
-    template<typename ParameterType>
-    std::remove_reference_t<ParameterType>
-    fromString(const std::string& value, std::enable_if_t<std::is_floating_point_v<ParameterType>, int> = 0) {
-        try {
-            return std::stod(value);
-        } catch (std::invalid_argument& e) {
-            throw StringParseException("Floating parsing failed for value: " + value);
-        }
-    }
+    private:
+        ParserConfiguration parserConfiguration;
 
-
-    template<typename ParameterType>
-    std::remove_reference_t<ParameterType>
-    fromString(const std::string& value,
-               std::enable_if_t<std::is_convertible_v<ParameterType, std::string>, int>  = 0) {
-        if (!value.empty()) {
-            return ParameterType(value);
-        } else {
-            throw StringParseException("Can't parse null parameter value");
+    public:
+        template<typename ParameterType>
+        std::remove_reference_t<ParameterType>
+        fromString(const std::string& value, std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) {
+            try {
+                return std::stol(value);
+            } catch (std::invalid_argument& e) {
+                throw StringParseException("Integer parsing failed for value: " + value);
+            }
         }
 
-    }
+        template<typename ParameterType>
+        std::remove_reference_t<ParameterType>
+        fromString(const std::string& value, std::enable_if_t<std::is_floating_point_v<ParameterType>, int> = 0) {
+            try {
+                return std::stod(value);
+            } catch (std::invalid_argument& e) {
+                throw StringParseException("Floating parsing failed for value: " + value);
+            }
+        }
+
+
+        template<typename ParameterType>
+        std::remove_reference_t<ParameterType>
+        fromString(const std::string& value,
+                   std::enable_if_t<std::is_convertible_v<ParameterType, std::string>, int> = 0) {
+            if (!value.empty()) {
+                return ParameterType(value);
+            } else {
+                throw StringParseException("Can't parse null parameter value");
+            }
+        }
+
+
+        template<typename ParameterType>
+        std::remove_reference_t<ParameterType>
+        fromString(const std::string& value, std::enable_if_t<is_pair_v<ParameterType>, int> = 0) {
+            try {
+
+                std::stringstream inputStream(value);
+                std::string first, second;
+                getline(inputStream, first, parserConfiguration.pairDelimiter);
+                getline(inputStream, second);
+                auto key = fromString<std::decay_t<typename ParameterType::first_type>>(first.c_str());
+                auto pairValue = fromString<typename ParameterType::second_type>(second.c_str());
+                return std::make_pair(key, pairValue);
+            } catch (std::invalid_argument& e) {
+                throw StringParseException("Pair parsing failed for value: " + value);
+            }
+        }
+
+        template<typename ParameterType>
+        std::remove_reference_t<ParameterType>
+        fromString(const std::string& value, std::enable_if_t<is_container_not_string<ParameterType>::value, int> = 0) {
+            ParameterType container;
+            std::stringstream inputStream(value);
+            std::string element;
+
+            while (getline(inputStream, element, parserConfiguration.csvDelimiter)) {
+                ;
+                container.insert(container.end(), fromString<typename ParameterType::value_type>(element.c_str()));
+            }
+
+            return container;
+        }
+    };
 
     template<>
-    inline bool fromString<bool>(const std::string& value, int) {
+    inline bool Parser::fromString<bool>(const std::string& value, int) {
         return true;
     }
 
     template<>
-    inline int fromString<int>(const std::string& value, int) {
+    inline int Parser::fromString<int>(const std::string& value, int) {
         try {
             return std::stoi(value);
         } catch (std::invalid_argument& e) {
@@ -112,7 +155,7 @@ namespace bsc {
     }
 
     template<>
-    inline long fromString<long>(const std::string& value, int) {
+    inline long Parser::fromString<long>(const std::string& value, int) {
         try {
             return std::stol(value);
         } catch (std::invalid_argument& e) {
@@ -121,7 +164,7 @@ namespace bsc {
     }
 
     template<>
-    inline unsigned long fromString<unsigned long>(const std::string& value, int) {
+    inline unsigned long Parser::fromString<unsigned long>(const std::string& value, int) {
         try {
             return std::stoul(value);
         } catch (std::invalid_argument& e) {
@@ -131,7 +174,7 @@ namespace bsc {
 
 
     template<>
-    inline float fromString<float>(const std::string& value, int) {
+    inline float Parser::fromString<float>(const std::string& value, int) {
         try {
             return std::stof(value);
         } catch (std::invalid_argument& e) {
@@ -140,7 +183,7 @@ namespace bsc {
     }
 
     template<>
-    inline double fromString<double>(const std::string& value, int) {
+    inline double Parser::fromString<double>(const std::string& value, int) {
         try {
             return std::stod(value);
         } catch (std::invalid_argument& e) {
@@ -149,7 +192,7 @@ namespace bsc {
     }
 
     template<>
-    inline long double fromString<long double>(const std::string& value, int) {
+    inline long double Parser::fromString<long double>(const std::string& value, int) {
         try {
             return std::stold(value);
         } catch (std::invalid_argument& e) {
@@ -157,39 +200,6 @@ namespace bsc {
         }
     }
 
+}// namespace bsc
 
-    template<typename ParameterType>
-    std::remove_reference_t<ParameterType>
-    fromString(const std::string& value, std::enable_if_t<is_pair_v<ParameterType>, int> = 0) {
-        try {
-
-            std::stringstream inputStream(value);
-            std::string first, second;
-            getline(inputStream, first, '=');
-            getline(inputStream, second);
-            auto key = fromString<std::decay_t<typename ParameterType::first_type>>(first.c_str());
-            auto pairValue = fromString<typename ParameterType::second_type>(second.c_str());
-            return std::make_pair(key, pairValue);
-        } catch (std::invalid_argument& e) {
-            throw StringParseException("Pair parsing failed for value: " + value);
-        }
-    }
-
-    template<typename ParameterType>
-    std::remove_reference_t<ParameterType>
-    fromString(const std::string& value, std::enable_if_t<is_container_not_string<ParameterType>::value, int>  = 0) {
-        ParameterType container;
-        std::stringstream inputStream(value);
-        std::string element;
-
-        while (getline(inputStream, element, ',')) { ;
-            container.insert(container.end(), fromString<typename ParameterType::value_type>(element.c_str()));
-        }
-
-        return container;
-
-    }
-
-}
-
-#endif //BSC_FROMSTRING_H
+#endif//BSC_FROMSTRING_H
