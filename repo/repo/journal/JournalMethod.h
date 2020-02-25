@@ -8,13 +8,13 @@ namespace bsc {
     enum JournalMethod {
         //@todo add some real numbers here, in case I need to add more stuff
         none,
-        added,
-        modified,
-        moved,
-        deleted,
-        ignored,
-        unignored,
-        forgotten,
+        add,
+        modify,
+        move,
+        remove,
+        ignore,
+        unignore,
+        forget,
     };
 }
 

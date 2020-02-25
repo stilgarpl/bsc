@@ -30,7 +30,8 @@ namespace bsc {
     private:
         JournalMethod method = JournalMethod::none;
         JournalTarget target = JournalTarget::none;
-        PathType path{};
+        std::string destination{};
+        std::string source{};//only used in certain cases, like move, rename or for specific parameters
         uint64_t size = 0;
         fs::perms permissions = fs::perms::none;
         //@todo C++20 this should probably be changed to utc_clock. epoch of file_time_type is unspecified and it may cause problems.
@@ -41,7 +42,7 @@ namespace bsc {
     private:
         template<class Archive>
         void serialize(Archive& ar) {
-            ar(CEREAL_NVP(method), CEREAL_NVP(target), CEREAL_NVP(path), CEREAL_NVP(size), CEREAL_NVP(resourceChecksum),
+            ar(CEREAL_NVP(method), CEREAL_NVP(target), CEREAL_NVP(destination), CEREAL_NVP(source), CEREAL_NVP(size), CEREAL_NVP(resourceChecksum),
                CEREAL_NVP(modificationTime),
                CEREAL_NVP(permissions));
         }
@@ -53,7 +54,7 @@ namespace bsc {
         JournalStateData(JournalMethod method, JournalTarget target, PathType path, bsc::FileData fileData) : method(
                                                                                                                       method),
                                                                                                               target(target),
-                                                                                                              path(std::move(
+                                                                                                              destination(std::move(
                                                                                                                       path)) {
             update(std::move(fileData));
         };
@@ -70,9 +71,9 @@ namespace bsc {
             return modificationTime;
         }
 
-        const PathType& getPath() const {
-            return path;
-        }
+
+        const std::string& getDestination() const;
+        const std::string& getSource() const;
 
         void update(bsc::FileData data);
 
@@ -84,7 +85,7 @@ namespace bsc {
             std::string hash = "";
             std::stringstream ss;
             ss << std::to_string(method) << std::to_string(static_cast<std::underlying_type_t<JournalTarget>>(target))
-               << path.string() << std::to_string(size) << std::to_string(static_cast<std::underlying_type_t<fs::perms>>(permissions)) << std::to_string(modificationTime.time_since_epoch().count()) << resourceChecksum;
+               << destination << source << std::to_string(size) << std::to_string(static_cast<std::underlying_type_t<fs::perms>>(permissions)) << std::to_string(modificationTime.time_since_epoch().count()) << resourceChecksum;
 
             hash = bsc::calculateSha1OfString(ss.str());
 

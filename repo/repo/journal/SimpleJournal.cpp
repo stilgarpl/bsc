@@ -33,7 +33,7 @@ namespace bsc {
         for (auto&& it : journalHistory) {
             //@todo I would like to remove getDataList and just pass the Func to it somehow
             for (auto&& jt : it->getDataList()) {
-                LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath().string());
+                LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getDestination());
                 funcMap.execute(jt);
             }
         }
@@ -51,7 +51,7 @@ namespace bsc {
 
                 for (auto&& jt : currentState->getDataList()) {
                     if (!jt.isProcessed()) {
-                        LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getPath().string());
+                        LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getDestination());
                         funcMap.execute(jt);
                         jt.setProcessed(true);
                     }

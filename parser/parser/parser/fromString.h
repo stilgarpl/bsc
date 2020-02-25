@@ -67,7 +67,6 @@ namespace bsc {
     template<typename ParameterType>
     std::remove_reference_t<ParameterType>
     fromString(const std::string& value, std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) {
-        //@todo stoi, stol, stoii based on Parameter type length?
         try {
             return std::stol(value);
         } catch (std::invalid_argument& e) {
@@ -78,7 +77,6 @@ namespace bsc {
     template<typename ParameterType>
     std::remove_reference_t<ParameterType>
     fromString(const std::string& value, std::enable_if_t<std::is_floating_point_v<ParameterType>, int> = 0) {
-        //@todo stoi, stol, stoii based on Parameter type length?
         try {
             return std::stod(value);
         } catch (std::invalid_argument& e) {

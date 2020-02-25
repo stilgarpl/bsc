@@ -641,6 +641,22 @@ processState(state,fieldMap); fieldMap = {{PARMS,RepoAttr::setParms},{SIZE,RepoA
 wywaliłem directory z Journal State. przecież już jest Target::directory, wiec po co to? teraz sie zastanawiam czy do incoming dir dodać osobny target czy własnie zamiast bool directory dać podrodzaj. tylko, ze podrodzaje byłyby rożne dla plików i katalogów... file->incoming nie ma sensu.
 
 operacje na kronice (tworzenie funcMap, operacje na plikach i katalogach powinne byc wydzielone z repository, teraz mamy actionPacki)
-@todo funcmap powinien byc osobnym obiektem przekazywanym do replay. obiekty te powinne byc stałe i używane jak actionPacki
 
 @todo użyte path transformery powinne byc zapisane w nagłówku Journala, inaczej dodanie transformera w jednym nodzie wychrzani journal w innym nodzie ktory go nie ma.
+
+
+@todo pobieranie storage nie powinno byc w storage, ale powinna byc osobna klasa, ktora inicjuje pobieranie i nim zarządza i zapisuje wynik w storage - if(!storage.has(id)) { res = storage.getResourceStream(id); download(res);};
+
+@todo lockChain - a jak proces wyrzuci wyjątek? trzeba zrobic unlocka w catchu
+
+@todo getFileMap powinno byc zastapione renderFileMap() ktore jest w osobnej klasie i ma wewnętrzny cache hash -> map
+
+@todo JournalStateData - path zmienione na source/destination i typy pól na string. dzieki temu mozna przechowywac w tym takze inne rzecyz, jak property INCOMING czy cos
+
+add feature source="INCOMING"
+remove feature source="INCOMING"
+modify feature source="INCOMING=TURBO"
+
+@todo chyba trzeba jednak zmienic destination z powrotem na path, bo to identyfikuje zasób, a source na... coś więcej mówiącego... value? bez sensu. albo zostawic destination i source, przynajmniej taka para razem ma sens
+
+@todo renderer moze łatwo parsowac source na property map używając bsc::parser, tylko w parser najlepiej byłoby zamknąć te funkcje w klasie ktora ich używa i przekazuje do nich np. symbol który jest delimiterem w CSV

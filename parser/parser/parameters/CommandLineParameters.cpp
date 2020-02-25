@@ -11,35 +11,34 @@ bsc::CommandLineParameters::CommandLineParameters() : parser(parserBuilder().mak
 
 }
 
-std::shared_ptr<bsc::CommandLineParameters::Parser> bsc::CommandLineParameters::ParserBuilder::make() {
+std::shared_ptr<bsc::CommandLineParameters::ArgumentParser> bsc::CommandLineParameters::ParserBuilder::make() {
     reset();
     return parser;
 }
 
 void bsc::CommandLineParameters::ParserBuilder::reset() {
     //reset internal state of builder
-    parser = std::make_shared<Parser>();
+    parser = std::make_shared<ArgumentParser>();
     currentKey = 1000;
-
 }
 
 void bsc::CommandLineParameters::ParserBuilder::addOption(char shortKey, const char* longKey, const char* argumentName,
                                                           int flags, const char* doc,
-                                                          bsc::CommandLineParameters::Parser::ParseFunc parserFunction) {
+                                                          bsc::CommandLineParameters::ArgumentParser::ParseFunc parserFunction) {
     parser->argpOptions.push_back(argp_option{longKey, shortKey, argumentName, flags, doc, 0});
     parser->parseMap[shortKey] = std::move(parserFunction);
 }
 
 void bsc::CommandLineParameters::ParserBuilder::addOption(char shortKey, const char* argumentName, int flags,
                                                           const char* doc,
-                                                          bsc::CommandLineParameters::Parser::ParseFunc parserFunction) {
+                                                          bsc::CommandLineParameters::ArgumentParser::ParseFunc parserFunction) {
     parser->argpOptions.push_back(argp_option{nullptr, shortKey, argumentName, flags, doc, 0});
     parser->parseMap[shortKey] = std::move(parserFunction);
 }
 
 void bsc::CommandLineParameters::ParserBuilder::addOption(const char* longKey, const char* argumentName, int flags,
                                                           const char* doc,
-                                                          bsc::CommandLineParameters::Parser::ParseFunc parserFunction) {
+                                                          bsc::CommandLineParameters::ArgumentParser::ParseFunc parserFunction) {
     auto arg = argp_option{longKey, ++currentKey, argumentName, flags, doc, 0};
     parser->argpOptions.push_back(arg);
     parser->parseMap[arg.key] = std::move(parserFunction);
@@ -87,8 +86,8 @@ void bsc::CommandLineParameters::ParserBuilder::addUsage(std::string usage) {
     parser->usageDocs.push_back(usage);
 }
 
-error_t bsc::CommandLineParameters::Parser::parseArgument(int key, char* arg, struct argp_state* state) {
-    auto* self = static_cast<Parser*>(state->input);
+error_t bsc::CommandLineParameters::ArgumentParser::parseArgument(int key, char* arg, struct argp_state* state) {
+    auto* self = static_cast<ArgumentParser*>(state->input);
     switch (key) {
         case ARGP_KEY_INIT:
             std::cout << "Parsing ARGP_KEY_INIT " << std::to_string(key) << " " << key << std::endl;
@@ -143,13 +142,12 @@ error_t bsc::CommandLineParameters::Parser::parseArgument(int key, char* arg, st
     return 0;
 }
 
-void bsc::CommandLineParameters::Parser::parse(int argc, char** argv) {
+void bsc::CommandLineParameters::ArgumentParser::parse(int argc, char** argv) {
 
     argp_parse(&argParams, argc, argv, flags, nullptr, this);
 }
 
-void
-bsc::CommandLineParameters::Parser::prepareParser(ParseConfiguration parseConfiguration) {
+void bsc::CommandLineParameters::ArgumentParser::prepareParser(ParseConfiguration parseConfiguration) {
     using namespace std::string_literals;
     //close argOptions:
     argpOptions.push_back({nullptr, 0, nullptr, 0, nullptr, 0});
@@ -175,16 +173,15 @@ bsc::CommandLineParameters::Parser::prepareParser(ParseConfiguration parseConfig
             break;
     }
 
-    argParams = {argpOptions.data(), Parser::parseArgument, argDoc.c_str(), doc.c_str(), nullptr, nullptr, nullptr};
+    argParams = {argpOptions.data(), ArgumentParser::parseArgument, argDoc.c_str(), doc.c_str(), nullptr, nullptr, nullptr};
 }
 
-char* bsc::CommandLineParameters::Parser::helpFilter(int key, const char* text, void* input) {
+char* bsc::CommandLineParameters::ArgumentParser::helpFilter(int key, const char* text, void* input) {
     if (text != nullptr) {
         using namespace std::string_literals;
-//        LOGGER("TEXT FILTER IS : "s + text);
+        //        LOGGER("TEXT FILTER IS : "s + text);
     } else {
-//        LOGGER("TEXT IS NULL");
+        //        LOGGER("TEXT IS NULL");
     }
     return nullptr;
 }
-

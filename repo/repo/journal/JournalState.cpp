@@ -14,12 +14,12 @@ namespace bsc {
             //@todo about that method and target... shouldn't this be an error if we have more than one method on one file?
             return data.getResourceChecksum() == i.getResourceChecksum() && data.getSize() == i.getSize() &&
                    data.getMethod() == i.getMethod() && data.getTarget() == i.getTarget() &&
-                   data.getPath() == i.getPath();
+                   data.getDestination() == i.getDestination();
         });
         if (same == dataList.end()) {
             dataList.push_back(data);
         } else {
-            LOGGER("error: trying to add same data again!" + data.getPath().string())
+            LOGGER("error: trying to add same data again!" + data.getDestination())
         }
 
     }
@@ -125,5 +125,11 @@ namespace bsc {
     JournalTarget JournalStateData::getTarget() const {
         return target;
     }
+    const std::string& JournalStateData::getSource() const {
+        return source;
+    }
+    const std::string& JournalStateData::getDestination() const {
+        return destination;
+    }
 
-}
+}// namespace bsc

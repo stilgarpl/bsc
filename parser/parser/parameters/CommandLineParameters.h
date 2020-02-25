@@ -33,9 +33,10 @@ namespace bsc {
     private:
         class ParserBuilder;
 
-        class Parser {
+        class ArgumentParser {
         public:
             using ParseFunc = std::function<void(const char*)>;
+
         private:
             std::vector<argp_option> argpOptions;
             std::string doc;
@@ -66,18 +67,19 @@ namespace bsc {
 
         class ParserBuilder {
         private:
-            std::shared_ptr<Parser> parser = nullptr;
+            std::shared_ptr<ArgumentParser> parser = nullptr;
             int currentKey = 0;
+
         public:
             void addOption(char shortKey, const char* longKey, const char* argumentName, int flags, const char* doc,
-                           Parser::ParseFunc parserFunction);
+                           ArgumentParser::ParseFunc parserFunction);
 
             void addOption(char shortKey, const char* argumentName, int flags, const char* doc,
-                           Parser::ParseFunc parserFunction);
+                           ArgumentParser::ParseFunc parserFunction);
 
             void
             addOption(const char* longKey, const char* argumentName, int flags, const char* doc,
-                      Parser::ParseFunc parserFunction);
+                      ArgumentParser::ParseFunc parserFunction);
 
             void addGroup(const char* doc);
             void addAlias(char shortKey);
@@ -87,7 +89,7 @@ namespace bsc {
 
             void addDoc(std::string doc);
 
-            std::shared_ptr<Parser> make();
+            std::shared_ptr<ArgumentParser> make();
 
             void reset();
         };
@@ -98,7 +100,7 @@ namespace bsc {
         }
 
 
-        const std::shared_ptr<Parser> parser;
+        const std::shared_ptr<ArgumentParser> parser;
 
 
         template<typename T>
@@ -181,7 +183,7 @@ namespace bsc {
     private:
         int counter = 0;
 
-        CommandLineParameters::Parser::ParseFunc makeParseFunction() {
+        CommandLineParameters::ArgumentParser::ParseFunc makeParseFunction() {
             return [this](const char* input) {
                 std::string text = input != nullptr ? input : "";
                 if (!value) {

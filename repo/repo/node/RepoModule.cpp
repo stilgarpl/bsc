@@ -2,33 +2,31 @@
 // Created by stilgar on 05.11.17.
 //
 
+#include "RepoModule.h"
+#include <core/factory/FactoryContext.h>
+#include <logic/actions/CommonActions.h>
+#include <logic/chain/ChainEvaluators.h>
+#include <logic/conditions/TimeConditions.h>
+#include <logic/conditions/TriggerConditions.h>
+#include <logic/evaluators/CommonEvaluators.h>
+#include <logic/evaluators/TriggerEvaluators.h>
+#include <logic/sources/TriggerSource.h>
 #include <p2p/modules/basic/BasicModule.h>
 #include <p2p/modules/command/CommandModule.h>
-#include <logic/evaluators/CommonEvaluators.h>
-#include <repo/repository/network/RepoQuery.h>
-#include <logic/conditions/TimeConditions.h>
+#include <p2p/modules/network/protocol/logic/actions/NetworkActions.h>
 #include <p2p/modules/network/protocol/logic/conditions/NetworkConditions.h>
+#include <repo/repository/Repository.h>
 #include <repo/repository/logic/actions/RepositoryActions.h>
 #include <repo/repository/logic/evaluators/RepoEvaluators.h>
-#include <logic/actions/CommonActions.h>
 #include <repo/repository/network/RepoProcessors.h>
-#include <logic/conditions/TriggerConditions.h>
-#include <logic/sources/TriggerSource.h>
-#include <logic/chain/ChainEvaluators.h>
-#include <logic/evaluators/TriggerEvaluators.h>
-#include <core/factory/FactoryContext.h>
+#include <repo/repository/network/RepoQuery.h>
+#include <repo/repository/storage/ManagedStorageFactory.h>
 #include <repo/repository/storage/StorageFactory.h>
 #include <repo/repository/storage/StorageFactorySpecialization.h>
-#include <repo/repository/storage/ManagedStorageFactory.h>
-#include <repo/repository/Repository.h>
-#include <p2p/modules/network/protocol/logic/actions/NetworkActions.h>
-#include "RepoModule.h"
-
 
 
 namespace bsc {
     void RepoModule::setupActions(ILogicModule::SetupActionHelper& actionHelper) {
-
     }
 
     bool RepoModule::assignActions(ILogicModule::AssignActionHelper& actionHelper) {
@@ -48,29 +46,30 @@ namespace bsc {
                             node.getLogicManager().getSource<TriggerSource>()->fireTrigger<std::string, std::string>(
                                     "syncLocalRepo", repository->getRepositoryId());
                         }
-
                     });
         }
-        when(TriggerConditions::trigger<std::string>("updateRepoTrigger")).fireNewGenericAction(
-                CommonActions::foreachActionGetter(NetworkActions::broadcastPacket,
-                                                   [this] { return this->repositoryManager.getRepositories(); },
-                                                   [](RepositoryPtr rep) -> BasePacketPtr {
-                                                       auto p = RepoQuery::Request::getNew();
-                                                       p->setRepoId(rep->getRepositoryId());
-                                                       return p;
-                                                   }),
-                CommonEvaluators::foreachValue<BasePacketPtr>());
+        when(TriggerConditions::trigger<std::string>("updateRepoTrigger"))
+                .fireNewGenericAction(
+                        CommonActions::foreachActionGetter(
+                                NetworkActions::broadcastPacket,
+                                [this] { return this->repositoryManager.getRepositories(); },
+                                [](RepositoryPtr rep) -> BasePacketPtr {
+                                    auto p = RepoQuery::Request::getNew();
+                                    p->setRepoId(rep->getRepositoryId());
+                                    return p;
+                                }),
+                        CommonEvaluators::foreachValue<BasePacketPtr>());
 
         auto start = when(NetworkConditions::packetReceived<RepoQuery::Response>())
-                .newChain("repoUpdateChain");
+                             .newChain("repoUpdateChain");
         auto stage1 = start
-                //@todo add lock name function
-                .lockChain(LockConfiguration::eval(CommonEvaluators::stack(
-                        RepoEvaluators::getRepoId,
-                        ChainEvaluators::chainResult(start))))
-                .ifTrue(RepositoryActions::checkIfUpdateRequired,
-                        RepoEvaluators::currentJournalFromRepoQueryResponse,
-                        RepoEvaluators::newJournalFromRepoQueryResponse);
+                              //@todo add lock name function
+                              .lockChain(LockConfiguration::eval(CommonEvaluators::stack(
+                                      RepoEvaluators::getRepoId,
+                                      ChainEvaluators::chainResult(start))))
+                              .ifTrue(RepositoryActions::checkIfUpdateRequired,
+                                      RepoEvaluators::currentJournalFromRepoQueryResponse,
+                                      RepoEvaluators::newJournalFromRepoQueryResponse);
         stage1.thenChain()
                 .fireNewGenericChainAction(RepositoryActions::updateJournal,
                                            CommonEvaluators::stack(
@@ -95,7 +94,7 @@ namespace bsc {
         auto syncStart = when(TriggerConditions::trigger<std::string, std::string>("syncLocalRepo"));
 
         syncStart.newChain("syncRepoChain")
-                        //@todo add lock name function
+                //@todo add lock name function
                 .lockChain(LockConfiguration::eval(CommonEvaluators::stack(
                         TriggerEvaluators::triggerValue,
                         ChainEvaluators::chainResult(syncStart))))
@@ -109,19 +108,19 @@ namespace bsc {
                                                    ChainEvaluators::chainResult(syncStart)))
                 .unlockChain();
 
-//    when(event<Tick>(100ms)).newChain("dupaChain").lockChain(LockConfiguration::chain()).fireNewChainAction([](auto e){
-//        LOGGER("gen1")
-//        std::this_thread::sleep_for(1s);
-//        LOGGER("gen2")
-//        return e;
-//    }).unlockChain();
+        //    when(event<Tick>(100ms)).newChain("dupaChain").lockChain(LockConfiguration::chain()).fireNewChainAction([](auto e){
+        //        LOGGER("gen1")
+        //        std::this_thread::sleep_for(1s);
+        //        LOGGER("gen2")
+        //        return e;
+        //    }).unlockChain();
         //debug
-//    stage1.lockChain()
-//            .fireNewGenericChainAction([]() { LOGGER("super secret generic action"); })
-//            .fireNewGenericChainAction([]() { LOGGER("and one after that"); })
-//            .fireNewGenericChainAction([]() { LOGGER("one more"); })
-//            .fireNewGenericChainAction([]() { LOGGER("and last one"); })
-//            .unlockChain();
+        //    stage1.lockChain()
+        //            .fireNewGenericChainAction([]() { LOGGER("super secret generic action"); })
+        //            .fireNewGenericChainAction([]() { LOGGER("and one after that"); })
+        //            .fireNewGenericChainAction([]() { LOGGER("one more"); })
+        //            .fireNewGenericChainAction([]() { LOGGER("and last one"); })
+        //            .unlockChain();
         //
 
         return ret;
@@ -144,39 +143,38 @@ namespace bsc {
 
     void RepoModule::loadRepository(const IRepository::RepoIdType& repoId) {
         //@todo get storage that this actual repository uses
-//    RepositoryPtr ptr = std::make_shared<Repository>(repoId, storageManager.getDefaultStorage());
+        //    RepositoryPtr ptr = std::make_shared<Repository>(repoId, storageManager.getDefaultStorage());
 
 
-//@todo this method should be moved somewhere else. Journal is not the only thing of repo that needs to be saved. Repository should have serialize and RepoManager should handle loading and saving.
-//@todo throw exception if repo does not exist
+        //@todo this method should be moved somewhere else. Journal is not the only thing of repo that needs to be saved. Repository should have serialize and RepoManager should handle loading and saving.
+        //@todo throw exception if repo does not exist
         auto ptr = node.getConfigurationManager().loadData<RepositoryPtr>(
                 configuration().getRepositoryDataPath() / (repoId + ".xml"));
-//    {
-//        std::ifstream is(path);
-//        cereal::XMLInputArchive ia(is);
-//        ia >> ptr->getJournal();
-//    }
+        //    {
+        //        std::ifstream is(path);
+        //        cereal::XMLInputArchive ia(is);
+        //        ia >> ptr->getJournal();
+        //    }
         repositoryManager.addRepository(ptr);
         LOGGER(ptr->getJournal()->getChecksum());
     }
 
     void RepoModule::saveRepository(const IRepository::RepoIdType& repoId) {
         auto rep = findRepository(repoId);
-//    rep->getJournal()->commitState();
+        //    rep->getJournal()->commitState();
         rep->commit();
         auto repoPath = (configuration().getRepositoryDataPath() / (repoId + ".xml")).string();
-//    node.getConfigurationManager().saveData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"),
-//                                                        rep->getJournal());
+        //    node.getConfigurationManager().saveData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"),
+        //                                                        rep->getJournal());
         node.getConfigurationManager().saveData<RepositoryPtr>(
                 configuration().getRepositoryDataPath() / (repoId + ".xml"),
                 rep);
         LOGGER("saving repository journal for repo " + repoId + " and checksum is " + rep->getJournal()->getChecksum())
-//    {
-//        std::ofstream os(savePath);
-//        cereal::XMLOutputArchive oa(os);
-//        oa << rep->getJournal();
-//    }
-
+        //    {
+        //        std::ofstream os(savePath);
+        //        cereal::XMLOutputArchive oa(os);
+        //        oa << rep->getJournal();
+        //    }
     }
 
     RepositoryPtr RepoModule::createRepository(const IRepository::RepoIdType& repoId) {
@@ -184,7 +182,6 @@ namespace bsc {
         auto ptr = std::make_shared<Repository>(repoId, storageManager.getDefaultStorage());
         repositoryManager.addRepository(ptr);
         return ptr;
-
     }
 
     void RepoModule::selectRepository(const IRepository::RepoIdType& repoId) {
@@ -192,13 +189,11 @@ namespace bsc {
         if (selectedRepository == nullptr) {
             LOGGER("SELECTED NULL REPOSITORY!")
         }
-
     }
 
     void RepoModule::persistFile(const fs::path& path) {
         if (selectedRepository != nullptr) {
             selectedRepository->persist(path);//getJournal()->append(JournalMethod::added,JournalTarget::file, path);
-
         }
     }
 
@@ -233,9 +228,8 @@ namespace bsc {
                 LOGGER("Creating new repo")
                 localRepo = createRepository(repoId);
                 localRepo->setJournal(remoteJournal);
-
             }
-//        localRepo->buildFileMap();
+            //        localRepo->buildFileMap();
             LOGGER("downloading storage")
             localRepo->downloadStorage();
             LOGGER("storage downloaded")
@@ -243,8 +237,6 @@ namespace bsc {
             //@todo throw exception maybe
             LOGGER("no response")
         }
-
-
     }
 
     void RepoModule::updateFile(const fs::path& path) {
@@ -252,9 +244,7 @@ namespace bsc {
         if (selectedRepository != nullptr) {
             selectedRepository->update(path, selectedRepository->getFullPack(),
                                        {Repository::UpdateOptions::followDirectories});
-
         }
-
     }
 
     void RepoModule::updateAllFiles() {
@@ -262,24 +252,19 @@ namespace bsc {
         if (selectedRepository != nullptr) {
             LOGGER("syncing repo ..." + selectedRepository->getRepositoryId())
             selectedRepository->syncLocalChanges();
-
         }
-
     }
 
     void RepoModule::deployAllFiles() {
 
         if (selectedRepository != nullptr) {
             selectedRepository->deploy();
-
         }
-
     }
 
     void RepoModule::ignoreFile(const fs::path& path) {
         if (selectedRepository != nullptr) {
             selectedRepository->ignore(path);
-
         }
     }
 
@@ -311,7 +296,6 @@ namespace bsc {
 
             return response;
         });
-
     }
 
     void RepoModule::downloadRepository(const IRepository::RepoIdType& repoId) {
@@ -341,7 +325,6 @@ namespace bsc {
         const std::string defaultStorageId = "default";
         auto defaultStorage = storageFactoryPtr->create(defaultStorageId, defaultStorageId);
         storageManager.setDefaultStorage(defaultStorageId, defaultStorage);
-
     }
 
     IStoragePtr
@@ -350,7 +333,6 @@ namespace bsc {
         auto factoryContext = node.getContext()->get<FactoryContext>();
         //@todo what if factory is null or created storage is null because storageType is wrong?
         return factoryContext->getFactory<IStoragePtr, bsc::StorageFactoryByType>()->create(storageType, storageId);
-
     }
 
     std::filesystem::path RepoModule::Configuration::getRepositoryDataPath() const {
@@ -376,4 +358,4 @@ namespace bsc {
     void RepoModule::Configuration::setStoragePath(const PathType& storagePath) {
         Configuration::storagePath = storagePath;
     }
-}
+}// namespace bsc
