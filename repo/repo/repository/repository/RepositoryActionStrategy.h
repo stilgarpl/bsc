@@ -15,19 +15,13 @@ namespace bsc {
     namespace fs = std::filesystem;
     class IRepository;
     class RepositoryActionStrategy {
-    protected:
-        //@todo maybe I should remove repository refefence? strategy packs could then be global and constant. on the other hand, repository would have to be passed everytime to strategy, clouding the interface. 2020-02-26 I really think this should be done, manipulator passed as argument. do it when done with refactor
-        RepositoryManipulator& manipulator;
-
     public:
-        DeployState apply(const fs::path& path) {
-            return this->apply(path, std::nullopt);
+        DeployState apply(const fs::path& path, RepositoryManipulator& manipulator) {
+            return this->apply(path, std::nullopt, manipulator);
         }
 
         //right now it returns deployed state, but maybe it should return enum or sth //@todo think about it
-        virtual DeployState apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes) = 0;
-
-        RepositoryActionStrategy(RepositoryManipulator& manipulator) : manipulator(manipulator) {}
+        virtual DeployState apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) = 0;
     };
 
 }// namespace bsc

@@ -81,10 +81,8 @@ namespace bsc {
 
 
     public:
-
+        //@todo this can probably be extracted as a separate class and all predefined packs can be made const,static and public to be able to be shared
         class RepositoryActionStrategyFactory {
-        protected:
-            RepositoryManipulator& manipulator;
 
         public:
             [[nodiscard]] std::shared_ptr<RepositoryActionStrategy> create(RepositoryAction action) const;
@@ -92,25 +90,23 @@ namespace bsc {
             //maybe should return unique or shared_ptr? maybe not @todo think about it
             [[nodiscard]] RepositoryActionStrategyPack createPack(RepoActionPack actionPack) const;
 
-            RepositoryActionStrategyFactory(RepositoryManipulator& manipulator);
         };
 
 
     private:
         JournalPtr journal = std::make_shared<SimpleJournal>();
         RepositoryManipulator manipulator;
-        const RepositoryActionStrategyFactory strategyFactory;
+        const RepositoryActionStrategyFactory strategyFactory{};
         const RepoIdType repositoryId;
         std::shared_ptr<IStorage> storage;
         std::shared_ptr<IPathTransformer> pathTransformer = std::make_shared<PathTransformer>();
 
-    public: //@todo should it be public?
+    private:
         const RepositoryActionStrategyPack deployPack;
         const RepositoryActionStrategyPack localSyncPack;
         const RepositoryActionStrategyPack fullPack;
 
     private:
-        //@todo add saving and loading of a deployMap
         RepoDeployMap deployMap;
         RepositoryFileMapRenderer fileMapRenderer;
 

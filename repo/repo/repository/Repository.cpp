@@ -27,7 +27,6 @@ namespace bsc {
     }
 
     Repository::Repository(RepoIdType repositoryId, IStoragePtr storagePtr) : manipulator(*this),
-                                                                              strategyFactory(manipulator),
                                                                               repositoryId(std::move(repositoryId)),
                                                                               storage(std::move(storagePtr)),
                                                                               deployPack(strategyFactory.createPack(
@@ -154,7 +153,7 @@ namespace bsc {
                     if (currentFileTime < attributes->getModificationTime()) {
                         //file in repository is newer than the file in filesystem, restore
                         LOGGER("restoring..." + path.string())
-                        auto state = strategyPack.updatedInRepo->apply(path, attributes);
+                        auto state = strategyPack.updatedInRepo->apply(path, attributes, manipulator);
                         deployMap.markDeployed(path, state);
                     } else {
                         if (currentFileTime == attributes->getModificationTime() &&
@@ -162,12 +161,12 @@ namespace bsc {
                             //@todo verify other things maybe
                             //file appear identical, nothing to do.
                             LOGGER("leaving alone " + path.string())
-                            auto state = strategyPack.same->apply(path, attributes);
+                            auto state = strategyPack.same->apply(path, attributes, manipulator);
                             deployMap.markDeployed(path, state);
                         } else {
                             LOGGER("updated file, persisting... " + path.string())
                             //file in the filesystem is newer then the one in repository
-                            auto state = strategyPack.updatedInFilesystem->apply(path, attributes);
+                            auto state = strategyPack.updatedInFilesystem->apply(path, attributes, manipulator);
                             deployMap.markDeployed(path, state);
 
                             //@todo this is mostly the same code as below, combine the two loops into a function or sth.
@@ -192,7 +191,7 @@ namespace bsc {
                     if (!fileMap.isDeleted(path) || currentFileTime > fileMap.getDeletionTime(path)) {
                         //this is new file that has the same path as deleted one. persist!
                         LOGGER("new file, persisting " + path.string())
-                        auto state = strategyPack.newInFilesystem->apply(path);
+                        auto state = strategyPack.newInFilesystem->apply(path, manipulator);
                         deployMap.markDeployed(path, state);
 
                     } else {
@@ -200,7 +199,7 @@ namespace bsc {
                         if (fileMap.isDeleted(path)) {
                             LOGGER("trashing " + path.string())
                             //file should be deleted, but let's check deletion time...
-                            auto state = strategyPack.deletedInRepo->apply(path);
+                            auto state = strategyPack.deletedInRepo->apply(path, manipulator);
                             deployMap.markDeployed(path, state);
                         }
                     }
@@ -228,13 +227,13 @@ namespace bsc {
                 if (deployMap.isDeployed(path)) {
                     //file is in file map and was deployed but is not on filesystem, removing (user must have deleted it)
                     LOGGER("deleting " + path.string());
-                    auto state = strategyPack.deletedInFilesystem->apply(path, attributes);
+                    auto state = strategyPack.deletedInFilesystem->apply(path, attributes, manipulator);
                     deployMap.markDeployed(path, state);
                 } else {
                     //file wasn't deployed. must be a new file from another node. restore.
                     //@todo this is duplicated code. move to strategies or sth. (three times as of writing this. seriously, do something about it)
                     LOGGER("not deployed " + path.string())
-                    auto state = strategyPack.newInRepo->apply(path, attributes);
+                    auto state = strategyPack.newInRepo->apply(path, attributes, manipulator);
                     deployMap.markDeployed(path, state);
                 }
             } else {
@@ -337,69 +336,56 @@ namespace bsc {
 
     class StrategyPersist : public RepositoryActionStrategy {
         DeployState
-        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes) override {
+        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
             manipulator.persist(path, attributes);
             return DeployState::deployed;//it was UNCHANGED, but file is clearly in the filesystem, so it's deployed!
             //UNCHANGED made some sense, because persisting the file doesn't actually deploy it, but new files weren't marked as deployed, so update thought they were deleted. and new files go through persist, so it should return deployed.
         }
-
-    public:
-        StrategyPersist(RepositoryManipulator& manipulator) : RepositoryActionStrategy(manipulator) {}
     };
 
     class StrategyRestore : public RepositoryActionStrategy {
     public:
         DeployState
-        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes) override {
+        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
             manipulator.restoreFileFromStorage(path, attributes);
             manipulator.restoreAttributes(path, attributes);
             return DeployState::deployed;
         }
-
-        StrategyRestore(RepositoryManipulator& manipulator) : RepositoryActionStrategy(manipulator) {}
     };
 
     class StrategyTrash : public RepositoryActionStrategy {
     public:
         DeployState
-        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes) override {
+        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
             manipulator.trash(path);
             return DeployState::notDeployed;
         }
-
-        StrategyTrash(RepositoryManipulator& manipulator) : RepositoryActionStrategy(manipulator) {}
     };
 
     class StrategyRemove : public RepositoryActionStrategy {
     public:
         DeployState
-        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes) override {
+        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
             manipulator.remove(path, attributes);
             return DeployState::notDeployed;
         }
-
-        StrategyRemove(RepositoryManipulator& manipulator) : RepositoryActionStrategy(manipulator) {}
     };
 
     class StrategyDelete : public RepositoryActionStrategy {
     public:
         DeployState
-        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes) override {
+        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
             //@todo implement
             return DeployState::notDeployed;
         }
-
-        StrategyDelete(RepositoryManipulator& manipulator) : RepositoryActionStrategy(manipulator) {}
     };
 
     class StrategyNull : public RepositoryActionStrategy {
     public:
         DeployState
-        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes) override {
+        apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
             return DeployState::unchanged;
         }
-
-        StrategyNull(RepositoryManipulator& manipulator) : RepositoryActionStrategy(manipulator) {}
     };
 
     std::shared_ptr<RepositoryActionStrategy>
@@ -408,21 +394,20 @@ namespace bsc {
             case RepositoryAction::persist:
             case RepositoryAction::update:
                 //update and persist are the same
-                return std::make_shared<StrategyPersist>(manipulator);
+                return std::make_shared<StrategyPersist>();
             case RepositoryAction::erase:
-                return std::make_shared<StrategyDelete>(manipulator);
+                return std::make_shared<StrategyDelete>();
             case RepositoryAction::trash:
-                return std::make_shared<StrategyTrash>(manipulator);
+                return std::make_shared<StrategyTrash>();
             case RepositoryAction::remove:
-                return std::make_shared<StrategyRemove>(manipulator);
+                return std::make_shared<StrategyRemove>();
             case RepositoryAction::restore:
-                return std::make_shared<StrategyRestore>(manipulator);
+                return std::make_shared<StrategyRestore>();
             default://<---- this is here just so that compiler won't complain about return reaching end of function.
             case RepositoryAction::nop:
-                return std::make_shared<StrategyNull>(manipulator);
+                return std::make_shared<StrategyNull>();
         }
     }
-    Repository::RepositoryActionStrategyFactory::RepositoryActionStrategyFactory(RepositoryManipulator& manipulator) : manipulator(manipulator) {}
 
 
     Repository::RepositoryActionStrategyPack
