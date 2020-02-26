@@ -191,12 +191,6 @@ namespace bsc {
         }
     }
 
-    void RepoModule::persistFile(const fs::path& path) {
-        if (selectedRepository != nullptr) {
-            selectedRepository->persist(path);//getJournal()->append(JournalMethod::added,JournalTarget::file, path);
-        }
-    }
-
     RepositoryPtr RepoModule::findRepository(const IRepository::RepoIdType& repoId) {
         return repositoryManager.getRepository(repoId);
     }
@@ -214,6 +208,7 @@ namespace bsc {
         auto netModule = node.getModule<NetworkModule>();
         auto localRepo = findRepository(repoId);
         LOGGER("downloading repo")
+        //@todo Repository is serializable. maybe request whole repository instead of just a journal? and then pass it to RepositoryManager to handle merging?
         auto req = JournalGroup::Request::getNew<Status::request>();
         req->setRepoId(repoId);
         auto res = netModule->sendPacketToNode(remoteId, req);
@@ -223,10 +218,12 @@ namespace bsc {
             LOGGER("received journal with checksum " + res->getJournal()->getChecksum())
             if (localRepo != nullptr) {
                 LOGGER("merging journal")
+                //@todo this should not operate on journal directly! thread safety and other issues. journal should be hidden behind Repository.
                 localRepo->getJournal()->merge(remoteJournal);
             } else {
                 LOGGER("Creating new repo")
                 localRepo = createRepository(repoId);
+                //@todo definitely get rid of external setting of journal. Journal is internal property of Repository
                 localRepo->setJournal(remoteJournal);
             }
             //        localRepo->buildFileMap();
@@ -262,16 +259,6 @@ namespace bsc {
         }
     }
 
-    void RepoModule::ignoreFile(const fs::path& path) {
-        if (selectedRepository != nullptr) {
-            selectedRepository->ignore(path);
-        }
-    }
-
-    void RepoModule::persistFile(const IRepository::RepoIdType& repoId, const fs::path& path) {
-        //@todo error handling
-        findRepository(repoId)->persist(path);
-    }
 
     void RepoModule::prepareSubmodules() {
         auto& commandSub = getSubModule<CommandModule>();

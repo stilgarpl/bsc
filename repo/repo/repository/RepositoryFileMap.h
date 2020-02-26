@@ -15,6 +15,7 @@ namespace bsc {
     //@todo Store more data in RepositoryFileMap - it should know modification date of each path and type (dir/file)
     class RepositoryFileMap {
     public:
+        using ValueType = std::optional<RepositoryAttributes>;
         class DeleteInfo {
         private:
             bool deleted = false;
@@ -32,8 +33,8 @@ namespace bsc {
         };
 
     private:
-        const std::optional<RepositoryAttributes> emptyAttribute = std::nullopt;
-        std::map<fs::path, std::optional<RepositoryAttributes>> attributesMap;
+        const ValueType emptyAttribute = std::nullopt;
+        std::map<fs::path, ValueType> attributesMap;
         const DeleteInfo defaultDeleteInfo{};
         std::map<fs::path, DeleteInfo> deleteMap;
         RepositoryFileMap(RepositoryFileMap&) = delete;

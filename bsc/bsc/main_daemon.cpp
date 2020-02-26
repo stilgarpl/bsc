@@ -45,8 +45,6 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("printRep", &RepoModule::printHistory);
     cmd->mapCommand("downRep", &RepoModule::downloadRemoteRepository);
     cmd->mapCommand("resRep", &RepoModule::restoreRepository);
-    cmd->mapCommand("update", &RepoModule::updateFile);
-    cmd->mapCommand("ignore", &RepoModule::ignoreFile);
     cmd->mapCommand("updateAll", &RepoModule::updateAllFiles);
     cmd->mapCommand("deploy", &RepoModule::deployAllFiles);
     cmd->mapCommand("run", &CommandModule::runScript);

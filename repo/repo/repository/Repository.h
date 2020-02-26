@@ -11,6 +11,7 @@
 #include "IRepository.h"
 #include "RepositoryAttributes.h"
 #include "RepositoryFileMap.h"
+#include "RepositoryManipulator.h"
 #include <core/factory/FactoryContext.h>
 #include <core/log/Logger.h>
 #include <core/utils/crypto.h>
@@ -21,6 +22,8 @@
 namespace bsc {
 
     class Repository : public IRepository {
+    public:
+        const IPathTransformer& getPathTransformer() override;
 
     public:
         class RepoDeployMap {
@@ -81,23 +84,26 @@ namespace bsc {
 
         class RepositoryActionStrategyFactory {
         protected:
-            Repository& repository;
+            RepositoryManipulator& manipulator;
+
         public:
             [[nodiscard]] std::shared_ptr<RepositoryActionStrategy> create(RepositoryAction action) const;
 
             //maybe should return unique or shared_ptr? maybe not @todo think about it
             [[nodiscard]] RepositoryActionStrategyPack createPack(RepoActionPack actionPack) const;
 
-            explicit RepositoryActionStrategyFactory(Repository& repository);
+            RepositoryActionStrategyFactory(RepositoryManipulator& manipulator);
         };
 
 
     private:
         JournalPtr journal = std::make_shared<SimpleJournal>();
+        RepositoryManipulator manipulator;
         const RepositoryActionStrategyFactory strategyFactory;
         const RepoIdType repositoryId;
         std::shared_ptr<IStorage> storage;
         std::shared_ptr<IPathTransformer> pathTransformer = std::make_shared<PathTransformer>();
+
     public: //@todo should it be public?
         const RepositoryActionStrategyPack deployPack;
         const RepositoryActionStrategyPack localSyncPack;
@@ -132,18 +138,6 @@ namespace bsc {
 
     public:
 
-        //@todo direct actions should be probably moved to separate class
-        //direct actions:
-        void persist(fs::path path) override;
-
-        void forget(fs::path path) override;
-
-        void remove(fs::path path) override;
-
-        void ignore(fs::path path) override;
-
-        void restoreAttributes(const fs::path& path) override;
-
         //update one file from the repository
         void update(fs::path path, const RepositoryActionStrategyPack& strategyPack,
                     std::set<UpdateOptions> updateOptions) override;
@@ -155,9 +149,6 @@ namespace bsc {
         void deploy() override;
 
         explicit Repository(RepoIdType repositoryId, IStoragePtr storagePtr);
-
-
-        void trash(const fs::path& path) override;
 
         ~Repository() override = default;
 

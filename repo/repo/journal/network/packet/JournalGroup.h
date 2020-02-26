@@ -10,6 +10,7 @@
 #include <repo/journal/SimpleJournal.h>
 
 namespace bsc {
+    //@todo this packet group probably should be removed and whole repositories should be sent instead of pure journals. on the other hand, for quick updates partial journals may be better. that really depends on journal size, who cares about even few MBs if we have GBs to transfer.
     class JournalGroup : public bsc::PacketGroup {
     public:
         class Request : public bsc::Packet<JournalGroup, Request> {
