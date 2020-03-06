@@ -75,11 +75,7 @@ namespace bsc {
         for (auto&& [path, attributes] : fileMap) {
             if (attributes) {
                 LOGGER("restoring path " + path.string())
-                if (attributes->isDirectory()) {
-                    fs::create_directories(path);
-                } else {
-                    storage->restore(attributes->getResourceId(), path);
-                }
+                manipulator.restoreFileFromStorage(path,attributes);
                 deployMap.markDeployed(path, DeployState::deployed);
                 manipulator.restoreAttributes(path, attributes);
             } else {
@@ -89,24 +85,7 @@ namespace bsc {
     }
 
     void Repository::commit() {
-        //@todo move this funcMap outside, so it's not remade every time
-        JournalFuncMap funcMap;
-        funcMap.setFunc(JournalMethod::add, JournalTarget::file, [&](auto& i) {
-            storage->store(bsc::calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getDestination())),
-                           fs::file_size(pathTransformer->transformFromJournalFormat(i.getDestination())),
-                           pathTransformer->transformFromJournalFormat(i.getDestination()));
-            LOGGER("commit: added file " + pathTransformer->transformFromJournalFormat(i.getDestination()).string())
-        });
-
-        funcMap.setFunc(JournalMethod::modify, JournalTarget::file, [&](auto& i) {
-            storage->store(bsc::calculateSha1OfFile(pathTransformer->transformFromJournalFormat(i.getDestination())),
-                           fs::file_size(pathTransformer->transformFromJournalFormat(i.getDestination())),
-                           pathTransformer->transformFromJournalFormat(i.getDestination()));
-            LOGGER("commit: modified file " + pathTransformer->transformFromJournalFormat(i.getDestination()).string())
-        });
-
-        journal->replayCurrentState(funcMap);
-        journal->commitState(CommitTimeType::clock::now());
+            manipulator.commit(*storage);
     }
 
 

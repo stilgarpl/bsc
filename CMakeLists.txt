@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 project(bsc VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -25,24 +25,24 @@ message($ENV{PATH})
 #conan setup
 find_program(conan NAMES conan)
 message("DEBUG: conan = ${conan}")
-if (EXISTS ${conan})
-    message("CONAN EXISTS")
-    set(CONAN_SYSTEM_INCLUDES ON)
-    include(${CMAKE_SOURCE_DIR}/conan/conan.cmake)
-    conan_check()
-    conan_add_remote(NAME bincrafters INDEX 1
-            URL https://api.bintray.com/conan/bincrafters/public-conan)
-    conan_cmake_run(CONANFILE conan/conanfile.txt
-            INSTALL_FOLDER ${CMAKE_BINARY_DIR}
-            BASIC_SETUP
-            BUILD_TYPE "Debug"
-            BUILD missing)
-    #    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-    #    conan_set_find_library_paths()
-    #    conan_set_find_paths()
-else ()
-    message("Conan not found")
-endif ()
+#if (EXISTS ${conan})
+#    message("CONAN EXISTS")
+#    set(CONAN_SYSTEM_INCLUDES ON)
+#    include(${CMAKE_SOURCE_DIR}/conan/conan.cmake)
+#    conan_check()
+#    conan_add_remote(NAME bincrafters INDEX 1
+#            URL https://api.bintray.com/conan/bincrafters/public-conan)
+#    conan_cmake_run(CONANFILE conan/conanfile.txt
+#            INSTALL_FOLDER ${CMAKE_BINARY_DIR}
+#            BASIC_SETUP
+#            BUILD_TYPE "Debug"
+#            BUILD missing)
+#    #    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+#    #    conan_set_find_library_paths()
+#    #    conan_set_find_paths()
+#else ()
+#    message("Conan not found")
+#endif ()
 #end of conan setup
 
 find_package(Catch2 CONFIG REQUIRED)
@@ -73,6 +73,9 @@ include(GNUInstallDirs)
 set(BSC_DESTINATION_LIB "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}")
 set(BSC_DESTINATION_INCLUDE "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
 set(BSC_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+option(CMAKE_UNITY_BUILD "Enable unity builds" ON)
+option(BSC_ENABLE_TESTS "Enable unit tests" ON)
 
 
 add_subdirectory(parser)

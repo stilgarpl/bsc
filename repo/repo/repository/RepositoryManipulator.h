@@ -27,6 +27,7 @@ namespace bsc {
         void restoreAttributes(const fs::path& path, const RepositoryFileMap::ValueType& attributes);
         void restoreFileFromStorage(const fs::path& path, const RepositoryFileMap::ValueType& attributes);
         void trash(const fs::path& path);
+        void commit(IStorage& storage);
     };
 }// namespace bsc
 

@@ -107,8 +107,35 @@ void bsc::RepositoryManipulator::trash(const fs::path& path) {
     fs::remove(path);
 }
 void bsc::RepositoryManipulator::restoreFileFromStorage(const fs::path& path, const bsc::RepositoryFileMap::ValueType& attributes) {
-    if (attributes && !attributes->isDirectory()) {
-        repository.getStorage()->restore(attributes->getResourceId(), path);
+    if (attributes) {
+        if (attributes->isDirectory())  {
+            fs::create_directories(path);
+        } else {
+            repository.getStorage()->restore(attributes->getResourceId(), path);
+        }
     }
 }
 bsc::RepositoryManipulator::RepositoryManipulator(bsc::IRepository& repository) : repository(repository) {}
+
+void bsc::RepositoryManipulator::commit(IStorage& storage) {
+    auto journal = repository.getJournal();                 //@todo if repo.setJournal is removed, then this call can be moved to constructor
+    auto& pathTransformer = repository.getPathTransformer();//@todo this one too can be moved to constructor
+    //@todo move this funcMap outside, so it's not remade every time
+    JournalFuncMap funcMap;
+    funcMap.setFunc(JournalMethod::add, JournalTarget::file, [&](auto& i) {
+      storage.store(bsc::calculateSha1OfFile(pathTransformer.transformFromJournalFormat(i.getDestination())),
+                     fs::file_size(pathTransformer.transformFromJournalFormat(i.getDestination())),
+                     pathTransformer.transformFromJournalFormat(i.getDestination()));
+      LOGGER("commit: added file " + pathTransformer.transformFromJournalFormat(i.getDestination()).string())
+    });
+
+    funcMap.setFunc(JournalMethod::modify, JournalTarget::file, [&](auto& i) {
+      storage.store(bsc::calculateSha1OfFile(pathTransformer.transformFromJournalFormat(i.getDestination())),
+                     fs::file_size(pathTransformer.transformFromJournalFormat(i.getDestination())),
+                     pathTransformer.transformFromJournalFormat(i.getDestination()));
+      LOGGER("commit: modified file " + pathTransformer.transformFromJournalFormat(i.getDestination()).string())
+    });
+
+    journal->replayCurrentState(funcMap);
+    journal->commitState(CommitTimeType::clock::now());
+}

@@ -122,7 +122,7 @@ namespace bsc {
         //@todo hide this perhaps?
         JournalPtr& getJournal() override;
 
-        const std::shared_ptr<IStorage>& getStorage() const;
+        const std::shared_ptr<IStorage>& getStorage() const override;
 
         void setJournal(const JournalPtr& journal) override;
 

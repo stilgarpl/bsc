@@ -6,5 +6,6 @@ set(SOURCE_FILES node/NodeInfo.cpp node/NodeInfo.h node/Node.cpp node/Node.h nod
 
 add_library(p2p_core ${SOURCE_FILES})
 target_include_directories(p2p_core PUBLIC ${BSC_P2P_BUILD_INCLUDE} $<INSTALL_INTERFACE:${BSC_DESTINATION_INCLUDE}>)
-target_link_libraries(p2p_core PUBLIC logic Poco::Net ${LIBS})
+target_precompile_headers(p2p_core REUSE_FROM logic)
+target_link_libraries(p2p_core PUBLIC logic Poco::Net)
 install(TARGETS p2p_core COMPONENT p2p DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)

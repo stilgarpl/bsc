@@ -27,10 +27,12 @@ namespace bsc {
     }
 
     RepositoryAttributes::RepositoryAttributes(const JournalStateData& data) {
+        //@todo I'm not sure it it should be a constructor and not a conversion method. this way RepositoryAttributtes wouldn't have to know about JournalStateData
         size = data.getSize();
         permissions = data.getPermissions();
         modificationTime = data.getModificationTime();
         checksum = data.getResourceChecksum();
+        //@todo replace getResourceId with resourceIdGenerator.
         resourceId = IStorage::getResourceId(data.getResourceChecksum(), data.getSize());
         directory = data.getTarget() == JournalTarget::directory;
     }

@@ -5,6 +5,15 @@ set(SOURCE_FILES core/thread/Runnable.cpp core/thread/Runnable.h core/context/Co
 
 add_library(core ${SOURCE_FILES})
 target_include_directories(core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:${BSC_DESTINATION_INCLUDE}>)
+target_precompile_headers(core PRIVATE <string> <filesystem> <map> <memory> <iostream> <mutex>
+        <core/thread/Runnable.h>
+        <core/context/Context.h>
+        <core/signal/Signal.h>
+        <core/uber/Uber.h>
+        <core/utils/cereal_include.h>
+        <core/utils/crypto.h>
+        <core/log/Logger.h>
+        )
 install(DIRECTORY core DESTINATION ${BSC_DESTINATION_INCLUDE}
         FILES_MATCHING PATTERN "*.h")
 target_link_libraries(core PUBLIC spdlog::spdlog Poco::Crypto)

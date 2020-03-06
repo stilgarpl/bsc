@@ -15,6 +15,7 @@ namespace bsc {
         //    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
         auto& fileMap = fileMapCache[journalChecksum];
         LOGGER("checksum different, recreate file map")
+        //@todo this funcmap should be const and generated in constructor or even static, no need to make it every call to render
         JournalFuncMap funcMap;
         funcMap.setFunc(JournalMethod::add, JournalTarget::file, [&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
@@ -77,6 +78,18 @@ namespace bsc {
             fileMap.deleteMap[path].setDeleted(false);
             fileMap.deleteMap[path].setDeletionTime(fs::file_time_type::min());
             //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
+        });
+
+        funcMap.setFunc(JournalMethod::add, JournalTarget::feature, [&](auto& i) {
+            //@todo implement
+        });
+
+        funcMap.setFunc(JournalMethod::remove, JournalTarget::feature, [&](auto& i) {
+            //@todo implement
+        });
+
+        funcMap.setFunc(JournalMethod::modify, JournalTarget::feature, [&](auto& i) {
+            //@todo implement
         });
 
 

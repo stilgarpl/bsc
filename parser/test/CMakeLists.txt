@@ -6,4 +6,4 @@ add_executable(test_parser ${SOURCE_FILES})
 catch_discover_tests(test_parser)
 
 #target_include_directories(test_parser PUBLIC test_parser)
-target_link_libraries(test_parser PUBLIC parser PRIVATE ${LIBS})
+target_link_libraries(test_parser PUBLIC parser )
