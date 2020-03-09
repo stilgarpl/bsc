@@ -5,11 +5,11 @@
 #include <regex>
 #include "HomeDirRule.h"
 namespace bsc {
-    std::filesystem::path HomeDirRule::transformToJournalFormat(fs::path path) {
+    JournalPathType HomeDirRule::transformToJournalFormat(fs::path path) {
         return std::regex_replace(path.string(), std::regex("^" + HOME_DIR), HOME_PATTERN);
     }
 
-    std::filesystem::path HomeDirRule::transformFromJournalFormat(fs::path path) {
-        return std::regex_replace(path.string(), std::regex(HOME_PATTERN), HOME_DIR);
+    std::filesystem::path HomeDirRule::transformFromJournalFormat(JournalPathType path) {
+        return std::regex_replace(path, std::regex(HOME_PATTERN), HOME_DIR);
     }
 }

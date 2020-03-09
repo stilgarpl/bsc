@@ -8,17 +8,19 @@
 #include <filesystem>
 #include <set>
 
+#include <repo/journal/JournalState.h>
+
 namespace bsc {
     namespace fs = std::filesystem;
-
+    using JournalPathType = std::remove_cvref_t<decltype(JournalStateData().getDestination())>;
     class ITransformRule {
 
     private:
         int priority = 10;
     public:
-        virtual fs::path transformToJournalFormat(fs::path path) = 0;
+        virtual JournalPathType transformToJournalFormat(fs::path path) = 0;
 
-        virtual fs::path transformFromJournalFormat(fs::path path) = 0;
+        virtual fs::path transformFromJournalFormat(JournalPathType path) = 0;
 
         int getPriority() const {
             return priority;

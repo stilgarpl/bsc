@@ -16,9 +16,9 @@ namespace bsc {
     public:
 
     private:
-        [[nodiscard]] std::filesystem::path transformToJournalFormat(fs::path path) const override;
+        [[nodiscard]] JournalPathType transformToJournalFormat(fs::path path) const override;
 
-        [[nodiscard]] std::filesystem::path transformFromJournalFormat(fs::path path) const override;
+        [[nodiscard]] std::filesystem::path transformFromJournalFormat(JournalPathType path) const override;
 
         void addRule(ITransformRulePtr rule) override;
 

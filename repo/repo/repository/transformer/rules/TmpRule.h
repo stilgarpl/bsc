@@ -14,9 +14,9 @@ namespace bsc {
         const std::string TEMP_PATTERN = "<TEMP>";
 
     public:
-        std::filesystem::path transformToJournalFormat(fs::path path) override;
+        JournalPathType transformToJournalFormat(fs::path path) override;
 
-        std::filesystem::path transformFromJournalFormat(fs::path path) override;
+        std::filesystem::path transformFromJournalFormat(JournalPathType path) override;
 
         ~TmpRule() override = default;
 

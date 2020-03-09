@@ -16,9 +16,9 @@ namespace bsc {
         std::string HOME_PATTERN = "<HOME>";
 
     public:
-        std::filesystem::path transformToJournalFormat(fs::path path) override;
+        JournalPathType transformToJournalFormat(fs::path path) override;
 
-        std::filesystem::path transformFromJournalFormat(fs::path path) override;
+        std::filesystem::path transformFromJournalFormat(JournalPathType path) override;
 
         ~HomeDirRule() override = default;
 

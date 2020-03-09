@@ -13,6 +13,8 @@ namespace bsc {
     namespace fs = std::filesystem;
 
     class IPathTransformer {
+    public:
+
     private:
 
 
@@ -29,9 +31,9 @@ namespace bsc {
 
     public:
 
-        virtual fs::path transformToJournalFormat(fs::path path) const = 0;
+        virtual JournalPathType transformToJournalFormat(fs::path path) const = 0;
 
-        virtual fs::path transformFromJournalFormat(fs::path path) const = 0;
+        virtual fs::path transformFromJournalFormat(JournalPathType path) const = 0;
 
         //@todo probably shared_ptrs would be better
         virtual void addRule(ITransformRulePtr rule) = 0;

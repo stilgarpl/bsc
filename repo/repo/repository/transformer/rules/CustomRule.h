@@ -18,9 +18,9 @@ namespace bsc {
     public:
         CustomRule(std::string from, std::string to);
 
-        std::filesystem::path transformToJournalFormat(fs::path path) override;
+        JournalPathType transformToJournalFormat(fs::path path) override;
 
-        std::filesystem::path transformFromJournalFormat(fs::path path) override;
+        std::filesystem::path transformFromJournalFormat(JournalPathType path) override;
 
         ~CustomRule() override = default;
     };

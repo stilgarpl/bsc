@@ -81,14 +81,17 @@ namespace bsc {
         });
 
         funcMap.setFunc(JournalMethod::add, JournalTarget::feature, [&](auto& i) {
+          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             //@todo implement
         });
 
         funcMap.setFunc(JournalMethod::remove, JournalTarget::feature, [&](auto& i) {
+          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             //@todo implement
         });
 
         funcMap.setFunc(JournalMethod::modify, JournalTarget::feature, [&](auto& i) {
+          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             //@todo implement
         });
 

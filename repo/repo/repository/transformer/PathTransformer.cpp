@@ -4,14 +4,14 @@
 
 #include "PathTransformer.h"
 namespace bsc {
-    std::filesystem::path PathTransformer::transformToJournalFormat(fs::path path) const {
+    JournalPathType PathTransformer::transformToJournalFormat(fs::path path) const {
         for (const auto& rule : rules) {
             path = rule->transformToJournalFormat(path);
         }
         return path;
     }
 
-    std::filesystem::path PathTransformer::transformFromJournalFormat(fs::path path) const {
+    std::filesystem::path PathTransformer::transformFromJournalFormat(JournalPathType path) const {
         for (auto rule = rules.rbegin(); rule != rules.rend(); rule++) {
             path = (*rule)->transformFromJournalFormat(path);
         }

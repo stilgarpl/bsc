@@ -30,7 +30,7 @@ void bsc::RepositoryManipulator::persist(fs::path path, const bsc::RepositoryFil
         auto target = !attributes->isDirectory() ? JournalTarget::file : JournalTarget::directory;
         //@todo check if file was actually changed.
         journal->append(JournalMethod::modify, target,
-                        pathTransformer.transformToJournalFormat(path).string(),
+                        pathTransformer.transformToJournalFormat(path),
                         bsc::FileData(path));
 
 
@@ -39,7 +39,7 @@ void bsc::RepositoryManipulator::persist(fs::path path, const bsc::RepositoryFil
 
 
         journal->append(JournalMethod::add, target,
-                        pathTransformer.transformToJournalFormat(path).string(),
+                        pathTransformer.transformToJournalFormat(path),
                         bsc::FileData(path));
     }
 }
@@ -53,7 +53,7 @@ void bsc::RepositoryManipulator::forget(fs::path path, const bsc::RepositoryFile
     if (attributes) {
         journal->append(JournalMethod::forget,
                         attributes->isDirectory() ? JournalTarget::directory : JournalTarget::file,
-                        pathTransformer.transformToJournalFormat(path).string(),
+                        pathTransformer.transformToJournalFormat(path),
                         attributes->toFileData(path));
     } else {
         //nothing to forget!
@@ -70,12 +70,12 @@ void bsc::RepositoryManipulator::remove(fs::path path, const bsc::RepositoryFile
     if (attributes) {
         if (!fs::is_directory(path)) {
             journal->append(JournalMethod::remove, JournalTarget::file,
-                            pathTransformer.transformToJournalFormat(path).string(),
+                            pathTransformer.transformToJournalFormat(path),
                             attributes->toFileData(path));
 
         } else {
             journal->append(JournalMethod::remove, JournalTarget::directory,
-                            pathTransformer.transformToJournalFormat(path).string(),
+                            pathTransformer.transformToJournalFormat(path),
                             attributes->toFileData(path));
             //@todo delete everything recursively ... or maybe do it in replayCurrentState?
         }
@@ -92,12 +92,12 @@ void bsc::RepositoryManipulator::ignore(fs::path path, const bsc::RepositoryFile
     }
     if (!fs::is_directory(path)) {
         journal->append(JournalMethod::ignore, JournalTarget::file,
-                        pathTransformer.transformToJournalFormat(path).string(),
+                        pathTransformer.transformToJournalFormat(path),
                         bsc::FileData(path));
 
     } else {
         journal->append(JournalMethod::ignore, JournalTarget::directory,
-                        pathTransformer.transformToJournalFormat(path).string(),
+                        pathTransformer.transformToJournalFormat(path),
                         bsc::FileData(path));
     }
 }
