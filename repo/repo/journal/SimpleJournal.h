@@ -65,7 +65,7 @@ namespace bsc {
         //@todo hmm hmm variadic template? - moved may have two paths for example?
         void append(JournalMethod method, JournalTarget target, PathType path, bsc::FileData data) override;
 
-        void replay(JournalFuncMap funcMap) const override;
+        void replay(const JournalFuncMap& funcMap) const override;
 
         const std::string& calculateChecksum();
 
@@ -95,7 +95,7 @@ namespace bsc {
         bool merge(const JournalPtr& other) override;
 
 
-        void replayCurrentState(JournalFuncMap funcMap) override;
+        void replayCurrentState(const JournalFuncMap&  funcMap) override;
 
         JournalStatePtr getState(const CommitTimeType& commitTime, const ChecksumType& checksumType) override;
 

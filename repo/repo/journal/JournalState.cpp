@@ -9,28 +9,6 @@
 #include "JournalState.h"
 namespace bsc {
 
-    void JournalState::add(const JournalStateData& data) {
-        auto same = std::find_if(dataList.begin(), dataList.end(), [&](auto i) {
-            //@todo about that method and target... shouldn't this be an error if we have more than one method on one file?
-            return data.getResourceChecksum() == i.getResourceChecksum() && data.getSize() == i.getSize() &&
-                   data.getMethod() == i.getMethod() && data.getTarget() == i.getTarget() &&
-                   data.getDestination() == i.getDestination();
-        });
-        if (same == dataList.end()) {
-            dataList.push_back(data);
-        } else {
-            LOGGER("error: trying to add same data again!" + data.getDestination())
-        }
-
-    }
-
-    const std::list<JournalStateData>& JournalState::getDataList() const {
-        return dataList;
-    }
-
-    void JournalState::setDataList(const std::list<JournalStateData>& dataList) {
-        JournalState::dataList = dataList;
-    }
 
     void JournalState::commit(CommitTimeType now) {
         //@todo how about a way to override this during test? commit(Clock=system_clock)? or maybe get the Clock from context?
@@ -49,7 +27,9 @@ namespace bsc {
                << std::to_string(duration_cast<seconds>(commitTime.time_since_epoch()).count());
             //@todo this assumes dataList is sorted.
             for (const auto& data : dataList) {
-                ss << data.calculateChecksum();
+                std::string dataChecksum;
+                std::visit([&dataChecksum](auto i){dataChecksum = i.calculateChecksum();},data);
+                ss << dataChecksum;
             }
         }
 
@@ -85,29 +65,6 @@ namespace bsc {
 
     JournalState::JournalState(JournalMetaData metaData) : metaData(std::move(metaData)) {}
 
-    void JournalStateData::update(bsc::FileData data) {
 
-        // if (!data.isIsDirectory()) {
-        size = data.getSize();
-        modificationTime = data.getModificationTime();
-        permissions = data.getPermissions();
-        resourceChecksum = data.getSha256hash();
-        //@todo think if data.isDirectory, target = directory?
-        //}
-    }
-
-    fs::perms JournalStateData::getPermissions() const {
-        return permissions;
-    }
-
-    JournalTarget JournalStateData::getTarget() const {
-        return target;
-    }
-    const std::string& JournalStateData::getSource() const {
-        return source;
-    }
-    const std::string& JournalStateData::getDestination() const {
-        return destination;
-    }
 
 }// namespace bsc

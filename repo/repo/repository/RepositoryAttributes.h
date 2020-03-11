@@ -33,7 +33,8 @@ namespace bsc {
 
         RepositoryAttributes() = default;
 
-        explicit RepositoryAttributes(const JournalStateData& data);
+        explicit RepositoryAttributes(const JournalStateData<JournalTarget::file>& data);
+        explicit RepositoryAttributes(const JournalStateData<JournalTarget::directory>& data);
 
         bool isDirectory() const;
 

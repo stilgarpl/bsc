@@ -17,22 +17,22 @@ namespace bsc {
         LOGGER("checksum different, recreate file map")
         //@todo this funcmap should be const and generated in constructor or even static, no need to make it every call to render
         JournalFuncMap funcMap;
-        funcMap.setFunc(JournalMethod::add, JournalTarget::file, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::add,JournalTarget::file>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
-        funcMap.setFunc(JournalMethod::modify, JournalTarget::file, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::modify,JournalTarget::file>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
         //@todo moved file should have two parameters - from to. or, just remove moved and use deleted/added
-        funcMap.setFunc(JournalMethod::move, JournalTarget::file, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::move,JournalTarget::file>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
         });
 
-        funcMap.setFunc(JournalMethod::remove, JournalTarget::file, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::remove,JournalTarget::file>([&](auto& i) {
             auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             fileMap.attributesMap[path] = std::nullopt;
             fileMap.deleteMap[path].setDeleted(true);
@@ -40,7 +40,7 @@ namespace bsc {
             //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
-        funcMap.setFunc(JournalMethod::forget, JournalTarget::file, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::forget,JournalTarget::file>([&](auto& i) {
             auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             fileMap.attributesMap[path] = std::nullopt;
             fileMap.deleteMap[path].setDeleted(false);
@@ -48,23 +48,23 @@ namespace bsc {
             //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
-        funcMap.setFunc(JournalMethod::add, JournalTarget::directory, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::add,JournalTarget::directory>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
-        funcMap.setFunc(JournalMethod::modify, JournalTarget::directory, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::modify,JournalTarget::directory>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
         //@todo order of operations is important. file moved and recreated with the same path may be overwritten and then moved if operations are in wrong order. that need to be preserved when I implement moves.
         //@todo moved file should have two parameters - from to. or, just remove moved and use deleted/added
-        funcMap.setFunc(JournalMethod::move, JournalTarget::directory, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::move,JournalTarget::directory>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
         });
 
-        funcMap.setFunc(JournalMethod::remove, JournalTarget::directory, [&, this](auto& i) {
+        funcMap.setFunc<JournalMethod::remove,JournalTarget::directory>([&](auto& i) {
             auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             fileMap.attributesMap[path] = std::nullopt;
             fileMap.deleteMap[path].setDeleted(true);
@@ -72,7 +72,7 @@ namespace bsc {
             //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
-        funcMap.setFunc(JournalMethod::forget, JournalTarget::directory, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::forget,JournalTarget::directory>([&](auto& i) {
             auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             fileMap.attributesMap[path] = std::nullopt;
             fileMap.deleteMap[path].setDeleted(false);
@@ -80,17 +80,17 @@ namespace bsc {
             //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
-        funcMap.setFunc(JournalMethod::add, JournalTarget::feature, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::add,JournalTarget::feature>([&](auto& i) {
           auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             //@todo implement
         });
 
-        funcMap.setFunc(JournalMethod::remove, JournalTarget::feature, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::remove,JournalTarget::feature>([&](auto& i) {
           auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             //@todo implement
         });
 
-        funcMap.setFunc(JournalMethod::modify, JournalTarget::feature, [&](auto& i) {
+        funcMap.setFunc<JournalMethod::modify,JournalTarget::feature>([&](auto& i) {
           auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             //@todo implement
         });

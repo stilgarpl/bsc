@@ -28,43 +28,28 @@ namespace bsc {
         }
     }
 
-    void SimpleJournal::replay(JournalFuncMap funcMap) const {
+    void SimpleJournal::replay(const JournalFuncMap& funcMap) const {
 
         for (const auto& it : journalHistory) {
-            //@todo I would like to remove getDataList and just pass the Func to it somehow
-            for (const auto& jt : it->getDataList()) {
-                LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getDestination());
-                funcMap.execute(jt);
-            }
+            it->replay(funcMap);
         }
 
         //@todo think if clearFunc() should not be invoked here and replay should check if any functions are setDirect. this way, if someone changes some but not all functions, replay will not do stupid things.
     }
 
-    void SimpleJournal::replayCurrentState(JournalFuncMap funcMap) {
+    void SimpleJournal::replayCurrentState(const JournalFuncMap&  funcMap) {
         if (currentState) {
-            //            int processingPass = 0;
-            //            while (!currentState->isProcessed()) {
-            //                processingPass++;
-            //                LOGGER("processing replay pass " + std::to_string(processingPass));
-            //@todo I would like to remove getDataList and just pass the Func to it somehow
-
-            for (auto&& jt : currentState->getDataList()) {
-                //                    if (!jt.isProcessed()) {
-                LOGGER(std::to_string(jt.getMethod()) + " +++ " + jt.getDestination());
-                funcMap.execute(jt);
-                //                        jt.setProcessed(true);
-                //                    }
-            }
+         currentState->replay(funcMap);
         }
-        //@todo I'm not very fond of this processed flag, but it's needed so changes to journal state will be in fact processed during replay.
-        //            currentState->clearProcessed();
-        //        }
     }
 
     void SimpleJournal::append(JournalMethod method, JournalTarget target, PathType path, bsc::FileData data) {
         prepareState();
-        currentState->add(JournalStateData(method, target, path, data));
+        if(data.isIsDirectory()) {
+            currentState->add(JournalStateData<JournalTarget::directory>(method, path, data));
+        } else {
+            currentState->add(JournalStateData<JournalTarget::file>(method, path, data));
+        }
     }
 
     void SimpleJournal::prepareState() {

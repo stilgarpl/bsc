@@ -28,9 +28,9 @@ public:
     virtual void commitState(CommitTimeType now) = 0;
 
     //@todo add parameters, commit range or sth
-    virtual void replay(JournalFuncMap funcMap) const = 0;
+    virtual void replay(const JournalFuncMap& funcMap) const = 0;
 
-    virtual void replayCurrentState(JournalFuncMap funcMap) = 0;
+    virtual void replayCurrentState(const JournalFuncMap& funcMap) = 0;
 
 private:
     template<class Archive>

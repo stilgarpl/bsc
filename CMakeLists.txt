@@ -25,24 +25,24 @@ message($ENV{PATH})
 #conan setup
 find_program(conan NAMES conan)
 message("DEBUG: conan = ${conan}")
-#if (EXISTS ${conan})
-#    message("CONAN EXISTS")
-#    set(CONAN_SYSTEM_INCLUDES ON)
-#    include(${CMAKE_SOURCE_DIR}/conan/conan.cmake)
-#    conan_check()
-#    conan_add_remote(NAME bincrafters INDEX 1
-#            URL https://api.bintray.com/conan/bincrafters/public-conan)
-#    conan_cmake_run(CONANFILE conan/conanfile.txt
-#            INSTALL_FOLDER ${CMAKE_BINARY_DIR}
-#            BASIC_SETUP
-#            BUILD_TYPE "Debug"
-#            BUILD missing)
-#    #    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-#    #    conan_set_find_library_paths()
-#    #    conan_set_find_paths()
-#else ()
-#    message("Conan not found")
-#endif ()
+if (EXISTS ${conan})
+    message("CONAN EXISTS")
+    set(CONAN_SYSTEM_INCLUDES ON)
+    include(${CMAKE_SOURCE_DIR}/conan/conan.cmake)
+    conan_check()
+    conan_add_remote(NAME bincrafters INDEX 1
+            URL https://api.bintray.com/conan/bincrafters/public-conan)
+    conan_cmake_run(CONANFILE conan/conanfile.txt
+            INSTALL_FOLDER ${CMAKE_BINARY_DIR}
+            BASIC_SETUP
+            BUILD_TYPE "Debug"
+            BUILD missing)
+    #    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+    #    conan_set_find_library_paths()
+    #    conan_set_find_paths()
+else ()
+    message("Conan not found")
+endif ()
 #end of conan setup
 
 find_package(Catch2 CONFIG REQUIRED)

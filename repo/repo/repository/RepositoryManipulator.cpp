@@ -122,14 +122,14 @@ void bsc::RepositoryManipulator::commit(IStorage& storage) {
     auto& pathTransformer = repository.getPathTransformer();//@todo this one too can be moved to constructor
     //@todo move this funcMap outside, so it's not remade every time
     JournalFuncMap funcMap;
-    funcMap.setFunc(JournalMethod::add, JournalTarget::file, [&](auto& i) {
+    funcMap.setFunc<JournalMethod::add,JournalTarget::file>([&](auto& i) {
       storage.store(bsc::calculateSha1OfFile(pathTransformer.transformFromJournalFormat(i.getDestination())),
                      fs::file_size(pathTransformer.transformFromJournalFormat(i.getDestination())),
                      pathTransformer.transformFromJournalFormat(i.getDestination()));
       LOGGER("commit: added file " + pathTransformer.transformFromJournalFormat(i.getDestination()).string())
     });
 
-    funcMap.setFunc(JournalMethod::modify, JournalTarget::file, [&](auto& i) {
+    funcMap.setFunc<JournalMethod::modify,JournalTarget::file>([&](auto& i) {
       storage.store(bsc::calculateSha1OfFile(pathTransformer.transformFromJournalFormat(i.getDestination())),
                      fs::file_size(pathTransformer.transformFromJournalFormat(i.getDestination())),
                      pathTransformer.transformFromJournalFormat(i.getDestination()));

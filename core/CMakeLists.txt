@@ -18,5 +18,6 @@ install(DIRECTORY core DESTINATION ${BSC_DESTINATION_INCLUDE}
         FILES_MATCHING PATTERN "*.h")
 target_link_libraries(core PUBLIC spdlog::spdlog Poco::Crypto)
 install(TARGETS core COMPONENT core DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)
-
-add_subdirectory(test)
+if (${BSC_ENABLE_TESTS})
+    add_subdirectory(test)
+endif ()

@@ -12,7 +12,7 @@
 
 namespace bsc {
     namespace fs = std::filesystem;
-    using JournalPathType = std::remove_cvref_t<decltype(JournalStateData().getDestination())>;
+    using JournalPathType = std::remove_cvref_t<decltype(JournalStateData<JournalTarget::file>().getDestination())>;
     class ITransformRule {
 
     private:

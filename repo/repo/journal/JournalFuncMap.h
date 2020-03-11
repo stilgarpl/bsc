@@ -4,35 +4,41 @@
 
 #ifndef BSC_JOURNALFUNCMAP_H
 #define BSC_JOURNALFUNCMAP_H
-#include "JournalState.h"
+
+#include "JournalTarget.h"
 #include "JournalTypes.h"
+#include "JournalStateData.h"
+#include <core/uber/Uber.h>
 #include <functional>
 #include <map>
+#include <core/log/Logger.h>
 
 namespace bsc {
     //@todo rename to some better name
     class JournalFuncMap {
 
     public:
-        typedef std::function<void(const JournalStateData&)> Func;
-        typedef std::map<std::pair<JournalMethod, JournalTarget>, Func> FuncMap;
+        template<JournalTarget target>
+        using Func =  std::function<void(const JournalStateData<target>&)> ;
+        template<JournalTarget target>
+        using FuncMap =  std::map<JournalMethod, Func<target>> ;
 
     private:
-        FuncMap funcMap;
+        NonTypeUber<FuncMap> funcMap;
 
     public:
-        void setFunc(JournalMethod method, JournalTarget target, const Func& func) {
-            funcMap[std::make_pair(method, target)] = func;
+        template<JournalMethod method, JournalTarget target>
+        void setFunc(const Func<target>& func) {
+            funcMap.get<target>()[method] = func;
         }
 
-        bool execute(const JournalStateData& state) {
-            auto id = std::make_pair(state.getMethod(), state.getTarget());
-            if (funcMap.contains(id)) {
-                funcMap[id](state);
+        template<JournalTarget target>
+        bool execute(JournalMethod method,const JournalStateData<target>& state) const {
+            if (funcMap.has<target>() && funcMap.get<target>().contains(method)) {
+                funcMap.get<target>().at(method)(state);
                 return true;
-            } else {
-                return false;
             }
+            return false;
         }
     };
 }// namespace bsc
