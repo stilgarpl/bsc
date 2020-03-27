@@ -90,28 +90,67 @@ namespace bsc {
             return resourceChecksum;
         }
 
-        const ChecksumType calculateChecksum() const {
-            std::string hash = "";
+        [[nodiscard]] ChecksumType calculateChecksum() const {
             std::stringstream ss;
-            ss << std::to_string(method) << std::to_string(static_cast<std::underlying_type_t<JournalTarget>>(target))
-               << destination << source << std::to_string(size) << std::to_string(static_cast<std::underlying_type_t<fs::perms>>(permissions)) << std::to_string(modificationTime.time_since_epoch().count()) << resourceChecksum;
+            ss << std::to_string(method)
+               << std::to_string(static_cast<std::underlying_type_t<JournalTarget>>(target))
+               << destination
+               << source
+               << std::to_string(size)
+               << std::to_string(static_cast<std::underlying_type_t<fs::perms>>(permissions))
+               << std::to_string(modificationTime.time_since_epoch().count())
+               << resourceChecksum;
 
-            hash = bsc::calculateSha1OfString(ss.str());
-
-            return hash;
+            return bsc::calculateSha1OfString(ss.str());
         }
 
         uintmax_t getSize() const {
             return size;
         }
+
+
+        bool operator==(const JournalStateData<target>& other) const {
+
+            return other.getResourceChecksum() == this->getResourceChecksum() &&
+                   other.getSize() == this->getSize() &&
+                   other.getMethod() == this->getMethod() &&
+                   other.getDestination() == this->getDestination();
+        }
     };
 
-    //@todo implement
-//    template<>
-//    class JournalStateData<JournalTarget::feature> {
-//    private:
-//        JournalMethod method = JournalMethod::none;
-//    };
+    template<JournalTarget target, JournalTarget otherTarget>
+    bool operator==(const JournalStateData<target>& first, const JournalStateData<otherTarget>& second) {
+        return false;
+    }
+
+
+    //    @todo implement
+    template<>
+    class JournalStateData<JournalTarget::feature> {
+    private:
+        JournalMethod method = JournalMethod::none;
+
+    public:
+        JournalMethod getMethod() const {
+            return method;
+        }
+
+        [[nodiscard]] ChecksumType calculateChecksum() const {
+            std::stringstream ss;
+            ss << std::to_string(method);
+
+            return bsc::calculateSha1OfString(ss.str());
+        }
+
+    private:
+        template<class Archive>
+        void serialize(Archive& ar) {
+            ar(CEREAL_NVP(method));
+        }
+
+
+        friend class cereal::access;
+    };
 }// namespace bsc
 
 #endif

@@ -1,35 +1,32 @@
 //
 // Created by stilgar on 17.10.17.
 //
-#include <core/log/Logger.h>
 #include <Poco/Environment.h>
+#include <core/log/Logger.h>
 #include <core/utils/crypto.h>
 
-#include <utility>
 #include "JournalState.h"
+#include <utility>
 namespace bsc {
 
 
+    //@todo change the name of this func, it doesn't really commit anything, maybe call it close(), finish(), finalize() or sth.
     void JournalState::commit(CommitTimeType now) {
-        //@todo how about a way to override this during test? commit(Clock=system_clock)? or maybe get the Clock from context?
         commitTime = now;
         checksum = calculateChecksum();
     }
 
     std::string JournalState::calculateChecksum() {
-        //@todo make sure this is deterministic. instead of using cereal to get the string, just generate it yourself.
         checksum = "";
         std::stringstream ss;
         {
             using namespace std::chrono;
             //@todo add journal utils that will do these conversions to strings and checksums
             ss << metaData.getChecksum()
-               << std::to_string(duration_cast<seconds>(commitTime.time_since_epoch()).count());
+               << std::to_string(duration_cast<milliseconds>(commitTime.time_since_epoch()).count());
             //@todo this assumes dataList is sorted.
             for (const auto& data : dataList) {
-                std::string dataChecksum;
-                std::visit([&dataChecksum](auto i){dataChecksum = i.calculateChecksum();},data);
-                ss << dataChecksum;
+                ss << std::visit([](auto i) { return  i.calculateChecksum(); }, data);
             }
         }
 
@@ -64,7 +61,6 @@ namespace bsc {
     }
 
     JournalState::JournalState(JournalMetaData metaData) : metaData(std::move(metaData)) {}
-
 
 
 }// namespace bsc

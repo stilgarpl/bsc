@@ -1,7 +1,6 @@
 [requires]
 OpenSSL/1.1.1b@conan/stable
 Poco/1.9.4@pocoproject/stable
-Catch2/2.11.1@catchorg/stable
 cereal/1.2.2@conan/stable
 spdlog/1.3.1@bincrafters/stable
 
@@ -17,5 +16,8 @@ Poco:enable_data_sqlite=False
 [generators]
 cmake
 
+[build_requires]
+cmake/[>3.16.3]
+Catch2/2.11.1@catchorg/stable
 
 

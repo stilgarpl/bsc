@@ -48,9 +48,7 @@ namespace bsc {
             auto same = std::find_if(dataList.begin(), dataList.end(), [&](auto i) {
               //@todo about that method and target... shouldn't this be an error if we have more than one method on one file?
               return std::visit([&](auto& i) {
-                    return data.getResourceChecksum() == i.getResourceChecksum() && data.getSize() == i.getSize() &&
-                           data.getMethod() == i.getMethod() && data.getTarget() == i.getTarget() &&
-                           data.getDestination() == i.getDestination();
+                    return data == i;
               },i);
             });
             if (same == dataList.end()) {

@@ -36,6 +36,8 @@ TEST_CASE("Journal merge test") {
                    bsc::FileData("/tmp/THIS_IS_OTHER_TEST.txt"));
     journal.append(JournalMethod::remove, JournalTarget::file, "/tmp/to_remove.txt",
                    bsc::FileData("/tmp/to_remove.txt"));
+    journal.append(JournalMethod::remove, JournalTarget::directory, "/tmp/folder/",
+                   bsc::FileData("/tmp/folder/","llll",{},{},{},true));
     journal.commitState(CommitTimeType::clock::now());
     journal.append(JournalMethod::modify, JournalTarget::file, "/tmp/dupa.txt", bsc::FileData("/tmp/to_remove.txt"));
     JournalFuncMap journalFuncMap;
