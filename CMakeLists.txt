@@ -12,6 +12,8 @@ include(${CMAKE_SOURCE_DIR}/cmake/configuration/sanitizers.cmake)
 enable_testing()
 
 
+message("modu:  ${CMAKE_MODULE_PATH}")
+message("pref: ${CMAKE_PREFIX_PATH}" )
 
 
 find_program(CCACHE_PROGRAM ccache)
@@ -20,8 +22,7 @@ if (CCACHE_PROGRAM)
     set(CMAKE_CUDA_COMPILER_LAUNCHER "${CCACHE_PROGRAM}") # CMake 3.9+
 endif ()
 
-
-message($ENV{PATH})
+message(PATH = $ENV{PATH})
 #conan setup
 find_program(conan NAMES conan)
 message("DEBUG: conan = ${conan}")

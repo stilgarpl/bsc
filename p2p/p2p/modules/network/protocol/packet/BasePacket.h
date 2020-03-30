@@ -4,7 +4,7 @@
 
 #ifndef BSC_BASEPACKET_H
 #define BSC_BASEPACKET_H
-//#define CEREAL_THREAD_SAFE 1
+
 
 
 

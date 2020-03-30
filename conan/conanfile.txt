@@ -1,8 +1,9 @@
 [requires]
 OpenSSL/1.1.1b@conan/stable
 Poco/1.9.4@pocoproject/stable
-cereal/1.2.2@conan/stable
+cereal/1.3.0
 spdlog/1.3.1@bincrafters/stable
+Catch2/2.11.1@catchorg/stable
 
 [options]
 Poco:shared=False # False
@@ -14,10 +15,11 @@ Poco:enable_redis=False
 Poco:enable_data_sqlite=False
 
 [generators]
-cmake
+virtualenv
+cmake_paths
 
 [build_requires]
 cmake/[>3.16.3]
-Catch2/2.11.1@catchorg/stable
+
 
 
