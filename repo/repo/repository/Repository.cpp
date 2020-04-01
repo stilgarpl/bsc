@@ -326,6 +326,7 @@ namespace bsc {
     public:
         DeployState
         apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
+            LOGGER("restoring "+path.string() )
             manipulator.restoreFileFromStorage(path, attributes);
             manipulator.restoreAttributes(path, attributes);
             return DeployState::deployed;
@@ -363,6 +364,7 @@ namespace bsc {
     public:
         DeployState
         apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
+            LOGGER("null strategy")
             return DeployState::unchanged;
         }
     };

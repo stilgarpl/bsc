@@ -660,3 +660,8 @@ modify feature source="INCOMING=TURBO"
 @todo chyba trzeba jednak zmienic destination z powrotem na path, bo to identyfikuje zasób, a source na... coś więcej mówiącego... value? bez sensu. albo zostawic destination i source, przynajmniej taka para razem ma sens
 
 @todo renderer moze łatwo parsowac source na property map używając bsc::parser, tylko w parser najlepiej byłoby zamknąć te funkcje w klasie ktora ich używa i przekazuje do nich np. symbol który jest delimiterem w CSV
+
+
+
+@todo checksums! do checksumy powinna, jeśli jeszcze nie jest, wliczać się suma jego parenta. to powinno uniemożliwić dodawanie elementów pomiędzy inne elementy (można dodać tylko na innych branchach). walidator powinien wyłapywać takie sytuacje
+@todo w partial journal, pierwszy element na liscie powinien mieć w previousState poprawny obiekt, który jednak nie jest na liście. to da możliwość wyliczenia poprawnej sumy

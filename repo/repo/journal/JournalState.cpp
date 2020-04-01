@@ -24,10 +24,11 @@ namespace bsc {
             //@todo add journal utils that will do these conversions to strings and checksums
             ss << metaData.getChecksum()
                << std::to_string(duration_cast<milliseconds>(commitTime.time_since_epoch()).count());
-            //@todo this assumes dataList is sorted.
+            //@todo this assumes dataList is always in the same order (sorted by time?).
             for (const auto& data : dataList) {
                 ss << std::visit([](auto i) { return  i.calculateChecksum(); }, data);
             }
+            ss << (previousState ? previousState->calculateChecksum() : "");
         }
 
         checksum = bsc::calculateSha1OfString(ss.str());

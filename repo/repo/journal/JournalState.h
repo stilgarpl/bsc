@@ -97,5 +97,6 @@ namespace bsc {
 
     };
 
+    typedef std::shared_ptr<JournalState> JournalStatePtr;
 }// namespace bsc
 #endif//BSC_JOURNALSTATE_H

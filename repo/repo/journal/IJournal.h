@@ -18,9 +18,6 @@ namespace bsc {
 
     class IJournal {
     public:
-        //@todo I'm not sure this should be in the interface...
-        typedef std::shared_ptr<JournalState> JournalStatePtr;
-        typedef std::vector<JournalStatePtr> JournalHistory;
     typedef std::shared_ptr<IJournal> JournalPtr;
 public:
     virtual ChecksumId getChecksum() const = 0;

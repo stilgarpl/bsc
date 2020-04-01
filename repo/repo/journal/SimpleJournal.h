@@ -7,10 +7,11 @@
 
 #include <core/utils/cereal_include.h>
 
-#include "JournalState.h"
 #include "IJournal.h"
-#include "JournalTypes.h"
+#include "JournalHistory.h"
 #include "JournalMetaDataFetcher.h"
+#include "JournalState.h"
+#include "JournalTypes.h"
 
 namespace bsc {
 
@@ -37,14 +38,8 @@ namespace bsc {
         friend class cereal::access;
 
         std::shared_ptr<JournalState> findLastState() {
-            if (!journalHistory.empty()) {
-                return *std::max_element(journalHistory.begin(), journalHistory.end(),
-                                         [&](auto a, auto b) -> bool {
-                                             return (a->getCommitTime() < b->getCommitTime());
-                                         });
-            } else {
-                return nullptr;
-            }
+            return journalHistory.getLastState();
+
         }
 
         void checkCurrentState() {
@@ -71,23 +66,10 @@ namespace bsc {
 
         //@todo debug method, remove eventually
         void printHistory() override {
-            for (auto&& item : journalHistory) {
-                std::cout << "SimpleJournal id " << item->calculateChecksum() << std::endl;
-                std::cout << "SimpleJournal prev "
-                          << (item->getPreviousState() ? item->getPreviousState()->calculateChecksum() : "0")
-                          << std::endl;
-            }
+            journalHistory.printHistory();
         }
 
-        JournalStatePtr findRoot() const {
-            for (auto&& item : journalHistory) {
-                if (item->getPreviousState() == nullptr) {
-                    return item;
-                }
 
-            }
-            return nullptr;
-        }
 
 
         bool merge(std::shared_ptr<SimpleJournal> other);

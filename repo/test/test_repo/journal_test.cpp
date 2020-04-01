@@ -26,7 +26,10 @@ TEST_CASE("Journal deterministic hash test") {
     journal.append(JournalMethod::add, JournalTarget::file, "/tmp/dupa.txt",
                    bsc::FileData("/tmp/dupa.txt", "hash", {}, 100, fs::file_time_type::min(), false));
     journal.commitState(CommitTimeType::clock::from_time_t(0));
-    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("2607dcfcfc7ec965778d4387e60c1072cbf95dc1"));
+    journal.append(JournalMethod::add, JournalTarget::file, "/tmp/other.txt",
+                   bsc::FileData("/tmp/other.txt", "hash2", {}, 100, fs::file_time_type::min(), false));
+    journal.commitState(CommitTimeType::clock::from_time_t(0));
+    REQUIRE_THAT(journal.getChecksum(), Catch::Matchers::Equals("5025f3f7d793c9e8f82946a246c395e30aa6a248"));
 }
 
 
@@ -49,6 +52,8 @@ TEST_CASE("Journal merge test") {
         oa << journal;
     }
 
+    auto firstChecksum = journal.calculateChecksum();
+
 
     SECTION("ok merge") {
 
@@ -63,8 +68,9 @@ TEST_CASE("Journal merge test") {
         journal1->append(JournalMethod::add, JournalTarget::file, "/bin/zsh", bsc::FileData("/bin/zsh"));
         journal1->commitState(CommitTimeType::clock::now());
 
-
         REQUIRE(journal.merge(journal1));
+        auto checksum = journal.calculateChecksum();
+        REQUIRE(checksum != firstChecksum);
 
     }
 
@@ -77,7 +83,8 @@ TEST_CASE("Journal merge test") {
 
 
         REQUIRE_FALSE(journal.merge(journal2));
-
+        auto checksum = journal.calculateChecksum();
+        REQUIRE(checksum == firstChecksum);
     }
 
     //cleanup
