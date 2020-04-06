@@ -4,9 +4,12 @@
 
 #include "RepositoryFileMap.h"
 
+#include <core/factory/FactoryContext.h>
 #include <utility>
 namespace bsc {
     const RepositoryFileMap& RepositoryFileMapRenderer::renderMap(JournalPtr journal) {
+        auto factoryContext = Context::getActiveContext()->get<FactoryContext>();
+        auto ruleFactory = factoryContext->getFactory<PathTransformerRulePtr>();
         //@todo should I check if journal is null?
         auto journalChecksum = journal->getChecksum();
         if (fileMapCache.contains(journalChecksum)) {
@@ -14,8 +17,9 @@ namespace bsc {
         }
         //    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
         auto& fileMap = fileMapCache[journalChecksum];
+        auto& pathTransformer = fileMap.pathTransformer;
         LOGGER("checksum different, recreate file map")
-        //@todo this funcmap should be const and generated in constructor or even static, no need to make it every call to render
+        //@todo this funcmap should be const and generated in constructor or even static, no need to make it every call to render... on the other hand, it has captures, so it may not be possible
         JournalFuncMap funcMap;
         funcMap.setFunc<JournalMethod::add,JournalTarget::file>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
@@ -53,6 +57,26 @@ namespace bsc {
             LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
+        funcMap.setFunc<JournalMethod::add,JournalTarget::special>([&](auto& i) {
+            const auto& transformedPath = pathTransformer->transformFromJournalFormat(i.getDestination());
+          if (fileMap.attributesMap.contains(transformedPath)) {
+              auto& attr = fileMap.attributesMap[transformedPath];
+              if (attr) {
+                  attr->setSpecial(true);
+              }
+            }
+        });
+
+        funcMap.setFunc<JournalMethod::remove,JournalTarget::special>([&](auto& i) {
+          const auto& transformedPath = pathTransformer->transformFromJournalFormat(i.getDestination());
+          if (fileMap.attributesMap.contains(transformedPath)) {
+              auto& attr = fileMap.attributesMap[transformedPath];
+              if (attr) {
+                  attr->setSpecial(false);
+              }
+          }
+        });
+
         funcMap.setFunc<JournalMethod::modify,JournalTarget::directory>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
@@ -80,19 +104,35 @@ namespace bsc {
             //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
-        funcMap.setFunc<JournalMethod::add,JournalTarget::feature>([&](auto& i) {
+        funcMap.setFunc<JournalMethod::add,JournalTarget::special>([&](auto& i) {
 //          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             //@todo implement
         });
 
-        funcMap.setFunc<JournalMethod::remove,JournalTarget::feature>([&](auto& i) {
+        funcMap.setFunc<JournalMethod::remove,JournalTarget::special>([&](auto& i) {
 //          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             //@todo implement
         });
 
-        funcMap.setFunc<JournalMethod::modify,JournalTarget::feature>([&](auto& i) {
+        funcMap.setFunc<JournalMethod::modify,JournalTarget::special>([&](auto& i) {
 //          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             //@todo implement
+        });
+
+        funcMap.setFunc<JournalMethod::add,JournalTarget::transformer>([&](auto& i) {
+//          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
+            pathTransformer->addRule(ruleFactory->create(i.getTransformerRuleSelector()));
+          //@todo implement
+        });
+
+        funcMap.setFunc<JournalMethod::remove,JournalTarget::transformer>([&](auto& i) {
+//          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
+          //@todo implement
+        });
+
+        funcMap.setFunc<JournalMethod::modify,JournalTarget::transformer>([&](auto& i) {
+//          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
+          //@todo implement
         });
 
 
@@ -100,7 +140,6 @@ namespace bsc {
         journal->replay(funcMap);
         return fileMap;
     }
-    RepositoryFileMapRenderer::RepositoryFileMapRenderer(std::shared_ptr<IPathTransformer> pathTransformer) : pathTransformer(std::move(pathTransformer)) {}
 
     auto RepositoryFileMap::operator[](const fs::path& path) const -> decltype(attributesMap.at(fs::current_path())) {
         if (!attributesMap.contains(path)) {
@@ -145,6 +184,16 @@ namespace bsc {
         }
         return deleteMap.at(path).isDeleted();
     }
+    RepositoryFileMap::RepositoryFileMap() {
+//        auto factoryContext = Context::getActiveContext()->get<FactoryContext>();
+//        auto ruleFactory = factoryContext->getFactory<PathTransformerRulePtr>();
+//        //@todo debug transformers, remove eventually. transformers should be set up by journal.
+//        pathTransformer->addRule(ruleFactory->create(PathTransformerRuleSelector::tmp));
+//        pathTransformer->addRule(ruleFactory->create(PathTransformerRuleSelector::home,{getenv("HOME")}));
+    }
+const PathTransformer & RepositoryFileMap::getPathTransformer() const{
+ return *pathTransformer;
+}
 
 
     bool RepositoryFileMap::DeleteInfo::isDeleted() const {

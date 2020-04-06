@@ -27,8 +27,9 @@ namespace bsc {
         bool merge(const JournalHistory& history);
         JournalStatePtr getState(const CommitTimeType& commitTime, const ChecksumType& checksum);
         [[nodiscard]] ChecksumType calculateChecksum();
-        void insert(JournalStatePtr state);
+        void insert(const JournalStatePtr& state);
         void replay(const JournalFuncMap& funcMap) const;
+        bool validate();
 
     private:
         template<class Archive>

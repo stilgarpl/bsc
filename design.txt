@@ -665,3 +665,5 @@ modify feature source="INCOMING=TURBO"
 
 @todo checksums! do checksumy powinna, jeśli jeszcze nie jest, wliczać się suma jego parenta. to powinno uniemożliwić dodawanie elementów pomiędzy inne elementy (można dodać tylko na innych branchach). walidator powinien wyłapywać takie sytuacje
 @todo w partial journal, pierwszy element na liscie powinien mieć w previousState poprawny obiekt, który jednak nie jest na liście. to da możliwość wyliczenia poprawnej sumy
+
+@todo zeby poprawnie procesować transformery i nie trzeba było zgadywać jak je zserializować, to takie rzeczy możnaby najpierw dodawać do journala, a przed commitem robić replaya rendererem. renderer moze miec opcje renderowania kroniki od commita do commita (lub heada)

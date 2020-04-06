@@ -6,10 +6,11 @@
 #include "HomeDirRule.h"
 namespace bsc {
     JournalPathType HomeDirRule::transformToJournalFormat(fs::path path) {
-        return std::regex_replace(path.string(), std::regex("^" + HOME_DIR), HOME_PATTERN);
+        return std::regex_replace(path.string(), std::regex("^" + homeDir), homePattern);
     }
 
     std::filesystem::path HomeDirRule::transformFromJournalFormat(JournalPathType path) {
-        return std::regex_replace(path, std::regex(HOME_PATTERN), HOME_DIR);
+        return std::regex_replace(path, std::regex(homePattern), homeDir);
     }
+    HomeDirRule::HomeDirRule(const std::string& homeDir) : homeDir(homeDir) {} //getenv("HOME")
 }

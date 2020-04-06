@@ -18,7 +18,7 @@ namespace bsc {
 
         checkCurrentState();
         if (currentState != nullptr) {
-            currentState->commit(now);
+            currentState->commit(now, this->getChecksum()); //@todo getChecksum or calculateChecksum?
             journalHistory.insert(currentState);
             auto prev = currentState;
             currentState = std::make_shared<JournalState>();
@@ -73,8 +73,12 @@ namespace bsc {
     }
 
     bool SimpleJournal::merge(const JournalPtr& other) {
-        //@todo error handling if other is not SimpleJournal -- or maybe just add protected getHistory to IJournal, so there may be just one overload
+        //@todo error handling if other is not SimpleJournal -- or maybe just add protected getHistory to Journal, so there may be just one overload
         return merge(std::static_pointer_cast<SimpleJournal>(other));
+    }
+    JournalStatePtr& SimpleJournal::getCurrentState() {
+        prepareState();
+        return currentState;
     }
 
     JournalStatePtr SimpleJournal::getState(const CommitTimeType& commitTime, const ChecksumType& checksum) {

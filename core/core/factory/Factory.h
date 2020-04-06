@@ -10,7 +10,10 @@
 #include <string>
 
 namespace bsc {
-    template<typename ProducedObjectType, typename ...  FactorySpecialization>
+
+    class NoFactorySpecialization {};
+
+    template<typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
     struct FactoryTraits {
         using SelectorType = std::string;
         //using ArgumentType = ...
@@ -32,35 +35,43 @@ namespace bsc {
         static const bool value = f<T>(0);
     };
 
-    template<bool hasArgs, typename ProducedObjectType, typename ...  FactorySpecialization>
+    template<bool hasArgs, typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
     struct BaseFactory {
-
     };
 
-    template<typename ProducedObjectType, typename ...  FactorySpecialization>
-    struct BaseFactory<false, ProducedObjectType, FactorySpecialization...> {
-        using SelectorType = typename FactoryTraits<ProducedObjectType, FactorySpecialization...>::SelectorType;
+    template<typename producedObjectType, typename factorySpecialization>
+    struct BaseFactory<false, producedObjectType, factorySpecialization> {
+        using ProducedObjectType = producedObjectType;
+        using FactorySpecialization = factorySpecialization;
+        using SelectorType = typename FactoryTraits<ProducedObjectType, FactorySpecialization>::SelectorType;
 
         virtual ProducedObjectType create(const SelectorType& selector) = 0;
     };
 
-    template<typename ProducedObjectType, typename ...  FactorySpecialization>
-    struct BaseFactory<true, ProducedObjectType, FactorySpecialization...> {
-        using SelectorType = typename FactoryTraits<ProducedObjectType, FactorySpecialization...>::SelectorType;
-        using ArgumentType = typename FactoryTraits<ProducedObjectType, FactorySpecialization...>::ArgumentType;
+    template<typename producedObjectType, typename factorySpecialization>
+    struct BaseFactory<true, producedObjectType, factorySpecialization> {
+        using ProducedObjectType = producedObjectType;
+        using FactorySpecialization = factorySpecialization;
+        using SelectorType = typename FactoryTraits<ProducedObjectType, FactorySpecialization>::SelectorType;
+        using ArgumentType = typename FactoryTraits<ProducedObjectType, FactorySpecialization>::ArgumentType;
 
+        //@todo it would be awesome if ArgumentType could be a parameter pack... investigate if this is possible
         virtual ProducedObjectType create(const SelectorType& selector, const ArgumentType& argument) = 0;
+        //@todo let's assume that ArgumentType is defualt constructible... if not, add a way to not have this overload for that case
+        ProducedObjectType create(const SelectorType& selector) {
+            return create(selector,{});
+        }
     };
 
 
-    template<typename ProducedObjectType, typename ...  FactorySpecialization>
+    template<typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
     struct Factory
-            : public BaseFactory<HasArgumentType<FactoryTraits<ProducedObjectType, FactorySpecialization...>>::value, ProducedObjectType, FactorySpecialization...> {
+        : public BaseFactory<HasArgumentType<FactoryTraits<ProducedObjectType, FactorySpecialization>>::value, ProducedObjectType, FactorySpecialization> {
     };
 
-    template<typename ProducedObjectType, typename ...  FactorySpecialization>
-    using FactoryPtr = std::shared_ptr<Factory<ProducedObjectType, FactorySpecialization...>>;
+    template<typename ProducedObjectType, typename FactorySpecialization=NoFactorySpecialization>
+    using FactoryPtr = std::shared_ptr<Factory<ProducedObjectType, FactorySpecialization>>;
 
-}
+}// namespace bsc
 
-#endif //BSC_FACTORY_H
+#endif//BSC_FACTORY_H

@@ -6,28 +6,35 @@
 #define BSC_FACTORYCONTEXT_H
 
 
-#include <core/uber/Uber.h>
 #include "Factory.h"
+#include <core/uber/Uber.h>
 
 
 namespace bsc {
     struct FactoryContext {
     private:
         Uber<Type> factories;
-    public:
-        //@todo maybe allow for FactorySpecialization to affect SelectorType? I think it should
-        template<typename ProducedObjectType, typename ...  FactorySpecialization>
-        FactoryPtr<ProducedObjectType, FactorySpecialization...> getFactory() {
 
-            return factories.get<FactoryPtr<ProducedObjectType, FactorySpecialization...>>();
+    public:
+        template<typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
+        FactoryPtr<ProducedObjectType, FactorySpecialization> getFactory() {
+            return factories.get<FactoryPtr<ProducedObjectType, FactorySpecialization>>();
         }
 
-        template<typename ProducedObjectType, typename ...  FactorySpecialization>
-        void setFactory(FactoryPtr<ProducedObjectType, FactorySpecialization...> ptr) {
-            factories.get<FactoryPtr<ProducedObjectType, FactorySpecialization...>>() = ptr;
+        template<typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
+        auto setFactory(FactoryPtr<ProducedObjectType, FactorySpecialization> ptr) {
+            factories.get<FactoryPtr<ProducedObjectType, FactorySpecialization>>() = ptr;
+            return ptr;
+        }
+
+        //@todo use/add concept Factory to limit types provided here to actual factories
+        template<typename FactoryType, typename... FactoryConstructorArgs>
+        auto addFactory(FactoryConstructorArgs&&... args) {
+            FactoryPtr<typename FactoryType::ProducedObjectType, typename FactoryType::FactorySpecialization> factoryPtr = std::make_shared<FactoryType>(std::forward<FactoryConstructorArgs>(args)...);
+            return setFactory(factoryPtr);
         }
     };
-}
+}// namespace bsc
 
 
-#endif //BSC_FACTORYCONTEXT_H
+#endif//BSC_FACTORYCONTEXT_H

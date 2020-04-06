@@ -6,10 +6,10 @@
 #define BSC_TMPRULE_H
 
 
-#include <repo/repository/transformer/ITransformRule.h>
+#include <repo/repository/transformer/PathTransformerRule.h>
 
 namespace bsc {
-    class TmpRule : public ITransformRule {
+    class TmpRule : public PathTransformerRule {
     private:
         const std::string TEMP_PATTERN = "<TEMP>";
 

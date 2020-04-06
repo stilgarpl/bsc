@@ -2,8 +2,9 @@
 // Created by stilgar on 07.12.17.
 //
 #include <catch2/catch.hpp>
-#include <repo/journal/SimpleJournal.h>
 #include <fstream>
+#include <repo/journal/SimpleJournal.h>
+#include <repo/journal/SimpleJournalMetaDataFetcher.h>
 
 using namespace bsc;
 class FakeMetaDataFetcher : public JournalMetaDataFetcher {
@@ -18,6 +19,8 @@ public:
                         std::string operatingSystemId) : metaData(nodeId, userId, operatingSystemId) {
 
     }
+
+
 };
 
 

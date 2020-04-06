@@ -6,10 +6,10 @@
 #define BSC_CUSTOMRULE_H
 
 
-#include <repo/repository/transformer/ITransformRule.h>
+#include <repo/repository/transformer/PathTransformerRule.h>
 
 namespace bsc {
-    class CustomRule : public ITransformRule {
+    class CustomRule : public PathTransformerRule {
 
     private:
         std::string from;

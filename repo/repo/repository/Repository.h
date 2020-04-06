@@ -23,7 +23,7 @@ namespace bsc {
 
     class Repository : public IRepository {
     public:
-        const IPathTransformer& getPathTransformer() override;
+        const PathTransformer& getPathTransformer() override;
 
     public:
         class RepoDeployMap {
@@ -99,7 +99,6 @@ namespace bsc {
         const RepositoryActionStrategyFactory strategyFactory{};
         const RepoIdType repositoryId;
         std::shared_ptr<IStorage> storage;
-        std::shared_ptr<IPathTransformer> pathTransformer = std::make_shared<PathTransformer>();
 
     private:
         const RepositoryActionStrategyPack deployPack;

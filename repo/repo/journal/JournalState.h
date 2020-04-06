@@ -27,16 +27,17 @@ namespace bsc {
 
     class JournalState {
         ChecksumType checksum;
-        std::list<std::variant<JournalStateData<JournalTarget::none>,JournalStateData<JournalTarget::file>,JournalStateData<JournalTarget::directory>,JournalStateData<JournalTarget::feature>>> dataList;
+        std::list<std::variant<JournalStateData<JournalTarget::none>,JournalStateData<JournalTarget::file>,JournalStateData<JournalTarget::directory>,JournalStateData<JournalTarget::special>,JournalStateData<JournalTarget::transformer>>> dataList;
         CommitTimeType commitTime;
         JournalMetaData metaData;
+        ChecksumType journalChecksum; // checksum of the whole journal at the moment of commit.
         std::shared_ptr<JournalState> previousState = nullptr;
 
     private:
         template<class Archive>
         void serialize(Archive& ar) {
             ar(CEREAL_NVP(checksum), CEREAL_NVP(dataList), CEREAL_NVP(commitTime), CEREAL_NVP(previousState),
-               CEREAL_NVP(metaData));
+               CEREAL_NVP(metaData), CEREAL_NVP(journalChecksum));
         }
 
 
@@ -54,14 +55,14 @@ namespace bsc {
             if (same == dataList.end()) {
                 dataList.push_back(data);
             } else {
-                LOGGER("error: trying to add same data again!" + data.getDestination());
+                LOGGER("error: trying to add same data again!");
             }
 
         }
 
         std::string calculateChecksum();
 
-        void commit(CommitTimeType);
+        void commit(CommitTimeType, ChecksumType journalChecksum);
 
         const std::shared_ptr<JournalState>& getPreviousState() const;
 

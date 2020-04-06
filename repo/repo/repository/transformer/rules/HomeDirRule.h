@@ -6,14 +6,14 @@
 #define BSC_HOMEDIRRULE_H
 
 
-#include <repo/repository/transformer/ITransformRule.h>
+#include <repo/repository/transformer/PathTransformerRule.h>
 
 namespace bsc {
-    class HomeDirRule : public ITransformRule {
+    class HomeDirRule : public PathTransformerRule {
 
     private:
-        std::string HOME_DIR = getenv("HOME");
-        std::string HOME_PATTERN = "<HOME>";
+        std::string homeDir;
+        std::string homePattern = "<HOME>";
 
     public:
         JournalPathType transformToJournalFormat(fs::path path) override;
@@ -22,6 +22,7 @@ namespace bsc {
 
         ~HomeDirRule() override = default;
 
+        HomeDirRule(const std::string& homeDir);
     };
 }
 

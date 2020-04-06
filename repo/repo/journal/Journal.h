@@ -2,8 +2,8 @@
 // Created by stilgar on 17.10.17.
 //
 
-#ifndef BSC_IJOURNAL_H
-#define BSC_IJOURNAL_H
+#ifndef BSC_JOURNAL_H
+#define BSC_JOURNAL_H
 
 
 #include "JournalFuncMap.h"
@@ -16,9 +16,9 @@
 
 namespace bsc {
 
-    class IJournal {
+    class Journal {
     public:
-    typedef std::shared_ptr<IJournal> JournalPtr;
+    typedef std::shared_ptr<Journal> JournalPtr;
 public:
     virtual ChecksumId getChecksum() const = 0;
 
@@ -28,6 +28,9 @@ public:
     virtual void replay(const JournalFuncMap& funcMap) const = 0;
 
     virtual void replayCurrentState(const JournalFuncMap& funcMap) = 0;
+
+protected:
+    virtual JournalStatePtr& getCurrentState() = 0;
 
 private:
     template<class Archive>
@@ -40,18 +43,23 @@ private:
 public:
     virtual void append(JournalMethod method, JournalTarget target, PathType path, bsc::FileData data) = 0;
 
+        template<JournalTarget target>
+        void appendState(JournalStateData<target> data){
+            getCurrentState()->add(data);
+        }
+
     virtual void printHistory()=0;
 
     virtual bool merge(const JournalPtr &other) =0;
 
         virtual JournalStatePtr getState(const CommitTimeType& commitTime, const ChecksumType& checksumType) = 0;
 
-        virtual ~IJournal() = default;
+        virtual ~Journal() = default;
     };
 
-    typedef std::shared_ptr<IJournal> JournalPtr;
-    typedef std::shared_ptr<const IJournal> JournalPtrConst;
+    typedef std::shared_ptr<Journal> JournalPtr;
+    typedef std::shared_ptr<const Journal> JournalPtrConst;
 }
-CEREAL_REGISTER_TYPE(bsc::IJournal)
+CEREAL_REGISTER_TYPE(bsc::Journal)
 
-#endif //BSC_IJOURNAL_H
+#endif//BSC_JOURNAL_H

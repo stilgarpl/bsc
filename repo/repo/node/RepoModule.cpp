@@ -23,6 +23,7 @@
 #include <repo/repository/storage/ManagedStorageFactory.h>
 #include <repo/repository/storage/StorageFactory.h>
 #include <repo/repository/storage/StorageFactorySpecialization.h>
+#include <repo/repository/transformer/PathTransformerRuleFactory.h>
 
 
 namespace bsc {
@@ -302,16 +303,13 @@ namespace bsc {
     void RepoModule::initialize() {
         auto factoryContext = node.getContext()->get<FactoryContext>();
         using namespace bsc;
-        FactoryPtr<IStoragePtr, bsc::StorageFactoryByType> storageFactoryPtr = std::make_shared<StorageFactory>(
-                getConfigurationManager().getFullDataPath(configuration().getStoragePath()));
-        FactoryPtr<IStoragePtr, bsc::StorageFactoryByName> managedStorageFactoryPtr = std::make_shared<ManagedStorageFactory>(
-                storageManager);
-        factoryContext->setFactory<IStoragePtr, bsc::StorageFactoryByType>(storageFactoryPtr);
-        factoryContext->setFactory<IStoragePtr, bsc::StorageFactoryByName>(managedStorageFactoryPtr);
-
+        auto storageFactoryPtr = factoryContext->addFactory<StorageFactory>(getConfigurationManager().getFullDataPath(configuration().getStoragePath()));
+        auto managedStorageFactoryPtr = factoryContext->addFactory<ManagedStorageFactory>(storageManager);
         const std::string defaultStorageId = "default";
         auto defaultStorage = storageFactoryPtr->create(defaultStorageId, defaultStorageId);
         storageManager.setDefaultStorage(defaultStorageId, defaultStorage);
+
+        factoryContext->addFactory<PathTransformerRuleFactory>();
     }
 
     IStoragePtr

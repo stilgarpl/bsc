@@ -7,7 +7,7 @@
 
 #include <core/utils/cereal_include.h>
 
-#include "IJournal.h"
+#include "Journal.h"
 #include "JournalHistory.h"
 #include "JournalMetaDataFetcher.h"
 #include "JournalState.h"
@@ -16,7 +16,7 @@
 namespace bsc {
 
 
-    class SimpleJournal : public IJournal {
+    class SimpleJournal : public Journal {
 
     private:
         ChecksumType checksum;
@@ -29,7 +29,7 @@ namespace bsc {
         template<class Archive>
         void serialize(Archive& ar) {
 
-            ar(cereal::base_class<IJournal>(this), CEREAL_NVP(checksum), CEREAL_NVP(journalHistory),
+            ar(cereal::base_class<Journal>(this), CEREAL_NVP(checksum), CEREAL_NVP(journalHistory),
                CEREAL_NVP(metaDataFetcher));
             //currentState is not serialized
         }
@@ -42,6 +42,9 @@ namespace bsc {
 
         }
 
+    protected:
+        JournalStatePtr& getCurrentState() override;
+    private:
         void checkCurrentState() {
             //@todo this is wrong. last state is commited it should be current->setPrev(last)
 //        if (currentState == nullptr && journalHistory.size() > 0) {
@@ -91,6 +94,6 @@ namespace bsc {
 }
 CEREAL_REGISTER_TYPE(bsc::SimpleJournal)
 
-CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::IJournal, bsc::SimpleJournal)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(bsc::Journal, bsc::SimpleJournal)
 
 #endif //BSC_SIMPLEJOURNAL_H

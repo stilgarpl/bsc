@@ -112,7 +112,7 @@ bsc::ChecksumType bsc::JournalHistory::calculateChecksum() {
     }
     return ss.str();
 }
-void bsc::JournalHistory::insert(bsc::JournalStatePtr state) {
+void bsc::JournalHistory::insert(const bsc::JournalStatePtr& state) {
     //@todo maybe insert sort by commit time?
     history.push_back(state);
 }
@@ -120,4 +120,7 @@ void bsc::JournalHistory::replay(const bsc::JournalFuncMap& funcMap) const {
     for (const auto& it : history) {
         it->replay(funcMap);
     }
+}
+bool bsc::JournalHistory::validate() {
+return false;
 }

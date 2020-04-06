@@ -11,8 +11,9 @@ namespace bsc {
 
 
     //@todo change the name of this func, it doesn't really commit anything, maybe call it close(), finish(), finalize() or sth.
-    void JournalState::commit(CommitTimeType now) {
+    void JournalState::commit(CommitTimeType now,ChecksumType journalChecksum) {
         commitTime = now;
+        journalChecksum = journalChecksum;
         checksum = calculateChecksum();
     }
 
@@ -28,6 +29,7 @@ namespace bsc {
             for (const auto& data : dataList) {
                 ss << std::visit([](auto i) { return  i.calculateChecksum(); }, data);
             }
+            ss << journalChecksum;
             ss << (previousState ? previousState->calculateChecksum() : "");
         }
 

@@ -4,12 +4,14 @@
 // Created by stilgar on 17.10.17.
 //
 
+
 #include "Repository.h"
 #include <repo/repository/transformer/rules/HomeDirRule.h>
 #include <repo/repository/transformer/rules/TmpRule.h>
 
 
 #include <repo/repository/storage/InternalStorage.h>
+#include <repo/repository/transformer/PathTransformerRuleFactory.h>
 namespace bsc {
     using namespace std::chrono_literals;
 
@@ -58,10 +60,11 @@ namespace bsc {
                                                                                               .newInFilesystem = RepositoryAction::persist,
                                                                                               .deletedInRepo = RepositoryAction::trash,
                                                                                               .deletedInFilesystem = RepositoryAction::remove,
-                                                                                      })),
-                                                                              fileMapRenderer(pathTransformer) {
-        pathTransformer->addRule(std::make_shared<TmpRule>());
-        pathTransformer->addRule(std::make_shared<HomeDirRule>());
+                                                                                      })) {
+
+
+
+//        pathTransformer->addRule(std::make_shared<HomeDirRule>(getenv("HOME")));
     }
 
     const std::shared_ptr<IStorage>& Repository::getStorage() const {
@@ -71,8 +74,8 @@ namespace bsc {
     void Repository::restoreAll() {
 
         //@todo this method kind of does the same as deploy() merge the two
-        auto& fileMap = fileMapRenderer.renderMap(journal);
-        for (auto&& [path, attributes] : fileMap) {
+        const auto& fileMap = fileMapRenderer.renderMap(journal);
+        for (const auto& [path, attributes] : fileMap) {
             if (attributes) {
                 LOGGER("restoring path " + path.string())
                 manipulator.restoreFileFromStorage(path,attributes);
@@ -267,9 +270,9 @@ namespace bsc {
     const IRepository::RepositoryActionStrategyPack& Repository::getFullPack() const {
         return fullPack;
     }
-    const IPathTransformer& Repository::getPathTransformer() {
-        //@todo should I check if this is null?
-        return *pathTransformer;
+    const PathTransformer& Repository::getPathTransformer() {
+        auto& fileMap = fileMapRenderer.renderMap(journal);
+        return fileMap.getPathTransformer();
     }
 
     //Repository::Repository() : Repository("", nullptr) {}

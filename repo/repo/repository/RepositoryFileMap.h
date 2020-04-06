@@ -6,8 +6,8 @@
 #define BSC_REPOSITORYFILEMAP_H
 #include "RepositoryAttributes.h"
 #include <filesystem>
-#include <repo/journal/IJournal.h>
-#include <repo/repository/transformer/IPathTransformer.h>
+#include <repo/journal/Journal.h>
+#include <repo/repository/transformer/PathTransformer.h>
 
 
 namespace bsc {
@@ -31,17 +31,21 @@ namespace bsc {
 
             void setDeletionTime(fs::file_time_type deletionTime);
         };
+        class SpecialInfo {};
 
     private:
         const ValueType emptyAttribute = std::nullopt;
         std::map<fs::path, ValueType> attributesMap;
         const DeleteInfo defaultDeleteInfo{};
         std::map<fs::path, DeleteInfo> deleteMap;
+        std::map<fs::path, SpecialInfo> specialMap;
+        //@todo probably this does not have to be shared_ptr, it can be ordinary member.
+        std::shared_ptr<PathTransformer> pathTransformer = std::make_shared<PathTransformer>();
         RepositoryFileMap(RepositoryFileMap&) = delete;
         RepositoryFileMap(RepositoryFileMap&&) = delete;
 
     public:
-        RepositoryFileMap() = default;
+        RepositoryFileMap();
         auto operator[](const fs::path& path) const -> decltype(attributesMap.at(fs::current_path()));
 
         auto contains(const fs::path& path) const {
@@ -54,14 +58,14 @@ namespace bsc {
         fs::file_time_type getDeletionTime(const fs::path& path) const;
         auto isDeleted(const fs::path& path) const -> decltype(deleteMap.at(path).isDeleted());
         friend class RepositoryFileMapRenderer;
+        const PathTransformer & getPathTransformer() const;
     };
 
     class RepositoryFileMapRenderer {
-        std::shared_ptr<IPathTransformer> pathTransformer;
         std::map<ChecksumId, RepositoryFileMap> fileMapCache{};
 
     public:
-        RepositoryFileMapRenderer(std::shared_ptr<IPathTransformer> pathTransformer);
+
 
     public:
         const RepositoryFileMap& renderMap(JournalPtr journal);

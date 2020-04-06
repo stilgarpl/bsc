@@ -19,6 +19,7 @@ namespace bsc {
         fs::file_time_type modificationTime = fs::file_time_type::min();
         ChecksumId checksum; //checksum of the file.
         bool directory = false;
+        bool special = false;
         IStorage::ResourceId resourceId;
     public:
         fs::perms getPermissions() const;
@@ -32,6 +33,9 @@ namespace bsc {
         const IStorage::ResourceId& getResourceId() const;
 
         RepositoryAttributes() = default;
+
+        bool isSpecial() const;
+        void setSpecial(bool special);
 
         explicit RepositoryAttributes(const JournalStateData<JournalTarget::file>& data);
         explicit RepositoryAttributes(const JournalStateData<JournalTarget::directory>& data);

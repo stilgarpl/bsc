@@ -5,32 +5,57 @@
 #ifndef BSC_PATHTRANSFORMER_H
 #define BSC_PATHTRANSFORMER_H
 
-
-#include "IPathTransformer.h"
+#include "PathTransformerRule.h"
+#include <filesystem>
+#include <set>
 
 namespace bsc {
-    class PathTransformer : public IPathTransformer {
+    namespace fs = std::filesystem;
 
+    class PathTransformer {
+     private:
+
+        class TransformComparator {
+        public:
+            bool operator()(const PathTransformerRulePtr& left, const PathTransformerRulePtr& right) const {
+                return left->getPriority() < right->getPriority();
+            }
+
+        };
+        typedef std::multiset<PathTransformerRulePtr, TransformComparator> RuleSet;
         RuleSet rules;
-
     public:
 
-    private:
-        [[nodiscard]] JournalPathType transformToJournalFormat(fs::path path) const override;
+        [[nodiscard]] virtual JournalPathType transformToJournalFormat(fs::path path) const {
+            for (const auto& rule : rules) {
+                path = rule->transformToJournalFormat(path);
+            }
+            return path;
+        }
 
-        [[nodiscard]] std::filesystem::path transformFromJournalFormat(JournalPathType path) const override;
+        [[nodiscard]] virtual fs::path transformFromJournalFormat(JournalPathType path) const {
+            for (auto rule = rules.rbegin(); rule != rules.rend(); rule++) {
+                path = (*rule)->transformFromJournalFormat(path);
+            }
+            return path;
+        }
 
-        void addRule(ITransformRulePtr rule) override;
+         void addRule(PathTransformerRulePtr rule) {
+            rules.insert(rule);
 
-        void removeRule(ITransformRulePtr rule) override;
+        }
 
-        RuleSet getRules() override;
+         void removeRule(PathTransformerRulePtr rule) {
+            rules.erase(rule);
+        }
 
-    public:
-        ~PathTransformer() override = default;
 
+         const RuleSet& getRules() const {
+            return rules;
+        }
 
+        virtual ~PathTransformer() = default;
     };
 }
 
-#endif //BSC_PATHTRANSFORMER_H
+#endif//BSC_PATHTRANSFORMER_H

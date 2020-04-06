@@ -8,7 +8,7 @@
 
 #include "RepositoryAttributes.h"
 #include <memory>
-#include <repo/journal/IJournal.h>
+#include <repo/journal/Journal.h>
 #include <repo/repository/repository/DeployState.h>
 #include <repo/repository/repository/RepositoryAction.h>
 #include <repo/repository/repository/RepositoryActionStrategy.h>
@@ -34,7 +34,7 @@ namespace bsc {
         virtual void commit() = 0;
         virtual void setJournal(const JournalPtr& journal) = 0;
         virtual const std::shared_ptr<IStorage>& getStorage() const = 0;
-        virtual const IPathTransformer& getPathTransformer() = 0;
+        virtual const PathTransformer& getPathTransformer() = 0;
 
         //everything filesystem -> journal
         virtual void syncLocalChanges() = 0;

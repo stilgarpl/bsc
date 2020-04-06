@@ -45,7 +45,6 @@ namespace bsc {
         }
 
     public:
-        //@todo testing...
         void setNodeContextActive() override {
             Context::setActiveContext(nodeContext);
         }

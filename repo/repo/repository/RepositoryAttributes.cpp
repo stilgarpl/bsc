@@ -51,4 +51,11 @@ namespace bsc {
     bool RepositoryAttributes::isDirectory() const {
         return directory;
     }
+    bool RepositoryAttributes::isSpecial() const {
+        return special;
+    }
+    void RepositoryAttributes::setSpecial(bool special) {
+        //@todo this method should be only visible to file map renderer. consider changing it to something else, += operator or something
+        RepositoryAttributes::special = special;
+    }
 }

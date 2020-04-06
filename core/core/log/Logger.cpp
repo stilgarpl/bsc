@@ -41,11 +41,11 @@ void bsc::Logger::debug(int line, const std::string& txt) {
     std::lock_guard<std::mutex> g(getLock());
     static std::string::size_type instanceLength = 0;
 //@todo optimize this call:
-    if (Context::hasActiveContext() && Context::getActiveContext()->has<bsc::LoggerContext>() &&
+    if (Context::hasActiveContext() && Context::getActiveContext()->has<LoggerContext>() &&
         Context::getActiveContext()->get<LoggerContext>()->getInstance().size() > instanceLength) {
         instanceLength = Context::getActiveContext()->get<LoggerContext>()->getInstance().size();
     }
-    if (Context::hasActiveContext() && Context::getActiveContext()->has<bsc::LoggerContext>()) {
+    if (Context::hasActiveContext() && Context::getActiveContext()->has<LoggerContext>()) {
         spdlog::info("[{:<{}}] [{}:{}]: {}", Context::getActiveContext()->get<LoggerContext>()->getInstance(),
                      instanceLength,
                      loggerName, std::to_string(line), txt);

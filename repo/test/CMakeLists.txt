@@ -1,6 +1,6 @@
 #setDirect(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES test_repo/test_main.cpp test_repo/journal_test.cpp test_repo/repo_test.cpp)
+set(SOURCE_FILES test_repo/test_main.cpp test_repo/journal_test.cpp test_repo/repo_test.cpp test_repo/repo_map_renderer_test.cpp)
 
 add_executable(test_repo ${SOURCE_FILES})
 catch_discover_tests(test_repo)

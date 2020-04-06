@@ -8,8 +8,8 @@
 
 #include <core/utils/cereal_include.h>
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
+#include <repo/journal/Journal.h>
 #include <repo/repository/IRepository.h>
-#include <repo/journal/IJournal.h>
 
 namespace bsc {
 

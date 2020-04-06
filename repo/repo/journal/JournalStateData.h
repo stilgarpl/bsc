@@ -14,6 +14,7 @@
 #include <core/utils/cereal_include.h>
 #include <filesystem>
 #include <p2p/modules/filesystem/data/FileData.h>
+#include <repo/repository/transformer/PathTransformerRuleSelector.h>
 
 namespace bsc {
     namespace fs = std::filesystem;
@@ -43,8 +44,8 @@ namespace bsc {
         friend class cereal::access;
 
     public:
-        JournalStateData(JournalMethod method, PathType path, bsc::FileData fileData) : method(method), destination(std::move(path)) {
-            update(std::move(fileData));
+        JournalStateData(JournalMethod method, const PathType& path, const bsc::FileData& fileData) : method(method), destination(path) {
+            update(fileData);
         };
 
         JournalStateData() = default;
@@ -126,13 +127,18 @@ namespace bsc {
 
     //    @todo implement
     template<>
-    class JournalStateData<JournalTarget::feature> {
+    class JournalStateData<JournalTarget::special> {
     private:
         JournalMethod method = JournalMethod::none;
+        std::string destination{};
 
     public:
         JournalMethod getMethod() const {
             return method;
+        }
+
+        const std::string& getDestination() const {
+            return destination;
         }
 
         [[nodiscard]] ChecksumType calculateChecksum() const {
@@ -145,12 +151,55 @@ namespace bsc {
     private:
         template<class Archive>
         void serialize(Archive& ar) {
-            ar(CEREAL_NVP(method));
+            ar(CEREAL_NVP(method), CEREAL_NVP(destination));
         }
 
-
+    public:
+        JournalStateData() = default;
+        JournalStateData(JournalMethod method, const PathType& path) : method(method), destination(path) {}
+    private:
         friend class cereal::access;
     };
+
+
+    //    @todo implement
+    template<>
+    class JournalStateData<JournalTarget::transformer> {
+    private:
+        JournalMethod method = JournalMethod::none;
+        PathTransformerRuleSelector transformerRuleSelector;
+
+    public:
+        JournalMethod getMethod() const {
+            return method;
+        }
+
+        PathTransformerRuleSelector getTransformerRuleSelector() const {
+            return transformerRuleSelector;
+        }
+
+        [[nodiscard]] ChecksumType calculateChecksum() const {
+            std::stringstream ss;
+            ss << std::to_string(method);
+
+            return bsc::calculateSha1OfString(ss.str());
+        }
+
+    private:
+        template<class Archive>
+        void serialize(Archive& ar) {
+            ar(CEREAL_NVP(method), CEREAL_NVP(transformerRuleSelector));
+        }
+
+    public:
+        JournalStateData() = default;
+        JournalStateData(JournalMethod method, PathTransformerRuleSelector transformerRuleSelector) : method(method), transformerRuleSelector(transformerRuleSelector) {}
+
+    private:
+        friend class cereal::access;
+    };
+
+
 }// namespace bsc
 
 #endif
