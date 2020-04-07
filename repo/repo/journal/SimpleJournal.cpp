@@ -42,9 +42,9 @@ namespace bsc {
     void SimpleJournal::append(JournalMethod method, JournalTarget target, PathType path, bsc::FileData data) {
         prepareState();
         if(data.isIsDirectory()) {
-            currentState->add(JournalStateData<JournalTarget::directory>(method, path, data));
+            currentState->add(JournalStateEntry<JournalTarget::directory>(method, path, data));
         } else {
-            currentState->add(JournalStateData<JournalTarget::file>(method, path, data));
+            currentState->add(JournalStateEntry<JournalTarget::file>(method, path, data));
         }
     }
 

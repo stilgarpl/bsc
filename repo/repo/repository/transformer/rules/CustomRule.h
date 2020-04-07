@@ -12,16 +12,21 @@ namespace bsc {
     class CustomRule : public PathTransformerRule {
 
     private:
+        //@todo make it possible for user to set priority.
+        constexpr static int customPriority = 20;
         std::string from;
         std::string to;
 
     public:
-        CustomRule(std::string from, std::string to);
+        CustomRule( std::string from, std::string to);
 
         JournalPathType transformToJournalFormat(fs::path path) override;
 
         std::filesystem::path transformFromJournalFormat(JournalPathType path) override;
 
+    protected:
+        std::string getDefinition() override;
+    public:
         ~CustomRule() override = default;
     };
 }

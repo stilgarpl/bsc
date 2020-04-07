@@ -5,13 +5,13 @@
 #ifndef BSC_JOURNALFUNCMAP_H
 #define BSC_JOURNALFUNCMAP_H
 
+#include "JournalStateEntry.h"
 #include "JournalTarget.h"
 #include "JournalTypes.h"
-#include "JournalStateData.h"
+#include <core/log/Logger.h>
 #include <core/uber/Uber.h>
 #include <functional>
 #include <map>
-#include <core/log/Logger.h>
 
 namespace bsc {
     //@todo rename to some better name
@@ -19,7 +19,7 @@ namespace bsc {
 
     public:
         template<JournalTarget target>
-        using Func =  std::function<void(const JournalStateData<target>&)> ;
+        using Func =  std::function<void(const JournalStateEntry<target>&)> ;
         template<JournalTarget target>
         using FuncMap =  std::map<JournalMethod, Func<target>> ;
 
@@ -33,7 +33,7 @@ namespace bsc {
         }
 
         template<JournalTarget target>
-        bool execute(JournalMethod method,const JournalStateData<target>& state) const {
+        bool execute(JournalMethod method,const JournalStateEntry<target>& state) const {
             if (funcMap.has<target>() && funcMap.get<target>().contains(method)) {
                 funcMap.get<target>().at(method)(state);
                 return true;

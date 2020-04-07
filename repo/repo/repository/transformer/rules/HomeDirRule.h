@@ -12,8 +12,9 @@ namespace bsc {
     class HomeDirRule : public PathTransformerRule {
 
     private:
+        constexpr static int homeDirPriority = 99999;
         std::string homeDir;
-        std::string homePattern = "<HOME>";
+        const std::string homePattern = "<HOME>";
 
     public:
         JournalPathType transformToJournalFormat(fs::path path) override;
@@ -22,6 +23,9 @@ namespace bsc {
 
         ~HomeDirRule() override = default;
 
+    protected:
+        std::string getDefinition() override;
+    public:
         HomeDirRule(const std::string& homeDir);
     };
 }

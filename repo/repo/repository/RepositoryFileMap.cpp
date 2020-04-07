@@ -127,7 +127,7 @@ namespace bsc {
 
         funcMap.setFunc<JournalMethod::remove,JournalTarget::transformer>([&](auto& i) {
 //          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
-          //@todo implement
+          pathTransformer->removeRule(ruleFactory->create(i.getTransformerRuleSelector()));
         });
 
         funcMap.setFunc<JournalMethod::modify,JournalTarget::transformer>([&](auto& i) {

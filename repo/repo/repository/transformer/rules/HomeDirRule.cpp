@@ -12,5 +12,8 @@ namespace bsc {
     std::filesystem::path HomeDirRule::transformFromJournalFormat(JournalPathType path) {
         return std::regex_replace(path, std::regex(homePattern), homeDir);
     }
-    HomeDirRule::HomeDirRule(const std::string& homeDir) : homeDir(homeDir) {} //getenv("HOME")
+    HomeDirRule::HomeDirRule(const std::string& homeDir)
+        : PathTransformerRule(homeDirPriority), homeDir(homeDir) {}
+    std::string HomeDirRule::getDefinition() { return homeDir; }
+    //getenv("HOME")
 }

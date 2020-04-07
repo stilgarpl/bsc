@@ -37,8 +37,8 @@ namespace bsc {
         bool isSpecial() const;
         void setSpecial(bool special);
 
-        explicit RepositoryAttributes(const JournalStateData<JournalTarget::file>& data);
-        explicit RepositoryAttributes(const JournalStateData<JournalTarget::directory>& data);
+        explicit RepositoryAttributes(const JournalStateEntry<JournalTarget::file>& data);
+        explicit RepositoryAttributes(const JournalStateEntry<JournalTarget::directory>& data);
 
         bool isDirectory() const;
 

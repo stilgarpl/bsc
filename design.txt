@@ -651,7 +651,7 @@ operacje na kronice (tworzenie funcMap, operacje na plikach i katalogach powinne
 
 @todo getFileMap powinno byc zastapione renderFileMap() ktore jest w osobnej klasie i ma wewnętrzny cache hash -> map
 
-@todo JournalStateData - path zmienione na source/destination i typy pól na string. dzieki temu mozna przechowywac w tym takze inne rzecyz, jak property INCOMING czy cos
+@todo JournalStateEntry - path zmienione na source/destination i typy pól na string. dzieki temu mozna przechowywac w tym takze inne rzecyz, jak property INCOMING czy cos
 
 add feature source="INCOMING"
 remove feature source="INCOMING"

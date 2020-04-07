@@ -24,6 +24,11 @@ JournalPtr prepareJournal() {
     return result;
 }
 
+void modifyJournal(JournalPtr journalPtr) {
+    journalPtr->appendState<JournalTarget::transformer>({JournalMethod::remove, PathTransformerRuleSelector::tmp});
+    journalPtr->commitState(CommitTimeType::clock::now());
+}
+
 void setupContext() {
     Context::Ptr context = Context::makeContext();
     Context::setActiveContext(context);
@@ -44,7 +49,13 @@ TEST_CASE("RepositoryFileMapRenderer test") {
     REQUIRE(fileMap.getPathTransformer().getRules().size() == 2);
     REQUIRE(fileMap.getPathTransformer().getRules().contains(std::make_shared<TmpRule>()));
     REQUIRE(fileMap.getPathTransformer().getRules().contains(std::make_shared<HomeDirRule>(getenv("HOME"))));
-
-
     //@todo implement all other cases (special etc.)
+
+    modifyJournal(journalPtr);
+    const auto& fileMap2 = fileMapRenderer.renderMap(journalPtr);
+    REQUIRE(fileMap2.getPathTransformer().getRules().size() == 1);
+    REQUIRE(!fileMap2.getPathTransformer().getRules().contains(std::make_shared<TmpRule>()));
+    REQUIRE(fileMap2.getPathTransformer().getRules().contains(std::make_shared<HomeDirRule>(getenv("HOME"))));
+
+
 }

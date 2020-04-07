@@ -11,6 +11,7 @@
 namespace bsc {
     class TmpRule : public PathTransformerRule {
     private:
+        constexpr static int tmpPriority = 99998;
         const std::string TEMP_PATTERN = "<TEMP>";
 
     public:
@@ -18,6 +19,10 @@ namespace bsc {
 
         std::filesystem::path transformFromJournalFormat(JournalPathType path) override;
 
+    protected:
+        std::string getDefinition() override;
+    public:
+        TmpRule();
         ~TmpRule() override = default;
 
     };

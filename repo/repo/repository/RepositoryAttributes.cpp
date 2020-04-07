@@ -26,8 +26,8 @@ namespace bsc {
         return resourceId;
     }
 
-    RepositoryAttributes::RepositoryAttributes(const JournalStateData<JournalTarget::file>& data) {
-        //@todo I'm not sure it it should be a constructor and not a conversion method. this way RepositoryAttributtes wouldn't have to know about JournalStateData
+    RepositoryAttributes::RepositoryAttributes(const JournalStateEntry<JournalTarget::file>& data) {
+        //@todo I'm not sure it it should be a constructor and not a conversion method. this way RepositoryAttributtes wouldn't have to know about JournalStateEntry
         size = data.getSize();
         permissions = data.getPermissions();
         modificationTime = data.getModificationTime();
@@ -37,8 +37,8 @@ namespace bsc {
         directory = data.getTarget() == JournalTarget::directory; //@todo this is always false
     }
 
-    RepositoryAttributes::RepositoryAttributes(const JournalStateData<JournalTarget::directory>& data) {
-        //@todo I'm not sure it it should be a constructor and not a conversion method. this way RepositoryAttributtes wouldn't have to know about JournalStateData
+    RepositoryAttributes::RepositoryAttributes(const JournalStateEntry<JournalTarget::directory>& data) {
+        //@todo I'm not sure it it should be a constructor and not a conversion method. this way RepositoryAttributtes wouldn't have to know about JournalStateEntry
         size = data.getSize();
         permissions = data.getPermissions();
         modificationTime = data.getModificationTime();

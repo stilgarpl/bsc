@@ -8,13 +8,14 @@
 #include <filesystem>
 #include <set>
 
-#include <repo/journal/JournalState.h>
-#include <repo/journal/JournalStateData.h>
 #include <core/factory/Factory.h>
+#include <repo/journal/JournalState.h>
+#include <repo/journal/JournalStateEntry.h>
 
 namespace bsc {
     namespace fs = std::filesystem;
-    using JournalPathType = std::remove_cvref_t<decltype(JournalStateData<JournalTarget::file>().getDestination())>;
+    using JournalPathType = std::remove_cvref_t<decltype(JournalStateEntry<JournalTarget::file>().getDestination())>;
+
     class PathTransformerRule {
 
     private:
@@ -27,6 +28,12 @@ namespace bsc {
         int getPriority() const {
             return priority;
         }
+        //@todo getDefinition should be protected, but Comparator needs to see it.
+        //@todo maybe think of better name. it is used to compare rules with the same priority
+        virtual std::string getDefinition() {
+            return "";
+        }
+        PathTransformerRule(int priority) : priority(priority) {}
 
         virtual ~PathTransformerRule() = default;
     };

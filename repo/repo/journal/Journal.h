@@ -44,7 +44,7 @@ public:
     virtual void append(JournalMethod method, JournalTarget target, PathType path, bsc::FileData data) = 0;
 
         template<JournalTarget target>
-        void appendState(JournalStateData<target> data){
+        void appendState(JournalStateEntry<target> data){
             getCurrentState()->add(data);
         }
 

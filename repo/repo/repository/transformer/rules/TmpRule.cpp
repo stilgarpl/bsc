@@ -21,4 +21,6 @@ namespace bsc {
 //    LOGGER("ret = " + ret)
         return ret;
     }
+    TmpRule::TmpRule() : PathTransformerRule(tmpPriority) {}
+    std::string TmpRule::getDefinition() { return "tmp"; }
 }

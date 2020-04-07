@@ -7,7 +7,7 @@
 
 #include "JournalFuncMap.h"
 #include "JournalMetaData.h"
-#include "JournalStateData.h"
+#include "JournalStateEntry.h"
 #include "JournalTypes.h"
 #include <cereal/access.hpp>
 #include <chrono>
@@ -16,48 +16,52 @@
 #include <sstream>
 #include <string>
 
+#include <core/log/Logger.h>
 #include <filesystem>
 #include <p2p/modules/filesystem/data/FileData.h>
 #include <variant>
-#include <core/log/Logger.h>
 
 namespace bsc {
 
-
-
     class JournalState {
         ChecksumType checksum;
-        std::list<std::variant<JournalStateData<JournalTarget::none>,JournalStateData<JournalTarget::file>,JournalStateData<JournalTarget::directory>,JournalStateData<JournalTarget::special>,JournalStateData<JournalTarget::transformer>>> dataList;
+        std::list<std::variant<JournalStateEntry<JournalTarget::none>,
+                               JournalStateEntry<JournalTarget::file>,
+                               JournalStateEntry<JournalTarget::directory>,
+                               JournalStateEntry<JournalTarget::special>,
+                               JournalStateEntry<JournalTarget::transformer>>>
+                dataList;
         CommitTimeType commitTime;
         JournalMetaData metaData;
-        ChecksumType journalChecksum; // checksum of the whole journal at the moment of commit.
+        ChecksumType journalChecksum;// checksum of the whole journal at the moment of commit.
         std::shared_ptr<JournalState> previousState = nullptr;
 
     private:
         template<class Archive>
         void serialize(Archive& ar) {
-            ar(CEREAL_NVP(checksum), CEREAL_NVP(dataList), CEREAL_NVP(commitTime), CEREAL_NVP(previousState),
-               CEREAL_NVP(metaData), CEREAL_NVP(journalChecksum));
+            ar(CEREAL_NVP(checksum),
+               CEREAL_NVP(dataList),
+               CEREAL_NVP(commitTime),
+               CEREAL_NVP(previousState),
+               CEREAL_NVP(metaData),
+               CEREAL_NVP(journalChecksum));
         }
-
 
         friend class cereal::access;
 
     public:
         template<JournalTarget target>
-        void add(const JournalStateData<target>& data){
+        void add(const JournalStateEntry<target>& data) {
             auto same = std::find_if(dataList.begin(), dataList.end(), [&](auto i) {
-              //@todo about that method and target... shouldn't this be an error if we have more than one method on one file?
-              return std::visit([&](auto& i) {
-                    return data == i;
-              },i);
+                //@todo about that method and target... shouldn't this be an error if we have more than one method on
+                //one file?
+                return std::visit([&](auto& i) { return data == i; }, i);
             });
             if (same == dataList.end()) {
                 dataList.push_back(data);
             } else {
                 LOGGER("error: trying to add same data again!");
             }
-
         }
 
         std::string calculateChecksum();
@@ -77,10 +81,10 @@ namespace bsc {
         const ChecksumType& getChecksum() const;
 
         JournalState(const JournalState& other) {
-            checksum = other.checksum;
-            dataList = other.dataList;
-            commitTime = other.commitTime;
-            metaData = other.metaData;
+            checksum      = other.checksum;
+            dataList      = other.dataList;
+            commitTime    = other.commitTime;
+            metaData      = other.metaData;
             previousState = other.previousState;
         }
 
@@ -90,14 +94,11 @@ namespace bsc {
 
         void replay(const JournalFuncMap& funcMap) const {
             for (const auto& it : dataList) {
-                std::visit([&funcMap](const auto& i){
-                    funcMap.execute(i.getMethod(),i);
-                },it);
+                std::visit([&funcMap](const auto& i) { funcMap.execute(i.getMethod(), i); }, it);
             }
         }
-
     };
 
     typedef std::shared_ptr<JournalState> JournalStatePtr;
 }// namespace bsc
-#endif//BSC_JOURNALSTATE_H
+#endif// BSC_JOURNALSTATE_H

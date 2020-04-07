@@ -18,7 +18,13 @@ namespace bsc {
         class TransformComparator {
         public:
             bool operator()(const PathTransformerRulePtr& left, const PathTransformerRulePtr& right) const {
-                return left->getPriority() < right->getPriority();
+                //@todo perfect place to use <=>
+                auto priority = left->getPriority() - right->getPriority();
+                if (priority == 0) {
+                    return left->getDefinition() < right->getDefinition();
+                } else {
+                    return priority < 0;
+                }
             }
 
         };
@@ -26,19 +32,9 @@ namespace bsc {
         RuleSet rules;
     public:
 
-        [[nodiscard]] virtual JournalPathType transformToJournalFormat(fs::path path) const {
-            for (const auto& rule : rules) {
-                path = rule->transformToJournalFormat(path);
-            }
-            return path;
-        }
+        [[nodiscard]] virtual JournalPathType transformToJournalFormat(fs::path path) const;
 
-        [[nodiscard]] virtual fs::path transformFromJournalFormat(JournalPathType path) const {
-            for (auto rule = rules.rbegin(); rule != rules.rend(); rule++) {
-                path = (*rule)->transformFromJournalFormat(path);
-            }
-            return path;
-        }
+        [[nodiscard]] virtual fs::path transformFromJournalFormat(JournalPathType path) const;
 
          void addRule(PathTransformerRulePtr rule) {
             rules.insert(rule);
