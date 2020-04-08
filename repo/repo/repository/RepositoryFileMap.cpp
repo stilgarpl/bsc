@@ -105,24 +105,25 @@ namespace bsc {
         });
 
         funcMap.setFunc<JournalMethod::add,JournalTarget::special>([&](auto& i) {
-//          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
-            //@todo implement
+            auto path     = pathTransformer->transformFromJournalFormat(i.getDestination());
+            auto& special = fileMap.specialMap[path];
+            special.setSpecialKind(i.getSpecialKind());
         });
 
         funcMap.setFunc<JournalMethod::remove,JournalTarget::special>([&](auto& i) {
-//          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
-            //@todo implement
+            auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
+            fileMap.specialMap.erase(path);
         });
 
         funcMap.setFunc<JournalMethod::modify,JournalTarget::special>([&](auto& i) {
-//          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
-            //@todo implement
+            auto path     = pathTransformer->transformFromJournalFormat(i.getDestination());
+            auto& special = fileMap.specialMap[path];
+            special.setSpecialKind(i.getSpecialKind());
         });
 
         funcMap.setFunc<JournalMethod::add,JournalTarget::transformer>([&](auto& i) {
 //          auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
             pathTransformer->addRule(ruleFactory->create(i.getTransformerRuleSelector()));
-          //@todo implement
         });
 
         funcMap.setFunc<JournalMethod::remove,JournalTarget::transformer>([&](auto& i) {
@@ -141,10 +142,8 @@ namespace bsc {
         return fileMap;
     }
 
-    auto RepositoryFileMap::operator[](const fs::path& path) const -> decltype(attributesMap.at(fs::current_path())) {
-        if (!attributesMap.contains(path)) {
-            return emptyAttribute;
-        }
+    auto RepositoryFileMap::operator[](const fs::path& path) const -> decltype(attributesMap.at(fs::current_path()))& {
+        if (!attributesMap.contains(path)) { return emptyAttribute; }
         return attributesMap.at(path);
     }
 
@@ -200,15 +199,15 @@ const PathTransformer & RepositoryFileMap::getPathTransformer() const{
         return deleted;
     }
 
-    fs::file_time_type RepositoryFileMap::DeleteInfo::getDeletionTime() const {
-        return deletionTime;
-    }
+    fs::file_time_type RepositoryFileMap::DeleteInfo::getDeletionTime() const { return deletionTime; }
 
     void RepositoryFileMap::DeleteInfo::setDeletionTime(fs::file_time_type deletionTime) {
         DeleteInfo::deletionTime = deletionTime;
     }
 
-    void RepositoryFileMap::DeleteInfo::setDeleted(bool deleted) {
-        DeleteInfo::deleted = deleted;
+    void RepositoryFileMap::DeleteInfo::setDeleted(bool deleted) { DeleteInfo::deleted = deleted; }
+    SpecialKind RepositoryFileMap::SpecialInfo::getSpecialKind() const { return specialKind; }
+    void RepositoryFileMap::SpecialInfo::setSpecialKind(SpecialKind specialKind) {
+        SpecialInfo::specialKind = specialKind;
     }
 }// namespace bsc

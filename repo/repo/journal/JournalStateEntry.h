@@ -9,6 +9,7 @@
 #include "JournalMethod.h"
 #include "JournalTarget.h"
 #include "JournalTypes.h"
+#include "SpecialKind.h"
 #include <cereal/access.hpp>
 #include <chrono>
 #include <core/utils/cereal_include.h>
@@ -99,6 +100,7 @@ namespace bsc {
     class JournalStateEntry<JournalTarget::special> {
     private:
         JournalMethod method = JournalMethod::none;
+        SpecialKind specialKind{};
         std::string destination{};
 
     public:
@@ -113,15 +115,18 @@ namespace bsc {
             return bsc::calculateSha1OfString(ss.str());
         }
 
+        SpecialKind getSpecialKind() const { return specialKind; }
+
     private:
         template<class Archive>
         void serialize(Archive& ar) {
-            ar(CEREAL_NVP(method), CEREAL_NVP(destination));
+            ar(CEREAL_NVP(method), CEREAL_NVP(destination), CEREAL_NVP(specialKind));
         }
 
     public:
         JournalStateEntry() = default;
-        JournalStateEntry(JournalMethod method, const PathType& path) : method(method), destination(path) {}
+        JournalStateEntry(JournalMethod method, const PathType& path, SpecialKind kind)
+            : method(method), specialKind(kind), destination(path) {}
 
     private:
         friend class cereal::access;

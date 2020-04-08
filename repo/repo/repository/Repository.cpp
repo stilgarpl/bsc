@@ -121,19 +121,17 @@ namespace bsc {
         LOGGER("update: " + path.string())
         path = fs::weakly_canonical(path);
         auto& fileMap = fileMapRenderer.renderMap(journal);
-        //only update if the file is in the repository
-        //    if (fileMap.contains(path)) {
 
+        auto& attributes = fileMap[path];
         if (fs::exists(path)) {
             if (fs::is_directory(path) || fs::is_regular_file(path)) {
                 //file exists in filesystem
                 auto currentFileTime = fs::last_write_time(path);
                 auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
-                if (fileMap[path].has_value()) {
-                    auto& attributes = fileMap[path];
-                    //file exists in the journal
+                if (attributes) {
+                    // file exists in the journal
                     if (currentFileTime < attributes->getModificationTime()) {
-                        //file in repository is newer than the file in filesystem, restore
+                        // file in repository is newer than the file in filesystem, restore
                         LOGGER("restoring..." + path.string())
                         auto state = strategyPack.updatedInRepo->apply(path, attributes, manipulator);
                         deployMap.markDeployed(path, state);
@@ -204,7 +202,6 @@ namespace bsc {
             }
         } else {
             //file was removed or perhaps wasn't deployed yet...
-            auto& attributes = fileMap[path];
             if (attributes) {
                 if (deployMap.isDeployed(path)) {
                     //file is in file map and was deployed but is not on filesystem, removing (user must have deleted it)

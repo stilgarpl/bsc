@@ -31,7 +31,14 @@ namespace bsc {
 
             void setDeletionTime(fs::file_time_type deletionTime);
         };
-        class SpecialInfo {};
+        class SpecialInfo {
+        private:
+            SpecialKind specialKind{};
+
+        public:
+            SpecialKind getSpecialKind() const;
+            void setSpecialKind(SpecialKind specialKind);
+        };
 
     private:
         const ValueType emptyAttribute = std::nullopt;
@@ -41,24 +48,26 @@ namespace bsc {
         std::map<fs::path, SpecialInfo> specialMap;
         //@todo probably this does not have to be shared_ptr, it can be ordinary member.
         std::shared_ptr<PathTransformer> pathTransformer = std::make_shared<PathTransformer>();
-        RepositoryFileMap(RepositoryFileMap&) = delete;
+        RepositoryFileMap(RepositoryFileMap&)            = delete;
         RepositoryFileMap(RepositoryFileMap&&) = delete;
 
     public:
         RepositoryFileMap();
         auto operator[](const fs::path& path) const -> decltype(attributesMap.at(fs::current_path()));
 
-        auto contains(const fs::path& path) const {
-            return attributesMap.contains(path);
-        }
+        auto contains(const fs::path& path) const { return attributesMap.contains(path); }
         auto getSize(const fs::path& path) const;
         decltype(attributesMap) subMap(const fs::path& root) const;
         auto begin() const -> decltype(attributesMap.begin());
         auto end() const -> decltype(attributesMap.end());
         fs::file_time_type getDeletionTime(const fs::path& path) const;
         auto isDeleted(const fs::path& path) const -> decltype(deleteMap.at(path).isDeleted());
+        auto isSpecial(const fs::path& path) const { return specialMap.contains(path); }
+        const auto& getSpecialData(const fs::path& path) const {
+            return specialMap.at(path);//@todo it will throw on bad path, handle
+        }
         friend class RepositoryFileMapRenderer;
-        const PathTransformer & getPathTransformer() const;
+        const PathTransformer& getPathTransformer() const;
     };
 
     class RepositoryFileMapRenderer {
