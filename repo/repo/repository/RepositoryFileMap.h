@@ -56,18 +56,33 @@ namespace bsc {
         auto operator[](const fs::path& path) const -> decltype(attributesMap.at(fs::current_path()));
 
         auto contains(const fs::path& path) const { return attributesMap.contains(path); }
-        auto getSize(const fs::path& path) const;
-        decltype(attributesMap) subMap(const fs::path& root) const;
+
+        auto getSize(const fs::path &path) const;
+
+        decltype(attributesMap) subMap(const fs::path &root) const;
+
         auto begin() const -> decltype(attributesMap.begin());
+
         auto end() const -> decltype(attributesMap.end());
-        fs::file_time_type getDeletionTime(const fs::path& path) const;
-        auto isDeleted(const fs::path& path) const -> decltype(deleteMap.at(path).isDeleted());
-        auto isSpecial(const fs::path& path) const { return specialMap.contains(path); }
-        const auto& getSpecialData(const fs::path& path) const {
+
+        fs::file_time_type getDeletionTime(const fs::path &path) const;
+
+        auto isDeleted(const fs::path &path) const -> decltype(deleteMap.at(path).isDeleted());
+
+        auto isSpecial(const fs::path &path) const { return specialMap.contains(path); }
+
+        const auto &getSpecialData(const fs::path &path) const {
             return specialMap.at(path);//@todo it will throw on bad path, handle
         }
+
+        //@todo maybe we don't have to return whole map? but Repository need to iterate through all special dirs...
+        const auto &getSpecialMap() const {
+            return specialMap;
+        }
+
         friend class RepositoryFileMapRenderer;
-        const PathTransformer& getPathTransformer() const;
+
+        const PathTransformer &getPathTransformer() const;
     };
 
     class RepositoryFileMapRenderer {

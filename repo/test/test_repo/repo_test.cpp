@@ -2,15 +2,18 @@
 // Created by stilgar on 08.12.17.
 //
 
+
 #include <catch2/catch.hpp>
-#include <p2p/modules/command/CommandModule.h>
-#include <repo/node/RepoModule.h>
-#include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/modules/basic/BasicModule.h>
+#include <p2p/modules/command/CommandModule.h>
+#include <p2p/modules/filesystem/FilesystemModule.h>
+#include <repo/node/RepoModule.h>
+#include <tester/Tester.h>
+
 using namespace bsc;
 
 
-void remoteServerTestModuleSetup(bsc::Node& node) {
+void remoteServerTestModuleSetup(bsc::Node &node) {
     node.addModule<bsc::BasicModule>();
     node.addModule<FilesystemModule>();
     node.addModule<bsc::NetworkModule>();
@@ -62,38 +65,7 @@ void setupCommands(CommandModule *cmd) {
 
 }
 
-void createFile(fs::path path, std::string content) {
-    std::ofstream file(path);
-    file << content;
-}
 
-void changeFile(fs::path path, std::string content) {
-    std::ofstream file(path);
-    file << content;
-}
-
-std::string readFile(fs::path path) {
-    if (fs::exists(path)) {
-        std::ifstream t(path);
-        std::string str((std::istreambuf_iterator<char>(t)),
-                        std::istreambuf_iterator<char>());
-        return str;
-    } else {
-        throw std::string("file not found");
-    }
-}
-
-class Cleanup {
-    fs::path pathToCleanup;
-public:
-    Cleanup(const fs::path &pathToCleanup) : pathToCleanup(pathToCleanup) {
-
-    }
-
-    virtual ~Cleanup() {
-        fs::remove_all(pathToCleanup);
-    }
-};
 
 TEST_CASE("Repo module test") {
 
@@ -138,20 +110,17 @@ TEST_CASE("Repo module test") {
     REQUIRE(otherRepoMod->getSelectedRepository() != nullptr);
 
     //create dirs and files
-    fs::path testPath = fs::temp_directory_path() / "dirtest";
-    Cleanup cleanup(testPath);
+    Tester::TestDir testDir;
+    using namespace std::string_literals;
+    fs::path testPath = testDir.getTestDirPath("dirtest"s);
     INFO("test path is " << testPath.string())
-    //just in case, cleanup
-    fs::remove_all(testPath);
-    //create test directories
-    fs::create_directories(testPath);
-    createFile(testPath / "1.txt", "111");
-    createFile(testPath / "2.txt", "222");
-    createFile(testPath / "3.txt", "333");
-    createFile(testPath / "4.txt", "444");
+    Tester::createFile(testPath / "1.txt", "111");
+    Tester::createFile(testPath / "2.txt", "222");
+    Tester::createFile(testPath / "3.txt", "333");
+    Tester::createFile(testPath / "4.txt", "444");
     fs::path subPath = testPath / "subdirectory" / "sub1";
     fs::create_directories(subPath);
-    createFile(subPath / "sub.txt", "sub");
+    Tester::createFile(subPath / "sub.txt", "sub");
 
     otherNode.setNodeContextActive();
     otherRepoMod->updateFile(testPath);
@@ -210,8 +179,8 @@ TEST_CASE("Repo module test") {
 
     //@todo here I have a bug that looks like a race. probably transfer queue enters finished state too soon. investigate.
     //  after investigation : downloadStorage finished before transfer queue has actually finished. I think transfer queue goes to FINISHED state too soon.
-    changeFile(testPath / "3.txt", "QWQQQQQQQQQ");
-    createFile(testPath / "5.txt", "555");
+    Tester::changeFile(testPath / "3.txt", "QWQQQQQQQQQ");
+    Tester::createFile(testPath / "5.txt", "555");
     otherNode.setNodeContextActive();
     otherRepoMod->updateAllFiles();
     otherRepoMod->saveRepository("test");
@@ -237,9 +206,9 @@ TEST_CASE("Repo module test") {
     REQUIRE(fs::exists(testPath / "3.txt"));
     REQUIRE(!fs::exists(testPath / "4.txt"));
     REQUIRE(fs::exists(testPath / "5.txt"));
-    REQUIRE(readFile(testPath / "1.txt") == "111");
-    REQUIRE(readFile(testPath / "2.txt") == "222");
-    REQUIRE(readFile(testPath / "3.txt") == "QWQQQQQQQQQ");
+    REQUIRE(Tester::readFile(testPath / "1.txt") == "111");
+    REQUIRE(Tester::readFile(testPath / "2.txt") == "222");
+    REQUIRE(Tester::readFile(testPath / "3.txt") == "QWQQQQQQQQQ");
     REQUIRE(fs::exists(subPath / "sub.txt"));
 
 

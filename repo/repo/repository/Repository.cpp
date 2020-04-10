@@ -9,7 +9,7 @@
 #include <repo/repository/transformer/rules/HomeDirRule.h>
 #include <repo/repository/transformer/rules/TmpRule.h>
 
-
+#include <repo/repository/special/RepositorySpecialIncomingHandler.h>
 #include <repo/repository/storage/InternalStorage.h>
 #include <repo/repository/transformer/PathTransformerRuleFactory.h>
 namespace bsc {
@@ -121,7 +121,6 @@ namespace bsc {
         LOGGER("update: " + path.string())
         path = fs::weakly_canonical(path);
         auto& fileMap = fileMapRenderer.renderMap(journal);
-
         auto& attributes = fileMap[path];
         if (fs::exists(path)) {
             if (fs::is_directory(path) || fs::is_regular_file(path)) {
@@ -150,11 +149,11 @@ namespace bsc {
                             deployMap.markDeployed(path, state);
 
                             //@todo this is mostly the same code as below, combine the two loops into a function or sth.
-                            if (fs::is_directory(path) &&
+                            if (fs::is_directory(path) && !fileMap.isSpecial(path) &&
                                 (updateOptions.contains(UpdateOptions::followUpdatedDirectories) ||
                                  updateOptions.contains(UpdateOptions::followDirectories))) {
                                 LOGGER(path.string() + " is a directory, iterating over...")
-                                for (const auto& item : fs::directory_iterator(path)) {
+                                for (const auto &item : fs::directory_iterator(path)) {
                                     //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
                                     //@todo OR, BETTER ALTERNATIVE - update could return set of paths that it updated. then it could recurse safely here, and this if(!in map) won't be needed. updateAll would just remove all already checked items from items to check list. DO IT LIKE THIS
                                     LOGGER(" item: " + item.path().string())
@@ -185,9 +184,10 @@ namespace bsc {
                     }
                 }
                 //@todo this iterates over all directories and files in path, which means that it will probably call some methods twice or even more times on some files. make sure it doesn't
-                if (fs::is_directory(path) && updateOptions.contains(UpdateOptions::followDirectories)) {
+                if (fs::is_directory(path) && !fileMap.isSpecial(path) &&
+                    updateOptions.contains(UpdateOptions::followDirectories)) {
                     LOGGER(path.string() + " is a directory, iterating over...")
-                    for (const auto& item : fs::directory_iterator(path)) {
+                    for (const auto &item : fs::directory_iterator(path)) {
                         //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
                         //@todo same as above, this check won't be needed if update() returns set of processed files.
                         LOGGER(" item: " + item.path().string())
@@ -198,7 +198,7 @@ namespace bsc {
                     }
                 }
             } else {
-                LOGGER("file type not supported for : " + path.string())
+                ERROR("file type not supported for : " + path.string())
             }
         } else {
             //file was removed or perhaps wasn't deployed yet...
@@ -264,12 +264,30 @@ namespace bsc {
         return localSyncPack;
     }
 
-    const IRepository::RepositoryActionStrategyPack& Repository::getFullPack() const {
+    const IRepository::RepositoryActionStrategyPack &Repository::getFullPack() const {
         return fullPack;
     }
-    const PathTransformer& Repository::getPathTransformer() {
-        auto& fileMap = fileMapRenderer.renderMap(journal);
+
+    const PathTransformer &Repository::getPathTransformer() {
+        auto &fileMap = fileMapRenderer.renderMap(journal);
         return fileMap.getPathTransformer();
+    }
+
+    void Repository::processSpecialDirectories() {
+        auto &fileMap = fileMapRenderer.renderMap(journal);
+        for (const auto&[path, specialData] : fileMap.getSpecialMap()) {
+            handleSpecialDirectory(path, specialData);
+        }
+    }
+
+    void Repository::handleSpecialDirectory(const fs::path &path, const RepositoryFileMap::SpecialInfo &info) {
+        switch (info.getSpecialKind()) {
+
+            case SpecialKind::incoming: {
+                RepositorySpecialIncomingHandler incomingHandler(path);
+            }
+                break;
+        }
     }
 
     //Repository::Repository() : Repository("", nullptr) {}

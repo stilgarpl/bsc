@@ -33,12 +33,15 @@ if (EXISTS ${conan})
     conan_check()
     conan_add_remote(NAME bincrafters INDEX 1
             URL https://api.bintray.com/conan/bincrafters/public-conan)
+    conan_add_remote(NAME degoodmanwilson INDEX 2
+            URL https://api.bintray.com/conan/degoodmanwilson/opensource)
     conan_cmake_run(CONANFILE conan/conanfile.txt
             INSTALL_FOLDER ${CMAKE_BINARY_DIR}
             BASIC_SETUP
             BUILD_TYPE "Debug"
             BUILD missing)
-    #    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
     #    conan_set_find_library_paths()
     #    conan_set_find_paths()
 else ()
@@ -78,7 +81,7 @@ set(BSC_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 option(CMAKE_UNITY_BUILD "Enable unity builds" ON)
 option(BSC_ENABLE_TESTS "Enable unit tests" ON)
 
-
+add_subdirectory(tester)
 add_subdirectory(parser)
 add_subdirectory(core)
 add_subdirectory(logic)

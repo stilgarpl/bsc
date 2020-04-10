@@ -20,17 +20,17 @@ namespace bsc {
 
         private:
             template<class Archive>
-            void serialize(Archive& ar) {
+            void serialize(Archive &ar) {
                 ar(cereal::base_class<Packet<StorageManifest, StorageManifest::Request>>
                            (this), repositoryId);
             }
 
         public:
-            [[nodiscard]] const IStorage::StorageId& getRepositoryId() const {
+            [[nodiscard]] const IStorage::StorageId &getRepositoryId() const {
                 return repositoryId;
             }
 
-            void setRepositoryId(const IStorage::StorageId& repositoryId) {
+            void setRepositoryId(const IStorage::StorageId &repositoryId) {
                 Request::repositoryId = repositoryId;
             }
 
@@ -43,7 +43,7 @@ namespace bsc {
         class Response : public bsc::Packet<StorageManifest, StorageManifest::Response> {
         private:
             template<class Archive>
-            void serialize(Archive& ar) {
+            void serialize(Archive &ar) {
                 ar(cereal::base_class<Packet<StorageManifest, StorageManifest::Response>>
                            (this));
             }

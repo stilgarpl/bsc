@@ -182,11 +182,16 @@ namespace bsc {
     public:
         friend class cereal::access;
 
-        [[nodiscard]] const RepositoryActionStrategyPack& getDeployPack() const override;
+        [[nodiscard]] const RepositoryActionStrategyPack &getDeployPack() const override;
 
-        [[nodiscard]] const RepositoryActionStrategyPack& getLocalSyncPack() const override;
+        [[nodiscard]] const RepositoryActionStrategyPack &getLocalSyncPack() const override;
 
-        [[nodiscard]] const RepositoryActionStrategyPack& getFullPack() const override;
+        [[nodiscard]] const RepositoryActionStrategyPack &getFullPack() const override;
+
+        void processSpecialDirectories();
+
+    private:
+        void handleSpecialDirectory(const fs::path &path, const RepositoryFileMap::SpecialInfo &info);
     };
 }
 CEREAL_REGISTER_TYPE(bsc::Repository)
