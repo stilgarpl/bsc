@@ -24,85 +24,85 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #-------------------------------------------------------------------------------
 
-# - Check for the presence of LIBMAGIC
+# - Check for the presence of LibMagic
 #
-# The following variables are set when LIBMAGIC is found:
-#  LIBMAGIC_FOUND      = Set to true, if all components of LIBMAGIC have been
+# The following variables are set when LibMagic is found:
+#  LibMagic_FOUND      = Set to true, if all components of LibMagic have been
 #                        found.
-#  LIBMAGIC_INCLUDES   = Include path for the header files of LIBMAGIC
-#  LIBMAGIC_LIBRARIES  = Link these to use LIBMAGIC
-#  LIBMAGIC_LFLAGS     = Linker flags (optional)
+#  LibMagic_INCLUDES   = Include path for the header files of LibMagic
+#  LibMagic_LIBRARIES  = Link these to use LibMagic
+#  LibMagic_LFLAGS     = Linker flags (optional)
 
-if (NOT LIBMAGIC_FOUND)
+if (NOT LibMagic_FOUND)
 
-  if (NOT LIBMAGIC_ROOT_DIR)
-    set (LIBMAGIC_ROOT_DIR ${CMAKE_INSTALL_PREFIX})
-  endif (NOT LIBMAGIC_ROOT_DIR)
+  if (NOT LibMagic_ROOT_DIR)
+    set (LibMagic_ROOT_DIR ${CMAKE_INSTALL_PREFIX})
+  endif (NOT LibMagic_ROOT_DIR)
 
   ##____________________________________________________________________________
   ## Check for the header files
 
-  find_path (LIBMAGIC_FILE_H
+  find_path (LibMagic_FILE_H
     NAMES file/file.h
-    HINTS ${LIBMAGIC_ROOT_DIR} ${CMAKE_INSTALL_PREFIX}
+    HINTS ${LibMagic_ROOT_DIR} ${CMAKE_INSTALL_PREFIX}
     PATH_SUFFIXES include
     )
-  if (LIBMAGIC_FILE_H)
-    list (APPEND LIBMAGIC_INCLUDES ${LIBMAGIC_FILE_H})
-  endif (LIBMAGIC_FILE_H)
+  if (LibMagic_FILE_H)
+    list (APPEND LibMagic_INCLUDES ${LibMagic_FILE_H})
+  endif (LibMagic_FILE_H)
 
-  find_path (LIBMAGIC_MAGIC_H
+  find_path (LibMagic_MAGIC_H
     NAMES magic.h
-    HINTS ${LIBMAGIC_ROOT_DIR} ${CMAKE_INSTALL_PREFIX}
+    HINTS ${LibMagic_ROOT_DIR} ${CMAKE_INSTALL_PREFIX}
     PATH_SUFFIXES include include/linux
     )
-  if (LIBMAGIC_MAGIC_H)
-    list (APPEND LIBMAGIC_INCLUDES ${LIBMAGIC_MAGIC_H})
-  endif (LIBMAGIC_MAGIC_H)
+  if (LibMagic_MAGIC_H)
+    list (APPEND LibMagic_INCLUDES ${LibMagic_MAGIC_H})
+  endif (LibMagic_MAGIC_H)
 
-  list (REMOVE_DUPLICATES LIBMAGIC_INCLUDES)
+  list (REMOVE_DUPLICATES LibMagic_INCLUDES)
 
   ##____________________________________________________________________________
   ## Check for the library
 
-  find_library (LIBMAGIC_LIBRARIES magic
-    HINTS ${LIBMAGIC_ROOT_DIR} ${CMAKE_INSTALL_PREFIX}
+  find_library (LibMagic_LIBRARIES magic
+    HINTS ${LibMagic_ROOT_DIR} ${CMAKE_INSTALL_PREFIX}
     PATH_SUFFIXES lib
     )
 
   ##____________________________________________________________________________
   ## Actions taken when all components have been found
   include(FindPackageHandleStandardArgs)
-  find_package_handle_standard_args (LIBMAGIC DEFAULT_MSG LIBMAGIC_LIBRARIES LIBMAGIC_INCLUDES)
+  find_package_handle_standard_args (LibMagic DEFAULT_MSG LibMagic_LIBRARIES LibMagic_INCLUDES)
 
-  if(LIBMAGIC_FOUND AND NOT TARGET LibMagic::LibMagic)
+  if(LibMagic_FOUND AND NOT TARGET LibMagic::LibMagic)
     add_library(LibMagic::LibMagic UNKNOWN IMPORTED)
     set_target_properties(LibMagic::LibMagic PROPERTIES
-            IMPORTED_LOCATION "${LIBMAGIC_LIBRARIES}"
-            INTERFACE_INCLUDE_DIRECTORIES "${LIBMAGIC_INCLUDES}"
+            IMPORTED_LOCATION "${LibMagic_LIBRARIES}"
+            INTERFACE_INCLUDE_DIRECTORIES "${LibMagic_INCLUDES}"
             )
   endif()
 
-  if (LIBMAGIC_FOUND)
-    if (NOT LIBMAGIC_FIND_QUIETLY)
-      message (STATUS "Found components for LIBMAGIC")
-      message (STATUS "LIBMAGIC_ROOT_DIR  = ${LIBMAGIC_ROOT_DIR}")
-      message (STATUS "LIBMAGIC_INCLUDES  = ${LIBMAGIC_INCLUDES}")
-      message (STATUS "LIBMAGIC_LIBRARIES = ${LIBMAGIC_LIBRARIES}")
-    endif (NOT LIBMAGIC_FIND_QUIETLY)
-  else (LIBMAGIC_FOUND)
-    if (LIBMAGIC_FIND_REQUIRED)
-      message (FATAL_ERROR "Could not find LIBMAGIC!")
-    endif (LIBMAGIC_FIND_REQUIRED)
-  endif (LIBMAGIC_FOUND)
+  if (LibMagic_FOUND)
+    if (NOT LibMagic_FIND_QUIETLY)
+      message (STATUS "Found components for LibMagic")
+      message (STATUS "LibMagic_ROOT_DIR  = ${LibMagic_ROOT_DIR}")
+      message (STATUS "LibMagic_INCLUDES  = ${LibMagic_INCLUDES}")
+      message (STATUS "LibMagic_LIBRARIES = ${LibMagic_LIBRARIES}")
+    endif (NOT LibMagic_FIND_QUIETLY)
+  else (LibMagic_FOUND)
+    if (LibMagic_FIND_REQUIRED)
+      message (FATAL_ERROR "Could not find LibMagic!")
+    endif (LibMagic_FIND_REQUIRED)
+  endif (LibMagic_FOUND)
 
   ##____________________________________________________________________________
   ## Mark advanced variables
 
   mark_as_advanced (
-    LIBMAGIC_ROOT_DIR
-    LIBMAGIC_INCLUDES
-    LIBMAGIC_LIBRARIES
+    LibMagic_ROOT_DIR
+    LibMagic_INCLUDES
+    LibMagic_LIBRARIES
     )
 
-endif (NOT LIBMAGIC_FOUND)
+endif (NOT LibMagic_FOUND)
