@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(bsc VERSION 0.1 LANGUAGES CXX)
-
+#include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -47,6 +47,7 @@ if (EXISTS ${conan})
 else ()
     message("Conan not found")
 endif ()
+
 #end of conan setup
 
 find_package(Catch2 CONFIG REQUIRED)
@@ -82,6 +83,7 @@ option(CMAKE_UNITY_BUILD "Enable unity builds" ON)
 option(BSC_ENABLE_TESTS "Enable unit tests" ON)
 
 add_subdirectory(tester)
+add_subdirectory(io)
 add_subdirectory(parser)
 add_subdirectory(core)
 add_subdirectory(logic)

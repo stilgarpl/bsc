@@ -55,13 +55,15 @@ namespace bsc {
         return testPath;
     }
 
-    TestingException::TestingException(const std::string &arg) : domain_error(arg) {}
+    TestingException::TestingException(const std::string& arg) : domain_error(arg) {}
 
-    Tester::TestDirWithResources::TestDirWithResources(const fs::path &resourcesPath) {
+    Tester::TestDirWithResources::TestDirWithResources(const fs::path& resourcesPath) {
         if (fs::exists(resourcesPath)) {
             fs::copy(resourcesPath, path, fs::copy_options::recursive);
         } else {
             throw TestingException("Resources path does not exist : " + resourcesPath.string());
         }
     }
+    Tester::Resources::Resources(const fs::path& resourcePath) : resourcePath(resourcePath) {}
+    const fs::path& Tester::Resources::getResourcePath() const { return resourcePath; }
 }// namespace bsc

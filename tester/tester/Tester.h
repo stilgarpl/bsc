@@ -37,14 +37,23 @@ namespace bsc {
         public:
             fs::path getTestDirPath();
 
-            TestDir(const fs::path &basePath = fs::temp_directory_path());
+            TestDir(const fs::path& basePath = fs::temp_directory_path());
 
-            fs::path getTestDirPath(const std::string &subdir);
+            fs::path getTestDirPath(const std::string& subdir);
         };
 
         class TestDirWithResources : public TestDir {
         public:
-            TestDirWithResources(const fs::path &resourcesPath = "resources");
+            TestDirWithResources(const fs::path& resourcesPath = "resources");
+        };
+
+        class Resources {
+        private:
+            fs::path resourcePath;
+
+        public:
+            Resources(const fs::path& resourcePath = "resources");
+            const fs::path& getResourcePath() const;
         };
     };
 

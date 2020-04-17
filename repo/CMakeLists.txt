@@ -7,7 +7,7 @@ set(SOURCE_FILES repo/journal/SimpleJournal.cpp repo/journal/SimpleJournal.h rep
 add_library(repo ${SOURCE_FILES})
 target_include_directories(repo PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:${BSC_DESTINATION_INCLUDE}>)
 message(CURRENT SOURCE: ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(repo PUBLIC p2p_core module_command module_filesystem)
+target_link_libraries(repo PUBLIC p2p_core module_command module_filesystem io)
 install(DIRECTORY repo DESTINATION ${BSC_DESTINATION_INCLUDE}
         FILES_MATCHING PATTERN "*.h")
 install(TARGETS repo COMPONENT repo DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)

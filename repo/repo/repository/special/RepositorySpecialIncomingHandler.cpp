@@ -3,16 +3,17 @@
 //
 
 #include "RepositorySpecialIncomingHandler.h"
+#include <io/file/FileMetaDataReader.h>
+#include <io/file/FileTypeDecoder.h>
 
-bsc::RepositorySpecialIncomingHandler::RepositorySpecialIncomingHandler(const fs::path &incomingPath)
-        : incomingPath(incomingPath) {
+bsc::RepositorySpecialIncomingHandler::RepositorySpecialIncomingHandler(const fs::path& incomingPath)
+    : incomingPath(incomingPath) {
     handleIncoming(incomingPath);
 }
 
-void bsc::RepositorySpecialIncomingHandler::handleIncoming(const fs::path &path) {
-    //make sure path exists and it's a directory
-    if (!fs::exists(path)) {
-        throw RepositoryIncomingHandlerException("Path does not exist: " + path.string());
+void bsc::RepositorySpecialIncomingHandler::handleIncoming(const fs::path& path) {
+    // make sure path exists and it's a directory
+    if (!fs::exists(path)) { throw RepositoryIncomingHandlerException("Path does not exist: " + path.string());
     }
 
     if (!fs::is_directory(path)) {
@@ -28,11 +29,13 @@ void bsc::RepositorySpecialIncomingHandler::handleIncoming(const fs::path &path)
 }
 
 void bsc::RepositorySpecialIncomingHandler::processIncomingFile(const fs::path &path) {
-    //get the file metadata
-    //get the file type category
-    //get the destination path
-    //move file to destination path
-
+    FileTypeDecoder decoder;
+    // get the file type category
+    auto fileType = decoder.getTypeForFile(path);
+    // get the file metadata -- modification time etc
+    FileMetaDataReader metaDataReader(fileType);
+    // get the destination path
+    // move file to destination path
 }
 
 bsc::RepositoryIncomingHandlerException::RepositoryIncomingHandlerException(const std::string &arg)

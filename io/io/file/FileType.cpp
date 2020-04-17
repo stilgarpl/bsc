@@ -21,7 +21,7 @@ namespace bsc {
 
     FileType::FileType(const FileType &other) : typeGroup(other.typeGroup), type(other.type) {}
 
-    FileType::FileType(const FileType &&other) : typeGroup(std::move(other.typeGroup)), type(std::move(other.type)) {}
+    FileType::FileType(FileType&& other) : typeGroup(other.typeGroup), type(other.type) {}
 
     FileTypeParseException::FileTypeParseException(const std::string &arg) : domain_error(arg) {}
 }// namespace bsc
