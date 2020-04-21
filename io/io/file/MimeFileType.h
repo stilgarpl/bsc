@@ -2,24 +2,24 @@
 // Created by stilgar on 09.04.2020.
 //
 
-#ifndef BSC_FILETYPE_H
-#define BSC_FILETYPE_H
+#ifndef BSC_MIMEFILETYPE_H
+#define BSC_MIMEFILETYPE_H
 
 #include <stdexcept>
 #include <string>
 
 namespace bsc {
-    struct FileType {
+    struct MimeFileType {
         const std::string typeGroup;
         const std::string type;
 
     private:
-        FileType(const std::string& typeGroup, const std::string& type);
+        MimeFileType(const std::string& typeGroup, const std::string& type);
 
     public:
-        FileType(const FileType& other);
-        FileType(FileType&& other);
-        static FileType make(std::string mimeString);
+        MimeFileType(const MimeFileType& other);
+        MimeFileType(MimeFileType&& other);
+        static MimeFileType make(std::string mimeString);
     };
 
 

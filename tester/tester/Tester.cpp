@@ -66,4 +66,8 @@ namespace bsc {
     }
     Tester::Resources::Resources(const fs::path& resourcePath) : resourcePath(resourcePath) {}
     const fs::path& Tester::Resources::getResourcePath() const { return resourcePath; }
+    fs::path Tester::Resources::getResourcePath(const fs::path& p) const {
+        //@todo maybe throw if this path does not exist?
+        return resourcePath / p;
+    }
 }// namespace bsc

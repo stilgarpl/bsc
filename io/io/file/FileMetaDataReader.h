@@ -5,21 +5,21 @@
 #ifndef BSC_FILEMETADATAREADER_H
 #define BSC_FILEMETADATAREADER_H
 
-#include "FileMetaData.h"
-#include "reader/FileReaderAlgorithm.h"
 #include <filesystem>
+#include <io/file/MimeFileType.h>
+#include <io/translator/PropertiesMetaData.h>
 #include <vector>
 
 namespace bsc {
     namespace fs = std::filesystem;
     class FileMetaDataReader {
     private:
-        FileType fileType;
+        MimeFileType fileType;
 
     public:
-        FileMetaDataReader(FileType type);
+        FileMetaDataReader(MimeFileType type);
 
-        FileMetaData readMetaData(const fs::path&);
+        PropertiesMetaData readMetaData(const fs::path&);
     };
 
 }// namespace bsc

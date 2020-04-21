@@ -10,8 +10,8 @@
 namespace bsc {
     class ImageFileReader : public FileReaderAlgorithm {
     public:
-        bool isAlgorithmSuitableForFileType(const FileType& type) override;
-        FileMetaData readMetaData(fs::path path) override;
+        bool isAlgorithmSuitableForFileType(const MimeFileType& type) override;
+        PropertiesMetaData readMetaData(fs::path path) override;
     };
 }// namespace bsc
 

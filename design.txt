@@ -668,4 +668,9 @@ modify feature source="INCOMING=TURBO"
 
 @todo zeby poprawnie procesować transformery i nie trzeba było zgadywać jak je zserializować, to takie rzeczy możnaby najpierw dodawać do journala, a przed commitem robić replaya rendererem. renderer moze miec opcje renderowania kroniki od commita do commita (lub heada)
 
-image/jpeg:{repo.head}/Photos/{date.year}/{date.month}/{date.
+image/jpeg:{repo.head}/Photos/{date.year}/{date.month}/{date.day}/
+
+Teoretycznie, to incoming folder może być też wydzielone jako osobne narzędzie, file sorter.
+@todo w incoming trzeba dodać opcję co robić z tymi plikami. copy/move/ persist with fake path - to ostatnie to do telefonu np. incoming=DCIM, pliki nie są nigdzie kopiowane w telefonie, tylko zapisywane w repo (które nie jest deployowane) i inne nody sobie te pliki ściągają.
+
+@todo dodać w repo PERSIST_AS - bierze plik i ścieżkę, pod którą plik ma występować w repo. to sie przyda do incoming na telefonie. dodatkowo do tego przyda się specjalny storage, podobny do in place storage.

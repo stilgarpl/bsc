@@ -7,12 +7,12 @@
 
 #include "ImageFileReader.h"
 namespace bsc {
-    bool ImageFileReader::isAlgorithmSuitableForFileType(const bsc::FileType& type) {
+    bool ImageFileReader::isAlgorithmSuitableForFileType(const bsc::MimeFileType& type) {
         return type.typeGroup == "image";
     }
-    FileMetaData ImageFileReader::readMetaData(fs::path path) {
-        FileMetaData result;
-        auto image = Exiv2::ImageFactory::open(path);
+    PropertiesMetaData ImageFileReader::readMetaData(fs::path path) {
+        PropertiesMetaData result = PropertiesMetaData::object();
+        auto image                = Exiv2::ImageFactory::open(path);
         assert(image.get() != nullptr);
 
         image->readMetadata();
@@ -25,12 +25,13 @@ namespace bsc {
                 std::smatch dateTimeMatch;
                 if (std::regex_match(dateTime, dateTimeMatch, dateTimeRegex) &&
                     dateTimeMatch.size() == dateTimeRegex.mark_count() + 1) {
-                    result["date.year"] = result["image.date.year"] = dateTimeMatch[1];
-                    result["date.month"] = result["image.date.month"] = dateTimeMatch[2];
-                    result["date.day"] = result["image.date.day"] = dateTimeMatch[3];
-                    result["time.hours"] = result["image.time.hours"] = dateTimeMatch[4];
-                    result["time.minutes"] = result["image.time.minutes"] = dateTimeMatch[5];
-                    result["time.seconds"] = result["image.time.seconds"] = dateTimeMatch[6];
+                    //@todo probably you can just set one struct and file.date = date
+                    result["date"]["year"] = result["image"]["date"]["year"] = dateTimeMatch[1];
+                    result["date"]["month"] = result["image"]["date"]["month"] = dateTimeMatch[2];
+                    result["date"]["day"] = result["image"]["date"]["day"] = dateTimeMatch[3];
+                    result["time"]["hours"] = result["image"]["time"]["hours"] = dateTimeMatch[4];
+                    result["time"]["minutes"] = result["image"]["time"]["minutes"] = dateTimeMatch[5];
+                    result["time"]["seconds"] = result["image"]["time"]["seconds"] = dateTimeMatch[6];
                     break;
                 }
             }

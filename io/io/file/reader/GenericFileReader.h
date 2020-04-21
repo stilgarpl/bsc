@@ -13,8 +13,8 @@ namespace bsc {
         const std::string prefix = "file";
 
     public:
-        bool isAlgorithmSuitableForFileType(const FileType& type) override;
-        FileMetaData readMetaData(fs::path path) override;
+        bool isAlgorithmSuitableForFileType(const MimeFileType& type) override;
+        PropertiesMetaData readMetaData(fs::path path) override;
     };
 }// namespace bsc
 

@@ -54,6 +54,7 @@ namespace bsc {
         public:
             Resources(const fs::path& resourcePath = "resources");
             const fs::path& getResourcePath() const;
+            fs::path getResourcePath(const fs::path&) const;
         };
     };
 

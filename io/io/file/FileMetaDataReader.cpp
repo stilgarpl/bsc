@@ -13,8 +13,9 @@ namespace bsc {
     private:
         std::vector<std::unique_ptr<FileReaderAlgorithm>> algorithms;
         FileMetaDataReaderImplementation() {
-            algorithms.emplace_back(std::make_unique<GenericFileReader>());
+            // algorithms have to be in order from most specific to least specific
             algorithms.emplace_back(std::make_unique<ImageFileReader>());
+            algorithms.emplace_back(std::make_unique<GenericFileReader>());
         }
         FileMetaDataReaderImplementation(const FileMetaDataReaderImplementation&)  = delete;
         FileMetaDataReaderImplementation(const FileMetaDataReaderImplementation&&) = delete;
@@ -24,19 +25,23 @@ namespace bsc {
             static FileMetaDataReaderImplementation self;
             return self;
         }
-        FileMetaData readMetaData(const FileType& fileType, const fs::path& path) {
-            FileMetaData result;
+        PropertiesMetaData readMetaData(const MimeFileType& fileType, const fs::path& path) {
+            PropertiesMetaData result = PropertiesMetaData::object();
             for (const auto& algorithm : algorithms) {
-                if (algorithm->isAlgorithmSuitableForFileType(fileType)) { result += algorithm->readMetaData(path); }
+                if (algorithm->isAlgorithmSuitableForFileType(fileType)) {
+                    const auto& meta = algorithm->readMetaData(path);
+                    result.insert(meta.begin(), meta.end());
+                    //                    LOGGER("result = " + result.dump(2))
+                }
             }
             return result;
         }
     };
 
-    FileMetaData FileMetaDataReader::readMetaData(const fs::path& path) {
+    PropertiesMetaData FileMetaDataReader::readMetaData(const fs::path& path) {
         auto& fileReader = FileMetaDataReaderImplementation::instance();
         return fileReader.readMetaData(fileType, path);
     }
 
-    FileMetaDataReader::FileMetaDataReader(FileType type) : fileType(std::move(type)) {}
+    FileMetaDataReader::FileMetaDataReader(MimeFileType type) : fileType(std::move(type)) {}
 }// namespace bsc

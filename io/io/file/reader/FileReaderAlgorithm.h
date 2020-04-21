@@ -5,16 +5,15 @@
 #ifndef BSC_FILEREADERALGORITHM_H
 #define BSC_FILEREADERALGORITHM_H
 
-#include "../FileMetaData.h"
-#include "../FileType.h"
+#include "io/translator/PropertiesMetaData.h"
 #include <filesystem>
 
 namespace bsc {
     namespace fs = std::filesystem;
     class FileReaderAlgorithm {
     public:
-        virtual bool isAlgorithmSuitableForFileType(const FileType&) = 0;
-        virtual FileMetaData readMetaData(fs::path)                  = 0;
+        virtual bool isAlgorithmSuitableForFileType(const MimeFileType&) = 0;
+        virtual PropertiesMetaData readMetaData(fs::path)                = 0;
     };
 }// namespace bsc
 

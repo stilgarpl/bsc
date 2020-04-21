@@ -4,7 +4,7 @@
 
 #include "RepositorySpecialIncomingHandler.h"
 #include <io/file/FileMetaDataReader.h>
-#include <io/file/FileTypeDecoder.h>
+#include <io/file/MimeFileTypeDecoder.h>
 
 bsc::RepositorySpecialIncomingHandler::RepositorySpecialIncomingHandler(const fs::path& incomingPath)
     : incomingPath(incomingPath) {
@@ -29,7 +29,7 @@ void bsc::RepositorySpecialIncomingHandler::handleIncoming(const fs::path& path)
 }
 
 void bsc::RepositorySpecialIncomingHandler::processIncomingFile(const fs::path &path) {
-    FileTypeDecoder decoder;
+    MimeFileTypeDecoder decoder;
     // get the file type category
     auto fileType = decoder.getTypeForFile(path);
     // get the file metadata -- modification time etc
