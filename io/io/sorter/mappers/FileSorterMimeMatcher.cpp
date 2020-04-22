@@ -4,9 +4,12 @@
 
 #include "FileSorterMimeMatcher.h"
 
+#include <utility>
+
 namespace bsc {
 
-    FileSorterMimeMatcher::FileSorterMimeMatcher(const MimeFileType& mimeFileType) : expectedMimeType(mimeFileType) {}
+    FileSorterMimeMatcher::FileSorterMimeMatcher(MimeFileType mimeFileType)
+        : expectedMimeType(std::move(mimeFileType)) {}
     MatchPrecision FileSorterMimeMatcher::matches(const fs::path& path) {
         if (fs::exists(path)) {
             const auto& decodedMime = decoder.getTypeForFile(path);
@@ -23,4 +26,6 @@ namespace bsc {
         }
         return MatchPrecision::none;
     }
+    FileSorterMimeMatcher::FileSorterMimeMatcher(const std::string& mimeString)
+        : FileSorterMimeMatcher(MimeFileType::make(mimeString)) {}
 }// namespace bsc

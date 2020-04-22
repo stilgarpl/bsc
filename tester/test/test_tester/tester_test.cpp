@@ -51,7 +51,7 @@ TEST_CASE("TestDirWithResources test") {
     fs::path testPath;
     {
         Tester::TestDirWithResources testDirWithResources;
-        testPath = testDirWithResources.getTestDirPath();
+        testPath = testDirWithResources.getResourcePath();
         REQUIRE(fs::exists(testPath));
         REQUIRE(fs::exists(testPath / "testFile1.txt"));
         REQUIRE(fs::exists(testPath / "testFile2.csv"));

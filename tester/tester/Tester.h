@@ -33,6 +33,7 @@ namespace bsc {
 
         protected:
             fs::path path;
+            fs::path rootPath;
 
         public:
             fs::path getTestDirPath();
@@ -43,8 +44,13 @@ namespace bsc {
         };
 
         class TestDirWithResources : public TestDir {
+        private:
+            fs::path localResourcesPath;
+
         public:
             TestDirWithResources(const fs::path& resourcesPath = "resources");
+            const fs::path& getResourcePath() const;
+            fs::path getResourcePath(const fs::path& p) const;
         };
 
         class Resources {
@@ -52,7 +58,7 @@ namespace bsc {
             fs::path resourcePath;
 
         public:
-            Resources(const fs::path& resourcePath = "resources");
+            Resources(fs::path resourcePath = "resources");
             const fs::path& getResourcePath() const;
             fs::path getResourcePath(const fs::path&) const;
         };

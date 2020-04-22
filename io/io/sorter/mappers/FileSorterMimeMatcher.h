@@ -15,7 +15,8 @@ namespace bsc {
         MimeFileTypeDecoder decoder;
 
     public:
-        FileSorterMimeMatcher(const MimeFileType& mimeFileType);
+        FileSorterMimeMatcher(MimeFileType mimeFileType);
+        FileSorterMimeMatcher(const std::string& mimeString);
         MatchPrecision matches(const fs::path& path) override;
     };
 }// namespace bsc

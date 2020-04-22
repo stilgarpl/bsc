@@ -18,6 +18,10 @@ namespace bsc {
     public:
         FileSorter(std::unique_ptr<FileListFetcher> fileListFetcher, std::unique_ptr<SortAction> sortAction);
         void sort(const fs::path& pathToSort);
+        //@todo replace with better way to set up matchers and patterns:
+        void addPattern(std::unique_ptr<FileSorterMapperMatcher> matcher, std::string pattern) {
+            mapper.addPattern(std::move(matcher), std::move(pattern));
+        }
     };
 }// namespace bsc
 

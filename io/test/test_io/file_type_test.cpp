@@ -33,7 +33,7 @@ TEST_CASE("Filetype test") {
 
 TEST_CASE("File type decoder test") {
     Tester::TestDirWithResources testDirWithResources;
-    auto path                        = testDirWithResources.getTestDirPath("mime");
+    auto path                        = testDirWithResources.getResourcePath("mime");
     const std::string gifFilename    = "test.gif";
     const std::string pngFilename    = "test.png";
     const std::string badPngFilename = "png_with_bad_extension.txt";
@@ -65,8 +65,8 @@ TEST_CASE("File type decoder test") {
 }
 
 TEST_CASE("FileMetaDataReader test") {
-    Tester::Resources testDirWithResources;
-    const auto& path              = testDirWithResources.getResourcePath("mime");
+    Tester::Resources resources;
+    const auto& path              = resources.getResourcePath("mime");
     const std::string txtFilename = "test.txt";
     const std::string pngFilename = "test.png";
     MimeFileTypeDecoder decoder;
@@ -105,7 +105,7 @@ TEST_CASE("FileMetaDataReader test") {
         FileMetaDataReader fileMetaDataReader(fileType);
         const auto& meta = fileMetaDataReader.readMetaData(path / pngFilename);
         //        REQUIRE(!meta["wrong_key"]);
-        LOGGER(meta.dump(2));
+        //        LOGGER(meta.dump(2));
         REQUIRE(meta["file"]["size"] == "8495");
         REQUIRE(meta["file"]["date"]["year"].is_string());
         REQUIRE(meta["file"]["date"]["year"] == "2020");

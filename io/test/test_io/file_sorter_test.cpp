@@ -3,6 +3,7 @@
 //
 
 #include <catch2/catch.hpp>
+#include <io/sorter/FileSorter.h>
 #include <io/sorter/actions/StandardFileSorterActions.h>
 #include <io/sorter/fetchers/FilesystemFileListFetcher.h>
 #include <io/sorter/fetchers/StaticFileListFetcher.h>
@@ -15,7 +16,7 @@ using namespace bsc;
 
 TEST_CASE("Sort actions test") {
     Tester::TestDirWithResources testDirWithResources;
-    auto path    = testDirWithResources.getTestDirPath("sort");
+    auto path    = testDirWithResources.getResourcePath("sort");
     auto newPath = path / "../other/";
     fs::create_directories(newPath);
     auto filename = "test.gif";
@@ -69,7 +70,7 @@ TEST_CASE("Sort fetchers test") {
 
 TEST_CASE("Sort mapper matchers test") {
     Tester::TestDirWithResources testDirWithResources;
-    auto path     = testDirWithResources.getTestDirPath("sort");
+    auto path     = testDirWithResources.getResourcePath("sort");
     auto filename = "test.gif";
     SECTION("FileSorterMimeMatcher") {
         SECTION("none - full") {
@@ -106,8 +107,8 @@ TEST_CASE("Sort mapper matchers test") {
 
 TEST_CASE("FileSorterMapper test") {
     Tester::TestDirWithResources testDirWithResources;
-    auto path                       = testDirWithResources.getTestDirPath("sort");
-    auto pathSubdir                 = testDirWithResources.getTestDirPath("sort/subdir");
+    auto path                       = testDirWithResources.getResourcePath("sort");
+    auto pathSubdir                 = testDirWithResources.getResourcePath("sort/subdir");
     const auto expectedTextPattern  = "text";
     const auto expectedImagePattern = "img";
     const auto expectedGifPattern   = "gif";
@@ -175,5 +176,48 @@ TEST_CASE("Path translator test") {
 }
 
 TEST_CASE("File sorter test") {
-    //@todo implement
+    Tester::TestDirWithResources testDirWithResources;
+    auto resourcePath    = testDirWithResources.getResourcePath("sort");
+    auto destinationPath = testDirWithResources.getTestDirPath("destination");
+    FileSorter fileSorter(std::make_unique<FilesystemFileListFetcher>(),
+                          std::make_unique<StandardFileSorterActions::Move>());
+    SECTION("images only") {
+        fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(MimeFileType::make("image/")),
+                              destinationPath.string() + "/Images/{{date.year}}/");
+        REQUIRE(fs::exists(resourcePath / "test.gif"));
+        REQUIRE(fs::exists(resourcePath / "test.png"));
+        REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
+        fileSorter.sort(resourcePath);
+        REQUIRE(fs::exists(destinationPath / "Images"));
+        //@todo this will fail in 2021, fix tests with current year for images that does not have exif data
+        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.gif"));
+        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
+        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "png_with_bad_extension.txt"));
+        REQUIRE(!fs::exists(resourcePath / "test.gif"));
+        REQUIRE(!fs::exists(resourcePath / "test.png"));
+        REQUIRE(!fs::exists(resourcePath / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
+    }
+    SECTION("images and txt") {
+        fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(MimeFileType::make("image/")),
+                              destinationPath.string() + "/Images/{{date.year}}/");
+        fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(MimeFileType::make("text/")),
+                              destinationPath.string() + "/Text/");
+        REQUIRE(fs::exists(resourcePath / "test.gif"));
+        REQUIRE(fs::exists(resourcePath / "test.png"));
+        REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
+        fileSorter.sort(resourcePath);
+        REQUIRE(fs::exists(destinationPath / "Images"));
+        //@todo this will fail in 2021, fix tests with current year for images that does not have exif data
+        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.gif"));
+        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
+        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(destinationPath / "Text" / "test.txt"));
+        REQUIRE(!fs::exists(resourcePath / "test.gif"));
+        REQUIRE(!fs::exists(resourcePath / "test.png"));
+        REQUIRE(!fs::exists(resourcePath / "png_with_bad_extension.txt"));
+        REQUIRE(!fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
+    }
 }
