@@ -4,13 +4,14 @@
 
 #include "MimeFileType.h"
 #include <regex>
+#include <utility>
 
 namespace bsc {
 
-    MimeFileType::MimeFileType(const std::string& typeGroup, const std::string& type)
-        : typeGroup(typeGroup), type(type) {}
+    MimeFileType::MimeFileType(std::string typeGroup, std::string type)
+        : typeGroup(std::move(typeGroup)), type(std::move(type)) {}
 
-    MimeFileType MimeFileType::make(std::string mimeString) {
+    MimeFileType MimeFileType::make(const std::string& mimeString) {
         static const std::regex mimeRegex("(\\w+)/([\\w-]*).*");
         std::smatch mimeMatch;
         if (std::regex_match(mimeString, mimeMatch, mimeRegex)) {
@@ -19,10 +20,6 @@ namespace bsc {
             throw FileTypeParseException("Mime string [" + mimeString + "] does not match (\\w+)/(\\w+) pattern");
         }
     }
-
-    MimeFileType::MimeFileType(const MimeFileType& other) : typeGroup(other.typeGroup), type(other.type) {}
-
-    MimeFileType::MimeFileType(MimeFileType&& other) : typeGroup(other.typeGroup), type(other.type) {}
 
     FileTypeParseException::FileTypeParseException(const std::string &arg) : domain_error(arg) {}
 }// namespace bsc

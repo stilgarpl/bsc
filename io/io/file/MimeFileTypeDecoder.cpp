@@ -16,10 +16,12 @@ namespace bsc {
             magic_t magic_cookie;
             std::mutex magicLock;
 
+        public:
             FileTypeDecoderImplementation(const FileTypeDecoderImplementation&) = delete;
 
             FileTypeDecoderImplementation(FileTypeDecoderImplementation&&) = delete;
 
+        private:
             FileTypeDecoderImplementation() {
                 std::lock_guard g(magicLock);
                 magic_cookie = magic_open(MAGIC_MIME);

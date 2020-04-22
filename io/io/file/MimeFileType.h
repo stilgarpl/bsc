@@ -14,18 +14,18 @@ namespace bsc {
         const std::string type;
 
     private:
-        MimeFileType(const std::string& typeGroup, const std::string& type);
+        MimeFileType(std::string typeGroup, std::string type);
 
     public:
-        MimeFileType(const MimeFileType& other);
-        MimeFileType(MimeFileType&& other);
-        static MimeFileType make(std::string mimeString);
+        MimeFileType(const MimeFileType& other)     = default;
+        MimeFileType(MimeFileType&& other) noexcept = default;
+        static MimeFileType make(const std::string& mimeString);
     };
 
 
     class FileTypeParseException : public std::domain_error {
     public:
-        FileTypeParseException(const std::string &arg);
+        explicit FileTypeParseException(const std::string& arg);
     };
 }// namespace bsc
 
