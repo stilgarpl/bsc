@@ -11,22 +11,25 @@ using namespace bsc;
 
 using namespace std::chrono_literals;
 
-
-void setupModules(bsc::Node& node) {
-    node.addModule<CommandModule>();
-}
+void setupModules(bsc::Node& node) { node.addModule<CommandModule>(); }
 
 struct BscControlProgramParameters : CommandLineParameters {
-    Usage usage = {"COMMAND [COMMAND OPTIONS] [COMMAND ARGUMENTS]"};
-    Usage us1 = {{{"Is1"}, {"Is2"}}};
+    Usage usage                        = {"COMMAND [COMMAND OPTIONS] [COMMAND ARGUMENTS]"};
+    Usage us1                          = {{{"Is1"}, {"Is2"}}};
     DefaultParameter<bool> interactive = {'s', "shell", "Run in shell mode", false};
-    DefaultParameter<int> port = {'P', "port", "PORT", "Port opened for incoming connections",
-                                  9191};//@todo control should not open any port, I should add client-only option for NetworkModule.
-    DefaultParameter<std::string> daemonAddress = {'c', "connect", "ADDRESS", "Adress of daemon to control",
+    DefaultParameter<int> port         = {
+            'P',
+            "port",
+            "PORT",
+            "Port opened for incoming connections",
+            9191};//@todo control should not open any port, I should add client-only option for NetworkModule.
+    DefaultParameter<std::string> daemonAddress = {'c',
+                                                   "connect",
+                                                   "ADDRESS",
+                                                   "Adress of daemon to control",
                                                    "127.0.0.1:9999"};
-    DefaultParameter<std::string> networkName = {'N', "network", "NETWORK", "Network id", "TheNetwork"};
+    DefaultParameter<std::string> networkName   = {'N', "network", "NETWORK", "Network id", "TheNetwork"};
 };
-
 
 int main(int argc, char* argv[]) {
     //@todo hide initialization of spdlog in Node or sth.

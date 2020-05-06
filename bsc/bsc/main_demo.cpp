@@ -105,11 +105,11 @@ int main(int argc, char* argv[]) {
     thisNode.getNodeInfo().setNodeId("first Node");
 
     setupModules(thisNode);
-    thisNode.getModule<bsc::NetworkModule>()->addToNetwork("TheNetwork");
-    thisNode.getModule<bsc::NetworkModule>()->configuration().setPort(9191);
-    thisNode.addModule<bsc::AuthModule>();
-    thisNode.getModule<bsc::AuthModule>()->getSubModule<bsc::AuthModule>().a = 5;
-    thisNode.getModule<CommandModule>()->getSubModule<bsc::AuthModule>().a = 2;
+    thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
+    thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
+    thisNode.addModule<AuthModule>();
+    thisNode.getModule<AuthModule>()->getSubModule<AuthModule>().a    = 5;
+    thisNode.getModule<CommandModule>()->getSubModule<AuthModule>().a = 2;
 
     auto cmdN = thisNode.getModule<CommandModule>();
 
@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
     cmdN->setInteractive(true);
 
     thisNode.start();
-//    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
+    //    setupProtocolLogic(thisNode.getLogicManager(), transmissionControl);
 
     bsc::Node otherNode;
     otherNode.getNodeInfo().setNodeId("second");
