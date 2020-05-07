@@ -39,20 +39,31 @@ namespace bsc {
             using ArgumentParseFunc = std::function<void(const std::string&)>;
 
         private:
-            std::vector<argp_option> argpOptions;
-            std::string doc;
-            std::string argDoc;
-            argp argParams;
-            unsigned flags;
-            std::map<decltype(argp_option::key), OptionParseFunc> parseMap;
+            std::vector<argp_option> argpOptions{};
+            std::string doc{};
+            std::string argDoc{};
+            argp argParams{};
+            unsigned flags{};
+            std::map<decltype(argp_option::key), OptionParseFunc> parseMap{};
 
-            std::vector<std::string> rawArguments;
-            //@todo this vector should have struct with index in rawArguments, with parse function, argument name/doc
-            std::vector<ArgumentParseFunc> argumentParseFunctions;
+            std::vector<std::string> rawArguments{};
+            struct ArgumentDescriptor {
+                ArgumentParseFunc argumentParseFunc{};
+                decltype(rawArguments)::size_type argumentIndex{};
+                std::optional<std::string> argumentName{};
+            };
+            std::vector<ArgumentDescriptor> argumentDescriptors{};
             std::vector<std::string> usageDocs    = {};
             std::optional<std::string> beforeInfo = std::nullopt;
             std::optional<std::string> afterInfo  = std::nullopt;
+            std::optional<decltype(rawArguments)::size_type> requiredArgumentsCount;
 
+            void incrementRequiredArguments() {
+                if (!requiredArgumentsCount.has_value()) {
+                    requiredArgumentsCount = 0;
+                }
+                ++*requiredArgumentsCount;
+            }
             void parseNamedArguments();
 
         public:
@@ -64,6 +75,7 @@ namespace bsc {
             auto& gerParsedArguments() { return rawArguments; }
 
             friend class CommandLineParameters::ParserBuilder;
+            void prepareArgumentUsage();
         };
 
         class ParserBuilder {
@@ -98,7 +110,8 @@ namespace bsc {
             void addUsage(std::string usage);
 
             void addDoc(std::string doc);
-            void addArgument(ArgumentParser::ArgumentParseFunc parserFunction);
+            void addArgument(ArgumentParser::ArgumentParseFunc parserFunction,
+                             std::optional<std::string> argumentName = std::nullopt);
 
             std::shared_ptr<ArgumentParser> make();
 
@@ -470,7 +483,7 @@ namespace bsc {
     using Flag = Parameter<bool>;
 
     /**
-     * named argument. @todo implement and describe
+     * Named argument from command line
      */
     template<typename T>
     class Argument {
@@ -490,6 +503,11 @@ namespace bsc {
         Argument() {
             auto& builder = CommandLineParameters::parserBuilder();
             builder.addArgument(makeParseFunction());
+        }
+
+        Argument(const std::string& name) {
+            auto& builder = CommandLineParameters::parserBuilder();
+            builder.addArgument(makeParseFunction(), name);
         }
 
         const auto& operator()() const { return *this->value; }

@@ -2,10 +2,10 @@
 // Created by stilgar on 07.01.2020.
 //
 
+#include "CommandLineParameters.h"
 #include <memory>
 #include <numeric>
-#include "CommandLineParameters.h"
-
+#include <utility>
 
 bsc::CommandLineParameters::CommandLineParameters() : parser(parserBuilder().make()) {
 
@@ -95,8 +95,12 @@ void bsc::CommandLineParameters::ParserBuilder::addDoc(std::string doc) {
 void bsc::CommandLineParameters::ParserBuilder::addUsage(std::string usage) {
     parser->usageDocs.push_back(std::move(usage));
 }
-void bsc::CommandLineParameters::ParserBuilder::addArgument(ArgumentParser::ArgumentParseFunc parserFunction) {
-    parser->argumentParseFunctions.push_back(parserFunction);
+void bsc::CommandLineParameters::ParserBuilder::addArgument(ArgumentParser::ArgumentParseFunc parserFunction,
+                                                            std::optional<std::string> argumentName) {
+    parser->argumentDescriptors.push_back({.argumentParseFunc = std::move(parserFunction),
+                                           .argumentIndex     = parser->argumentDescriptors.size(),
+                                           .argumentName      = std::move(argumentName)});
+    parser->incrementRequiredArguments();
 }
 
 error_t bsc::CommandLineParameters::ArgumentParser::parseArgument(int key, char* arg, struct argp_state* state) {
@@ -120,7 +124,14 @@ error_t bsc::CommandLineParameters::ArgumentParser::parseArgument(int key, char*
             break;
 
         case ARGP_KEY_END:
-            //            std::cout << "Parsing ARGP_KEY_END " << std::to_string(key) << " " << key << std::endl;
+            if (self->requiredArgumentsCount.has_value()) {
+                if (self->requiredArgumentsCount.value() > self->rawArguments.size()) {
+                    argp_error(state,
+                               "Arguments required: %zu, got %zu",
+                               *self->requiredArgumentsCount,
+                               self->rawArguments.size());
+                }
+            }
             break;
 
         case ARGP_KEY_NO_ARGS:
@@ -169,6 +180,7 @@ void bsc::CommandLineParameters::ArgumentParser::prepareParser(ParseConfiguratio
         doc = beforeInfo.value_or(" ") + "\v" + afterInfo.value_or("");
     }
 
+    prepareArgumentUsage();
 
     argDoc = std::accumulate(usageDocs.begin(), usageDocs.end(), ""s, [](const auto& a, const auto& b) {
         if (a.empty()) {
@@ -200,7 +212,23 @@ char* bsc::CommandLineParameters::ArgumentParser::helpFilter(int key, const char
     return nullptr;
 }
 void bsc::CommandLineParameters::ArgumentParser::parseNamedArguments() {
-    for (unsigned int i = 0; i < argumentParseFunctions.size(); ++i) {
-        argumentParseFunctions[i](rawArguments[i]);
+    for (const auto& descriptor : argumentDescriptors) {
+        if (descriptor.argumentIndex < rawArguments.size()) {
+            descriptor.argumentParseFunc(rawArguments[descriptor.argumentIndex]);
+        }
     }
+}
+void bsc::CommandLineParameters::ArgumentParser::prepareArgumentUsage() {
+    static const std::string defaultArgumentName = "ARG#";
+    std::string usageString{};
+    for (const auto& descriptor : argumentDescriptors) {
+        if (descriptor.argumentName.has_value()) {
+            usageString += *descriptor.argumentName;
+        } else {
+            usageString += defaultArgumentName + std::to_string(descriptor.argumentIndex + 1);
+        }
+        usageString += " ";
+    }
+    usageString.pop_back();
+    usageDocs.insert(usageDocs.begin(), usageString);
 }
