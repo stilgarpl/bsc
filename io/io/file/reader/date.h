@@ -71,13 +71,8 @@
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 7)
 #pragma GCC diagnostic ignored "-Wpedantic"
-#endif
-#if __GNUC__ < 5
-// GCC 4.9 Bug 61489 Wrong warning with -Wmissing-field-initializers
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-#endif
+
 #endif
 
 #ifdef _MSC_VER

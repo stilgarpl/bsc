@@ -5,18 +5,21 @@
 #ifndef BSC_FILESORTER_H
 #define BSC_FILESORTER_H
 #include <filesystem>
-#include <io/sorter/actions/SortAction.h>
 #include <io/sorter/fetchers/FileListFetcher.h>
 #include <io/sorter/mappers/FileSorterMapper.h>
 namespace bsc {
-
+    //@todo handle more actions - errors like file already present -> sort action should return optional error code?
     class FileSorter {
-        const std::unique_ptr<SortAction> sortAction;
+    public:
+        using SortAction = std::function<void(const fs::path& from, const fs::path& to)>;
+
+    private:
+        const SortAction sortAction;
         FileSorterMapper mapper;
         const std::unique_ptr<FileListFetcher> fileListFetcher;
 
     public:
-        FileSorter(std::unique_ptr<FileListFetcher> fileListFetcher, std::unique_ptr<SortAction> sortAction);
+        FileSorter(std::unique_ptr<FileListFetcher> fileListFetcher, SortAction sortAction);
         void sort(const fs::path& pathToSort);
         //@todo replace with better way to set up matchers and patterns:
         void addPattern(std::unique_ptr<FileSorterMapperMatcher> matcher, std::string pattern) {

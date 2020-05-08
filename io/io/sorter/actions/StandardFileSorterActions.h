@@ -4,25 +4,14 @@
 
 #ifndef BSC_STANDARDFILESORTERACTIONS_H
 #define BSC_STANDARDFILESORTERACTIONS_H
+#include <io/sorter/FileSorter.h>
 
-#include "SortAction.h"
 namespace bsc {
-    class StandardFileSorterActions {
-    public:
-        class Copy : public SortAction {
-        public:
-            void sort(const fs::path& from, const fs::path& to) override;
-        };
-
-        class Move : public SortAction {
-        public:
-            void sort(const fs::path& from, const fs::path& to) override;
-        };
-
-        class Pretend : public SortAction {
-        public:
-            void sort(const fs::path& from, const fs::path& to) override;
-        };
+    struct StandardFileSorterActions {
+        static FileSorter::SortAction copy;
+        static FileSorter::SortAction move;
+        static FileSorter::SortAction erase;
+        static FileSorter::SortAction pretend;
     };
 }// namespace bsc
 

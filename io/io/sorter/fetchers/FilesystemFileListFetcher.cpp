@@ -4,7 +4,7 @@
 
 #include "FilesystemFileListFetcher.h"
 namespace bsc {
-    std::vector<fs::path> bsc::FilesystemFileListFetcher::listFiles(const fs::path& path) {
+    std::vector<fs::path> bsc::FilesystemFileListFetcher::doListFiles(const fs::path& path) {
 
         if (!fs::exists(path)) {
             return {};

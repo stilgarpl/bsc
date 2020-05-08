@@ -12,6 +12,7 @@ namespace bsc {
         : typeGroup(std::move(typeGroup)), type(std::move(type)) {}
 
     MimeFileType MimeFileType::make(const std::string& mimeString) {
+        //@todo make / optional, so you can have "image" but required for "image/jpeg"
         static const std::regex mimeRegex("(\\w+)/([\\w-]*).*");
         std::smatch mimeMatch;
         if (std::regex_match(mimeString, mimeMatch, mimeRegex)) {

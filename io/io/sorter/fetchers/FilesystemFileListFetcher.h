@@ -12,7 +12,7 @@ namespace bsc {
      */
     class FilesystemFileListFetcher : public FileListFetcher {
     public:
-        std::vector<fs::path> listFiles(const fs::path& path) override;
+        std::vector<fs::path> doListFiles(const fs::path& path) override;
     };
 }// namespace bsc
 

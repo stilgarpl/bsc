@@ -14,6 +14,7 @@ namespace bsc {
         perfect = 64,
     };
 
+    //@todo convert to std::function like SortAction
     class FileSorterMapperMatcher {
     public:
         virtual MatchPrecision matches(const fs::path& path) = 0;

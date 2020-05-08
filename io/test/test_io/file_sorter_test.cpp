@@ -21,25 +21,32 @@ TEST_CASE("Sort actions test") {
     fs::create_directories(newPath);
     auto filename = "test.gif";
     SECTION("Copy") {
-        StandardFileSorterActions::Copy copyAction;
-        copyAction.sort(path / filename, newPath / filename);
+        auto& copyAction = StandardFileSorterActions::copy;
+        copyAction(path / filename, newPath / filename);
         // assert that file was copied
         REQUIRE(fs::exists(newPath / filename));
         REQUIRE(fs::exists(path / filename));
         REQUIRE(fs::file_size(newPath / filename) == fs::file_size(path / filename));
     }
     SECTION("Move") {
-        StandardFileSorterActions::Move moveAction;
-        auto oldSize = fs::file_size(path / filename);
-        moveAction.sort(path / filename, newPath / filename);
+        auto& moveAction = StandardFileSorterActions::move;
+        auto oldSize     = fs::file_size(path / filename);
+        moveAction(path / filename, newPath / filename);
         // assert that file was moved
         REQUIRE(fs::exists(newPath / filename));
         REQUIRE(!fs::exists(path / filename));
         REQUIRE(fs::file_size(newPath / filename) == oldSize);
     }
+    SECTION("Erase") {
+        auto& eraseAction = StandardFileSorterActions::erase;
+        eraseAction(path / filename, newPath / filename);
+        // assert that file was deleted
+        REQUIRE(!fs::exists(newPath / filename));
+        REQUIRE(!fs::exists(path / filename));
+    }
     SECTION("Pretend") {
-        StandardFileSorterActions::Pretend pretendAction;
-        pretendAction.sort(path / filename, newPath / filename);
+        auto& pretendAction = StandardFileSorterActions::pretend;
+        pretendAction(path / filename, newPath / filename);
         // assert that it didn't actually do anything
         REQUIRE(!fs::exists(newPath / filename));
         REQUIRE(fs::exists(path / filename));
@@ -53,7 +60,7 @@ TEST_CASE("Sort fetchers test") {
         std::set<fs::path> expectedResult = {"test.txt", "test.gif", "test.png", "png_with_bad_extension.txt"};
         auto path                         = testDirWithResources.getTestDirPath("sort");
         FilesystemFileListFetcher fetcher;
-        auto result = fetcher.listFiles(path);
+        auto result = fetcher.doListFiles(path);
         for (const auto& item : result) {
             REQUIRE(expectedResult.contains(item.filename()));
         }
@@ -63,7 +70,7 @@ TEST_CASE("Sort fetchers test") {
         std::vector<fs::path> expectedResult = {"file1", "file2.txt", "file5.zip"};
         fs::path path                        = {"any/path"};
         StaticFileListFetcher fetcher(expectedResult);
-        auto result = fetcher.listFiles(path);
+        auto result = fetcher.doListFiles(path);
         REQUIRE(expectedResult == result);
     }
 }
@@ -179,8 +186,7 @@ TEST_CASE("File sorter test") {
     Tester::TestDirWithResources testDirWithResources;
     auto resourcePath    = testDirWithResources.getResourcePath("sort");
     auto destinationPath = testDirWithResources.getTestDirPath("destination");
-    FileSorter fileSorter(std::make_unique<FilesystemFileListFetcher>(),
-                          std::make_unique<StandardFileSorterActions::Move>());
+    FileSorter fileSorter(std::make_unique<FilesystemFileListFetcher>(), StandardFileSorterActions::move);
     SECTION("images only") {
         fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(MimeFileType::make("image/")),
                               destinationPath.string() + "/Images/{{date.year}}/");

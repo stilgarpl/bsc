@@ -10,6 +10,7 @@
 #include <string>
 using namespace bsc;
 using namespace std::string_literals;
+//@todo add action - copy, move, pretend
 struct FileSorterParameters : CommandLineParameters {
     Argument<std::filesystem::path> targetPath                        = {"PATH"};
     DefaultParameter<std::map<std::string, std::string>> mimeMatchers = {'m',
@@ -21,8 +22,8 @@ struct FileSorterParameters : CommandLineParameters {
 int main(int argc, char* argv[]) {
 
     const auto& parameters = CommandLineParameters::parse<FileSorterParameters>(argc, argv);
-    FileSorter fileSorter(std::make_unique<FilesystemFileListFetcher>(),
-                          std::make_unique<StandardFileSorterActions::Move>());
+    auto fetcher           = std::make_unique<FilesystemFileListFetcher>();
+    FileSorter fileSorter(std::move(fetcher), StandardFileSorterActions::copy);
     for (const auto& [mime, pattern] : parameters.mimeMatchers()) {
         fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(mime), pattern);
     }

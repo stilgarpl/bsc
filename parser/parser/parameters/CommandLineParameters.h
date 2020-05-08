@@ -189,6 +189,8 @@ namespace bsc {
             return parse<T>(cstrings.size(), cstrings.data(), parseConfiguration);
         }
 
+        //@todo add method that returns only arguments that were not matched against required arguments - use std::span
+        //when avaiable
         [[nodiscard]] const std::vector<std::string>& arguments() const {
             return parser->gerParsedArguments();
         }

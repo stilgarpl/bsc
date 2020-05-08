@@ -15,7 +15,7 @@ namespace bsc {
         StaticFileListFetcher(std::vector<fs::path> fileList);
 
     public:
-        std::vector<fs::path> listFiles(const fs::path& path) override;
+        std::vector<fs::path> doListFiles(const fs::path& path) override;
     };
 }// namespace bsc
 
