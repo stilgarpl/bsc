@@ -28,13 +28,15 @@ namespace bsc {
                     if (std::regex_match(dateTime, dateTimeMatch, dateTimeRegex) &&
                         dateTimeMatch.size() == dateTimeRegex.mark_count() + 1) {
                         //@todo probably you can just set one struct and image.date = date
-                        result["date"]["year"] = result["image"]["date"]["year"] = dateTimeMatch[1];
-                        result["date"]["month"] = result["image"]["date"]["month"] = dateTimeMatch[2];
-                        result["date"]["day"] = result["image"]["date"]["day"] = dateTimeMatch[3];
-                        result["time"]["hours"] = result["image"]["time"]["hours"] = dateTimeMatch[4];
-                        result["time"]["minutes"] = result["image"]["time"]["minutes"] = dateTimeMatch[5];
-                        result["time"]["seconds"] = result["image"]["time"]["seconds"] = dateTimeMatch[6];
-                        break;
+                        result["image"]["date"]["year"]    = dateTimeMatch[1];
+                        result["image"]["date"]["month"]   = dateTimeMatch[2];
+                        result["image"]["date"]["day"]     = dateTimeMatch[3];
+                        result["date"]                     = result["image"]["date"];
+                        result["image"]["time"]["hours"]   = dateTimeMatch[4];
+                        result["image"]["time"]["minutes"] = dateTimeMatch[5];
+                        result["image"]["time"]["seconds"] = dateTimeMatch[6];
+                        result["time"]                     = result["image"]["time"];
+                        break;// all fields set, stop processing EXIF elements
                     }
                 }
             }

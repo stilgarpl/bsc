@@ -4,6 +4,7 @@
 
 #ifndef BSC_FILESORTER_H
 #define BSC_FILESORTER_H
+#include <core/factory/CopyFactory.h>
 #include <filesystem>
 #include <io/sorter/fetchers/FileListFetcher.h>
 #include <io/sorter/mappers/FileSorterMapper.h>
@@ -11,7 +12,8 @@ namespace bsc {
     //@todo handle more actions - errors like file already present -> sort action should return optional error code?
     class FileSorter {
     public:
-        using SortAction = std::function<void(const fs::path& from, const fs::path& to)>;
+        using SortAction        = std::function<void(const fs::path& from, const fs::path& to)>;
+        using SortActionFactory = CopyFactory<SortAction>;
 
     private:
         const SortAction sortAction;

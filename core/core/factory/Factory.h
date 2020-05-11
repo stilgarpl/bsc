@@ -12,6 +12,7 @@
 namespace bsc {
 
     class NoFactorySpecialization {};
+    //    using NoFactorySpecialization = void;
 
     template<typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
     struct FactoryTraits {
@@ -35,9 +36,8 @@ namespace bsc {
         static const bool value = f<T>(0);
     };
 
-    template<bool hasArgs, typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
-    struct BaseFactory {
-    };
+    template<bool hasArgs, typename producedObjectType, typename factorySpecialization = NoFactorySpecialization>
+    struct BaseFactory {};
 
     template<typename producedObjectType, typename factorySpecialization>
     struct BaseFactory<false, producedObjectType, factorySpecialization> {
@@ -57,7 +57,8 @@ namespace bsc {
 
         //@todo it would be awesome if ArgumentType could be a parameter pack... investigate if this is possible
         virtual ProducedObjectType create(const SelectorType& selector, const ArgumentType& argument) = 0;
-        //@todo let's assume that ArgumentType is defualt constructible... if not, add a way to not have this overload for that case
+        //@todo let's assume that ArgumentType is default constructible... if not, add a way to not have this overload
+        //for that case
         ProducedObjectType create(const SelectorType& selector) {
             return create(selector,{});
         }

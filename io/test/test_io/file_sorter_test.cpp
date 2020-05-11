@@ -9,6 +9,7 @@
 #include <io/sorter/fetchers/StaticFileListFetcher.h>
 #include <io/sorter/mappers/FileSorterMapper.h>
 #include <io/sorter/mappers/FileSorterMimeMatcher.h>
+#include <io/sorter/mappers/FileSorterNameMatcher.h>
 #include <io/translator/PathTranslator.h>
 #include <tester/Tester.h>
 
@@ -106,6 +107,20 @@ TEST_CASE("Sort mapper matchers test") {
             FileSorterMimeMatcher mimeMatcher(MimeFileType::make("image/gif"));
 
             auto result = mimeMatcher.matches(path / filename);
+            REQUIRE(result == expectedResult);
+        }
+    }
+    SECTION("FileSorterNameMatcher") {
+        SECTION("none") {
+            auto expectedResult = MatchPrecision::none;
+            FileSorterNameMatcher nameMatcher("(.)+\\.jpg");
+            auto result = nameMatcher.matches(path / filename);
+            REQUIRE(result == expectedResult);
+        }
+        SECTION("perfect") {
+            auto expectedResult = MatchPrecision::perfect;
+            FileSorterNameMatcher nameMatcher("(.)+\\.gif");
+            auto result = nameMatcher.matches(path / filename);
             REQUIRE(result == expectedResult);
         }
     }

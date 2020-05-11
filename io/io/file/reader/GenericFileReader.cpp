@@ -13,9 +13,11 @@ namespace bsc {
         using namespace date;
         PropertiesMetaData result = PropertiesMetaData::object();
         if (fs::exists(path)) {
-            result["file"]["size"] = std::to_string(fs::file_size(path));
-            auto modificationTime  = fs::last_write_time(path);
-            auto dp                = floor<days>(modificationTime);
+            result["file"]["size"]      = std::to_string(fs::file_size(path));
+            result["file"]["name"]      = path.filename().string();
+            result["file"]["extension"] = path.filename().extension();
+            auto modificationTime       = fs::last_write_time(path);
+            auto dp                     = floor<days>(modificationTime);
             //@todo workaround for missing clock converters in GCC: (remove when C++20 is complete)
             auto file_clock_epoch = 6437660400;
             auto secondsInSysTime = floor<seconds>(modificationTime).time_since_epoch().count() + file_clock_epoch;
