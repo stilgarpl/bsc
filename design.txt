@@ -674,3 +674,8 @@ Teoretycznie, to incoming folder może być też wydzielone jako osobne narzędz
 @todo w incoming trzeba dodać opcję co robić z tymi plikami. copy/move/ persist with fake path - to ostatnie to do telefonu np. incoming=DCIM, pliki nie są nigdzie kopiowane w telefonie, tylko zapisywane w repo (które nie jest deployowane) i inne nody sobie te pliki ściągają.
 
 @todo dodać w repo PERSIST_AS - bierze plik i ścieżkę, pod którą plik ma występować w repo. to sie przyda do incoming na telefonie. dodatkowo do tego przyda się specjalny storage, podobny do in place storage.
+
+@todo można dodać customowe skrypty {{expression.lang.1} które wywołają jakiś skrypt dla danego pliku który zwróci wartość pola.
+
+wiem jak dodać listę dostępnych akcji w CLI - dodać Enumerate czy coś - funkcję która wylistuje wszystkie możliwe wartości jakie może przyjąć typ (konwersja do std::set) - w przypadku innych wartości -> error
+zrobić typ na to pole który może przyjąć zarówno set<T> jak i function -> set<T>

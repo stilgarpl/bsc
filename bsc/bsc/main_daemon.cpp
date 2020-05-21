@@ -57,10 +57,13 @@ void setupCommands(CommandModule *cmd) {
 }
 
 struct BscControlProgramParameters : CommandLineParameters {
-    DefaultParameter<int> port = {'P', "port", "PORT", "Port opened for incoming connections",
-                                  9999};//@todo control should not open any port, I should add client-only option for NetworkModule.
-    DefaultParameter<std::string> networkName = {'N', "network", "NETWORK", "Network id", "TheNetwork"};
-
+    DefaultParameter<int> port = {
+            {'P',
+             "port",
+             "PORT",
+             "Port opened for incoming connections",
+             9999}};//@todo control should not open any port, I should add client-only option for NetworkModule.
+    DefaultParameter<std::string> networkName = {{'N', "network", "NETWORK", "Network id", "TheNetwork"}};
 };
 
 int main(int argc, char* argv[]) {

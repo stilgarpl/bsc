@@ -14,18 +14,12 @@ using namespace std::string_literals;
 //@todo add way to list available actions in help
 struct FileSorterParameters : CommandLineParameters {
     Argument<std::filesystem::path> targetPath                        = {"PATH"};
-    DefaultParameter<std::map<std::string, std::string>> mimeMatchers = {'m',
-                                                                         "mime",
-                                                                         "PATTERN",
-                                                                         "Pair of mime type and path pattern",
-                                                                         {}};
-    DefaultParameter<std::map<std::string, std::string>> nameMatchers = {'n',
-                                                                         "name",
-                                                                         "PATTERN",
-                                                                         "Pair of filename regex and path pattern",
-                                                                         {}};
+    DefaultParameter<std::map<std::string, std::string>> mimeMatchers = {
+            {'m', "mime", "PATTERN", "Pair of mime type and path pattern", {}}};
+    DefaultParameter<std::map<std::string, std::string>> nameMatchers = {
+            {'n', "name", "PATTERN", "Pair of filename regex and path pattern", {}}};
 
-    DefaultParameter<std::string> action = {'a', "action", "ACTION", "Action to perform on files", "copy"};
+    DefaultParameter<std::string> action = {{'a', "action", "ACTION", "Action to perform on files", "copy"}};
 };
 
 int main(int argc, char* argv[]) {

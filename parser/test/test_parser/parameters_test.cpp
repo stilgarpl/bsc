@@ -9,11 +9,11 @@ using namespace bsc;
 
 struct TestParameters : CommandLineParameters {
 
-    Flag flag                                 = {'f', "flag", "Flag"};
-    DefaultParameter<std::string> text        = {'t', "text", "text", "Text", "Default"};
-    DefaultParameter<std::string> shortText   = {'s', "short", "short text", "default"};
-    DefaultParameter<std::string> defaultText = {'d', "short", "short text", "default"};
-    Parameter<std::vector<int>> vector        = {'v', "vec", "vec", "Vector of ints"};
+    Flag flag                                 = {{'f', "flag", "Flag"}};
+    DefaultParameter<std::string> text        = {{'t', "text", "text", "Text", "Default"}};
+    DefaultParameter<std::string> shortText   = {{'s', "short", "short text", "default"}};
+    DefaultParameter<std::string> defaultText = {{'d', "short", "short text", "default"}};
+    Parameter<std::vector<int>> vector        = {{'v', "vec", "vec", "Vector of ints"}};
     Argument<int> number;
 };
 

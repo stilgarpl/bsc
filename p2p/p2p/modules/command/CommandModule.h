@@ -413,7 +413,7 @@ namespace bsc {
         }
 
         struct CommandPP : public bsc::CommandLineParameters {
-            bsc::Parameter<int> a = {'a', "aaa", "NUM", "IntegerParameter"};
+            bsc::Parameter<int> a = {{'a', "aaa", "NUM", "IntegerParameter"}};
         };
 
         void parametersTestingCommand(const CommandPP& params);

@@ -5,16 +5,15 @@
 #ifndef BSC_COMMANDLINEPARAMETERS_H
 #define BSC_COMMANDLINEPARAMETERS_H
 
-
-#include "parser/parser/fromString.h"
 #include <argp.h>
 #include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <optional>
+#include <parser/parser/fromString.h>
+#include <set>
 #include <utility>
-
 
 namespace bsc {
 
@@ -23,11 +22,15 @@ namespace bsc {
         silent,
     };
 
-
     class CommandLineParameters;
 
     template<typename T>
     concept ParametersClass = std::is_base_of_v<CommandLineParameters, T>;
+
+    class ValueNotAllowed : public std::domain_error {
+    public:
+        ValueNotAllowed(const std::string& arg);
+    };
 
     class CommandLineParameters {
     private:
@@ -81,27 +84,17 @@ namespace bsc {
         class ParserBuilder {
         private:
             std::shared_ptr<ArgumentParser> parser = nullptr;
-            int currentKey = 0;
+            int currentKey                         = 0;
 
         public:
-            void addOption(char shortKey,
-                           const char* longKey,
-                           const char* argumentName,
-                           int flags,
-                           const char* doc,
-                           ArgumentParser::OptionParseFunc parserFunction);
-
-            void addOption(char shortKey,
-                           const char* argumentName,
-                           int flags,
-                           const char* doc,
-                           ArgumentParser::OptionParseFunc parserFunction);
-
-            void addOption(const char* longKey,
-                           const char* argumentName,
-                           int flags,
-                           const char* doc,
-                           ArgumentParser::OptionParseFunc parserFunction);
+            struct ParserOptions {
+                std::optional<char> shortKey{};
+                std::optional<std::string_view> longKey{};
+                std::optional<std::string_view> argumentName{};
+                int flags{};
+                std::optional<std::string_view> doc{};
+            };
+            void addOption(ParserOptions parserOptions, ArgumentParser::OptionParseFunc parserFunction);
 
             void addGroup(const char* doc);
             void addAlias(char shortKey);
@@ -123,9 +116,7 @@ namespace bsc {
             return parserBuilder;
         }
 
-
         const std::shared_ptr<ArgumentParser> parser;
-
 
         template<typename T>
         friend class BaseParameter;
@@ -168,9 +159,9 @@ namespace bsc {
         }
 
         template<ParametersClass T>
-        [[nodiscard]] static T
-        parse(const std::string& commandName, const std::vector<std::string>& vals,
-              ParseConfiguration parseConfiguration = ParseConfiguration::simple) {
+        [[nodiscard]] static T parse(const std::string& commandName,
+                                     const std::vector<std::string>& vals,
+                                     ParseConfiguration parseConfiguration = ParseConfiguration::simple) {
             // guarantee contiguous, null terminated strings
             std::vector<std::vector<char>> vstrings;
             // pointers to those strings
@@ -190,20 +181,38 @@ namespace bsc {
         }
 
         //@todo add method that returns only arguments that were not matched against required arguments - use std::span
-        //when avaiable
-        [[nodiscard]] const std::vector<std::string>& arguments() const {
-            return parser->gerParsedArguments();
-        }
+        // when avaiable
+        [[nodiscard]] const std::vector<std::string>& arguments() const { return parser->gerParsedArguments(); }
     };
 
     template<typename T>
     class BaseParameter {
+    public:
+        class AllowedValues {
+        public:
+            using AllowedValuesSet = std::set<T>;
+            using GetterFunc       = std::function<AllowedValuesSet(void)>;
+
+        private:
+            GetterFunc getter = []() { return AllowedValuesSet{}; };
+
+        public:
+            AllowedValues(std::initializer_list<T> list) {
+                std::set<T> set = list;
+                getter          = [set]() { return set; };
+            }
+            AllowedValues()                     = default;
+            AllowedValues(const AllowedValues&) = default;
+            AllowedValues(AllowedValues&&)      = default;
+            AllowedValuesSet get() { return getter(); }
+        };
 
     protected:
         std::optional<T> value;
 
     private:
         int counter = 0;
+        AllowedValues allowedValues{};
 
         CommandLineParameters::ArgumentParser::OptionParseFunc makeParseFunction() {
             static Parser parser;
@@ -216,10 +225,18 @@ namespace bsc {
                     // overwrite.
                     if constexpr (is_container_not_string<T>::value) {
                         auto tempValue = parser.fromString<T>(text);
-                        std::for_each(tempValue.begin(), tempValue.end(), [this](auto& i) { value->insert(value->end(), i); });
+                        std::for_each(tempValue.begin(), tempValue.end(), [this](auto& i) {
+                            value->insert(value->end(), i);
+                        });
                     } else {
                         value = parser.fromString<T>(text);
                     }
+                }
+                const auto& validValues = this->allowedValues.get();
+                //@todo case sensitive or not
+                if (!validValues.contains(*value)) {
+                    using namespace std::string_literals;
+                    throw ValueNotAllowed("Value "s + input + " is not allowed.");
                 }
                 counter++;
             };
@@ -233,51 +250,32 @@ namespace bsc {
         }
 
     protected:
-        void setValue(const T& v) {
-            value = v;
-        }
+        void setValue(const T& v) { value = v; }
 
     public:
-        BaseParameter(char shortKey, const char* longKey, const char* doc, const char* argumentName,
-                      std::optional<T> defaultValue, bool optional, bool hidden) {
-            value = defaultValue;
+        struct BaseParameterDefinition {
+            std::optional<char> shortKey{};
+            std::optional<std::string_view> longKey{};
+            std::optional<std::string_view> argumentName{};
+            std::optional<std::string_view> doc{};
+            bool optional = false;
+            bool hidden   = false;
+            std::optional<T> defaultValue{};
+            AllowedValues allowedValues{};
+        };
+
+        BaseParameter(BaseParameterDefinition def) : allowedValues(def.allowedValues) {
+            value         = def.defaultValue;
             auto& builder = bsc::CommandLineParameters::parserBuilder();
-            builder.addOption(shortKey, longKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
+            builder.addOption({.shortKey     = def.shortKey,
+                               .longKey      = def.longKey,
+                               .argumentName = def.argumentName,
+                               .flags        = makeFlags(def.optional, def.hidden),
+                               .doc          = def.doc},
+                              makeParseFunction());
         }
 
-        BaseParameter(char shortKey, const char* longKey, const char* doc, const char* argumentName, bool optional,
-                      bool hidden) {
-            auto& builder = bsc::CommandLineParameters::parserBuilder();
-            builder.addOption(shortKey, longKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
-        }
-
-        BaseParameter(char shortKey, const char* doc, const char* argumentName, bool optional, bool hidden) {
-            auto& builder = bsc::CommandLineParameters::parserBuilder();
-            builder.addOption(shortKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
-        }
-
-        BaseParameter(char shortKey, const char* doc, const char* argumentName, std::optional<T> defaultValue,
-                      bool optional, bool hidden) {
-            value = defaultValue;
-            auto& builder = bsc::CommandLineParameters::parserBuilder();
-            builder.addOption(shortKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
-        }
-
-        BaseParameter(const char* longKey, const char* doc, const char* argumentName, bool optional, bool hidden) {
-            auto& builder = bsc::CommandLineParameters::parserBuilder();
-            builder.addOption(longKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
-        }
-
-        BaseParameter(const char* longKey, const char* doc, const char* argumentName, std::optional<T> defaultValue,
-                      bool optional, bool hidden) {
-            value = defaultValue;
-            auto& builder = bsc::CommandLineParameters::parserBuilder();
-            builder.addOption(longKey, argumentName, makeFlags(optional, hidden), doc, makeParseFunction());
-        }
-
-        const decltype(value)& operator()() const {
-            return value;
-        }
+        const decltype(value)& operator()() const { return value; }
 
         [[nodiscard]] auto count() const { return counter; }
     };
@@ -286,111 +284,69 @@ namespace bsc {
     class Parameter : public BaseParameter<T> {
 
     public:
-        Parameter(char shortKey,
-                  const char* longKey,
-                  const char* argumentName,
-                  const char* doc,
-                  std::optional<T> defaultValue = std::nullopt)
-            : BaseParameter<T>(shortKey, longKey, doc, argumentName, defaultValue, false, false) {}
+        using AllowedValues = BaseParameter<T>::AllowedValues;
+        struct ParameterDefinition {
+            std::optional<char> shortKey{};
+            std::optional<std::string_view> longKey{};
+            std::optional<std::string_view> argumentName{};
+            std::optional<std::string_view> doc{};
+            std::optional<T> defaultValue{};
+            AllowedValues allowedValues{};
+        };
 
-        Parameter(char shortKey, const char* argumentName, const char* doc)
-            : BaseParameter<T>(shortKey, doc, argumentName, false, false) {}
-
-        Parameter(const char* longKey, const char* argumentName, const char* doc)
-            : BaseParameter<T>(longKey, doc, argumentName, false, false) {}
+        Parameter(ParameterDefinition def)
+            : BaseParameter<T>({.shortKey      = def.shortKey,
+                                .longKey       = def.longKey,
+                                .argumentName  = def.argumentName,
+                                .doc           = def.doc,
+                                .defaultValue  = def.defaultValue,
+                                .allowedValues = def.allowedValues}) {}
     };
 
     template<typename T>
     class DefaultParameter : public BaseParameter<T> {
 
     public:
-        DefaultParameter(char shortKey, const char* longKey, const char* argumentName, const char* doc,
-                         const T& defaultValue) : BaseParameter<T>(shortKey, longKey,
-                                                                   doc, argumentName, defaultValue,
-                                                                   false,
-                                                                   false) {}
+        using AllowedValues = BaseParameter<T>::AllowedValues;
+        struct DefaultParameterDefinition {
+            std::optional<char> shortKey{};
+            std::optional<std::string_view> longKey{};
+            std::optional<std::string_view> argumentName{};
+            std::optional<std::string_view> doc{};
+            T defaultValue{};
+            AllowedValues allowedValues{};
+        };
 
-        DefaultParameter(char shortKey, const char* argumentName, const char* doc, const T& defaultValue)
-            : BaseParameter<T>(shortKey, doc, argumentName, defaultValue, false, false) {}
+        DefaultParameter(DefaultParameterDefinition def)
+            : BaseParameter<T>({.shortKey      = def.shortKey,
+                                .longKey       = def.longKey,
+                                .argumentName  = def.argumentName,
+                                .doc           = def.doc,
+                                .defaultValue  = std::move(def.defaultValue),
+                                .allowedValues = def.allowedValues}) {}
 
-        DefaultParameter(const char* longKey, const char* argumentName, const char* doc, const T& defaultValue)
-            : BaseParameter<T>(longKey, doc,
-                               argumentName,
-                               defaultValue, false,
-                               false) {}
-
-        const auto& operator()() const {
-            return *this->value;
-        }
-    };
-
-    template<>
-    class DefaultParameter<bool> : public BaseParameter<bool> {
-
-    public:
-        DefaultParameter(char shortKey, const char* longKey, const char* doc,
-                         const bool& defaultValue) : BaseParameter<bool>(shortKey, longKey,
-                                                                         doc, nullptr, defaultValue,
-                                                                         false,
-                                                                         false) {}
-
-        DefaultParameter(char shortKey, const char* doc, const bool& defaultValue)
-            : BaseParameter<bool>(shortKey,
-                                  doc, nullptr, defaultValue,
-                                  false, false) {}
-
-        DefaultParameter(const char* longKey, const char* doc, const bool& defaultValue)
-            : BaseParameter<bool>(longKey,
-                                  doc, nullptr, defaultValue,
-                                  false,
-                                  false) {}
-
-        const auto& operator()() const {
-            return *this->value;
-        }
-    };
-
-    template<>
-    class Parameter<bool> : public BaseParameter<bool> {
-    public:
-        Parameter(char shortKey, const char* longKey, const char* doc, std::optional<bool> defaultValue)
-            : BaseParameter<bool>(shortKey, longKey, doc, nullptr,
-                                  defaultValue, true, false) {
-        }
-
-        Parameter(char shortKey, const char* longKey, const char* doc) : BaseParameter<bool>(shortKey, longKey, doc,
-                                                                                             nullptr,
-                                                                                             true, false) {
-        }
-
-        Parameter(char shortKey, const char* doc) : BaseParameter<bool>(shortKey, doc, nullptr, true, false) {
-        }
-
-        Parameter(const char* longKey, const char* doc) : BaseParameter<bool>(longKey, doc, nullptr, true, false) {
-        }
+        const auto& operator()() const { return *this->value; }
     };
 
     template<typename T>
     class OptionalParameter : public BaseParameter<T> {
     public:
-        OptionalParameter(char shortKey, const char* longKey, const char* argumentName, const char* doc,
-                          const std::optional<T>& defaultValue) : BaseParameter<T>(shortKey, longKey, doc, argumentName,
-                                                                                   defaultValue, true, false) {}
+        OptionalParameter(char shortKey,
+                          const char* longKey,
+                          const char* argumentName,
+                          const char* doc,
+                          const std::optional<T>& defaultValue)
+            : BaseParameter<T>(shortKey, longKey, doc, argumentName, defaultValue, true, false) {}
 
-        OptionalParameter(char shortKey, const char* argumentName, const char* doc) : BaseParameter<T>(shortKey,
-                                                                                                       argumentName,
-                                                                                                       doc, true,
-                                                                                                       false) {}
+        OptionalParameter(char shortKey, const char* argumentName, const char* doc)
+            : BaseParameter<T>(shortKey, argumentName, doc, true, false) {}
 
-        OptionalParameter(const char* longKey, const char* argumentName, const char* doc) : BaseParameter<T>(longKey,
-                                                                                                             argumentName,
-                                                                                                             doc, true,
-                                                                                                             false) {}
+        OptionalParameter(const char* longKey, const char* argumentName, const char* doc)
+            : BaseParameter<T>(longKey, argumentName, doc, true, false) {}
     };
 
     template<typename T>
-    class HiddenParameter : public OptionalParameter<T> {
-    };
+    class HiddenParameter : public OptionalParameter<T> {};
 
     class Group {
 
@@ -434,7 +390,6 @@ namespace bsc {
         }
     };
 
-
     class Doc {
     public:
         Doc(std::string doc) {
@@ -443,43 +398,17 @@ namespace bsc {
         }
     };
 
-
     template<typename T>
     class RequiredParameter : public BaseParameter<T> {
     public:
         RequiredParameter(char shortKey, const char* longKey, const char* argumentName, const char* doc)
-            : BaseParameter<T>(
-                      shortKey, longKey, argumentName, doc,
-                      false, false) {}
+            : BaseParameter<T>(shortKey, longKey, argumentName, doc, false, false) {}
 
-        RequiredParameter(char shortKey, const char* argumentName, const char* doc) : BaseParameter<T>(shortKey,
-                                                                                                       argumentName,
-                                                                                                       doc, false,
-                                                                                                       false) {}
+        RequiredParameter(char shortKey, const char* argumentName, const char* doc)
+            : BaseParameter<T>(shortKey, argumentName, doc, false, false) {}
 
-        RequiredParameter(const char* longKey, const char* argumentName, const char* doc) : BaseParameter<T>(longKey,
-                                                                                                             argumentName,
-                                                                                                             doc, false,
-                                                                                                             false) {}
-    };
-
-
-    template<>
-    class OptionalParameter<bool> : public BaseParameter<bool> {
-    public:
-        OptionalParameter(char shortKey, const char* longKey, const char* doc,
-                          const std::optional<bool>& defaultValue) : BaseParameter<bool>(shortKey, longKey, doc,
-                                                                                         nullptr,
-
-                                                                                         defaultValue, true, false) {}
-
-        OptionalParameter(char shortKey, const char* longKey, const char* doc) : BaseParameter<bool>(shortKey, longKey,
-                                                                                                     nullptr, doc, true, false) {}
-
-        OptionalParameter(char shortKey, const char* doc) : BaseParameter<bool>(shortKey, nullptr, doc, true, false) {}
-
-        OptionalParameter(const char* longKey, const char* doc)
-            : BaseParameter<bool>(longKey, nullptr, doc, true, false) {}
+        RequiredParameter(const char* longKey, const char* argumentName, const char* doc)
+            : BaseParameter<T>(longKey, argumentName, doc, false, false) {}
     };
 
     using Flag = Parameter<bool>;
@@ -516,5 +445,4 @@ namespace bsc {
     };
 }// namespace bsc
 
-
-#endif//BSC_COMMANDLINEPARAMETERS_H
+#endif// BSC_COMMANDLINEPARAMETERS_H

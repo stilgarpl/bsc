@@ -12,7 +12,7 @@
 
 namespace bsc {
     struct DefaultCommandGroupParameters : bsc::CommandLineParameters {
-        Flag help = {'h', "help", "Shows help", false};
+        Flag help = {{.shortKey = 'h', .longKey = "help", .doc = "Shows help", .defaultValue = false}};
     };
 
     CommandModule::CommandExecutionStatus
