@@ -80,7 +80,7 @@ namespace bsc {
             try {
                 return std::stol(value);
             } catch (std::invalid_argument& e) {
-                throw StringParseException("Integer parsing failed for value: " + value);
+                throw StringParseException("Long parsing failed for value: " + value);
             }
         }
 
@@ -159,7 +159,7 @@ namespace bsc {
         try {
             return std::stol(value);
         } catch (std::invalid_argument& e) {
-            throw StringParseException("Integer parsing failed for value: " + value);
+            throw StringParseException("Long parsing failed for value: " + value);
         }
     }
 
@@ -168,7 +168,7 @@ namespace bsc {
         try {
             return std::stoul(value);
         } catch (std::invalid_argument& e) {
-            throw StringParseException("Integer parsing failed for value: " + value);
+            throw StringParseException("Unsigned long parsing failed for value: " + value);
         }
     }
 

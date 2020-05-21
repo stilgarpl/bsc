@@ -201,6 +201,10 @@ namespace bsc {
                 std::set<T> set = list;
                 getter          = [set]() { return set; };
             }
+            template<typename Func>
+            AllowedValues(Func func) {
+                getter = func;
+            }
             AllowedValues()                     = default;
             AllowedValues(const AllowedValues&) = default;
             AllowedValues(AllowedValues&&)      = default;
@@ -232,9 +236,10 @@ namespace bsc {
                         value = parser.fromString<T>(text);
                     }
                 }
+                //@todo maybe this should be optimized so it is only called once
                 const auto& validValues = this->allowedValues.get();
                 //@todo case sensitive or not
-                if (!validValues.contains(*value)) {
+                if (!validValues.empty() && !validValues.contains(*value)) {
                     using namespace std::string_literals;
                     throw ValueNotAllowed("Value "s + input + " is not allowed.");
                 }

@@ -7,6 +7,17 @@
 
 using namespace std::chrono_literals;
 using namespace bsc;
+using namespace std::string_literals;
+
+struct TestParameters : CommandLineParameters {
+
+    Flag flag                                 = {{'f', "flag", "Flag"}};
+    DefaultParameter<std::string> text        = {{'t', "text", "text", "Text", "Default"}};
+    DefaultParameter<std::string> shortText   = {{'s', "short", "short text", "default"}};
+    DefaultParameter<std::string> defaultText = {{'d', "short", "short text", "default"}};
+    Parameter<std::vector<int>> vector        = {{'v', "vec", "vec", "Vector of ints"}};
+    Argument<int> number;
+};
 
 struct TestProgramParameters : public bsc::CommandLineParameters {
     Parameter<int> a = {{
@@ -24,7 +35,15 @@ struct TestProgramParameters : public bsc::CommandLineParameters {
                                  .argumentName  = "TEXT",
                                  .doc           = "Text field",
                                  .defaultValue  = "xix",
-                                 .allowedValues = {"lala", "llee"}}};
+                                 .allowedValues = []() {
+                                     return std::set<std::string>{"eee"s, "xxx"s};
+                                 }}};
+    Parameter<std::string> dd                   = {{.shortKey      = 'D',
+                                  .longKey       = "testd",
+                                  .argumentName  = "TEXTd",
+                                  .doc           = "Text fieldd",
+                                  .defaultValue  = "xixd",
+                                  .allowedValues = {"lala", "lulu"}}};
     Parameter<std::vector<std::string>> vec     = {{'v', "vector", "VEC", "Vector test"}};
     Parameter<std::vector<int>> vin             = {{'q', "qqqwer", "VEC", "Vector int test"}};
     Alias a1                                    = {'x', "aaaaaa"};
@@ -39,7 +58,7 @@ struct TestProgramParameters : public bsc::CommandLineParameters {
 
 int main(int argc, char* argv[]) {
 
-    const auto& params = CommandLineParameters::parse<TestProgramParameters>(argc, argv);
+    const auto& params = CommandLineParameters::parse<TestParameters>(argc, argv);
     std::stringstream dataStorage;
     cereal::BinaryOutputArchive oa(dataStorage);
     cereal::BinaryInputArchive ia(dataStorage);

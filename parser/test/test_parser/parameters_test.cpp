@@ -19,7 +19,7 @@ struct TestParameters : CommandLineParameters {
 
 TEST_CASE("Parameters test") {
     using namespace std::string_literals;
-    std::vector<std::string> arg = {"-f"s, "-s", "short", "-t"s, "lala"s, "-v"s, "1,2,7"s, "5"s};
+    std::vector<std::string> arg = {"-f"s, "-s"s, "short"s, "-t"s, "lala"s, "-v"s, "1,2,7"s, "5"s};
     const auto& params = CommandLineParameters::parse<TestParameters>("cmd"s, arg, ParseConfiguration::silent);
     REQUIRE(params.flag() == true);
     REQUIRE(params.text() == "lala");
