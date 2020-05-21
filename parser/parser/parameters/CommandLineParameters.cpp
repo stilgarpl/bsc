@@ -23,10 +23,13 @@ namespace bsc {
     void CommandLineParameters::ParserBuilder::addOption(
             CommandLineParameters::ParserBuilder::ParserOptions parserOptions,
             CommandLineParameters::ArgumentParser::OptionParseFunc parserFunction) {
+        // if there is no argument name provided, then argument will be optional
+        int flags = parserOptions.argumentName.has_value() ? parserOptions.flags
+                                                           : parserOptions.flags | OPTION_ARG_OPTIONAL;
         auto arg = argp_option{.name  = parserOptions.longKey ? parserOptions.longKey->data() : nullptr,
                                .key   = parserOptions.shortKey ? *parserOptions.shortKey : ++currentKey,
                                .arg   = parserOptions.argumentName ? parserOptions.argumentName->data() : nullptr,
-                               .flags = parserOptions.flags,
+                               .flags = flags,
                                .doc   = parserOptions.doc ? parserOptions.doc->data() : nullptr,
                                .group = 0};
         parser->argpOptions.push_back(arg);
