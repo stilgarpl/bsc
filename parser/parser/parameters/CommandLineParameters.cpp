@@ -138,9 +138,25 @@ namespace bsc {
                     try {
                         self->parseMap[key](arg);
                     } catch (StringParseException& e) {
-                        argp_error(state, "Argument \"%s\" parse failed for '%c' with error: [%s]", arg, key, e.what());
+                        if (self->parseConfiguration == ParseConfiguration::simple) {
+                            argp_error(state,
+                                       "Argument \"%s\" parse failed for '%c' with error: [%s]",
+                                       arg,
+                                       key,
+                                       e.what());
+                        } else {
+                            throw e;
+                        }
                     } catch (ValueNotAllowed& e) {
-                        argp_error(state, "Argument \"%s\" parse failed for '%c' with error: [%s]", arg, key, e.what());
+                        if (self->parseConfiguration == ParseConfiguration::simple) {
+                            argp_error(state,
+                                       "Argument \"%s\" parse failed for '%c' with error: [%s]",
+                                       arg,
+                                       key,
+                                       e.what());
+                        } else {
+                            throw e;
+                        }
                     }
 
                 } else {
@@ -184,8 +200,8 @@ namespace bsc {
                 flags |= ARGP_SILENT;
                 break;
         }
-
-        argParams = {argpOptions.data(),
+        this->parseConfiguration = parseConfiguration;
+        argParams                = {argpOptions.data(),
                      ArgumentParser::parseArgument,
                      argDoc.c_str(),
                      doc.c_str(),

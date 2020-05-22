@@ -679,3 +679,5 @@ Teoretycznie, to incoming folder może być też wydzielone jako osobne narzędz
 
 wiem jak dodać listę dostępnych akcji w CLI - dodać Enumerate czy coś - funkcję która wylistuje wszystkie możliwe wartości jakie może przyjąć typ (konwersja do std::set) - w przypadku innych wartości -> error
 zrobić typ na to pole który może przyjąć zarówno set<T> jak i function -> set<T>
+
+problem z tym tutaj... zrobiłem, działa. ale wychodzi na to, że allowedValues powinno być stringami zawsze, a nie docelowymi wartościami. jeśli konwertujemy stringa na enuma, to komunikat błędu nic nie powie.

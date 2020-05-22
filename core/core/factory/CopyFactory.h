@@ -7,6 +7,7 @@
 
 #include "Factory.h"
 #include <map>
+#include <set>
 namespace bsc {
 
     class CopyFactoryNoMoldException : public std::domain_error {
@@ -32,6 +33,13 @@ namespace bsc {
             }
         }
         void addMold(const SelectorType& selector, ProducedObjectType object) { molds[selector] = object; }
+        std::set<SelectorType> getMolds() {
+            std::set<SelectorType> keys;
+            for (const auto& [key, value] : molds) {
+                keys.emplace(key);
+            }
+            return keys;
+        }
     };
 }// namespace bsc
 

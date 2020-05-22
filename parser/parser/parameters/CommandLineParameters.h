@@ -46,6 +46,7 @@ namespace bsc {
             std::string doc{};
             std::string argDoc{};
             argp argParams{};
+            ParseConfiguration parseConfiguration;
             unsigned flags{};
             std::map<decltype(argp_option::key), OptionParseFunc> parseMap{};
 
@@ -200,6 +201,9 @@ namespace bsc {
             AllowedValues(std::initializer_list<T> list) {
                 std::set<T> set = list;
                 getter          = [set]() { return set; };
+            }
+            AllowedValues(AllowedValuesSet set) {
+                getter = [set]() { return set; };
             }
             template<typename Func>
             AllowedValues(Func func) {
