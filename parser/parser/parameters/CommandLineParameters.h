@@ -191,14 +191,14 @@ namespace bsc {
     public:
         class AllowedValues {
         public:
-            using AllowedValuesSet = std::set<T>;
+            using AllowedValuesSet = std::set<std::string>;
             using GetterFunc       = std::function<AllowedValuesSet(void)>;
 
         private:
             GetterFunc getter = []() { return AllowedValuesSet{}; };
 
         public:
-            AllowedValues(std::initializer_list<T> list) {
+            AllowedValues(std::initializer_list<AllowedValuesSet ::value_type> list) {
                 std::set<T> set = list;
                 getter          = [set]() { return set; };
             }
@@ -226,6 +226,13 @@ namespace bsc {
             static Parser parser;
             return [this](const char* input) {
                 std::string text = input != nullptr ? input : "";
+                //@todo maybe this should be optimized so it is only called once
+                const auto& validValues = this->allowedValues.get();
+                //@todo case sensitive or not
+                if (!validValues.empty() && !validValues.contains(text)) {
+                    using namespace std::string_literals;
+                    throw ValueNotAllowed("Value "s + text + " is not allowed.");
+                }
                 if (!value) {
                     value = parser.fromString<T>(text);
                 } else {
@@ -240,13 +247,7 @@ namespace bsc {
                         value = parser.fromString<T>(text);
                     }
                 }
-                //@todo maybe this should be optimized so it is only called once
-                const auto& validValues = this->allowedValues.get();
-                //@todo case sensitive or not
-                if (!validValues.empty() && !validValues.contains(*value)) {
-                    using namespace std::string_literals;
-                    throw ValueNotAllowed("Value "s + input + " is not allowed.");
-                }
+
                 counter++;
             };
         }
