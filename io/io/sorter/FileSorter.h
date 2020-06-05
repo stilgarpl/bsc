@@ -12,16 +12,26 @@ namespace bsc {
     //@todo handle more actions - errors like file already present -> sort action should return optional error code?
     class FileSorter {
     public:
-        using SortAction        = std::function<void(const fs::path& from, const fs::path& to)>;
-        using SortActionFactory = CopyFactory<SortAction>;
+        using SortAction   = std::function<void(const fs::path& from, const fs::path& to)>;
+        using TargetAction = std::function<void(const fs::path& target)>;
+        using ErrorAction  = std::function<void(const fs::path& from, const fs::path& to)>;
+        //@todo I don't think factories should be defined here.
+        using SortActionFactory   = CopyFactory<SortAction>;
+        using TargetActionFactory = CopyFactory<TargetAction>;
+        using ErrorActionFactory  = CopyFactory<ErrorAction>;
+        struct Actions {
+            const SortAction sortAction;
+            const TargetAction targetAction;
+            const ErrorAction errorAction;
+        };
 
     private:
-        const SortAction sortAction;
+        const Actions actions;
         FileSorterMapper mapper;
         const std::unique_ptr<FileListFetcher> fileListFetcher;
 
     public:
-        FileSorter(std::unique_ptr<FileListFetcher> fileListFetcher, SortAction sortAction);
+        FileSorter(std::unique_ptr<FileListFetcher> fileListFetcher, Actions Actions);
         void sort(const fs::path& pathToSort);
         //@todo replace with better way to set up matchers and patterns:
         void addPattern(std::unique_ptr<FileSorterMapperMatcher> matcher, std::string pattern) {

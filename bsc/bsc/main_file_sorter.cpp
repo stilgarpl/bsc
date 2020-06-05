@@ -12,7 +12,6 @@
 using namespace bsc;
 using namespace std::string_literals;
 
-
 int main(int argc, char* argv[]) {
     //@todo move actionFactory setup somewhere else
     static FileSorter::SortActionFactory actionFactory;
@@ -24,16 +23,23 @@ int main(int argc, char* argv[]) {
     struct FileSorterParameters : CommandLineParameters {
         Argument<std::filesystem::path> targetPath                        = {"PATH"};
         DefaultParameter<std::map<std::string, std::string>> mimeMatchers = {
-                {'m', "mime", "PATTERN", "Pair of mime type and path pattern", {}}};
+                {.shortKey     = 'm',
+                 .longKey      = "mime",
+                 .argumentName = "mimetype=PATTERN",
+                 .doc          = "Pair of mime type and path pattern"}};
         DefaultParameter<std::map<std::string, std::string>> nameMatchers = {
-                {'n', "name", "PATTERN", "Pair of filename regex and path pattern", {}}};
+                {.shortKey     = 'n',
+                 .longKey      = "name",
+                 .argumentName = "regex=PATTERN",
+                 .doc          = "Pair of filename regex and path pattern"}};
 
-        DefaultParameter<std::string> action = {{.shortKey      = 'a',
-                                                 .longKey       = "action",
-                                                 .argumentName  = "ACTION",
-                                                 .doc           = "Action to perform on files",
-                                                 .defaultValue  = "copy",
-                                                 .allowedValues = actionFactory.getMolds()}};
+        DefaultParameter<std::string> action = {
+                {.shortKey      = 'a',
+                 .longKey       = "action",
+                 .argumentName  = "ACTION",
+                 .doc           = "Action to perform on files\nAvailable actions:\ncopy\nmove\npretend",
+                 .defaultValue  = "copy",
+                 .allowedValues = actionFactory.getMolds()}};
     };
 
     const auto& parameters = CommandLineParameters::parse<FileSorterParameters>(argc, argv);

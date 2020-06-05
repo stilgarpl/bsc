@@ -16,8 +16,6 @@ JournalPtr prepareJournal() {
     auto result = std::make_shared<SimpleJournal>(std::make_unique<FakeMetaDataFetcher>("node", "user", "system"));
     result->appendState<JournalTarget::file>({JournalMethod::add, bsc::fs::path("/tmp/dupa.txt"), fileData});
     result->appendState<JournalTarget::directory>({JournalMethod::add, bsc::fs::path("/tmp/dir"), dirData});
-    result->appendState<JournalTarget::special>(
-            {JournalMethod::add, bsc::fs::path("/tmp/incoming"), SpecialKind::incoming});
     result->appendState<JournalTarget::transformer>({JournalMethod::add, PathTransformerRuleSelector::tmp});
     result->appendState<JournalTarget::transformer>({JournalMethod::add, PathTransformerRuleSelector::home});
     result->commitState(CommitTimeType::clock::now());
@@ -28,7 +26,6 @@ void modifyJournal(const JournalPtr& journalPtr) {
     const auto fileData = FileData{"", "hash", {}, 100, fs::file_time_type::min(), false};
     journalPtr->appendState<JournalTarget::file>({JournalMethod::remove, bsc::fs::path("/tmp/dupa.txt"), fileData});
     journalPtr->appendState<JournalTarget::transformer>({JournalMethod::remove, PathTransformerRuleSelector::tmp});
-    journalPtr->appendState<JournalTarget::special>({JournalMethod::remove, bsc::fs::path("/tmp/incoming"), {}});
     journalPtr->commitState(CommitTimeType::clock::now());
 }
 
@@ -55,9 +52,6 @@ TEST_CASE("RepositoryFileMapRenderer test") {
     REQUIRE(fileMap.getPathTransformer().getRules().size() == 2);
     REQUIRE(fileMap.getPathTransformer().getRules().contains(std::make_shared<TmpRule>()));
     REQUIRE(fileMap.getPathTransformer().getRules().contains(std::make_shared<HomeDirRule>(getenv("HOME"))));
-    REQUIRE(!fileMap.isSpecial("/tmp/dupa.txt"));
-    REQUIRE(fileMap.isSpecial("/tmp/incoming"));
-    REQUIRE(fileMap.getSpecialData("/tmp/incoming").getSpecialKind() == SpecialKind::incoming);
 
     modifyJournal(journalPtr);
     const auto& fileMap2 = fileMapRenderer.renderMap(journalPtr);
@@ -68,6 +62,4 @@ TEST_CASE("RepositoryFileMapRenderer test") {
     REQUIRE(fileMap2.getPathTransformer().getRules().size() == 1);
     REQUIRE(!fileMap2.getPathTransformer().getRules().contains(std::make_shared<TmpRule>()));
     REQUIRE(fileMap2.getPathTransformer().getRules().contains(std::make_shared<HomeDirRule>(getenv("HOME"))));
-    REQUIRE(!fileMap2.isSpecial("/tmp/dupa.txt"));
-    REQUIRE(!fileMap2.isSpecial("/tmp/incoming"));
 }

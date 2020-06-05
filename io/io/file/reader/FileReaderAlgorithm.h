@@ -14,6 +14,7 @@ namespace bsc {
     public:
         virtual bool isAlgorithmSuitableForFileType(const MimeFileType&) = 0;
         virtual PropertiesMetaData readMetaData(fs::path)                = 0;
+        virtual ~FileReaderAlgorithm()                                   = default;
     };
 }// namespace bsc
 

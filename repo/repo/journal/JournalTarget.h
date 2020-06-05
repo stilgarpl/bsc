@@ -6,11 +6,10 @@
 #define BSC_JOURNALTARGET_H
 namespace bsc {
     enum class JournalTarget {
-        none=0,
-        file=1,
-        directory=2,
-        special=3,
-        transformer=4,
+        none        = 0,
+        file        = 1,
+        directory   = 2,
+        transformer = 3,
     };
 
 }

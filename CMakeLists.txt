@@ -9,11 +9,12 @@ set(TEMPLATE_PATH "${CMAKE_SOURCE_DIR}/cmake/template/")
 
 #include additional configuration
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/sanitizers.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/configuration/analyzers.cmake)
 enable_testing()
 
 
 message("modu:  ${CMAKE_MODULE_PATH}")
-message("pref: ${CMAKE_PREFIX_PATH}" )
+message("pref: ${CMAKE_PREFIX_PATH}")
 
 
 find_program(CCACHE_PROGRAM ccache)
@@ -40,10 +41,8 @@ if (EXISTS ${conan})
             BASIC_SETUP
             BUILD_TYPE "Debug"
             BUILD missing)
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-    #    conan_set_find_library_paths()
-    #    conan_set_find_paths()
+    #    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    #    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 else ()
     message("Conan not found")
 endif ()

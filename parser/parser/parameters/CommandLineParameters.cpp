@@ -149,11 +149,17 @@ namespace bsc {
                         }
                     } catch (ValueNotAllowed& e) {
                         if (self->parseConfiguration == ParseConfiguration::simple) {
+                            using namespace std::string_literals;
+                            std::string allowedValues = std::accumulate(
+                                    e.allowedValues.begin(),
+                                    e.allowedValues.end(),
+                                    ""s,
+                                    [](const auto& a, const auto& b) { return a.empty() ? b : a + ", " + b; });
+                            //@todo add option name (short or long) to message.
                             argp_error(state,
-                                       "Argument \"%s\" parse failed for '%c' with error: [%s]",
+                                       "Value \"%s\" is not allowed. Allowed values: %s",
                                        arg,
-                                       key,
-                                       e.what());
+                                       allowedValues.c_str());
                         } else {
                             throw e;
                         }
@@ -241,5 +247,7 @@ namespace bsc {
         usageDocs.insert(usageDocs.begin(), usageString);
     }
 
-    ValueNotAllowed::ValueNotAllowed(const std::string& arg) : domain_error(arg) {}
+    ValueNotAllowed::ValueNotAllowed(const std::string& arg) : ValueNotAllowed(arg, {}) {}
+    ValueNotAllowed::ValueNotAllowed(const std::string& arg, std::remove_cvref_t<decltype(allowedValues)> a)
+        : domain_error(arg), allowedValues(std::move(a)) {}
 }// namespace bsc

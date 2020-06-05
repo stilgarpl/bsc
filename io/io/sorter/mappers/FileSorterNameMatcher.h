@@ -15,6 +15,7 @@ namespace bsc {
     public:
         explicit FileSorterNameMatcher(const std::string& regexPattern) : regex(regexPattern) {}
         MatchPrecision matches(const fs::path& path) override;
+        virtual ~FileSorterNameMatcher() = default;
     };
 }// namespace bsc
 

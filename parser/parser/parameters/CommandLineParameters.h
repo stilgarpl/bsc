@@ -29,7 +29,12 @@ namespace bsc {
 
     class ValueNotAllowed : public std::domain_error {
     public:
+        const std::set<std::string> allowedValues;
+
         ValueNotAllowed(const std::string& arg);
+        ValueNotAllowed(const std::string& arg, std::remove_cvref_t<decltype(allowedValues)> a);
+        ValueNotAllowed(const ValueNotAllowed&) = default;
+        ValueNotAllowed(ValueNotAllowed&&)      = default;
     };
 
     class CommandLineParameters {
@@ -206,9 +211,10 @@ namespace bsc {
                 getter = [set]() { return set; };
             }
             template<typename Func>
-            AllowedValues(Func func) {
+            AllowedValues(Func func) requires std::is_invocable_r_v<AllowedValuesSet, Func> {
                 getter = func;
             }
+
             AllowedValues()                     = default;
             AllowedValues(const AllowedValues&) = default;
             AllowedValues(AllowedValues&&)      = default;
@@ -231,7 +237,7 @@ namespace bsc {
                 //@todo case sensitive or not
                 if (!validValues.empty() && !validValues.contains(text)) {
                     using namespace std::string_literals;
-                    throw ValueNotAllowed("Value "s + text + " is not allowed.");
+                    throw ValueNotAllowed("Value "s + text + " is not allowed.", validValues);
                 }
                 if (!value) {
                     value = parser.fromString<T>(text);
@@ -294,7 +300,7 @@ namespace bsc {
     class Parameter : public BaseParameter<T> {
 
     public:
-        using AllowedValues = BaseParameter<T>::AllowedValues;
+        using AllowedValues = typename BaseParameter<T>::AllowedValues;
         struct ParameterDefinition {
             std::optional<char> shortKey{};
             std::optional<std::string_view> longKey{};
@@ -304,7 +310,7 @@ namespace bsc {
             AllowedValues allowedValues{};
         };
 
-        Parameter(ParameterDefinition def)
+        Parameter(ParameterDefinition def)// NOLINT
             : BaseParameter<T>({.shortKey      = def.shortKey,
                                 .longKey       = def.longKey,
                                 .argumentName  = def.argumentName,
@@ -327,7 +333,7 @@ namespace bsc {
             AllowedValues allowedValues{};
         };
 
-        DefaultParameter(DefaultParameterDefinition def)
+        DefaultParameter(DefaultParameterDefinition def)// NOLINT
             : BaseParameter<T>({.shortKey      = def.shortKey,
                                 .longKey       = def.longKey,
                                 .argumentName  = def.argumentName,
@@ -335,7 +341,7 @@ namespace bsc {
                                 .defaultValue  = std::move(def.defaultValue),
                                 .allowedValues = def.allowedValues}) {}
 
-        const auto& operator()() const { return *this->value; }
+        const auto& operator()() const { return *this->value; }// NOLINT
     };
 
     template<typename T>

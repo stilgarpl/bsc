@@ -24,13 +24,12 @@
 namespace bsc {
 
     class JournalState {
+        using JournalStateVariant = std::variant<JournalStateEntry<JournalTarget::none>,
+                                                 JournalStateEntry<JournalTarget::file>,
+                                                 JournalStateEntry<JournalTarget::directory>,
+                                                 JournalStateEntry<JournalTarget::transformer>>;
         ChecksumType checksum;
-        std::list<std::variant<JournalStateEntry<JournalTarget::none>,
-                               JournalStateEntry<JournalTarget::file>,
-                               JournalStateEntry<JournalTarget::directory>,
-                               JournalStateEntry<JournalTarget::special>,
-                               JournalStateEntry<JournalTarget::transformer>>>
-                dataList;
+        std::list<JournalStateVariant> dataList;
         CommitTimeType commitTime;
         JournalMetaData metaData;
         ChecksumType journalChecksum;// checksum of the whole journal at the moment of commit.
@@ -54,7 +53,7 @@ namespace bsc {
         void add(const JournalStateEntry<target>& data) {
             auto same = std::find_if(dataList.begin(), dataList.end(), [&](auto i) {
                 //@todo about that method and target... shouldn't this be an error if we have more than one method on
-                //one file?
+                // one file?
                 return std::visit([&](auto& i) { return data == i; }, i);
             });
             if (same == dataList.end()) {

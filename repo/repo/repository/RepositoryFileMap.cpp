@@ -57,26 +57,6 @@ namespace bsc {
             LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
-        funcMap.setFunc<JournalMethod::add,JournalTarget::special>([&](auto& i) {
-            const auto& transformedPath = pathTransformer->transformFromJournalFormat(i.getDestination());
-          if (fileMap.attributesMap.contains(transformedPath)) {
-              auto& attr = fileMap.attributesMap[transformedPath];
-              if (attr) {
-                  attr->setSpecial(true);
-              }
-            }
-        });
-
-        funcMap.setFunc<JournalMethod::remove,JournalTarget::special>([&](auto& i) {
-          const auto& transformedPath = pathTransformer->transformFromJournalFormat(i.getDestination());
-          if (fileMap.attributesMap.contains(transformedPath)) {
-              auto& attr = fileMap.attributesMap[transformedPath];
-              if (attr) {
-                  attr->setSpecial(false);
-              }
-          }
-        });
-
         funcMap.setFunc<JournalMethod::modify,JournalTarget::directory>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
             LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
@@ -102,23 +82,6 @@ namespace bsc {
             fileMap.deleteMap[path].setDeleted(false);
             fileMap.deleteMap[path].setDeletionTime(fs::file_time_type::min());
             //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
-        });
-
-        funcMap.setFunc<JournalMethod::add,JournalTarget::special>([&](auto& i) {
-            auto path     = pathTransformer->transformFromJournalFormat(i.getDestination());
-            auto& special = fileMap.specialMap[path];
-            special.setSpecialKind(i.getSpecialKind());
-        });
-
-        funcMap.setFunc<JournalMethod::remove,JournalTarget::special>([&](auto& i) {
-            auto path = pathTransformer->transformFromJournalFormat(i.getDestination());
-            fileMap.specialMap.erase(path);
-        });
-
-        funcMap.setFunc<JournalMethod::modify,JournalTarget::special>([&](auto& i) {
-            auto path     = pathTransformer->transformFromJournalFormat(i.getDestination());
-            auto& special = fileMap.specialMap[path];
-            special.setSpecialKind(i.getSpecialKind());
         });
 
         funcMap.setFunc<JournalMethod::add,JournalTarget::transformer>([&](auto& i) {

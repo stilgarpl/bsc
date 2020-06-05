@@ -18,6 +18,7 @@ namespace bsc {
     class FileSorterMapperMatcher {
     public:
         virtual MatchPrecision matches(const fs::path& path) = 0;
+        virtual ~FileSorterMapperMatcher()                   = default;
     };
 }// namespace bsc
 

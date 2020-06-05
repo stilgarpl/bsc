@@ -273,22 +273,6 @@ namespace bsc {
         return fileMap.getPathTransformer();
     }
 
-    void Repository::processSpecialDirectories() {
-        auto &fileMap = fileMapRenderer.renderMap(journal);
-        for (const auto&[path, specialData] : fileMap.getSpecialMap()) {
-            handleSpecialDirectory(path, specialData);
-        }
-    }
-
-    void Repository::handleSpecialDirectory(const fs::path &path, const RepositoryFileMap::SpecialInfo &info) {
-        switch (info.getSpecialKind()) {
-
-            case SpecialKind::incoming: {
-                RepositorySpecialIncomingHandler incomingHandler(path);
-            }
-                break;
-        }
-    }
 
     //Repository::Repository() : Repository("", nullptr) {}
 

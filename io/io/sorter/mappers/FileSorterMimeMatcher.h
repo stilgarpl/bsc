@@ -18,6 +18,7 @@ namespace bsc {
         FileSorterMimeMatcher(MimeFileType mimeFileType);
         FileSorterMimeMatcher(const std::string& mimeString);
         MatchPrecision matches(const fs::path& path) override;
+        virtual ~FileSorterMimeMatcher() = default;
     };
 }// namespace bsc
 

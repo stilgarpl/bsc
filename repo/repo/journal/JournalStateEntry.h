@@ -97,43 +97,6 @@ namespace bsc {
 
     //    @todo implement
     template<>
-    class JournalStateEntry<JournalTarget::special> {
-    private:
-        JournalMethod method = JournalMethod::none;
-        SpecialKind specialKind{};
-        std::string destination{};
-
-    public:
-        JournalMethod getMethod() const { return method; }
-
-        const std::string& getDestination() const { return destination; }
-
-        [[nodiscard]] ChecksumType calculateChecksum() const {
-            std::stringstream ss;
-            ss << std::to_string(method);
-
-            return bsc::calculateSha1OfString(ss.str());
-        }
-
-        SpecialKind getSpecialKind() const { return specialKind; }
-
-    private:
-        template<class Archive>
-        void serialize(Archive& ar) {
-            ar(CEREAL_NVP(method), CEREAL_NVP(destination), CEREAL_NVP(specialKind));
-        }
-
-    public:
-        JournalStateEntry() = default;
-        JournalStateEntry(JournalMethod method, const PathType& path, SpecialKind kind)
-            : method(method), specialKind(kind), destination(path) {}
-
-    private:
-        friend class cereal::access;
-    };
-
-    //    @todo implement
-    template<>
     class JournalStateEntry<JournalTarget::transformer> {
     private:
         JournalMethod method = JournalMethod::none;

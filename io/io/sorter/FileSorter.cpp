@@ -23,7 +23,7 @@ namespace bsc {
                 const auto& properties = reader.readMetaData(file);
                 try {
                     const auto& targetPath = translator.translate(*pattern, properties);
-                    sortAction(file, targetPath / file.filename());
+                    actions.sortAction(file, targetPath / file.filename());
                 } catch (const std::exception& e) {
                     ERROR("Exception : "s + e.what());
                 }
@@ -33,7 +33,7 @@ namespace bsc {
             }
         }
     }
-    FileSorter::FileSorter(std::unique_ptr<FileListFetcher> fileListFetcher, SortAction sortAction)
-        : sortAction(std::move(sortAction)), fileListFetcher(std::move(fileListFetcher)) {}
+    FileSorter::FileSorter(std::unique_ptr<FileListFetcher> fileListFetcher, Actions actions)
+        : actions(std::move(actions)), fileListFetcher(std::move(fileListFetcher)) {}
 
 }// namespace bsc
