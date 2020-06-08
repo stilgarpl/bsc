@@ -677,7 +677,30 @@ Teoretycznie, to incoming folder może być też wydzielone jako osobne narzędz
 
 @todo można dodać customowe skrypty {{expression.lang.1} które wywołają jakiś skrypt dla danego pliku który zwróci wartość pola.
 
-wiem jak dodać listę dostępnych akcji w CLI - dodać Enumerate czy coś - funkcję która wylistuje wszystkie możliwe wartości jakie może przyjąć typ (konwersja do std::set) - w przypadku innych wartości -> error
-zrobić typ na to pole który może przyjąć zarówno set<T> jak i function -> set<T>
+@todo path.relative -> ścieżka pliku od folderu sortowania do niego. w ten sposób można sortować zachowując strukturę katalogów.
 
-problem z tym tutaj... zrobiłem, działa. ale wychodzi na to, że allowedValues powinno być stringami zawsze, a nie docelowymi wartościami. jeśli konwertujemy stringa na enuma, to komunikat błędu nic nie powie.
+file sorter powinien mieć możliwość zdefiniowania co sie dzieje jak plik już istnieje w danym miejscu (overwrite, rename, etc.) z tym, że to nie jest takie proste
+overwrite mogłoby być domyślną akcją, wiec nie robiłoby niczego. rename musiałoby się wywołać tuż przed samą akcją, żeby faktycznie sprawdzić czy istnieje taki plik... ale co w sytuacji, gdy pliku nie ma a robimy persist_as ? no to wtedy nie powinno się uzywać akcji rename, ewentualnie mieć drugą akcję rename_repo która uwzględni to czy ścieżka istnieje w filemapie (tam gdzie pisze persist)
+
+algorytm file sortera:
+
+if (existPredicate(targetPath)) {
+//file already exists
+    targetPath = targetAction(targetPath,existPredicate); <- possibly this will rename the path to something that is ok.
+}
+@todo zmienic nazwe targetAction na nazwę która faktycznie mówi co to robi
+
+
+pomysł odnośnie kontekstów - teraz kontekst jest globalny i dostępny dla wszystkich którzy wiedzą o co prosić. można pomyśleć o tym, żeby ukryć to wewnątrz faktycznich konsumentów
+np. chcąc wziąc logic manager można zamiast
+context->get<LogicContext>().getLogicManager()
+LogicManager::fromContext(); //to wcale nie wygląda lepiej
+LogicContext::active().getLogicManager() -> active może być metodą z ContextConsumer<CRTP>
+
+Node : ContextConsumer<NodeContext> {
+context() -> NodeContext& ?
+}
+
+
+@todo rename(renameFormat) -> should validate format and throw if it doesn't have right field {}
+

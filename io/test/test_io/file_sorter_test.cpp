@@ -4,33 +4,34 @@
 
 #include <catch2/catch.hpp>
 #include <io/sorter/FileSorter.h>
-#include <io/sorter/actions/StandardFileSorterActions.h>
 #include <io/sorter/fetchers/FilesystemFileListFetcher.h>
 #include <io/sorter/fetchers/StaticFileListFetcher.h>
 #include <io/sorter/mappers/FileSorterMapper.h>
 #include <io/sorter/mappers/FileSorterMimeMatcher.h>
 #include <io/sorter/mappers/FileSorterNameMatcher.h>
+#include <io/sorter/strategies/StandardFileSorterStrategies.h>
 #include <io/translator/PathTranslator.h>
 #include <tester/Tester.h>
 
 using namespace bsc;
 
-TEST_CASE("Sort actions test") {
+TEST_CASE("Sort strategies test") {
     Tester::TestDirWithResources testDirWithResources;
     auto path    = testDirWithResources.getResourcePath("sort");
     auto newPath = path / "../other/";
     fs::create_directories(newPath);
     auto filename = "test.gif";
     SECTION("Copy") {
-        auto& copyAction = StandardFileSorterActions::copy;
+        auto& copyAction = StandardFileSorterSortStrategies::copy;
         copyAction(path / filename, newPath / filename);
         // assert that file was copied
         REQUIRE(fs::exists(newPath / filename));
+        REQUIRE(!fs::is_directory(newPath / filename));
         REQUIRE(fs::exists(path / filename));
         REQUIRE(fs::file_size(newPath / filename) == fs::file_size(path / filename));
     }
     SECTION("Move") {
-        auto& moveAction = StandardFileSorterActions::move;
+        auto& moveAction = StandardFileSorterSortStrategies::move;
         auto oldSize     = fs::file_size(path / filename);
         moveAction(path / filename, newPath / filename);
         // assert that file was moved
@@ -39,20 +40,70 @@ TEST_CASE("Sort actions test") {
         REQUIRE(fs::file_size(newPath / filename) == oldSize);
     }
     SECTION("Erase") {
-        auto& eraseAction = StandardFileSorterActions::erase;
+        auto& eraseAction = StandardFileSorterSortStrategies::erase;
         eraseAction(path / filename, newPath / filename);
         // assert that file was deleted
         REQUIRE(!fs::exists(newPath / filename));
         REQUIRE(!fs::exists(path / filename));
     }
     SECTION("Pretend") {
-        auto& pretendAction = StandardFileSorterActions::pretend;
+        auto& pretendAction = StandardFileSorterSortStrategies::pretend;
         pretendAction(path / filename, newPath / filename);
         // assert that it didn't actually do anything
         REQUIRE(!fs::exists(newPath / filename));
         REQUIRE(fs::exists(path / filename));
     }
     //@todo add some tests for failed cases, files that not exist and so on.
+}
+
+TEST_CASE("Sort error strategies test") {
+    const fs::path file = "/tmp";
+    const FileSortingException exception("Exception");
+    SECTION("ignore strategy") { REQUIRE_NOTHROW(StandardFileSorterErrorHandlers::ignore(file, exception)); }
+    SECTION("stop strategy") {
+        REQUIRE_THROWS_AS(StandardFileSorterErrorHandlers::stop(file, exception), FileSortingException);
+    }
+}
+
+TEST_CASE("Sort predicates test") {
+    Tester::TestDirWithResources testDirWithResources;
+    auto resourcePath        = testDirWithResources.getResourcePath("sort");
+    auto existingTestFile    = resourcePath / "test.gif";
+    auto notExistingTestFile = resourcePath / "wrong.file";
+    SECTION("file exists predicate") {
+        auto predicate = StandardFileSorterPredicates::fileExistsPredicate;
+        REQUIRE(predicate(existingTestFile) == true);
+        REQUIRE(predicate(notExistingTestFile) == false);
+        // does not change when asked again
+        REQUIRE(predicate(existingTestFile) == true);
+        REQUIRE(predicate(notExistingTestFile) == false);
+    }
+
+    SECTION("pretend file exists predicate") {
+        auto predicate = StandardFileSorterPredicates::pretendFileExistsPredicate;
+        REQUIRE(predicate(existingTestFile) == true);
+        REQUIRE(predicate(notExistingTestFile) == false);
+        // this predicate remembers all files that were
+        REQUIRE(predicate(existingTestFile) == true);
+        REQUIRE(predicate(notExistingTestFile) == true);
+        SECTION("second time") {
+            auto secondPredicate = StandardFileSorterPredicates::pretendFileExistsPredicate;
+            auto predicateCopy   = predicate;
+            REQUIRE(predicateCopy(existingTestFile) == true);
+            REQUIRE(predicateCopy(notExistingTestFile) == true);
+            // second predicate does not share memory with first
+            REQUIRE(secondPredicate(existingTestFile) == true);
+            REQUIRE(secondPredicate(notExistingTestFile) == false);
+        }
+    }
+}
+
+//@todo move this to more suitable place
+TEST_CASE("escapeAllRegexCharacters test") {
+    std::string text         = "[test(string).]";
+    std::string expectedText = "\\[test\\(string\\)\\.\\]";
+    auto result              = escapeAllRegexCharacters(text);
+    REQUIRE(result == expectedText);
 }
 
 TEST_CASE("Sort fetchers test") {
@@ -201,7 +252,13 @@ TEST_CASE("File sorter test") {
     Tester::TestDirWithResources testDirWithResources;
     auto resourcePath    = testDirWithResources.getResourcePath("sort");
     auto destinationPath = testDirWithResources.getTestDirPath("destination");
-    FileSorter fileSorter(std::make_unique<FilesystemFileListFetcher>(), StandardFileSorterActions::move);
+    FileSorter fileSorter(std::make_unique<FilesystemFileListFetcher>(),
+                          {.sortStrategy                  = StandardFileSorterSortStrategies::copy,
+                           .createValidTargetPathStrategy = StandardCreateValidTargetPathStrategies::abort,
+                           .errorHandlerStrategy          = StandardFileSorterErrorHandlers::stop,
+                           .fileExistsPredicate           = StandardFileSorterPredicates::fileExistsPredicate
+
+                          });
     SECTION("images only") {
         fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(MimeFileType::make("image/")),
                               destinationPath.string() + "/Images/{{date.year}}/");
@@ -209,15 +266,18 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "test.png"));
         REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
-        fileSorter.sort(resourcePath);
+        const auto& result = fileSorter.sort(resourcePath);
+        REQUIRE(result.getFilesSortedMap().size() == 3);
         REQUIRE(fs::exists(destinationPath / "Images"));
         //@todo this will fail in 2021, fix tests with current year for images that does not have exif data
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.gif"));
+        REQUIRE(!fs::is_directory(destinationPath / "Images" / "2020" / "test.gif"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
+        REQUIRE(!fs::is_directory(destinationPath / "Images" / "2020" / "test.png"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "png_with_bad_extension.txt"));
-        REQUIRE(!fs::exists(resourcePath / "test.gif"));
-        REQUIRE(!fs::exists(resourcePath / "test.png"));
-        REQUIRE(!fs::exists(resourcePath / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "test.gif"));
+        REQUIRE(fs::exists(resourcePath / "test.png"));
+        REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
     }
     SECTION("images and txt") {
@@ -229,16 +289,71 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "test.png"));
         REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
-        fileSorter.sort(resourcePath);
+        const auto& result = fileSorter.sort(resourcePath);
+        REQUIRE(result.getFilesSortedMap().size() == 4);
         REQUIRE(fs::exists(destinationPath / "Images"));
         //@todo this will fail in 2021, fix tests with current year for images that does not have exif data
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.gif"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "png_with_bad_extension.txt"));
         REQUIRE(fs::exists(destinationPath / "Text" / "test.txt"));
-        REQUIRE(!fs::exists(resourcePath / "test.gif"));
-        REQUIRE(!fs::exists(resourcePath / "test.png"));
-        REQUIRE(!fs::exists(resourcePath / "png_with_bad_extension.txt"));
-        REQUIRE(!fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
+        REQUIRE(fs::exists(resourcePath / "test.gif"));
+        REQUIRE(fs::exists(resourcePath / "test.png"));
+        REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
+        SECTION("second sort should end with error") {
+            const auto& result = fileSorter.sort(resourcePath);
+            REQUIRE(result.getFilesSortedMap().size() == 0);
+        }
+    }
+}
+
+TEST_CASE("Target strategy test ") {
+    Tester::TestDirWithResources testDirWithResources;
+    auto resourcePath    = testDirWithResources.getResourcePath("sort");
+    auto testGif         = resourcePath / "test.gif";
+    const auto predicate = StandardFileSorterPredicates::fileExistsPredicate;
+    REQUIRE(fs::exists(testGif));
+    SECTION("overwrite") {
+        const auto& action  = StandardCreateValidTargetPathStrategies::overwrite;
+        auto expectedResult = testGif;
+        auto result         = action(testGif, predicate);
+        REQUIRE(result == testGif);
+    }
+
+    SECTION("rename") {
+        const auto& action  = StandardCreateValidTargetPathStrategies::rename();
+        auto expectedResult = resourcePath / "test (1).gif";
+        SECTION("basic test") {
+            auto result = action(testGif, predicate);
+            REQUIRE(result == expectedResult);
+            REQUIRE(!fs::is_directory(result));
+            SECTION("second file") {
+                Tester::createFile(expectedResult, "test");
+                auto expectedSecondResult = resourcePath / "test (2).gif";
+                auto result2              = action(testGif, predicate);
+                REQUIRE(!fs::is_directory(result2));
+                REQUIRE(result2 == expectedSecondResult);
+            }
+        }
+        SECTION("number finding test") {
+            const auto predicate2 = StandardFileSorterPredicates::pretendFileExistsPredicate;
+            // this file does not exist, so it's ok, it won't be renamed, but other two should be.
+            auto testGif9        = resourcePath / "test (9).gif";
+            auto expectedResult1 = resourcePath / "test (9).gif";
+            auto expectedResult2 = resourcePath / "test (10).gif";
+            auto expectedResult3 = resourcePath / "test (11).gif";
+            auto result          = action(testGif9, predicate2);
+            auto result2         = action(testGif9, predicate2);
+            auto result3         = action(testGif9, predicate2);
+            REQUIRE(result == expectedResult1);
+            REQUIRE(result2 == expectedResult2);
+            REQUIRE(result3 == expectedResult3);
+        }
+    }
+
+    SECTION("abort") {
+        const auto& action = StandardCreateValidTargetPathStrategies::abort;
+        REQUIRE_THROWS_AS(action(testGif, predicate), FileSortingException);
     }
 }

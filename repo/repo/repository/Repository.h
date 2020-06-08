@@ -187,11 +187,6 @@ namespace bsc {
         [[nodiscard]] const RepositoryActionStrategyPack &getLocalSyncPack() const override;
 
         [[nodiscard]] const RepositoryActionStrategyPack &getFullPack() const override;
-
-        void processSpecialDirectories();
-
-    private:
-        void handleSpecialDirectory(const fs::path &path, const RepositoryFileMap::SpecialInfo &info);
     };
 }
 CEREAL_REGISTER_TYPE(bsc::Repository)

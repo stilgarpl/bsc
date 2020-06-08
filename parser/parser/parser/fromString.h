@@ -14,7 +14,7 @@
 namespace bsc {
 
     //@todo all of those SFINAE enable_if can be replaced by concepts, but concepts do not quite work yet in current
-    //compilers. try again when GCC 11 comes out.
+    // compilers. try again when GCC 11 comes out.
     template<typename T>
     struct IsPairT : std::false_type {};
 
@@ -27,17 +27,14 @@ namespace bsc {
     concept IsPair = IsPairT<T>::value;
 
     template<typename T, typename _ = void>
-    struct is_container_not_string : std::false_type {
-    };
+    struct is_container_not_string : std::false_type {};
 
     template<typename T>
-    struct is_container_not_string<
-            T,
-            std::void_t<
-                    typename T::value_type,
-                    typename T::size_type,
-                    typename T::allocator_type,
-                    typename T::iterator,
+    struct is_container_not_string<T,
+                                   std::void_t<typename T::value_type,
+                                               typename T::size_type,
+                                               typename T::allocator_type,
+                                               typename T::iterator,
                                                typename T::const_iterator,
                                                decltype(std::declval<T>().size()),
                                                decltype(std::declval<T>().begin()),
@@ -80,7 +77,8 @@ namespace bsc {
     public:
         template<typename ParameterType>
         std::remove_reference_t<ParameterType>
-        fromString(const std::string& value, std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) {
+        fromString(const std::string& value,
+                   std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) {
             try {
                 return std::stol(value);
             } catch (std::invalid_argument& e) {
@@ -97,7 +95,6 @@ namespace bsc {
                 throw StringParseException("Floating parsing failed for value: " + value);
             }
         }
-
 
         template<typename ParameterType>
         std::remove_reference_t<ParameterType>
@@ -175,7 +172,6 @@ namespace bsc {
         }
     }
 
-
     template<>
     inline float Parser::fromString<float>(const std::string& value, int) {
         try {
@@ -203,6 +199,12 @@ namespace bsc {
         }
     }
 
+    template<typename ParameterType>
+    auto fromString(const std::string& value) {
+        static Parser parser;
+        return parser.fromString<ParameterType>(value);
+    }
+
 }// namespace bsc
 
-#endif//BSC_FROMSTRING_H
+#endif// BSC_FROMSTRING_H

@@ -3,10 +3,10 @@
 //
 #include <filesystem>
 #include <io/sorter/FileSorter.h>
-#include <io/sorter/actions/StandardFileSorterActions.h>
 #include <io/sorter/fetchers/FilesystemFileListFetcher.h>
 #include <io/sorter/mappers/FileSorterMimeMatcher.h>
 #include <io/sorter/mappers/FileSorterNameMatcher.h>
+#include <io/sorter/strategies/StandardFileSorterStrategies.h>
 #include <parser/parameters/CommandLineParameters.h>
 #include <string>
 using namespace bsc;
@@ -14,12 +14,12 @@ using namespace std::string_literals;
 
 int main(int argc, char* argv[]) {
     //@todo move actionFactory setup somewhere else
-    static FileSorter::SortActionFactory actionFactory;
-    actionFactory.addMold("copy", StandardFileSorterActions::copy);
-    actionFactory.addMold("move", StandardFileSorterActions::move);
-    actionFactory.addMold("pretend", StandardFileSorterActions::pretend);
+    static FileSortingStrategies::SortStrategyFactory actionFactory;
+    actionFactory.addMold("copy", StandardFileSorterSortStrategies::copy);
+    actionFactory.addMold("move", StandardFileSorterSortStrategies::move);
+    actionFactory.addMold("pretend", StandardFileSorterSortStrategies::pretend);
 
-    //@todo add way to list available actions in help
+    //@todo add way to list available strategies in help
     struct FileSorterParameters : CommandLineParameters {
         Argument<std::filesystem::path> targetPath                        = {"PATH"};
         DefaultParameter<std::map<std::string, std::string>> mimeMatchers = {
@@ -37,20 +37,22 @@ int main(int argc, char* argv[]) {
                 {.shortKey      = 'a',
                  .longKey       = "action",
                  .argumentName  = "ACTION",
-                 .doc           = "Action to perform on files\nAvailable actions:\ncopy\nmove\npretend",
+                 .doc           = "Action to perform on files\nAvailable strategies:\ncopy\nmove\npretend",
                  .defaultValue  = "copy",
                  .allowedValues = actionFactory.getMolds()}};
     };
 
     const auto& parameters = CommandLineParameters::parse<FileSorterParameters>(argc, argv);
     auto fetcher           = std::make_unique<FilesystemFileListFetcher>();
-    FileSorter fileSorter(std::move(fetcher), actionFactory.create(parameters.action()));
+    FileSorter fileSorter(std::move(fetcher),
+                          {.sortStrategy        = actionFactory.create(parameters.action()),
+                           .fileExistsPredicate = StandardFileSorterPredicates::fileExistsPredicate});
     for (const auto& [mime, pattern] : parameters.mimeMatchers()) {
         fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(mime), pattern);
     }
     for (const auto& [name, pattern] : parameters.nameMatchers()) {
         fileSorter.addPattern(std::make_unique<FileSorterNameMatcher>(name), pattern);
     }
-    fileSorter.sort(parameters.targetPath());
+    fileSorter.sort(parameters.targetPath()) | FileSorter::printResult;
     return 0;
 }
