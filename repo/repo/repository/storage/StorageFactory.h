@@ -16,8 +16,7 @@ namespace bsc {
     private:
         fs::path storagePath;
     public:
-
-        IStoragePtr create(const SelectorType& selector, const ArgumentType& argument) override;
+        IStoragePtr create(const SelectorType& selector, const ArgumentType& argument) const override;
 
         explicit StorageFactory(fs::path storagePath);
 

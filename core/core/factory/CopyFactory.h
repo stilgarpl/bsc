@@ -10,6 +10,7 @@
 #include <set>
 namespace bsc {
 
+    //@todo replace with Factory::InvalidSelector
     class CopyFactoryNoMoldException : public std::domain_error {
     public:
         CopyFactoryNoMoldException(const std::string& arg) : domain_error(arg) {}
@@ -23,9 +24,9 @@ namespace bsc {
         std::map<SelectorType, ProducedObjectType> molds{};
 
     public:
-        ProducedObjectType create(const SelectorType& selector) override {
+        ProducedObjectType create(const SelectorType& selector) const override {
             if (molds.contains(selector)) {
-                return molds[selector];
+                return molds.at(selector);
             } else {
                 using namespace std::string_literals;
                 //@todo this assumes selector is string. fix for other types

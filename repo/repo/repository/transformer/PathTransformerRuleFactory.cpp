@@ -8,9 +8,9 @@
 #include <repo/repository/transformer/rules/HomeDirRule.h>
 #include <repo/repository/transformer/rules/TmpRule.h>
 
-bsc::PathTransformerRulePtr bsc::PathTransformerRuleFactory::create(const SelectorType& selector, const ArgumentType& argument) {
+bsc::PathTransformerRulePtr bsc::PathTransformerRuleFactory::create(const SelectorType& selector,
+                                                                    const ArgumentType& argument) const {
     switch (selector) {
-
 
         case PathTransformerRuleSelector::tmp:
             return std::make_shared<TmpRule>();

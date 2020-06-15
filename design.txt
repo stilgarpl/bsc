@@ -704,3 +704,17 @@ context() -> NodeContext& ?
 
 @todo rename(renameFormat) -> should validate format and throw if it doesn't have right field {}
 
+
+
+
+@todo Factory!!! tak jak w CommandModule, wykorzystac unpack caller zeby móc
+zapisac dowolne metody tworzace obiekty. create() mialoby wtedy vector string
+-> ktory bylby rzutowany przez unpack do wlasciwych typow, odpowiednia metoda
+przechowywana w lambdzie. 
+Factory.registerFactoryMethod<"rename">(make<ss::rename,std::string>);
+... ("rename",make<...>) <-- bez NTTP 
+w sumie to to nawet nie musi korzystac z make<>, bo moze wydedukowac wszystkie
+parametry
+Factory.register("rename",ss::rename); tak samo jak w CommandModule
+
+@todo najlepsze miejsce do definiowania factory traits to to samo miejsce gdzie sie definiuje specialization. problem jest NoSpecialization - moze to usunac i wymagac specjalizacje dla kazdego typu?

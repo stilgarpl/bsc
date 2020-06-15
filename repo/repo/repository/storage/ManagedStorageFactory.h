@@ -17,8 +17,8 @@ namespace bsc {
     private:
         StorageManager& manager;
     public:
-//    IStoragePtr create(const SelectorType &selector) override;
-        IStoragePtr create(const SelectorType& selector) override;
+        //    IStoragePtr create(const SelectorType &selector) override;
+        IStoragePtr create(const SelectorType& selector) const override;
 
         explicit ManagedStorageFactory(StorageManager& manager);
     };

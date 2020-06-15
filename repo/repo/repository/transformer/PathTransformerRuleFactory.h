@@ -15,7 +15,7 @@ namespace bsc {
 
     class PathTransformerRuleFactory : public Factory<PathTransformerRulePtr> {
     public:
-        PathTransformerRulePtr create(const SelectorType& selector, const ArgumentType& argument) override;
+        PathTransformerRulePtr create(const SelectorType& selector, const ArgumentType& argument) const override;
     };
 }// namespace bsc
 

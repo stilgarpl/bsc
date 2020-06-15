@@ -13,6 +13,7 @@
 #include <optional>
 #include <parser/parser/fromString.h>
 #include <set>
+#include <span>
 #include <utility>
 
 namespace bsc {
@@ -66,7 +67,6 @@ namespace bsc {
             std::optional<std::string> beforeInfo = std::nullopt;
             std::optional<std::string> afterInfo  = std::nullopt;
             std::optional<decltype(rawArguments)::size_type> requiredArgumentsCount;
-
             void incrementRequiredArguments() {
                 if (!requiredArgumentsCount.has_value()) {
                     requiredArgumentsCount = 0;
@@ -81,7 +81,12 @@ namespace bsc {
             void prepareParser(ParseConfiguration parseConfiguration);
             void parse(int argc, char* argv[]);
             static char* helpFilter(int key, const char* text, void* input);
-            auto& gerParsedArguments() { return rawArguments; }
+            auto& getParsedArguments() { return rawArguments; }
+            auto getRemainingArguments() {
+                return std::span<std::string>(rawArguments.begin() +
+                                                      (requiredArgumentsCount ? *requiredArgumentsCount : 0),
+                                              rawArguments.end());
+            };
 
             friend class CommandLineParameters::ParserBuilder;
             void prepareArgumentUsage();
@@ -186,9 +191,10 @@ namespace bsc {
             return parse<T>(cstrings.size(), cstrings.data(), parseConfiguration);
         }
 
-        //@todo add method that returns only arguments that were not matched against required arguments - use std::span
-        // when avaiable
-        [[nodiscard]] const std::vector<std::string>& arguments() const { return parser->gerParsedArguments(); }
+        [[nodiscard]] const std::vector<std::string>& arguments() const { return parser->getParsedArguments(); }
+        [[nodiscard]] const std::span<std::string> remainingArguments() const {
+            return parser->getRemainingArguments();
+        }
     };
 
     template<typename T>
@@ -323,7 +329,7 @@ namespace bsc {
     class DefaultParameter : public BaseParameter<T> {
 
     public:
-        using AllowedValues = BaseParameter<T>::AllowedValues;
+        using AllowedValues = typename BaseParameter<T>::AllowedValues;
         struct DefaultParameterDefinition {
             std::optional<char> shortKey{};
             std::optional<std::string_view> longKey{};

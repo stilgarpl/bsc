@@ -27,7 +27,7 @@ struct TestParameters : CommandLineParameters {
 
 TEST_CASE("Parameters test") {
     using namespace std::string_literals;
-    std::vector<std::string> arg = {"-f"s, "-s"s, "short"s, "-t"s, "la la"s, "-v"s, "1,2,7"s, "5"s};
+    std::vector<std::string> arg = {"-f"s, "-s"s, "short"s, "-t"s, "la la"s, "-v"s, "1,2,7"s, "5"s, "argument"};
     const auto& params = CommandLineParameters::parse<TestParameters>("cmd"s, arg, ParseConfiguration::silent);
     REQUIRE(params.flag() == true);
     REQUIRE(params.text() == "la la");
@@ -39,6 +39,11 @@ TEST_CASE("Parameters test") {
     REQUIRE(params.number() == 5);
     REQUIRE(params.shortText() == "short");
     REQUIRE(params.defaultText() == "default");
+    std::vector<std::string> expectedArguments          = {{"5"}, {"argument"}};
+    std::vector<std::string> expectedRemainingArguments = {{"argument"}};
+    REQUIRE(params.arguments() == expectedArguments);
+    REQUIRE(params.remainingArguments()[0] == std::span(expectedRemainingArguments)[0]);
+    REQUIRE(params.remainingArguments().size() == std::span(expectedRemainingArguments).size());
 }
 
 TEST_CASE("Invalid parameters test") {
