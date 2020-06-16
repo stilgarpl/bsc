@@ -156,8 +156,17 @@ namespace bsc {
                                     ""s,
                                     [](const auto& a, const auto& b) { return a.empty() ? b : a + ", " + b; });
                             //@todo add option name (short or long) to message.
+                            auto failedOption = std::find_if(self->argpOptions.begin(),
+                                                             self->argpOptions.end(),
+                                                             [&key](argp_option& option) { return option.key == key; });
+                            std::string parameterName =
+                                    (failedOption != self->argpOptions.end() && failedOption->name != nullptr)
+                                            ? failedOption->name
+                                    : key < 128 ? std::string(1, key)
+                                                : "unknown";
                             argp_error(state,
-                                       "Value \"%s\" is not allowed. Allowed values: %s",
+                                       "Parameter [%s] : Value \"%s\" is not allowed. Allowed values: %s",
+                                       parameterName.c_str(),
                                        arg,
                                        allowedValues.c_str());
                         } else {

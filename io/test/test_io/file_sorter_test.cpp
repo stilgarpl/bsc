@@ -58,10 +58,19 @@ TEST_CASE("Sort strategies test") {
 
 TEST_CASE("Sort error strategies test") {
     const fs::path file = "/tmp";
-    const FileSortingException exception("Exception");
-    SECTION("ignore strategy") { REQUIRE_NOTHROW(StandardFileSorterErrorHandlers::ignore(file, exception)); }
+    const FileSortingException exception("Exception", file);
+    std::list<SortFailure> failures;
+    SECTION("ignore strategy") {
+        REQUIRE_NOTHROW(StandardFileSorterErrorHandlers::ignore(file, exception, failures));
+        REQUIRE(failures.empty());
+    }
+    SECTION("continue strategy") {
+        REQUIRE_NOTHROW(StandardFileSorterErrorHandlers::logAndContinue(file, exception, failures));
+        REQUIRE(!failures.empty());
+    }
     SECTION("stop strategy") {
-        REQUIRE_THROWS_AS(StandardFileSorterErrorHandlers::stop(file, exception), FileSortingException);
+        REQUIRE_THROWS_AS(StandardFileSorterErrorHandlers::stop(file, exception, failures), FileSortingException);
+        REQUIRE(!failures.empty());
     }
 }
 
@@ -267,7 +276,7 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
         const auto& result = fileSorter.sort(resourcePath);
-        REQUIRE(result.getFilesSortedMap().size() == 3);
+        REQUIRE(result.getSortedFiles().size() == 3);
         REQUIRE(fs::exists(destinationPath / "Images"));
         //@todo this will fail in 2021, fix tests with current year for images that does not have exif data
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.gif"));
@@ -290,7 +299,7 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
         const auto& result = fileSorter.sort(resourcePath);
-        REQUIRE(result.getFilesSortedMap().size() == 4);
+        REQUIRE(result.getSortedFiles().size() == 4);
         REQUIRE(fs::exists(destinationPath / "Images"));
         //@todo this will fail in 2021, fix tests with current year for images that does not have exif data
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.gif"));
@@ -303,7 +312,7 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
         SECTION("second sort should end with error") {
             const auto& result = fileSorter.sort(resourcePath);
-            REQUIRE(result.getFilesSortedMap().size() == 0);
+            REQUIRE(result.getSortedFiles().size() == 0);
         }
     }
 }

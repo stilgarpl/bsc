@@ -718,3 +718,12 @@ parametry
 Factory.register("rename",ss::rename); tak samo jak w CommandModule
 
 @todo najlepsze miejsce do definiowania factory traits to to samo miejsce gdzie sie definiuje specialization. problem jest NoSpecialization - moze to usunac i wymagac specjalizacje dla kazdego typu?
+
+@todo error handlers w file sorter - ignore powinno pomijac bledy bez dodawania ich do listy, a continue dodawac ale leciec dalej jak ignore
+@todo powinienem dodać automatyczną serializację tych opcji - w końcu mam krótki/długi klucz, wystarczyłoby to dać w normalnym formacie key=value. skonwertować plik do vector of strings, rzucic argp do przeprocesowania. w ten sposób można załadować tę konfigurację z pliku lub ustawić wartości przed parsowaniem (dla rzeczy których ktoś nie poda)
+-a copy
+--mime ####
+--name ####
+--error ###
+CLI::parse<>(argc,argv,configPath)
+parameters.saveConfiguration(configPath)

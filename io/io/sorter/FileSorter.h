@@ -8,27 +8,15 @@
 #include <filesystem>
 #include <io/sorter/fetchers/FileListFetcher.h>
 #include <io/sorter/mappers/FileSorterMapper.h>
+#include <io/sorter/result/SortResult.h>
 #include <io/sorter/strategies/StandardFileSorterStrategies.h>
 #include <io/sorter/strategies/Strategies.h>
+#include <list>
 namespace bsc {
 
     class FileSorter {
     public:
-        class SortResult;
-        using ResultConsumer = std::function<void(const SortResult&)>;
-        class SortResult {
-            std::map<fs::path, fs::path> filesMap;
-            friend class FileSorter;
 
-        public:
-            [[nodiscard]] const decltype(filesMap)& getFilesSortedMap() const { return filesMap; }
-            const SortResult& operator|(const ResultConsumer& consumer) const {
-                consumer(*this);
-                return *this;
-            }
-        };
-
-        static ResultConsumer printResult;
 
         struct SortingStrategies {
             const FileSortingStrategies::SortStrategy sortStrategy = StandardFileSorterSortStrategies::copy;

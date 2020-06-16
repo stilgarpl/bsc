@@ -5,22 +5,21 @@
 #include "StandardFileSorterStrategies.h"
 #include <core/log/Logger.h>
 #include <fmt/format.h>
+
 #include <parser/parser/fromString.h>
 namespace bsc {
     FileSortingStrategies::SortStrategy StandardFileSorterSortStrategies::copy = [](const std::filesystem::path& from,
                                                                                     const std::filesystem::path& to) {
         //@todo check for errors? throw ? anything?
-        //@todo create directories if not exist?
         LOGGER("Copying " + from.string() + " to " + to.string());
         LOGGER("Creating dirs: " + to.parent_path().string());
         fs::create_directories(to.parent_path());
-        fs::copy(from, to);
+        fs::copy(from, to, fs::copy_options::overwrite_existing);
         //@todo copy properties of the file
     };
     FileSortingStrategies::SortStrategy StandardFileSorterSortStrategies::move = [](const fs::path& from,
                                                                                     const fs::path& to) {
         //@todo check for errors? throw ? anything?
-        //@todo create directories if not exist?
         fs::create_directories(to.parent_path());
         fs::rename(from, to);
     };
@@ -38,15 +37,15 @@ namespace bsc {
     };
 
     FileSortingStrategies::CreateValidTargetPathStrategy StandardCreateValidTargetPathStrategies::overwrite =
-            [](const fs::path& from, const FileSortingStrategies::FileExistsPredicate&) { return from; };
+            [](const fs::path& target, const FileSortingStrategies::FileExistsPredicate&) { return target; };
 
     FileSortingStrategies::CreateValidTargetPathStrategy StandardCreateValidTargetPathStrategies::skip =
-            [](const fs::path& from, const FileSortingStrategies::FileExistsPredicate&) { return fs::path{}; };
+            [](const fs::path& target, const FileSortingStrategies::FileExistsPredicate&) { return fs::path{}; };
 
     FileSortingStrategies::CreateValidTargetPathStrategy StandardCreateValidTargetPathStrategies::abort =
-            [](const fs::path& from, const FileSortingStrategies::FileExistsPredicate&) -> fs::path {
+            [](const fs::path& target, const FileSortingStrategies::FileExistsPredicate&) -> fs::path {
         //@todo better error message
-        throw FileSortingException("Aborting: " + from.string());
+        throw FileSortingException("Aborting: " + target.string(), {}, target);
     };
 
     FileSortingStrategies::CreateValidTargetPathStrategy
@@ -55,14 +54,14 @@ namespace bsc {
         //@todo validate regex or add error handling.
         std::string regexString = fmt::format(escapeAllRegexCharacters(suffixFormat), "([0-9]+)") + '$';
         auto numberRegex        = std::regex(regexString);
-        return [numberRegex, regexString, suffixFormat](const fs::path& from,
+        return [numberRegex, regexString, suffixFormat](const fs::path& target,
                                                         const FileSortingStrategies::FileExistsPredicate& fileExists) {
             // stem and update index to it's value
 
             int index         = 1;
-            fs::path newPath  = from;
-            auto parentPath   = from.parent_path();
-            auto filenameStem = from.stem().string();
+            fs::path newPath  = target;
+            auto parentPath   = target.parent_path();
+            auto filenameStem = target.stem().string();
             std::smatch numberMatch;
             LOGGER("trying to match " + regexString + " to " + filenameStem);
             if (std::regex_search(filenameStem, numberMatch, numberRegex)) {
@@ -75,7 +74,7 @@ namespace bsc {
             do {
                 auto suffix = fmt::format(suffixFormat, index);
                 LOGGER("file name stem is :" + filenameStem);
-                newPath = parentPath / (filenameStem + suffix + from.extension().string());
+                newPath = parentPath / (filenameStem + suffix + target.extension().string());
                 LOGGER("rename: trying " + newPath.string())
                 index++;
             } while (fileExists(newPath));
@@ -102,12 +101,23 @@ namespace bsc {
             PretendFileExistsPredicate();
 
     FileSortingStrategies::ErrorHandlingStrategy StandardFileSorterErrorHandlers::ignore =
-            [](const fs::path& from, const std::exception& exception) {
+            [](const fs::path& from, const std::exception& exception, std::list<SortFailure>& sortFailure) {
+                ERROR("Failed processing " + from.string() + " exception: " + exception.what());
+            };
+
+    FileSortingStrategies::ErrorHandlingStrategy StandardFileSorterErrorHandlers::logAndContinue =
+            [](const fs::path& from, const FileSortingException& exception, std::list<SortFailure>& sortFailure) {
+                sortFailure.push_back({.sourcePath      = from,
+                                       .destinationPath = exception.getDestinationPath(),
+                                       .errorMessage    = exception.what()});
                 ERROR("Failed processing " + from.string() + " exception: " + exception.what());
             };
 
     FileSortingStrategies::ErrorHandlingStrategy StandardFileSorterErrorHandlers::stop =
-            [](const fs::path& from, const FileSortingException& exception) {
+            [](const fs::path& from, const FileSortingException& exception, std::list<SortFailure>& sortFailure) {
+                sortFailure.push_back({.sourcePath      = from,
+                                       .destinationPath = exception.getDestinationPath(),
+                                       .errorMessage    = exception.what()});
                 ERROR("Failed processing " + from.string() + " exception: " + exception.what());
                 throw exception;
             };

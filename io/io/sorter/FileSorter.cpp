@@ -7,14 +7,15 @@
 #include <io/translator/PathTranslator.h>
 #include <iostream>
 namespace bsc {
-    FileSorter::SortResult FileSorter::sort(const fs::path& pathToSort) {
+    SortResult FileSorter::sort(const fs::path& pathToSort) {
         SortResult sortResult;
         try {
 
             PathTranslator translator;
             MimeFileTypeDecoder decoder;
             //@todo get global properties
-            const auto& fileList = fileListFetcher->listFiles(pathToSort);
+            auto fileList = fileListFetcher->listFiles(pathToSort);
+            std::ranges::sort(fileList);
             for (const auto& file : fileList) {
                 //@todo this could probably be done in parallel
                 //@todo first all patterns should be processed, then all files should be copied/moved - what if error
@@ -35,18 +36,19 @@ namespace bsc {
                             LOGGER("New target path is "s + targetPath.string());
                         }
                         //@todo this if is mostly for skip action to work, but maybe I should throw on invalid target
-                        //paths created?
+                        // paths created?
                         if (!targetPath.empty()) {
 
                             actions.sortStrategy(file, targetPath);
-                            sortResult.filesMap[file] = targetPath;
+                            sortResult.sortedFilesMap[file] = targetPath;
                         }
                     } catch (const PathTranslationException& e) {
                         //@todo maybe better error handling?
-                        FileSortingException exception("Path transforming failed: "s + e.what());
-                        actions.errorHandlerStrategy(file, exception);
+                        FileSortingException exception("Path transforming failed: "s + e.what(), file);
+                        actions.errorHandlerStrategy(file, exception, sortResult.failedFilesList);
                     } catch (const FileSortingException& e) {
-                        actions.errorHandlerStrategy(file, e);
+                        FileSortingException exception(e.what(), file, e.getDestinationPath());
+                        actions.errorHandlerStrategy(file, exception, sortResult.failedFilesList);
                     }
 
                 } else {
@@ -55,17 +57,11 @@ namespace bsc {
             }
         } catch (const FileSortingException& e) {
             //@todo print error message?
+            ERROR("File sorting exception: "s + e.what());
         }
         return sortResult;
     }
     FileSorter::FileSorter(std::unique_ptr<FileListFetcher> fileListFetcher, SortingStrategies actions)
         : actions(std::move(actions)), fileListFetcher(std::move(fileListFetcher)) {}
 
-    FileSorter::ResultConsumer FileSorter::printResult = [](const FileSorter::SortResult& sortResult) {
-        std::cout << "\n Sorted files:\n";
-        for (const auto& [from, to] : sortResult.getFilesSortedMap()) {
-            std::cout << fmt::format("[{}] => [{}]\n", from.string(), to.string());
-        }
-        std::cout << std::endl;
-    };
 }// namespace bsc

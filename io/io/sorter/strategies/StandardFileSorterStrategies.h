@@ -18,11 +18,12 @@ namespace bsc {
         static FileSortingStrategies::CreateValidTargetPathStrategy overwrite;
         static FileSortingStrategies::CreateValidTargetPathStrategy abort;
         static FileSortingStrategies::CreateValidTargetPathStrategy skip;
-        static FileSortingStrategies::CreateValidTargetPathStrategy rename(const std::string& format = " ({})");
+        static FileSortingStrategies::CreateValidTargetPathStrategy rename(const std::string& target = " ({})");
     };
 
     struct StandardFileSorterErrorHandlers {
         static FileSortingStrategies::ErrorHandlingStrategy ignore;
+        static FileSortingStrategies::ErrorHandlingStrategy logAndContinue;
         static FileSortingStrategies::ErrorHandlingStrategy stop;
     };
 

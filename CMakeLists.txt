@@ -79,6 +79,7 @@ set(BSC_DESTINATION_INCLUDE "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
 set(BSC_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
 option(CMAKE_UNITY_BUILD "Enable unity builds" ON)
+option(BSC_USE_PCH "Use precompiled headers" OFF)
 option(BSC_ENABLE_TESTS "Enable unit tests" ON)
 
 add_subdirectory(tester)

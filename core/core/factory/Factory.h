@@ -67,7 +67,7 @@ namespace bsc {
 
     class FactoryInvalidSelector : public std::domain_error {
     public:
-        FactoryInvalidSelector(const std::string& arg) : domain_error(arg) {}
+        explicit FactoryInvalidSelector(const std::string& arg) : domain_error(arg) {}
     };
 
     template<typename ProducedObjectType,

@@ -14,10 +14,19 @@ using namespace std::string_literals;
 
 int main(int argc, char* argv[]) {
     //@todo move actionFactory setup somewhere else
-    static FileSortingStrategies::SortStrategyFactory actionFactory;
-    actionFactory.addMold("copy", StandardFileSorterSortStrategies::copy);
-    actionFactory.addMold("move", StandardFileSorterSortStrategies::move);
-    actionFactory.addMold("pretend", StandardFileSorterSortStrategies::pretend);
+    static FileSortingStrategyFactories::SortStrategyFactory actionFactory;
+    actionFactory.registerCreator("copy", StandardFileSorterSortStrategies::copy);
+    actionFactory.registerCreator("move", StandardFileSorterSortStrategies::move);
+    actionFactory.registerCreator("pretend", StandardFileSorterSortStrategies::pretend);
+    static FileSortingStrategyFactories::ErrorActionFactory errorActionFactory;
+    errorActionFactory.registerCreator("ignore", StandardFileSorterErrorHandlers::ignore);
+    errorActionFactory.registerCreator("continue", StandardFileSorterErrorHandlers::logAndContinue);
+    errorActionFactory.registerCreator("stop", StandardFileSorterErrorHandlers::stop);
+    static FileSortingStrategyFactories::CreateValidTargetPathStrategyFactory fileExistsFactory;
+    fileExistsFactory.registerCreator("overwrite", StandardCreateValidTargetPathStrategies::overwrite);
+    fileExistsFactory.registerCreator("skip", StandardCreateValidTargetPathStrategies::skip);
+    fileExistsFactory.registerCreator("abort", StandardCreateValidTargetPathStrategies::abort);
+    fileExistsFactory.registerCreator("rename", StandardCreateValidTargetPathStrategies::rename);
 
     //@todo add way to list available strategies in help
     struct FileSorterParameters : CommandLineParameters {
@@ -37,22 +46,38 @@ int main(int argc, char* argv[]) {
                 {.shortKey      = 'a',
                  .longKey       = "action",
                  .argumentName  = "ACTION",
-                 .doc           = "Action to perform on files\nAvailable strategies:\ncopy\nmove\npretend",
+                 .doc           = "Action to perform on files\nAvailable actions:\ncopy *\nmove\npretend",
                  .defaultValue  = "copy",
-                 .allowedValues = actionFactory.getMolds()}};
+                 .allowedValues = actionFactory.getSelectors()}};
+        DefaultParameter<std::string> errorHandler = {
+                {.shortKey      = 'e',
+                 .longKey       = "error",
+                 .argumentName  = "ERROR HANDLER",
+                 .doc           = "What to do when error occurs.\nAvailable handlers:\nstop *\nignore",
+                 .defaultValue  = "stop",
+                 .allowedValues = errorActionFactory.getSelectors()}};
+        DefaultParameter<std::string> fileExists = {
+                {.shortKey     = 'f',
+                 .longKey      = "file-exists",
+                 .argumentName = "ACTION",
+                 .doc = "What to do when target file exists.\nAvailable actions:\nrename *\nskip\noverwrite\nabort",
+                 .defaultValue  = "rename",
+                 .allowedValues = fileExistsFactory.getSelectors()}};
     };
 
     const auto& parameters = CommandLineParameters::parse<FileSorterParameters>(argc, argv);
     auto fetcher           = std::make_unique<FilesystemFileListFetcher>();
     FileSorter fileSorter(std::move(fetcher),
-                          {.sortStrategy        = actionFactory.create(parameters.action()),
-                           .fileExistsPredicate = StandardFileSorterPredicates::fileExistsPredicate});
+                          {.sortStrategy                  = actionFactory.create(parameters.action(), {}),
+                           .createValidTargetPathStrategy = fileExistsFactory.create(parameters.fileExists(), {}),
+                           .errorHandlerStrategy          = errorActionFactory.create(parameters.errorHandler(), {}),
+                           .fileExistsPredicate           = StandardFileSorterPredicates::fileExistsPredicate});
     for (const auto& [mime, pattern] : parameters.mimeMatchers()) {
         fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(mime), pattern);
     }
     for (const auto& [name, pattern] : parameters.nameMatchers()) {
         fileSorter.addPattern(std::make_unique<FileSorterNameMatcher>(name), pattern);
     }
-    fileSorter.sort(parameters.targetPath()) | FileSorter::printResult;
+    fileSorter.sort(parameters.targetPath()) | StandardResultConsumers::printResult;
     return 0;
 }

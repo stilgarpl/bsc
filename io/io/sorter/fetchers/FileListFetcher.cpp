@@ -7,7 +7,7 @@
 namespace bsc {
     std::vector<fs::path> FileListFetcher::listFiles(const std::filesystem::path& rootPath) {
         auto files = doListFiles(rootPath);
-        //@todo replace with ranges
+        //@todo replace with ranges C++20
         files.erase(std::remove_if(files.begin(),
                                    files.end(),
                                    [this](const auto& path) {
