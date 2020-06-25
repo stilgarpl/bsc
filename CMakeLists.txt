@@ -51,10 +51,11 @@ endif ()
 
 find_package(Catch2 CONFIG REQUIRED)
 include(Catch)
-
+message("GCC is ${CMAKE_CXX_COMPILER_ID}")
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options(-Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic -Wno-unused-but-set-variable)
-    if (LINUX)
+    if (UNIX)
+        message("GCC on Linux")
         add_compile_options(-pthread)
         add_link_options(-lpthread)
     endif ()
@@ -78,7 +79,7 @@ set(BSC_DESTINATION_LIB "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}")
 set(BSC_DESTINATION_INCLUDE "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
 set(BSC_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-option(CMAKE_UNITY_BUILD "Enable unity builds" ON)
+option(CMAKE_UNITY_BUILD "Enable unity builds" OFF)
 option(BSC_USE_PCH "Use precompiled headers" OFF)
 option(BSC_ENABLE_TESTS "Enable unit tests" ON)
 

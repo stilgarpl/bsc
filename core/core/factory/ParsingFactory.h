@@ -8,6 +8,8 @@
 #include "Factory.h"
 #include <parser/cast/templateCast.h>
 #include <set>
+#include <map>
+#include <vector>
 namespace bsc {
 
     //@todo this has the requirement of traits::argumentType = std::vector<std::string>>. try to find a way to enforce

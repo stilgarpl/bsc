@@ -10,8 +10,8 @@
 #include <chrono>
 using namespace bsc;
 
-void remoteServerTestModuleSetup(bsc::Node& node) {
-    node.addModule<bsc::BasicModule>();
+void remoteServerTestModuleSetup(Node& node) {
+    node.addModule<BasicModule>();
     node.addModule<NetworkModule>();
     node.addModule<FilesystemModule>();
 }
@@ -27,7 +27,7 @@ void waitFor(const std::function<bool(void)> &expression, std::chrono::milliseco
 
 TEST_CASE("Remote node test") {
 
-    bsc::Node thisNode;
+    Node thisNode;
 
     thisNode.getNodeInfo().setNodeId("firstNodeR");
 
@@ -35,7 +35,7 @@ TEST_CASE("Remote node test") {
     thisNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");
     thisNode.getModule<NetworkModule>()->configuration().setPort(9191);
 
-    bsc::Node otherNode;
+    Node otherNode;
     otherNode.getNodeInfo().setNodeId("secondR");
     remoteServerTestModuleSetup(otherNode);
     otherNode.getModule<NetworkModule>()->addToNetwork("TheNetwork");

@@ -5,8 +5,11 @@
 #ifndef BSC_FILESORTINGEXCEPTIONS_H
 #define BSC_FILESORTINGEXCEPTIONS_H
 
+#include <filesystem>
+#include <optional>
 #include <stdexcept>
 namespace bsc {
+    namespace fs = std::filesystem;
     class FileSortingException : public std::domain_error {
         fs::path sourcePath{};
         std::optional<fs::path> destinationPath{};

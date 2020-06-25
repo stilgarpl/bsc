@@ -44,8 +44,8 @@ namespace bsc {
 
         class ArgumentParser {
         public:
-            using OptionParseFunc   = std::function<void(const char*)>;
-            using ArgumentParseFunc = std::function<void(const std::string&)>;
+            using OptionParseFunc   = std::function<void(const char*, Parser&)>;
+            using ArgumentParseFunc = std::function<void(const std::string&, Parser&)>;
 
         private:
             std::vector<argp_option> argpOptions{};
@@ -55,7 +55,6 @@ namespace bsc {
             ParseConfiguration parseConfiguration;
             unsigned flags{};
             std::map<decltype(argp_option::key), OptionParseFunc> parseMap{};
-
             std::vector<std::string> rawArguments{};
             struct ArgumentDescriptor {
                 ArgumentParseFunc argumentParseFunc{};
@@ -67,6 +66,8 @@ namespace bsc {
             std::optional<std::string> beforeInfo = std::nullopt;
             std::optional<std::string> afterInfo  = std::nullopt;
             std::optional<decltype(rawArguments)::size_type> requiredArgumentsCount;
+            Parser parser{};
+
             void incrementRequiredArguments() {
                 if (!requiredArgumentsCount.has_value()) {
                     requiredArgumentsCount = 0;
@@ -78,7 +79,7 @@ namespace bsc {
         public:
             static error_t parseArgument(int key, char* arg, struct argp_state* state);
 
-            void prepareParser(ParseConfiguration parseConfiguration);
+            void prepareParser(ParseConfiguration configuration, const Parser&);
             void parse(int argc, char* argv[]);
             static char* helpFilter(int key, const char* text, void* input);
             auto& getParsedArguments() { return rawArguments; }
@@ -89,6 +90,7 @@ namespace bsc {
             };
 
             friend class CommandLineParameters::ParserBuilder;
+            friend class CommandLineParser;
             void prepareArgumentUsage();
         };
 
@@ -153,26 +155,35 @@ namespace bsc {
     public:
         CommandLineParameters();
 
+        friend class CommandLineParser;
+
+        [[nodiscard]] const std::vector<std::string>& arguments() const { return parser->getParsedArguments(); }
+        [[nodiscard]] const std::span<std::string> remainingArguments() const {
+            return parser->getRemainingArguments();
+        }
+    };
+
+    class CommandLineParser {
+    private:
+        ParseConfiguration parseConfiguration = ParseConfiguration::simple;
+        const Parser parser{};
+
+    public:
+        CommandLineParser(ParseConfiguration parseConfiguration, const Parser& parser)
+            : parseConfiguration(parseConfiguration), parser(parser) {}
+        CommandLineParser() = default;
+
         template<ParametersClass T>
-        [[nodiscard]] static T
-        parse(int argc, char* argv[], ParseConfiguration parseConfiguration = ParseConfiguration::simple) {
+        [[nodiscard]] T parse(int argc, char* argv[]) {
+            static Parser parser;
             T t;
-            t.parser->prepareParser(parseConfiguration);
+            t.parser->prepareParser(parseConfiguration, parser);
             t.parser->parse(argc, argv);
             return t;
         }
 
         template<ParametersClass T>
-        [[nodiscard]] static T parse(const std::vector<std::string>& vals,
-                                     ParseConfiguration parseConfiguration = ParseConfiguration::simple) {
-            std::string empty;
-            return parse<T>(empty, vals, parseConfiguration);
-        }
-
-        template<ParametersClass T>
-        [[nodiscard]] static T parse(const std::string& commandName,
-                                     const std::vector<std::string>& vals,
-                                     ParseConfiguration parseConfiguration = ParseConfiguration::simple) {
+        [[nodiscard]] T parse(const std::vector<std::string>& vals) {
             // guarantee contiguous, null terminated strings
             std::vector<std::vector<char>> vstrings;
             // pointers to those strings
@@ -180,20 +191,36 @@ namespace bsc {
             vstrings.reserve(vals.size() + 1);
             cstrings.reserve(vals.size() + 1);
 
-            vstrings.emplace_back(commandName.begin(), commandName.end());
-            vstrings.back().push_back('\0');
-            cstrings.push_back(vstrings.back().data());
             for (const auto& val : vals) {
                 vstrings.emplace_back(val.begin(), val.end());
                 vstrings.back().push_back('\0');
                 cstrings.push_back(vstrings.back().data());
             }
-            return parse<T>(cstrings.size(), cstrings.data(), parseConfiguration);
+            return this->parse<T>(cstrings.size(), cstrings.data());
         }
 
-        [[nodiscard]] const std::vector<std::string>& arguments() const { return parser->getParsedArguments(); }
-        [[nodiscard]] const std::span<std::string> remainingArguments() const {
-            return parser->getRemainingArguments();
+        template<ParametersClass T>
+        [[nodiscard]] T parse(const std::string& commandName, std::vector<std::string> vals) {
+            vals.insert(vals.begin(), commandName);
+            return this->parse<T>(vals);
+        }
+
+        template<ParametersClass T>
+        [[nodiscard]] static T defaultParse(int argc, char* argv[]) {
+            static CommandLineParser commandLineParser;
+            return commandLineParser.parse<T>(argc, argv);
+        }
+
+        template<ParametersClass T>
+        [[nodiscard]] static T defaultParse(const std::vector<std::string>& vals) {
+            static CommandLineParser commandLineParser;
+            return commandLineParser.parse<T>(vals);
+        }
+
+        template<ParametersClass T>
+        [[nodiscard]] static T defaultParse(const std::string& commandName, std::vector<std::string> vals) {
+            static CommandLineParser commandLineParser;
+            return commandLineParser.parse<T>(commandName, vals);
         }
     };
 
@@ -235,8 +262,7 @@ namespace bsc {
         AllowedValues allowedValues{};
 
         CommandLineParameters::ArgumentParser::OptionParseFunc makeParseFunction() {
-            static Parser parser;
-            return [this](const char* input) {
+            return [this](const char* input, Parser& parser) {
                 std::string text = input != nullptr ? input : "";
                 //@todo maybe this should be optimized so it is only called once
                 const auto& validValues = this->allowedValues.get();
@@ -250,7 +276,7 @@ namespace bsc {
                 } else {
                     // if parameter is mentioned multiple times and it's a container, combine options. otherwise,
                     // overwrite.
-                    if constexpr (is_container_not_string<T>::value) {
+                    if constexpr (IsContainerNotString<T>) {
                         auto tempValue = parser.fromString<T>(text);
                         std::for_each(tempValue.begin(), tempValue.end(), [this](auto& i) {
                             value->insert(value->end(), i);
@@ -275,6 +301,7 @@ namespace bsc {
         void setValue(const T& v) { value = v; }
 
     public:
+        //@todo maybe I should add callback here that will be called after this value is set?
         struct BaseParameterDefinition {
             std::optional<char> shortKey{};
             std::optional<std::string_view> longKey{};
@@ -443,8 +470,7 @@ namespace bsc {
     private:
         std::optional<T> value;
         CommandLineParameters::ArgumentParser::ArgumentParseFunc makeParseFunction() {
-            static Parser parser;
-            return [this](const std::string& text) {
+            return [this](const std::string& text, Parser& parser) {
                 // this if is probably not necessary, it will be a bug to call it more than once.
                 if (!value) {
                     value = parser.fromString<T>(text);

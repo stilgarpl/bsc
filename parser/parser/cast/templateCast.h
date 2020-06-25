@@ -10,6 +10,7 @@
 #include <vector>
 #include <parser/parser/fromString.h>
 //#include "from_string.h"
+#include <functional>
 
 namespace bsc {
     class IncorrectParametersException {
@@ -24,25 +25,25 @@ namespace bsc {
     };
 
     template<typename T, typename RetType, typename Parameter, typename... Args, typename... Strings>
-    static RetType runStringCast(T& t, RetType (T::*f)(Args...), Strings... strings) {
+    inline static RetType runStringCast(T& t, RetType (T::*f)(Args...), Strings... strings) {
         static Parser parser{};
         return (t.*f)(parser.fromString<Args>(strings)...);
     }
 
     template<typename T, typename RetType, typename... Args, typename... Strings>
-    static RetType runStringCast(T& t, RetType (T::*f)(Args...), Strings... strings) {
+    inline static RetType runStringCast(T& t, RetType (T::*f)(Args...), Strings... strings) {
         static Parser parser{};
         return (t.*f)(parser.fromString<Args>(strings)...);
     }
 
     template<typename RetType, typename... Args, typename... Strings>
-    static RetType runStringCast(RetType (*f)(Args...), Strings... strings) {
+    inline static RetType runStringCast(RetType (*f)(Args...), Strings... strings) {
         static Parser parser{};
         return (*f)(parser.fromString<Args>(strings)...);
     }
 
     template<typename RetType, typename... Args, typename... Strings>
-    static RetType runStringCast(std::function<RetType(Args...)> f, Strings... strings) {
+    inline static RetType runStringCast(std::function<RetType(Args...)> f, Strings... strings) {
         static Parser parser{};
         return f(parser.fromString<Args>(strings)...);
     }
@@ -90,19 +91,19 @@ namespace bsc {
     };
 
     template<typename T, typename RetType, typename... Args>
-    RetType runMemberFunction(T& t, RetType (T::*f)(Args...), std::vector<std::string> values) {
+    inline RetType runMemberFunction(T& t, RetType (T::*f)(Args...), std::vector<std::string> values) {
         bsc::UnpackCaller<sizeof...(Args)> a;
         return a(t, f, values);
     }
 
     template<typename RetType, typename... Args>
-    RetType runFunction(RetType (*f)(Args...), std::vector<std::string> values) {
+    inline RetType runFunction(RetType (*f)(Args...), std::vector<std::string> values) {
         bsc::UnpackCaller<sizeof...(Args)> a;
         return a(f, values);
     }
 
     template<typename RetType, typename... Args>
-    RetType runStandardFunction(std::function<RetType(Args...)> f, std::vector<std::string> values) {
+    inline RetType runStandardFunction(std::function<RetType(Args...)> f, std::vector<std::string> values) {
         bsc::UnpackCaller<sizeof...(Args)> a;
         return a(f, values);
     }

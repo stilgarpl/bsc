@@ -12,12 +12,12 @@
 using namespace std::chrono_literals;
 using namespace bsc;
 
-void setupModules(bsc::Node& node) {
-    node.addModule<bsc::BasicModule>();
-    node.addModule<bsc::FilesystemModule>();
-    node.addModule<bsc::NetworkModule>();
+void setupModules(Node& node) {
+    node.addModule<BasicModule>();
+    node.addModule<FilesystemModule>();
+    node.addModule<NetworkModule>();
     node.addModule<RepoModule>();
-    node.addModule<bsc::CommandModule>();
+    node.addModule<CommandModule>();
 }
 
 //@todo commands should be setDirect up by submodule, right now they are redeclared in every main
@@ -26,14 +26,14 @@ void setupCommands(CommandModule *cmd) {
     cmd->group("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->group("tt").group("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
-    cmd->mapCommand("connect", &bsc::NetworkModule::connectTo);
-    cmd->mapCommand("connectTo", &bsc::NetworkModule::connectToNode);
-    cmd->mapCommand<bsc::NetworkModule, RemoteNode&, const NodeIdType&>("getnode", &bsc::NetworkModule::getRemoteNode);
-    cmd->mapCommand("disconnect", &bsc::NetworkModule::disconnect);
-    cmd->mapCommand("print", &bsc::NetworkModule::printConnections);
+    cmd->mapCommand("connect", &NetworkModule::connectTo);
+    cmd->mapCommand("connectTo", &NetworkModule::connectToNode);
+    cmd->mapCommand<NetworkModule, RemoteNode&, const NodeIdType&>("getnode", &NetworkModule::getRemoteNode);
+    cmd->mapCommand("disconnect", &NetworkModule::disconnect);
+    cmd->mapCommand("print", &NetworkModule::printConnections);
     cmd->mapRawCommand("remote", &CommandModule::sendRemoteCommand);
     cmd->mapRawCommand("broadcast", &CommandModule::broadcastRemoteCommand);
-    cmd->mapCommand("shutdown", &bsc::BasicModule::shutdownNode);
+    cmd->mapCommand("shutdown", &BasicModule::shutdownNode);
     cmd->mapCommand("cd", &FilesystemModule::changeDirectory);
     cmd->mapCommand("pwd", &FilesystemModule::printWorkingDirectory);
     cmd->mapCommand("ls", &FilesystemModule::listCurrentDirectory);
@@ -49,10 +49,10 @@ void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("deploy", &RepoModule::deployAllFiles);
     cmd->mapCommand("run", &CommandModule::runScript);
     cmd->mapCommand("sleep", &CommandModule::sleep);
-    cmd->mapCommand("saveConf", &bsc::BasicModule::saveAllConfiguration);
+    cmd->mapCommand("saveConf", &BasicModule::saveAllConfiguration);
     cmd->mapRawCommand("bg", &CommandModule::runInBackground);
-    cmd->mapCommand("fireTrigV", &bsc::BasicModule::fireTriggerValue<std::string, std::string>);
-    cmd->mapCommand("fireTrig", &bsc::BasicModule::fireTrigger<std::string>);
+    cmd->mapCommand("fireTrigV", &BasicModule::fireTriggerValue<std::string, std::string>);
+    cmd->mapCommand("fireTrig", &BasicModule::fireTrigger<std::string>);
 
 }
 
@@ -68,16 +68,16 @@ struct BscControlProgramParameters : CommandLineParameters {
 
 int main(int argc, char* argv[]) {
 
-    auto parameters = CommandLineParameters::parse<BscControlProgramParameters>(argc, argv);
-    bsc::Node thisNode;
+    auto parameters = CommandLineParser::defaultParse<BscControlProgramParameters>(argc, argv);
+    Node thisNode;
 
 //    auto host_name = boost::asio::ip::host_name();
     //@todo name from configuration
     thisNode.getNodeInfo().setNodeId(Poco::Environment::nodeName());
 
     setupModules(thisNode);
-    thisNode.getModule<bsc::NetworkModule>()->addToNetwork(parameters.networkName());
-    thisNode.getModule<bsc::NetworkModule>()->configuration().setPort(parameters.port());
+    thisNode.getModule<NetworkModule>()->addToNetwork(parameters.networkName());
+    thisNode.getModule<NetworkModule>()->configuration().setPort(parameters.port());
 
     auto cmdN = thisNode.getModule<CommandModule>();
 

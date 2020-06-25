@@ -65,17 +65,17 @@ namespace bsc {
 
     }
 
-    void CommandModule::sendRemoteCommand(ArgumentContainerTypeRef args) {
+    void CommandModule::sendRemoteCommand(ArgumentContainerTypeCRef args) {
         LOGGER("send remote")
         //@todo add checking if the number of parameters is correct
         if (args.size() >= 2) {
-            std::string nodeId = args[0];
+            std::string nodeId  = args[0];
             std::string command = args[1];
             std::vector<std::string> rest(args.begin() + 2, args.end());
 
-            auto netModule = node.getModule<bsc::NetworkModule>();
+            auto netModule                          = node.getModule<bsc::NetworkModule>();
             bsc::CommandPacket::Request::Ptr packet = bsc::CommandPacket::Request::getNew();
-            //CommandPacket::Request* packet;
+            // CommandPacket::Request* packet;
             packet->setData(rest);
             packet->setCommandName(command);
             LOGGER("sending packet ")
@@ -94,7 +94,7 @@ namespace bsc {
         }
     }
 
-    void CommandModule::sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentContainerTypeRef args) {
+    void CommandModule::sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentContainerTypeCRef args) {
         //@todo unify this and sendRemoteCommand
         LOGGER("send remote")
         //@todo add checking if the number of parameters is correct
@@ -102,9 +102,9 @@ namespace bsc {
             std::string command = args[0];
             std::vector<std::string> rest(args.begin() + 1, args.end());
 
-            auto netModule = node.getModule<bsc::NetworkModule>();
+            auto netModule                          = node.getModule<bsc::NetworkModule>();
             bsc::CommandPacket::Request::Ptr packet = bsc::CommandPacket::Request::getNew();
-            //CommandPacket::Request* packet;
+            // CommandPacket::Request* packet;
             packet->setData(rest);
             packet->setCommandName(command);
             LOGGER("sending packet ")

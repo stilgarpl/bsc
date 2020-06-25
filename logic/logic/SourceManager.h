@@ -158,6 +158,7 @@ namespace bsc {
 
 //
     private:
+        std::recursive_mutex sourcesLock;
         SourceList sources;
         //@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
         bsc::Uber<Type> sourcesByType;
@@ -168,6 +169,7 @@ namespace bsc {
 
         template<typename SourceType, typename... Args>
         void addSource(Args... args) {
+            std::lock_guard g(sourcesLock);
             std::shared_ptr<SourceType> sourcePtr = std::make_shared<SourceType>(*this, args...);
             addSource(sourcePtr);
             auto& sbt = sourcesByType.get<std::shared_ptr<SourceType>>();
@@ -176,11 +178,13 @@ namespace bsc {
 
         template<typename SourceType>
         std::shared_ptr<SourceType> getSource() {
+            std::lock_guard g(sourcesLock);
             return sourcesByType.get<std::shared_ptr<SourceType>>();
         }
 
         template<typename SourceType>
         void removeSource() {
+            std::lock_guard g(sourcesLock);
             std::shared_ptr<SourceType> sourcePtr = sourcesByType.get<std::shared_ptr<SourceType>>();
             removeSource(sourcePtr);
             sourcesByType.get<std::shared_ptr<SourceType>>() = nullptr;
@@ -190,6 +194,7 @@ namespace bsc {
         void addSource(const SourcePtr& source);
 
         void removeSource(SourcePtr source) {
+            std::lock_guard g(sourcesLock);
             sources.remove(source);
         }
 
@@ -225,7 +230,7 @@ namespace bsc {
 //    }
         void setContext(const Context::Ptr& context);
 
-
+        virtual ~SourceManager();
     };
 }
 #endif //BSC_SOURCEMANAGER_H

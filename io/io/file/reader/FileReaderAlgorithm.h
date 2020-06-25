@@ -5,6 +5,7 @@
 #ifndef BSC_FILEREADERALGORITHM_H
 #define BSC_FILEREADERALGORITHM_H
 
+#include "io/file/MimeFileType.h"
 #include "io/translator/PropertiesMetaData.h"
 #include <filesystem>
 

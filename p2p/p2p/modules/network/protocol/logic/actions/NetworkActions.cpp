@@ -27,12 +27,13 @@ void bsc::NetworkActions::updateNetworkInfo(const NetworkInfoEvent& event) {
 
 void bsc::NetworkActions::saveNetworkInfo(const ModuleEvent<NetworkModule>& event) {
     Context::Ptr context = Context::getActiveContext();
-//    LOGGER("SAVE NETWORK INFO")
+    //    LOGGER("SAVE NETWORK INFO")
     auto nodeContext = context->get<NodeContext>();
 
     auto& node = nodeContext->getNode();
-    node.getConfigurationManager().saveData<NetworkInfo>("networkInfo.dat", *event.getModule().getNetworkInfo());
-
+    if (event.getModule().getNetworkInfo() != nullptr) {
+        node.getConfigurationManager().saveData<NetworkInfo>("networkInfo.dat", *event.getModule().getNetworkInfo());
+    }
 }
 
 void bsc::NetworkActions::loadNetworkInfo(const ModuleEvent<NetworkModule>& event) {

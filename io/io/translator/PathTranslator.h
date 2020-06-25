@@ -6,7 +6,9 @@
 #define BSC_PATHTRANSLATOR_H
 
 #include "PropertiesMetaData.h"
+#include <filesystem>
 namespace bsc {
+    namespace fs = std::filesystem;
     class PathTranslator {
     public:
         fs::path translate(const std::string& pattern, const PropertiesMetaData& properties);

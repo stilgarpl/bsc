@@ -1,27 +1,13 @@
 //
 // Created by stilgar on 07.12.17.
 //
+#include "FakeMetaDataFetcher.h"
 #include <catch2/catch.hpp>
 #include <fstream>
 #include <repo/journal/SimpleJournal.h>
-#include <repo/journal/SimpleJournalMetaDataFetcher.h>
 
 using namespace bsc;
-class FakeMetaDataFetcher : public JournalMetaDataFetcher {
-    JournalMetaData metaData;
-public:
-    JournalMetaData makeMetaData() override {
-        return metaData;
-    }
 
-    FakeMetaDataFetcher(std::string nodeId,
-                        std::string userId,
-                        std::string operatingSystemId) : metaData(nodeId, userId, operatingSystemId) {
-
-    }
-
-
-};
 
 
 TEST_CASE("Journal deterministic hash test") {

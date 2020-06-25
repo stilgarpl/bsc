@@ -12,7 +12,7 @@
 
 
 bsc::Node::~Node() {
-    std::unique_lock<std::recursive_mutex> g(startMutex);
+    std::unique_lock g(startMutex);
     //setting node context to active - if more than one node is created in a single thread, things may get mixed up.
     Node::setNodeContextActive();
     if (started) {
@@ -23,10 +23,15 @@ bsc::Node::~Node() {
 
 
 }
-
+namespace bsc {
+    bool Node::isRunning() {
+        std::unique_lock g(startMutex);
+        return started;
+    }
+}// namespace bsc
 
 void bsc::Node::start() {
-    std::unique_lock<std::recursive_mutex> g(startMutex);
+    std::unique_lock g(startMutex);
     setNodeContextActive();
     initialize();
     logicManager.start();
@@ -38,24 +43,27 @@ void bsc::Node::start() {
 
 void bsc::Node::stop() {
     LOGGER("node stop")
-    std::unique_lock<std::recursive_mutex> g(startMutex);
+    std::unique_lock g(startMutex);
     setNodeContextActive();
     started = false;
-    shutdownModules(); //@todo as above, this should wait for completion of onStop() phase on Runnable IMPORTANT!!!
+    shutdownModules();//@todo as above, this should wait for completion of onStop() phase on Runnable IMPORTANT!!!
     //@todo wait for shutdown to complete, sleep will do for now
     std::this_thread::sleep_for(10ms);
     logicManager.stop();
     stopModules();
 }
 
+bsc::Node::Node()
+    : Node({.rootPath = fs::path(std::getenv("HOME")) / ".bsc"}){LOGGER("default node constructor")}
 
-bsc::Node::Node() {
-    LOGGER("default node constructor")
+      bsc::Node::Node(const Node::Configuration& configuration)
+    : nodeConfiguration(configuration) {
+    LOGGER("configuration node constructor")
     nodeContext->set<NodeContext, Node&, NodeInfo&>(*this, this->thisNodeInfo);
     nodeContext->set<LoggerContext>([&] { return thisNodeInfo.getNodeId(); });
     nodeContext->setDirect<InputOutputContext>(std::make_shared<StandardInputOutputContext>());
 
-    //this creates common context for role definitions across the entire node.
+    // this creates common context for role definitions across the entire node.
     nodeContext->set<RoleDefinitionsContext>();
     nodeContext->setDebugId("node contxt");
 
@@ -66,7 +74,6 @@ bsc::Node::Node() {
     Node::setNodeContextActive();
     LOGGER("node constructor finished")
 }
-
 
 void bsc::Node::startModules() {
     forEachModule<void>(&bsc::NodeModule::start);
@@ -104,7 +111,7 @@ void bsc::Node::joinModules() {
 }
 
 void bsc::Node::waitToFinish() {
-    std::unique_lock<std::recursive_mutex> g(startMutex);
+    std::unique_lock g(startMutex);
     logicManager.join();
     joinModules();
 
@@ -122,13 +129,6 @@ void bsc::Node::saveConfiguration() {
 }
 
 void bsc::Node::waitUntilStarted() {
-    std::unique_lock<std::recursive_mutex> g(startMutex);
+    std::unique_lock g(startMutex);
     startedReady.wait(g, [this] { return started; });
-}
-
-bsc::Node::Configuration::Configuration() {
-
-    //@todo constant or sth for project name
-    rootPath = fs::path(std::getenv("HOME")) / ".bsc";
-//    LOGGER("root path is " + rootPath.string());
 }

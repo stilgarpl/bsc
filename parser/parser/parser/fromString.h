@@ -27,10 +27,10 @@ namespace bsc {
     concept IsPair = IsPairT<T>::value;
 
     template<typename T, typename _ = void>
-    struct is_container_not_string : std::false_type {};
+    struct IsContainerNotStringCheck : std::false_type {};
 
     template<typename T>
-    struct is_container_not_string<T,
+    struct IsContainerNotStringCheck<T,
                                    std::void_t<typename T::value_type,
                                                typename T::size_type,
                                                typename T::allocator_type,
@@ -45,7 +45,7 @@ namespace bsc {
 
                                                >> : public std::true_type {};
     template<typename T>
-    concept IsContainerNotString = is_container_not_string<T>::value;
+    concept IsContainerNotString = IsContainerNotStringCheck<T>::value;
     /*std::negation_v<std::is_convertible<T, std::string>> && requires {
             typename T::value_type;
                     typename T::size_type;
@@ -75,10 +75,14 @@ namespace bsc {
         ParserConfiguration parserConfiguration;
 
     public:
+        explicit Parser(const ParserConfiguration& parserConfiguration) : parserConfiguration(parserConfiguration) {}
+        Parser() = default;
+
+    public:
         template<typename ParameterType>
-        std::remove_reference_t<ParameterType>
+        [[nodiscard]] std::remove_reference_t<ParameterType>
         fromString(const std::string& value,
-                   std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) {
+                   std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) const  {
             try {
                 return std::stol(value);
             } catch (std::invalid_argument& e) {
@@ -87,8 +91,8 @@ namespace bsc {
         }
 
         template<typename ParameterType>
-        std::remove_reference_t<ParameterType>
-        fromString(const std::string& value, std::enable_if_t<std::is_floating_point_v<ParameterType>, int> = 0) {
+        [[nodiscard]] std::remove_reference_t<ParameterType>
+        fromString(const std::string& value, std::enable_if_t<std::is_floating_point_v<ParameterType>, int> = 0) const {
             try {
                 return std::stod(value);
             } catch (std::invalid_argument& e) {
@@ -97,9 +101,9 @@ namespace bsc {
         }
 
         template<typename ParameterType>
-        std::remove_reference_t<ParameterType>
+        [[nodiscard]] std::remove_reference_t<ParameterType>
         fromString(const std::string& value,
-                   std::enable_if_t<std::is_convertible_v<ParameterType, std::string>, int> = 0) {
+                   std::enable_if_t<std::is_convertible_v<ParameterType, std::string>, int> = 0) const {
             if (!value.empty()) {
                 return ParameterType(value);
             } else {
@@ -108,8 +112,8 @@ namespace bsc {
         }
 
         template<typename ParameterType>
-        std::remove_reference_t<ParameterType> fromString(const std::string& value,
-                                                          int = 0) requires IsPair<ParameterType> {
+        [[nodiscard]] std::remove_reference_t<ParameterType> fromString(const std::string& value,
+                                                          int = 0) const requires IsPair<ParameterType> {
             try {
 
                 std::stringstream inputStream(value);
@@ -125,14 +129,13 @@ namespace bsc {
         }
 
         template<typename ParameterType>
-        std::remove_reference_t<ParameterType>
-        fromString(const std::string& value, std::enable_if_t<is_container_not_string<ParameterType>::value, int> = 0) {
+        [[nodiscard]] std::remove_reference_t<ParameterType>
+        fromString(const std::string& value, std::enable_if_t<IsContainerNotStringCheck<ParameterType>::value, int> = 0) const {
             ParameterType container;
             std::stringstream inputStream(value);
             std::string element;
 
             while (getline(inputStream, element, parserConfiguration.csvDelimiter)) {
-                ;
                 container.insert(container.end(), fromString<typename ParameterType::value_type>(element.c_str()));
             }
 
@@ -141,12 +144,12 @@ namespace bsc {
     };
 
     template<>
-    inline bool Parser::fromString<bool>(const std::string& value, int) {
+    [[nodiscard]] inline bool Parser::fromString<bool>(const std::string& value, int)const {
         return true;
     }
 
     template<>
-    inline int Parser::fromString<int>(const std::string& value, int) {
+    [[nodiscard]] inline int Parser::fromString<int>(const std::string& value, int) const{
         try {
             return std::stoi(value);
         } catch (std::invalid_argument& e) {
@@ -155,7 +158,7 @@ namespace bsc {
     }
 
     template<>
-    inline long Parser::fromString<long>(const std::string& value, int) {
+    [[nodiscard]] inline long Parser::fromString<long>(const std::string& value, int)const {
         try {
             return std::stol(value);
         } catch (std::invalid_argument& e) {
@@ -164,7 +167,7 @@ namespace bsc {
     }
 
     template<>
-    inline unsigned long Parser::fromString<unsigned long>(const std::string& value, int) {
+    [[nodiscard]] inline unsigned long Parser::fromString<unsigned long>(const std::string& value, int)const {
         try {
             return std::stoul(value);
         } catch (std::invalid_argument& e) {
@@ -173,7 +176,7 @@ namespace bsc {
     }
 
     template<>
-    inline float Parser::fromString<float>(const std::string& value, int) {
+    [[nodiscard]] inline float Parser::fromString<float>(const std::string& value, int) const{
         try {
             return std::stof(value);
         } catch (std::invalid_argument& e) {
@@ -182,7 +185,7 @@ namespace bsc {
     }
 
     template<>
-    inline double Parser::fromString<double>(const std::string& value, int) {
+    [[nodiscard]] inline double Parser::fromString<double>(const std::string& value, int) const{
         try {
             return std::stod(value);
         } catch (std::invalid_argument& e) {
@@ -191,7 +194,7 @@ namespace bsc {
     }
 
     template<>
-    inline long double Parser::fromString<long double>(const std::string& value, int) {
+    [[nodiscard]] inline long double Parser::fromString<long double>(const std::string& value, int) const {
         try {
             return std::stold(value);
         } catch (std::invalid_argument& e) {
@@ -200,7 +203,7 @@ namespace bsc {
     }
 
     template<typename ParameterType>
-    auto fromString(const std::string& value) {
+    [[nodiscard]] auto fromString(const std::string& value) {
         static Parser parser;
         return parser.fromString<ParameterType>(value);
     }

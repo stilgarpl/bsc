@@ -4,13 +4,11 @@
 // Created by stilgar on 21.08.17.
 //
 
-#include <fstream>
 #include "ConfigurationManager.h"
-#include <cereal/archives/xml.hpp>
+#include "core/utils/cereal_include.h"
+#include <fstream>
 
-
-
-//void ConfigurationManager::save(const ConfigurationManager::IdType &id, std::shared_ptr<IConfig> config) {
+// void ConfigurationManager::save(const ConfigurationManager::IdType &id, std::shared_ptr<IConfig> config) {
 //    //@todo implement saving config to file
 ////      fs::path configPath("~/.bsc/");
 //

@@ -9,6 +9,7 @@
 
 namespace bsc {
     void SourceManager::addSource(const std::shared_ptr<bsc::ISource>& source) {
+        std::lock_guard g(sourcesLock);
         sources.push_back(source);
 //    source->setContext(commonContext);
     }
@@ -24,6 +25,7 @@ namespace bsc {
     }
 
     void SourceManager::startSources() {
+        std::lock_guard g(sourcesLock);
         Context::setActiveContext(commonContext);
         for (auto&& source : sources) {
             source->start();
@@ -31,15 +33,21 @@ namespace bsc {
     }
 
     void SourceManager::stopSources() {
+        std::lock_guard g(sourcesLock);
         for (auto&& source : sources) {
             source->stop();
         }
     }
 
     void SourceManager::joinSources() {
+        std::lock_guard g(sourcesLock);
         for (auto&& source : sources) {
             source->join();
         }
+    }
+    SourceManager::~SourceManager() {
+        std::lock_guard g(sourcesLock);
+        stopSources();
     }
 
     SourceManager::SourceManager() = default;

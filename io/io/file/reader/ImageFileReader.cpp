@@ -2,8 +2,10 @@
 // Created by stilgar on 16.04.2020.
 //
 
+#include <core/log/Logger.h>
 #include <exiv2/exiv2.hpp>
 #include <parser/parser/explode.h>
+#include <regex>
 
 #include "ImageFileReader.h"
 namespace bsc {
@@ -42,6 +44,7 @@ namespace bsc {
             }
         } catch (const std::exception& e) {
             //@todo better error handling
+            using namespace std::string_literals;
             ERROR("Image reader exception: "s + e.what());
         }
         return result;

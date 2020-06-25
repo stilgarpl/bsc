@@ -20,14 +20,15 @@ namespace bsc {
     private:
         Uber<EventQueueSource> eventQueueSources;
         std::mutex sourcesLock;
-        bool active = true;
+        std::atomic_bool active = true;
+
     public:
         explicit AutoSource(SourceManager& sourceManager);
 
 
         template<typename EventType, typename ... Args>
         void generateEvent(Args... args) {
-            std::unique_lock<std::mutex> g(sourcesLock);
+            std::unique_lock g(sourcesLock);
             if (active) {
                 //        LOGGER("generating event for type " + std::string(typeid(EventType).name()))
                 auto& source = eventQueueSources.get<EventType, AutoSource>(std::ref(sourceManager));

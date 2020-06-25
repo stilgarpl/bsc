@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
                  .allowedValues = fileExistsFactory.getSelectors()}};
     };
 
-    const auto& parameters = CommandLineParameters::parse<FileSorterParameters>(argc, argv);
+    const auto& parameters = CommandLineParser::defaultParse<FileSorterParameters>(argc, argv);
     auto fetcher           = std::make_unique<FilesystemFileListFetcher>();
     FileSorter fileSorter(std::move(fetcher),
                           {.sortStrategy                  = actionFactory.create(parameters.action(), {}),

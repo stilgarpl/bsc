@@ -10,8 +10,6 @@
 #include "p2p/modules/network/protocol/logic/actions/NodeActions.h"
 #include "p2p/modules/network/protocol/logic/sources/NetworkSource.h"
 #include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"
-#include <cereal/archives/xml.hpp>
-#include <cereal/types/memory.hpp>
 #include <repo/repository/storage/InternalStorage.h>
 #include <p2p/modules/network/protocol/packet/NodeInfoGroup.h>
 #include <p2p/modules/auth/AuthModule.h>

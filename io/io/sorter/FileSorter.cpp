@@ -3,12 +3,16 @@
 //
 
 #include "FileSorter.h"
+#include <core/log/Logger.h>
 #include <fmt/format.h>
+#include <io/file/FileMetaDataReader.h>
+#include <io/file/MimeFileTypeDecoder.h>
 #include <io/translator/PathTranslator.h>
 #include <iostream>
 namespace bsc {
     SortResult FileSorter::sort(const fs::path& pathToSort) {
         SortResult sortResult;
+        using namespace std::string_literals;
         try {
 
             PathTranslator translator;

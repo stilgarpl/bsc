@@ -38,10 +38,10 @@ void bsc::ClockSource::run() {
                 event<bsc::Tick>(tick);
             }
             TimePoint timeToNextTick = getLastTick(d) + d;
-            nextTickTime = std::min(nextTickTime, timeToNextTick);
+            nextTickTime             = std::min(nextTickTime, timeToNextTick);
         }
-
-        std::this_thread::sleep_for(nextTickTime - now);
+        //@todo maybe it should be sleeping on a conditional variable? so it's waken up when thread is being stopped.
+        // workaround for now, maximum sleep time 1s
+        std::this_thread::sleep_for(std::min<decltype(nextTickTime - now)>(nextTickTime - now, 1s));
     }
-
 }

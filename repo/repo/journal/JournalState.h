@@ -9,7 +9,6 @@
 #include "JournalMetaData.h"
 #include "JournalStateEntry.h"
 #include "JournalTypes.h"
-#include <cereal/access.hpp>
 #include <chrono>
 #include <core/utils/cereal_include.h>
 #include <list>

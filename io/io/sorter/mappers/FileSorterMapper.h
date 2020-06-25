@@ -7,6 +7,7 @@
 #include "FileSorterMapperMatcher.h"
 #include <filesystem>
 #include <optional>
+#include <vector>
 namespace bsc {
     namespace fs = std::filesystem;
     /**

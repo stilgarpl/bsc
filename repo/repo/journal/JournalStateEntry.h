@@ -10,7 +10,6 @@
 #include "JournalTarget.h"
 #include "JournalTypes.h"
 #include "SpecialKind.h"
-#include <cereal/access.hpp>
 #include <chrono>
 #include <core/utils/cereal_include.h>
 #include <filesystem>

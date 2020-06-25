@@ -3,7 +3,6 @@
 #include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
 #include "p2p/modules/network/protocol/logic/actions/NodeActions.h"
 #include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"
-#include <cereal/types/memory.hpp>
 #include <p2p/modules/command/CommandModule.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
@@ -35,7 +34,7 @@ int main(int argc, char* argv[]) {
     spdlog::set_default_logger(file_logger);
     spdlog::flush_every(std::chrono::seconds(5));
 
-    auto parameters = CommandLineParameters::parse<BscControlProgramParameters>(argc, argv);
+    auto parameters = CommandLineParser::defaultParse<BscControlProgramParameters>(argc, argv);
     if (argc <= 1) {
         return 0;
     }

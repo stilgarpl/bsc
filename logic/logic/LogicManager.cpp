@@ -27,5 +27,6 @@ void bsc::LogicManager::setContexts(const Context::Ptr& context) {
 
 bsc::LogicManager::~LogicManager() {
     LOGGER("logic destructor")
+    sourceManager.stopSources();
 
 }

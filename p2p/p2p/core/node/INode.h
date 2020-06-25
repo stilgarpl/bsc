@@ -63,15 +63,14 @@ namespace bsc {
         }
 
     public:
-
         template<typename ModuleType>
-        void addModule() {
-            //@todo check if module exist before overwriting?
+        auto addModule() {
             if (modules.get<ModuleType>() == nullptr) {
                 modules.get<ModuleType>() = std::make_shared<ModuleType>(std::ref(*this));
             } else {
                 LOGGER(std::string("Module ") + typeid(ModuleType).name() + " already added!")
             }
+            return getModule<ModuleType>();
         }
 
         template<typename ModuleType>

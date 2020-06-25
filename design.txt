@@ -688,7 +688,6 @@ if (existPredicate(targetPath)) {
 //file already exists
     targetPath = targetAction(targetPath,existPredicate); <- possibly this will rename the path to something that is ok.
 }
-@todo zmienic nazwe targetAction na nazwę która faktycznie mówi co to robi
 
 
 pomysł odnośnie kontekstów - teraz kontekst jest globalny i dostępny dla wszystkich którzy wiedzą o co prosić. można pomyśleć o tym, żeby ukryć to wewnątrz faktycznich konsumentów
@@ -721,9 +720,12 @@ Factory.register("rename",ss::rename); tak samo jak w CommandModule
 
 @todo error handlers w file sorter - ignore powinno pomijac bledy bez dodawania ich do listy, a continue dodawac ale leciec dalej jak ignore
 @todo powinienem dodać automatyczną serializację tych opcji - w końcu mam krótki/długi klucz, wystarczyłoby to dać w normalnym formacie key=value. skonwertować plik do vector of strings, rzucic argp do przeprocesowania. w ten sposób można załadować tę konfigurację z pliku lub ustawić wartości przed parsowaniem (dla rzeczy których ktoś nie poda)
--a copy
---mime ####
---name ####
+-a
+copy
+--mime
+####
+--name
+####
 --error ###
 CLI::parse<>(argc,argv,configPath)
 parameters.saveConfiguration(configPath)

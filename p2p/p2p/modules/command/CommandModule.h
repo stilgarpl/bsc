@@ -11,6 +11,7 @@
 #include <p2p/core/node/Node.h>
 #include <p2p/core/node/context/NodeContext.h>
 #include <p2p/core/node/module/NodeModule.h>
+#include <p2p/modules/basic/BasicModule.h>
 #include <p2p/modules/network/NetworkModule.h>
 #include <p2p/modules/network/remote/RemoteNode.h>
 #include <parser/cast/templateCast.h>
@@ -18,10 +19,10 @@
 #include <parser/parser/explode.h>
 
 namespace bsc {
-    class CommandModule : public NodeModuleDependent<CommandModule, NetworkModule> {
+    class CommandModule : public NodeModuleDependent<CommandModule, NetworkModule, BasicModule> {
     public:
-        using ArgumentContainerType    = std::vector<std::string>;
-        using ArgumentContainerTypeRef = const ArgumentContainerType&;
+        using ArgumentContainerType     = std::vector<std::string>;
+        using ArgumentContainerTypeCRef = const ArgumentContainerType&;
         enum class CommandExecutionStatus {
             success,
             notEnoughArguments,
@@ -41,7 +42,7 @@ namespace bsc {
 
     private:
         using InternalGroupHandlerFunc =
-                std::function<GroupHandlerResult(ArgumentContainerTypeRef, const CommandGroup&)>;
+                std::function<GroupHandlerResult(ArgumentContainerTypeCRef, const CommandGroup&)>;
 
     public:
         class SubModule {
@@ -125,7 +126,7 @@ namespace bsc {
         class CommandGroup {
         private:
             //        Uber<std::map> commands;
-            std::map<std::string, std::function<CommandExecutionStatus(ArgumentContainerTypeRef)>> commands{};
+            std::map<std::string, std::function<CommandExecutionStatus(ArgumentContainerTypeCRef)>> commands{};
             CommandModule& parent;
             std::map<std::string, std::shared_ptr<CommandGroup>> groups{};
             InternalGroupHandlerFunc groupHandler;
@@ -142,7 +143,7 @@ namespace bsc {
                 return commands;
             }
 
-            template<bsc::ParametersClass ParametersType>
+            template<ParametersClass ParametersType>
             void setDefaultGroupHandler(const InternalGroupHandlerFunc& newGroupHandler) {
                 if (!groupHandler || isDefaultHandler) {
                     groupHandler     = newGroupHandler;
@@ -158,14 +159,14 @@ namespace bsc {
 
             CommandGroup& group(const std::string& name);
 
-            template<bsc::ParametersClass ParametersType>
+            template<ParametersClass ParametersType>
             void handler(std::function<CommandExecutionStatus(const ParametersType&
 
                                                               )> handlerFunc) {
-                groupHandler = [handlerFunc](ArgumentContainerTypeRef arguments,
+                groupHandler = [handlerFunc](ArgumentContainerTypeCRef arguments,
                                              const CommandModule::CommandGroup& group) -> GroupHandlerResult {
                     auto parameters =
-                            bsc::CommandLineParameters::parse<ParametersType>(arguments, ParseConfiguration::silent);
+                            CommandLineParser::defaultParse<ParametersType>(arguments, ParseConfiguration::silent);
                     auto status = handlerFunc(parameters, group);
                     return {status, parameters.arguments()};
                 };
@@ -176,14 +177,14 @@ namespace bsc {
             /// template <typename ReturnType, typename ... Args>
             void mapCommand(const std::string& prefix,
                             const std::string& commandName,
-                            const std::function<CommandExecutionStatus(ArgumentContainerTypeRef)>& func) {
+                            const std::function<CommandExecutionStatus(ArgumentContainerTypeCRef)>& func) {
                 std::string key = prefix + ":::" + commandName;
                 auto& map = getCommandMap();// commands.get<std::string, std::function<void(ArgumentContainerType)>>();
                 map[key]  = func;
             }
 
         public:
-            template<typename ModuleType, bsc::ParametersClass ParametersType, typename RetType, typename... Args>
+            template<typename ModuleType, ParametersClass ParametersType, typename RetType, typename... Args>
             void mapCommand(std::string commandName,
                             RetType (ModuleType::*f)(const ParametersType&, Args... args),
                             ParametersType params) {
@@ -195,15 +196,15 @@ namespace bsc {
                 //@todo prefix or sth, problem is that size of args breaks raw functions that are random
                 mapCommand(" ",
                            commandName,
-                           [f, mod, commandName, params](CommandModule::ArgumentContainerTypeRef vals) {
+                           [f, mod, commandName, params](CommandModule::ArgumentContainerTypeCRef vals) {
                                ParametersType localParams =
-                                       bsc::CommandLineParameters::parse<ParametersType>(commandName, vals);
+                                       CommandLineParser::defaultParse<ParametersType>(commandName, vals);
                                std::function<RetType(Args...)> func = [mod, localParams, f](Args... args) -> RetType {
                                    ((mod.get())->*f)(localParams, args...);
                                };
                                try {
-                                   bsc::runStandardFunction(func, localParams.arguments());
-                               } catch (const bsc::IncorrectParametersException& e) {
+                                   runStandardFunction(func, localParams.arguments());
+                               } catch (const IncorrectParametersException& e) {
                                    if (e.requiredParameters > e.gotParameters) {
                                        return CommandExecutionStatus::notEnoughArguments;
                                    } else {
@@ -222,10 +223,10 @@ namespace bsc {
                 /// long cast is sad :( to_string should have size_t overload
                 /// std::to_string((long) sizeof...(Args))
                 //@todo prefix or sth, problem is that size of args breaks raw functions that are random
-                mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerTypeRef vals) {
+                mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerTypeCRef vals) {
                     try {
-                        bsc::runMemberFunction(*mod, f, vals);
-                    } catch (const bsc::IncorrectParametersException& e) {
+                        runMemberFunction(*mod, f, vals);
+                    } catch (const IncorrectParametersException& e) {
                         if (e.requiredParameters > e.gotParameters) {
                             return CommandExecutionStatus::notEnoughArguments;
                         } else {
@@ -237,16 +238,16 @@ namespace bsc {
             }
 
             template<typename ModuleType, typename RetType>
-            void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerTypeRef)) {
+            void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerTypeCRef)) {
                 parent.addRequiredDependency<ModuleType>();
                 auto mod = parent.node.getModule<ModuleType>();
-                mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerTypeRef vals) {
+                mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerTypeCRef vals) {
                     (mod.get()->*f)(vals);
                     return CommandExecutionStatus::success;
                 });
             }
 
-            CommandExecutionStatus runCommand(const std::string& commandName, ArgumentContainerTypeRef arguments) {
+            CommandExecutionStatus runCommand(const std::string& commandName, ArgumentContainerTypeCRef arguments) {
                 if (groups.contains(commandName)) {
                     auto& thisGroup = groups[commandName];
                     //@todo optimize this, arguments are copied and copied...
@@ -254,8 +255,8 @@ namespace bsc {
                                                  ? thisGroup->groupHandler(arguments, *thisGroup)
                                                  : GroupHandlerResult{CommandExecutionStatus::success, arguments};
                     if (handlerResult.status == CommandExecutionStatus::success) {
-                        ArgumentContainerTypeRef realArguments = handlerResult.arguments;
-                        if (realArguments.size() > 1) {
+                        ArgumentContainerTypeCRef realArguments = handlerResult.arguments;
+                        if (!realArguments.empty()) {
                             // command is a submodule, redirecting
                             //@todo type
                             std::vector<std::string> newArguments(realArguments.begin() + 1, realArguments.end());
@@ -312,15 +313,15 @@ namespace bsc {
         InternalGroupHandlerFunc defaultGroupHandler;
 
     public:
-        template<bsc::ParametersClass ParametersType>
+        template<ParametersClass ParametersType>
         void setDefaultGroupHandler(
                 std::function<CommandExecutionStatus(const ParametersType&, const CommandModule::CommandGroup&)
 
                               > handlerFunc) {
             //@todo unify duplicated code with CommandGroup
-            defaultGroupHandler = [handlerFunc](ArgumentContainerTypeRef arguments,
+            defaultGroupHandler = [handlerFunc](ArgumentContainerTypeCRef arguments,
                                                 const CommandModule::CommandGroup& group) -> GroupHandlerResult {
-                auto parameters = bsc::CommandLineParameters::parse<ParametersType>(arguments);
+                auto parameters = CommandLineParser::defaultParse<ParametersType>("", arguments);
                 auto status     = handlerFunc(parameters, group);
                 return {status, parameters.arguments()};
             };
@@ -333,7 +334,7 @@ namespace bsc {
 
         CommandGroup& group() { return defaultCommandGroup; }
 
-        explicit CommandModule(bsc::INode& node);
+        explicit CommandModule(INode& node);
 
     public:
         template<typename ModuleType, typename RetType, typename... Args>
@@ -351,21 +352,21 @@ namespace bsc {
         }
 
         template<typename ModuleType, typename RetType>
-        void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerTypeRef)) {
+        void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerTypeCRef)) {
 
             group().mapRawCommand(commandName, f);
         }
 
-        CommandExecutionStatus runCommand(const std::string& commandName, ArgumentContainerTypeRef arguments) {
+        CommandExecutionStatus runCommand(const std::string& commandName, ArgumentContainerTypeCRef arguments = {}) {
             return group().runCommand(commandName, arguments);
             //        }
         }
 
-        void setupActions(bsc::ILogicModule::SetupActionHelper& actionHelper) override;
+        void setupActions(ILogicModule::SetupActionHelper& actionHelper) override;
 
-        bool assignActions(bsc::ILogicModule::AssignActionHelper& actionHelper) override;
+        bool assignActions(ILogicModule::AssignActionHelper& actionHelper) override;
 
-        bool setupSources(bsc::ILogicModule::SetupSourceHelper& sourceHelper) override;
+        bool setupSources(ILogicModule::SetupSourceHelper& sourceHelper) override;
 
     public:
         void runLine(const std::string& line);
@@ -380,13 +381,13 @@ namespace bsc {
 
         void initialize() override;
 
-        void sendRemoteCommand(ArgumentContainerTypeRef args);
+        void sendRemoteCommand(ArgumentContainerTypeCRef args);
 
-        void sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentContainerTypeRef args);
+        void sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentContainerTypeCRef args);
 
-        void broadcastRemoteCommand(ArgumentContainerTypeRef args);
+        void broadcastRemoteCommand(ArgumentContainerTypeCRef args);
 
-        void runInBackground(ArgumentContainerTypeRef args);
+        void runInBackground(ArgumentContainerTypeCRef args);
 
         void runScript(const fs::path& scriptPath) {
             if (fs::exists(scriptPath)) {
@@ -412,8 +413,8 @@ namespace bsc {
             LOGGER("Command testing method INT FLOAT " + std::to_string(a) + " " + std::to_string(b));
         }
 
-        struct CommandPP : public bsc::CommandLineParameters {
-            bsc::Parameter<int> a = {{'a', "aaa", "NUM", "IntegerParameter"}};
+        struct CommandPP : public CommandLineParameters {
+            Parameter<int> a = {{'a', "aaa", "NUM", "IntegerParameter"}};
         };
 
         void parametersTestingCommand(const CommandPP& params);

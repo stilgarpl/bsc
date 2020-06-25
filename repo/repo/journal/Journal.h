@@ -5,24 +5,22 @@
 #ifndef BSC_JOURNAL_H
 #define BSC_JOURNAL_H
 
-
 #include "JournalFuncMap.h"
 #include "JournalMethod.h"
 #include "JournalState.h"
 #include "JournalTypes.h"
-#include <cereal/types/memory.hpp>
-#include <cereal/types/vector.hpp>
-
+#include "core/utils/cereal_include.h"
 
 namespace bsc {
 
     class Journal {
     public:
-    typedef std::shared_ptr<Journal> JournalPtr;
-public:
-    virtual ChecksumId getChecksum() const = 0;
+        typedef std::shared_ptr<Journal> JournalPtr;
 
-    virtual void commitState(CommitTimeType now) = 0;
+    public:
+        virtual ChecksumId getChecksum() const = 0;
+
+        virtual void commitState(CommitTimeType now) = 0;
 
     //@todo add parameters, commit range or sth
     virtual void replay(const JournalFuncMap& funcMap) const = 0;

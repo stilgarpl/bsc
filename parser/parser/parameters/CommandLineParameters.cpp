@@ -26,7 +26,7 @@ namespace bsc {
         // if there is no argument name provided, then argument will be optional
         int flags = parserOptions.argumentName.has_value() ? parserOptions.flags
                                                            : parserOptions.flags | OPTION_ARG_OPTIONAL;
-        auto arg = argp_option{.name  = parserOptions.longKey ? parserOptions.longKey->data() : nullptr,
+        auto arg  = argp_option{.name  = parserOptions.longKey ? parserOptions.longKey->data() : nullptr,
                                .key   = parserOptions.shortKey ? *parserOptions.shortKey : ++currentKey,
                                .arg   = parserOptions.argumentName ? parserOptions.argumentName->data() : nullptr,
                                .flags = flags,
@@ -57,7 +57,7 @@ namespace bsc {
     }
 
     void CommandLineParameters::ParserBuilder::addDoc(std::string doc) {
-        if (parser->argpOptions.size() == 0) {
+        if (parser->argpOptions.empty()) {
             auto& before = parser->beforeInfo;
             if (before.has_value()) {
                 *before += "\n" + doc;
@@ -89,11 +89,9 @@ namespace bsc {
         auto* self = static_cast<ArgumentParser*>(state->input);
         switch (key) {
             case ARGP_KEY_INIT:
-                //            std::cout << "Parsing ARGP_KEY_INIT " << std::to_string(key) << " " << key << std::endl;
                 break;
 
             case ARGP_KEY_ARG:
-                //            std::cout << "Parsing ARGP_KEY_ARG " << std::to_string(key) << " " << key << std::endl;
                 self->rawArguments.emplace_back(arg);
                 {
                     auto next   = state->next;
@@ -117,26 +115,21 @@ namespace bsc {
                 break;
 
             case ARGP_KEY_NO_ARGS:
-                //            std::cout << "Parsing ARGP_KEY_NO_ARGS " << std::to_string(key) << " " << key <<
-                //            std::endl;
+
                 break;
             case ARGP_KEY_SUCCESS:
-                //            std::cout << "Parsing ARGP_KEY_SUCCESS " << std::to_string(key) << " " << key <<
-                //            std::endl;
+
                 break;
 
             case ARGP_KEY_FINI:
-                //            std::cout << "Parsing ARGP_KEY_FINI " << std::to_string(key) << " " << key << std::endl;
                 break;
             case ARGP_KEY_ERROR:
-                //            std::cout << "Parsing ARGP_KEY_ERROR " << std::to_string(key) << " " << key << std::endl;
                 break;
 
             default:
-                //            std::cout << "Parsing argument " << (char) key << " " << key << std::endl;
                 if (self->parseMap.contains(key)) {
                     try {
-                        self->parseMap[key](arg);
+                        self->parseMap[key](arg, self->parser);
                     } catch (StringParseException& e) {
                         if (self->parseConfiguration == ParseConfiguration::simple) {
                             argp_error(state,
@@ -189,8 +182,11 @@ namespace bsc {
         parseNamedArguments();
     }
 
-    void CommandLineParameters::ArgumentParser::prepareParser(ParseConfiguration parseConfiguration) {
+    void CommandLineParameters::ArgumentParser::prepareParser(ParseConfiguration configuration,
+                                                              const Parser& newParser) {
         using namespace std::string_literals;
+        this->parseConfiguration = configuration;
+        this->parser             = newParser;
         // close argOptions:
         argpOptions.push_back({nullptr, 0, nullptr, 0, nullptr, 0});
         if (beforeInfo || afterInfo) {
@@ -207,7 +203,7 @@ namespace bsc {
             }
         });
         flags  = ARGP_IN_ORDER;
-        switch (parseConfiguration) {
+        switch (configuration) {
             case ParseConfiguration::simple:
                 break;
 
@@ -215,8 +211,8 @@ namespace bsc {
                 flags |= ARGP_SILENT;
                 break;
         }
-        this->parseConfiguration = parseConfiguration;
-        argParams                = {argpOptions.data(),
+
+        argParams = {argpOptions.data(),
                      ArgumentParser::parseArgument,
                      argDoc.c_str(),
                      doc.c_str(),
@@ -237,7 +233,7 @@ namespace bsc {
     void CommandLineParameters::ArgumentParser::parseNamedArguments() {
         for (const auto& descriptor : argumentDescriptors) {
             if (descriptor.argumentIndex < rawArguments.size()) {
-                descriptor.argumentParseFunc(rawArguments[descriptor.argumentIndex]);
+                descriptor.argumentParseFunc(rawArguments[descriptor.argumentIndex], this->parser);
             }
         }
     }

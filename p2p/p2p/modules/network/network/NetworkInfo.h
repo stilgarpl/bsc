@@ -5,12 +5,10 @@
 #ifndef BSC_NETWORKINFO_H
 #define BSC_NETWORKINFO_H
 
-
-#include <list>
-#include "cereal/types/map.hpp"
-#include "core/log/Logger.h"
 #include "RemoteNodeInfo.h"
-
+#include "core/log/Logger.h"
+#include "core/utils/cereal_include.h"
+#include <list>
 
 #include <optional>
 

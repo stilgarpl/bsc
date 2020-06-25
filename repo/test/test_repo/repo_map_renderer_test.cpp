@@ -2,13 +2,19 @@
 // Created by stilgar on 02.04.2020.
 //
 
+#include "FakeMetaDataFetcher.h"
 #include <catch2/catch.hpp>
+#include <core/context/Context.h>
 #include <core/factory/FactoryContext.h>
+#include <repo/journal/Journal.h>
+#include <repo/journal/SimpleJournal.h>
+#include <repo/repository/RepositoryFileMap.h>
 #include <repo/repository/transformer/PathTransformerRuleFactory.h>
 #include <repo/repository/transformer/rules/HomeDirRule.h>
 #include <repo/repository/transformer/rules/TmpRule.h>
 
 using namespace bsc;
+
 
 JournalPtr prepareJournal() {
     const auto fileData = FileData{"", "fileHash", {}, 100, fs::file_time_type::min(), false};

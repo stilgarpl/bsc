@@ -6,7 +6,6 @@
 #define BSC_RESOURCEIDENTIFICATOR_H
 
 #include <filesystem>
-#include <cereal/access.hpp>
 #include <core/utils/cereal_include.h>
 
 namespace bsc {

@@ -58,7 +58,7 @@ struct TestProgramParameters : public bsc::CommandLineParameters {
 
 int main(int argc, char* argv[]) {
 
-    const auto& params = CommandLineParameters::parse<TestParameters>(argc, argv);
+    const auto& params = CommandLineParser::defaultParse<TestParameters>(argc, argv);
     std::stringstream dataStorage;
     cereal::BinaryOutputArchive oa(dataStorage);
     cereal::BinaryInputArchive ia(dataStorage);

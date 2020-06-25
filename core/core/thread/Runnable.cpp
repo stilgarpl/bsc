@@ -13,7 +13,7 @@ void bsc::Runnable::start() {
     if (thread == nullptr) {
         thread = std::make_unique<std::thread>(std::ref(*this), Context::getActiveContext());
     }
-
+    //@todo throw exception on already started thread?
 }
 
 void bsc::Runnable::operator()(Context::Ptr contextPtr) {
@@ -28,10 +28,8 @@ void bsc::Runnable::operator()(Context::Ptr contextPtr) {
 bsc::Runnable::~Runnable() {
     if (!finished) {
         stop();
-        join();
     }
-
-
+    join();
 }
 
 void bsc::Runnable::stop() {
@@ -39,6 +37,7 @@ void bsc::Runnable::stop() {
     stopping = true;
     started = false;
     shutdownSignal.notify_all();
+    stopRequested();
     //@todo kill ? join?
 
 }
@@ -49,8 +48,10 @@ bool bsc::Runnable::isStopping() const {
 }
 
 void bsc::Runnable::join() {
-    if (thread != nullptr && thread->joinable())
+    if (thread != nullptr && thread->joinable()) {
         thread->join();
+        thread = nullptr;
+    }
 }
 
 void bsc::Runnable::waitForStop() {

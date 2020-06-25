@@ -24,9 +24,8 @@ namespace bsc {
     public:
 
         struct Configuration {
+            //@todo this rootPath is weird - it's a global root path for all nodes, where it should just be a path for this specific node.
             fs::path rootPath;
-
-            Configuration();
         };
 
     private:
@@ -82,6 +81,8 @@ namespace bsc {
 
         Node();
 
+        Node(const Configuration& configuration);
+
         Node(Node&) = delete;
 
         Node(Node&&) = delete;
@@ -103,6 +104,8 @@ namespace bsc {
         void joinModules();
 
         void saveConfiguration() override;
+
+        bool isRunning();
 
     protected:
         void shutdownModules();
