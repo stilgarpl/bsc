@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(bsc VERSION 0.1 LANGUAGES CXX)
-#include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -10,68 +10,17 @@ set(TEMPLATE_PATH "${CMAKE_SOURCE_DIR}/cmake/template/")
 #include additional configuration
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/sanitizers.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/analyzers.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/configuration/speedup.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/configuration/packagemanagers.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/configuration/compilers.cmake)
+
+
+#testing
 enable_testing()
-
-
-message("modu:  ${CMAKE_MODULE_PATH}")
-message("pref: ${CMAKE_PREFIX_PATH}")
-
-
-find_program(CCACHE_PROGRAM ccache)
-if (CCACHE_PROGRAM)
-    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-    set(CMAKE_CUDA_COMPILER_LAUNCHER "${CCACHE_PROGRAM}") # CMake 3.9+
-endif ()
-
-message(PATH = $ENV{PATH})
-#conan setup
-find_program(conan NAMES conan)
-message("DEBUG: conan = ${conan}")
-if (EXISTS ${conan})
-    message("CONAN EXISTS")
-    set(CONAN_SYSTEM_INCLUDES ON)
-    include(${CMAKE_SOURCE_DIR}/conan/conan.cmake)
-    conan_check()
-    conan_add_remote(NAME bincrafters INDEX 1
-            URL https://api.bintray.com/conan/bincrafters/public-conan)
-    conan_add_remote(NAME degoodmanwilson INDEX 2
-            URL https://api.bintray.com/conan/degoodmanwilson/opensource)
-    conan_cmake_run(CONANFILE conan/conanfile.txt
-            INSTALL_FOLDER ${CMAKE_BINARY_DIR}
-            BASIC_SETUP
-            BUILD_TYPE "Debug"
-            BUILD missing)
-    #    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    #    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-else ()
-    message("Conan not found")
-endif ()
-
-#end of conan setup
-
 find_package(Catch2 CONFIG REQUIRED)
 include(Catch)
-message("GCC is ${CMAKE_CXX_COMPILER_ID}")
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    add_compile_options(-Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic -Wno-unused-but-set-variable)
-    if (UNIX)
-        message("GCC on Linux")
-        add_compile_options(-pthread)
-        add_link_options(-lpthread)
-    endif ()
+option(BSC_ENABLE_TESTS "Enable unit tests" ON)
 
-    #    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -lstdc++fs -Wall -Wno-unused-local-typedefs -pedantic")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    if (MSVC_VERSION GREATER_EQUAL "1900")
-        include(CheckCXXCompilerFlag)
-        add_compile_definitions(NOGDI)
-        add_compile_definitions(NOMINMAX)
-        add_compile_definitions(_ITERATOR_DEBUG_LEVEL=0)
-        add_compile_definitions(_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
-        add_compile_options(/bigobj)
-        include_directories(SYSTEM C:/Program\ Files \(x86\)/Windows\ Kits/10/Include/10.0.18362.0/shared)
-    endif ()
-endif ()
 
 #set destinations for install targets
 include(GNUInstallDirs)
@@ -79,9 +28,6 @@ set(BSC_DESTINATION_LIB "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}")
 set(BSC_DESTINATION_INCLUDE "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
 set(BSC_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-option(CMAKE_UNITY_BUILD "Enable unity builds" OFF)
-option(BSC_USE_PCH "Use precompiled headers" OFF)
-option(BSC_ENABLE_TESTS "Enable unit tests" ON)
 
 add_subdirectory(tester)
 add_subdirectory(io)

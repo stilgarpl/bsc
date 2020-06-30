@@ -110,8 +110,7 @@ namespace bsc {
             void addOption(ParserOptions parserOptions, ArgumentParser::OptionParseFunc parserFunction);
 
             void addGroup(const char* doc);
-            void addAlias(char shortKey);
-            void addAlias(char shortKey, const char* longKey);
+            void addAlias(char shortKey, const char* longKey = nullptr);
             void addAlias(const char* longKey);
             void addUsage(std::string usage);
 

@@ -5,23 +5,19 @@
 #ifndef BSC_TEMPLATECAST_H
 #define BSC_TEMPLATECAST_H
 
-#include <cstddef>
 #include <utility>
 #include <vector>
 #include <parser/parser/fromString.h>
-//#include "from_string.h"
 #include <functional>
 
 namespace bsc {
     class IncorrectParametersException {
     public:
-        size_t requiredParameters;
-        size_t gotParameters;
+        std::size_t requiredParameters;
+        std::size_t gotParameters;
 
-        IncorrectParametersException(size_t requiredParameters, size_t gotParameters) : requiredParameters(
-                requiredParameters), gotParameters(gotParameters) {};
-
-
+        IncorrectParametersException(std::size_t requiredParameters, std::size_t gotParameters)
+            : requiredParameters(requiredParameters), gotParameters(gotParameters){};
     };
 
     template<typename T, typename RetType, typename Parameter, typename... Args, typename... Strings>

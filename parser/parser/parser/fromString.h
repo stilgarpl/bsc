@@ -13,7 +13,8 @@
 
 namespace bsc {
 
-    //@todo all of those SFINAE enable_if can be replaced by concepts, but concepts do not quite work yet in current
+    //@todo C++20 all of those SFINAE enable_if can be replaced by concepts, but concepts do not quite work yet in
+    //current
     // compilers. try again when GCC 11 comes out.
     template<typename T>
     struct IsPairT : std::false_type {};

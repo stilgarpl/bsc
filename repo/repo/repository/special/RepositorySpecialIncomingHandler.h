@@ -9,7 +9,7 @@
 
 namespace bsc {
     namespace fs = std::filesystem;
-
+    //@todo remove this class
     class RepositorySpecialIncomingHandler {
         const fs::path &incomingPath;
 

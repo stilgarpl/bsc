@@ -18,19 +18,21 @@ namespace bsc {
     private:
         // std::string storageId;
         const fs::path storagePath;
-        bsc::TransferManager::TransferQueuePtr transferQueue = nullptr;
+        //@todo replace direct transfer queue with Downloader class that wraps around it.
+        TransferManager::TransferQueuePtr transferQueue = nullptr;
+
     public:
         void store(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) override;
 
         void update(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) override;
 
-        void sync(const bsc::NodeIdType& nodeID) override;
+        void sync(const NodeIdType& nodeID) override;
 
         void initStorage();
 
         explicit InternalStorage(StorageId storageId, fs::path path);
 
-//
+        //
         std::shared_ptr<std::iostream> getResourceStream(const ResourceId& resourceId) override;
 //    InternalStorage(const std::string &storageId);
 

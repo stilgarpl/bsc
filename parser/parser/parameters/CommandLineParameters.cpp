@@ -41,11 +41,6 @@ namespace bsc {
         parser->argpOptions.push_back(arg);
     }
 
-    void CommandLineParameters::ParserBuilder::addAlias(char shortKey) {
-        auto arg = argp_option{nullptr, shortKey, nullptr, OPTION_ALIAS, nullptr, 0};
-        parser->argpOptions.push_back(arg);
-    }
-
     void CommandLineParameters::ParserBuilder::addAlias(char shortKey, const char* longKey) {
         auto arg = argp_option{longKey, shortKey, nullptr, OPTION_ALIAS, nullptr, 0};
         parser->argpOptions.push_back(arg);
@@ -148,7 +143,6 @@ namespace bsc {
                                     e.allowedValues.end(),
                                     ""s,
                                     [](const auto& a, const auto& b) { return a.empty() ? b : a + ", " + b; });
-                            //@todo add option name (short or long) to message.
                             auto failedOption = std::find_if(self->argpOptions.begin(),
                                                              self->argpOptions.end(),
                                                              [&key](argp_option& option) { return option.key == key; });

@@ -14,7 +14,7 @@
 namespace bsc {
     void InternalStorage::store(const ResourceId& checksum, const size_t& size, const fs::path& sourcePath) {
 
-        auto realChecksum = bsc::calculateSha1OfFile(fs::path(sourcePath));
+        auto realChecksum = calculateSha1OfFile(fs::path(sourcePath));
         auto realFileSize = fs::file_size(sourcePath);
         if (realChecksum == checksum && realFileSize == size) {
             //file IS OK

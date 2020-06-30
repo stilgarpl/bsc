@@ -12,12 +12,11 @@
 #include <core/context/Context.h>
 #include <atomic>
 
-
-using namespace std::chrono_literals;
-
 namespace bsc {
+
     class Runnable {
     private:
+        //@todo switch to jthread
         std::unique_ptr<std::thread> thread;
         mutable std::mutex startMutex, stopMutex;
         std::atomic_bool stopping = false;
