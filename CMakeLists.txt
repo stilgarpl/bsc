@@ -29,7 +29,7 @@ set(BSC_DESTINATION_INCLUDE "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
 set(BSC_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
 
-add_subdirectory(tester)
+add_subdirectory(aide)
 add_subdirectory(io)
 add_subdirectory(parser)
 add_subdirectory(core)

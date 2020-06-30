@@ -2,22 +2,23 @@
 // Created by stilgar on 10.04.2020.
 //
 
-#include "Tester.h"
+#include "Aide.h"
 #include <random>
 #include <utility>
 
 namespace bsc {
-    void Tester::createFile(const std::filesystem::path& path, const std::string& content) {
+
+    void aide::createFile(const std::filesystem::path& path, const std::string& content) {
         std::ofstream file(path);
         file << content;
     }
 
-    void Tester::changeFile(const fs::path& path, const std::string& content) {
+    void aide::changeFile(const fs::path& path, const std::string& content) {
         std::ofstream file(path);
         file << content;
     }
 
-    std::string Tester::readFile(const fs::path& path) {
+    std::string aide::readFile(const fs::path& path) {
         if (fs::exists(path)) {
             std::ifstream t(path);
             std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
@@ -28,11 +29,11 @@ namespace bsc {
         }
     }
 
-    Tester::Cleanup::Cleanup(fs::path pathToCleanup) : pathToCleanup(std::move(pathToCleanup)) {}
+    aide::Cleanup::Cleanup(fs::path pathToCleanup) : pathToCleanup(std::move(pathToCleanup)) {}
 
-    Tester::Cleanup::~Cleanup() { fs::remove_all(pathToCleanup); }
+    aide::Cleanup::~Cleanup() { fs::remove_all(pathToCleanup); }
 
-    Tester::TestDir::TestDir(const fs::path& basePath) {
+    aide::TestDir::TestDir(const fs::path& basePath) {
         if (!fs::exists(basePath)) {
             using namespace std::string_literals;
             throw TestingException("Base path "s + basePath.string() + "does not exist");
@@ -51,9 +52,9 @@ namespace bsc {
         this->cleanup = std::make_unique<Cleanup>(rootPath);
     }
 
-    fs::path Tester::TestDir::getTestDirPath() { return path; }
+    fs::path aide::TestDir::getTestDirPath() { return path; }
 
-    fs::path Tester::TestDir::getTestDirPath(const std::string& subdir) {
+    fs::path aide::TestDir::getTestDirPath(const std::string& subdir) {
         auto testPath = path / subdir;
         fs::create_directories(testPath);
         return testPath;
@@ -61,7 +62,7 @@ namespace bsc {
 
     TestingException::TestingException(const std::string& arg) : domain_error(arg) {}
 
-    Tester::TestDirWithResources::TestDirWithResources(const fs::path& resourcesPath) {
+    aide::TestDirWithResources::TestDirWithResources(const fs::path& resourcesPath) {
         if (fs::exists(resourcesPath)) {
             localResourcesPath = rootPath / "resources";
             //@todo maybe it should not copy everything, but only requested files on getResourcePath ?
@@ -70,11 +71,11 @@ namespace bsc {
             throw TestingException("Resources path does not exist : " + resourcesPath.string());
         }
     }
-    const fs::path& Tester::TestDirWithResources::getResourcePath() const { return localResourcesPath; }
-    fs::path Tester::TestDirWithResources::getResourcePath(const fs::path& p) const { return localResourcesPath / p; }
-    Tester::Resources::Resources(fs::path resourcePath) : resourcePath(std::move(resourcePath)) {}
-    const fs::path& Tester::Resources::getResourcePath() const { return resourcePath; }
-    fs::path Tester::Resources::getResourcePath(const fs::path& p) const {
+    const fs::path& aide::TestDirWithResources::getResourcePath() const { return localResourcesPath; }
+    fs::path aide::TestDirWithResources::getResourcePath(const fs::path& p) const { return localResourcesPath / p; }
+    aide::Resources::Resources(fs::path resourcePath) : resourcePath(std::move(resourcePath)) {}
+    const fs::path& aide::Resources::getResourcePath() const { return resourcePath; }
+    fs::path aide::Resources::getResourcePath(const fs::path& p) const {
         //@todo maybe throw if this path does not exist?
         return resourcePath / p;
     }
