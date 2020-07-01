@@ -8,7 +8,7 @@
 #include <p2p/modules/command/CommandModule.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 #include <repo/node/RepoModule.h>
-#include <tester/Tester.h>
+#include <aide/Aide.h>
 
 using namespace bsc;
 
@@ -110,17 +110,17 @@ TEST_CASE("Repo module test") {
     REQUIRE(otherRepoMod->getSelectedRepository() != nullptr);
 
     //create dirs and files
-    Tester::TestDir testDir;
+    aide::TestDir testDir;
     using namespace std::string_literals;
     fs::path testPath = testDir.getTestDirPath("dirtest"s);
     INFO("test path is " << testPath.string())
-    Tester::createFile(testPath / "1.txt", "111");
-    Tester::createFile(testPath / "2.txt", "222");
-    Tester::createFile(testPath / "3.txt", "333");
-    Tester::createFile(testPath / "4.txt", "444");
+    aide::createFile(testPath / "1.txt", "111");
+    aide::createFile(testPath / "2.txt", "222");
+    aide::createFile(testPath / "3.txt", "333");
+    aide::createFile(testPath / "4.txt", "444");
     fs::path subPath = testPath / "subdirectory" / "sub1";
     fs::create_directories(subPath);
-    Tester::createFile(subPath / "sub.txt", "sub");
+    aide::createFile(subPath / "sub.txt", "sub");
 
     otherNode.setNodeContextActive();
     otherRepoMod->updateFile(testPath);
@@ -179,8 +179,8 @@ TEST_CASE("Repo module test") {
 
     //@todo here I have a bug that looks like a race. probably transfer queue enters finished state too soon. investigate.
     //  after investigation : downloadStorage finished before transfer queue has actually finished. I think transfer queue goes to FINISHED state too soon.
-    Tester::changeFile(testPath / "3.txt", "QWQQQQQQQQQ");
-    Tester::createFile(testPath / "5.txt", "555");
+    aide::changeFile(testPath / "3.txt", "QWQQQQQQQQQ");
+    aide::createFile(testPath / "5.txt", "555");
     otherNode.setNodeContextActive();
     otherRepoMod->updateAllFiles();
     otherRepoMod->saveRepository("test");
@@ -206,9 +206,9 @@ TEST_CASE("Repo module test") {
     REQUIRE(fs::exists(testPath / "3.txt"));
     REQUIRE(!fs::exists(testPath / "4.txt"));
     REQUIRE(fs::exists(testPath / "5.txt"));
-    REQUIRE(Tester::readFile(testPath / "1.txt") == "111");
-    REQUIRE(Tester::readFile(testPath / "2.txt") == "222");
-    REQUIRE(Tester::readFile(testPath / "3.txt") == "QWQQQQQQQQQ");
+    REQUIRE(aide::readFile(testPath / "1.txt") == "111");
+    REQUIRE(aide::readFile(testPath / "2.txt") == "222");
+    REQUIRE(aide::readFile(testPath / "3.txt") == "QWQQQQQQQQQ");
     REQUIRE(fs::exists(subPath / "sub.txt"));
 
 

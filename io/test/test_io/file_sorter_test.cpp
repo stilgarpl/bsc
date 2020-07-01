@@ -11,12 +11,12 @@
 #include <io/sorter/mappers/FileSorterNameMatcher.h>
 #include <io/sorter/strategies/StandardFileSorterStrategies.h>
 #include <io/translator/PathTranslator.h>
-#include <tester/Tester.h>
+#include <aide/Aide.h>
 
 using namespace bsc;
 
 TEST_CASE("Sort strategies test") {
-    Tester::TestDirWithResources testDirWithResources;
+    aide::TestDirWithResources testDirWithResources;
     auto path    = testDirWithResources.getResourcePath("sort");
     auto newPath = path / "../other/";
     fs::create_directories(newPath);
@@ -75,7 +75,7 @@ TEST_CASE("Sort error strategies test") {
 }
 
 TEST_CASE("Sort predicates test") {
-    Tester::TestDirWithResources testDirWithResources;
+    aide::TestDirWithResources testDirWithResources;
     auto resourcePath        = testDirWithResources.getResourcePath("sort");
     auto existingTestFile    = resourcePath / "test.gif";
     auto notExistingTestFile = resourcePath / "wrong.file";
@@ -116,7 +116,7 @@ TEST_CASE("escapeAllRegexCharacters test") {
 }
 
 TEST_CASE("Sort fetchers test") {
-    Tester::TestDirWithResources testDirWithResources;
+    aide::TestDirWithResources testDirWithResources;
     SECTION("Filesystem fetcher test") {
         std::set<fs::path> expectedResult = {"test.txt", "test.gif", "test.png", "png_with_bad_extension.txt"};
         auto path                         = testDirWithResources.getTestDirPath("sort");
@@ -137,7 +137,7 @@ TEST_CASE("Sort fetchers test") {
 }
 
 TEST_CASE("Sort mapper matchers test") {
-    Tester::TestDirWithResources testDirWithResources;
+    aide::TestDirWithResources testDirWithResources;
     auto path     = testDirWithResources.getResourcePath("sort");
     auto filename = "test.gif";
     SECTION("FileSorterMimeMatcher") {
@@ -188,7 +188,7 @@ TEST_CASE("Sort mapper matchers test") {
 }
 
 TEST_CASE("FileSorterMapper test") {
-    Tester::TestDirWithResources testDirWithResources;
+    aide::TestDirWithResources testDirWithResources;
     auto path                       = testDirWithResources.getResourcePath("sort");
     auto pathSubdir                 = testDirWithResources.getResourcePath("sort/subdir");
     const auto expectedTextPattern  = "text";
@@ -258,7 +258,7 @@ TEST_CASE("Path translator test") {
 }
 
 TEST_CASE("File sorter test") {
-    Tester::TestDirWithResources testDirWithResources;
+    aide::TestDirWithResources testDirWithResources;
     auto resourcePath    = testDirWithResources.getResourcePath("sort");
     auto destinationPath = testDirWithResources.getTestDirPath("destination");
     FileSorter fileSorter(std::make_unique<FilesystemFileListFetcher>(),
@@ -318,7 +318,7 @@ TEST_CASE("File sorter test") {
 }
 
 TEST_CASE("Target strategy test ") {
-    Tester::TestDirWithResources testDirWithResources;
+    aide::TestDirWithResources testDirWithResources;
     auto resourcePath    = testDirWithResources.getResourcePath("sort");
     auto testGif         = resourcePath / "test.gif";
     const auto predicate = StandardFileSorterPredicates::fileExistsPredicate;
@@ -338,7 +338,7 @@ TEST_CASE("Target strategy test ") {
             REQUIRE(result == expectedResult);
             REQUIRE(!fs::is_directory(result));
             SECTION("second file") {
-                Tester::createFile(expectedResult, "test");
+                aide::createFile(expectedResult, "test");
                 auto expectedSecondResult = resourcePath / "test (2).gif";
                 auto result2              = action(testGif, predicate);
                 REQUIRE(!fs::is_directory(result2));

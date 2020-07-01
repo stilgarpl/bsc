@@ -2,11 +2,11 @@
 // Created by stilgar on 24.06.2020.
 //
 
+#include <aide/Aide.h>
 #include <catch2/catch.hpp>
 #include <p2p/core/node/Node.h>
 #include <p2p/modules/basic/BasicModule.h>
 #include <p2p/modules/command/CommandModule.h>
-#include <tester/Tester.h>
 
 using namespace bsc;
 
@@ -20,7 +20,7 @@ void commandModuleSetup(Node& node) {
 }
 
 TEST_CASE("CommandModule test") {
-    Tester::TestDir testDir;
+    aide::TestDir testDir;
     Node thisNode({.rootPath = testDir.getTestDirPath()});
     thisNode.getNodeInfo().setNodeId("firstNodeR");
     commandModuleSetup(thisNode);

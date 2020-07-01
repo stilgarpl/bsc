@@ -6,4 +6,4 @@ add_executable(test_repo ${SOURCE_FILES})
 catch_discover_tests(test_repo WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
 #target_include_directories(test_repo PUBLIC test_repo)
-target_link_libraries(test_repo repo tester)
+target_link_libraries(test_repo repo aide)

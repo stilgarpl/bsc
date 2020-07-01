@@ -13,11 +13,11 @@ namespace bsc {
 
     namespace aide {
 
-        static void createFile(const fs::path& path, const std::string& content);
+        void createFile(const fs::path& path, const std::string& content);
 
-        static void changeFile(const fs::path& path, const std::string& content);
+        void changeFile(const fs::path& path, const std::string& content);
 
-        static std::string readFile(const fs::path& path);
+        std::string readFile(const fs::path& path);
 
         class Cleanup {
             fs::path pathToCleanup;
@@ -62,12 +62,12 @@ namespace bsc {
             [[nodiscard]] const fs::path& getResourcePath() const;
             [[nodiscard]] fs::path getResourcePath(const fs::path&) const;
         };
-    };
+        class TestingException : public std::domain_error {
+        public:
+            explicit TestingException(const std::string& arg);
+        };
+    }// namespace aide
 
-    class TestingException : public std::domain_error {
-    public:
-        explicit TestingException(const std::string& arg);
-    };
 }// namespace bsc
 
 #endif

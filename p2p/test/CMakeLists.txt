@@ -6,4 +6,4 @@ add_executable(test_p2p ${SOURCE_FILES})
 catch_discover_tests(test_p2p WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
 #target_include_directories(test_p2p PUBLIC test_p2p)
-target_link_libraries(test_p2p p2p logic tester)
+target_link_libraries(test_p2p p2p logic aide)

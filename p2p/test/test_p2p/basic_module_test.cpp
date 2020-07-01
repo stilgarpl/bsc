@@ -4,14 +4,14 @@
 #include <catch2/catch.hpp>
 #include <p2p/core/node/Node.h>
 #include <p2p/modules/basic/BasicModule.h>
-#include <tester/Tester.h>
+#include <aide/Aide.h>
 
 using namespace bsc;
 
 void basicModuleSetup(Node& node) { node.addModule<BasicModule>(); }
 
 TEST_CASE("BasicModule test") {
-    Tester::TestDir testDir;
+    aide::TestDir testDir;
     Node thisNode({.rootPath = testDir.getTestDirPath()});
     thisNode.getNodeInfo().setNodeId("firstNodeR");
     basicModuleSetup(thisNode);

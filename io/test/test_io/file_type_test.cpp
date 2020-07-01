@@ -1,12 +1,12 @@
 //
 // Created by stilgar on 09.04.2020.
 //
+#include <aide/Aide.h>
 #include <catch2/catch.hpp>
 #include <core/log/Logger.h>
 #include <io/file/FileMetaDataReader.h>
 #include <io/file/MimeFileType.h>
 #include <io/file/MimeFileTypeDecoder.h>
-#include <tester/Tester.h>
 
 using namespace bsc;
 using namespace std::string_literals;
@@ -32,7 +32,7 @@ TEST_CASE("Filetype test") {
 }
 
 TEST_CASE("File type decoder test") {
-    Tester::TestDirWithResources testDirWithResources;
+    aide::TestDirWithResources testDirWithResources;
     auto path                        = testDirWithResources.getResourcePath("mime");
     const std::string gifFilename    = "test.gif";
     const std::string pngFilename    = "test.png";
@@ -65,7 +65,7 @@ TEST_CASE("File type decoder test") {
 }
 
 TEST_CASE("FileMetaDataReader test") {
-    Tester::Resources resources;
+    aide::Resources resources;
     const auto& path              = resources.getResourcePath("mime");
     const std::string txtFilename = "test.txt";
     const std::string pngFilename = "test.png";

@@ -6,4 +6,4 @@ add_executable(test_core ${SOURCE_FILES})
 catch_discover_tests(test_core WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
 #target_include_directories(test_core PUBLIC test_core)
-target_link_libraries(test_core PUBLIC core PRIVATE tester)
+target_link_libraries(test_core PUBLIC core PRIVATE aide)
