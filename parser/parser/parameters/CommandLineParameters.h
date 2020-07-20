@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 07.01.2020.
+// Created by Krzysztof Tulidowicz on 07.01.2020.
 //
 
 #ifndef BSC_COMMANDLINEPARAMETERS_H
@@ -407,9 +407,9 @@ namespace bsc {
 
     class Alias {
     public:
-        Alias(char key) {
+        Alias(char shortKey) {
             auto& builder = CommandLineParameters::parserBuilder();
-            builder.addAlias(key);
+            builder.addAlias(shortKey);
         }
 
         Alias(const char* longKey) {

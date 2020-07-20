@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 04.11.18.
+// Created by Krzysztof Tulidowicz on 04.11.18.
 //
 
 #ifndef BSC_HOMEDIRRULE_H

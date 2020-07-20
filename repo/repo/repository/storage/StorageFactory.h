@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 19.08.2019.
+// Created by Krzysztof Tulidowicz on 19.08.2019.
 //
 
 #ifndef BSC_STORAGEFACTORY_H

@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 29.07.2019.
+// Created by Krzysztof Tulidowicz on 29.07.2019.
 //
 
 #include <core/context/Context.h>
@@ -23,7 +23,7 @@ void bsc::ThreadPoolExecutor::execute(std::function<void(void)> task) {
 
 void bsc::ThreadPoolExecutor::startWorker() {
 
-    std::shared_ptr<std::thread> worker = std::make_shared<std::thread>([this] {
+    std::shared_ptr<std::thread> worker = std::make_shared<std::thread>([this] ()-> void {
         std::unique_lock<std::mutex> g(queueLock);
         while (running) {
             if (taskQueue.empty()) {

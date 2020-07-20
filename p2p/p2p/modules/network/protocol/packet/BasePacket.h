@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 01.08.17.
+// Created by Krzysztof Tulidowicz on 01.08.17.
 //
 
 #ifndef BSC_BASEPACKET_H
@@ -91,18 +91,6 @@ namespace bsc {
 
     template<typename... T1>
     using Fu = std::function<void(T1& ...)>;
-
-    //@todo I think this class is not used, remove it.
-    class TypeOperator {
-
-        template<typename T>
-        void operate(NetworkPacketPointer<T> ptr) {
-            LOGGER("do shit")
-            //@todo somehow invoke logic engine. preferably without including logic manager here.
-            //  if only somehow I could pass a lambda or sth that would be invoked here.
-
-        }
-    };
 
 
 }

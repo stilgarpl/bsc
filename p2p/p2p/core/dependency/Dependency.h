@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 07.11.17.
+// Created by Krzysztof Tulidowicz on 07.11.17.
 //
 
 #ifndef BSC_DEPENDENCY_H

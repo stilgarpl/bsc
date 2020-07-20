@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 30.01.19.
+// Created by Krzysztof Tulidowicz on 30.01.19.
 //
 
 #ifndef BSC_EVENTWRAPPER_H

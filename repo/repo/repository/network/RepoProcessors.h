@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 28.02.19.
+// Created by Krzysztof Tulidowicz on 28.02.19.
 //
 
 #ifndef BSC_REPOPROCESSORS_H

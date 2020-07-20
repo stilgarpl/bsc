@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 24.10.18.
+// Created by Krzysztof Tulidowicz on 24.10.18.
 //
 
 #include "RemoteNodeInfo.h"

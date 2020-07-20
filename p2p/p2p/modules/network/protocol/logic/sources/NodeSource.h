@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 08.09.17.
+// Created by Krzysztof Tulidowicz on 08.09.17.
 //
 
 #ifndef BSC_NODESOURCE_H

@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 9/27/19.
+// Created by Krzysztof Tulidowicz on 9/27/19.
 //
 
 #include <catch2/catch.hpp>

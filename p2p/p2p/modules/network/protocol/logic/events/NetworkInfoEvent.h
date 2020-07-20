@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 06.10.17.
+// Created by Krzysztof Tulidowicz on 06.10.17.
 //
 
 #ifndef BSC_NETWORKINFOEVENT_H

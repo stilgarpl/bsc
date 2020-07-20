@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 08.10.17.
+// Created by Krzysztof Tulidowicz on 08.10.17.
 //
 
 #ifndef BSC_NODEINFOGROUP_H

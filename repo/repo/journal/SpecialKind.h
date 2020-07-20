@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 07.04.2020.
+// Created by Krzysztof Tulidowicz on 07.04.2020.
 //
 
 #ifndef BSC_SPECIALKIND_H

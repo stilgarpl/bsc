@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 02.12.2019.
+// Created by Krzysztof Tulidowicz on 02.12.2019.
 //
 
 #include <Poco/Environment.h>

@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 14.11.17.
+// Created by Krzysztof Tulidowicz on 14.11.17.
 //
 
 #include <p2p/modules/command/network/logic/actions/CommandActions.h>
@@ -218,7 +218,7 @@ namespace bsc {
         LOGGER("Command Module has stopped")
     }
     void CommandModule::runLine(const std::string& line) {
-        LOGGER("Command: " + line);
+        LOGGER("Command: " + line)
         //explode command into words
         auto words = bsc::explode(line, ' ');
 
@@ -237,7 +237,7 @@ namespace bsc {
             runCommand(groupOrCommandName, data);
         } catch (const bsc::IncorrectParametersException& e) {
             LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " +
-                   std::to_string(e.gotParameters));
+                   std::to_string(e.gotParameters))
         }
     }
 

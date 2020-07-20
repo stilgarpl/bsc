@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 2/1/19.
+// Created by Krzysztof Tulidowicz on 2/1/19.
 //
 
 #ifndef BSC_COMMONEVALUATORS_H

@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 02.04.2020.
+// Created by Krzysztof Tulidowicz on 02.04.2020.
 //
 
 #ifndef BSC_PATHTRANSFORMERRULEFACTORY_H

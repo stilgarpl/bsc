@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 19.03.19.
+// Created by Krzysztof Tulidowicz on 19.03.19.
 //
 
 #ifndef BSC_TRANSFERQUERY_H

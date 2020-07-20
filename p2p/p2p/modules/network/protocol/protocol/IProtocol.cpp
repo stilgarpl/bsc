@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 05.09.17.
+// Created by Krzysztof Tulidowicz on 05.09.17.
 //
 
 #include <logic/sources/ClockSource.h>

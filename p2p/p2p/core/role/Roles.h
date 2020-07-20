@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 12.11.17.
+// Created by Krzysztof Tulidowicz on 12.11.17.
 //
 
 #ifndef BSC_ROLES_H

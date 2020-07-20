@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 17.11.17.
+// Created by Krzysztof Tulidowicz on 17.11.17.
 //
 
 #ifndef BSC_INODEMODULE_H

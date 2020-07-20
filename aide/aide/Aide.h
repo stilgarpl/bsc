@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 10.04.2020.
+// Created by Krzysztof Tulidowicz on 10.04.2020.
 //
 
 #ifndef BSC_AIDE_H

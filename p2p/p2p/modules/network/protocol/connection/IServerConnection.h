@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 09.10.17.
+// Created by Krzysztof Tulidowicz on 09.10.17.
 //
 
 #ifndef BSC_ISERVERCONNECTION_H

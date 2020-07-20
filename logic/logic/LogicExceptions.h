@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 05.12.2019.
+// Created by Krzysztof Tulidowicz on 05.12.2019.
 //
 
 #ifndef BSC_LOGICEXCEPTIONS_H

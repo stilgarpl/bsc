@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 23.08.17.
+// Created by Krzysztof Tulidowicz on 23.08.17.
 //
 
 #ifndef BSC_TICK_H

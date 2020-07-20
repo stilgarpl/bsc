@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 20.04.2020.
+// Created by Krzysztof Tulidowicz on 20.04.2020.
 //
 
 #include <catch2/catch.hpp>
@@ -118,7 +118,7 @@ TEST_CASE("escapeAllRegexCharacters test") {
 TEST_CASE("Sort fetchers test") {
     aide::TestDirWithResources testDirWithResources;
     SECTION("Filesystem fetcher test") {
-        std::set<fs::path> expectedResult = {"test.txt", "test.gif", "test.png", "png_with_bad_extension.txt"};
+        std::set<fs::path> expectedResult = {"test.txt", "test.gif", "test.png", "png_with_wrong_extension.txt"};
         auto path                         = testDirWithResources.getTestDirPath("sort");
         FilesystemFileListFetcher fetcher;
         auto result = fetcher.doListFiles(path);
@@ -216,7 +216,7 @@ TEST_CASE("FileSorterMapper test") {
         REQUIRE(result == expectedImagePattern);
     }
     SECTION("png-txt") {
-        auto filenamePngTxt = "png_with_bad_extension.txt";
+        auto filenamePngTxt = "png_with_wrong_extension.txt";
         auto result         = fileSorterMapper.map(path / filenamePngTxt);
         REQUIRE(result);
         REQUIRE(result == expectedImagePattern);
@@ -273,7 +273,7 @@ TEST_CASE("File sorter test") {
                               destinationPath.string() + "/Images/{{date.year}}/");
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
-        REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
         const auto& result = fileSorter.sort(resourcePath);
         REQUIRE(result.getSortedFiles().size() == 3);
@@ -283,10 +283,10 @@ TEST_CASE("File sorter test") {
         REQUIRE(!fs::is_directory(destinationPath / "Images" / "2020" / "test.gif"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
         REQUIRE(!fs::is_directory(destinationPath / "Images" / "2020" / "test.png"));
-        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
-        REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
     }
     SECTION("images and txt") {
@@ -296,7 +296,7 @@ TEST_CASE("File sorter test") {
                               destinationPath.string() + "/Text/");
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
-        REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
         const auto& result = fileSorter.sort(resourcePath);
         REQUIRE(result.getSortedFiles().size() == 4);
@@ -304,11 +304,11 @@ TEST_CASE("File sorter test") {
         //@todo this will fail in 2021, fix tests with current year for images that does not have exif data
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.gif"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
-        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(destinationPath / "Text" / "test.txt"));
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
-        REQUIRE(fs::exists(resourcePath / "png_with_bad_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
         SECTION("second sort should end with error") {
             const auto& result = fileSorter.sort(resourcePath);

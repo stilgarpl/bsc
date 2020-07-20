@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 05.11.17.
+// Created by Krzysztof Tulidowicz on 05.11.17.
 //
 
 #ifndef BSC_REPOMODULE_H
@@ -73,18 +73,11 @@ namespace bsc {
         /// Commands section
         ////////////////////////////////
 
-        void persistFile(const fs::path& path);
-
-        void ignoreFile(const fs::path& path);
-
         void updateFile(const fs::path& path);
 
         void updateAllFiles();
 
         void deployAllFiles();
-
-        void persistFile(const IRepository::RepoIdType& repoId, const fs::path& path);
-
 
         void selectRepository(const IRepository::RepoIdType& repoId);
 

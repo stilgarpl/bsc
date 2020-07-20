@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 07.01.2020.
+// Created by Krzysztof Tulidowicz on 07.01.2020.
 //
 
 #include "CommandLineParameters.h"

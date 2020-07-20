@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 30.08.2019.
+// Created by Krzysztof Tulidowicz on 30.08.2019.
 //
 
 #ifndef BSC_STORAGEFACTORYSPECIALIZATION_H

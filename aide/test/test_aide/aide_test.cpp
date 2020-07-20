@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 10.04.2020.
+// Created by Krzysztof Tulidowicz on 10.04.2020.
 //
 #include "aide/Aide.h"
 #include <catch2/catch.hpp>

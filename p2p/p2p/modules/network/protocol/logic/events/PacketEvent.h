@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 03.09.17.
+// Created by Krzysztof Tulidowicz on 03.09.17.
 //
 
 #ifndef BSC_PACKETEVENT_H

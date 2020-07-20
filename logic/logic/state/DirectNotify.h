@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 14.10.2019.
+// Created by Krzysztof Tulidowicz on 14.10.2019.
 //
 
 #ifndef BSC_DIRECTNOTIFY_H

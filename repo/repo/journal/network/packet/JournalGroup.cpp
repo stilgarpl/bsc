@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 18.10.17.
+// Created by Krzysztof Tulidowicz on 18.10.17.
 //
 
 #include "JournalGroup.h"

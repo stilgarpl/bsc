@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 29.07.2019.
+// Created by Krzysztof Tulidowicz on 29.07.2019.
 //
 
 #ifndef BSC_THREADPOOLEXECUTOR_H

@@ -1,25 +1,23 @@
 //
-// Created by stilgar on 10.04.2020.
+// Created by Krzysztof Tulidowicz on 10.04.2020.
 //
 
 #include "Aide.h"
 #include <random>
 #include <utility>
 
-namespace bsc {
+namespace bsc::aide {
+    void createFile(const std::filesystem::path& path, const std::string& content) {
+        std::ofstream file(path);
+        file << content;
+    }
 
-    namespace aide {
-        void createFile(const std::filesystem::path& path, const std::string& content) {
-            std::ofstream file(path);
-            file << content;
-        }
+    void changeFile(const fs::path& path, const std::string& content) {
+        std::ofstream file(path);
+        file << content;
+    }
 
-        void changeFile(const fs::path& path, const std::string& content) {
-            std::ofstream file(path);
-            file << content;
-        }
-
-        std::string readFile(const fs::path& path) {
+    std::string readFile(const fs::path& path) {
             if (fs::exists(path)) {
                 std::ifstream t(path);
                 std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
@@ -80,5 +78,4 @@ namespace bsc {
             //@todo maybe throw if this path does not exist?
             return resourcePath / p;
         }
-    }// namespace aide
-}// namespace bsc
+}// namespace bsc::aide

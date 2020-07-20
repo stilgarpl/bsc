@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 12.07.18.
+// Created by Krzysztof Tulidowicz on 12.07.18.
 //
 
 #ifndef BSC_KEEPALIVEPACKET_H

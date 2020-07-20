@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 04.04.19.
+// Created by Krzysztof Tulidowicz on 04.04.19.
 //
 
 #ifndef BSC_STRATEGY_H

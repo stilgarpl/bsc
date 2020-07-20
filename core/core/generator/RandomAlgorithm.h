@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 13.12.2019.
+// Created by Krzysztof Tulidowicz on 13.12.2019.
 //
 
 #ifndef BSC_RANDOMALGORITHM_H

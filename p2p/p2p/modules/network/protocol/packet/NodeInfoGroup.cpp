@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 08.10.17.
+// Created by Krzysztof Tulidowicz on 08.10.17.
 //
 
 #include <p2p/modules/network/protocol/packet/BasePacket.h>

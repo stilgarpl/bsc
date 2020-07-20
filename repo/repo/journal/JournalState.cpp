@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 17.10.17.
+// Created by Krzysztof Tulidowicz on 17.10.17.
 //
 #include <Poco/Environment.h>
 #include <core/log/Logger.h>

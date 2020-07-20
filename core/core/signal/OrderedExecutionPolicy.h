@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 29.11.18.
+// Created by Krzysztof Tulidowicz on 29.11.18.
 //
 
 #ifndef BSC_ORDEREDEXECUTIONPOLICY_H

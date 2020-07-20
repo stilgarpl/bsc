@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 29.07.2019.
+// Created by Krzysztof Tulidowicz on 29.07.2019.
 //
 
 #include "SimpleExecutor.h"

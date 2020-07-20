@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 13.01.2020.
+// Created by Krzysztof Tulidowicz on 13.01.2020.
 //
 
 #include <core/io/InputOutputContext.h>

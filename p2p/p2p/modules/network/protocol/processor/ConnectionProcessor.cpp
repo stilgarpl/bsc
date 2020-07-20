@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 20.08.17.
+// Created by Krzysztof Tulidowicz on 20.08.17.
 //
 
 #include <iostream>

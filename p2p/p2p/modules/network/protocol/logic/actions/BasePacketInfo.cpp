@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 06.09.17.
+// Created by Krzysztof Tulidowicz on 06.09.17.
 //
 #include "BasePacketInfo.h"
 

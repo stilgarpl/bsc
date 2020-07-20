@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 01.04.2020.
+// Created by Krzysztof Tulidowicz on 01.04.2020.
 //
 
 #include "JournalHistory.h"

@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 31.05.19.
+// Created by Krzysztof Tulidowicz on 31.05.19.
 //
 
 #ifndef BSC_DATAFILENOTFOUNDEXCEPTION_H

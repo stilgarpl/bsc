@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 18.11.17.
+// Created by Krzysztof Tulidowicz on 18.11.17.
 //
 
 #ifndef BSC_TEMPLATECAST_H
@@ -66,7 +66,6 @@ namespace bsc {
     public:
         template<typename T, typename RetType, typename... Args>
         RetType operator()(T& t, RetType (T::*f)(Args...), std::vector<std::string>& args) {
-            // assert(args.size() == num_args); // just to be sure
             if (args.size() != num_args) {
                 throw IncorrectParametersException(num_args, args.size());
             }
@@ -75,32 +74,36 @@ namespace bsc {
 
         template<typename RetType, typename... Args>
         RetType operator()(RetType (*f)(Args...), std::vector<std::string>& args) {
-            // assert(args.size() == num_args); // just to be sure
+            if (args.size() != num_args) {
+                throw IncorrectParametersException(num_args, args.size());
+            }
             return call(f, args, std::make_index_sequence<num_args>{});
         }
 
         template<typename RetType, typename... Args>
         RetType operator()(std::function<RetType(Args...)> f, std::vector<std::string>& args) {
-            // assert(args.size() == num_args); // just to be sure
+            if (args.size() != num_args) {
+                throw IncorrectParametersException(num_args, args.size());
+            }
             return call(f, args, std::make_index_sequence<num_args>{});
         }
     };
 
     template<typename T, typename RetType, typename... Args>
     inline RetType runMemberFunction(T& t, RetType (T::*f)(Args...), std::vector<std::string> values) {
-        bsc::UnpackCaller<sizeof...(Args)> a;
+        UnpackCaller<sizeof...(Args)> a;
         return a(t, f, values);
     }
 
     template<typename RetType, typename... Args>
     inline RetType runFunction(RetType (*f)(Args...), std::vector<std::string> values) {
-        bsc::UnpackCaller<sizeof...(Args)> a;
+        UnpackCaller<sizeof...(Args)> a;
         return a(f, values);
     }
 
     template<typename RetType, typename... Args>
     inline RetType runStandardFunction(std::function<RetType(Args...)> f, std::vector<std::string> values) {
-        bsc::UnpackCaller<sizeof...(Args)> a;
+        UnpackCaller<sizeof...(Args)> a;
         return a(f, values);
     }
 }

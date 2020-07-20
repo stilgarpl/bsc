@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 02.12.2019.
+// Created by Krzysztof Tulidowicz on 02.12.2019.
 //
 
 #ifndef BSC_JOURNALMETADATAFETCHER_H

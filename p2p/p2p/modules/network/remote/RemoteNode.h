@@ -3,7 +3,7 @@
 #include <utility>
 
 //
-// Created by stilgar on 06.07.18.
+// Created by Krzysztof Tulidowicz on 06.07.18.
 //
 
 #ifndef BSC_REMOTENODE_H

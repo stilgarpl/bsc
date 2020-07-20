@@ -1,7 +1,6 @@
 //
-// Created by stilgar on 03.09.17.
+// Created by Krzysztof Tulidowicz on 03.09.17.
 //
-
 
 #include "PacketEvent.h"
 

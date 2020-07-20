@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 01.08.17.
+// Created by Krzysztof Tulidowicz on 01.08.17.
 //
 
 #ifndef BSC_COMMAND_H

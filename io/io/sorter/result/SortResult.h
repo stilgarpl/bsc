@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 16.06.2020.
+// Created by Krzysztof Tulidowicz on 16.06.2020.
 //
 
 #ifndef BSC_SORTRESULT_H

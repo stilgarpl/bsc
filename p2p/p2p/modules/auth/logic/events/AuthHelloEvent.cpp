@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 19.07.18.
+// Created by Krzysztof Tulidowicz on 19.07.18.
 //
 
 #include "AuthHelloEvent.h"

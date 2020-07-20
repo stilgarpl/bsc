@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 25.02.2020.
+// Created by Krzysztof Tulidowicz on 25.02.2020.
 //
 
 #include "RepositoryFileMap.h"

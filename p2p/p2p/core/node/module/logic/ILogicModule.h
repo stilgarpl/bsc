@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 12.10.17.
+// Created by Krzysztof Tulidowicz on 12.10.17.
 //
 
 #ifndef BSC_ILOGICMODULE_H

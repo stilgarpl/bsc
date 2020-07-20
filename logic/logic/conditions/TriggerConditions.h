@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 24.03.19.
+// Created by Krzysztof Tulidowicz on 24.03.19.
 //
 
 #ifndef BSC_TRIGGERCONDITIONS_H

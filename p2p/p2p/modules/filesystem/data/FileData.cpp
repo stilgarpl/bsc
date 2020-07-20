@@ -2,7 +2,7 @@
 #include <core/utils/crypto.h>
 
 //
-// Created by stilgar on 04.11.18.
+// Created by Krzysztof Tulidowicz on 04.11.18.
 //
 
 #include "FileData.h"

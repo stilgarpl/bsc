@@ -1,7 +1,7 @@
 #include <utility>
 
 //
-// Created by stilgar on 05.09.17.
+// Created by Krzysztof Tulidowicz on 05.09.17.
 //
 
 #ifndef BSC_IPROTOCOL_H

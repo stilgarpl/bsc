@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 16.04.2020.
+// Created by Krzysztof Tulidowicz on 16.04.2020.
 //
 
 #ifndef BSC_IMAGEFILEREADER_H

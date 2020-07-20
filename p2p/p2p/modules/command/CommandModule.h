@@ -1,7 +1,5 @@
-#include <utility>
-
 //
-// Created by stilgar on 14.11.17.
+// Created by Krzysztof Tulidowicz on 14.11.17.
 //
 
 #ifndef BSC_COMMANDMODULE_H
@@ -17,6 +15,7 @@
 #include <parser/cast/templateCast.h>
 #include <parser/parameters/CommandLineParameters.h>
 #include <parser/parser/explode.h>
+#include <utility>
 
 namespace bsc {
     class CommandModule : public NodeModuleDependent<CommandModule, NetworkModule, BasicModule> {
@@ -167,6 +166,7 @@ namespace bsc {
                                              const CommandModule::CommandGroup& group) -> GroupHandlerResult {
                     auto parameters =
                             CommandLineParser::defaultParse<ParametersType>(arguments, ParseConfiguration::silent);
+                    //@todo handlerFunc takes only one parameter... fix it.
                     auto status = handlerFunc(parameters, group);
                     return {status, parameters.arguments()};
                 };

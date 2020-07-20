@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 10.06.19.
+// Created by Krzysztof Tulidowicz on 10.06.19.
 //
 
 #ifndef BSC_REMOTENODECONNECTIONEXCEPTION_H

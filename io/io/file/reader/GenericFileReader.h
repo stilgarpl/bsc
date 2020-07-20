@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 11.04.2020.
+// Created by Krzysztof Tulidowicz on 11.04.2020.
 //
 
 #ifndef BSC_GENERICFILEREADER_H

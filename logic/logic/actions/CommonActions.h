@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 03.02.19.
+// Created by Krzysztof Tulidowicz on 03.02.19.
 //
 
 #ifndef BSC_COMMONACTIONS_H

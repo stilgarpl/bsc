@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 29.12.17.
+// Created by Krzysztof Tulidowicz on 29.12.17.
 //
 
 #ifndef BSC_RESOURCEIDENTIFICATOR_H

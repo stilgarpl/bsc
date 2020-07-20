@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 09.12.2019.
+// Created by Krzysztof Tulidowicz on 09.12.2019.
 //
 
 #include "ConnectionException.h"

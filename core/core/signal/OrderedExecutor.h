@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 09.07.19.
+// Created by Krzysztof Tulidowicz on 09.07.19.
 //
 
 #ifndef BSC_ORDEREDEXECUTOR_H

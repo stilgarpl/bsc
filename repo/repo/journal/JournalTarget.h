@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 06.11.18.
+// Created by Krzysztof Tulidowicz on 06.11.18.
 //
 
 #ifndef BSC_JOURNALTARGET_H

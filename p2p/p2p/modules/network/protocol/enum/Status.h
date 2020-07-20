@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 21.08.17.
+// Created by Krzysztof Tulidowicz on 21.08.17.
 //
 
 #ifndef BSC_STATUS_H

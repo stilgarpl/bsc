@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 23.08.17.
+// Created by Krzysztof Tulidowicz on 23.08.17.
 //
 
 #include "chain/GlobalChainContext.h"

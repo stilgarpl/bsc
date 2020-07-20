@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 20.10.17.
+// Created by Krzysztof Tulidowicz on 20.10.17.
 //
 
 #ifndef BSC_REPOSITORYCONTEXT_H

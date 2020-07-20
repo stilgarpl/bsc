@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 03.08.17.
+// Created by Krzysztof Tulidowicz on 03.08.17.
 //
 //#define CEREAL_THREAD_SAFE 1
 

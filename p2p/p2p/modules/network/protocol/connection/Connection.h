@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 03.08.17.
+// Created by Krzysztof Tulidowicz on 03.08.17.
 //
 
 #ifndef BSC_CONNECTION_H

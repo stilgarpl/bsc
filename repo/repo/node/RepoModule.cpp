@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 05.11.17.
+// Created by Krzysztof Tulidowicz on 05.11.17.
 //
 
 #include "RepoModule.h"

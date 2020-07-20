@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 09.04.2020.
+// Created by Krzysztof Tulidowicz on 09.04.2020.
 //
 
 #ifndef BSC_MIMEFILETYPEDECODER_H

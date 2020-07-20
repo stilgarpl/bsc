@@ -3,7 +3,7 @@
 #include <utility>
 
 //
-// Created by stilgar on 31.07.17.
+// Created by Krzysztof Tulidowicz on 31.07.17.
 //
 
 #include <thread>

@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 22.04.2020.
+// Created by Krzysztof Tulidowicz on 22.04.2020.
 //
 #include <filesystem>
 #include <io/sorter/FileSorter.h>

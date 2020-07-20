@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 08.01.2020.
+// Created by Krzysztof Tulidowicz on 08.01.2020.
 //
 
 #ifndef BSC_FROMSTRING_H

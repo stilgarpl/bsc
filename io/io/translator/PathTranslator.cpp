@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 21.04.2020.
+// Created by Krzysztof Tulidowicz on 21.04.2020.
 //
 
 #include "PathTranslator.h"

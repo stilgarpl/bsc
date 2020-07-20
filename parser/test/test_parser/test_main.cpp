@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 07.12.17.
+// Created by Krzysztof Tulidowicz on 07.12.17.
 //
 
 #define CATCH_CONFIG_MAIN

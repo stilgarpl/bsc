@@ -1,7 +1,7 @@
 #include <utility>
 
 //
-// Created by stilgar on 20.08.17.
+// Created by Krzysztof Tulidowicz on 20.08.17.
 //
 
 #ifndef BSC_CONTEXT_H

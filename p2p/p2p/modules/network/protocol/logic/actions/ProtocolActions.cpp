@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 29.08.17.
+// Created by Krzysztof Tulidowicz on 29.08.17.
 //
 
 #include "ProtocolActions.h"

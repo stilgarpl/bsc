@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 08.05.2020.
+// Created by Krzysztof Tulidowicz on 08.05.2020.
 //
 
 #include "FileListFetcher.h"

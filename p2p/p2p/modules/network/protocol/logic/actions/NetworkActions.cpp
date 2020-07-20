@@ -1,7 +1,7 @@
 #include <utility>
 
 //
-// Created by stilgar on 07.10.17.
+// Created by Krzysztof Tulidowicz on 07.10.17.
 //
 
 #include <p2p/core/node/context/NodeContext.h>

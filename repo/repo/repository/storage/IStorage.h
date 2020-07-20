@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 10.12.17.
+// Created by Krzysztof Tulidowicz on 10.12.17.
 //
 
 #ifndef BSC_ISTORAGE_H

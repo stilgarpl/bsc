@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 06.12.2019.
+// Created by Krzysztof Tulidowicz on 06.12.2019.
 //
 
 #include "CommandInputOutputContext.h"

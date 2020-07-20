@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 08.06.2020.
+// Created by Krzysztof Tulidowicz on 08.06.2020.
 //
 
 #include "FileSortingExceptions.h"

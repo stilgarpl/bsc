@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 20.04.2020.
+// Created by Krzysztof Tulidowicz on 20.04.2020.
 //
 
 #ifndef BSC_STATICFILELISTFETCHER_H

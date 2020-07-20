@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 22.12.17.
+// Created by Krzysztof Tulidowicz on 22.12.17.
 //
 
 #ifndef BSC_IREPOSITORY_H

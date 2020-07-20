@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 08.09.17.
+// Created by Krzysztof Tulidowicz on 08.09.17.
 //
 
 #include <p2p/core/node/context/NodeContext.h>

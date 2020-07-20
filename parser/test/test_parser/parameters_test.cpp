@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 15.01.2020.
+// Created by Krzysztof Tulidowicz on 15.01.2020.
 //
 
 #include <catch2/catch.hpp>
@@ -12,13 +12,11 @@ struct TestParameters : CommandLineParameters {
     Flag flag                          = {{.shortKey = 'f', .longKey = "flag", .doc = "Flag"}};
     DefaultParameter<std::string> text = {
             {.shortKey = 't', .longKey = "text", .argumentName = "text", .doc = "Text", .defaultValue = "Default"}};
-    //    DefaultParameter<std::string> shortText   = {{ 's',  "short",  "short text", "default"}};
     DefaultParameter<std::string> shortText = {{.shortKey      = 's',
                                                 .argumentName  = "short",
                                                 .doc           = "short text",
                                                 .defaultValue  = "default",
                                                 .allowedValues = {"short"}}};
-    //    DefaultParameter<std::string> defaultText = {{'d', "short", "short text",  "default"}};
     DefaultParameter<std::string> defaultText = {
             {.shortKey = 'd', .argumentName = "short", .doc = "short text", .defaultValue = "default"}};
     Parameter<std::vector<int>> vector = {{'v', "vec", "vec", "Vector of ints"}};

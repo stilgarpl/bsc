@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 16.08.2019.
+// Created by Krzysztof Tulidowicz on 16.08.2019.
 //
 
 #include <core/uber/Uber.h>

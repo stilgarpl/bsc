@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 09.07.18.
+// Created by Krzysztof Tulidowicz on 09.07.18.
 //
 
 #ifndef BSC_NOTREQUESTEXCEPTION_H

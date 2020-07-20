@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 09.04.2020.
+// Created by Krzysztof Tulidowicz on 09.04.2020.
 //
 #include <aide/Aide.h>
 #include <catch2/catch.hpp>
@@ -36,7 +36,7 @@ TEST_CASE("File type decoder test") {
     auto path                        = testDirWithResources.getResourcePath("mime");
     const std::string gifFilename    = "test.gif";
     const std::string pngFilename    = "test.png";
-    const std::string badPngFilename = "png_with_bad_extension.txt";
+    const std::string badPngFilename = "png_with_wrong_extension.txt";
     const std::string txtFilename    = "test.txt";
     MimeFileTypeDecoder decoder;
     SECTION("txt") {

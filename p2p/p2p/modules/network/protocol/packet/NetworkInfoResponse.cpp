@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 06.10.17.
+// Created by Krzysztof Tulidowicz on 06.10.17.
 //
 
 #include <core/log/Logger.h>

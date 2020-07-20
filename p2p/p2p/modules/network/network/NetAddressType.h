@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 29.10.18.
+// Created by Krzysztof Tulidowicz on 29.10.18.
 //
 
 #ifndef BSC_NETADDRESSTYPE_H

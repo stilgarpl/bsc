@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 17.10.17.
+// Created by Krzysztof Tulidowicz on 17.10.17.
 //
 #include "SimpleJournal.h"
 #include "SimpleJournalMetaDataFetcher.h"

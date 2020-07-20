@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 27.10.18.
+// Created by Krzysztof Tulidowicz on 27.10.18.
 //
 
 #ifndef BSC_MODULESOURCE_H

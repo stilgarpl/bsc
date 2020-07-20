@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 11.05.2020.
+// Created by Krzysztof Tulidowicz on 11.05.2020.
 //
 
 #ifndef BSC_COPYFACTORY_H

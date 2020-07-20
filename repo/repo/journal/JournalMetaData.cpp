@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 21.11.2019.
+// Created by Krzysztof Tulidowicz on 21.11.2019.
 //
 
 #include "JournalState.h"

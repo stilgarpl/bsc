@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 20.02.2020.
+// Created by Krzysztof Tulidowicz on 20.02.2020.
 //
 #include <core/utils/cereal_include.h>
 #include <catch2/catch.hpp>

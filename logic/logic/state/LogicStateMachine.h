@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 20.07.18.
+// Created by Krzysztof Tulidowicz on 20.07.18.
 //
 
 #ifndef BSC_LOGICSTATEMACHINE_H

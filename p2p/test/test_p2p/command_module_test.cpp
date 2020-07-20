@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 24.06.2020.
+// Created by Krzysztof Tulidowicz on 24.06.2020.
 //
 
 #include <aide/Aide.h>

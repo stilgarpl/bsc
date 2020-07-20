@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 10.12.2019.
+// Created by Krzysztof Tulidowicz on 10.12.2019.
 //
 
 #ifndef BSC_CONNECTIONPROCESSORS_H

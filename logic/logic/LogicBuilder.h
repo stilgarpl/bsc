@@ -1,7 +1,7 @@
 #include <utility>
 
 //
-// Created by stilgar on 1/7/19.
+// Created by Krzysztof Tulidowicz on 1/7/19.
 //
 
 #ifndef BSC_LOGICBUILDER_H

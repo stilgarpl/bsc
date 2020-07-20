@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 19.11.17.
+// Created by Krzysztof Tulidowicz on 19.11.17.
 //
 
 #ifndef BSC_COMMANDEVENT_H

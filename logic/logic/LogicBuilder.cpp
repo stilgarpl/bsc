@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 1/7/19.
+// Created by Krzysztof Tulidowicz on 1/7/19.
 //
 
 #include "LogicBuilder.h"

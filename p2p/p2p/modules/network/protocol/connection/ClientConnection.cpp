@@ -1,7 +1,7 @@
 #include <utility>
 
 //
-// Created by stilgar on 01.08.17.
+// Created by Krzysztof Tulidowicz on 01.08.17.
 //
 
 #include <Poco/Net/SocketStream.h>
@@ -45,10 +45,10 @@ bsc::ClientConnection::~ClientConnection() {
         ClientConnection::shutdown();
     } catch (const Poco::Net::NetException& e) {
         LOGGER("net exception")
-        LOGGER(e.displayText());
+        LOGGER(e.displayText())
         auto nested = e.nested();
         while (nested != nullptr) {
-            LOGGER(nested->displayText());
+            LOGGER(nested->displayText())
             nested = nested->nested();
         }
     }

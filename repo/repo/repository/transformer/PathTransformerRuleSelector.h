@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 03.04.2020.
+// Created by Krzysztof Tulidowicz on 03.04.2020.
 //
 
 #ifndef BSC_PATHTRANSFORMERRULESELECTOR_H

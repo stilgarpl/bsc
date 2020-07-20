@@ -5,7 +5,7 @@
 #include <utility>
 
 //
-// Created by stilgar on 01.01.19.
+// Created by Krzysztof Tulidowicz on 01.01.19.
 //
 
 #ifndef BSC_CHAINEVENT_H

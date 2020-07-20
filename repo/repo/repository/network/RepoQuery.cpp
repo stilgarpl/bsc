@@ -1,5 +1,5 @@
 //
-// Created by stilgar on 05.02.19.
+// Created by Krzysztof Tulidowicz on 05.02.19.
 //
 
 #include <logic/context/LogicContext.h>
