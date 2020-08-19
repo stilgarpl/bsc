@@ -4,7 +4,7 @@ project(bsc VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 set(TEMPLATE_PATH "${CMAKE_SOURCE_DIR}/cmake/template/")
 
 #include additional configuration
@@ -28,16 +28,7 @@ set(BSC_DESTINATION_LIB "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}")
 set(BSC_DESTINATION_INCLUDE "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
 set(BSC_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-
-add_subdirectory(aide)
-add_subdirectory(io)
-add_subdirectory(parser)
-add_subdirectory(core)
-add_subdirectory(logic)
-add_subdirectory(p2p)
-add_subdirectory(repo)
-add_subdirectory(bsc)
-
+add_subdirectory(src)
 
 install(EXPORT ${PROJECT_NAME}Targets
         FILE ${PROJECT_NAME}Targets.cmake

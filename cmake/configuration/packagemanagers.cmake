@@ -18,6 +18,7 @@ if (BSC_USE_PACKAGE_MANAGER)
                 BASIC_SETUP
                 BUILD_TYPE "Debug"
                 BUILD missing)
+        include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
     else ()
         message("Conan not found")
     endif ()

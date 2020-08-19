@@ -1,0 +1,13 @@
+file(GLOB BSC_LIBRARY_LIST LIST_DIRECTORIES true CONFIGURE_DEPENDS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *)
+set(BSC_LIBRARIES)
+foreach (BSC_LIB IN LISTS BSC_LIBRARY_LIST)
+    if (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${BSC_LIB})
+        message("Found library: ${BSC_LIB}")
+        add_subdirectory(${BSC_LIB})
+        list(APPEND BSC_LIBRARIES ${BSC_LIB})
+    endif ()
+endforeach ()
+
+set(BSC_LIBRARIES ${BSC_LIBRARIES} PARENT_SCOPE)
+
+
