@@ -143,3 +143,7 @@ Examples:
 
 ### templateCast 
 This small tool allows to call any Callable object (function, function pointer, lambda, functor, pointer-to-member,etc.) with vector of strings containing values of its arguments. Values are converted to parameter types using fromString parser. 
+
+## Dependencies
+
+The only dependency of this project is GNU argp, which is included as part of GNU standard library (GLIBC). If you are using GCC with standard libraries, this project should work without any additional dependencies. If you are using clang or not using standard libraries from GNU, you should install and link against standalone GNU argp. 
