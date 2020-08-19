@@ -1,0 +1,10 @@
+build
+build/**
+out/**
+out
+cmake-**/**
+cmake-**
+cmake-*
+.kdev4
+.git
+.conan
