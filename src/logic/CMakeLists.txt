@@ -13,6 +13,6 @@ target_link_libraries(logic PUBLIC core PRIVATE)
 install(DIRECTORY logic DESTINATION ${BSC_DESTINATION_INCLUDE}
         FILES_MATCHING PATTERN "*.h")
 install(TARGETS logic COMPONENT logic DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)
-if (${BSC_ENABLE_TESTS})
+if (BSC_ENABLE_TESTS)
     add_subdirectory(test)
 endif ()

@@ -9,6 +9,6 @@ target_link_libraries(repo PUBLIC p2p_core module_command module_filesystem io)
 install(DIRECTORY repo DESTINATION ${BSC_DESTINATION_INCLUDE}
         FILES_MATCHING PATTERN "*.h")
 install(TARGETS repo COMPONENT repo DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)
-if (${BSC_ENABLE_TESTS})
+if (BSC_ENABLE_TESTS)
     add_subdirectory(test)
 endif ()
