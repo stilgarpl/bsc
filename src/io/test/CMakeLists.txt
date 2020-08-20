@@ -1,5 +1,3 @@
-#setDirect(CMAKE_CXX_STANDARD 17)
-
 set(SOURCE_FILES test_io/test_main.cpp test_io/file_type_test.cpp test_io/file_sorter_test.cpp)
 
 add_executable(test_io ${SOURCE_FILES})

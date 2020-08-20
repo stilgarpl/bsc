@@ -67,7 +67,7 @@ namespace bsc::testaid {
                 //@todo maybe it should not copy everything, but only requested files on getResourcePath ?
                 fs::copy(resourcesPath, localResourcesPath, fs::copy_options::recursive);
             } else {
-                throw TestingException("Resources path does not exist : " + resourcesPath.string());
+                throw TestingException("Resources path does not exist : " + resourcesPath.string() + ", current dir: " + fs::current_path().string());
             }
         }
         const fs::path& TestDirWithResources::getResourcePath() const { return localResourcesPath; }

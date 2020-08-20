@@ -1,5 +1,3 @@
-#setDirect(CMAKE_CXX_STANDARD 17)
-
 set(SOURCE_FILES test_parser/test_main.cpp test_parser/fromString_test.cpp test_parser/templateCast_test.cpp test_parser/parameters_test.cpp)
 
 add_executable(test_parser ${SOURCE_FILES})

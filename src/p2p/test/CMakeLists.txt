@@ -1,5 +1,3 @@
-#setDirect(CMAKE_CXX_STANDARD 17)
-
 set(SOURCE_FILES test_p2p/test_main.cpp test_p2p/transfer_test.cpp test_p2p/remote_node_test.cpp test_p2p/basic_module_test.cpp test_p2p/command_module_test.cpp)
 
 add_executable(test_p2p ${SOURCE_FILES})

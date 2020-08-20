@@ -77,27 +77,27 @@ TEST_CASE("FileMetaDataReader test") {
         //        REQUIRE(meta["wrong_key"].is_null());
         REQUIRE(meta["file"]["size"] == "11");
         REQUIRE(meta["file"]["date"]["year"] == "2020");
-        REQUIRE(meta["file"]["date"]["month"] == "4");
+        REQUIRE(meta["file"]["date"]["month"] == "8");
         REQUIRE(meta["file"]["date"]["day"].is_string());
-        REQUIRE(meta["file"]["date"]["day"] == "10");
+        REQUIRE(meta["file"]["date"]["day"] == "20");
         REQUIRE(meta["file"]["time"]["hours"].is_string());
-        REQUIRE(meta["file"]["time"]["hours"] == "12");
+        REQUIRE(meta["file"]["time"]["hours"] == "8");
         REQUIRE(meta["file"]["time"]["minutes"].is_string());
-        REQUIRE(meta["file"]["time"]["minutes"] == "1");
+        REQUIRE(meta["file"]["time"]["minutes"] == "40");
         REQUIRE(meta["file"]["time"]["seconds"].is_string());
-        REQUIRE(meta["file"]["time"]["seconds"] == "1");
+        REQUIRE(meta["file"]["time"]["seconds"] == "35");
         REQUIRE(meta["date"]["year"].is_string());
         REQUIRE(meta["date"]["year"] == "2020");
         REQUIRE(meta["date"]["month"].is_string());
-        REQUIRE(meta["date"]["month"] == "4");
+        REQUIRE(meta["date"]["month"] == "8");
         REQUIRE(meta["date"]["day"].is_string());
-        REQUIRE(meta["date"]["day"] == "10");
+        REQUIRE(meta["date"]["day"] == "20");
         REQUIRE(meta["time"]["hours"].is_string());
-        REQUIRE(meta["time"]["hours"] == "12");
+        REQUIRE(meta["time"]["hours"] == "8");
         REQUIRE(meta["time"]["minutes"].is_string());
-        REQUIRE(meta["time"]["minutes"] == "1");
+        REQUIRE(meta["time"]["minutes"] == "40");
         REQUIRE(meta["time"]["seconds"].is_string());
-        REQUIRE(meta["time"]["seconds"] == "1");
+        REQUIRE(meta["time"]["seconds"] == "35");
     }
 
     SECTION("png") {
@@ -110,15 +110,15 @@ TEST_CASE("FileMetaDataReader test") {
         REQUIRE(meta["file"]["date"]["year"].is_string());
         REQUIRE(meta["file"]["date"]["year"] == "2020");
         REQUIRE(meta["file"]["date"]["month"].is_string());
-        REQUIRE(meta["file"]["date"]["month"] == "4");
+        REQUIRE(meta["file"]["date"]["month"] == "8");
         REQUIRE(meta["file"]["date"]["day"].is_string());
-        REQUIRE(meta["file"]["date"]["day"] == "16");
+        REQUIRE(meta["file"]["date"]["day"] == "20");
         REQUIRE(meta["file"]["time"]["hours"].is_string());
-        REQUIRE(meta["file"]["time"]["hours"] == "10");
+        REQUIRE(meta["file"]["time"]["hours"] == "8");
         REQUIRE(meta["file"]["time"]["minutes"].is_string());
-        REQUIRE(meta["file"]["time"]["minutes"] == "15");
+        REQUIRE(meta["file"]["time"]["minutes"] == "40");
         REQUIRE(meta["file"]["time"]["seconds"].is_string());
-        REQUIRE(meta["file"]["time"]["seconds"] == "49");
+        REQUIRE(meta["file"]["time"]["seconds"] == "35");
         REQUIRE(meta["image"]["date"]["year"].is_string());
         REQUIRE(meta["image"]["date"]["year"] == "2020");
         REQUIRE(meta["image"]["date"]["month"].is_string());
