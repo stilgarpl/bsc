@@ -1,5 +1,3 @@
-#setDirect(CMAKE_CXX_STANDARD 17)
-
 set(SOURCE_FILES test_testaid/test_main.cpp test_testaid/testaid_test.cpp)
 
 add_executable(test_testaid ${SOURCE_FILES})
