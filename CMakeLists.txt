@@ -13,14 +13,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/configuration/analyzers.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/speedup.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/packagemanagers.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/compilers.cmake)
-
-
-#testing
-enable_testing()
-find_package(Catch2 CONFIG REQUIRED)
-include(Catch)
-option(BSC_ENABLE_TESTS "Enable unit tests" ON)
-
+include(${CMAKE_SOURCE_DIR}/cmake/configuration/testing.cmake)
 
 #set destinations for install targets
 include(GNUInstallDirs)
