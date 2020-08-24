@@ -25,6 +25,7 @@ TEST_CASE("Parameters test") {
     std::vector<std::string> arg = {"-f", "-s", "short", "-t", "la la", "-v", "1,2,7", "5"s, "argument"};
     CommandLineParser silentParser{ParseConfiguration::silent, {}};
     const auto& params = silentParser.parse<TestParameters>("cmd", arg);
+    REQUIRE(params.commandName() == "cmd");
     REQUIRE(params.flag() == true);
     REQUIRE(params.text() == "la la");
     REQUIRE(params.vector().has_value());
