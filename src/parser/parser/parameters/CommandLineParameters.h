@@ -56,6 +56,7 @@ namespace bsc {
             unsigned flags{};
             std::map<decltype(argp_option::key), OptionParseFunc> parseMap{};
             std::vector<std::string> rawArguments{};
+            std::string commandName;
             struct ArgumentDescriptor {
                 ArgumentParseFunc argumentParseFunc{};
                 decltype(rawArguments)::size_type argumentIndex{};
@@ -84,10 +85,10 @@ namespace bsc {
             static char* helpFilter(int key, const char* text, void* input);
             auto& getParsedArguments() { return rawArguments; }
             auto getRemainingArguments() {
-                return std::span<std::string>(rawArguments.begin() +
-                                                      (requiredArgumentsCount ? *requiredArgumentsCount : 0),
+                return std::span<std::string>(rawArguments.begin() + (requiredArgumentsCount ? *requiredArgumentsCount : 0),
                                               rawArguments.end());
             };
+            auto& getCommandName() { return commandName; }
 
             friend class CommandLineParameters::ParserBuilder;
             friend class CommandLineParser;
@@ -157,9 +158,9 @@ namespace bsc {
         friend class CommandLineParser;
 
         [[nodiscard]] const std::vector<std::string>& arguments() const { return parser->getParsedArguments(); }
-        [[nodiscard]] const std::span<std::string> remainingArguments() const {
-            return parser->getRemainingArguments();
-        }
+        [[nodiscard]] const std::span<std::string> remainingArguments() const { return parser->getRemainingArguments(); }
+
+        const std::string& commandName() const { return parser->getCommandName(); }
     };
 
     class CommandLineParser {
