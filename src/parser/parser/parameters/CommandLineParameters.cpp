@@ -171,7 +171,9 @@ namespace bsc {
     }
 
     void CommandLineParameters::ArgumentParser::parse(int argc, char** argv) {
-
+        if (argc > 0 && argv[0] != nullptr) {
+            commandName = argv[0];
+        }
         argp_parse(&argParams, argc, argv, flags, nullptr, this);
         parseNamedArguments();
     }
