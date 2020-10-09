@@ -10,7 +10,6 @@ using namespace std::chrono_literals;
 
 void bsc::ThreadPoolExecutor::execute(std::function<void(void)> task) {
     if (running.load()) {
-        Context::Ptr origContext = Context::getActiveContext();
         std::unique_lock<std::mutex> g(queueLock);
         taskQueue.push(std::make_pair(task, Context::getActiveContext()));
         if (getActiveWorkerCount() < maxWorker) {
@@ -30,14 +29,12 @@ void bsc::ThreadPoolExecutor::startWorker() {
                 //@todo 1s? configurable value?
                 queueReady.wait_for(g, 1s, [&] { return !taskQueue.empty() || !running; });
             }
-            if (running && !taskQueue.empty()) {
-                auto[task, contextPtr] = taskQueue.front();
+            while (running && !taskQueue.empty()) {
+                auto [task, contextPtr] = taskQueue.front();
                 taskQueue.pop();
                 g.unlock();
-                Context::setActiveContext(contextPtr);
-                task();
+                ContextRunner::run(contextPtr, task);
                 g.lock();
-
             }
         }
     });

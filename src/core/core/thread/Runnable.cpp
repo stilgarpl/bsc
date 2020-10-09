@@ -10,14 +10,14 @@ using namespace std::chrono_literals;
 
 void bsc::Runnable::start() {
     std::lock_guard g(startMutex);
-    if (thread == nullptr) {
-        thread = std::make_unique<std::thread>(std::ref(*this), Context::getActiveContext());
+    if (!threadStarted) {
+        threadStarted = true;
+        thread        = ContextRunner::runNewThread(std::ref(*this));
     }
     //@todo throw exception on already started thread?
 }
 
-void bsc::Runnable::operator()(Context::Ptr contextPtr) {
-    Context::setActiveContext(std::move(contextPtr));
+void bsc::Runnable::operator()() {
     onStart();
     started = true;
     run();
@@ -37,6 +37,7 @@ void bsc::Runnable::stop() {
     stopping = true;
     started = false;
     shutdownSignal.notify_all();
+    thread.request_stop();
     stopRequested();
     //@todo kill ? join?
 
@@ -48,9 +49,8 @@ bool bsc::Runnable::isStopping() const {
 }
 
 void bsc::Runnable::join() {
-    if (thread != nullptr && thread->joinable()) {
-        thread->join();
-        thread = nullptr;
+    if (thread.joinable()) {
+        thread.join();
     }
 }
 

@@ -81,7 +81,7 @@ namespace bsc {
 
         Node();
 
-        Node(const Configuration& configuration);
+        Node(Configuration configuration);
 
         Node(Node&) = delete;
 

@@ -16,14 +16,15 @@ namespace bsc {
 
     class Runnable {
     private:
-        //@todo switch to jthread
-        std::unique_ptr<std::thread> thread;
+        std::jthread thread;
         mutable std::mutex startMutex, stopMutex;
-        std::atomic_bool stopping = false;
+        std::atomic_bool threadStarted = false;
+        std::atomic_bool stopping      = false;
         std::atomic_bool started  = false;
         std::atomic_bool finished = false;
 
     protected:
+        //@todo investigate if this is still needed now that we have jthread. migrate to stop_token.
         std::condition_variable shutdownSignal;
 
         void waitForStop();
@@ -38,7 +39,7 @@ namespace bsc {
 
         virtual void join() final;
 
-        void operator()(Context::Ptr contextPtr);
+        void operator()();
 
         virtual ~Runnable();
 

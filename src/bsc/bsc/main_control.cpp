@@ -1,10 +1,11 @@
-#include <iostream>
 #include "p2p/core/node/Node.h"
-#include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
-#include "p2p/modules/network/protocol/logic/actions/NodeActions.h"
 #include "p2p/modules/network/protocol/logic/actions/NetworkActions.h"
+#include "p2p/modules/network/protocol/logic/actions/NodeActions.h"
+#include "p2p/modules/network/protocol/logic/sources/NodeSource.h"
+#include <iostream>
 #include <p2p/modules/command/CommandModule.h>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
 
 using namespace bsc;
 

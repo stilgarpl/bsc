@@ -111,3 +111,86 @@ TEST_CASE("Context loop test") {
     context3->setParentContext(context2);
     REQUIRE_THROWS_AS(context1->setParentContext(context3), bsc::ContextLoopException);
 }
+
+TEST_CASE("SetLocalContext test") {
+    Context::OwnPtr context1 = Context::makeContext();
+    Context::OwnPtr context2 = Context::makeContext();
+    Context::setActiveContext(context1);
+    SECTION("SetLocalContext should set context2 as active context and restore context1 after leaving the scope") {
+        REQUIRE(Context::getActiveContext() == context1);
+        {
+            SetLocalContext l{context2};
+            REQUIRE(Context::getActiveContext() == context2);
+        }
+        REQUIRE(Context::getActiveContext() == context1);
+    }
+    SECTION("SetLocalContext should run callback in local context") {
+        REQUIRE(Context::getActiveContext() == context1);
+        SetLocalContext{context2}([&]() { REQUIRE(Context::getActiveContext() == context2); });
+        REQUIRE(Context::getActiveContext() == context1);
+    }
+    SECTION("SetLocalContext should run callback in local context - multi callback") {
+        REQUIRE(Context::getActiveContext() == context1);
+        SetLocalContext{context2}([&]() { REQUIRE(Context::getActiveContext() == context2); })(
+                [&]() { REQUIRE(Context::getActiveContext() == context2); })([&]() { REQUIRE(Context::getActiveContext() == context2); });
+        REQUIRE(Context::getActiveContext() == context1);
+    }
+
+    SECTION("SetLocalContext should run callback in local context - with parameters") {
+        const int argument = 5;
+        REQUIRE(Context::getActiveContext() == context1);
+        SetLocalContext{context2}(
+                [&](auto i) {
+                    REQUIRE(i == argument);
+                    REQUIRE(Context::getActiveContext() == context2);
+                },
+                argument);
+        REQUIRE(Context::getActiveContext() == context1);
+    }
+}
+
+TEST_CASE("ContextRunner test") {
+    Context::OwnPtr context1 = Context::makeContext();
+    Context::OwnPtr context2 = Context::makeContext();
+    Context::setActiveContext(context1);
+    const auto threadId = std::this_thread::get_id();
+
+    SECTION("ContextRunner::run test") {
+        ContextRunner::run([&]() {
+            REQUIRE(Context::getActiveContext() == context1);
+            REQUIRE(threadId == std::this_thread::get_id());
+        });
+        ContextRunner::run(context2, [&]() {
+            REQUIRE(Context::getActiveContext() == context2);
+            REQUIRE(threadId == std::this_thread::get_id());
+        });
+        const int argument = 5;
+        ContextRunner::run(
+                context2,
+                [&](auto i) {
+                    REQUIRE(i == argument);
+                    REQUIRE(Context::getActiveContext() == context2);
+                    REQUIRE(threadId == std::this_thread::get_id());
+                },
+                argument);
+    }
+    SECTION("ContextRunner::runNewThread test") {
+        auto t1            = ContextRunner::runNewThread([&]() {
+            REQUIRE(Context::getActiveContext() == context1);
+            REQUIRE(threadId != std::this_thread::get_id());
+        });
+        auto t2            = ContextRunner::runNewThread(context2, [&]() {
+            REQUIRE(Context::getActiveContext() == context2);
+            REQUIRE(threadId != std::this_thread::get_id());
+        });
+        const int argument = 5;
+        auto t3            = ContextRunner::runNewThread(
+                context2,
+                [&](auto i) {
+                    REQUIRE(i == argument);
+                    REQUIRE(Context::getActiveContext() == context2);
+                    REQUIRE(threadId != std::this_thread::get_id());
+                },
+                argument);
+    }
+}

@@ -8,20 +8,13 @@
 #include <p2p/modules/basic/BasicModule.h>
 
 #include <chrono>
+#include <testaid/testaid.h>
 using namespace bsc;
 
 void remoteServerTestModuleSetup(Node& node) {
     node.addModule<BasicModule>();
     node.addModule<NetworkModule>();
     node.addModule<FilesystemModule>();
-}
-
-void waitFor(const std::function<bool(void)> &expression, std::chrono::milliseconds timeout) {
-
-    auto beginTime = std::chrono::steady_clock::now();
-    while (!expression() || std::chrono::steady_clock::now() - beginTime < timeout) {
-        std::this_thread::sleep_for(10ms);
-    }
 }
 
 
@@ -54,7 +47,7 @@ TEST_CASE("Remote node test") {
         bool connectedToSecond = remoteSecondNode.isConnected();
         INFO("testing require")
         REQUIRE(connectedToSecond);
-        waitFor([&] { return remoteSecondNode.getNodeId().has_value(); }, 5s);
+        testaid::waitFor([&] { return remoteSecondNode.getNodeId().has_value(); }, 5s);
         bool hasNodeId = remoteSecondNode.getNodeId().has_value();
         REQUIRE(hasNodeId);
         auto realNodeId = *remoteSecondNode.getNodeId();

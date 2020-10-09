@@ -65,7 +65,9 @@ TEST_CASE("File type decoder test") {
 }
 
 TEST_CASE("FileMetaDataReader test") {
-    testaid::Resources resources;
+    //@todo use chrono ymd when it's available
+    testaid::TestDirWithResources resources(testaid::TestDirWithResources::Options{
+            .fixedFileTime = std::chrono::file_clock::from_sys(std::chrono::system_clock::from_time_t(1586429253))});
     const auto& path              = resources.getResourcePath("mime");
     const std::string txtFilename = "test.txt";
     const std::string pngFilename = "test.png";
@@ -74,54 +76,54 @@ TEST_CASE("FileMetaDataReader test") {
         auto fileType = decoder.getTypeForFile(path / txtFilename);
         FileMetaDataReader fileMetaDataReader(fileType);
         const auto& meta = fileMetaDataReader.readMetaData(path / txtFilename);
-        //        REQUIRE(meta["wrong_key"].is_null());
         REQUIRE(meta["file"]["size"] == "11");
+        REQUIRE(meta["file"]["date"]["year"].is_string());
         REQUIRE(meta["file"]["date"]["year"] == "2020");
-        REQUIRE(meta["file"]["date"]["month"] == "8");
+        REQUIRE(meta["file"]["date"]["month"].is_string());
+        REQUIRE(meta["file"]["date"]["month"] == "4");
         REQUIRE(meta["file"]["date"]["day"].is_string());
-        REQUIRE(meta["file"]["date"]["day"] == "20");
+        REQUIRE(meta["file"]["date"]["day"] == "9");
         REQUIRE(meta["file"]["time"]["hours"].is_string());
-        REQUIRE(meta["file"]["time"]["hours"] == "8");
+        REQUIRE(meta["file"]["time"]["hours"] == "10");
         REQUIRE(meta["file"]["time"]["minutes"].is_string());
-        REQUIRE(meta["file"]["time"]["minutes"] == "40");
+        REQUIRE(meta["file"]["time"]["minutes"] == "47");
         REQUIRE(meta["file"]["time"]["seconds"].is_string());
-        REQUIRE(meta["file"]["time"]["seconds"] == "35");
+        REQUIRE(meta["file"]["time"]["seconds"] == "33");
         REQUIRE(meta["date"]["year"].is_string());
         REQUIRE(meta["date"]["year"] == "2020");
         REQUIRE(meta["date"]["month"].is_string());
-        REQUIRE(meta["date"]["month"] == "8");
+        REQUIRE(meta["date"]["month"] == "4");
         REQUIRE(meta["date"]["day"].is_string());
-        REQUIRE(meta["date"]["day"] == "20");
+        REQUIRE(meta["date"]["day"] == "9");
         REQUIRE(meta["time"]["hours"].is_string());
-        REQUIRE(meta["time"]["hours"] == "8");
+        REQUIRE(meta["time"]["hours"] == "10");
         REQUIRE(meta["time"]["minutes"].is_string());
-        REQUIRE(meta["time"]["minutes"] == "40");
+        REQUIRE(meta["time"]["minutes"] == "47");
         REQUIRE(meta["time"]["seconds"].is_string());
-        REQUIRE(meta["time"]["seconds"] == "35");
+        REQUIRE(meta["time"]["seconds"] == "33");
     }
 
     SECTION("png") {
         auto fileType = decoder.getTypeForFile(path / pngFilename);
         FileMetaDataReader fileMetaDataReader(fileType);
         const auto& meta = fileMetaDataReader.readMetaData(path / pngFilename);
-        //        REQUIRE(!meta["wrong_key"]);
-        //        LOGGER(meta.dump(2));
         REQUIRE(meta["file"]["size"] == "8495");
         REQUIRE(meta["file"]["date"]["year"].is_string());
         REQUIRE(meta["file"]["date"]["year"] == "2020");
         REQUIRE(meta["file"]["date"]["month"].is_string());
-        REQUIRE(meta["file"]["date"]["month"] == "8");
+        REQUIRE(meta["file"]["date"]["month"] == "4");
         REQUIRE(meta["file"]["date"]["day"].is_string());
-        REQUIRE(meta["file"]["date"]["day"] == "20");
+        REQUIRE(meta["file"]["date"]["day"] == "9");
         REQUIRE(meta["file"]["time"]["hours"].is_string());
-        REQUIRE(meta["file"]["time"]["hours"] == "8");
+        REQUIRE(meta["file"]["time"]["hours"] == "10");
         REQUIRE(meta["file"]["time"]["minutes"].is_string());
-        REQUIRE(meta["file"]["time"]["minutes"] == "40");
+        REQUIRE(meta["file"]["time"]["minutes"] == "47");
         REQUIRE(meta["file"]["time"]["seconds"].is_string());
-        REQUIRE(meta["file"]["time"]["seconds"] == "35");
+        REQUIRE(meta["file"]["time"]["seconds"] == "33");
         REQUIRE(meta["image"]["date"]["year"].is_string());
         REQUIRE(meta["image"]["date"]["year"] == "2020");
         REQUIRE(meta["image"]["date"]["month"].is_string());
+        //@todo I see inconsistency with leading 0s, either add them to file parser or remove from image parser (I think adding is better)
         REQUIRE(meta["image"]["date"]["month"] == "04");
         REQUIRE(meta["image"]["date"]["day"].is_string());
         REQUIRE(meta["image"]["date"]["day"] == "16");

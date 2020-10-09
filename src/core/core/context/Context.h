@@ -7,14 +7,13 @@
 #ifndef BSC_CONTEXT_H
 #define BSC_CONTEXT_H
 
-
+#include <atomic>
+#include <core/log/Logger.h>
+#include <iostream>
 #include <map>
 #include <memory>
-#include <iostream>
 #include <mutex>
-#include <core/log/Logger.h>
-#include <atomic>
-
+#include <thread>
 
 namespace bsc {
     class InvalidContextException : public std::invalid_argument {
@@ -37,6 +36,7 @@ namespace bsc {
 
     class Context {
     public:
+        //@todo replace this with class that wraps around shared_ptr and apply correct semantics to Ptr and OwnPtr
         typedef std::shared_ptr<Context> ContextPtr;
         typedef ContextPtr Ptr;
         typedef const ContextPtr OwnPtr;
@@ -69,7 +69,7 @@ namespace bsc {
         constexpr static KeyType defaultKey = 0;
     private:
         //@todo remove debug id
-        std::string debugId = "";
+        std::string debugId;
         bool defaultContext = false;
         mutable std::recursive_mutex contextLock;
         //initialized to nullptr in .cpp file
@@ -286,19 +286,47 @@ namespace bsc {
 
     class SetLocalContext {
         Context::Ptr prevContext = nullptr;
+
     public:
-        explicit SetLocalContext(Context::ContextPtr ptr) {
+        explicit SetLocalContext(Context::Ptr ptr) {
             if (Context::hasActiveContext()) {
                 prevContext = Context::getActiveContext();
             }
             Context::setActiveContext(std::move(ptr));
         }
 
-        ~SetLocalContext() {
-            Context::setActiveContext(prevContext);
+        template<typename Func, typename... Args>
+        requires std::regular_invocable<Func, Args...> SetLocalContext& operator()(const Func& f, Args... args) {
+            f(args...);
+            return *this;
+        }
+
+        ~SetLocalContext() { Context::setActiveContext(prevContext); }
+    };
+
+    class ContextRunner {
+    public:
+        template<typename Func, typename... Args>
+        requires std::regular_invocable<Func, Args...> static void run(const Context::Ptr& context, const Func& f, Args... args) {
+            SetLocalContext{context}(f, args...);
+        }
+
+        template<typename Func, typename... Args>
+        requires std::regular_invocable<Func, Args...> static void run(const Func& f, Args... args) {
+            return run(Context::getActiveContext(), f, args...);
+        }
+
+        template<typename Func, typename... Args>
+        requires std::regular_invocable<Func, Args...> [[nodiscard]] static auto
+        runNewThread(const Context::Ptr& context, const Func& f, Args... args) {
+            return std::jthread([context, f, args...]() { SetLocalContext{context}(f, args...); });
+        }
+
+        template<typename Func, typename... Args>
+        requires std::regular_invocable<Func, Args...> [[nodiscard]] static auto runNewThread(const Func& f, Args... args) {
+            return runNewThread(Context::getActiveContext(), f, args...);
         }
     };
-}
-
+}// namespace bsc
 
 #endif //BSC_CONTEXT_H

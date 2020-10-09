@@ -7,18 +7,7 @@
 #include "ThreadExecutor.h"
 
 
-void bsc::ThreadExecutor::execute(const std::function<void(void)> task) {
-
-    Context::Ptr origContext = Context::getActiveContext();
-    std::thread(
-            [=]() {
-                Context::setActiveContext(origContext);
-                task();
-            }
-    ).detach();
-
-
-}
+void bsc::ThreadExecutor::execute(const std::function<void(void)> task) { ContextRunner::runNewThread(task).detach(); }
 
 void bsc::ThreadExecutor::stop() {
 
