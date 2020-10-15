@@ -32,6 +32,7 @@ namespace bsc {
 
     protected:
         ConnectionProcessor processor;
+
     private:
         std::mutex sendQueueLock;
         std::mutex receiveQueueLock;
@@ -39,18 +40,16 @@ namespace bsc {
         std::queue<std::shared_ptr<BasePacket>> receiveQueue;
         std::condition_variable sendReady;
         std::condition_variable receiveReady;
-        Context::OwnPtr connectionContext = nullptr; //initialized from node context in constructor
+        Context::OwnPtr connectionContext;// initialized from node context in constructor
     private:
-
         std::unique_ptr<std::thread> sendThread;
         std::unique_ptr<std::thread> receiveThread;
         std::recursive_mutex sendThreadLock;
         std::recursive_mutex receiveThreadLock;
-        std::atomic<bool> sending = true;
+        std::atomic<bool> sending   = true;
         std::atomic<bool> receiving = true;
 
     protected:
-
         void workSend(Poco::Net::StreamSocket& socket);
 
         void workReceive(Poco::Net::StreamSocket& socket);

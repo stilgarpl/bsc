@@ -729,3 +729,6 @@ copy
 --error ###
 CLI::parse<>(argc,argv,configPath)
 parameters.saveConfiguration(configPath)
+
+
+Autoregister<Type,registerFunc> - jak Spring. ma pole static ktore zainicjalizuje się przy starcie aplikacji (mam nadzieje) i wykona ten funktor ktory zarejestruje klase w kontekscie czy gdzieś.

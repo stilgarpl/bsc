@@ -15,18 +15,10 @@ namespace bsc {
     }
 
 
-    void SourceManager::setContext(const Context::Ptr& context) {
-//    *commonContext += context;
-        commonContext->setParentContext(context);
-        commonContext->setDebugId("source manager common context");
-        //@todo there may be another way of initializing global chain context, but it may just as well be here...
-//    commonContext->setDebugId("common context source");
-        context->set<bsc::GlobalChainContext>();
-    }
+    void SourceManager::setContext(const Context::Ptr& context) {}
 
     void SourceManager::startSources() {
         std::lock_guard g(sourcesLock);
-        Context::setActiveContext(commonContext);
         for (auto&& source : sources) {
             source->start();
         }

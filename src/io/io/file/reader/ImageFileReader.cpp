@@ -29,7 +29,6 @@ namespace bsc {
                     std::smatch dateTimeMatch;
                     if (std::regex_match(dateTime, dateTimeMatch, dateTimeRegex) &&
                         dateTimeMatch.size() == dateTimeRegex.mark_count() + 1) {
-                        //@todo probably you can just set one struct and image.date = date
                         result["image"]["date"]["year"]    = dateTimeMatch[1];
                         result["image"]["date"]["month"]   = dateTimeMatch[2];
                         result["image"]["date"]["day"]     = dateTimeMatch[3];

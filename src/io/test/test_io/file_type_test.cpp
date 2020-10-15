@@ -11,21 +11,28 @@
 using namespace bsc;
 using namespace std::string_literals;
 TEST_CASE("Filetype test") {
+    MimeFileTypeFactory factory;
 
     SECTION("application/json") {
-        MimeFileType f = MimeFileType::make("application/json");
+        MimeFileType f = factory.create("application/json");
         REQUIRE(f.type == "json");
         REQUIRE(f.typeGroup == "application");
     }
 
     SECTION("image/jpeg") {
-        MimeFileType f = MimeFileType::make("image/jpeg");
+        MimeFileType f = factory.create("image/jpeg");
         REQUIRE(f.type == "jpeg");
         REQUIRE(f.typeGroup == "image");
     }
 
+    SECTION("image/") {
+        MimeFileType f = factory.create("image/");
+        REQUIRE(f.type.empty());
+        REQUIRE(f.typeGroup == "image");
+    }
+
     SECTION("invalid mime string") {
-        REQUIRE_THROWS_MATCHES(MimeFileType::make("invalid"),
+        REQUIRE_THROWS_MATCHES(factory.create("invalid"),
                                FileTypeParseException,
                                Catch::Matchers::Message("Mime string [invalid] does not match (\\w+)/(\\w+) pattern"));
     }
@@ -65,7 +72,7 @@ TEST_CASE("File type decoder test") {
 }
 
 TEST_CASE("FileMetaDataReader test") {
-    //@todo use chrono ymd when it's available
+    //@todo use chrono ymd when it's available C++20
     testaid::TestDirWithResources resources(testaid::TestDirWithResources::Options{
             .fixedFileTime = std::chrono::file_clock::from_sys(std::chrono::system_clock::from_time_t(1586429253))});
     const auto& path              = resources.getResourcePath("mime");

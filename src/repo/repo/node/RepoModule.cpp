@@ -308,8 +308,6 @@ namespace bsc {
         const std::string defaultStorageId = "default";
         auto defaultStorage = storageFactoryPtr->create(defaultStorageId, defaultStorageId);
         storageManager.setDefaultStorage(defaultStorageId, defaultStorage);
-
-        factoryContext->addFactory<PathTransformerRuleFactory>();
     }
 
     IStoragePtr

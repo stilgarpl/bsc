@@ -5,21 +5,18 @@
 #ifndef BSC_GLOBALCHAINCONTEXT_H
 #define BSC_GLOBALCHAINCONTEXT_H
 
-
-#include <map>
 #include "ChainDefinitions.h"
 #include "ChainLock.h"
+#include <core/context/AutoContextSetter.h>
+#include <map>
 
 namespace bsc {
-    class GlobalChainContext {
+    class GlobalChainContext : public AutoContextSetter<GlobalChainContext> {
     private:
         std::map<ChainLockIdType, ChainLock> chainLocks;
 
     public:
-        ChainLock& getChainLock(const ChainLockIdType& chainId) {
-            return chainLocks[chainId];
-        }
-
+        ChainLock& getChainLock(const ChainLockIdType& chainId) { return chainLocks[chainId]; }
     };
 }
 

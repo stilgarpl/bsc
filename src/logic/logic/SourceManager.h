@@ -86,8 +86,8 @@ namespace bsc {
         template<typename EventType, typename... Args>
         void event(const EventType& event, Args... args) {
 
-            bsc::SetLocalContext localContext(event.context());
-            auto executor = getExecutorForEvent<EventType>();
+            SetLocalContext localContext(event.context());
+            auto executor            = getExecutorForEvent<EventType>();
             const auto& signalGlobal = this->getSignal<EventType, Args...>();
             const auto& signal = this->getSignal<EventType, Args...>(event.getEventId());
             signalGlobal.signal(executor, event, args...);
@@ -162,8 +162,7 @@ namespace bsc {
         SourceList sources;
         //@todo mozna zmienic ten type na list jesli wiecej niz jedno source danego typu bedzie potrzebne
         bsc::Uber<Type> sourcesByType;
-        //@todo it would appear that the common context is not actually used - it is replaced by context from events.
-        Context::OwnPtr commonContext = Context::makeContext();
+
     public:
 
 

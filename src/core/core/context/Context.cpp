@@ -10,7 +10,7 @@
 #include "Context.h"
 
 namespace bsc {
-    thread_local Context::Ptr Context::activeContext = nullptr;
+    thread_local Context::Ptr Context::activeContext = {};
 
     Context::Ptr Context::getParentContext() const {
         return parentContext;
@@ -65,12 +65,14 @@ namespace bsc {
         return *this;
     }
 
+    //@todo is this constructor actually used anywhere? delete it if not
     Context::Context(const Context::Ptr& ptr) : Context(*ptr) {}
 
-    Context::ContextPtr Context::makeContext() {
-        struct ContextMakeSharedWorkaround : public Context {
-        };
-        return std::make_shared<ContextMakeSharedWorkaround>();
+    Context::OwnPtr Context::makeContext(bool initialize) {
+        struct ContextMakeSharedWorkaround : public Context {};
+        Ptr p(std::make_shared<ContextMakeSharedWorkaround>());
+        if (initialize) p->initialize();
+        return p;
     }
 
     bool Context::isDefaultContext() const {
@@ -88,13 +90,13 @@ namespace bsc {
 
     }
 
-    Context::ContextPtr Context::makeContext(const Context::Ptr& parentContext) {
+    Context::OwnPtr Context::makeContext(const Context::Ptr& parentContext) {
         struct ContextMakeSharedWorkaround : public Context {
             explicit ContextMakeSharedWorkaround(const Context& other) : Context(other) {}
         };
-        if (parentContext != nullptr) {
-            //this was using copy constructor and needlessly copying everything in parent context to this new context.
-            ContextPtr ret = makeContext();//std::make_shared<ContextMakeSharedWorkaround>(*parentContext);
+        if (parentContext.hasValue()) {
+            // this was using copy constructor and needlessly copying everything in parent context to this new context.
+            OwnPtr ret = makeContext(false);// std::make_shared<ContextMakeSharedWorkaround>(*parentContext);
             ret->setParentContext(parentContext);
             return ret;
         } else {
@@ -103,15 +105,13 @@ namespace bsc {
         }
     }
 
-    bool Context::hasActiveContext() {
-        return activeContext != nullptr;
-    }
+    bool Context::hasActiveContext() { return activeContext.hasValue(); }
 
     void Context::validateParentContext() {
         //@todo if performance becomes an issue, maybe remove this call in release version.
         // I don't think it's actually possible to make a context loop in my apps, but who knows what can happen.
         Context::Ptr ancestor = parentContext;
-        while (ancestor != nullptr) {
+        while (ancestor.hasValue()) {
             if (&*ancestor == this) {
                 throw ContextLoopException("Context loop detected");
             } else {

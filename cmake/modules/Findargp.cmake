@@ -7,7 +7,7 @@ if (NOT argp_FOUND)
     #found header and library
     find_path(argp_INCLUDE_PATH "argp.h")
     #here cmake is clever, because looking for "argp" will return libc if argp is included in it (GNU libc)
-    find_library(argp_LIBRARIES NAMES "argp")
+    find_library(argp_LIBRARIES NAMES argp)
     if (argp_INCLUDE_PATH AND argp_LIBRARIES)
         #check if found argp library has right symbol
         set(CMAKE_REQUIRED_LIBRARIES ${argp_LIBRARIES})

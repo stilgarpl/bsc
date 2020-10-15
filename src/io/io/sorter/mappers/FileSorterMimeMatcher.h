@@ -9,16 +9,15 @@
 #include <io/file/MimeFileType.h>
 #include <io/file/MimeFileTypeDecoder.h>
 namespace bsc {
-    class FileSorterMimeMatcher : public FileSorterMapperMatcher {
+    class FileSorterMimeMatcher final : public FileSorterMapperMatcher {
     private:
         MimeFileType expectedMimeType;
         MimeFileTypeDecoder decoder;
 
     public:
-        FileSorterMimeMatcher(MimeFileType mimeFileType);
-        FileSorterMimeMatcher(const std::string& mimeString);
+        explicit FileSorterMimeMatcher(MimeFileType mimeFileType);
         MatchPrecision matches(const fs::path& path) override;
-        virtual ~FileSorterMimeMatcher() = default;
+        ~FileSorterMimeMatcher() override = default;
     };
 }// namespace bsc
 

@@ -7,15 +7,13 @@
 
 #include "PathTransformerRule.h"
 #include "PathTransformerRuleSelector.h"
-
+#include <core/factory/AutoFactory.h>
 
 namespace bsc {
 
-
-
-    class PathTransformerRuleFactory : public Factory<PathTransformerRulePtr> {
+    class PathTransformerRuleFactory : public AutoFactory<PathTransformerRuleFactory, PathTransformerRulePtr> {
     public:
-        PathTransformerRulePtr create(const SelectorType& selector, const ArgumentType& argument) const override;
+        [[nodiscard]] PathTransformerRulePtr create(const SelectorType& selector, const ArgumentType& argument) const override;
     };
 }// namespace bsc
 

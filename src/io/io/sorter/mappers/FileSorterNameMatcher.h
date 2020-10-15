@@ -9,13 +9,13 @@
 #include <string>
 
 namespace bsc {
-    class FileSorterNameMatcher : public FileSorterMapperMatcher {
+    class FileSorterNameMatcher final : public FileSorterMapperMatcher {
         std::regex regex;
 
     public:
         explicit FileSorterNameMatcher(const std::string& regexPattern) : regex(regexPattern) {}
         MatchPrecision matches(const fs::path& path) override;
-        virtual ~FileSorterNameMatcher() = default;
+        ~FileSorterNameMatcher() override = default;
     };
 }// namespace bsc
 

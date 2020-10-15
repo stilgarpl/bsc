@@ -64,8 +64,6 @@ bsc::Node::Node()
     nodeContext->set<RoleDefinitionsContext>();
     nodeContext->setDebugId("node contxt");
 
-    nodeContext->set<FactoryContext>();
-
     logicManager.setContexts(nodeContext);
 
     Node::setNodeContextActive();

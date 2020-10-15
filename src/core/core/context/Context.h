@@ -9,6 +9,8 @@
 
 #include <atomic>
 #include <core/log/Logger.h>
+#include <core/registry/InitializerRegistry.h>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -33,13 +35,50 @@ namespace bsc {
         explicit ContextLoopException(const std::string& arg);
     };
 
-
-    class Context {
+    class Context : public InitializerRegistry<Context> {
     public:
-        //@todo replace this with class that wraps around shared_ptr and apply correct semantics to Ptr and OwnPtr
-        typedef std::shared_ptr<Context> ContextPtr;
-        typedef ContextPtr Ptr;
-        typedef const ContextPtr OwnPtr;
+        //        template<bool owning>
+        class ContextPtr {
+            std::shared_ptr<Context> ptr = nullptr;
+
+        protected:
+            //@todo this constructor is needed for Context::makeContext. try to move creating shared_ptr here.
+            explicit ContextPtr(std::shared_ptr<Context> ptr) : ptr(std::move(ptr)) {}
+
+        public:
+            Context* operator->() const { return ptr.get(); }
+
+            Context& operator*() const { return *ptr; }
+            [[nodiscard]] bool hasValue() const { return ptr != nullptr; }
+
+            bool operator==(const ContextPtr& other) const { return ptr == other.ptr; }
+
+            ContextPtr() = default;
+            friend class Context;
+
+            //@todo this was an attempt to have proper semantics between owning and non owning context ptr - try to implement it
+            //            //owning ptr can only be moved from other owning (like unique_ptr)
+            //            explicit ContextPtr(const ContextPtr<true>&) requires owning = delete;
+            //            explicit ContextPtr(const ContextPtr<false>&) requires owning = delete;
+            //            explicit ContextPtr(ContextPtr<true>&& other) noexcept requires owning {
+            //                ptr = std::move(other.ptr);
+            //            }
+            //            explicit ContextPtr(ContextPtr<false>&& other) requires owning = delete;
+            //
+            //            //non owning can be copied from anything, but moved only from non owning
+            //            explicit ContextPtr(const ContextPtr<true>& other) requires (!owning) {
+            //                ptr = other.ptr;
+            //            }
+            //            explicit ContextPtr(const ContextPtr<false>& other) requires (!owning) {
+            //                ptr = other.ptr;
+            //            }
+            //            explicit ContextPtr(ContextPtr<true>&& other) noexcept requires (!owning) = delete;
+            //            explicit ContextPtr(ContextPtr<false>&& other) noexcept requires (!owning) {
+            //                ptr = std::move(other.ptr);
+            //            }
+        };
+        typedef ContextPtr /*<false>*/ Ptr;
+        typedef const ContextPtr /*<true>*/ OwnPtr;
 
         template<typename T>
         class Entry {
@@ -47,10 +86,9 @@ namespace bsc {
             std::shared_ptr<T> obj;
             //@todo throw exception if obj == null?
             explicit Entry(const std::shared_ptr<T>& obj) : obj(obj) {}
+
         public:
-            operator T&() {
-                return *obj;
-            }
+            operator T&() { return *obj; }
 
             T* operator->() {
                 return obj.get();
@@ -67,15 +105,16 @@ namespace bsc {
         typedef unsigned int KeyType;
         typedef unsigned int TypeIdType;
         constexpr static KeyType defaultKey = 0;
+
     private:
         //@todo remove debug id
         std::string debugId;
         bool defaultContext = false;
         mutable std::recursive_mutex contextLock;
-        //initialized to nullptr in .cpp file
+        // initialized to nullptr in .cpp file
         thread_local static Context::Ptr activeContext;
         //@todo add thread safety - mutex, lock and locking of the parent before accessing it
-        Context::Ptr parentContext = nullptr;
+        Context::Ptr parentContext;
 
     public:
         bool isDefaultContext() const;
@@ -124,7 +163,7 @@ namespace bsc {
             std::lock_guard guard(contextLock);
             const static auto typeId = getTypeId<T>();
             bool ret = data[typeId][getKey(id)] != nullptr;
-            if (!ret && parentContext != nullptr) {
+            if (!ret && parentContext.hasValue()) {
                 return parentContext->has<T>(id);
             } else {
                 return ret;
@@ -136,7 +175,7 @@ namespace bsc {
             std::lock_guard guard(contextLock);
             const static auto typeId = getTypeId<T>();
             bool ret = data[typeId][getKey(defaultKey)] != nullptr;
-            if (!ret && parentContext != nullptr) {
+            if (!ret && parentContext.hasValue()) {
                 return parentContext->has<T>(defaultKey);
             } else {
                 return ret;
@@ -157,7 +196,7 @@ namespace bsc {
             const static auto typeId = getTypeId<T>();
             auto ret = std::static_pointer_cast<T>(data[typeId][getKey(id)]);
             if (ret == nullptr) {
-                if (parentContext != nullptr) {
+                if (parentContext.hasValue()) {
                     return parentContext->get<T, CustomKeyType>(id);
                 } else {
                     if constexpr (std::is_convertible_v<CustomKeyType, std::string>) {
@@ -274,9 +313,9 @@ namespace bsc {
 
         void setParentContext(Context::Ptr parentContext);
 
-        static ContextPtr makeContext();
+        static OwnPtr makeContext(bool initialize = true);
 
-        static ContextPtr makeContext(const Context::Ptr& parentContext);
+        static OwnPtr makeContext(const Context::Ptr& parentContext);
 
         virtual ~Context();
 
@@ -285,14 +324,14 @@ namespace bsc {
     };
 
     class SetLocalContext {
-        Context::Ptr prevContext = nullptr;
+        Context::Ptr prevContext;
 
     public:
         explicit SetLocalContext(Context::Ptr ptr) {
             if (Context::hasActiveContext()) {
                 prevContext = Context::getActiveContext();
             }
-            Context::setActiveContext(std::move(ptr));
+            Context::setActiveContext(ptr);
         }
 
         template<typename Func, typename... Args>

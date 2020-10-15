@@ -3,7 +3,7 @@
 //
 
 #include "GenericFileReader.h"
-//@todo remove this include and date.h from project when it is implemented in stdlib
+//@todo remove this include and date.h from project when it is implemented in stdlib C++20
 #include "date.h"
 namespace bsc {
     bool bsc::GenericFileReader::isAlgorithmSuitableForFileType(const bsc::MimeFileType& type) { return true; }

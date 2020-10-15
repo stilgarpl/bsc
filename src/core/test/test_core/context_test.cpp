@@ -53,20 +53,23 @@ TEST_CASE("Context test") {
         REQUIRE(childContext->has<int>(contextName));
         REQUIRE(*childContext->get<int>(contextName) == value);
     }
-
-
 }
 
+TEST_CASE("Context initializer test") {
+    Context::registerInitializer([](Context& context) { context.set<int>(5); });
+
+    Context::OwnPtr context = Context::makeContext();
+    REQUIRE(context->has<int>());
+    REQUIRE(*context->get<int>() == 5);
+}
 
 class TestInputOutputContext : public bsc::InputOutputContext {
     std::stringstream stream;
-public:
-    std::ostream& out() override {
-        return stream;
-    }
 
-    std::ostream& err() override {
-        return stream;
+public:
+    std::ostream& out() override { return stream; }
+
+    std::ostream& err() override { return stream;
     }
 
     std::istream& in() override {

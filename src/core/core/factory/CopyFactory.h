@@ -5,6 +5,7 @@
 #ifndef BSC_COPYFACTORY_H
 #define BSC_COPYFACTORY_H
 
+#include "AutoFactory.h"
 #include "Factory.h"
 #include <map>
 #include <set>
@@ -17,7 +18,8 @@ namespace bsc {
     };
 
     template<typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
-    class CopyFactory : public Factory<ProducedObjectType, FactorySpecialization> {
+    class CopyFactory
+        : public AutoFactory<CopyFactory<ProducedObjectType, FactorySpecialization>, ProducedObjectType, FactorySpecialization> {
         using SelectorType = typename Factory<ProducedObjectType, FactorySpecialization>::SelectorType;
 
     private:

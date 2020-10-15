@@ -13,6 +13,7 @@ using namespace bsc;
 using namespace std::string_literals;
 
 int main(int argc, char* argv[]) {
+    Context::setActiveContext(Context::makeContext());
     //@todo move actionFactory setup somewhere else
     static FileSortingStrategyFactories::SortStrategyFactory actionFactory;
     actionFactory.registerCreator("copy", StandardFileSorterSortStrategies::copy);
@@ -72,8 +73,8 @@ int main(int argc, char* argv[]) {
                            .createValidTargetPathStrategy = fileExistsFactory.create(parameters.fileExists(), {}),
                            .errorHandlerStrategy          = errorActionFactory.create(parameters.errorHandler(), {}),
                            .fileExistsPredicate           = StandardFileSorterPredicates::fileExistsPredicate});
-    for (const auto& [mime, pattern] : parameters.mimeMatchers()) {
-        fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(mime), pattern);
+    for (MimeFileTypeFactory factory; const auto& [mime, pattern] : parameters.mimeMatchers()) {
+        fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create(mime)), pattern);
     }
     for (const auto& [name, pattern] : parameters.nameMatchers()) {
         fileSorter.addPattern(std::make_unique<FileSorterNameMatcher>(name), pattern);

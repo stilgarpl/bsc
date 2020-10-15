@@ -67,7 +67,7 @@ class RemoteNode {
 private:
     RemoteNodeInfo remoteNodeInfo;
     std::shared_ptr<ConnectionFetcher> connectionFetcher = std::make_shared<ConnectionFetcher>(); //it's shared ptr because it's Connection::Observer.
-    Context::OwnPtr _context = Context::makeContext();
+    Context::OwnPtr _context                             = Context::makeContext(false);
     std::shared_ptr<IProtocol> protocol;
 
 public:

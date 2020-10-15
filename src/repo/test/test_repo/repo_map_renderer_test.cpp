@@ -38,8 +38,6 @@ void modifyJournal(const JournalPtr& journalPtr) {
 void setupContext() {
     Context::Ptr context = Context::makeContext();
     Context::setActiveContext(context);
-    auto factoryContext = context->set<FactoryContext>();
-    factoryContext->addFactory<PathTransformerRuleFactory>();
 }
 
 TEST_CASE("RepositoryFileMapRenderer test") {

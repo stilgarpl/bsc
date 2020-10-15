@@ -8,10 +8,10 @@
 
 namespace bsc {
 
-    MimeFileType::MimeFileType(std::string typeGroup, std::string type)
-        : typeGroup(std::move(typeGroup)), type(std::move(type)) {}
+    MimeFileType::MimeFileType(std::string typeGroup, std::string type) : typeGroup(std::move(typeGroup)), type(std::move(type)) {}
 
-    MimeFileType MimeFileType::make(const std::string& mimeString) {
+    FileTypeParseException::FileTypeParseException(const std::string& arg) : domain_error(arg) {}
+    MimeFileType MimeFileTypeFactory::create(const std::string& mimeString) const {
         //@todo make / optional, so you can have "image" but required for "image/jpeg"
         static const std::regex mimeRegex("(\\w+)/([\\w-]*).*");
         std::smatch mimeMatch;
@@ -21,6 +21,4 @@ namespace bsc {
             throw FileTypeParseException("Mime string [" + mimeString + "] does not match (\\w+)/(\\w+) pattern");
         }
     }
-
-    FileTypeParseException::FileTypeParseException(const std::string &arg) : domain_error(arg) {}
 }// namespace bsc

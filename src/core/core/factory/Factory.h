@@ -5,7 +5,6 @@
 #ifndef BSC_FACTORY_H
 #define BSC_FACTORY_H
 
-
 #include <memory>
 #include <string>
 
@@ -17,7 +16,7 @@ namespace bsc {
     template<typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
     struct FactoryTraits {
         using SelectorType = std::string;
-        //using ArgumentType = ...
+        // using ArgumentType = ...
     };
 
     template<typename T>
@@ -42,19 +41,21 @@ namespace bsc {
              typename Traits                = FactoryTraits<producedObjectType, factorySpecialization>>
     struct BaseFactory {};
 
-    template<typename producedObjectType, typename factorySpecialization, typename Traits>
-    struct BaseFactory<false, producedObjectType, factorySpecialization, Traits> {
+    template<typename producedObjectType, typename factorySpecialization, typename traits>
+    struct BaseFactory<false, producedObjectType, factorySpecialization, traits> {
         using ProducedObjectType    = producedObjectType;
         using FactorySpecialization = factorySpecialization;
+        using Traits                = traits;
         using SelectorType          = typename Traits::SelectorType;
 
         virtual ProducedObjectType create(const SelectorType& selector) const = 0;
     };
 
-    template<typename producedObjectType, typename factorySpecialization, typename Traits>
-    struct BaseFactory<true, producedObjectType, factorySpecialization, Traits> {
+    template<typename producedObjectType, typename factorySpecialization, typename traits>
+    struct BaseFactory<true, producedObjectType, factorySpecialization, traits> {
         using ProducedObjectType    = producedObjectType;
         using FactorySpecialization = factorySpecialization;
+        using Traits                = traits;
         using SelectorType          = typename Traits::SelectorType;
         using ArgumentType          = typename Traits::ArgumentType;
 
@@ -73,12 +74,10 @@ namespace bsc {
     template<typename ProducedObjectType,
              typename FactorySpecialization = NoFactorySpecialization,
              typename Traits                = FactoryTraits<ProducedObjectType, FactorySpecialization>>
-    struct Factory
-        : public BaseFactory<HasArgumentType<Traits>::value, ProducedObjectType, FactorySpecialization, Traits> {};
-
-    template<typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
-    using FactoryPtr = std::shared_ptr<Factory<ProducedObjectType, FactorySpecialization>>;
+    struct Factory : public BaseFactory<HasArgumentType<Traits>::value, ProducedObjectType, FactorySpecialization, Traits> {
+        using Ptr = std::shared_ptr<Factory<ProducedObjectType, FactorySpecialization, Traits>>;
+    };
 
 }// namespace bsc
 
-#endif//BSC_FACTORY_H
+#endif// BSC_FACTORY_H

@@ -26,6 +26,4 @@ namespace bsc {
         }
         return MatchPrecision::none;
     }
-    FileSorterMimeMatcher::FileSorterMimeMatcher(const std::string& mimeString)
-        : FileSorterMimeMatcher(MimeFileType::make(mimeString)) {}
 }// namespace bsc
