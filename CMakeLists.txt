@@ -7,6 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 set(TEMPLATE_PATH "${CMAKE_SOURCE_DIR}/cmake/template/")
 
+message("PATH is $ENV{PATH}")
+
 #include additional configuration
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/targets.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/sanitizers.cmake)
