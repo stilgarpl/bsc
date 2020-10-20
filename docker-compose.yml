@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  bsc:
+    container_name: bsc-develop
+    build: .
+    ports:
+      - "2222:22"
+    cap_add:
+      - "sys_ptrace"
