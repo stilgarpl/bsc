@@ -119,7 +119,7 @@ TEST_CASE("Parsing factory test") {
         auto creator                      = [](int x) { return SampleTypeWithCustomSelectorAndArgument{x}; };
         const int incorrectSelector       = 8;
         auto parsingFactory               = std::make_shared<ParsingFactory<SampleTypeWithCustomSelectorAndArgument>>();
-        auto factoryPtr                   = parsingFactory;
+        auto& factoryPtr                  = parsingFactory;
         parsingFactory->registerCreator(correctSelector, *creator);
         SECTION("correct selector") {
             auto producedObject = factoryPtr->create(correctSelector, {std::to_string(correctSelectorArgument)});

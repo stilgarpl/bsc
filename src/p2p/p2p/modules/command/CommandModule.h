@@ -5,6 +5,7 @@
 #ifndef BSC_COMMANDMODULE_H
 #define BSC_COMMANDMODULE_H
 
+#include <fmt/format.h>
 #include <p2p/core/dependency/DependencyManaged.h>
 #include <p2p/core/node/Node.h>
 #include <p2p/core/node/context/NodeContext.h>
@@ -18,14 +19,21 @@
 #include <utility>
 
 namespace bsc {
+
+    class InvalidCommandException : std::domain_error {
+    public:
+        InvalidCommandException(const std::string& arg);
+    };
+
     class CommandModule : public NodeModuleDependent<CommandModule, NetworkModule, BasicModule> {
     public:
         using ArgumentContainerType     = std::vector<std::string>;
         using ArgumentContainerTypeCRef = const ArgumentContainerType&;
         enum class CommandExecutionStatus {
             success,
-            notEnoughArguments,
-            tooManyArguments,
+            notEnoughArguments,     // one overload, not enough arguments
+            tooManyArguments,       // one overload, too many arguments
+            incorrectArgumentsCount,// many overloads, but none with this arguments
             noCommand,
             badCommand,
         };
@@ -40,8 +48,8 @@ namespace bsc {
         class CommandGroup;
 
     private:
-        using InternalGroupHandlerFunc =
-                std::function<GroupHandlerResult(ArgumentContainerTypeCRef, const CommandGroup&)>;
+        using InternalGroupHandlerFunc = std::function<GroupHandlerResult(ArgumentContainerTypeCRef, const CommandGroup&)>;
+        using CommandFunc              = std::function<CommandExecutionStatus(ArgumentContainerTypeCRef)>;
 
     public:
         class SubModule {
@@ -124,20 +132,48 @@ namespace bsc {
 
         class CommandGroup {
         private:
-            //        Uber<std::map> commands;
-            std::map<std::string, std::function<CommandExecutionStatus(ArgumentContainerTypeCRef)>> commands{};
+            class CommandSet {
+                //@todo add mutex here or assure thread safety in whole command module?
+                std::map<std::size_t, CommandFunc> commandMap;
+                std::optional<CommandFunc> rawCommand;
+
+            public:
+                void setCommand(std::size_t argumentCount, CommandFunc func) { commandMap[argumentCount] = func; }
+
+                void setRawCommand(CommandFunc func) { rawCommand = func; }
+
+                bool hasCommand(std::size_t argumentCount) { return commandMap.contains(argumentCount) || rawCommand.has_value(); }
+
+                std::size_t commandCount() { return commandMap.size() + (rawCommand.has_value() ? 1 : 0); }
+
+                auto avaiableCommands() {
+                    std::set<std::size_t> resultSet;
+                    for (const auto& [key, value] : commandMap) {
+                        resultSet.insert(key);
+                    }
+                    return resultSet;
+                }
+
+                [[nodiscard]] auto& getCommand(std::size_t argumentCount) const {
+                    if (commandMap.contains(argumentCount)) {
+                        return commandMap.at(argumentCount);
+                    } else if (rawCommand.has_value()) {
+                        return *rawCommand;
+                    }
+                    throw InvalidCommandException(fmt::format("Invalid argument count {} for command", argumentCount));
+                }
+            };
+
+            std::map<std::string, CommandSet> commands{};
             CommandModule& parent;
             std::map<std::string, std::shared_ptr<CommandGroup>> groups{};
             InternalGroupHandlerFunc groupHandler;
             bool isDefaultHandler = true;
 
         private:
-            auto& getCommandMap() {
-                // return commands.get<std::string, std::function<void(ArgumentContainerType)>>();
-                return commands;
-            }
+            auto& getCommandMap() { return commands; }
 
-            const auto& getCommandMap() const {
+            [[nodiscard]] const auto& getCommandMap() const {
                 // return commands.get<std::string, std::function<void(ArgumentContainerType)>>();
                 return commands;
             }
@@ -164,8 +200,7 @@ namespace bsc {
                                                               )> handlerFunc) {
                 groupHandler = [handlerFunc](ArgumentContainerTypeCRef arguments,
                                              const CommandModule::CommandGroup& group) -> GroupHandlerResult {
-                    auto parameters =
-                            CommandLineParser::defaultParse<ParametersType>(arguments, ParseConfiguration::silent);
+                    auto parameters = CommandLineParser::defaultParse<ParametersType>(arguments, ParseConfiguration::silent);
                     //@todo handlerFunc takes only one parameter... fix it.
                     auto status = handlerFunc(parameters, group);
                     return {status, parameters.arguments()};
@@ -174,37 +209,32 @@ namespace bsc {
             }
 
         protected:
-            /// template <typename ReturnType, typename ... Args>
-            void mapCommand(const std::string& prefix,
-                            const std::string& commandName,
-                            const std::function<CommandExecutionStatus(ArgumentContainerTypeCRef)>& func) {
-                std::string key = prefix + ":::" + commandName;
-                auto& map = getCommandMap();// commands.get<std::string, std::function<void(ArgumentContainerType)>>();
-                map[key]  = func;
+            void mapCommand(const std::string& commandName, std::size_t argumentCount, const CommandFunc& func) {
+                auto& map = getCommandMap();
+                map[commandName].setCommand(argumentCount, func);
+            }
+
+            void mapRawCommand(const std::string& commandName, const CommandFunc& func) {
+                auto& map = getCommandMap();
+                map[commandName].setRawCommand(func);
             }
 
         public:
             template<typename ModuleType, ParametersClass ParametersType, typename RetType, typename... Args>
-            void mapCommand(std::string commandName,
-                            RetType (ModuleType::*f)(const ParametersType&, Args... args),
-                            ParametersType params) {
+            void mapCommand(std::string commandName, RetType (ModuleType::*f)(const ParametersType&, Args... args), ParametersType params) {
                 parent.addRequiredDependency<ModuleType>();
                 auto mod     = parent.node.getModule<ModuleType>();
                 auto command = parent.node.getModule<CommandModule>();
-                /// long cast is sad :( to_string should have size_t overload
-                /// std::to_string((long) sizeof...(Args))
-                //@todo prefix or sth, problem is that size of args breaks raw functions that are random
-                mapCommand(" ",
-                           commandName,
+                mapCommand(commandName,
+                           sizeof...(Args) + params.getRequiredArgumentsCount(),
                            [f, mod, commandName, params](CommandModule::ArgumentContainerTypeCRef vals) {
-                               ParametersType localParams =
-                                       CommandLineParser::defaultParse<ParametersType>(commandName, vals);
+                               ParametersType localParams           = CommandLineParser::defaultParse<ParametersType>(commandName, vals);
                                std::function<RetType(Args...)> func = [mod, localParams, f](Args... args) -> RetType {
                                    ((mod.get())->*f)(localParams, args...);
                                };
                                try {
                                    runStandardFunction(func, localParams.arguments());
-                               } catch (const IncorrectParametersException& e) {
+                               } catch (const IncorrectParametersCountException& e) {
                                    if (e.requiredParameters > e.gotParameters) {
                                        return CommandExecutionStatus::notEnoughArguments;
                                    } else {
@@ -220,13 +250,10 @@ namespace bsc {
                 parent.addRequiredDependency<ModuleType>();
                 auto mod     = parent.node.getModule<ModuleType>();
                 auto command = parent.node.getModule<CommandModule>();
-                /// long cast is sad :( to_string should have size_t overload
-                /// std::to_string((long) sizeof...(Args))
-                //@todo prefix or sth, problem is that size of args breaks raw functions that are random
-                mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerTypeCRef vals) {
+                mapCommand(commandName, sizeof...(Args), [=](CommandModule::ArgumentContainerTypeCRef vals) {
                     try {
                         runMemberFunction(*mod, f, vals);
-                    } catch (const IncorrectParametersException& e) {
+                    } catch (const IncorrectParametersCountException& e) {
                         if (e.requiredParameters > e.gotParameters) {
                             return CommandExecutionStatus::notEnoughArguments;
                         } else {
@@ -241,7 +268,7 @@ namespace bsc {
             void mapRawCommand(std::string commandName, RetType (ModuleType::*f)(ArgumentContainerTypeCRef)) {
                 parent.addRequiredDependency<ModuleType>();
                 auto mod = parent.node.getModule<ModuleType>();
-                mapCommand(" ", commandName, [=](CommandModule::ArgumentContainerTypeCRef vals) {
+                mapRawCommand(commandName, [=](CommandModule::ArgumentContainerTypeCRef vals) {
                     (mod.get()->*f)(vals);
                     return CommandExecutionStatus::success;
                 });
@@ -272,16 +299,25 @@ namespace bsc {
                     }
                 } else {
                     // command is mapped to this module, execute
-                    std::string prefix =
-                            " ";//@todo raw pointers and this is colliding std::to_string(arguments.size());
-                    LOGGER("Running module " + prefix + " command " + commandName);
-                    std::string key = prefix + ":::" + commandName;
-                    auto& map       = getCommandMap();
-                    if (!map.contains(key)) {
-                        LOGGER("FAILURE");
+                    LOGGER("Running module  command " + commandName);
+                    auto& map = getCommandMap();
+                    if (!map.contains(commandName)) {
+                        LOGGER("FAILURE, NO SUCH COMMAND");
                         return CommandExecutionStatus::badCommand;
                     } else {
-                        return map[key](arguments);
+                        auto& commandSet = map[commandName];
+                        if (!commandSet.hasCommand(arguments.size())) {
+                            if (commandSet.commandCount() == 1) {
+                                LOGGER("FAILURE, WRONG ARGUMENTS");
+                                auto commandArgumentCount = *commandSet.avaiableCommands().begin();
+                                return commandArgumentCount > arguments.size() ? CommandExecutionStatus::notEnoughArguments
+                                                                               : CommandExecutionStatus::tooManyArguments;
+                            } else {
+                                return CommandExecutionStatus::incorrectArgumentsCount;
+                            }
+                        } else {
+                            return commandSet.getCommand(arguments.size())(arguments);
+                        }
                     }
                 }
             }

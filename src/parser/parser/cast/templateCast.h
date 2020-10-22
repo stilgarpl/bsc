@@ -11,12 +11,12 @@
 #include <functional>
 
 namespace bsc {
-    class IncorrectParametersException {
+    class IncorrectParametersCountException {
     public:
         std::size_t requiredParameters;
         std::size_t gotParameters;
 
-        IncorrectParametersException(std::size_t requiredParameters, std::size_t gotParameters)
+        IncorrectParametersCountException(std::size_t requiredParameters, std::size_t gotParameters)
             : requiredParameters(requiredParameters), gotParameters(gotParameters){};
     };
 
@@ -67,7 +67,7 @@ namespace bsc {
         template<typename T, typename RetType, typename... Args>
         RetType operator()(T& t, RetType (T::*f)(Args...), std::vector<std::string>& args) {
             if (args.size() != num_args) {
-                throw IncorrectParametersException(num_args, args.size());
+                throw IncorrectParametersCountException(num_args, args.size());
             }
             return call(t, f, args, std::make_index_sequence<num_args>{});
         }
@@ -75,7 +75,7 @@ namespace bsc {
         template<typename RetType, typename... Args>
         RetType operator()(RetType (*f)(Args...), std::vector<std::string>& args) {
             if (args.size() != num_args) {
-                throw IncorrectParametersException(num_args, args.size());
+                throw IncorrectParametersCountException(num_args, args.size());
             }
             return call(f, args, std::make_index_sequence<num_args>{});
         }
@@ -83,7 +83,7 @@ namespace bsc {
         template<typename RetType, typename... Args>
         RetType operator()(std::function<RetType(Args...)> f, std::vector<std::string>& args) {
             if (args.size() != num_args) {
-                throw IncorrectParametersException(num_args, args.size());
+                throw IncorrectParametersCountException(num_args, args.size());
             }
             return call(f, args, std::make_index_sequence<num_args>{});
         }

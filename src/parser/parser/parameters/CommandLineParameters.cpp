@@ -99,14 +99,10 @@ namespace bsc {
                 break;
 
             case ARGP_KEY_END:
-                if (self->requiredArgumentsCount.has_value()) {
-                    if (self->requiredArgumentsCount.value() > self->rawArguments.size()) {
-                        argp_error(state,
-                                   "Arguments required: %zu, got %zu",
-                                   *self->requiredArgumentsCount,
-                                   self->rawArguments.size());
-                    }
+                if (self->requiredArgumentsCount > self->rawArguments.size()) {
+                    argp_error(state, "Arguments required: %zu, got %zu", self->requiredArgumentsCount, self->rawArguments.size());
                 }
+
                 break;
 
             case ARGP_KEY_NO_ARGS:

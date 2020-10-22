@@ -732,3 +732,11 @@ parameters.saveConfiguration(configPath)
 
 
 Autoregister<Type,registerFunc> - jak Spring. ma pole static ktore zainicjalizuje się przy starcie aplikacji (mam nadzieje) i wykona ten funktor ktory zarejestruje klase w kontekscie czy gdzieś.
+
+
+@todo global exception handler - template które przyjmuje w parameterach handlery na konkretne typy wyjątków, i catchuje ich typ, rekursywnie można wywoływać to przez args... w lambdzie
+try {
+run<RestArgs>(exec)
+} catch (ExceptionType e&) {
+handle(e);
+}

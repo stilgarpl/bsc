@@ -65,16 +65,11 @@ namespace bsc {
             std::vector<ArgumentDescriptor> argumentDescriptors{};
             std::vector<std::string> usageDocs    = {};
             std::optional<std::string> beforeInfo = std::nullopt;
-            std::optional<std::string> afterInfo  = std::nullopt;
-            std::optional<decltype(rawArguments)::size_type> requiredArgumentsCount;
+            std::optional<std::string> afterInfo                     = std::nullopt;
+            decltype(rawArguments)::size_type requiredArgumentsCount = 0;
             Parser parser{};
 
-            void incrementRequiredArguments() {
-                if (!requiredArgumentsCount.has_value()) {
-                    requiredArgumentsCount = 0;
-                }
-                ++*requiredArgumentsCount;
-            }
+            void incrementRequiredArguments() { ++requiredArgumentsCount; }
             void parseNamedArguments();
 
         public:
@@ -85,10 +80,11 @@ namespace bsc {
             static char* helpFilter(int key, const char* text, void* input);
             auto& getParsedArguments() { return rawArguments; }
             auto getRemainingArguments() {
-                return std::span<std::string>(rawArguments.begin() + (requiredArgumentsCount ? *requiredArgumentsCount : 0),
-                                              rawArguments.end());
+                return std::span<std::string>(rawArguments.begin() + requiredArgumentsCount, rawArguments.end());
             };
             auto& getCommandName() { return commandName; }
+
+            auto getRequiredArgumentsCount() const { return requiredArgumentsCount; }
 
             friend class CommandLineParameters::ParserBuilder;
             friend class CommandLineParser;
@@ -159,6 +155,7 @@ namespace bsc {
 
         [[nodiscard]] const std::vector<std::string>& arguments() const { return parser->getParsedArguments(); }
         [[nodiscard]] const std::span<std::string> remainingArguments() const { return parser->getRemainingArguments(); }
+        [[nodiscard]] auto getRequiredArgumentsCount() const { return parser->getRequiredArgumentsCount(); }
 
         const std::string& commandName() const { return parser->getCommandName(); }
     };

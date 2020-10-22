@@ -235,9 +235,8 @@ namespace bsc {
 
         try {
             runCommand(groupOrCommandName, data);
-        } catch (const bsc::IncorrectParametersException& e) {
-            LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " +
-                   std::to_string(e.gotParameters))
+        } catch (const bsc::IncorrectParametersCountException& e) {
+            LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " + std::to_string(e.gotParameters))
         }
     }
 
@@ -254,7 +253,6 @@ namespace bsc {
 
     CommandModule::SubModule::CommandData::CommandData(std::string commandName) : commandName(std::move(commandName)) {}
 
-    const std::string& CommandModule::SubModule::CommandData::getCommandName() const {
-        return commandName;
-    }
+    const std::string& CommandModule::SubModule::CommandData::getCommandName() const { return commandName; }
+    InvalidCommandException::InvalidCommandException(const std::string& arg) : domain_error(arg) {}
 }
