@@ -6,9 +6,6 @@
 #define BSC_EVENTWRAPPER_H
 
 
-#include "../IEvent.h"
-
-
 namespace bsc {
     template<typename Type>
     class EventWrapper : public IEvent<int> {

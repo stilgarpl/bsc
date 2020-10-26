@@ -37,7 +37,7 @@ namespace bsc {
 
     class Context : public InitializerRegistry<Context> {
     public:
-        //        template<bool owning>
+        template<bool owning>
         class ContextPtr {
             std::shared_ptr<Context> ptr = nullptr;
 
@@ -56,29 +56,23 @@ namespace bsc {
             ContextPtr() = default;
             friend class Context;
 
-            //@todo this was an attempt to have proper semantics between owning and non owning context ptr - try to implement it
-            //            //owning ptr can only be moved from other owning (like unique_ptr)
-            //            explicit ContextPtr(const ContextPtr<true>&) requires owning = delete;
-            //            explicit ContextPtr(const ContextPtr<false>&) requires owning = delete;
-            //            explicit ContextPtr(ContextPtr<true>&& other) noexcept requires owning {
-            //                ptr = std::move(other.ptr);
-            //            }
-            //            explicit ContextPtr(ContextPtr<false>&& other) requires owning = delete;
-            //
-            //            //non owning can be copied from anything, but moved only from non owning
-            //            explicit ContextPtr(const ContextPtr<true>& other) requires (!owning) {
-            //                ptr = other.ptr;
-            //            }
-            //            explicit ContextPtr(const ContextPtr<false>& other) requires (!owning) {
-            //                ptr = other.ptr;
-            //            }
-            //            explicit ContextPtr(ContextPtr<true>&& other) noexcept requires (!owning) = delete;
-            //            explicit ContextPtr(ContextPtr<false>&& other) noexcept requires (!owning) {
-            //                ptr = std::move(other.ptr);
-            //            }
+            //            @todo this was an attempt to have proper semantics between owning and non owning context ptr - try to implement it
+            // owning ptr can only be moved from other owning (like unique_ptr)
+            //                         ContextPtr(const ContextPtr<true>&) requires owning = delete;
+            ContextPtr(const ContextPtr<false>&) requires owning = delete;
+            ContextPtr(ContextPtr<true>&& other) noexcept requires owning { ptr = std::move(other.ptr); }
+            ContextPtr(ContextPtr<false>&& other) requires owning = delete;
+
+            // non owning can be copied from anything, but moved only from non owning
+            ContextPtr(const ContextPtr<true>& other) requires(!owning) { ptr = other.ptr; }
+            ContextPtr(const ContextPtr<false>& other) requires(!owning) { ptr = other.ptr; }
+            ContextPtr(ContextPtr<true>&& other) noexcept requires(!owning) = delete;
+            ContextPtr(ContextPtr<false>&& other) noexcept requires(!owning) { ptr = std::move(other.ptr); }
+
+            ContextPtr<owning>& operator=(const ContextPtr<owning>& other) requires(!owning) = default;
         };
-        typedef ContextPtr /*<false>*/ Ptr;
-        typedef const ContextPtr /*<true>*/ OwnPtr;
+        typedef ContextPtr<false> Ptr;
+        typedef ContextPtr<true> OwnPtr;
 
         template<typename T>
         class Entry {
@@ -255,7 +249,7 @@ namespace bsc {
             return Entry<ContextValueType>(ret);
         }
 
-        //todo this version may be a problem if someone tries to use the ordinary setDirect and std::shared_ptr is one of vals.
+        // todo this version may be a problem if someone tries to use the ordinary set and std::shared_ptr is one of vals.
         template<typename ContextValueType, typename RealValueType>
         Entry<ContextValueType> setDirect(std::shared_ptr<RealValueType> valuePtr) {
             std::lock_guard<std::recursive_mutex> guard(contextLock);

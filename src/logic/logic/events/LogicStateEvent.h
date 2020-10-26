@@ -6,8 +6,7 @@
 #define BSC_LOGICSTATEEVENT_H
 
 #include <core/signal/OrderedExecutionPolicy.h>
-#include "../IEvent.h"
-
+#include <logic/IEvent.h>
 
 namespace bsc {
     enum class LogicStateMethod {
@@ -18,18 +17,18 @@ namespace bsc {
 
     template<typename Object, typename StateIdType>
     class LogicStateEvent
-            : public bsc::IEvent<StateIdType/*not so sure about this, ENTER and LEAVE should be separate events but now they aren't, but maybe that's not an issue, as it may be handled internally*/> {
+            : public IEvent<StateIdType/*not so sure about this, ENTER and LEAVE should be separate events but now they aren't, but maybe that's not an issue, as it may be handled internally*/> {
     public:
         typedef LogicStateMethod Method;
         typedef Object Type;
         using ExecutionPolicy = OrderedExecutionPolicy;
+
     private:
         Object& object;
         Method method = Method::invalid;
-    public :
-        StateIdType getState() {
-            return this->getEventId();
-        }
+
+    public:
+        StateIdType getState() { return this->getEventId(); }
 
         Method getMethod() const {
             return method;

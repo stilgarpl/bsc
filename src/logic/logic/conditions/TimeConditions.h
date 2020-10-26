@@ -6,9 +6,6 @@
 #define BSC_TIMECONDITIONS_H
 
 
-#include "../LogicObject.h"
-
-
 namespace bsc {
     struct TimeConditions {
 

@@ -134,8 +134,8 @@ TEST_CASE("Autoregistering factories") {
     // registered factory will be CopyFactory<Aa>, not AaFactory, because that's what the parameter is CopyFactory: AutoFactory - if it's a
     // problem, add parameter to Copy/Parsing factories.
     class AaFactory : public CopyFactory<Aa> {};
-
-    Context::setActiveContext(Context::makeContext());
+    auto context = Context::makeContext();
+    Context::setActiveContext(context);
 
     auto factoryContext = Context::getActiveContext()->get<FactoryContext>();
     REQUIRE(factoryContext->hasFactory<Aa>() == true);

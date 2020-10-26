@@ -10,6 +10,12 @@
 
 using namespace bsc;
 
+struct TestingCommandParams : public CommandLineParameters {
+    Parameter<int> a  = {{'a', "aaa", "NUM", "IntegerParameter"}};
+    Argument<float> f = {"float"};
+    Argument<int> i   = {"int"};
+};
+
 class CommandTestingModule : public NodeModuleDependent<CommandTestingModule, CommandModule> {
 public:
     int value1 = 0;
@@ -24,6 +30,11 @@ public:
         value2 = v2;
     }
 
+    void setValue1And2FromParameter(const TestingCommandParams& params, int v1) {
+        value1 = v1;
+        value2 = params.i();
+    }
+
     void rawCommand(CommandModule::ArgumentContainerTypeCRef arguments) {
         value1 = arguments.size();
         value2 = arguments.size();
@@ -33,7 +44,7 @@ public:
     bool assignActions(AssignActionHelper& actionHelper) override { return true; }
     bool setupSources(SetupSourceHelper& sourceHelper) override { return true; }
 
-    CommandTestingModule(INode& node) : NodeModuleDependent(node, "testing command") {}
+    explicit CommandTestingModule(INode& node) : NodeModuleDependent(node, "testing command") {}
 };
 
 void commandModuleSetup(Node& node) {
@@ -52,6 +63,8 @@ void commandModuleSetup(Node& node) {
     commandModule->mapCommand("vr", &CommandTestingModule::setValue1);
     commandModule->mapCommand("vr", &CommandTestingModule::setValue1And2);
     commandModule->mapRawCommand("vr", &CommandTestingModule::rawCommand);
+    commandModule->mapCommand("vp", &CommandTestingModule::setValue1And2FromParameter, {});
+    commandModule->mapCommand("vp", &CommandTestingModule::setValue1);
 }
 
 TEST_CASE("CommandModule test") {
@@ -157,6 +170,29 @@ TEST_CASE("CommandModule test") {
                 REQUIRE(testingModule->value1 == 3);
                 REQUIRE(testingModule->value2 == 3);
                 REQUIRE(result == CommandModule::CommandExecutionStatus::success);
+            }
+        }
+
+        SECTION("overloads with parameters") {
+            REQUIRE(testingModule->value1 == 0);
+            REQUIRE(testingModule->value2 == 0);
+            SECTION("one argument") {
+                auto result = commandModule->runCommand("vp", {"5"});
+                REQUIRE(testingModule->value1 == 5);
+                REQUIRE(testingModule->value2 == 0);
+                REQUIRE(result == CommandModule::CommandExecutionStatus::success);
+            }
+            SECTION("two arguments") {
+                auto result = commandModule->runCommand("vp", {"5", "9"});
+                REQUIRE(testingModule->value1 == 0);
+                REQUIRE(testingModule->value2 == 0);
+                REQUIRE(result == CommandModule::CommandExecutionStatus::incorrectArgumentsCount);
+            }
+            SECTION("three arguments") {
+                auto result = commandModule->runCommand("vp", {"5.2", "9", "10"});
+                REQUIRE(result == CommandModule::CommandExecutionStatus::success);
+                REQUIRE(testingModule->value1 == 10);
+                REQUIRE(testingModule->value2 == 9);
             }
         }
     }

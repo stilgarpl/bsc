@@ -31,9 +31,7 @@ namespace bsc {
         }
     }
 
-    void Context::setActiveContext(Context::Ptr ctx) {
-        activeContext = std::move(ctx);
-    }
+    void Context::setActiveContext(Context::Ptr ctx) { activeContext = ctx; }
 
     Context::Context(const Context& other) {
         std::scoped_lock g(contextLock, other.contextLock);
@@ -70,7 +68,7 @@ namespace bsc {
 
     Context::OwnPtr Context::makeContext(bool initialize) {
         struct ContextMakeSharedWorkaround : public Context {};
-        Ptr p(std::make_shared<ContextMakeSharedWorkaround>());
+        OwnPtr p(std::make_shared<ContextMakeSharedWorkaround>());
         if (initialize) p->initialize();
         return p;
     }

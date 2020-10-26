@@ -5,15 +5,14 @@
 #ifndef BSC_TICK_H
 #define BSC_TICK_H
 
-
 #include <chrono>
-#include "../IEvent.h"
+#include <logic/IEvent.h>
 
 namespace bsc {
     /**
          * tick every set amount of time
          */
-    class Tick : public bsc::IEvent<std::chrono::milliseconds> {
+    class Tick : public IEvent<std::chrono::milliseconds> {
     public:
         typedef std::chrono::steady_clock Clock;
         typedef std::chrono::milliseconds Duration;

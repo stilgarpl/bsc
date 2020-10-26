@@ -221,7 +221,8 @@ namespace bsc {
 
         public:
             template<typename ModuleType, ParametersClass ParametersType, typename RetType, typename... Args>
-            void mapCommand(std::string commandName, RetType (ModuleType::*f)(const ParametersType&, Args... args), ParametersType params) {
+            void mapCommand(std::string commandName, RetType (ModuleType::*f)(const ParametersType&, Args...), ParametersType params) {
+                //@todo find a way to remove ParametersType param, it's not needed
                 parent.addRequiredDependency<ModuleType>();
                 auto mod     = parent.node.getModule<ModuleType>();
                 auto command = parent.node.getModule<CommandModule>();
@@ -233,7 +234,7 @@ namespace bsc {
                                    ((mod.get())->*f)(localParams, args...);
                                };
                                try {
-                                   runStandardFunction(func, localParams.arguments());
+                                   runStandardFunction(func, localParams.remainingArguments());
                                } catch (const IncorrectParametersCountException& e) {
                                    if (e.requiredParameters > e.gotParameters) {
                                        return CommandExecutionStatus::notEnoughArguments;

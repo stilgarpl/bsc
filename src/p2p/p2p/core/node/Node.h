@@ -33,8 +33,8 @@ namespace bsc {
         ConfigurationManager configurationManager;
         Configuration nodeConfiguration;
         LogicManager logicManager;
-        Context::Ptr nodeContext = Context::makeContext();
-        //if somehow start is called from start or wait from start or stop from... change this to recursive mutex.
+        Context::OwnPtr nodeContext = Context::makeContext();
+        // if somehow start is called from start or wait from start or stop from... change this to recursive mutex.
         std::recursive_mutex startMutex;
         std::condition_variable_any startedReady;
         bool started = false;

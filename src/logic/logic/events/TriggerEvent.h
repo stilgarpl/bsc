@@ -5,18 +5,16 @@
 #ifndef BSC_TRIGGEREVENT_H
 #define BSC_TRIGGEREVENT_H
 
-#include "../IEvent.h"
-
+#include <logic/IEvent.h>
 
 namespace bsc {
     template<typename TriggerIdType, typename TriggerValueType = void>
-    class TriggerEvent : public bsc::IEvent<TriggerIdType> {
+    class TriggerEvent : public IEvent<TriggerIdType> {
 
     private:
         TriggerValueType value;
 
     public:
-
         explicit TriggerEvent(TriggerValueType value) : value(value) {}
 
         TriggerEvent(TriggerIdType e, TriggerValueType value) : IEvent<TriggerIdType>(e), value(value) {}

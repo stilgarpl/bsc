@@ -36,7 +36,7 @@ void modifyJournal(const JournalPtr& journalPtr) {
 }
 
 void setupContext() {
-    Context::Ptr context = Context::makeContext();
+    auto context = Context::makeContext();
     Context::setActiveContext(context);
 }
 

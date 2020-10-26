@@ -19,14 +19,15 @@ public:
 };
 
 TEST_CASE("Queue processor test") {
-    Context::setActiveContext(Context::makeContext());
-    int lastToken = 0;
+    auto context = Context::makeContext();
+    Context::setActiveContext(context);
+    int lastToken  = 0;
     int lastSender = 0;
-    int token = 5;
-    int value = 17;
+    int token      = 5;
+    int value      = 17;
     {
         TestProcessor processor([&](int token, int& sender) {
-            lastToken = token;
+            lastToken  = token;
             lastSender = sender;
         });
         processor.process(token, value);

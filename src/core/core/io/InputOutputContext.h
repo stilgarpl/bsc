@@ -22,6 +22,7 @@ namespace bsc {
 
     };
 
+    //@todo this should autoregister as InputOutputContext unless changed
     class StandardInputOutputContext : public bsc::InputOutputContext {
     public:
         std::ostream& out() override;

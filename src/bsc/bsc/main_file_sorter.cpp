@@ -13,7 +13,8 @@ using namespace bsc;
 using namespace std::string_literals;
 
 int main(int argc, char* argv[]) {
-    Context::setActiveContext(Context::makeContext());
+    auto context = Context::makeContext();
+    Context::setActiveContext(context);
     //@todo move actionFactory setup somewhere else
     static FileSortingStrategyFactories::SortStrategyFactory actionFactory;
     actionFactory.registerCreator("copy", StandardFileSorterSortStrategies::copy);

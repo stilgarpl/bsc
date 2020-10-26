@@ -5,7 +5,6 @@
 #ifndef BSC_AUTOSOURCE_H
 #define BSC_AUTOSOURCE_H
 
-#include "../ISource.h"
 #include "EventQueueSource.h"
 
 #include <core/uber/Uber.h>

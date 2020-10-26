@@ -5,18 +5,12 @@
 #ifndef BSC_EVENTQUEUESOURCE_H
 #define BSC_EVENTQUEUESOURCE_H
 
-
+#include <core/log/Logger.h>
+#include <logic/ISource.h>
 #include <queue>
-#include "../ISource.h"
-#include "../IEvent.h"
-#include "core/log/Logger.h"
-
-
-
-//#include "p2p/modules/network/protocol/context/NodeContext.h"
 
 namespace bsc {
-    template<typename EventType_, typename FriendClass=std::nullptr_t>
+    template<typename EventType_, typename FriendClass = std::nullptr_t>
     class EventQueueSource : public ISource {
         friend FriendClass;
 

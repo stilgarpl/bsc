@@ -5,11 +5,7 @@
 #ifndef BSC_TRIGGERCONDITIONS_H
 #define BSC_TRIGGERCONDITIONS_H
 
-
-#include "../LogicObject.h"
-#include "../events/TriggerEvent.h"
-
-
+#include <logic/events/TriggerEvent.h>
 namespace bsc {
     struct TriggerConditions {
 

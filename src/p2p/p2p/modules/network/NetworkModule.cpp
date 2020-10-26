@@ -321,8 +321,9 @@ namespace bsc {
         p->setMaxThreads(configuration().getMaxConcurrentThreads());
         p->setMaxQueued(configuration().getMaxConcurrentThreads());
         server = std::make_shared<TCPServer>(
-                new ServerConnectionFactory([&] { return getRemoteNode().context(); }, {*this}),
-                *serverSocket, p);
+                new ServerConnectionFactory([&] { return Context::makeContext(getRemoteNode().context()); }, {*this}),
+                *serverSocket,
+                p);
         server->start();
         using namespace std::string_literals;
         LOGGER("server connections max: "s + std::to_string(server->maxConcurrentConnections()))

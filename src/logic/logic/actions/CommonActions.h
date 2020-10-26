@@ -6,8 +6,7 @@
 #define BSC_COMMONACTIONS_H
 
 #include <core/context/Context.h>
-#include "../common/ForeachContext.h"
-
+#include <logic/common/ForeachContext.h>
 
 namespace bsc {
     struct CommonActions {

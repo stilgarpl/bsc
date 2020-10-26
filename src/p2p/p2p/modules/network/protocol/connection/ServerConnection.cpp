@@ -107,8 +107,8 @@ Poco::Net::StreamSocket& bsc::ServerConnection::getSocket() {
 
 Poco::Net::TCPServerConnection* bsc::ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket& socket) {
     LOGGER("creating server connection");
-    Context::Ptr connectionContext = contextGetter();
-    bsc::SetLocalContext localContext(connectionContext); //RAII
+    Context::OwnPtr connectionContext = contextGetter();
+    bsc::SetLocalContext localContext(connectionContext);//RAII
     bsc::ServerConnection* connection = new bsc::ServerConnection(socket, connectionContext);
     for (const auto& observer : observers) {
         connection->registerStateObserver(observer);
