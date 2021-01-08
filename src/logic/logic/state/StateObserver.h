@@ -5,9 +5,9 @@
 #ifndef BSC_STATEOBSERVER_H
 #define BSC_STATEOBSERVER_H
 
-
-#include <mutex>
+#include <core/log/Logger.h>
 #include <memory>
+#include <mutex>
 
 namespace bsc {
 

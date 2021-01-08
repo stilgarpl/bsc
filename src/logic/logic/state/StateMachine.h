@@ -5,82 +5,52 @@
 #ifndef BSC_STATEMACHINE_H
 #define BSC_STATEMACHINE_H
 
-#include <set>
-#include <map>
-#include <functional>
-#include <core/log/Logger.h>
+#include "StateMachineDefinition.h"
 #include <atomic>
-
+#include <core/log/Logger.h>
+#include <functional>
+#include <map>
+#include <set>
 
 namespace bsc {
+
     template<typename StateIdType>
     class StateMachine {
+    public:
+        using StateMachineType = StateMachine<StateIdType>;
+        using Definition       = StateMachineDefinition<StateIdType>;
+        using DefinitionPtr    = std::shared_ptr<const Definition>;
 
-        typedef StateMachine<StateIdType> StateMachineType;
+        class StateMachineUninitialized : public std::domain_error {
+        public:
+            explicit StateMachineUninitialized(const std::string& arg) : domain_error(arg) {}
+        };
+
+        class InvalidStateMachineDefinition : public std::domain_error {
+        public:
+            explicit InvalidStateMachineDefinition(const std::string& arg) : domain_error(arg) {}
+        };
 
     private:
-        //@todo states and links should be moved to other class with defintion.
-        std::set<StateIdType> states;
-        std::map<StateIdType, std::set<StateIdType>> links;
-        std::atomic<typename std::set<StateIdType>::iterator> currentState;
+        const DefinitionPtr definition;
+        std::atomic<const StateIdType*> currentState = nullptr;
         std::function<void(const StateIdType&)> onEnterStateHandler;
         std::function<void(const StateIdType&)> onLeaveStateHandler;
         std::function<void(const StateIdType&)> invalidStateHandler;
         std::function<void(const StateIdType&)> invalidChangeHandler;
         std::recursive_mutex changeStateMutex;
 
-
     public:
-
-
     protected:
-
         auto getCurrentState() {
             //        std::lock_guard<std::recursive_mutex> g(changeStateMutex);
             return *currentState.load();
         }
 
     public:
-        void addState(const StateIdType& state) {
-            //        LOGGER("adding state" + std::to_string(state));
-            states.insert(state);
-        }
-
-        template<typename ... StateIdTypes>
-        void addState(const StateIdTypes& ... newStates) {
-            StateIdType allStates[] = {newStates...};
-            for (const auto& item : allStates) {
-                addState(item);
-            }
-        }
-
-        void addLink(const StateIdType& state1, const StateIdType& state2) {
-            if (states.count(state1) > 0 && states.count(state2) > 0) {
-                //            LOGGER("linking " + std::to_string(state1) + " to " + std::to_string(state2));
-                links[state1].insert(state2);
-            } else {
-                //@todo exception?
-            }
-        }
-
-        template<typename ... StateIdTypes>
-        void addLink(const StateIdType& state1, const StateIdTypes& ... otherStates) {
-            //@todo check if both states exist in states setDirect
-            StateIdType allStates[] = {otherStates...};
-            for (const auto& item : allStates) {
-                addLink(state1, item);
-            }
-        }
-
-    public:
         void setState(const StateIdType& state) {
             std::lock_guard<std::recursive_mutex> g(changeStateMutex);
-            auto tempState = states.find(state);
-            if (tempState == states.end()) {
-                //@todo error handling
-                abort();
-            }
-            currentState.store(tempState);
+            currentState.store(&definition->getState(state));
         }
 
         //@todo maybe return bool if change state was successful?
@@ -89,51 +59,54 @@ namespace bsc {
             std::lock_guard<std::recursive_mutex> g(changeStateMutex);
 
             auto localCurrentState = this->currentState.load();
-            //@todo error handling if currentState points to wrong state or uninitialized?
-            //already in that state, do nothing.
+
+            if (localCurrentState == nullptr) {
+                ERROR("state machine is in invalid state")
+                throw StateMachineUninitialized("state machine is in invalid state");
+            }
+
+            // already in that state, do nothing.
             if (state == *localCurrentState) {
                 //@todo think about it. Allow changing state to itself?
                 return;
             }
 
-            if (!states.count(state)) {
+            if (!definition->hasState(state)) {
                 invalidStateHandler(state);
                 LOGGER("invalid state")
                 return;
             }
 
-
-            if (!links.count(*localCurrentState) || !links[*localCurrentState].count(state)) {
+            if (!definition->hasLink(*localCurrentState, state)) {
                 invalidChangeHandler(state);
                 LOGGER("invalid change")
                 return;
             }
 
-            if (localCurrentState != states.end()) {
-                onLeaveStateHandler(*localCurrentState);
-            }
+            onLeaveStateHandler(*localCurrentState);
 
             setState(state);
             onEnterStateHandler(state);
         }
 
     public:
-        StateMachine(const std::function<void(const StateIdType&)>& onEnterStateHandler,
-                     const std::function<void(const StateIdType&)>& onLeaveStateHandler) : onEnterStateHandler(
-                onEnterStateHandler), onLeaveStateHandler(onLeaveStateHandler) {
-
-        }
-
-        StateMachine(const std::function<void(const StateIdType&)>& onEnterStateHandler,
+        StateMachine(const DefinitionPtr definition,
+                     const std::function<void(const StateIdType&)>& onEnterStateHandler,
                      const std::function<void(const StateIdType&)>& onLeaveStateHandler,
                      const std::function<void(const StateIdType&)>& invalidStateHandler,
-                     const std::function<void(const StateIdType&)>& invalidChangeHandler) : onEnterStateHandler(
-                onEnterStateHandler), onLeaveStateHandler(onLeaveStateHandler), invalidStateHandler(
-                invalidStateHandler),
-                                                                                            invalidChangeHandler(
-                                                                                                    invalidChangeHandler) {}
+                     const std::function<void(const StateIdType&)>& invalidChangeHandler)
+            : definition(definition), onEnterStateHandler(onEnterStateHandler), onLeaveStateHandler(onLeaveStateHandler),
+              invalidStateHandler(invalidStateHandler), invalidChangeHandler(invalidChangeHandler) {
+            if (definition == nullptr) {
+                throw InvalidStateMachineDefinition("Invalid state machine definition");
+            }
+        }
+
+        StateMachine(const DefinitionPtr definition,
+                     const std::function<void(const StateIdType&)>& onEnterStateHandler,
+                     const std::function<void(const StateIdType&)>& onLeaveStateHandler)
+            : StateMachine(definition, onEnterStateHandler, onLeaveStateHandler) {}
     };
-}
+}// namespace bsc
 
-
-#endif //BSC_STATEMACHINE_H
+#endif// BSC_STATEMACHINE_H

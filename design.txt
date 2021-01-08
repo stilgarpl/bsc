@@ -740,3 +740,13 @@ run<RestArgs>(exec)
 } catch (ExceptionType e&) {
 handle(e);
 }
+
+@todo add hashes for file parts, like torrent.
+@todo add resumable downloads and out of order downloading - Transport service could get bitmask of parts to download (and part size)
+maybe transport service should store that bitmask itself?
+@todo should part hashes be stored in journal? it would add another layer of verifing if files are ok.
+@todo maybe I should add sqlite to the project. where trasport service should store bitmasks? rtorrents stores metafiles, but I don't like this, it makes download folders messy.
+
+@todo define -> link().from(state).to(states...) ; -> states().add(states...)
+
+@todo maybe instead of optional StateMachine should just take default state in the constructor?

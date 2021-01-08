@@ -19,6 +19,7 @@ namespace bsc {
         //things so that it don't have to parse file again.
     public:
         std::optional<std::string> map(const fs::path& from);
+
         void addPattern(std::unique_ptr<FileSorterMapperMatcher> matcher, std::string pattern) {
             patterns.push_back(
                     std::make_pair<std::unique_ptr<FileSorterMapperMatcher>, std::string>(std::move(matcher),

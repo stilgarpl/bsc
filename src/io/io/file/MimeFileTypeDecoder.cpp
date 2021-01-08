@@ -5,10 +5,17 @@
 #include "MimeFileTypeDecoder.h"
 //@todo if IO don't need logger, I can drop core dependency on io
 #include <core/log/Logger.h>
+#include <fmt/format.h>
 #include <magic.h>
 #include <mutex>
 
 namespace bsc {
+
+    class MimeFileTypeDecodingException : public std::domain_error {
+    public:
+        MimeFileTypeDecodingException(const std::string& arg) : domain_error(arg) {}
+    };
+
     using namespace std::string_literals;
     namespace detail {
         class FileTypeDecoderImplementation {
@@ -48,7 +55,7 @@ namespace bsc {
                 std::lock_guard g(magicLock);
                 auto result = magic_file(magic_cookie, path.c_str());
                 if (result == nullptr) {
-                    //@todo throw exception
+                    throw MimeFileTypeDecodingException(fmt::format("Unable to match mime for path: {}", path.string()));
                 }
                 return result;
             }

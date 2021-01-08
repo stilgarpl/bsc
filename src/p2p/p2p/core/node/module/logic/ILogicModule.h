@@ -17,35 +17,40 @@
 
 
 namespace bsc {
-    class ILogicModule
-            : public INodeModule,
-              public LogicObject,
-              public LogicStateMachine<ILogicModule, ModuleState, DirectNotify> {
+    class ILogicModule : public INodeModule, public LogicObject, public LogicStateMachine<ILogicModule, ModuleState, DirectNotify> {
 
     public:
+        bool setupLogic() override { return LogicObject::setupLogic(); }
 
-        bool setupLogic() override {
-            return LogicObject::setupLogic();
+    private:
+        static DefinitionPtr makeDefinition() {
+            static auto ptr = std::make_shared<Definition>([]() {
+                Definition definition;
+                definition.addState(ModuleState::UNINITIALIZED,
+                                    ModuleState::INITIALIZED,
+                                    ModuleState::LOGIC_READY,
+                                    ModuleState::SUBMODULES_PREPARED,
+                                    ModuleState::READY,
+                                    ModuleState::SHUTDOWN);
+                definition.addLink(ModuleState::UNINITIALIZED, ModuleState::INITIALIZED);
+                definition.addLink(ModuleState::INITIALIZED, ModuleState::LOGIC_READY, ModuleState::SHUTDOWN);
+                definition.addLink(ModuleState::LOGIC_READY, ModuleState::SUBMODULES_PREPARED, ModuleState::SHUTDOWN);
+                definition.addLink(ModuleState::SUBMODULES_PREPARED, ModuleState::READY);
+                definition.addLink(ModuleState::READY, ModuleState::SHUTDOWN);
+                return definition;
+            }());
+            return ptr;
         }
 
-        explicit ILogicModule(INode& node) : INodeModule(node), LogicObject(node.getLogicManager()),
-                                             LogicStateMachine(*this) {
-            //@todo move to state definition when I figure it out
-            addState(ModuleState::UNINITIALIZED, ModuleState::INITIALIZED, ModuleState::LOGIC_READY,
-                     ModuleState::SUBMODULES_PREPARED, ModuleState::READY,
-                     ModuleState::SHUTDOWN);
-            addLink(ModuleState::UNINITIALIZED, ModuleState::INITIALIZED);
-            addLink(ModuleState::INITIALIZED, ModuleState::LOGIC_READY, ModuleState::SHUTDOWN);
-            addLink(ModuleState::LOGIC_READY, ModuleState::SUBMODULES_PREPARED, ModuleState::SHUTDOWN);
-            addLink(ModuleState::SUBMODULES_PREPARED, ModuleState::READY);
-            addLink(ModuleState::READY, ModuleState::SHUTDOWN);
+    public:
+        explicit ILogicModule(INode& node)
+            : INodeModule(node), LogicObject(node.getLogicManager()), LogicStateMachine(makeDefinition(), *this) {
+
             setState(ModuleState::UNINITIALIZED);
-
         }
 
-        template<typename EventType, typename ... Args>
-        class ModuleLogicChainHelper
-                : public LogicObject::SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...> {
+        template<typename EventType, typename... Args>
+        class ModuleLogicChainHelper : public LogicObject::SpecificLogicChainHelper<ModuleLogicChainHelper, EventType, Args...> {
             //        typedef ModuleLogicChainHelper<EventType, Args...> ThisType;
         private:
             INode& node;

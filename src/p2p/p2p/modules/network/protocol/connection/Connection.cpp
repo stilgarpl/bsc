@@ -249,17 +249,10 @@ void bsc::Connection::stopReceiving() {
     //  processor.stop();
 }
 
-bsc::Connection::Connection(const Context::Ptr& context) : LogicStateMachine(*this), processor(*this),
-                                                           connectionContext(Context::makeContext(context)) {
+bsc::Connection::Connection(const Context::Ptr& context)
+    : LogicStateMachine(makeDefinition(), *this), processor(*this), connectionContext(Context::makeContext(context)) {
 
     connectionContext->set<ConnectionContext, bsc::Connection&>(*this);
-
-    //@todo when state machine global definition setting is implemented, move this out of the constructor:
-
-    addState(ConnectionState::NEW, ConnectionState::CONNECTED, ConnectionState::DISCONNECTED);
-    addLink(ConnectionState::NEW, ConnectionState::CONNECTED, ConnectionState::DISCONNECTED);
-    addLink(ConnectionState::CONNECTED, ConnectionState::DISCONNECTED);
-    addLink(ConnectionState::DISCONNECTED, ConnectionState::CONNECTED);
     setState(ConnectionState::NEW);
 }
 
@@ -296,4 +289,15 @@ bsc::NetAddressType bsc::Connection::getAddress() {
         throw ConnectionException("Connection Exception: Can't get connection address");
     }
 }
+bsc::Connection::DefinitionPtr bsc::Connection::makeDefinition() {
 
+    static auto ptr = std::make_shared<Definition>([]() {
+        Definition definition;
+        definition.addState(ConnectionState::NEW, ConnectionState::CONNECTED, ConnectionState::DISCONNECTED);
+        definition.addLink(ConnectionState::NEW, ConnectionState::CONNECTED, ConnectionState::DISCONNECTED);
+        definition.addLink(ConnectionState::CONNECTED, ConnectionState::DISCONNECTED);
+        definition.addLink(ConnectionState::DISCONNECTED, ConnectionState::CONNECTED);
+        return definition;
+    }());
+    return ptr;
+}

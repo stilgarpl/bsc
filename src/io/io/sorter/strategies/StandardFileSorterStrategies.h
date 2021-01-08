@@ -32,11 +32,6 @@ namespace bsc {
         static FileSortingStrategies::FileExistsPredicate pretendFileExistsPredicate;
     };
 
-    //@todo move this to a more suitable place
-    inline std::string escapeAllRegexCharacters(const std::string& input) {
-        std::regex specialCharacters("\\.|\\(|\\)|\\[|\\]");
-        return std::regex_replace(input, specialCharacters, "\\$&");
-    }
 }// namespace bsc
 
 #endif

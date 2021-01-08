@@ -107,14 +107,6 @@ TEST_CASE("Sort predicates test") {
     }
 }
 
-//@todo move this to more suitable place
-TEST_CASE("escapeAllRegexCharacters test") {
-    std::string text         = "[test(string).]";
-    std::string expectedText = R"(\[test\(string\)\.\])";
-    auto result              = escapeAllRegexCharacters(text);
-    REQUIRE(result == expectedText);
-}
-
 TEST_CASE("Sort fetchers test") {
     testaid::TestDirWithResources testDirWithResources;
     SECTION("Filesystem fetcher test") {
@@ -277,11 +269,11 @@ TEST_CASE("File sorter test") {
         const auto& result = fileSorter.sort(resourcePath);
         REQUIRE(result.getSortedFiles().size() == 3);
         REQUIRE(fs::exists(destinationPath / "Images"));
-        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.gif"));
-        REQUIRE(!fs::is_directory(destinationPath / "Images" / "2020" / "test.gif"));
+        REQUIRE(fs::exists(destinationPath / "Images" / "2021" / "test.gif"));
+        REQUIRE(!fs::is_directory(destinationPath / "Images" / "2021" / "test.gif"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
         REQUIRE(!fs::is_directory(destinationPath / "Images" / "2020" / "test.png"));
-        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "png_with_wrong_extension.txt"));
+        REQUIRE(fs::exists(destinationPath / "Images" / "2021" / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
         REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
@@ -298,9 +290,10 @@ TEST_CASE("File sorter test") {
         const auto& result = fileSorter.sort(resourcePath);
         REQUIRE(result.getSortedFiles().size() == 4);
         REQUIRE(fs::exists(destinationPath / "Images"));
-        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.gif"));
+        //@todo replace "2020" with current year, "2020" in png stays, it's taken from exif
+        REQUIRE(fs::exists(destinationPath / "Images" / "2021" / "test.gif"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
-        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "png_with_wrong_extension.txt"));
+        REQUIRE(fs::exists(destinationPath / "Images" / "2021" / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(destinationPath / "Text" / "test.txt"));
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));

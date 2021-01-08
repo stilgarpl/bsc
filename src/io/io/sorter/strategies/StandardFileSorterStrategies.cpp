@@ -6,16 +6,20 @@
 #include <core/log/Logger.h>
 #include <fmt/format.h>
 
+#include <core/text/TextUtils.h>
 #include <parser/parser/fromString.h>
 namespace bsc {
     FileSortingStrategies::SortStrategy StandardFileSorterSortStrategies::copy = [](const std::filesystem::path& from,
                                                                                     const std::filesystem::path& to) {
-        //@todo check for errors? throw ? anything?
+        //@todo check for errors? throw ? anything? (copy may fail, permisions setting may fail, modification date may fail)
         LOGGER("Copying " + from.string() + " to " + to.string());
         LOGGER("Creating dirs: " + to.parent_path().string());
+        auto modificationDate = fs::last_write_time(from);
+        auto permissions      = fs::status(from).permissions();
         fs::create_directories(to.parent_path());
-        fs::copy(from, to, fs::copy_options::overwrite_existing);
-        //@todo copy properties of the file
+        fs::copy(from, to, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+        fs::last_write_time(to, modificationDate);
+        fs::permissions(to, permissions);
     };
     FileSortingStrategies::SortStrategy StandardFileSorterSortStrategies::move = [](const fs::path& from,
                                                                                     const fs::path& to) {
@@ -52,7 +56,7 @@ namespace bsc {
     StandardCreateValidTargetPathStrategies::rename(const std::string& suffixFormat) {
         // calculate what possible here, so it doesn't have to be calculated when lambda is run.
         //@todo validate regex or add error handling.
-        std::string regexString = fmt::format(escapeAllRegexCharacters(suffixFormat), "([0-9]+)") + '$';
+        std::string regexString = fmt::format(TextUtils::escapeAllRegexCharacters(suffixFormat), "([0-9]+)") + '$';
         auto numberRegex        = std::regex(regexString);
         return [numberRegex, regexString, suffixFormat](const fs::path& target,
                                                         const FileSortingStrategies::FileExistsPredicate& fileExists) {

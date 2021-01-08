@@ -28,7 +28,7 @@ enum class ConnectionState {
 
 
 namespace bsc {
-    class Connection : public RoleScope, public bsc::LogicStateMachine<Connection, ConnectionState, DirectNotify> {
+    class Connection : public RoleScope, public LogicStateMachine<Connection, ConnectionState, DirectNotify> {
 
     protected:
         ConnectionProcessor processor;
@@ -56,6 +56,9 @@ namespace bsc {
 
         //@todo if possible try to remove this method. we should hide Poco
         virtual Poco::Net::StreamSocket& getSocket() = 0;
+
+    private:
+        static DefinitionPtr makeDefinition();
 
     public:
         //@todo why do those methods need socket as parameter?

@@ -5,16 +5,22 @@
 #ifndef BSC_DEFERREDNOTIFY_H
 #define BSC_DEFERREDNOTIFY_H
 
+#include "StateObserver.h"
+#include <cassert>
+#include <core/thread/ThreadQueueProcessor.h>
+#include <list>
+#include <memory>
+#include <mutex>
 
 namespace bsc {
     template<typename StateObject, typename stateIdType>
     class DeferredNotify {
         using ObserverType = Observer<StateObject, stateIdType>;
         std::list<std::shared_ptr<ObserverType>> observers;
-        std::unique_ptr<ThreadQueueProcessor < stateIdType, StateObject>> processor;
+        std::unique_ptr<ThreadQueueProcessor<stateIdType, StateObject>> processor;
         std::mutex observerLock;
-    public:
 
+    public:
         DeferredNotify() {
             processor = std::make_unique<ThreadQueueProcessor<stateIdType, StateObject>>(
                     [this](auto state, auto& object) {

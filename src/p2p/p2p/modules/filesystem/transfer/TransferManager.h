@@ -7,10 +7,11 @@
 #ifndef BSC_TRANSFERMANAGER_H
 #define BSC_TRANSFERMANAGER_H
 
-#include <p2p/modules/filesystem/identification/ResourceIdentificator.h>
-#include <logic/state/LogicStateMachine.h>
 #include <algorithm>
 #include <logic/state/DeferredNotify.h>
+#include <logic/state/LogicStateMachine.h>
+#include <p2p/core/node/NodeInfo.h>
+#include <p2p/modules/filesystem/identification/ResourceIdentificator.h>
 #include <p2p/modules/filesystem/identification/TransferTypes.h>
 
 namespace bsc {
@@ -24,11 +25,11 @@ namespace bsc {
             TransferSize size;
 
         public:
-            const std::shared_ptr<std::istream>& getInputStream() const;
+            [[nodiscard]] const std::shared_ptr<std::istream>& getInputStream() const;
 
             void setInputStream(const std::shared_ptr<std::istream>& inputStream);
 
-            TransferSize getSize() const;
+            [[nodiscard]] TransferSize getSize() const;
 
             void setSize(TransferSize size);
         };
@@ -66,12 +67,14 @@ namespace bsc {
             std::function<void(LocalTransferDescriptor&)> payload;
 
         protected:
-
             void setPayload(const std::function<void(LocalTransferDescriptor&)>& p);
 
             void startThread();
 
             friend class TransferManager;
+
+        private:
+            static DefinitionPtr makeDefinition();
 
         public:
             const ResourceIdentificatorPtr& getDestination() const;
@@ -139,6 +142,7 @@ namespace bsc {
             std::condition_variable finishReady;
             std::recursive_mutex startLock;
 
+            static DefinitionPtr makeDefinition();
 
         public:
             explicit TransferQueue(TransferManager& manager);
@@ -207,6 +211,7 @@ namespace bsc {
                          bool start = true);
 
     };
+
 }
 
 #endif //BSC_TRANSFERMANAGER_H
