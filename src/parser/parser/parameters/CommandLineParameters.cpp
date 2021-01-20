@@ -120,7 +120,7 @@ namespace bsc {
             default:
                 if (self->parseMap.contains(key)) {
                     try {
-                        self->parseMap[key](arg, self->parser);
+                        self->parseMap[key](arg, self->stringParser);
                     } catch (StringParseException& e) {
                         if (self->parseConfiguration == ParseConfiguration::simple) {
                             argp_error(state,
@@ -178,7 +178,7 @@ namespace bsc {
                                                               const Parser& newParser) {
         using namespace std::string_literals;
         this->parseConfiguration = configuration;
-        this->parser             = newParser;
+        this->stringParser       = newParser;
         // close argOptions:
         argpOptions.push_back({nullptr, 0, nullptr, 0, nullptr, 0});
         if (beforeInfo || afterInfo) {
@@ -225,7 +225,7 @@ namespace bsc {
     void CommandLineParameters::ArgumentParser::parseNamedArguments() {
         for (const auto& descriptor : argumentDescriptors) {
             if (descriptor.argumentIndex < rawArguments.size()) {
-                descriptor.argumentParseFunc(rawArguments[descriptor.argumentIndex], this->parser);
+                descriptor.argumentParseFunc(rawArguments[descriptor.argumentIndex], this->stringParser);
             }
         }
     }

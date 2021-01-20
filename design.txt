@@ -750,3 +750,83 @@ maybe transport service should store that bitmask itself?
 @todo define -> link().from(state).to(states...) ; -> states().add(states...)
 
 @todo maybe instead of optional StateMachine should just take default state in the constructor?
+
+@todo GetSet could take optional validator (that would validate the value before assignment and optional notification operation, that would be fired after assignment)
+
+@todo zrobić na bazie yaml-cpp properties mapper? int version = Property{"software.version"}
+
+ewentualnie można też zrobić
+
+struct Conf {
+Property<int,"port"> port;
+}
+
+struct Conf : Prefix<"spring.conf"> {
+Property<int,"port"> port;
+}
+
+how to load the file? it would be best to store it in context, but what if different contexts are required? loading different files could just add more entries to the property map
+
+automagiczny property loader (include z osobnego pliku jakby ktoś nie chciał), może skanować wszystkie katalogi od current_dir w poszukiwaniu plików "application.properties"
+
+
+also, load properties just like CommandLineParameters:
+
+auto properties = PropertiesLoader.load<AppProperties>(/path/to/file) - to załaduje property z pliku do lokalnego kontekstu i utworzy obiekt, który odczyta je z tego kontekstu, po wyjściu z load przez RAII kontekst zostanie przywrócony do stanu globalnego i inne klasy będą z niego czytać.
+Property<T> powinno mieć w środku pewnie std::optional<T> na przechowywanie wartości. przy próbie odczytu z brakiem wartości rzucać wyjątek
+
+@todo at the end of parse() object should be closed (it's parser finished), but I'd like it to close earlier
+
+
+class Properties : Prefix<"prefix">
+{
+
+Property<InnerProperties,"inner"> inner; -> specjalizacja która w konstruktorze odkłada prefix "inner", inicjalizuje InnerProperties (co powoduje inicjalizacje jego pól) na stos a na koniec konstruktora go zdejmuje.
+Property<int,"port"> port;
+}
+
+dodać testy na głębokość stosu prefiksów - żeby dwa obiekty utworzone po sobie na siebie nie wpływały, można też generować id w konstruktorze Prefix i pozwalać na to, żeby obiekty z innym id wchodziły na stos tylko jeśli są zwrapowane w Property<>
+
+Properties a;
+Property<Properties> b; // tu dalej jest błąd
+
+
+FileSorterProperties {
+
+std::list<MapperProperties> mappers;
+}
+
+MapperProperties {
+
+type: (mime, pattern)
+match: (application/text / "*.zip")
+action: move
+error: continue
+
+}
+
+
+int a = Property<"test">
+Property<"test", int> a;
+Property<"test"> a; // a.as<int>();
+
+Property<"test", std::list<...> > -> specialization for container types, if yaml is list type, then add elements, if single type, then just add one object to the list
+
+Property should not depend on yaml, specific parsers should be provided by PropertyLoaders
+
+PropertyLoader<"yaml">
+
+Property as
+return propertyData->as<T>()
+
+return propertyCaster.get<T>()->cast(propertyData);
+
+PropertyData => string with id eg. "core.property.id"; pointer to source/loader
+
+PropertyData<ParserType> : public PropertyDataCRTP<PropertyData<ParserType>>
+Uber?
+
+
+how to initialize propertyCaster?
+
+

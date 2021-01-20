@@ -3,9 +3,9 @@ zlib/1.2.11 # dependency conflict between poco and exiv2, remove when exiv2 is m
 poco/1.10.1
 cereal/1.3.0
 spdlog/1.8.0
-catch2/2.13.0
 inja/3.0.0
 Exiv2/0.27@piponazo/stable
+yaml-cpp/0.6.3
 
 [options]
 Poco:shared=False # False
@@ -26,7 +26,7 @@ cmake_paths
 cmake_find_package
 
 [build_requires]
-
+catch2/2.13.0
 
 
 

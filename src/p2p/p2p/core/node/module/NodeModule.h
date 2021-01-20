@@ -19,16 +19,15 @@
 #include <p2p/core/node/module/logic/ModuleSource.h>
 
 namespace bsc {
-    class NodeModule : public bsc::ILogicModule {
+    class NodeModule : public ILogicModule {
     private:
         const ModuleIdType moduleId;
 
     public:
-
         using Configuration = IConfig;
 
         //@todo pure or not?
-        void initialize() override {};
+        void initialize() override{};
 
         void ready() override {};
 

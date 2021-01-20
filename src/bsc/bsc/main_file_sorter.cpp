@@ -35,27 +35,19 @@ int main(int argc, char* argv[]) {
     struct FileSorterParameters : CommandLineParameters {
         Argument<std::filesystem::path> targetPath                        = {"PATH"};
         DefaultParameter<std::map<std::string, std::string>> mimeMatchers = {
-                {.shortKey     = 'm',
-                 .longKey      = "mime",
-                 .argumentName = "mimetype=PATTERN",
-                 .doc          = "Pair of mime type and path pattern"}};
+                {.shortKey = 'm', .longKey = "mime", .argumentName = "mimetype=PATTERN", .doc = "Pair of mime type and path pattern"}};
         DefaultParameter<std::map<std::string, std::string>> nameMatchers = {
-                {.shortKey     = 'n',
-                 .longKey      = "name",
-                 .argumentName = "regex=PATTERN",
-                 .doc          = "Pair of filename regex and path pattern"}};
+                {.shortKey = 'n', .longKey = "name", .argumentName = "regex=PATTERN", .doc = "Pair of filename regex and path pattern"}};
 
-        DefaultParameter<std::string> action = {
-                {.shortKey      = 'a',
-                 .longKey       = "action",
-                 .argumentName  = "ACTION",
-                 .doc           = "Action to perform on files\nAvailable actions:\ncopy *\nmove\npretend",
-                 .defaultValue  = "copy",
-                 .allowedValues = actionFactory.getSelectors()}};
-        DefaultParameter<std::string> errorHandler = {
-                {.shortKey      = 'e',
-                 .longKey       = "error",
-                 .argumentName  = "ERROR HANDLER",
+        DefaultParameter<std::string> action       = {{.shortKey      = 'a',
+                                                 .longKey       = "action",
+                                                 .argumentName  = "ACTION",
+                                                 .doc           = "Action to perform on files\nAvailable actions:\ncopy *\nmove\npretend",
+                                                 .defaultValue  = "copy",
+                                                 .allowedValues = actionFactory.getSelectors()}};
+        DefaultParameter<std::string> errorHandler = {{.shortKey     = 'e',
+                                                       .longKey      = "error",
+                                                       .argumentName = "ERROR HANDLER",
                                                        .doc          = "What to do when error occurs.\nAvailable handlers:\nstop *\nignore",
                                                        .defaultValue = "stop",
                                                        .allowedValues = errorActionFactory.getSelectors()}};

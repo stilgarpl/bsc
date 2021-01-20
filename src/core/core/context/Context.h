@@ -42,7 +42,7 @@ namespace bsc {
             std::shared_ptr<Context> ptr = nullptr;
 
         protected:
-            //@todo this constructor is needed for Context::makeContext. try to move creating shared_ptr here.
+            //@todo this constructor is needed for Context::makeContext. try to move creating shared_ptr there.
             explicit ContextPtr(std::shared_ptr<Context> ptr) : ptr(std::move(ptr)) {}
 
         public:

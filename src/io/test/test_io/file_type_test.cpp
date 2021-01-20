@@ -31,10 +31,16 @@ TEST_CASE("Filetype test") {
         REQUIRE(f.typeGroup == "image");
     }
 
+    SECTION("image") {
+        MimeFileType f = factory.create("image");
+        REQUIRE(f.type.empty());
+        REQUIRE(f.typeGroup == "image");
+    }
+
     SECTION("invalid mime string") {
-        REQUIRE_THROWS_MATCHES(factory.create("invalid"),
+        REQUIRE_THROWS_MATCHES(factory.create("  invalid"),
                                FileTypeParseException,
-                               Catch::Matchers::Message("Mime string [invalid] does not match (\\w+)/(\\w+) pattern"));
+                               Catch::Matchers::Message("Mime string [  invalid] does not match (\\w+)/(\\w+) pattern"));
     }
 }
 

@@ -12,11 +12,13 @@ namespace bsc {
 
     FileTypeParseException::FileTypeParseException(const std::string& arg) : domain_error(arg) {}
     MimeFileType MimeFileTypeFactory::create(const std::string& mimeString) const {
-        //@todo make / optional, so you can have "image" but required for "image/jpeg"
-        static const std::regex mimeRegex("(\\w+)/([\\w-]*).*");
+        static const std::regex mimeRegex(R"((\w+)(/[\w-\.]*)?.*)");
         std::smatch mimeMatch;
         if (std::regex_match(mimeString, mimeMatch, mimeRegex)) {
-            return MimeFileType(mimeMatch[1], mimeMatch[2]);
+            auto& group = mimeMatch[1];
+            auto& type  = mimeMatch[2];
+            // remove first character "/" from type string.
+            return MimeFileType(group, type.str().empty() ? type : type.str().substr(1));
         } else {
             throw FileTypeParseException("Mime string [" + mimeString + "] does not match (\\w+)/(\\w+) pattern");
         }

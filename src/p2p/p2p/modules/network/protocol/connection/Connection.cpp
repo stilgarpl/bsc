@@ -252,7 +252,7 @@ void bsc::Connection::stopReceiving() {
 bsc::Connection::Connection(const Context::Ptr& context)
     : LogicStateMachine(makeDefinition(), *this), processor(*this), connectionContext(Context::makeContext(context)) {
 
-    connectionContext->set<ConnectionContext, bsc::Connection&>(*this);
+    connectionContext->set<ConnectionContext, Connection&>(*this);
     setState(ConnectionState::NEW);
 }
 

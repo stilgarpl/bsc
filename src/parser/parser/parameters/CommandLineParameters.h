@@ -32,7 +32,7 @@ namespace bsc {
     public:
         const std::set<std::string> allowedValues;
 
-        ValueNotAllowed(const std::string& arg);
+        explicit ValueNotAllowed(const std::string& arg);
         ValueNotAllowed(const std::string& arg, std::remove_cvref_t<decltype(allowedValues)> a);
         ValueNotAllowed(const ValueNotAllowed&) = default;
         ValueNotAllowed(ValueNotAllowed&&)      = default;
@@ -67,7 +67,7 @@ namespace bsc {
             std::optional<std::string> beforeInfo = std::nullopt;
             std::optional<std::string> afterInfo                     = std::nullopt;
             decltype(rawArguments)::size_type requiredArgumentsCount = 0;
-            Parser parser{};
+            Parser stringParser{};
 
             void incrementRequiredArguments() { ++requiredArgumentsCount; }
             void parseNamedArguments();
@@ -154,10 +154,10 @@ namespace bsc {
         friend class CommandLineParser;
 
         [[nodiscard]] const std::vector<std::string>& arguments() const { return parser->getParsedArguments(); }
-        [[nodiscard]] const std::span<std::string> remainingArguments() const { return parser->getRemainingArguments(); }
+        [[nodiscard]] std::span<std::string> remainingArguments() const { return parser->getRemainingArguments(); }
         [[nodiscard]] auto getRequiredArgumentsCount() const { return parser->getRequiredArgumentsCount(); }
 
-        const std::string& commandName() const { return parser->getCommandName(); }
+        [[nodiscard]] const std::string& commandName() const { return parser->getCommandName(); }
     };
 
     class CommandLineParser {
@@ -172,7 +172,6 @@ namespace bsc {
 
         template<ParametersClass T>
         [[nodiscard]] T parse(int argc, char* argv[]) {
-            static Parser parser;
             T t;
             t.parser->prepareParser(parseConfiguration, parser);
             t.parser->parse(argc, argv);
