@@ -7,7 +7,8 @@
 
 #include "Factory.h"
 #include "FactoryContext.h"
-#include <core/auto/AutoCaller.h>
+#include <context/auto/AutoCaller.h>
+#include <core/log/Logger.h>
 namespace bsc {
 
     namespace detail {

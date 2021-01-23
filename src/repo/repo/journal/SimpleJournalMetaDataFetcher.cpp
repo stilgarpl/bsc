@@ -2,10 +2,10 @@
 // Created by Krzysztof Tulidowicz on 02.12.2019.
 //
 
-#include <Poco/Environment.h>
-#include <core/context/Context.h>
-#include <p2p/core/node/context/NodeContext.h>
 #include "SimpleJournalMetaDataFetcher.h"
+#include <Poco/Environment.h>
+#include <context/context/Context.h>
+#include <p2p/core/node/context/NodeContext.h>
 namespace bsc {
 
 

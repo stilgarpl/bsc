@@ -2,7 +2,7 @@
 // Created by Krzysztof Tulidowicz on 06.10.17.
 //
 
-#include <core/context/Context.h>
+#include <context/context/Context.h>
 
 #include <p2p/modules/network/protocol/packet/BasePacket.h>
 #include "NetworkInfoResponse.h"

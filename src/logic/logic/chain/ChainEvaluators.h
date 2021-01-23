@@ -5,8 +5,7 @@
 #ifndef BSC_CHAINEVALUATORS_H
 #define BSC_CHAINEVALUATORS_H
 
-
-#include <core/context/Context.h>
+#include <context/context/Context.h>
 
 #include "ChainDefinitions.h"
 #include "ChainContext.h"

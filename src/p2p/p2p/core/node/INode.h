@@ -5,13 +5,11 @@
 #ifndef BSC_INODE_H
 #define BSC_INODE_H
 
-
+#include <context/context/Context.h>
+#include <logic/LogicManager.h>
 #include <p2p/core/dependency/DependencyManager.h>
 #include <p2p/core/node/NodeInfo.h>
-#include <core/context/Context.h>
 #include <p2p/core/node/configuration/ConfigurationManager.h>
-#include <logic/LogicManager.h>
-
 
 namespace bsc {
     class INodeModule;

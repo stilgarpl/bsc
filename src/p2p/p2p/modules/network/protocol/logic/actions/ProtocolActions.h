@@ -5,10 +5,8 @@
 #ifndef BSC_PROTOCOLACTIONS_H
 #define BSC_PROTOCOLACTIONS_H
 
-
+#include "context/context/Context.h"
 #include <p2p/modules/network/protocol/logic/events/ConnectionEvent.h>
-#include "core/context/Context.h"
-
 
 namespace bsc {
     class ProtocolActions {

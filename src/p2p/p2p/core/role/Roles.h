@@ -5,13 +5,11 @@
 #ifndef BSC_ROLES_H
 #define BSC_ROLES_H
 
-
-#include <core/log/Logger.h>
-#include <core/context/Context.h>
 #include "Role.h"
 #include "RoleInvalidException.h"
 #include "RoleScope.h"
-
+#include <context/context/Context.h>
+#include <core/log/Logger.h>
 
 namespace bsc {
     class Roles {

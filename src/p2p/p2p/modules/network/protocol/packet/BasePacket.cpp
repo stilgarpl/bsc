@@ -2,10 +2,9 @@
 // Created by Krzysztof Tulidowicz on 01.08.17.
 //
 
-#include <atomic>
-#include "core/context/Context.h"
 #include "BasePacket.h"
-
+#include "context/context/Context.h"
+#include <atomic>
 
 bsc::Status bsc::BasePacket::getStatus() const {
     return status;

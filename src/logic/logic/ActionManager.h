@@ -5,12 +5,10 @@
 #ifndef BSC_ACTIONMANAGER_H
 #define BSC_ACTIONMANAGER_H
 
-
-#include <map>
-#include "core/uber/Uber.h"
+#include "context/context/Context.h"
 #include "core/signal/Signal.h"
-#include "core/context/Context.h"
-
+#include "core/uber/Uber.h"
+#include <map>
 
 #include <optional>
 

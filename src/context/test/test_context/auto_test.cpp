@@ -2,7 +2,7 @@
 // Created by stilgar on 13.10.2020.
 //
 #include <catch2/catch.hpp>
-#include <core/auto/AutoCaller.h>
+#include <context/auto/AutoCaller.h>
 using namespace bsc;
 
 bool autoTested = false;

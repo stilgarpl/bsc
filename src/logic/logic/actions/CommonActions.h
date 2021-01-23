@@ -5,7 +5,7 @@
 #ifndef BSC_COMMONACTIONS_H
 #define BSC_COMMONACTIONS_H
 
-#include <core/context/Context.h>
+#include <context/context/Context.h>
 #include <logic/common/ForeachContext.h>
 
 namespace bsc {

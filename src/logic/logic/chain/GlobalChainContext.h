@@ -7,7 +7,7 @@
 
 #include "ChainDefinitions.h"
 #include "ChainLock.h"
-#include <core/context/AutoContextSetter.h>
+#include <context/context/AutoContextSetter.h>
 #include <map>
 
 namespace bsc {

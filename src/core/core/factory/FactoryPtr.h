@@ -7,7 +7,7 @@
 
 #include "Factory.h"
 #include "FactoryContext.h"
-#include <core/context/Context.h>
+#include <context/context/Context.h>
 namespace bsc {
     template<typename ProducedObjectType,
              typename FactorySpecialization = NoFactorySpecialization,

@@ -5,10 +5,9 @@
 #ifndef BSC_IEVENT_H
 #define BSC_IEVENT_H
 
-#include <core/context/Context.h>
-#include <core/signal/DefaultExecutionPolicy.h>
+#include <context/context/Context.h>
 #include <core/log/Logger.h>
-
+#include <core/signal/DefaultExecutionPolicy.h>
 
 namespace bsc {
     template<typename idType>

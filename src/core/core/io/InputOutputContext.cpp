@@ -5,7 +5,7 @@
 #include <iostream>
 #include "InputOutputContext.h"
 
-#include <core/context/Context.h>
+#include <context/context/Context.h>
 
 std::ostream& bsc::StandardInputOutputContext::out() {
     return std::cout;

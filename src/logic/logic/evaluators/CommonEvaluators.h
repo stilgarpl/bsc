@@ -5,11 +5,9 @@
 #ifndef BSC_COMMONEVALUATORS_H
 #define BSC_COMMONEVALUATORS_H
 
-
+#include <context/context/Context.h>
 #include <core/log/Logger.h>
-#include <core/context/Context.h>
 #include <logic/common/ForeachContext.h>
-
 
 namespace bsc {
     struct CommonEvaluators {

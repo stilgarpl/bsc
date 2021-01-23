@@ -1,5 +1,3 @@
-#include <utility>
-
 //
 // Created by Krzysztof Tulidowicz on 20.08.17.
 //
@@ -7,15 +5,15 @@
 #ifndef BSC_CONTEXT_H
 #define BSC_CONTEXT_H
 
+#include "context/registry/InitializerRegistry.h"
 #include <atomic>
-#include <core/log/Logger.h>
-#include <core/registry/InitializerRegistry.h>
 #include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <utility>
 
 namespace bsc {
     class InvalidContextException : public std::invalid_argument {

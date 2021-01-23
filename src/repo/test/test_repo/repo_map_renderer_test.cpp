@@ -4,7 +4,7 @@
 
 #include "FakeMetaDataFetcher.h"
 #include <catch2/catch.hpp>
-#include <core/context/Context.h>
+#include <context/context/Context.h>
 #include <core/factory/FactoryContext.h>
 #include <repo/journal/Journal.h>
 #include <repo/journal/SimpleJournal.h>

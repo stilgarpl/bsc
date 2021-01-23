@@ -12,9 +12,8 @@
 #include <core/utils/cereal_include.h>
 #include <core/log/Logger.h>
 
-#include <core/context/Context.h>
+#include <context/context/Context.h>
 #include <p2p/core/role/Roles.h>
-
 
 namespace bsc {
 

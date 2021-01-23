@@ -1,7 +1,7 @@
 find_package(spdlog REQUIRED)
 find_package(Poco REQUIRED Crypto)
 
-set(SOURCE_FILES core/thread/Runnable.cpp core/thread/Runnable.h core/context/Context.h core/signal/Signal.h core/uber/Uber.h core/utils/cereal_include.h core/context/Context.cpp core/signal/Executor.h core/utils/crypto.h core/utils/crypto.cpp core/signal/OrderedExecutionPolicy.h core/log/Logger.cpp core/log/Logger.h core/log/LoggerContext.cpp core/log/LoggerContext.h core/signal/DefaultExecutionPolicy.h core/signal/OrderedExecutor.cpp core/signal/OrderedExecutor.h core/signal/SimpleExecutor.cpp core/signal/SimpleExecutor.h core/signal/Executor.h core/signal/ThreadExecutor.cpp core/signal/ThreadExecutor.h core/signal/ThreadPoolExecutor.cpp core/signal/ThreadPoolExecutor.h core/signal/ExecutorPolicyTraits.h core/factory/Factory.h core/factory/FactoryContext.h core/thread/ThreadQueueProcessor.h core/io/InputOutputContext.cpp core/io/InputOutputContext.h core/getset/GetSet.h core/generator/Generator.h core/generator/SequenceAlgorithm.h core/generator/RandomAlgorithm.h core/generator/RandomHashStringAlgorithm.cpp core/generator/RandomHashStringAlgorithm.h core/factory/CopyFactory.h core/factory/ParsingFactory.h core/auto/AutoCaller.h core/factory/AutoFactory.h core/context/AutoContextSetter.h core/registry/Registry.h core/registry/InitializerRegistry.h core/factory/FactoryPtr.h core/text/TextUtils.cpp core/text/TextUtils.h)
+set(SOURCE_FILES core/thread/Runnable.cpp core/thread/Runnable.h ../context/context/context/Context.h core/signal/Signal.h core/uber/Uber.h core/utils/cereal_include.h ../context/context/context/Context.cpp core/signal/Executor.h core/utils/crypto.h core/utils/crypto.cpp core/signal/OrderedExecutionPolicy.h core/log/Logger.cpp core/log/Logger.h core/log/LoggerContext.cpp core/log/LoggerContext.h core/signal/DefaultExecutionPolicy.h core/signal/OrderedExecutor.cpp core/signal/OrderedExecutor.h core/signal/SimpleExecutor.cpp core/signal/SimpleExecutor.h core/signal/Executor.h core/signal/ThreadExecutor.cpp core/signal/ThreadExecutor.h core/signal/ThreadPoolExecutor.cpp core/signal/ThreadPoolExecutor.h core/signal/ExecutorPolicyTraits.h core/factory/Factory.h core/factory/FactoryContext.h core/thread/ThreadQueueProcessor.h core/io/InputOutputContext.cpp core/io/InputOutputContext.h core/getset/GetSet.h core/generator/Generator.h core/generator/SequenceAlgorithm.h core/generator/RandomAlgorithm.h core/generator/RandomHashStringAlgorithm.cpp core/generator/RandomHashStringAlgorithm.h core/factory/CopyFactory.h core/factory/ParsingFactory.h ../context/context/auto/AutoCaller.h core/factory/AutoFactory.h ../context/context/context/AutoContextSetter.h ../context/context/registry/Registry.h ../context/context/registry/InitializerRegistry.h core/factory/FactoryPtr.h core/text/TextUtils.cpp core/text/TextUtils.h ../properties/properties/Property.h)
 
 add_library(core ${SOURCE_FILES})
 target_include_directories(core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:${BSC_DESTINATION_INCLUDE}>)
@@ -20,7 +20,7 @@ install(DIRECTORY core DESTINATION ${BSC_DESTINATION_INCLUDE}
         FILES_MATCHING PATTERN "*.h")
 #@todo fix when conan poco has components
 #target_link_libraries(core PUBLIC parser spdlog::spdlog Poco::Crypto)
-target_link_libraries(core PUBLIC parser spdlog::spdlog Poco::Poco)
+target_link_libraries(core PUBLIC parser context spdlog::spdlog Poco::Poco)
 install(TARGETS core COMPONENT core DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)
 if (BSC_ENABLE_TESTS)
     add_subdirectory(test)

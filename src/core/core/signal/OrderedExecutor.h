@@ -5,11 +5,10 @@
 #ifndef BSC_ORDEREDEXECUTOR_H
 #define BSC_ORDEREDEXECUTOR_H
 
-#include <memory>
 #include <condition_variable>
+#include <context/context/Context.h>
+#include <memory>
 #include <queue>
-#include <core/context/Context.h>
-
 
 #include <thread>
 #include <atomic>

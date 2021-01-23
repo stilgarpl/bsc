@@ -5,12 +5,10 @@
 #ifndef BSC_NODEACTIONS_H
 #define BSC_NODEACTIONS_H
 
-
+#include "context/context/Context.h"
+#include <logic/events/Tick.h>
 #include <p2p/modules/network/protocol/logic/events/ConnectionEvent.h>
 #include <p2p/modules/network/protocol/logic/events/NodeInfoEvent.h>
-#include <logic/events/Tick.h>
-#include "core/context/Context.h"
-
 
 namespace bsc {
     class NodeActions {

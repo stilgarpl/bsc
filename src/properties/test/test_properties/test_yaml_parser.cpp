@@ -1,0 +1,103 @@
+//
+// Created by Krzysztof Tulidowicz on 21.01.2021.
+//
+#include <catch2/catch.hpp>
+#include <context/context/Context.h>
+#include <properties/Property.h>
+#include <properties/PropertyContext.h>
+#include <properties/PropertyLoader.h>
+#include <properties/parser/YamlParser.h>
+using namespace bsc;
+
+TEST_CASE("YamlParser test ") {
+
+    static const char* yaml = "invoice: 34843\n"
+                              "date   : !!str 2001-01-23\n"
+                              "bill-to: &id001\n"
+                              "    given  : Chris\n"
+                              "    family : Dumars\n"
+                              "    address:\n"
+                              "        lines: |\n"
+                              "            458 Walkman Dr.\n"
+                              "            Suite #292\n"
+                              "sequence:\n"
+                              "  -  i: t1\n"
+                              "  -  i: t2\n"
+                              "  -  i: t3\n"
+                              "outerSequence:\n"
+                              "  - innerSequence:\n"
+                              "      - i: a1\n"
+                              "      - i: a2\n"
+                              "      - i: a3\n"
+                              "  - innerSequence:\n"
+                              "      - i: b1\n"
+                              "      - i: b2\n"
+                              "      - i: b3\n";
+
+    YamlParser yamlParser{yaml};
+
+    SECTION("selectNode test ") {
+        auto rootType = yamlParser.getNodeType();
+        REQUIRE(rootType == PropertyParserNodeType::map);
+        yamlParser.selectNode({{"invoice"}});
+        auto type  = yamlParser.getNodeType();
+        auto value = yamlParser.getValue();
+        REQUIRE(type == PropertyParserNodeType::scalar);
+        REQUIRE(value == "34843");
+        //        yamlParser.selectNode({"date"});
+        //        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::invalid);
+        yamlParser.resetNode();
+        yamlParser.selectNode({"date"});
+        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::scalar);
+        REQUIRE(yamlParser.getValue() == "2001-01-23");
+        yamlParser.resetNode();
+        yamlParser.selectNode({"bill-to"});
+        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::map);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"given"}}) == "Chris");
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"family"}}) == "Dumars");
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"address"}, {"lines"}}) == "458 Walkman Dr.\nSuite #292\n");
+    }
+
+    SECTION("sequence test") {
+        auto rootType = yamlParser.getNodeType();
+        REQUIRE(rootType == PropertyParserNodeType::map);
+        yamlParser.selectNode({{"sequence"}});
+        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::sequence);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "t1");
+        REQUIRE(yamlParser.nextEntry() == true);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "t2");
+        REQUIRE(yamlParser.nextEntry() == true);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "t3");
+        REQUIRE(yamlParser.nextEntry() == false);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "t1");
+    }
+
+    SECTION("nested sequence test") {
+        auto rootType = yamlParser.getNodeType();
+        REQUIRE(rootType == PropertyParserNodeType::map);
+        yamlParser.selectNode({{"outerSequence"}});
+        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::sequence);
+        yamlParser.push();
+        yamlParser.selectNode({{"innerSequence"}});
+        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::sequence);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a1");
+        REQUIRE(yamlParser.nextEntry() == true);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a2");
+        REQUIRE(yamlParser.nextEntry() == true);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a3");
+        REQUIRE(yamlParser.nextEntry() == false);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a1");
+        REQUIRE(yamlParser.nextEntry() == true);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a2");
+        yamlParser.pop();
+        yamlParser.nextEntry();
+        yamlParser.selectNode({{"innerSequence"}});
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "b1");
+        REQUIRE(yamlParser.nextEntry() == true);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "b2");
+        REQUIRE(yamlParser.nextEntry() == true);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "b3");
+        REQUIRE(yamlParser.nextEntry() == false);
+        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "b1");
+    }
+}

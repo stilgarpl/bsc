@@ -5,14 +5,12 @@
 #ifndef BSC_CONNECTIONPROCESSOR_H
 #define BSC_CONNECTIONPROCESSOR_H
 
-
-#include <thread>
+#include "context/context/Context.h"
+#include "core/log/Logger.h"
+#include "core/thread/Runnable.h"
 #include <p2p/modules/network/protocol/filter/PacketFilter.h>
 #include <p2p/modules/network/protocol/filter/RoleFilter.h>
-#include "core/thread/Runnable.h"
-#include "core/context/Context.h"
-#include "core/log/Logger.h"
-
+#include <thread>
 
 namespace bsc {
     class Connection;

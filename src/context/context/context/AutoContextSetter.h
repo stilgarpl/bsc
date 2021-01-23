@@ -6,7 +6,7 @@
 #define BSC_AUTOCONTEXTSETTER_H
 
 #include "Context.h"
-#include <core/auto/AutoCaller.h>
+#include "context/auto/AutoCaller.h"
 namespace bsc {
 
     namespace detail {

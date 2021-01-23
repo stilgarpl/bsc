@@ -10,7 +10,7 @@
 #include <sstream>
 
 namespace bsc {
-    inline std::vector<std::string> explode(std::string const& s, char delim) {
+    inline std::vector<std::string> explode(const std::string& s, char delim) {
         std::vector<std::string> result;
         std::istringstream iss(s);
 

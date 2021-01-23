@@ -5,17 +5,16 @@
 #ifndef BSC_THREADQUEUEPROCESSOR_H
 #define BSC_THREADQUEUEPROCESSOR_H
 
-#include <utility>
-#include <queue>
-#include <memory>
-#include <mutex>
-#include <thread>
 #include <atomic>
 #include <condition_variable>
-#include <functional>
+#include <context/context/Context.h>
 #include <core/log/Logger.h>
-#include <core/context/Context.h>
-
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <queue>
+#include <thread>
+#include <utility>
 
 using namespace std::chrono_literals;
 

@@ -1,13 +1,9 @@
-#include <utility>
-
-#include <utility>
 
 //
 // Created by stilg on 15.09.2017.
 //
-
-#include <core/log/Logger.h>
 #include "Context.h"
+#include <utility>
 
 namespace bsc {
     thread_local Context::Ptr Context::activeContext = {};
@@ -26,7 +22,7 @@ namespace bsc {
         if (hasActiveContext()) {
             return activeContext;
         } else {
-            ERROR("No active context")
+            //            ERROR("No active context")
             throw InvalidContextException("No active context");
         }
     }
@@ -84,7 +80,6 @@ namespace bsc {
     }
 
     Context::~Context() {
-//    LOGGER("context destructor " + debugId);
 
     }
 
@@ -98,7 +93,6 @@ namespace bsc {
             ret->setParentContext(parentContext);
             return ret;
         } else {
-            LOGGER("error: NULL CONTEXT PASSED")
             throw InvalidContextException("Null context passed");
         }
     }

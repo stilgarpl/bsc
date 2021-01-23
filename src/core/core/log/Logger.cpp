@@ -2,12 +2,11 @@
 // Created by Krzysztof Tulidowicz on 21.08.17.
 //
 
-#include <iostream>
-#include <spdlog/spdlog.h>
-#include <core/context/Context.h>
 #include "Logger.h"
 #include "LoggerContext.h"
-
+#include <context/context/Context.h>
+#include <iostream>
+#include <spdlog/spdlog.h>
 
 #include <utility>
 

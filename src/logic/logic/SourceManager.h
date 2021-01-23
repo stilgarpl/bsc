@@ -5,18 +5,16 @@
 #ifndef BSC_SOURCEMANAGER_H
 #define BSC_SOURCEMANAGER_H
 
-
+#include <context/context/Context.h>
+#include <core/signal/DefaultExecutionPolicy.h>
+#include <core/signal/ExecutorPolicyTraits.h>
+#include <core/signal/OrderedExecutionPolicy.h>
+#include <core/signal/Signal.h>
+#include <core/signal/ThreadExecutor.h>
+#include <core/uber/Uber.h>
 #include <list>
 #include <memory>
 #include <thread>
-#include <core/signal/Signal.h>
-#include <core/context/Context.h>
-#include <core/uber/Uber.h>
-#include <core/signal/OrderedExecutionPolicy.h>
-#include <core/signal/ExecutorPolicyTraits.h>
-#include <core/signal/DefaultExecutionPolicy.h>
-#include <core/signal/ThreadExecutor.h>
-
 
 namespace bsc {
     class ISource;

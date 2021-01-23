@@ -1,8 +1,8 @@
 //
 // Created by Krzysztof Tulidowicz on 25.08.17.
 //
+#include <core/log/Logger.h>
 #include <logic/context/LogicContext.h>
-
 
 void bsc::LogicManager::onStop() {
     LOGGER("LOGIC MANAGER IS STOPPING")

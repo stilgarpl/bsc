@@ -793,7 +793,7 @@ Property<Properties> b; // tu dalej jest błąd
 
 FileSorterProperties {
 
-std::list<MapperProperties> mappers;
+Property<"mappers", std::list<MapperProperties>> mappers; // property dla sequence container miałoby przechodzić po sekwencji, cały czas podmieniajac kontekst na następny yaml node ? wtedy w tworzonych strukturach MapperProperties Property<"type"> na przykład by pobierało pole z kolejnej struktury, default by się przydało też dla wartości pominiętych
 }
 
 MapperProperties {
@@ -828,5 +828,34 @@ Uber?
 
 
 how to initialize propertyCaster?
+
+
+
+
+
+PropertyLoader -> template na parser, zwracałby PropertyData z osadzonym parserem
+
+new design
+
+PropertyDataProvider -> PropertyParser = Yaml/TOML/XML/.../Parser -> PropertySource (string, file, stream, etc.)
+
+parser.resetNode() -> goes back to root
+parser.selectNode("servers"); -> all calls will now start with this prefix
+parser.getValue("ip"); -> returns string
+parser.selectNode("servers", n); -> select nth node for sequence
+parser.getNodeType("servers"); -> {scalar, sequence, map, invalid, empty,
+parser.getNodeCount("servers") -> int (number of items in node, 1 for scalar, 0-n for sequence, exception for map)
+
+
+
+Property<"servers",list> -> iterate "servers", simply create
+
+
+current design - PropertyContext has a parser, probably wrapped in a different class. Property<"id"> objects push the parser state, select node from its id (split into vector), and then:
+if normal value - just getValue() and use from_string to assign it
+if container(not string) - and iterate: while(next()) .push_back(obj()); - if that object is a property itself, it should load correct value in constructor, if it's a class with property fields, they should also self-initialize
+if class - construct that class, if it has property fields, it should also initialzie properly
+
+lastly, pop state
 
 

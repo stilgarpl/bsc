@@ -6,7 +6,7 @@
 #define BSC_FACTORYCONTEXT_H
 
 #include "Factory.h"
-#include <core/context/AutoContextSetter.h>
+#include <context/context/AutoContextSetter.h>
 #include <core/uber/Uber.h>
 
 namespace bsc {
