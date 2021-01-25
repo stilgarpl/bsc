@@ -11,10 +11,12 @@
 #include <yaml-cpp/yaml.h>
 
 namespace bsc {
+
     class YamlParser : public PropertyParser {
         struct StackEntry {
             std::unique_ptr<YAML::Node> current;
             std::size_t sequenceCount;
+            std::string currentPath = {};
         };
 
     private:
@@ -22,17 +24,21 @@ namespace bsc {
         std::stack<StackEntry> idStack{};
         std::unique_ptr<YAML::Node> current{};
         std::size_t sequenceCount = 0;
+        //@todo this path is stored for debug and exception purposes. maybe it could be optimized ?
+        std::string currentPath = {};
 
     public:
         void resetNode() override;
         void selectNode(const PropertyIdSequence& propertyId) override;
-        bool nextEntry() override;
+        void nextEntry() override;
+        bool hasEntry() override;
         PropertyParserNodeType getNodeType() override;
         PropertyValueType getValue() override;
         void push() override;
         void pop() override;
+        std::size_t size() override;
         //        YamlParser(const fs::path& yamlFile);
-        YamlParser(const std::string& yamlText);
+        explicit YamlParser(const std::string& yamlText);
     };
 }// namespace bsc
 

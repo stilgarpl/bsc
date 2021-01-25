@@ -5,9 +5,8 @@
 #ifndef BSC_NODEINFOGROUP_H
 #define BSC_NODEINFOGROUP_H
 
-
+#include <p2p/core/node/NodeInfo.h>
 #include <p2p/modules/network/protocol/packet/info/PacketInfo.h>
-
 
 namespace bsc {
     struct NodeInfoGroup : public bsc::PacketGroup {

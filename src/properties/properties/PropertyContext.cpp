@@ -6,8 +6,5 @@
 
 namespace bsc {
 
-    const std::shared_ptr<PropertyData>& PropertyContext::getPropertyData() const { return propertyData; }
-    void PropertyContext::setPropertyData(const std::shared_ptr<PropertyData>& propertyData) {
-        PropertyContext::propertyData = propertyData;
-    }
+    PropertiesNotLoaded::PropertiesNotLoaded(const std::string& arg) : domain_error(arg) {}
 }// namespace bsc

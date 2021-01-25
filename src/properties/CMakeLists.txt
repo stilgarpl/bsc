@@ -1,6 +1,6 @@
 find_package(yaml-cpp REQUIRED)
 find_package(fyaml REQUIRED)
-set(SOURCE_FILES properties/Property.h properties/PropertyLoader.cpp properties/PropertyLoader.h properties/PropertyContext.cpp properties/PropertyContext.h properties/PropertyData.cpp properties/PropertyData.h properties/PropertyDefinitions.h properties/parser/PropertyParser.cpp properties/parser/PropertyParser.h properties/parser/YamlParser.cpp properties/parser/YamlParser.h properties/parser/PropertyParserNodeType.h)
+set(SOURCE_FILES properties/Property.h properties/PropertyLoader.cpp properties/PropertyLoader.h properties/PropertyContext.cpp properties/PropertyContext.h properties/PropertyDefinitions.h properties/parser/PropertyParser.cpp properties/parser/PropertyParser.h properties/parser/YamlParser.cpp properties/parser/YamlParser.h properties/parser/PropertyParserNodeType.h properties/PropertyExceptions.h properties/parser/PropertyParserController.cpp properties/parser/PropertyParserController.h properties/PropertyPrefix.h)
 
 add_library(properties ${SOURCE_FILES})
 target_include_directories(properties PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:${BSC_DESTINATION_INCLUDE}>)

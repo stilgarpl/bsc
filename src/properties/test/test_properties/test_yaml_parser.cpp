@@ -64,12 +64,11 @@ TEST_CASE("YamlParser test ") {
         yamlParser.selectNode({{"sequence"}});
         REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::sequence);
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "t1");
-        REQUIRE(yamlParser.nextEntry() == true);
+        yamlParser.nextEntry();
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "t2");
-        REQUIRE(yamlParser.nextEntry() == true);
+        yamlParser.nextEntry();
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "t3");
-        REQUIRE(yamlParser.nextEntry() == false);
-        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "t1");
+        yamlParser.nextEntry();
     }
 
     SECTION("nested sequence test") {
@@ -80,24 +79,28 @@ TEST_CASE("YamlParser test ") {
         yamlParser.push();
         yamlParser.selectNode({{"innerSequence"}});
         REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::sequence);
+        REQUIRE(yamlParser.hasEntry() == true);
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a1");
-        REQUIRE(yamlParser.nextEntry() == true);
+        yamlParser.nextEntry();
+        REQUIRE(yamlParser.hasEntry() == true);
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a2");
-        REQUIRE(yamlParser.nextEntry() == true);
+        yamlParser.nextEntry();
+        REQUIRE(yamlParser.hasEntry() == true);
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a3");
-        REQUIRE(yamlParser.nextEntry() == false);
-        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a1");
-        REQUIRE(yamlParser.nextEntry() == true);
-        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a2");
+        yamlParser.nextEntry();
+        REQUIRE(yamlParser.hasEntry() == false);
         yamlParser.pop();
         yamlParser.nextEntry();
         yamlParser.selectNode({{"innerSequence"}});
+        REQUIRE(yamlParser.hasEntry() == true);
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "b1");
-        REQUIRE(yamlParser.nextEntry() == true);
+        yamlParser.nextEntry();
+        REQUIRE(yamlParser.hasEntry() == true);
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "b2");
-        REQUIRE(yamlParser.nextEntry() == true);
+        yamlParser.nextEntry();
+        REQUIRE(yamlParser.hasEntry() == true);
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "b3");
-        REQUIRE(yamlParser.nextEntry() == false);
-        REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "b1");
+        yamlParser.nextEntry();
+        REQUIRE(yamlParser.hasEntry() == false);
     }
 }

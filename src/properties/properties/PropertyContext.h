@@ -5,16 +5,31 @@
 #ifndef BSC_PROPERTYCONTEXT_H
 #define BSC_PROPERTYCONTEXT_H
 
-#include "PropertyData.h"
 #include <context/context/AutoContextSetter.h>
+#include <properties/parser/PropertyParser.h>
+#include <utility>
 namespace bsc {
-    class PropertyContext : public AutoContextSetter<PropertyContext> {
 
-        std::shared_ptr<PropertyData> propertyData;
+    class PropertiesNotLoaded : public std::domain_error {
+    public:
+        explicit PropertiesNotLoaded(const std::string& arg);
+    };
+
+    class PropertyContext : public AutoContextSetter<PropertyContext> {
+        std::unique_ptr<PropertyParser> propertyParser = nullptr;
 
     public:
-        const std::shared_ptr<PropertyData>& getPropertyData() const;
-        void setPropertyData(const std::shared_ptr<PropertyData>& propertyData);
+        PropertyParser& getPropertyParser() {
+            if (propertyParser == nullptr) {
+                throw PropertiesNotLoaded("Property parser is not set");
+            }
+            return *propertyParser;
+        }
+
+        template<IsPropertyParser ParserType, typename... Args>
+        void setPropertyParser(Args&&... args) {
+            propertyParser = std::make_unique<ParserType>(std::forward<Args...>(args...));
+        }
     };
 }// namespace bsc
 

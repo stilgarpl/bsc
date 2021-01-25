@@ -6,10 +6,14 @@
 #define BSC_PROPERTYPARSER_H
 
 #include "PropertyParserNodeType.h"
+#include <mutex>
 #include <properties/PropertyDefinitions.h>
 namespace bsc {
     class PropertyParser {
-    private:
+    protected:
+        std::recursive_mutex mutex;
+
+    public:
         class StackKeeper {
             PropertyParser& propertyParser;
 
@@ -18,7 +22,6 @@ namespace bsc {
             virtual ~StackKeeper();
         };
 
-    public:
         /**
          * resets selected node to root node
          */
@@ -38,7 +41,7 @@ namespace bsc {
          *
          * @return true if the entry is valid
          */
-        virtual bool nextEntry() = 0;
+        virtual void nextEntry() = 0;
 
         /**
          * returns the type of the node
@@ -72,7 +75,19 @@ namespace bsc {
          * restores node from the stack, exception if stack is empty
          */
         virtual void pop() = 0;
+
+        /**
+         * returns size of current node (for sequences, but it will returns sane value for scalars too)
+         */
+        virtual std::size_t size() = 0;
+
+        virtual bool hasEntry() = 0;
+
+        friend class PropertyParserController;
     };
+
+    template<typename T>
+    concept IsPropertyParser = std::is_base_of_v<PropertyParser, T>;
 }// namespace bsc
 
 #endif
