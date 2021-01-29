@@ -8,4 +8,5 @@ More information is in pages for the specific modules
 
 ## List of modules
 * [parser](src/parser/README.md)
+* [properties](src/properties/README.md)
 * [testaid](src/testaid/README.md)
