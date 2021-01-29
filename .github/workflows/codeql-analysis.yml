@@ -64,6 +64,7 @@ jobs:
       #    uses a compiled language
 
     - run: |
+        pip install conan --user
         mkdir -p build
         cd build
         cmake .. -DBSC_USE_PACKAGE_MANAGER=ON
