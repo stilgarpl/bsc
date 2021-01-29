@@ -106,4 +106,9 @@ int main() {
 
 ```
 
-You can declare properties as fields of a class, even nest them or use container (mapped to sequences in yaml); 
+You can declare properties as fields of a class, even nest them or use container (mapped to sequences in yaml);
+
+## Todo:
+
+* Support formats other than Yaml/JSON - like INI, XML
+* Support prefixes for struct mapping (hard without reflection)
