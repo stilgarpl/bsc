@@ -99,14 +99,10 @@ namespace bsc {
                 break;
 
             case ARGP_KEY_END:
-                if (self->requiredArgumentsCount.has_value()) {
-                    if (self->requiredArgumentsCount.value() > self->rawArguments.size()) {
-                        argp_error(state,
-                                   "Arguments required: %zu, got %zu",
-                                   *self->requiredArgumentsCount,
-                                   self->rawArguments.size());
-                    }
+                if (self->requiredArgumentsCount > self->rawArguments.size()) {
+                    argp_error(state, "Arguments required: %zu, got %zu", self->requiredArgumentsCount, self->rawArguments.size());
                 }
+
                 break;
 
             case ARGP_KEY_NO_ARGS:
@@ -124,7 +120,7 @@ namespace bsc {
             default:
                 if (self->parseMap.contains(key)) {
                     try {
-                        self->parseMap[key](arg, self->parser);
+                        self->parseMap[key](arg, self->stringParser);
                     } catch (StringParseException& e) {
                         if (self->parseConfiguration == ParseConfiguration::simple) {
                             argp_error(state,
@@ -182,7 +178,7 @@ namespace bsc {
                                                               const Parser& newParser) {
         using namespace std::string_literals;
         this->parseConfiguration = configuration;
-        this->parser             = newParser;
+        this->stringParser       = newParser;
         // close argOptions:
         argpOptions.push_back({nullptr, 0, nullptr, 0, nullptr, 0});
         if (beforeInfo || afterInfo) {
@@ -229,7 +225,7 @@ namespace bsc {
     void CommandLineParameters::ArgumentParser::parseNamedArguments() {
         for (const auto& descriptor : argumentDescriptors) {
             if (descriptor.argumentIndex < rawArguments.size()) {
-                descriptor.argumentParseFunc(rawArguments[descriptor.argumentIndex], this->parser);
+                descriptor.argumentParseFunc(rawArguments[descriptor.argumentIndex], this->stringParser);
             }
         }
     }

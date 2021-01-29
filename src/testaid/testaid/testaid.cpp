@@ -4,7 +4,9 @@
 
 #include "testaid.h"
 #include <random>
+#include <thread>
 #include <utility>
+using namespace std::chrono_literals;
 
 namespace bsc::testaid {
     void createFile(const std::filesystem::path& path, const std::string& content) {
@@ -25,6 +27,14 @@ namespace bsc::testaid {
         } else {
 
             throw TestingException("file not found");
+        }
+    }
+
+    void waitFor(const std::function<bool(void)>& expression, std::chrono::milliseconds timeout) {
+
+        auto beginTime = std::chrono::steady_clock::now();
+        while (!expression() || std::chrono::steady_clock::now() - beginTime < timeout) {
+            std::this_thread::sleep_for(1ms);
         }
     }
 
@@ -61,18 +71,30 @@ namespace bsc::testaid {
 
     TestingException::TestingException(const std::string& arg) : domain_error(arg) {}
 
-    TestDirWithResources::TestDirWithResources(const fs::path& resourcesPath) {
-        if (fs::exists(resourcesPath)) {
+    TestDirWithResources::TestDirWithResources(Options options) {
+        if (fs::exists(options.resourcesPath)) {
             localResourcesPath = rootPath / "resources";
             //@todo maybe it should not copy everything, but only requested files on getResourcePath ?
-            fs::copy(resourcesPath, localResourcesPath, fs::copy_options::recursive);
+            fs::copy(options.resourcesPath, localResourcesPath, fs::copy_options::recursive);
+            //@todo extract this to new function
+            if (options.filePermissions || options.fixedFileTime) {
+                for (const auto& item : fs::recursive_directory_iterator(localResourcesPath)) {
+                    if (options.filePermissions) {
+                        fs::permissions(item.path(), *options.filePermissions);
+                    }
+                    if (options.fixedFileTime) {
+                        fs::last_write_time(item.path(), *options.fixedFileTime);
+                    }
+                }
+            }
         } else {
-            throw TestingException("Resources path does not exist : " + resourcesPath.string() +
+            throw TestingException("Resources path does not exist : " + options.resourcesPath.string() +
                                    ", current dir: " + fs::current_path().string());
         }
     }
     const fs::path& TestDirWithResources::getResourcePath() const { return localResourcesPath; }
     fs::path TestDirWithResources::getResourcePath(const fs::path& p) const { return localResourcesPath / p; }
+    TestDirWithResources::TestDirWithResources() : TestDirWithResources(Options()) {}
     Resources::Resources(fs::path resourcePath) : resourcePath(std::move(resourcePath)) {}
     const fs::path& Resources::getResourcePath() const { return resourcePath; }
     fs::path Resources::getResourcePath(const fs::path& p) const {

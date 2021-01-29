@@ -8,6 +8,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 set(TEMPLATE_PATH "${CMAKE_SOURCE_DIR}/cmake/template/")
 
 #include additional configuration
+include(${CMAKE_SOURCE_DIR}/cmake/configuration/targets.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/sanitizers.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/analyzers.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/configuration/speedup.cmake)

@@ -1,0 +1,1 @@
+message("Cmake release flag is ${CMAKE_CXX_FLAGS_RELEASE}")

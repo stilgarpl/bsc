@@ -18,6 +18,7 @@ struct TestParameters : CommandLineParameters {
             {.shortKey = 'd', .argumentName = "short", .doc = "short text", .defaultValue = "default"}};
     Parameter<std::vector<int>> vector = {{'v', "vec", "vec", "Vector of ints"}};
     Argument<int> number;
+    Parameter<std::map<int, int>> map = {{.shortKey = 'm', .longKey = "map", .argumentName = "map"}};
 };
 
 TEST_CASE("Parameters test") {
@@ -34,6 +35,7 @@ TEST_CASE("Parameters test") {
     REQUIRE(params.vector()->at(1) == 2);
     REQUIRE(params.vector()->at(2) == 7);
     REQUIRE(params.number() == 5);
+    REQUIRE(!params.map().has_value());
     REQUIRE(params.shortText() == "short");
     REQUIRE(params.defaultText() == "default");
     std::vector<std::string> expectedArguments          = {{"5"}, {"argument"}};
@@ -46,7 +48,7 @@ TEST_CASE("Parameters test") {
 TEST_CASE("Parameters test with custom parser") {
     Parser parser({.csvDelimiter = ';', .pairDelimiter = '@'});
     using namespace std::string_literals;
-    std::vector<std::string> arg = {"-f"s, "-s"s, "short"s, "-t"s, "la la"s, "-v"s, "1,2,7"s, "5"s, "argument"};
+    std::vector<std::string> arg = {"-f"s, "-s"s, "short"s, "-t"s, "la la"s, "-v"s, "1;2;7"s, "-m", "2@3;5@1;9@0", "5"s, "argument"};
     CommandLineParser silentParser{ParseConfiguration::silent, parser};
     const auto& params = silentParser.parse<TestParameters>("cmd"s, arg);
     REQUIRE(params.flag() == true);
@@ -57,6 +59,10 @@ TEST_CASE("Parameters test with custom parser") {
     REQUIRE(params.vector()->at(1) == 2);
     REQUIRE(params.vector()->at(2) == 7);
     REQUIRE(params.number() == 5);
+    REQUIRE(params.map()->size() == 3);
+    REQUIRE(params.map()->at(2) == 3);
+    REQUIRE(params.map()->at(5) == 1);
+    REQUIRE(params.map()->at(9) == 0);
     REQUIRE(params.shortText() == "short");
     REQUIRE(params.defaultText() == "default");
     std::vector<std::string> expectedArguments          = {{"5"}, {"argument"}};

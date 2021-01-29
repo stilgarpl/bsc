@@ -32,7 +32,7 @@ namespace bsc {
     public:
         const std::set<std::string> allowedValues;
 
-        ValueNotAllowed(const std::string& arg);
+        explicit ValueNotAllowed(const std::string& arg);
         ValueNotAllowed(const std::string& arg, std::remove_cvref_t<decltype(allowedValues)> a);
         ValueNotAllowed(const ValueNotAllowed&) = default;
         ValueNotAllowed(ValueNotAllowed&&)      = default;
@@ -63,18 +63,13 @@ namespace bsc {
                 std::optional<std::string> argumentName{};
             };
             std::vector<ArgumentDescriptor> argumentDescriptors{};
-            std::vector<std::string> usageDocs    = {};
-            std::optional<std::string> beforeInfo = std::nullopt;
-            std::optional<std::string> afterInfo  = std::nullopt;
-            std::optional<decltype(rawArguments)::size_type> requiredArgumentsCount;
-            Parser parser{};
+            std::vector<std::string> usageDocs                       = {};
+            std::optional<std::string> beforeInfo                    = std::nullopt;
+            std::optional<std::string> afterInfo                     = std::nullopt;
+            decltype(rawArguments)::size_type requiredArgumentsCount = 0;
+            Parser stringParser{};
 
-            void incrementRequiredArguments() {
-                if (!requiredArgumentsCount.has_value()) {
-                    requiredArgumentsCount = 0;
-                }
-                ++*requiredArgumentsCount;
-            }
+            void incrementRequiredArguments() { ++requiredArgumentsCount; }
             void parseNamedArguments();
 
         public:
@@ -85,10 +80,11 @@ namespace bsc {
             static char* helpFilter(int key, const char* text, void* input);
             auto& getParsedArguments() { return rawArguments; }
             auto getRemainingArguments() {
-                return std::span<std::string>(rawArguments.begin() + (requiredArgumentsCount ? *requiredArgumentsCount : 0),
-                                              rawArguments.end());
+                return std::span<std::string>(rawArguments.begin() + requiredArgumentsCount, rawArguments.end());
             };
             auto& getCommandName() { return commandName; }
+
+            auto getRequiredArgumentsCount() const { return requiredArgumentsCount; }
 
             friend class CommandLineParameters::ParserBuilder;
             friend class CommandLineParser;
@@ -157,9 +153,10 @@ namespace bsc {
         friend class CommandLineParser;
 
         [[nodiscard]] const std::vector<std::string>& arguments() const { return parser->getParsedArguments(); }
-        [[nodiscard]] const std::span<std::string> remainingArguments() const { return parser->getRemainingArguments(); }
+        [[nodiscard]] std::span<std::string> remainingArguments() const { return parser->getRemainingArguments(); }
+        [[nodiscard]] auto getRequiredArgumentsCount() const { return parser->getRequiredArgumentsCount(); }
 
-        const std::string& commandName() const { return parser->getCommandName(); }
+        [[nodiscard]] const std::string& commandName() const { return parser->getCommandName(); }
     };
 
     class CommandLineParser {
@@ -174,7 +171,6 @@ namespace bsc {
 
         template<ParametersClass T>
         [[nodiscard]] T parse(int argc, char* argv[]) {
-            static Parser parser;
             T t;
             t.parser->prepareParser(parseConfiguration, parser);
             t.parser->parse(argc, argv);

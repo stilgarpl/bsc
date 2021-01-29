@@ -7,6 +7,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <functional>
 
 namespace bsc {
     namespace fs = std::filesystem;
@@ -16,6 +17,8 @@ namespace bsc {
         void createFile(const fs::path& path, const std::string& content);
 
         void changeFile(const fs::path& path, const std::string& content);
+
+        void waitFor(const std::function<bool(void)>& expression, std::chrono::milliseconds timeout);
 
         std::string readFile(const fs::path& path);
 
@@ -48,7 +51,14 @@ namespace bsc {
             fs::path localResourcesPath;
 
         public:
-            explicit TestDirWithResources(const fs::path& resourcesPath = "resources");
+            struct Options {
+                fs::path resourcesPath = "resources";
+                std::optional<std::filesystem::file_time_type> fixedFileTime{};
+                std::optional<std::filesystem::perms> filePermissions{};
+            };
+
+            explicit TestDirWithResources(Options options);
+            TestDirWithResources();
             [[nodiscard]] const fs::path& getResourcePath() const;
             [[nodiscard]] fs::path getResourcePath(const fs::path& p) const;
         };

@@ -59,7 +59,11 @@ namespace bsc {
                     std::declval<T>().cbegin();
                     std::declval<T>().cend();
         };*/
+    template<typename T>
+    concept IsString = std::is_convertible_v<T, std::string>;
 
+    template<typename T>
+    concept IsClassNotString = std::is_class_v<T> && !IsString<T>;
     class StringParseException : public std::invalid_argument {
     public:
         explicit StringParseException(const std::string& arg) : invalid_argument(arg) {}

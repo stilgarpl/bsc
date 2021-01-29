@@ -10,7 +10,8 @@
 #include <sstream>
 
 namespace bsc {
-    inline std::vector<std::string> explode(std::string const& s, char delim) {
+    //@todo C++20 constexpr, when stdlib++ has it
+    inline std::vector<std::string> explode(const std::string& s, char delim) {
         std::vector<std::string> result;
         std::istringstream iss(s);
 
@@ -20,6 +21,6 @@ namespace bsc {
 
         return result;
     }
-}
+}// namespace bsc
 
 #endif //BSC_EXPLODE_H
