@@ -48,18 +48,18 @@ TEST_CASE("TestDir test") {
 }
 
 TEST_CASE("TestDirWithResources test") {
-    fs::path testPath;
+    fs::path resourcePath;
     {
         testaid::TestDirWithResources testDirWithResources;
-        testPath = testDirWithResources.getResourcePath();
-        REQUIRE(fs::exists(testPath));
-        REQUIRE(fs::exists(testPath / "testFile1.txt"));
-        REQUIRE(fs::exists(testPath / "testFile2.csv"));
-        REQUIRE(testaid::readFile(testPath / "testFile1.txt") == "jfsdkjfhds");
+        resourcePath = testDirWithResources.getResourcePath();
+        REQUIRE(fs::exists(resourcePath));
+        REQUIRE(fs::exists(resourcePath / "testFile1.txt"));
+        REQUIRE(fs::exists(resourcePath / "testFile2.csv"));
+        REQUIRE(testaid::readFile(resourcePath / "testFile1.txt") == "jfsdkjfhds");
     }
-    REQUIRE(!fs::exists(testPath));
-    REQUIRE(!fs::exists(testPath / "testFile1.txt"));
-    REQUIRE(!fs::exists(testPath / "testFile2.csv"));
+    REQUIRE(!fs::exists(resourcePath));
+    REQUIRE(!fs::exists(resourcePath / "testFile1.txt"));
+    REQUIRE(!fs::exists(resourcePath / "testFile2.csv"));
 }
 
 TEST_CASE("Resources test") {

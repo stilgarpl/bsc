@@ -1,0 +1,15 @@
+sample-property: 5
+nested:
+  property: 7
+  text: text with spaces
+stringSequence:
+  - aaa
+  - bbb
+  - ccc
+structSequence:
+  - fieldA: a1
+    fieldB: b1
+  - fieldA: a2
+    fieldB: b2
+  - fieldA: a3
+    fieldB: b3

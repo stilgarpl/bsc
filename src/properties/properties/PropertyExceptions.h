@@ -8,12 +8,17 @@
 namespace bsc {
     class InvalidPropertyKeyException : public std::domain_error {
     public:
-        InvalidPropertyKeyException(const std::string& arg);
+        explicit InvalidPropertyKeyException(const std::string& arg) : domain_error(arg) {}
     };
 
     class InvalidPropertyTypeException : public std::domain_error {
     public:
-        InvalidPropertyTypeException(const std::string& arg);
+        explicit InvalidPropertyTypeException(const std::string& arg) : domain_error(arg) {}
+    };
+
+    class PropertyContextAlreadyLoaded : public std::domain_error {
+    public:
+        explicit PropertyContextAlreadyLoaded(const std::string& arg) : domain_error(arg) {}
     };
 
 }// namespace bsc

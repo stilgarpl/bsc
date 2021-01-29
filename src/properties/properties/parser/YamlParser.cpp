@@ -86,10 +86,10 @@ namespace bsc {
         currentPath   = idStack.top().currentPath;
         idStack.pop();
     }
-    //    YamlParser::YamlParser(const fs::path& yamlFile) {
-    //        fyd           = fy_document_build_from_file(nullptr, yamlFile.c_str());
-    //        currentFyNode = fy_document_root(fyd);
-    //    }
+    YamlParser::YamlParser(const fs::path& yamlFile) {
+        root = YAML::LoadFile(yamlFile);
+        resetNode();
+    }
     YamlParser::YamlParser(const std::string& yamlText) {
         root = YAML::Load(yamlText);
         resetNode();

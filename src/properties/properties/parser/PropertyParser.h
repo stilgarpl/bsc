@@ -60,10 +60,16 @@ namespace bsc {
          * @param idSequence
          * @return value of the selected node
          */
-        PropertyValueType getValue(const PropertyIdSequence& idSequence) {
+        auto getValue(const PropertyIdSequence& idSequence) {
             StackKeeper keeper(*this);// this will restore node to state before select
             selectNode(idSequence);
             return getValue();
+        }
+
+        auto getNodeType(const PropertyIdSequence& idSequence) {
+            StackKeeper keeper(*this);// this will restore node to state before select
+            selectNode(idSequence);
+            return getNodeType();
         }
 
         /**

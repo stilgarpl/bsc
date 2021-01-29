@@ -50,6 +50,7 @@ namespace bsc {
             [[nodiscard]] bool hasValue() const { return ptr != nullptr; }
 
             bool operator==(const ContextPtr& other) const { return ptr == other.ptr; }
+            bool operator==(const std::nullptr_t& other) const { return ptr == other; }
 
             ContextPtr() = default;
             friend class Context;

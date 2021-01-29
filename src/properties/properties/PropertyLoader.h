@@ -1,20 +1,18 @@
 //
-// Created by Krzysztof Tulidowicz on 20.01.2021.
+// Created by Krzysztof Tulidowicz on 29.01.2021.
 //
 
 #ifndef BSC_PROPERTYLOADER_H
 #define BSC_PROPERTYLOADER_H
 
-#include <string>
-
+#include <context/context/Context.h>
 namespace bsc {
-
     class PropertyLoader {
+        Context::Ptr context;
 
     public:
-        //@todo refactor this into more usable interface
-        //        void loadToContext(const fs::path& path);
-        static void parseToContext(const std::string& text);
+        PropertyLoader();
+        virtual ~PropertyLoader();
     };
 }// namespace bsc
 

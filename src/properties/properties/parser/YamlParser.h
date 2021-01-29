@@ -37,7 +37,7 @@ namespace bsc {
         void push() override;
         void pop() override;
         std::size_t size() override;
-        //        YamlParser(const fs::path& yamlFile);
+        explicit YamlParser(const fs::path& yamlFile);
         explicit YamlParser(const std::string& yamlText);
     };
 }// namespace bsc

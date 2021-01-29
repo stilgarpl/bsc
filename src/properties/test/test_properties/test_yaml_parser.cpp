@@ -5,24 +5,23 @@
 #include <context/context/Context.h>
 #include <properties/Property.h>
 #include <properties/PropertyContext.h>
-#include <properties/PropertyLoader.h>
 #include <properties/parser/YamlParser.h>
 using namespace bsc;
 
 TEST_CASE("YamlParser test ") {
 
-    static const char* yaml = "invoice: 34843\n"
-                              "date   : !!str 2001-01-23\n"
-                              "bill-to: &id001\n"
-                              "    given  : Chris\n"
-                              "    family : Dumars\n"
-                              "    address:\n"
-                              "        lines: |\n"
-                              "            458 Walkman Dr.\n"
-                              "            Suite #292\n"
-                              "sequence:\n"
-                              "  -  i: t1\n"
-                              "  -  i: t2\n"
+    std::string yaml = "invoice: 34843\n"
+                       "date   : !!str 2001-01-23\n"
+                       "bill-to: &id001\n"
+                       "    given  : Chris\n"
+                       "    family : Dumars\n"
+                       "    address:\n"
+                       "        lines: |\n"
+                       "            458 Walkman Dr.\n"
+                       "            Suite #292\n"
+                       "sequence:\n"
+                       "  -  i: t1\n"
+                       "  -  i: t2\n"
                               "  -  i: t3\n"
                               "outerSequence:\n"
                               "  - innerSequence:\n"

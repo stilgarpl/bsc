@@ -15,7 +15,7 @@ namespace bsc {
         explicit PropertiesNotLoaded(const std::string& arg);
     };
 
-    class PropertyContext : public AutoContextSetter<PropertyContext> {
+    class PropertyContext final : public AutoContextSetter<PropertyContext> {
         std::unique_ptr<PropertyParser> propertyParser = nullptr;
 
     public:
@@ -30,6 +30,10 @@ namespace bsc {
         void setPropertyParser(Args&&... args) {
             propertyParser = std::make_unique<ParserType>(std::forward<Args...>(args...));
         }
+
+        bool hasPropertyParser() { return propertyParser != nullptr; }
+
+        void removePropertyParser() { propertyParser = nullptr; }
     };
 }// namespace bsc
 
