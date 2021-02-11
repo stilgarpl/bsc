@@ -3,6 +3,7 @@
 //
 
 #include <catch2/catch.hpp>
+#include <list>
 #include <parser/parameters/CommandLineParameters.h>
 
 using namespace bsc;
@@ -19,6 +20,7 @@ struct TestParameters : CommandLineParameters {
     Parameter<std::vector<int>> vector = {{'v', "vec", "vec", "Vector of ints"}};
     Argument<int> number;
     Parameter<std::map<int, int>> map = {{.shortKey = 'm', .longKey = "map", .argumentName = "map"}};
+    Arguments<std::list<std::string>> other;
 };
 
 TEST_CASE("Parameters test") {
@@ -43,6 +45,8 @@ TEST_CASE("Parameters test") {
     REQUIRE(params.arguments() == expectedArguments);
     REQUIRE(params.remainingArguments()[0] == std::span(expectedRemainingArguments)[0]);
     REQUIRE(params.remainingArguments().size() == std::span(expectedRemainingArguments).size());
+    REQUIRE(params.other().size() == 1);
+    REQUIRE(*(params.other().begin()) == "argument");
 }
 
 TEST_CASE("Parameters test with custom parser") {
@@ -70,6 +74,8 @@ TEST_CASE("Parameters test with custom parser") {
     REQUIRE(params.arguments() == expectedArguments);
     REQUIRE(params.remainingArguments()[0] == std::span(expectedRemainingArguments)[0]);
     REQUIRE(params.remainingArguments().size() == std::span(expectedRemainingArguments).size());
+    REQUIRE(params.other().size() == 1);
+    REQUIRE(*(params.other().begin()) == "argument");
 }
 
 TEST_CASE("Invalid parameters test") {

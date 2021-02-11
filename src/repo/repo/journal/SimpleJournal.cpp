@@ -6,7 +6,7 @@
 #include <core/utils/crypto.h>
 #include <utility>
 
-#include <core/log/Logger.h>
+#include <log/log/Logger.h>
 
 namespace bsc {
     ChecksumType SimpleJournal::getChecksum() const {

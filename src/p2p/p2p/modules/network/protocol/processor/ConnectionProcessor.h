@@ -6,8 +6,8 @@
 #define BSC_CONNECTIONPROCESSOR_H
 
 #include "context/context/Context.h"
-#include "core/log/Logger.h"
 #include "core/thread/Runnable.h"
+#include "log/log/Logger.h"
 #include <p2p/modules/network/protocol/filter/PacketFilter.h>
 #include <p2p/modules/network/protocol/filter/RoleFilter.h>
 #include <thread>

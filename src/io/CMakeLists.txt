@@ -2,9 +2,10 @@
 find_package(LibMagic REQUIRED)
 find_package(exiv2 REQUIRED)
 find_package(inja REQUIRED)
-find_package(fmt)
+find_package(fmt REQUIRED)
+find_package(range-v3 REQUIRED)
 
-set(SOURCE_FILES io/file/MimeFileTypeDecoder.cpp io/file/MimeFileTypeDecoder.h io/file/MimeFileType.h io/file/MimeFileType.cpp io/translator/PropertiesMetaData.cpp io/translator/PropertiesMetaData.h io/file/FileMetaDataReader.cpp io/file/FileMetaDataReader.h io/file/reader/GenericFileReader.cpp io/file/reader/GenericFileReader.h io/file/reader/FileReaderAlgorithm.h io/file/reader/ImageFileReader.cpp io/file/reader/ImageFileReader.h io/sorter/FileSorter.cpp io/sorter/FileSorter.h io/sorter/mappers/FileSorterMapper.h io/sorter/mappers/FileSorterMapper.cpp io/sorter/fetchers/FileListFetcher.h io/sorter/fetchers/FileListFetcher.cpp io/sorter/fetchers/FilesystemFileListFetcher.cpp io/sorter/fetchers/FilesystemFileListFetcher.h io/sorter/fetchers/StaticFileListFetcher.cpp io/sorter/fetchers/StaticFileListFetcher.h io/sorter/strategies/StandardFileSorterStrategies.cpp io/sorter/strategies/StandardFileSorterStrategies.h io/sorter/mappers/FileSorterMapperMatcher.h io/sorter/mappers/FileSorterMimeMatcher.cpp io/sorter/mappers/FileSorterMimeMatcher.h io/translator/PathTranslator.cpp io/translator/PathTranslator.h io/sorter/fetchers/FileListFetcher.cpp io/sorter/mappers/FileSorterNameMatcher.cpp io/sorter/mappers/FileSorterNameMatcher.h io/sorter/exceptions/FileSortingExceptions.cpp io/sorter/result/SortResult.cpp io/sorter/result/SortResult.h)
+set(SOURCE_FILES io/file/MimeFileTypeDecoder.cpp io/file/MimeFileTypeDecoder.h io/file/MimeFileType.h io/file/MimeFileType.cpp io/translator/PropertiesMetaData.cpp io/translator/PropertiesMetaData.h io/file/FileMetaDataReader.cpp io/file/FileMetaDataReader.h io/file/reader/GenericFileReader.cpp io/file/reader/GenericFileReader.h io/file/reader/FileReaderAlgorithm.h io/file/reader/ImageFileReader.cpp io/file/reader/ImageFileReader.h io/sorter/FileSorter.cpp io/sorter/FileSorter.h io/sorter/mappers/FileSorterMapper.h io/sorter/mappers/FileSorterMapper.cpp io/sorter/fetchers/FileListFetcher.h io/sorter/fetchers/FileListFetcher.cpp io/sorter/fetchers/FilesystemFileListFetcher.cpp io/sorter/fetchers/FilesystemFileListFetcher.h io/sorter/fetchers/StaticFileListFetcher.cpp io/sorter/fetchers/StaticFileListFetcher.h io/sorter/strategies/StandardFileSorterStrategies.cpp io/sorter/strategies/StandardFileSorterStrategies.h io/sorter/mappers/FileSorterMapperMatcher.h io/sorter/mappers/FileSorterMimeMatcher.cpp io/sorter/mappers/FileSorterMimeMatcher.h io/translator/PathTranslator.cpp io/translator/PathTranslator.h io/sorter/fetchers/FileListFetcher.cpp io/sorter/mappers/FileSorterNameMatcher.cpp io/sorter/mappers/FileSorterNameMatcher.h io/sorter/exceptions/FileSortingExceptions.cpp io/sorter/result/SortResult.cpp io/sorter/result/SortResult.h io/sorter/fetchers/StandardFileListFetcherConstraints.cpp io/sorter/fetchers/StandardFileListFetcherConstraints.h)
 
 add_library(io ${SOURCE_FILES})
 target_include_directories(io PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:${BSC_DESTINATION_INCLUDE}>)
@@ -15,7 +16,7 @@ if (BSC_USE_PCH)
 endif ()
 install(DIRECTORY io DESTINATION ${BSC_DESTINATION_INCLUDE}
         FILES_MATCHING PATTERN "*.h")
-target_link_libraries(io PUBLIC LibMagic::LibMagic core exiv2 parser fmt::fmt-header-only)
+target_link_libraries(io PUBLIC LibMagic::LibMagic core exiv2 parser fmt::fmt-header-only range-v3::range-v3)
 install(TARGETS io COMPONENT io DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)
 if (BSC_ENABLE_TESTS)
     add_subdirectory(test)

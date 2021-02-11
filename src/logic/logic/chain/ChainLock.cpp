@@ -2,9 +2,8 @@
 // Created by Krzysztof Tulidowicz on 21.03.19.
 //
 
-#include <core/log/Logger.h>
 #include "ChainLock.h"
-
+#include <log/log/Logger.h>
 
 using namespace std::chrono_literals;
 

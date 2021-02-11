@@ -5,11 +5,10 @@
 #ifndef BSC_REPOEVALUATORS_H
 #define BSC_REPOEVALUATORS_H
 
-
-#include <core/log/Logger.h>
-#include <repo/repository/network/RepoQuery.h>
+#include <log/log/Logger.h>
 #include <p2p/core/node/context/NodeContext.h>
 #include <repo/node/RepoModule.h>
+#include <repo/repository/network/RepoQuery.h>
 
 namespace bsc {
 

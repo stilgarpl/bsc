@@ -2,8 +2,8 @@
 // Created by Krzysztof Tulidowicz on 16.04.2020.
 //
 
-#include <core/log/Logger.h>
 #include <exiv2/exiv2.hpp>
+#include <log/log/Logger.h>
 #include <parser/parser/explode.h>
 #include <regex>
 

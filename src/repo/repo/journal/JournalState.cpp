@@ -2,8 +2,8 @@
 // Created by Krzysztof Tulidowicz on 17.10.17.
 //
 #include <Poco/Environment.h>
-#include <core/log/Logger.h>
 #include <core/utils/crypto.h>
+#include <log/log/Logger.h>
 
 #include "JournalState.h"
 #include <utility>

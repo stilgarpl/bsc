@@ -3,8 +3,8 @@
 //
 
 #include "PathTranslator.h"
-#include <core/log/Logger.h>
 #include <inja/inja.hpp>
+#include <log/log/Logger.h>
 
 namespace bsc {
     namespace detail {}// namespace detail

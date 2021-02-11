@@ -6,7 +6,7 @@
 #define BSC_COMMONEVALUATORS_H
 
 #include <context/context/Context.h>
-#include <core/log/Logger.h>
+#include <log/log/Logger.h>
 #include <logic/common/ForeachContext.h>
 
 namespace bsc {

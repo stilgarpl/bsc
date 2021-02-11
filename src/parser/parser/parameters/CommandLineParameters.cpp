@@ -69,15 +69,18 @@ namespace bsc {
         }
     }
 
-    void CommandLineParameters::ParserBuilder::addUsage(std::string usage) {
-        parser->usageDocs.push_back(std::move(usage));
-    }
+    void CommandLineParameters::ParserBuilder::addUsage(std::string usage) { parser->usageDocs.push_back(std::move(usage)); }
     void CommandLineParameters::ParserBuilder::addArgument(ArgumentParser::ArgumentParseFunc parserFunction,
                                                            std::optional<std::string> argumentName) {
         parser->argumentDescriptors.push_back({.argumentParseFunc = std::move(parserFunction),
                                                .argumentIndex     = parser->argumentDescriptors.size(),
                                                .argumentName      = std::move(argumentName)});
         parser->incrementRequiredArguments();
+    }
+
+    void CommandLineParameters::ParserBuilder::addArguments(ArgumentParser::ArgumentsParseFunc parserFunction,
+                                                            std::optional<std::string> argumentName) {
+        parser->argumentsDescriptors.push_back({.argumentsParseFunc = std::move(parserFunction), .argumentName = std::move(argumentName)});
     }
 
     error_t CommandLineParameters::ArgumentParser::parseArgument(int key, char* arg, struct argp_state* state) {
@@ -224,14 +227,20 @@ namespace bsc {
     }
     void CommandLineParameters::ArgumentParser::parseNamedArguments() {
         for (const auto& descriptor : argumentDescriptors) {
+            //@todo handle argument index > raw.size()
             if (descriptor.argumentIndex < rawArguments.size()) {
                 descriptor.argumentParseFunc(rawArguments[descriptor.argumentIndex], this->stringParser);
             }
+        }
+
+        for (const auto& descriptor : argumentsDescriptors) {
+            descriptor.argumentsParseFunc(this->getRemainingArguments(), this->stringParser);
         }
     }
     void CommandLineParameters::ArgumentParser::prepareArgumentUsage() {
         static const std::string defaultArgumentName = "ARG#";
         std::string usageString{};
+        //@todo format parameters, instead of building string manually with " "
         for (const auto& descriptor : argumentDescriptors) {
             if (descriptor.argumentName.has_value()) {
                 usageString += *descriptor.argumentName;
@@ -240,7 +249,14 @@ namespace bsc {
             }
             usageString += " ";
         }
-        if (usageString.size() > 1) usageString.pop_back();
+        for (const auto& descriptor : argumentsDescriptors) {
+            if (descriptor.argumentName.has_value()) {
+                usageString += *descriptor.argumentName;
+            }
+            usageString += " ";
+        }
+
+        if (usageString.size() > 1) usageString.pop_back();// remove last space
         usageDocs.insert(usageDocs.begin(), usageString);
     }
 

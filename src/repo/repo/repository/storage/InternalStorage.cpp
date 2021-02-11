@@ -2,8 +2,8 @@
 // Created by Krzysztof Tulidowicz on 10.12.17.
 //
 
-#include <core/log/Logger.h>
 #include <core/utils/crypto.h>
+#include <log/log/Logger.h>
 #include <p2p/modules/filesystem/FilesystemModule.h>
 
 #include <utility>

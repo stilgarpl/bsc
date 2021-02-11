@@ -6,7 +6,7 @@
 #include "p2p/core/node/module/NodeModule.h"
 #include <core/factory/FactoryContext.h>
 #include <core/io/InputOutputContext.h>
-#include <core/log/LoggerContext.h>
+#include <log/log/LoggerContext.h>
 #include <p2p/core/node/context/NodeContext.h>
 
 #include <utility>
@@ -57,7 +57,7 @@ bsc::Node::Node()
     : nodeConfiguration(std::move(configuration)) {
     LOGGER("configuration node constructor")
     nodeContext->set<NodeContext, Node&, NodeInfo&>(*this, this->thisNodeInfo);
-    nodeContext->set<LoggerContext>([&] { return thisNodeInfo.getNodeId(); });
+    nodeContext->get<LoggerContext>()->setInstanceFetcher([&] { return thisNodeInfo.getNodeId(); });
     nodeContext->setDirect<InputOutputContext>(std::make_shared<StandardInputOutputContext>());
 
     // this creates common context for role definitions across the entire node.

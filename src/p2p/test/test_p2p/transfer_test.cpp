@@ -4,8 +4,9 @@
 
 #include <catch2/catch.hpp>
 #include <p2p/core/node/Node.h>
-#include <p2p/modules/filesystem/FilesystemModule.h>
 #include <p2p/modules/basic/BasicModule.h>
+#include <p2p/modules/filesystem/FilesystemModule.h>
+#include <testaid/testaid.h>
 
 using namespace bsc;
 
@@ -85,6 +86,7 @@ TEST_CASE("Transfer test") {
     INFO("testing require")
     REQUIRE(connectedToSecond);
     std::this_thread::sleep_for(200ms);
+    testaid::waitFor([&]() { return remoteSecondNode.getNodeId().has_value(); }, 500ms);
     bool hasNodeId = remoteSecondNode.getNodeId().has_value();
     REQUIRE(hasNodeId);
     auto realNodeId = *remoteSecondNode.getNodeId();

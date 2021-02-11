@@ -12,28 +12,41 @@
 using namespace bsc;
 using namespace std::string_literals;
 
-int main(int argc, char* argv[]) {
-    auto context = Context::makeContext();
-    Context::setActiveContext(context);
-    //@todo move actionFactory setup somewhere else
+auto makeActionFactory() {
     static FileSortingStrategyFactories::SortStrategyFactory actionFactory;
     actionFactory.registerCreator("copy", StandardFileSorterSortStrategies::copy);
     actionFactory.registerCreator("move", StandardFileSorterSortStrategies::move);
     actionFactory.registerCreator("pretend", StandardFileSorterSortStrategies::pretend);
+    return actionFactory;
+}
+
+auto makeErrorActionFactory() {
     static FileSortingStrategyFactories::ErrorActionFactory errorActionFactory;
     errorActionFactory.registerCreator("ignore", StandardFileSorterErrorHandlers::ignore);
     errorActionFactory.registerCreator("continue", StandardFileSorterErrorHandlers::logAndContinue);
     errorActionFactory.registerCreator("stop", StandardFileSorterErrorHandlers::stop);
+    return errorActionFactory;
+}
+
+auto makeFileExistsFactory() {
     static FileSortingStrategyFactories::CreateValidTargetPathStrategyFactory fileExistsFactory;
     fileExistsFactory.registerCreator("overwrite", StandardCreateValidTargetPathStrategies::overwrite);
     fileExistsFactory.registerCreator("skip", StandardCreateValidTargetPathStrategies::skip);
     fileExistsFactory.registerCreator("abort", StandardCreateValidTargetPathStrategies::abort);
     //@todo maybe rename should be renamed to "addSuffix", because that's what it does. rename could be added as search-and-replace regex
     fileExistsFactory.registerCreator("rename", StandardCreateValidTargetPathStrategies::rename);
+    return fileExistsFactory;
+}
 
+int main(int argc, char* argv[]) {
+    auto context = Context::makeContext();
+    Context::setActiveContext(context);
+    static FileSortingStrategyFactories::SortStrategyFactory actionFactory                      = makeActionFactory();
+    static FileSortingStrategyFactories::ErrorActionFactory errorActionFactory                  = makeErrorActionFactory();
+    static FileSortingStrategyFactories::CreateValidTargetPathStrategyFactory fileExistsFactory = makeFileExistsFactory();
     //@todo add way to list available strategies in help
     struct FileSorterParameters : CommandLineParameters {
-        Argument<std::filesystem::path> targetPath                        = {"PATH"};
+        Arguments<std::vector<std::filesystem::path>> targetPath          = {"PATHS..."};
         DefaultParameter<std::map<std::string, std::string>> mimeMatchers = {
                 {.shortKey = 'm', .longKey = "mime", .argumentName = "mimetype=PATTERN", .doc = "Pair of mime type and path pattern"}};
         DefaultParameter<std::map<std::string, std::string>> nameMatchers = {

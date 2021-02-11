@@ -6,8 +6,8 @@
 #define BSC_IEVENT_H
 
 #include <context/context/Context.h>
-#include <core/log/Logger.h>
 #include <core/signal/DefaultExecutionPolicy.h>
+#include <log/log/Logger.h>
 
 namespace bsc {
     template<typename idType>

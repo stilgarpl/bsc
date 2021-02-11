@@ -3,8 +3,8 @@
 //
 
 #include "StandardFileSorterStrategies.h"
-#include <core/log/Logger.h>
 #include <fmt/format.h>
+#include <log/log/Logger.h>
 
 #include <core/text/TextUtils.h>
 #include <parser/parser/fromString.h>

@@ -4,8 +4,8 @@
 
 #include "MimeFileTypeDecoder.h"
 //@todo if IO don't need logger, I can drop core dependency on io
-#include <core/log/Logger.h>
 #include <fmt/format.h>
+#include <log/log/Logger.h>
 #include <magic.h>
 #include <mutex>
 

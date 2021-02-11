@@ -2,9 +2,9 @@
 // Created by Krzysztof Tulidowicz on 04.11.18.
 //
 
-#include <regex>
-#include <core/log/Logger.h>
 #include "TmpRule.h"
+#include <log/log/Logger.h>
+#include <regex>
 namespace bsc {
     JournalPathType TmpRule::transformToJournalFormat(fs::path path) {
 //    LOGGER("tmprule ToJ " + path.string())

@@ -3,14 +3,15 @@
 //
 
 #include "FileSorter.h"
-#include <core/log/Logger.h>
 #include <fmt/format.h>
 #include <io/file/FileMetaDataReader.h>
 #include <io/file/MimeFileTypeDecoder.h>
 #include <io/translator/PathTranslator.h>
 #include <iostream>
+#include <log/log/Logger.h>
+#include <range/v3/to_container.hpp>
 namespace bsc {
-    SortResult FileSorter::sort(const fs::path& pathToSort) {
+    SortResult FileSorter::sort(const std::vector<fs::path>& pathsToSort) {
         SortResult sortResult;
         using namespace std::string_literals;
         try {
@@ -18,7 +19,18 @@ namespace bsc {
             PathTranslator translator;
             MimeFileTypeDecoder decoder;
             //@todo get global properties
-            auto fileList = fileListFetcher->listFiles(pathToSort);
+            std::vector<fs::path> fileList;
+
+            for (const auto& path : pathsToSort) {
+                auto list = fileListFetcher->listFiles(path);
+                for (const auto& item : list) {
+                    fileList.push_back(item);
+                }
+            }
+            //                        auto fileList1 = pathsToSort | std::ranges::views::transform([&](const auto& path) {
+            //                                return fileListFetcher->listFiles(path);
+            //                            }) | std::views::join | std::ranges::sort | std::ranges::unique |
+            //                            ranges::to<std::vector<fs::path>>();
             std::ranges::sort(fileList);
             for (const auto& file : fileList) {
                 //@todo this could probably be done in parallel

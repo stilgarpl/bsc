@@ -7,8 +7,8 @@
 
 #include "StateMachine.h"
 #include "StateObserver.h"
-#include <core/log/Logger.h>
 #include <core/thread/ThreadQueueProcessor.h>
+#include <log/log/Logger.h>
 #include <logic/context/LogicContext.h>
 #include <logic/sources/LogicStateSource.h>
 

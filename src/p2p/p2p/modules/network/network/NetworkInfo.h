@@ -6,8 +6,8 @@
 #define BSC_NETWORKINFO_H
 
 #include "RemoteNodeInfo.h"
-#include "core/log/Logger.h"
 #include "core/utils/cereal_include.h"
+#include "log/log/Logger.h"
 #include <list>
 
 #include <optional>

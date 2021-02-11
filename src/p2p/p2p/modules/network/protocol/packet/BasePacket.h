@@ -5,12 +5,9 @@
 #ifndef BSC_BASEPACKET_H
 #define BSC_BASEPACKET_H
 
-
-
-
-#include <p2p/modules/network/protocol/enum/Status.h>
 #include <core/utils/cereal_include.h>
-#include <core/log/Logger.h>
+#include <log/log/Logger.h>
+#include <p2p/modules/network/protocol/enum/Status.h>
 
 #include <context/context/Context.h>
 #include <p2p/core/role/Roles.h>

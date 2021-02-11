@@ -7,14 +7,13 @@
 #ifndef BSC_REPOSITORY_H
 #define BSC_REPOSITORY_H
 
-
 #include "IRepository.h"
 #include "RepositoryAttributes.h"
 #include "RepositoryFileMap.h"
 #include "RepositoryManipulator.h"
 #include <core/factory/FactoryContext.h>
-#include <core/log/Logger.h>
 #include <core/utils/crypto.h>
+#include <log/log/Logger.h>
 #include <repo/journal/SimpleJournal.h>
 #include <repo/repository/storage/IStorage.h>
 #include <repo/repository/storage/StorageFactorySpecialization.h>

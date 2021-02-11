@@ -5,9 +5,7 @@
 #ifndef BSC_TRIGGEREVALUATORS_H
 #define BSC_TRIGGEREVALUATORS_H
 
-
-#include <core/log/Logger.h>
-
+#include <log/log/Logger.h>
 
 namespace bsc {
     struct TriggerEvaluators {

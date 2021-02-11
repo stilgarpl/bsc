@@ -45,7 +45,8 @@ namespace bsc {
         class ArgumentParser {
         public:
             using OptionParseFunc   = std::function<void(const char*, Parser&)>;
-            using ArgumentParseFunc = std::function<void(const std::string&, Parser&)>;
+            using ArgumentParseFunc  = std::function<void(const std::string&, Parser&)>;
+            using ArgumentsParseFunc = std::function<void(const std::span<std::string>&, Parser&)>;
 
         private:
             std::vector<argp_option> argpOptions{};
@@ -63,8 +64,13 @@ namespace bsc {
                 std::optional<std::string> argumentName{};
             };
             std::vector<ArgumentDescriptor> argumentDescriptors{};
-            std::vector<std::string> usageDocs    = {};
-            std::optional<std::string> beforeInfo = std::nullopt;
+            struct ArgumentsDescriptor {
+                ArgumentsParseFunc argumentsParseFunc{};
+                std::optional<std::string> argumentName{};
+            };
+            std::vector<ArgumentsDescriptor> argumentsDescriptors{};
+            std::vector<std::string> usageDocs                       = {};
+            std::optional<std::string> beforeInfo                    = std::nullopt;
             std::optional<std::string> afterInfo                     = std::nullopt;
             decltype(rawArguments)::size_type requiredArgumentsCount = 0;
             Parser stringParser{};
@@ -112,8 +118,8 @@ namespace bsc {
             void addUsage(std::string usage);
 
             void addDoc(std::string doc);
-            void addArgument(ArgumentParser::ArgumentParseFunc parserFunction,
-                             std::optional<std::string> argumentName = std::nullopt);
+            void addArgument(ArgumentParser::ArgumentParseFunc parserFunction, std::optional<std::string> argumentName = std::nullopt);
+            void addArguments(ArgumentParser::ArgumentsParseFunc parserFunction, std::optional<std::string> argumentName = std::nullopt);
 
             std::shared_ptr<ArgumentParser> make();
 
@@ -142,6 +148,8 @@ namespace bsc {
         friend class Group;
         template<typename T>
         friend class Argument;
+        template<IsContainerNotString T, typename ValueType>
+        friend class Arguments;
         friend class Usage;
 
         friend class Doc;
@@ -483,6 +491,39 @@ namespace bsc {
         Argument(const std::string& name) {
             auto& builder = CommandLineParameters::parserBuilder();
             builder.addArgument(makeParseFunction(), name);
+        }
+
+        const auto& operator()() const { return *this->value; }
+    };
+
+    /**
+     * Named argument from command line
+     */
+    template<IsContainerNotString T, typename ValueType = typename T::value_type>
+    class Arguments {
+    private:
+        std::optional<T> value;
+        CommandLineParameters::ArgumentParser::ArgumentsParseFunc makeParseFunction() {
+            return [this](const std::span<std::string>& text, Parser& parser) {
+                // this if is probably not necessary, it will be a bug to call it more than once.
+                if (!value) {
+                    value.emplace();
+                    for (const auto& item : text) {
+                        value->insert(value->end(), parser.fromString<ValueType>(item));
+                    }
+                }
+            };
+        }
+
+    public:
+        Arguments() {
+            auto& builder = CommandLineParameters::parserBuilder();
+            builder.addArguments(makeParseFunction());
+        }
+
+        Arguments(const std::string& name) {
+            auto& builder = CommandLineParameters::parserBuilder();
+            builder.addArguments(makeParseFunction(), name);
         }
 
         const auto& operator()() const { return *this->value; }

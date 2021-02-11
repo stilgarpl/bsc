@@ -9,7 +9,7 @@
 #include "RoleInvalidException.h"
 #include "RoleScope.h"
 #include <context/context/Context.h>
-#include <core/log/Logger.h>
+#include <log/log/Logger.h>
 
 namespace bsc {
     class Roles {

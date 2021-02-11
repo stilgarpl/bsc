@@ -5,7 +5,7 @@
 #ifndef BSC_EVENTQUEUESOURCE_H
 #define BSC_EVENTQUEUESOURCE_H
 
-#include <core/log/Logger.h>
+#include <log/log/Logger.h>
 #include <logic/ISource.h>
 #include <queue>
 

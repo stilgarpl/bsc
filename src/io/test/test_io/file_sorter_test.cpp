@@ -5,6 +5,7 @@
 #include <catch2/catch.hpp>
 #include <io/sorter/FileSorter.h>
 #include <io/sorter/fetchers/FilesystemFileListFetcher.h>
+#include <io/sorter/fetchers/StandardFileListFetcherConstraints.h>
 #include <io/sorter/fetchers/StaticFileListFetcher.h>
 #include <io/sorter/mappers/FileSorterMapper.h>
 #include <io/sorter/mappers/FileSorterMimeMatcher.h>
@@ -266,7 +267,7 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "test.png"));
         REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
-        const auto& result = fileSorter.sort(resourcePath);
+        const auto& result = fileSorter.sort({resourcePath});
         REQUIRE(result.getSortedFiles().size() == 3);
         REQUIRE(fs::exists(destinationPath / "Images"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2021" / "test.gif"));
@@ -287,7 +288,7 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "test.png"));
         REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
-        const auto& result = fileSorter.sort(resourcePath);
+        const auto& result = fileSorter.sort({resourcePath});
         REQUIRE(result.getSortedFiles().size() == 4);
         REQUIRE(fs::exists(destinationPath / "Images"));
         //@todo replace "2020" with current year, "2020" in png stays, it's taken from exif
@@ -300,7 +301,7 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
         SECTION("second sort should end with error") {
-            const auto& result = fileSorter.sort(resourcePath);
+            const auto& result = fileSorter.sort({resourcePath});
             REQUIRE(result.getSortedFiles().size() == 0);
         }
     }
@@ -353,5 +354,85 @@ TEST_CASE("Target strategy test ") {
     SECTION("abort") {
         const auto& action = StandardCreateValidTargetPathStrategies::abort;
         REQUIRE_THROWS_AS(action(testGif, predicate), FileSortingException);
+    }
+}
+
+TEST_CASE("Matchers test") {
+    SECTION("is") {
+        auto isBb = StandardFileListFetcherConstraints::is("bb");
+        REQUIRE(isBb("bb") == true);
+        REQUIRE(isBb("") == false);
+        REQUIRE(isBb("aa") == false);
+    }
+
+    SECTION("time") {
+        using namespace std::chrono_literals;
+        auto now    = std::chrono::steady_clock::now();
+        auto past   = now - 1h;
+        auto future = now + 1h;
+        SECTION("before") {
+            auto isBefore = StandardFileListFetcherConstraints::before(now);
+            REQUIRE(isBefore(past) == true);
+            REQUIRE(isBefore(future) == false);
+        }
+        SECTION("after") {
+            auto isAfter = StandardFileListFetcherConstraints::after(now);
+            REQUIRE(isAfter(past) == false);
+            REQUIRE(isAfter(future) == true);
+        }
+    }
+}
+
+TEST_CASE("Constraints test") {
+
+    fs::path testPath    = "/test/path";
+    fs::path otherPath   = "/test/path/1";
+    fs::path testPathExt = "/test/path.exe";
+    SECTION("path") {
+        auto con = StandardFileListFetcherConstraints::path([testPath](const auto& p) { return p == testPath; });
+        REQUIRE(con(testPath) == true);
+        REQUIRE(con(otherPath) == false);
+    }
+
+    SECTION("filename") {
+        auto con = StandardFileListFetcherConstraints::filename([testPath](const auto& p) { return p == "path"; });
+        REQUIRE(con(testPath) == true);
+        REQUIRE(con(otherPath) == false);
+    }
+
+    SECTION("extension") {
+        auto con = StandardFileListFetcherConstraints::extension([testPath](const auto& p) { return p == ".exe"; });
+        REQUIRE(con(testPathExt) == true);
+        REQUIRE(con(otherPath) == false);
+    }
+
+    SECTION("date") {
+        testaid::TestDirWithResources testDirWithResources;
+        auto realPath = testDirWithResources.getResourcePath("sort") / "test.gif";
+        auto con      = StandardFileListFetcherConstraints::date([realPath](const auto& p) { return p == fs::last_write_time(realPath); });
+        REQUIRE(con(realPath) == true);
+    }
+}
+
+#include <experimental/source_location>
+
+TEST_CASE("Matchers and constraints test") {
+    using namespace StandardFileListFetcherConstraints;
+    SECTION("path - is ") {
+        fs::path testPath  = "/test/path";
+        fs::path otherPath = "/test/path/1";
+        auto p             = path(is(testPath));
+        REQUIRE(p(testPath) == true);
+        REQUIRE(p(otherPath) == false);
+    }
+
+    SECTION("date - before ") {
+        using namespace std::chrono_literals;
+        testaid::TestDirWithResources testDirWithResources;
+        auto realPath = testDirWithResources.getResourcePath("sort") / "test.gif";
+        auto p1       = date(before(fs::last_write_time(realPath) + 1h));
+        auto p2       = date(before(fs::last_write_time(realPath) - 1h));
+        REQUIRE(p1(realPath) == true);
+        REQUIRE(p2(realPath) == false);
     }
 }

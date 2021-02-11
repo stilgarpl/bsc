@@ -5,11 +5,9 @@
 #ifndef BSC_ROLEDEFINITIONS_H
 #define BSC_ROLEDEFINITIONS_H
 
-
-#include <core/uber/Uber.h>
-#include <core/log/Logger.h>
 #include "Role.h"
-
+#include <core/uber/Uber.h>
+#include <log/log/Logger.h>
 
 namespace bsc {
     class RoleDefinitions {

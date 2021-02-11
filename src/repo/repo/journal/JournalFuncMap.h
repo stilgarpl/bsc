@@ -8,9 +8,9 @@
 #include "JournalStateEntry.h"
 #include "JournalTarget.h"
 #include "JournalTypes.h"
-#include <core/log/Logger.h>
 #include <core/uber/Uber.h>
 #include <functional>
+#include <log/log/Logger.h>
 #include <map>
 
 namespace bsc {

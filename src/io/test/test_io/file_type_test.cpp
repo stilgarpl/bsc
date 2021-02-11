@@ -1,12 +1,12 @@
 //
 // Created by Krzysztof Tulidowicz on 09.04.2020.
 //
-#include <testaid/testaid.h>
 #include <catch2/catch.hpp>
-#include <core/log/Logger.h>
 #include <io/file/FileMetaDataReader.h>
 #include <io/file/MimeFileType.h>
 #include <io/file/MimeFileTypeDecoder.h>
+#include <log/log/Logger.h>
+#include <testaid/testaid.h>
 
 using namespace bsc;
 using namespace std::string_literals;

@@ -5,22 +5,22 @@
 #ifndef BSC_LOGGERCONTEXT_H
 #define BSC_LOGGERCONTEXT_H
 
-
+#include <context/context/AutoContextSetter.h>
 #include <functional>
 #include <optional>
 #include <string>
 
 namespace bsc {
-    class LoggerContext {
+    class LoggerContext : public AutoContextSetter<LoggerContext> {
 
     private:
         std::function<std::string(void)> instanceFetcher;
 
     public:
-        LoggerContext(std::function<std::string()> instanceFetcher);
+        void setInstanceFetcher(const std::function<std::string(void)>& instanceFetcher);
 
         std::string getInstance();
-
+        LoggerContext();
     };
 }
 

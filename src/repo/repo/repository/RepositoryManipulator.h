@@ -5,10 +5,9 @@
 #ifndef BSC_REPOSITORYMANIPULATOR_H
 #define BSC_REPOSITORYMANIPULATOR_H
 
-
 #include "RepositoryFileMap.h"
-#include <core/log/Logger.h>
 #include <filesystem>
+#include <log/log/Logger.h>
 
 namespace bsc {
     namespace fs = std::filesystem;

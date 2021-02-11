@@ -8,13 +8,12 @@
 #include <vector>
 #include <memory>
 
-#include <list>
-#include <algorithm>
-#include <core/log/Logger.h>
-#include <iostream>
 #include "IDependency.h"
 #include "IDependencyManaged.h"
-
+#include <algorithm>
+#include <iostream>
+#include <list>
+#include <log/log/Logger.h>
 
 namespace bsc {
     class DependencyManager {

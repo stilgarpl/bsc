@@ -5,7 +5,7 @@
 #ifndef BSC_STATEOBSERVER_H
 #define BSC_STATEOBSERVER_H
 
-#include <core/log/Logger.h>
+#include <log/log/Logger.h>
 #include <memory>
 #include <mutex>
 

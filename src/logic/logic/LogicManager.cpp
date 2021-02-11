@@ -1,7 +1,7 @@
 //
 // Created by Krzysztof Tulidowicz on 25.08.17.
 //
-#include <core/log/Logger.h>
+#include <log/log/Logger.h>
 #include <logic/context/LogicContext.h>
 
 void bsc::LogicManager::onStop() {

@@ -8,8 +8,8 @@
 #include <atomic>
 #include <condition_variable>
 #include <context/context/Context.h>
-#include <core/log/Logger.h>
 #include <functional>
+#include <log/log/Logger.h>
 #include <memory>
 #include <mutex>
 #include <queue>
