@@ -16,7 +16,7 @@
 //    fname = this->filenameFromId(id);
 //    fs::path filePath = getConfigPath() / fname;
 //    fs::create_directories(filePath.parent_path());
-//    LOGGER(filePath);
+//    logger.debug(filePath);
 //    std::ofstream os(filePath);
 //    cereal::XMLOutputArchive archive(os);
 //    archive << config;

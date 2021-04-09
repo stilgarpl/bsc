@@ -57,8 +57,8 @@ template<typename T, typename ... Args>
         void checkAndAddModules() {
             if (!node.hasModule<T1>()) {
                 node.addModule<T1>();
-            LOGGER(std::string("MODULE NOT FOUND, ADDING MODULE") + typeid(T1).name());
-        }
+                logger.debug(std::string("MODULE NOT FOUND, ADDING MODULE") + typeid(T1).name());
+            }
         if constexpr (sizeof...(Args1) > 0) {
             checkAndAddModules<Args1...>();
         }
@@ -98,12 +98,12 @@ public:
     void loadConfiguration() override {
         auto loaded = node.getConfigurationManager().template load<typename T::Configuration>(
                 this->getModuleId());
-        LOGGER(std::string("Checking configuration for class: ") + typeid(T).name());
+        logger.debug(std::string("Checking configuration for class: ") + typeid(T).name());
         if (loaded) {
             configuration() = *loaded;
-            LOGGER("Configuration found, loading")
+            logger.debug("Configuration found, loading");
         } else {
-            LOGGER("Failed to load configuration")
+            logger.debug("Failed to load configuration");
         }
     }
 };

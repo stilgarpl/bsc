@@ -11,18 +11,18 @@ namespace bsc {
 
     std::function<RepoQuery::Response::Ptr(RepoQuery::Request::Ptr)> RepoProcessors::queryProcessor = [](
             const RepoQuery::Request::Ptr& ptr) {
-        LOGGER("Repo Query Processor")
-        auto repoMod = bsc::NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
+                logger.debug("Repo Query Processor");
+                auto repoMod = bsc::NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
         auto repo = repoMod->findRepository(ptr->getRepoId());
         RepoQuery::Response::Ptr res = RepoQuery::Response::getNew();
         res->setRepoId(ptr->getRepoId());
         if (repo != nullptr) {
-            LOGGER("repo isn't null")
+            logger.debug("repo isn't null");
             res->setExists(true);
             res->setJournal(repo->getJournal());
         } else {
             res->setExists(false);
-            LOGGER("repo is null")
+            logger.debug("repo is null");
         }
         return res;
     };

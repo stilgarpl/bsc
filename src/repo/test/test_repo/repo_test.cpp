@@ -197,7 +197,7 @@ TEST_CASE("Repo module test") {
     thisRepoMod->downloadRemoteRepository("second", "test");
     REQUIRE(thisRepoMod->findRepository("test") != nullptr);
     thisRepoMod->selectRepository("test");
-    LOGGER("deplying files")
+    logger.debug("deplying files");
     thisRepoMod->deployAllFiles();
 
     REQUIRE(fs::exists(testPath));

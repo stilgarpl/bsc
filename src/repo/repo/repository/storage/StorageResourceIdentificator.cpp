@@ -43,15 +43,15 @@ namespace bsc {
     }
 
     bool StorageResourceIdentificator::exists() {
-        LOGGER("storage resource exists")
+        logger.debug("storage resource exists");
         auto repoModule = bsc::NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
         auto storage = repoModule->findStorage(storageId);
         if (storage != nullptr) {
-            LOGGER("storage isn't null")
-            LOGGER(storage->getResourcePath(objectId).string());
+            logger.debug("storage isn't null");
+            logger.debug(storage->getResourcePath(objectId).string());
             return fs::exists(storage->getResourcePath(objectId));
         } else {
-            LOGGER("storage is null")
+            logger.debug("storage is null");
             return false;
         }
     }

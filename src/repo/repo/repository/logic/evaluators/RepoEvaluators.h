@@ -17,7 +17,7 @@ namespace bsc {
 
         //@todo actual parameter types, this isn't auto, it's SpecificPacket Repo Query Response.
         static constexpr auto newJournalFromRepoQueryResponse = [](auto e) {
-            LOGGER("newJournalFromRepoQueryResponse event")
+            logger.debug("newJournalFromRepoQueryResponse event");
             //@todo error handling
 
             return e.getPacket()->getJournal();
@@ -25,14 +25,14 @@ namespace bsc {
 
         //@todo actual parameter types, this isn't auto, it's SpecificPacket Repo Query Response.
         static constexpr auto currentJournalFromRepoQueryResponse = [](auto e) {
-            LOGGER("currentJournalFromRepoQueryResponse event")
+            logger.debug("currentJournalFromRepoQueryResponse event");
             //@todo error handling.
             return bsc::NodeContext::getNodeFromActiveContext().getModule<RepoModule>()->findRepository(
                     e.getPacket()->getRepoId())->getJournal();
         };
 
         static constexpr auto getRepoId = [](const auto& e) {
-            LOGGER("currentJournalFromRepoQueryResponse event")
+            logger.debug("currentJournalFromRepoQueryResponse event");
             //@todo error handling.
             return e.getPacket()->getRepoId();
         };

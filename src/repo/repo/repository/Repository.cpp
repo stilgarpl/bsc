@@ -77,12 +77,12 @@ namespace bsc {
         const auto& fileMap = fileMapRenderer.renderMap(journal);
         for (const auto& [path, attributes] : fileMap) {
             if (attributes) {
-                LOGGER("restoring path " + path.string())
-                manipulator.restoreFileFromStorage(path,attributes);
+                logger.debug("restoring path " + path.string());
+                manipulator.restoreFileFromStorage(path, attributes);
                 deployMap.markDeployed(path, DeployState::deployed);
                 manipulator.restoreAttributes(path, attributes);
             } else {
-                LOGGER("resAll: no value")
+                logger.debug("resAll: no value");
             }
         }
     }
@@ -97,14 +97,14 @@ namespace bsc {
         auto& fileMap = fileMapRenderer.renderMap(journal);
         bool hasResources = true;
         for (const auto& [path, value] : fileMap) {
-            LOGGER("file " + path.string() + " => " + (value ? value->getResourceId() : std::string(" [X] ")));
+            logger.debug("file " + path.string() + " => " + (value ? value->getResourceId() : std::string(" [X] ")));
             //@todo change this bool to actual transfer management
 
             //check for resources.
             if (value && !value->isDirectory()) {
-                LOGGER("checking if file should be downloaded")
+                logger.debug("checking if file should be downloaded");
                 if (!storage->hasResource(value->getResourceId())) {
-                    LOGGER("storage doesn't have resource " + value->getResourceId() + " , acquiring")
+                    logger.debug("storage doesn't have resource " + value->getResourceId() + " , acquiring");
                     hasResources &= storage->acquireResource(value->getResourceId());
                 }
             }
@@ -118,8 +118,8 @@ namespace bsc {
     void Repository::update(fs::path path, const RepositoryActionStrategyPack& strategyPack,
                             std::set<UpdateOptions> updateOptions) {
         //@todo change the name of this function to something else. it's about merging the state or journal and filesystem and updating one from the other or both
-        LOGGER("update: " + path.string())
-        path = fs::weakly_canonical(path);
+        logger.debug("update: " + path.string());
+        path             = fs::weakly_canonical(path);
         auto& fileMap = fileMapRenderer.renderMap(journal);
         auto& attributes = fileMap[path];
         if (fs::exists(path)) {
@@ -131,7 +131,7 @@ namespace bsc {
                     // file exists in the journal
                     if (currentFileTime < attributes->getModificationTime()) {
                         // file in repository is newer than the file in filesystem, restore
-                        LOGGER("restoring..." + path.string())
+                        logger.debug("restoring..." + path.string());
                         auto state = strategyPack.updatedInRepo->apply(path, attributes, manipulator);
                         deployMap.markDeployed(path, state);
                     } else {
@@ -139,11 +139,11 @@ namespace bsc {
                             currentFileSize == attributes->getSize()) {
                             //@todo verify other things maybe
                             //file appear identical, nothing to do.
-                            LOGGER("leaving alone " + path.string())
+                            logger.debug("leaving alone " + path.string());
                             auto state = strategyPack.same->apply(path, attributes, manipulator);
                             deployMap.markDeployed(path, state);
                         } else {
-                            LOGGER("updated file, persisting... " + path.string())
+                            logger.debug("updated file, persisting... " + path.string());
                             //file in the filesystem is newer then the one in repository
                             auto state = strategyPack.updatedInFilesystem->apply(path, attributes, manipulator);
                             deployMap.markDeployed(path, state);
@@ -152,13 +152,13 @@ namespace bsc {
                             if (fs::is_directory(path) && !fileMap.isSpecial(path) &&
                                 (updateOptions.contains(UpdateOptions::followUpdatedDirectories) ||
                                  updateOptions.contains(UpdateOptions::followDirectories))) {
-                                LOGGER(path.string() + " is a directory, iterating over...")
+                                logger.debug(path.string() + " is a directory, iterating over...");
                                 for (const auto &item : fs::directory_iterator(path)) {
                                     //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
                                     //@todo OR, BETTER ALTERNATIVE - update could return set of paths that it updated. then it could recurse safely here, and this if(!in map) won't be needed. updateAll would just remove all already checked items from items to check list. DO IT LIKE THIS
-                                    LOGGER(" item: " + item.path().string())
+                                    logger.debug(" item: " + item.path().string());
                                     if (!fileMap.contains(item)) {
-                                        LOGGER("following directory " + path.string() + " to " + item.path().string())
+                                        logger.debug("following directory " + path.string() + " to " + item.path().string());
                                         update(item, strategyPack, updateOptions);
                                     }
                                 }
@@ -169,14 +169,14 @@ namespace bsc {
                     //not in the map
                     if (!fileMap.isDeleted(path) || currentFileTime > fileMap.getDeletionTime(path)) {
                         //this is new file that has the same path as deleted one. persist!
-                        LOGGER("new file, persisting " + path.string())
+                        logger.debug("new file, persisting " + path.string());
                         auto state = strategyPack.newInFilesystem->apply(path, manipulator);
                         deployMap.markDeployed(path, state);
 
                     } else {
                         //@todo delete file
                         if (fileMap.isDeleted(path)) {
-                            LOGGER("trashing " + path.string())
+                            logger.debug("trashing " + path.string());
                             //file should be deleted, but let's check deletion time...
                             auto state = strategyPack.deletedInRepo->apply(path, manipulator);
                             deployMap.markDeployed(path, state);
@@ -186,43 +186,43 @@ namespace bsc {
                 //@todo this iterates over all directories and files in path, which means that it will probably call some methods twice or even more times on some files. make sure it doesn't
                 if (fs::is_directory(path) && !fileMap.isSpecial(path) &&
                     updateOptions.contains(UpdateOptions::followDirectories)) {
-                    LOGGER(path.string() + " is a directory, iterating over...")
+                    logger.debug(path.string() + " is a directory, iterating over...");
                     for (const auto &item : fs::directory_iterator(path)) {
                         //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
                         //@todo same as above, this check won't be needed if update() returns set of processed files.
-                        LOGGER(" item: " + item.path().string())
+                        logger.debug(" item: " + item.path().string());
                         if (!fileMap.contains(item)) {
-                            LOGGER("following directory " + path.string() + " to " + item.path().string())
+                            logger.debug("following directory " + path.string() + " to " + item.path().string());
                             update(item, strategyPack, updateOptions);
                         }
                     }
                 }
             } else {
-                ERROR("file type not supported for : " + path.string())
+                logger.error("file type not supported for : " + path.string());
             }
         } else {
             //file was removed or perhaps wasn't deployed yet...
             if (attributes) {
                 if (deployMap.isDeployed(path)) {
                     //file is in file map and was deployed but is not on filesystem, removing (user must have deleted it)
-                    LOGGER("deleting " + path.string());
+                    logger.debug("deleting " + path.string());
                     auto state = strategyPack.deletedInFilesystem->apply(path, attributes, manipulator);
                     deployMap.markDeployed(path, state);
                 } else {
                     //file wasn't deployed. must be a new file from another node. restore.
                     //@todo this is duplicated code. move to strategies or sth. (three times as of writing this. seriously, do something about it)
-                    LOGGER("not deployed " + path.string())
+                    logger.debug("not deployed " + path.string());
                     auto state = strategyPack.newInRepo->apply(path, attributes, manipulator);
                     deployMap.markDeployed(path, state);
                 }
             } else {
                 if (fileMap.isDeleted(path)) {
-                    LOGGER("file deleted, but not in filesystem so nothing to do: " + path.string())
+                    logger.debug("file deleted, but not in filesystem so nothing to do: " + path.string());
                     //@todo add this to strategyPack?
                     deployMap.markDeployed(path, DeployState::notDeployed);
                 } else {
                     //file is neither on file system nor in the map. someone trying to update unknown file?
-                    LOGGER("file unknown " + path.string());
+                    logger.debug("file unknown " + path.string());
                     //@todo add this to strategyPack?
                     //@todo add strategy for this ?
                 }
@@ -236,7 +236,7 @@ namespace bsc {
         //@todo process files from incoming directory here? or somewhere else?
         //@todo change the name of this function to updateAll or sth
         for (const auto& i : fileMapRenderer.renderMap(journal)) {
-            LOGGER("update()" + i.first.string())
+            logger.debug("update()" + i.first.string());
             update(i.first, localSyncPack, {UpdateOptions::followUpdatedDirectories});
         }
     }
@@ -292,10 +292,10 @@ namespace bsc {
 
     void Repository::RepoDeployMap::markDeployed(const fs::path& path, DeployState deployState) {
         if (deployState == DeployState::deployed) {
-            LOGGER("marking " + path.string() + " as deployed")
+            logger.debug("marking " + path.string() + " as deployed");
             deployMap[path] = true;
         } else if (deployState == DeployState::notDeployed) {
-            LOGGER("marking " + path.string() + " as not deployed")
+            logger.debug("marking " + path.string() + " as not deployed");
             deployMap[path] = false;
         }//else unchanged
     }
@@ -305,7 +305,7 @@ namespace bsc {
     }
 
     void Repository::RepoDeployMap::DeployAttributes::setDeployed(bool deployed) {
-        LOGGER("setDirect deployed")
+        logger.debug("setDirect deployed");
         DeployAttributes::deployed = deployed;
     }
 
@@ -328,7 +328,7 @@ namespace bsc {
     public:
         DeployState
         apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
-            LOGGER("restoring "+path.string() )
+            logger.debug("restoring " + path.string());
             manipulator.restoreFileFromStorage(path, attributes);
             manipulator.restoreAttributes(path, attributes);
             return DeployState::deployed;
@@ -366,7 +366,7 @@ namespace bsc {
     public:
         DeployState
         apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
-            LOGGER("null strategy")
+            logger.debug("null strategy");
             return DeployState::unchanged;
         }
     };

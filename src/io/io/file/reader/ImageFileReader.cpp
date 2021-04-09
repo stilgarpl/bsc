@@ -44,7 +44,7 @@ namespace bsc {
         } catch (const std::exception& e) {
             //@todo better error handling
             using namespace std::string_literals;
-            ERROR("Image reader exception: "s + e.what());
+            logger.error("Image reader exception: "s + e.what());
         }
         return result;
     }

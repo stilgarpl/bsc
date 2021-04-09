@@ -31,7 +31,7 @@ namespace bsc {
                 if (algorithm->isAlgorithmSuitableForFileType(fileType)) {
                     const auto& meta = algorithm->readMetaData(path);
                     result.insert(meta.begin(), meta.end());
-                    //                    LOGGER("result = " + result.dump(2))
+                    //                    logger.debug("result = " + result.dump(2));
                 }
             }
             return result;

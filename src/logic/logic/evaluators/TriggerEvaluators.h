@@ -10,7 +10,7 @@
 namespace bsc {
     struct TriggerEvaluators {
         static constexpr auto triggerValue = [](auto e, auto ... args) {
-            LOGGER("getting trigger value " + e.getValue())
+            logger.debug("getting trigger value " + e.getValue());
             return e.getValue();
         };
     };

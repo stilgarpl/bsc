@@ -859,3 +859,4 @@ if class - construct that class, if it has property fields, it should also initi
 lastly, pop state
 
 
+@todo maybe add context observers, that get triggered when active context is set? or just set for the first time? it could update LoggerContext

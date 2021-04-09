@@ -22,8 +22,8 @@ using namespace std::chrono_literals;
 
 void bsc::ServerConnection::run() {
     // std::cout << "opening server connection" << std::endl;
-    // LOGGER("Opening server connection");
-    //run is already in a separate thread, so there is no need to start a new one
+    // logger.debug("Opening server connection");
+    // run is already in a separate thread, so there is no need to start a new one
     Context::setActiveContext(getConnectionContext());
 //    socket().setReceiveTimeout(Poco::Timespan(150, 1));
 //    socket().setSendTimeout(Poco::Timespan(150, 1));
@@ -34,7 +34,7 @@ void bsc::ServerConnection::run() {
     try {
         workReceive(socket());
     } catch (const Poco::Net::NetException& e) {
-        LOGGER("Server connection caught poco net exception")
+        logger.debug("Server connection caught poco net exception");
         //processor.stop();
         stopReceiving();
         stopSending();
@@ -71,12 +71,12 @@ void bsc::ServerConnection::stopReceiving() {
 }
 
 bsc::ServerConnection::~ServerConnection() {
-    //  LOGGER("Server conn dest");
+    //  logger.debug("Server conn dest");
     changeState(ConnectionState::DISCONNECTED);
 }
 
 void bsc::ServerConnection::stop() {
-    //  LOGGER("stop");
+    //  logger.debug("stop");
     shutdown();
 }
 
@@ -90,7 +90,7 @@ void bsc::ServerConnection::shutdown() {
 //        connectionSourcePtr->connectionClosedServer(this);
     }
     catch (const Poco::Net::NetException& e) {
-        LOGGER("net exception")
+        logger.debug("net exception");
         e.displayText();
         auto nested = e.nested();
         while (nested != nullptr) {
@@ -106,7 +106,7 @@ Poco::Net::StreamSocket& bsc::ServerConnection::getSocket() {
 
 
 Poco::Net::TCPServerConnection* bsc::ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket& socket) {
-    LOGGER("creating server connection");
+    logger.debug("creating server connection");
     Context::OwnPtr connectionContext = contextGetter();
     bsc::SetLocalContext localContext(connectionContext);//RAII
     bsc::ServerConnection* connection = new bsc::ServerConnection(socket, connectionContext);

@@ -163,9 +163,9 @@ namespace bsc {
 //    void beginTransferTest(const NodeIdType &nodeId, fs::path from) {
 //        BeginTransfer::Request::Ptr req = BeginTransfer::Request::getNew();
 //        req->setResourceId(std::make_shared<SimplePathRI>(from));
-//        auto res = node.getModule<NetworkModule>()->sendPacketToNode(nodeId, req);
-//        LOGGER("received begin " + std::to_string(res->getTransferId()))
-//    }
+        //        auto res = node.getModule<NetworkModule>()->sendPacketToNode(nodeId, req);
+        //        logger.debug("received begin " + std::to_string(res->getTransferId()));
+        //    }
     };
 }
 

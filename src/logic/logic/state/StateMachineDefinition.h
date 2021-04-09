@@ -41,7 +41,7 @@ namespace bsc {
 
     public:
         void addState(const StateIdType& state) {
-            //        LOGGER("adding state" + std::to_string(state));
+            //        logger.debug("adding state" + std::to_string(state));
             states.insert(state);
         }
 
@@ -55,7 +55,7 @@ namespace bsc {
 
         void addLink(const StateIdType& state1, const StateIdType& state2) {
             if (states.count(state1) > 0 && states.count(state2) > 0) {
-                //            LOGGER("linking " + std::to_string(state1) + " to " + std::to_string(state2));
+                //            logger.debug("linking " + std::to_string(state1) + " to " + std::to_string(state2));
                 links[state1].insert(state2);
             } else {
                 throw InvalidLinkException(state1, state2, "Invalid Link");

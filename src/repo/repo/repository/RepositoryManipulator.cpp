@@ -17,12 +17,12 @@ void bsc::RepositoryManipulator::restoreAttributes(const fs::path& path, const b
     }
 }
 void bsc::RepositoryManipulator::persist(fs::path path, const bsc::RepositoryFileMap::ValueType& attributes) {
-    LOGGER("persist: " + path.string())
+    logger.debug("persist: " + path.string());
     auto journal = repository.getJournal();
     auto& pathTransformer = repository.getPathTransformer();
     if (path.is_relative()) {
         path = fs::canonical(fs::current_path() / path);
-        LOGGER("after canonical: " + path.string())
+        logger.debug("after canonical: " + path.string());
     }
 
     if (attributes) {
@@ -124,17 +124,17 @@ void bsc::RepositoryManipulator::commit(IStorage& storage) {
     JournalFuncMap funcMap;
     funcMap.setFunc<JournalMethod::add,JournalTarget::file>([&](auto& i) {
         //@todo add error handling - what if file was removed between persisting and storing? if storage fails, commit should fail
-      storage.store(bsc::calculateSha1OfFile(pathTransformer.transformFromJournalFormat(i.getDestination())),
-                     fs::file_size(pathTransformer.transformFromJournalFormat(i.getDestination())),
-                     pathTransformer.transformFromJournalFormat(i.getDestination()));
-      LOGGER("commit: added file " + pathTransformer.transformFromJournalFormat(i.getDestination()).string())
+        storage.store(bsc::calculateSha1OfFile(pathTransformer.transformFromJournalFormat(i.getDestination())),
+                      fs::file_size(pathTransformer.transformFromJournalFormat(i.getDestination())),
+                      pathTransformer.transformFromJournalFormat(i.getDestination()));
+        logger.debug("commit: added file " + pathTransformer.transformFromJournalFormat(i.getDestination()).string());
     });
 
     funcMap.setFunc<JournalMethod::modify,JournalTarget::file>([&](auto& i) {
-      storage.store(bsc::calculateSha1OfFile(pathTransformer.transformFromJournalFormat(i.getDestination())),
-                     fs::file_size(pathTransformer.transformFromJournalFormat(i.getDestination())),
-                     pathTransformer.transformFromJournalFormat(i.getDestination()));
-      LOGGER("commit: modified file " + pathTransformer.transformFromJournalFormat(i.getDestination()).string())
+        storage.store(bsc::calculateSha1OfFile(pathTransformer.transformFromJournalFormat(i.getDestination())),
+                      fs::file_size(pathTransformer.transformFromJournalFormat(i.getDestination())),
+                      pathTransformer.transformFromJournalFormat(i.getDestination()));
+        logger.debug("commit: modified file " + pathTransformer.transformFromJournalFormat(i.getDestination()).string());
     });
 
     journal->replayCurrentState(funcMap);

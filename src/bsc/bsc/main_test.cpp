@@ -1,8 +1,12 @@
 
-template<typename X>
-class A {};
+#include <context/context/Context.h>
+#include <log/log/Logger.h>
+#include <log/log/LoggerContext.h>
 
 int main(int argc, char* argv[]) {
-
-    return 0;
+    auto nodeContext = bsc::Context::makeContext();
+    bsc::Context::setActiveContext(nodeContext);
+    bsc::logger.info("Test log");
+    nodeContext->get<bsc::LoggerContext>()->setInstanceFetcher([&] { return "lalal"; });
+    bsc::logger.info("Test log");
 }

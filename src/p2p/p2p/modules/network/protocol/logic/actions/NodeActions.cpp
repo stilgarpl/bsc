@@ -15,8 +15,8 @@ void bsc::NodeActions::newNodeDiscovered(const NodeInfoEvent& event) {
     Context::Ptr context = Context::getActiveContext();
 //    auto &nodeContext = context->get<NodeContext>();
 
-    //  LOGGER("Node discovered (connecting): " + event.getNodeInfo().getNodeId())
-//        auto &node = nodeContext->getNode();
+    //  logger.debug("Node discovered (connecting): " + event.getNodeInfo().getNodeId());
+    //        auto &node = nodeContext->getNode();
     //@todo we shouldn't connect to any node, just in certain situations
 //        node.getModule<NetworkModule>()->connectTo(event.getNodeInfo());
 
@@ -24,7 +24,7 @@ void bsc::NodeActions::newNodeDiscovered(const NodeInfoEvent& event) {
 }
 
 void bsc::NodeActions::updateNodeInfo(const NodeInfoEvent& event) {
-    LOGGER("update node info")
+    logger.debug("update node info");
     Context::Ptr context = Context::getActiveContext();
     auto remoteNodeContext = context->get<RemoteNodeContext>();
 
@@ -32,10 +32,10 @@ void bsc::NodeActions::updateNodeInfo(const NodeInfoEvent& event) {
     remoteNode.setNodeInfo(event.getNodeInfo());
 
 //    auto nodeContext = context->get<NodeContext>();
-//    if (nodeContext != nullptr) {
-//        //  LOGGER("received node info: " + event.getNodeInfo().getNodeId());
-//        auto &node = nodeContext->getNode();
-//        auto netModule = node.getModule<NetworkModule>();
+    //    if (nodeContext != nullptr) {
+    //        //  logger.debug("received node info: " + event.getNodeInfo().getNodeId());
+    //        auto &node = nodeContext->getNode();
+    //        auto netModule = node.getModule<NetworkModule>();
 //
 //    }
 }
@@ -44,7 +44,7 @@ void bsc::NodeActions::addKnownNode(const NodeInfoEvent& event) {
     Context::Ptr context = Context::getActiveContext();
     auto nodeContext = context->get<NodeContext>();
 
-    // LOGGER(                "Adding known node " + event.getNodeInfo().getNodeId() + " ... " + event.getNodeInfo().getNetworkId())
+    // logger.debug(                "Adding known node " + event.getNodeInfo().getNodeId() + " ... " + event.getNodeInfo().getNetworkId());
     auto& node = nodeContext->getNode();
     if (event.getNodeInfo().getNetworkId() == node.getNodeInfo().getNetworkId()) {
         node.getModule<NetworkModule>()->getNetworkInfo()->addKnownNode(event.getNodeInfo());
@@ -61,7 +61,7 @@ void bsc::NodeActions::addKnownNode(const NodeInfoEvent& event) {
 
             }
         } catch (const bsc::ConnectionException& e) {
-            ERROR("Error while adding known node.")
+            logger.error("Error while adding known node.");
         }
 
 
@@ -87,14 +87,14 @@ void bsc::NodeActions::triggerUpdateNode(const bsc::Tick& tick) {
 }
 
 void bsc::NodeActions::sendNetworkInfoRequest(ConnectionEvent connectionEvent) {
-    LOGGER("send network info request")
+    logger.debug("send network info request");
     auto req = std::make_shared<bsc::NetworkInfoRequest>();
     connectionEvent.getConnection()->send(req);
 }
 
 void bsc::NodeActions::sendNodeInfoRequest(ConnectionEvent connectionEvent) {
 
-    LOGGER("send node info request")
+    logger.debug("send node info request");
     NodeInfoRequest::Ptr req = NodeInfoRequest::getNew();
     connectionEvent.getConnection()->send(req);
     //        connectionEvent.context()->get<RemoteNodeContext>()->getRemoteNode().sendRequestToNode(req);

@@ -38,10 +38,10 @@ void setupCommands(CommandModule *cmd) {
     cmd->setDefaultGroupHandler<bsc::DefaultCommandGroupParameters>(defaultCommandGroupHandler);
     cmd->group("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->group("tt").group("xx").mapCommand("tx", &CommandModule::testingMethodInt);
-//    cmd->group("tt").handler<CommandModule::CommandPP>([](auto properties) {
-//        LOGGER("handler" + std::to_string(properties.a().value_or(-1)));
-//        return CommandModule::CommandExecutionStatus::success;
-//    });
+    //    cmd->group("tt").handler<CommandModule::CommandPP>([](auto properties) {
+    //        logger.debug("handler" + std::to_string(properties.a().value_or(-1)));
+    //        return CommandModule::CommandExecutionStatus::success;
+    //    });
 
     cmd->mapCommand("t3", &CommandModule::testingMethodIntFloat);
     cmd->mapCommand("connect", &bsc::NetworkModule::connectTo);
@@ -155,9 +155,8 @@ int main(int argc, char* argv[]) {
     thirdNode.stop();
     thirdNode.waitToFinish();
 
-
-//    LOGGER("connection was ... " + std::to_string(ret));
-//    otherNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9898");
+    //    logger.debug("connection was ... " + std::to_string(ret));
+    //    otherNode.getModule<NetworkModule>()->connectTo("127.0.0.1:9898");
     //  thisNode.getModule<NetworkModule>()->connectTo("127.0.0.1:100");
 //    std::this_thread::sleep_for(5s);
 
@@ -175,16 +174,16 @@ int main(int argc, char* argv[]) {
 //    thirdNode.getModule<NetworkModule>()->purgeDuplicateConnections();
 //    thisNode.getModule<NetworkModule>()->purgeInactiveConnections();
 //    otherNode.getModule<NetworkModule>()->purgeInactiveConnections();
-//    thirdNode.getModule<NetworkModule>()->purgeInactiveConnections();
-//    //LOGGER("lala");
-//    std::this_thread::sleep_for(2s);
-//    thisNode.getModule<NetworkModule>()->printConnections();
+    //    thirdNode.getModule<NetworkModule>()->purgeInactiveConnections();
+    //    //logger.debug("lala");
+    //    std::this_thread::sleep_for(2s);
+    //    thisNode.getModule<NetworkModule>()->printConnections();
 //    otherNode.getModule<NetworkModule>()->printConnections();
 //    thirdNode.getModule<NetworkModule>()->printConnections();
-//    std::this_thread::sleep_for(9995s);
-//    LOGGER("stopping");
-//    thisNode.stop();
-//    otherNode.stop();
+    //    std::this_thread::sleep_for(9995s);
+    //    logger.debug("stopping");
+    //    thisNode.stop();
+    //    otherNode.stop();
 //    thirdNode.stop();
 //    std::this_thread::sleep_for(5s);
 //    thisNode.getModule<NetworkModule>()->purgeInactiveConnections();
@@ -193,11 +192,11 @@ int main(int argc, char* argv[]) {
 //    std::this_thread::sleep_for(45s);
 //    thisNode.getModule<NetworkModule>()->printConnections();
 //    otherNode.getModule<NetworkModule>()->printConnections();
-//    thirdNode.getModule<NetworkModule>()->printConnections();
-//    LOGGER("finishing");
-//
-//    std::this_thread::sleep_for(115s);
-//    LOGGER("finished");
+    //    thirdNode.getModule<NetworkModule>()->printConnections();
+    //    logger.debug("finishing");
+    //
+    //    std::this_thread::sleep_for(115s);
+    //    logger.debug("finished");
 
     return 0;
 }

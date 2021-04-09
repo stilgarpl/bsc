@@ -42,7 +42,7 @@ namespace bsc {
         virtual ~Observer() {
             std::lock_guard<std::recursive_mutex> g(observeeMutex);
             if (observee) {
-                LOGGER("unregistering observer")
+                logger.debug("unregistering observer");
                 observee->unregisterStateObserver(*this);
             }
         };

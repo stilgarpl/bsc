@@ -5,42 +5,40 @@
 #ifndef BSC_LOGGER_H
 #define BSC_LOGGER_H
 
-#include <string>
-#include <mutex>
+#include <experimental/source_location>
 #include <filesystem>
+#include <mutex>
+#include <optional>
+#include <string>
 
 namespace fs = std::filesystem;
 
-
-#define LOGGER(x) bsc::Logger(fs::path(__FILE__).filename().string()).debug(__LINE__, x);
-#define ERROR(x) bsc::Logger(fs::path(__FILE__).filename().string()).error(__LINE__, x);
-#define SHOW(x) LOGGER(std::string(#x) +"="+std::to_string(x))
+#define SHOW(x) logger.debug(std::string(#x) + "=" + std::to_string(x));
 
 namespace bsc {
+
     class Logger {
-    private:
-
-        std::string loggerName;
     public:
+        enum class LogLevel {
+            debug,
+            info,
+            error,
+        };
 
-        //@todo think about this global locking: Is it necessary?
-        static std::mutex& getLock() {
-            static std::mutex lock;
-            return lock;
-        }
+        Logger();
 
-        explicit Logger(std::string name);
+        void debug(const std::string& txt,
+                   std::experimental::source_location sourceLocation = std::experimental::source_location::current());
+        void info(const std::string& txt,
+                  std::experimental::source_location sourceLocation = std::experimental::source_location::current());
+        void error(const std::string& txt,
+                   std::experimental::source_location sourceLocation = std::experimental::source_location::current());
 
-        void debug(const std::string& txt);
-
-        void debug(int line, const std::string& txt);
-
-        void error(int line, const std::string& txt);
-
-        void error(const std::string& txt);
-
-        void info(const std::string& txt);
+    private:
+        void doLog(LogLevel level, const std::string& txt, std::experimental::source_location sourceLocation);
     };
+
+    inline thread_local Logger logger = {};
 }
 
 

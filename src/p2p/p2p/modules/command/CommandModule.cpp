@@ -28,7 +28,7 @@ namespace bsc {
                 [&](ILogicModule& module) {
                     //@todo move this mechanism to NodeModule to auto collect all submodules from other modules.
                     //  submodules probably have to be optional or sth.
-                    LOGGER("command submodule!")
+                    logger.debug("command submodule!");
                     auto& commandSub = module.getSubModule<CommandModule>();
                     commandSub.applyCommands(*this);
                 });
@@ -66,7 +66,7 @@ namespace bsc {
     }
 
     void CommandModule::sendRemoteCommand(ArgumentContainerTypeCRef args) {
-        LOGGER("send remote")
+        logger.debug("send remote");
         //@todo add checking if the number of parameters is correct
         if (args.size() >= 2) {
             std::string nodeId  = args[0];
@@ -78,16 +78,16 @@ namespace bsc {
             // CommandPacket::Request* packet;
             packet->setData(rest);
             packet->setCommandName(command);
-            LOGGER("sending packet ")
+            logger.debug("sending packet ");
             auto res = netModule->sendPacketToNode(nodeId, packet);
 
             if (res && res->isRunStatus()) {
-                LOGGER("remote run successful")
+                logger.debug("remote run successful");
                 auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
 //            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
                 out << res->getOutput();
             } else {
-                LOGGER("remote run failure")
+                logger.debug("remote run failure");
             }
 
 
@@ -96,7 +96,7 @@ namespace bsc {
 
     void CommandModule::sendCommandToRemoteNode(RemoteNode& remoteNode, ArgumentContainerTypeCRef args) {
         //@todo unify this and sendRemoteCommand
-        LOGGER("send remote")
+        logger.debug("send remote");
         //@todo add checking if the number of parameters is correct
         if (args.size() >= 1) {
             std::string command = args[0];
@@ -107,16 +107,16 @@ namespace bsc {
             // CommandPacket::Request* packet;
             packet->setData(rest);
             packet->setCommandName(command);
-            LOGGER("sending packet ")
+            logger.debug("sending packet ");
             auto res = remoteNode.sendRequestToNode(packet);
 
             if (res && res->isRunStatus()) {
-                LOGGER("remote run successful")
+                logger.debug("remote run successful");
                 auto& out = Context::getActiveContext()->get<InputOutputContext>()->out();
 //            out << "Remote run result: \n --- \n" << res->getOutput() << std::endl << " --- \n";
                 out << res->getOutput();
             } else {
-                LOGGER("remote run failure")
+                logger.debug("remote run failure");
             }
 
 
@@ -125,7 +125,7 @@ namespace bsc {
 
 
     void CommandModule::broadcastRemoteCommand(const std::vector<std::string>& args) {
-        LOGGER("send broadcast")
+        logger.debug("send broadcast");
         //@todo add checking if the number of parameters is correct
         if (args.size() >= 1) {
             std::string command = args[0];
@@ -136,15 +136,15 @@ namespace bsc {
             //CommandPacket::Request* packet;
             packet->setData(rest);
             packet->setCommandName(command);
-            LOGGER("sending packet ")
+            logger.debug("sending packet ");
             auto res = netModule->broadcastRequest(packet);
 
             for (const auto &[nodeId, response] : res) {
-                LOGGER("broadcast received from " + nodeId)
+                logger.debug("broadcast received from " + nodeId);
                 if (response && response->isRunStatus()) {
-                    LOGGER("remote run successful")
+                    logger.debug("remote run successful");
                 } else {
-                    LOGGER("remote run failure")
+                    logger.debug("remote run failure");
                 }
             }
 
@@ -172,7 +172,7 @@ namespace bsc {
         auto& networkSub = getSubModule<bsc::NetworkModule>();
 
         networkSub.registerPacketProcessor<bsc::CommandPacket>([this](const bsc::CommandPacket::Request::Ptr& request) {
-            LOGGER("remote command!")
+            logger.debug("remote command!");
 
             //setting up remote command context.
             //@todo simplify context making
@@ -215,10 +215,10 @@ namespace bsc {
 
         }
 
-        LOGGER("Command Module has stopped")
+        logger.debug("Command Module has stopped");
     }
     void CommandModule::runLine(const std::string& line) {
-        LOGGER("Command: " + line)
+        logger.debug("Command: " + line);
         //explode command into words
         auto words = bsc::explode(line, ' ');
 
@@ -236,7 +236,8 @@ namespace bsc {
         try {
             runCommand(groupOrCommandName, data);
         } catch (const bsc::IncorrectParametersCountException& e) {
-            LOGGER("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) + " got: " + std::to_string(e.gotParameters))
+            logger.debug("Incorrect parameters. Required: " + std::to_string(e.requiredParameters) +
+                         " got: " + std::to_string(e.gotParameters));
         }
     }
 

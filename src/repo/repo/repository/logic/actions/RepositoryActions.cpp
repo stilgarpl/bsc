@@ -10,7 +10,7 @@
 
 namespace bsc {
     bool RepositoryActions::checkIfUpdateRequired(const JournalPtr& currentJournal, const JournalPtr& newJournal) {
-        LOGGER("REPO CHECK IF U")
+        logger.debug("REPO CHECK IF U");
         if (newJournal == nullptr || currentJournal == nullptr) {
             return false;
         }
@@ -32,7 +32,7 @@ namespace bsc {
         auto repoMod = bsc::NodeContext::getNodeFromActiveContext().getModule<RepoModule>();
         //@todo error handling
         //@todo shouldn't take journal, instead merge should be a function of Repository
-        LOGGER("merging journal")
+        logger.debug("merging journal");
         repoMod->findRepository(repoId)->getJournal()->merge(newJournal);
     }
 

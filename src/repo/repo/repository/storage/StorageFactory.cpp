@@ -10,7 +10,7 @@ namespace bsc {
 
     IStoragePtr StorageFactory::create(const SelectorType& selector, const ArgumentType& storageName) const {
         //@todo implement actual identifiers and different storages
-        LOGGER("creating storage with path " + (storagePath / storageName).string())
+        logger.debug("creating storage with path " + (storagePath / storageName).string());
         return std::make_shared<InternalStorage>(storageName, storagePath / storageName);
     }
 

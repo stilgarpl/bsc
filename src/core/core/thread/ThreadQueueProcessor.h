@@ -77,8 +77,7 @@ namespace bsc {
             running = false;
             queueReady.notify_all();
             processorThread->join();
-            LOGGER("thread queue processor finished")
-
+            logger.debug("thread queue processor finished");
         }
     };
 }

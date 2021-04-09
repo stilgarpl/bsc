@@ -61,7 +61,7 @@ namespace bsc {
             auto localCurrentState = this->currentState.load();
 
             if (localCurrentState == nullptr) {
-                ERROR("state machine is in invalid state")
+                logger.error("state machine is in invalid state");
                 throw StateMachineUninitialized("state machine is in invalid state");
             }
 
@@ -73,13 +73,13 @@ namespace bsc {
 
             if (!definition->hasState(state)) {
                 invalidStateHandler(state);
-                LOGGER("invalid state")
+                logger.debug("invalid state");
                 return;
             }
 
             if (!definition->hasLink(*localCurrentState, state)) {
                 invalidChangeHandler(state);
-                LOGGER("invalid change")
+                logger.debug("invalid change");
                 return;
             }
 

@@ -103,15 +103,13 @@ public:
         std::unique_lock g(*connectionFetcher);
         if (connectionFetcher->getConnection() != nullptr) {
 
-//            LOGGER("sending packet to node " + nodeId)
+            //            logger.debug("sending packet to node " + nodeId);
             protocol->send(connectionFetcher->getConnection(), p);
 
         } else {
             using namespace std::string_literals;
-            LOGGER("unable to send packet to " +
-                   (remoteNodeInfo.getNodeInfo() ? remoteNodeInfo.getNodeInfo()->getNodeId() : "remote node."s) +
-                   "Not connected"s)
-
+            logger.debug("unable to send packet to " +
+                         (remoteNodeInfo.getNodeInfo() ? remoteNodeInfo.getNodeInfo()->getNodeId() : "remote node."s) + "Not connected"s);
         }
     }
 
@@ -124,15 +122,14 @@ public:
         }
         if (connectionFetcher->getConnection() != nullptr) {
 
-//            LOGGER("sending packet to node " + nodeId)
+            //            logger.debug("sending packet to node " + nodeId);
             auto[response, error] = protocol->sendExpectExtended(connectionFetcher->getConnection(), p);
             //@todo error handling
             return response;
 
         } else {
-            LOGGER("unable to send request to " +
-                   (remoteNodeInfo.getNodeInfo() ? remoteNodeInfo.getNodeInfo()->getNodeId() : "remote node.") +
-                   "Not connected")
+            logger.debug("unable to send request to " +
+                         (remoteNodeInfo.getNodeInfo() ? remoteNodeInfo.getNodeInfo()->getNodeId() : "remote node.") + "Not connected");
             return std::shared_ptr<ReturnType>(nullptr);
 
         }

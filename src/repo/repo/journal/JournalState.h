@@ -58,7 +58,7 @@ namespace bsc {
             if (same == dataList.end()) {
                 dataList.push_back(data);
             } else {
-                LOGGER("error: trying to add same data again!");
+                logger.debug("error: trying to add same data again!");
             }
         }
 

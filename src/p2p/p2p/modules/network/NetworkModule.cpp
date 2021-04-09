@@ -79,24 +79,23 @@ namespace bsc {
             networkSub.setupPacketProcessing(*this);
         });
 
-
         //        when(event<bsc::Tick>(5s)).fireNewAction([this](auto e) {
         //            if (server != nullptr) {
         //                using namespace std::string_literals;
-        //                LOGGER("SERVER DETAILS >>> ")
-        //                LOGGER(" rejected connections : "s + std::to_string(server->refusedConnections()))
-        //                LOGGER(" queued connections : "s + std::to_string(server->queuedConnections()))
-        //                LOGGER(" current connections : "s + std::to_string(server->currentConnections()))
-        //                LOGGER(" max threads : "s + std::to_string(server->maxThreads()))
-        //                LOGGER(">>>>>>")
+        //                logger.debug("SERVER DETAILS >>> ");
+        //                logger.debug(" rejected connections : "s + std::to_string(server->refusedConnections()));
+        //                logger.debug(" queued connections : "s + std::to_string(server->queuedConnections()));
+        //                logger.debug(" current connections : "s + std::to_string(server->currentConnections()));
+        //                logger.debug(" max threads : "s + std::to_string(server->maxThreads()));
+        //                logger.debug(">>>>>>");
         //            }
         //        });
 
-        //high level logic:
+        // high level logic:
 
         //    when(event<ConnectionEvent>().withId(ConnectionEvent::IdType::CONNECTION_ESTABLISHED)).
 
-        //send keepalives - I tried using it to help with the packet loss, but it didn't work.
+        // send keepalives - I tried using it to help with the packet loss, but it didn't work.
         when(event<bsc::Tick>(120s)).fireNewAction([&, this](auto e) { this->broadcastPacket(KeepAlivePacket::Request::getNew()); });
 
         when(event<ModuleEvent<NetworkModule>>(ModuleState::READY)).fireNewAction(NetworkActions::loadNetworkInfo);
@@ -104,9 +103,9 @@ namespace bsc {
         when(event<ModuleEvent<NetworkModule>>(ModuleState::SHUTDOWN)).fireNewAction(
                 NetworkActions::saveNetworkInfo);
 
-        when(event<ModuleEvent<NetworkModule>>()).fireNewAction([](auto event) { LOGGER("module event NNM") });
+        when(event<ModuleEvent<NetworkModule>>()).fireNewAction([](auto event) { logger.debug("module event NNM"); });
 
-//    auto list = {88, 77, 44, 101};
+        //    auto list = {88, 77, 44, 101};
 //    auto list2 = {99, 10};
 //    auto stage1 = when(event < Tick > (1s)).newChain("chain_test").fireNewChainAction(testingMethod3s, "1");
 ////    stage1.
@@ -124,12 +123,13 @@ namespace bsc {
 //                                     CommonEvaluators::foreachValue<int>());
 
 //    when(event < SpecificPacketEvent<KeepAlivePacket::Response>>
-//    (PacketEventId::PACKET_RECEIVED)).fireNewAction([](auto event) {
-//        LOGGER("SPECIFIC EVENT: keepalive received!");
-//    });
-//        stage1.fireNewChainAction([](Tick tick){return IEvent<int>(51);}).fireNewChainAction([](IEvent<int> e, std::string w){LOGGER("lwlwl " +std::to_string(e.getEventId())); return e;}, "7");
-//
-//    stage1.fireNewChainAction(testingMethod3s, "2");
+        //    (PacketEventId::PACKET_RECEIVED)).fireNewAction([](auto event) {
+        //        logger.debug("SPECIFIC EVENT: keepalive received!");
+        //    });
+        //        stage1.fireNewChainAction([](Tick tick){return IEvent<int>(51);}).fireNewChainAction([](IEvent<int> e, std::string
+        //        w){logger.debug("lwlwl " +std::to_string(e.getEventId())); return e;}, "7");
+        //
+        //    stage1.fireNewChainAction(testingMethod3s, "2");
 //    stage1.fireNewChainAction(testingMethod3s, "a").fireNewChainAction(testingMethod3s, "b").fireNewChainAction(
 //            testingMethod3s, "w");
 //    stage1.fireNewChainAction(testingMethod3s, "x");
@@ -144,22 +144,22 @@ namespace bsc {
 //    when(event < LogicStateEvent<NetworkModule, int>>
 //    ()).fireModuleAction(&NetworkModule::testingMethod2);
 //    when(state<NetworkModule, int>(2).entered()/*.left()*/).valid();
-//    when(state<NetworkModule, int>(4).entered()/*.left()*/).fireStateChangeReaction([](auto &netMod, auto a) {
-//        LOGGER("net mode test.. " + std::to_string(a) + "  " + netMod.testingMethod())
-//    });//.fireModuleAction(&NetworkModule::testingMethod);
+        //    when(state<NetworkModule, int>(4).entered()/*.left()*/).fireStateChangeReaction([](auto &netMod, auto a) {
+        //        logger.debug("net mode test.. " + std::to_string(a) + "  " + netMod.testingMethod());
+        //    });//.fireModuleAction(&NetworkModule::testingMethod);
         when(event < bsc::LogicStateEvent<NetworkModule, int>>
         ()).fireNewAction([](auto event) {
-            LOGGER("logic state event " + std::to_string(event.getState()) +
-                   (event.getMethod() == bsc::LogicStateMethod::entered ? " entered" : " left"))
+            logger.debug("logic state event " + std::to_string(event.getState()) +
+                         (event.getMethod() == bsc::LogicStateMethod::entered ? " entered" : " left"));
         });
 
 //    Tick tick;
 //    tick.getNow().time_since_epoch().
 //    when(event < Tick > (1s)).constraint([](Tick &event) -> bool {
-//        return std::chrono::duration_cast<std::chrono::seconds>(event.getNow().time_since_epoch()).count() % 7 == 0;
-//    }).fireNewAction([](auto event) { LOGGER("every 5s!") });
-//    intStateMachine.define(1).to(2).to(3).to(4);
-//    auto def = intStateMachine.define(1);
+        //        return std::chrono::duration_cast<std::chrono::seconds>(event.getNow().time_since_epoch()).count() % 7 == 0;
+        //    }).fireNewAction([](auto event) { logger.debug("every 5s!") });
+        //    intStateMachine.define(1).to(2).to(3).to(4);
+        //    auto def = intStateMachine.define(1);
 //    def->(2)->(3);
 //    intStateMachine.addState(1, 2, 3, 4, 5, 6);
 //    intStateMachine.addLink(1, 2, 3, 4, 5, 6);
@@ -187,10 +187,10 @@ namespace bsc {
                     auto packet = event.getPacket();
                     if (packet->getNetworkInfo() != nullptr) {
                         networkSource.networkInfoReceived(*packet->getNetworkInfo());
-                        LOGGER("Network response received " + std::to_string(packet->getId()) + " " +
-                               packet->getNetworkInfo()->getNetworkId());
+                        logger.debug("Network response received " + std::to_string(packet->getId()) + " " +
+                                     packet->getNetworkInfo()->getNetworkId());
                     } else {
-                        LOGGER("Empty network response")
+                        logger.debug("Empty network response");
                     }
                 });
 
@@ -198,8 +198,7 @@ namespace bsc {
             auto packet = event.getPacket();
 
             nodeSource.nodeInfoReceived(packet->getNodeInfo());
-            LOGGER("Node response received " + packet->getNodeInfo().getNodeId() + "  " +
-                   std::to_string(packet->getId()));
+            logger.debug("Node response received " + packet->getNodeInfo().getNodeId() + "  " + std::to_string(packet->getId()));
         });
 
         return true;
@@ -219,18 +218,18 @@ namespace bsc {
         //   std::lock_guard<std::mutex> g1(node.getLock());
         // std::thread([&]() {
         //    //this is meant to be run from a thread
-//    LOGGER("update node ")
-//        for (auto &&item : activeClientConnections) {
-//            LOGGER("update connection " + (item->nodeId ? *item->nodeId : " ?? "));
-//            auto packet = NodeInfoRequest::getNew();
-//            NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
+        //    logger.debug("update node ");
+        //        for (auto &&item : activeClientConnections) {
+        //            logger.debug("update connection " + (item->nodeId ? *item->nodeId : " ?? "));
+        //            auto packet = NodeInfoRequest::getNew();
+        //            NodeInfoResponse::Ptr response = protocol->sendExpect(item->connection.get(), packet);
 //            if (response != nullptr) {
 //                auto &ni = response->getNodeInfo();
 //                ni.printAll();
-//                auto nid = ni.getNodeId();
-//                LOGGER(ni.getNetworkId());
-//                const auto &val = response->getNodeInfo().getNodeId();
-//                //(*(*item).nodeId) = val;
+        //                auto nid = ni.getNodeId();
+        //                logger.debug(ni.getNetworkId());
+        //                const auto &val = response->getNodeInfo().getNodeId();
+        //                //(*(*item).nodeId) = val;
 //                item->nodeId = val;
 //            } else {
 //                //response not received, connection probably is down
@@ -287,7 +286,7 @@ namespace bsc {
 
 
     void NetworkModule::removeAcceptedConnection(IServerConnection* c) {
-        // LOGGER("REMOVE REMOVE REMOVE");
+        // logger.debug("REMOVE REMOVE REMOVE");
         std::lock_guard<std::mutex> g(acceptedConnectionsMutex);
         acceptedConnections.remove(c);
     }
@@ -314,7 +313,7 @@ namespace bsc {
         if (serverSocket == nullptr) {
 
             serverSocket = std::make_shared<ServerSocket>(configuration().getPort());
-            LOGGER(std::string("Opening port ") + std::to_string(configuration().getPort()));
+            logger.debug(std::string("Opening port ") + std::to_string(configuration().getPort()));
         }
 
         Poco::AutoPtr<Poco::Net::TCPServerParams> p(new Poco::Net::TCPServerParams());
@@ -326,8 +325,7 @@ namespace bsc {
                 p);
         server->start();
         using namespace std::string_literals;
-        LOGGER("server connections max: "s + std::to_string(server->maxConcurrentConnections()))
-
+        logger.debug("server connections max: "s + std::to_string(server->maxConcurrentConnections()));
     }
 
 
@@ -362,13 +360,13 @@ namespace bsc {
 //    }
 //
 //    if (conn != nullptr) {
-//        conn->send(packet);
-//        LOGGER("sending packet to node " + nodeId)
-//        return true;
-//    } else {
-//        LOGGER("unable to send packet to " + nodeId)
-//        return false;
-//
+    //        conn->send(packet);
+    //        logger.debug("sending packet to node " + nodeId);
+    //        return true;
+    //    } else {
+    //        logger.debug("unable to send packet to " + nodeId);
+    //        return false;
+    //
 //    }
 //}
 
@@ -454,11 +452,11 @@ namespace bsc {
         networkSub.registerPacketProcessor<ConnectionControl>(ConnectionProcessors::processConnectionControl);
         networkSub.registerPacketProcessor<NetworkInfoGroup>([this](NetworkInfoRequest::Ptr request) {
             auto response = request->getNew<Status::response>();
-            // LOGGER("processing network info request id" + std::to_string(this->getId()));
+            // logger.debug("processing network info request id" + std::to_string(this->getId()));
 
             if (this->getNetworkInfo() == nullptr) {
                 //@todo actual error handling
-                LOGGER("empty network info! ")
+                logger.debug("empty network info! ");
             }
             response->setNetworkInfo(this->getNetworkInfo());
             return response;
@@ -466,8 +464,7 @@ namespace bsc {
 
         networkSub.registerPacketProcessor<NodeInfoGroup>([this](NodeInfoGroup::Request::Ptr request) {
             auto response = request->getNew<Status::response>();
-            // LOGGER("processing network info request id" + std::to_string(this->getId()));
-
+            // logger.debug("processing network info request id" + std::to_string(this->getId()));
 
             response->setNodeInfo(node.getNodeInfo());
             return response;

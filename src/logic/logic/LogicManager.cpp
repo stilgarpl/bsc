@@ -5,7 +5,7 @@
 #include <logic/context/LogicContext.h>
 
 void bsc::LogicManager::onStop() {
-    LOGGER("LOGIC MANAGER IS STOPPING")
+    logger.debug("LOGIC MANAGER IS STOPPING");
     sourceManager.stopSources();
     sourceManager.joinSources();
 }
@@ -15,9 +15,8 @@ void bsc::LogicManager::onStart() {
 }
 
 void bsc::LogicManager::run() {
-    LOGGER("logic stopping is " + std::to_string(this->isStopping()))
+    logger.debug("logic stopping is " + std::to_string(this->isStopping()));
     waitForStop();
-
 }
 
 void bsc::LogicManager::setContexts(const Context::Ptr& context) {
@@ -26,7 +25,6 @@ void bsc::LogicManager::setContexts(const Context::Ptr& context) {
 }
 
 bsc::LogicManager::~LogicManager() {
-    LOGGER("logic destructor")
+    logger.debug("logic destructor");
     sourceManager.stopSources();
-
 }

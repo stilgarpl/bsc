@@ -19,7 +19,7 @@ bsc::ClientConnection::ClientConnection(const Poco::Net::SocketAddress& a, const
 
     auto lm = getConnectionContext()->get<LogicContext>();
 
-    LOGGER("adding new connection, triggering connection established event")
+    logger.debug("adding new connection, triggering connection established event");
 
     lm->getLogicManager().getSource<bsc::ConnectionSource>()->connectionEstablished(this);
 
@@ -44,15 +44,14 @@ bsc::ClientConnection::~ClientConnection() {
 //        socket.shutdown();
         ClientConnection::shutdown();
     } catch (const Poco::Net::NetException& e) {
-        LOGGER("net exception")
-        LOGGER(e.displayText())
+        logger.debug("net exception");
+        logger.debug(e.displayText());
         auto nested = e.nested();
         while (nested != nullptr) {
-            LOGGER(nested->displayText())
+            logger.debug(nested->displayText());
             nested = nested->nested();
         }
     }
-
 }
 
 void bsc::ClientConnection::shutdown() {
@@ -60,7 +59,7 @@ void bsc::ClientConnection::shutdown() {
     try {
         socket.shutdown();
     } catch (const Poco::Net::NetException& e) {
-        LOGGER("net exception")
+        logger.debug("net exception");
         e.displayText();
         auto nested = e.nested();
         while (nested != nullptr) {

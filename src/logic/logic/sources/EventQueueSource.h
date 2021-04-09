@@ -60,7 +60,7 @@ namespace bsc {
                 //                this->isStopping()); });
                 queueReady.wait_for(g, 100ms);
                 while (!eventQueue.empty()) {
-                    //  LOGGER("Processing event");
+                    //  logger.debug("Processing event");
                     //@todo better locking and unlocking of mutex
 
                     EventTypePtr i = eventQueue.front();
@@ -70,7 +70,7 @@ namespace bsc {
                     if (i != nullptr) {
                         this->event(*i);
                     } else {
-                        LOGGER("BAD POINTER");
+                        logger.debug("BAD POINTER");
                     }
                     g.lock();
                 }

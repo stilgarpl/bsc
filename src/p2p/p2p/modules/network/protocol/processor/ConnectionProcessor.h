@@ -17,9 +17,6 @@ namespace bsc {
 
     class ConnectionProcessor : public bsc::Runnable {
 
-    private:
-        Logger logger = Logger("Connection Processor");
-
     protected:
         Connection& connection;
         //@todo initialize packet filter from AuthModule or configuration or sth.

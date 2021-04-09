@@ -40,7 +40,7 @@ namespace bsc {
         protected:
             void applyRule() override {
                 for (const auto& item : requiredRoles) {
-                    LOGGER("APPLYING RULE")
+                    logger.debug("APPLYING RULE");
                     Roles::defineRequiredRole<PacketType>(item);
                 }
             }

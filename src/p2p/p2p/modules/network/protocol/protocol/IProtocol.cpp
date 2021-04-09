@@ -16,15 +16,15 @@ std::future<bsc::BasePacketPtr> bsc::ProtocolWrapper::send(BasePacketPtr p) {
 }
 
 void bsc::DummyProtocol::onPacketSent(const PacketEvent& event) {
-    LOGGER("on packet sent")
+    logger.debug("on packet sent");
 }
 
 void bsc::DummyProtocol::onPacketReceived(const PacketEvent& event) {
-    LOGGER("on packet received")
+    logger.debug("on packet received");
 }
 
 void bsc::DummyProtocol::work(const bsc::Tick& tick) {
-    LOGGER("on work")
+    logger.debug("on work");
 }
 
 std::future<bsc::BasePacketPtr>
@@ -71,6 +71,5 @@ std::future<bsc::BasePacketPtr> bsc::IProtocol::send(Connection* conn, BasePacke
 }
 
 void bsc::IProtocol::testMethod(std::string a) {
-    LOGGER("test method " + a);
-
+    logger.debug("test method " + a);
 }

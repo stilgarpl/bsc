@@ -18,7 +18,7 @@ namespace bsc {
         auto realFileSize = fs::file_size(sourcePath);
         if (realChecksum == checksum && realFileSize == size) {
             //file IS OK
-            LOGGER("CHECKSUM IS OK, COPYING TO INTERNAL STORAGE");
+            logger.debug("CHECKSUM IS OK, COPYING TO INTERNAL STORAGE");
             fs::copy_options options = fs::copy_options::none;
             //check if file is already in storage
             if (fs::exists(getResourcePath(getResourceId(checksum, size)))) {
@@ -33,7 +33,7 @@ namespace bsc {
             try {
                 fs::copy(sourcePath, getResourcePath(getResourceId(checksum, size)), options);
             } catch (fs::filesystem_error& e) {
-                LOGGER(e.what());
+                logger.debug(e.what());
             }
         }
 
@@ -51,9 +51,9 @@ namespace bsc {
 
         if (!fs::exists(this->storagePath)) {
             if (fs::create_directories(storagePath)) {
-                LOGGER("STORAGE INITIALIZED")
+                logger.debug("STORAGE INITIALIZED");
             } else {
-                LOGGER("FAILED TO INITIALIZE STORAGE");
+                logger.debug("FAILED TO INITIALIZE STORAGE");
             }
         }
 
@@ -88,7 +88,7 @@ namespace bsc {
 //    req->setObjectId(resourceId);
 //    //@todo this will wait for response, potentially blocking Repository
 //    auto responseMap = netModule->broadcastRequest(req);
-        LOGGER("acquiring resource " + resourceId)
+        logger.debug("acquiring resource " + resourceId);
         if (transferQueue == nullptr) {
             transferQueue = fileModule->transferQueue();
         }
@@ -107,13 +107,13 @@ namespace bsc {
         //@todo don't do restore if the target is identical or changed
         //@todo verify checksum and size (add way to get those from resource id?)
         auto resourcePath = getResourcePath(resourceId);
-        LOGGER("IS:restore resP " + resourcePath.string() + " desP " + destinationPath.string())
+        logger.debug("IS:restore resP " + resourcePath.string() + " desP " + destinationPath.string());
 
         fs::create_directories(fs::weakly_canonical(destinationPath).parent_path());
         try {
             fs::copy(resourcePath, destinationPath, fs::copy_options::overwrite_existing);
         } catch (fs::filesystem_error& e) {
-            LOGGER(e.what());
+            logger.debug(e.what());
         }
     }
 

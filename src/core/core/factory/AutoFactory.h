@@ -16,7 +16,7 @@ namespace bsc {
         void registerFactoryInFactoryContext() {
             FactoryContext::registerInitializer([](FactoryContext& factoryContext) {
                 using namespace std::string_literals;
-                LOGGER("AUTO: Registering factory: "s + typeid(FactoryType).name())
+                logger.debug("AUTO: Registering factory: "s + typeid(FactoryType).name());
                 factoryContext.template addFactory<FactoryType>();
             });
         }

@@ -16,7 +16,7 @@ bsc::Node::~Node() {
     // setting node context to active - if more than one node is created in a single thread, things may get mixed up.
     Node::setNodeContextActive();
     if (started) {
-        ERROR("stopping in destructor is usually too late. stop and wait!")
+        logger.error("stopping in destructor is usually too late. stop and wait!");
         Node::stop();
         bsc::Node::waitToFinish();
     }
@@ -39,7 +39,7 @@ void bsc::Node::start() {
 }
 
 void bsc::Node::stop() {
-    LOGGER("node stop")
+    logger.debug("node stop");
     std::unique_lock g(startMutex);
     setNodeContextActive();
     started = false;
@@ -50,12 +50,13 @@ void bsc::Node::stop() {
     stopModules();
 }
 
-bsc::Node::Node()
-    : Node({.rootPath = fs::path(std::getenv("HOME")) / ".bsc"}){LOGGER("default node constructor")}
+bsc::Node::Node() : Node({.rootPath = fs::path(std::getenv("HOME")) / ".bsc"}) {
+    logger.debug("default node constructor");
+}
 
-      bsc::Node::Node(Node::Configuration configuration)
+bsc::Node::Node(Node::Configuration configuration)
     : nodeConfiguration(std::move(configuration)) {
-    LOGGER("configuration node constructor")
+    logger.debug("configuration node constructor");
     nodeContext->set<NodeContext, Node&, NodeInfo&>(*this, this->thisNodeInfo);
     nodeContext->get<LoggerContext>()->setInstanceFetcher([&] { return thisNodeInfo.getNodeId(); });
     nodeContext->setDirect<InputOutputContext>(std::make_shared<StandardInputOutputContext>());
@@ -67,7 +68,7 @@ bsc::Node::Node()
     logicManager.setContexts(nodeContext);
 
     Node::setNodeContextActive();
-    LOGGER("node constructor finished")
+    logger.debug("node constructor finished");
 }
 
 void bsc::Node::startModules() {

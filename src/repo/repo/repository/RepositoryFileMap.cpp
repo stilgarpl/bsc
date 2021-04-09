@@ -15,20 +15,20 @@ namespace bsc {
         if (fileMapCache.contains(journalChecksum)) {
             return fileMapCache[journalChecksum];
         }
-        //    LOGGER("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum)
+        //    logger.debug("prepare map jch:" + journal->getChecksum() + " mck " + mapChecksum);
         auto& fileMap = fileMapCache[journalChecksum];
         auto& pathTransformer = fileMap.pathTransformer;
-        LOGGER("checksum different, recreate file map")
+        logger.debug("checksum different, recreate file map");
         //@todo this funcmap should be const and generated in constructor or even static, no need to make it every call to render... on the other hand, it has captures, so it may not be possible
         JournalFuncMap funcMap;
         funcMap.setFunc<JournalMethod::add,JournalTarget::file>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
-            LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
+            logger.debug(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
         funcMap.setFunc<JournalMethod::modify,JournalTarget::file>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
-            LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
+            logger.debug(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
         //@todo moved file should have two parameters - from to. or, just remove moved and use deleted/added
@@ -41,7 +41,7 @@ namespace bsc {
             fileMap.attributesMap[path] = std::nullopt;
             fileMap.deleteMap[path].setDeleted(true);
             fileMap.deleteMap[path].setDeletionTime(i.getModificationTime());
-            //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
+            //            logger.debug(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
         funcMap.setFunc<JournalMethod::forget,JournalTarget::file>([&](auto& i) {
@@ -49,17 +49,17 @@ namespace bsc {
             fileMap.attributesMap[path] = std::nullopt;
             fileMap.deleteMap[path].setDeleted(false);
             fileMap.deleteMap[path].setDeletionTime(fs::file_time_type::min());
-            //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
+            //            logger.debug(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
         funcMap.setFunc<JournalMethod::add,JournalTarget::directory>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
-            LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
+            logger.debug(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
         funcMap.setFunc<JournalMethod::modify,JournalTarget::directory>([&](auto& i) {
             fileMap.attributesMap[pathTransformer->transformFromJournalFormat(i.getDestination())] = RepositoryAttributes(i);
-            LOGGER(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
+            logger.debug(IStorage::getResourceId(i.getResourceChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
         //@todo order of operations is important. file moved and recreated with the same path may be overwritten and then moved if operations are in wrong order. that need to be preserved when I implement moves.
@@ -73,7 +73,7 @@ namespace bsc {
             fileMap.attributesMap[path] = std::nullopt;
             fileMap.deleteMap[path].setDeleted(true);
             fileMap.deleteMap[path].setDeletionTime(i.getModificationTime());
-            //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
+            //            logger.debug(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
         funcMap.setFunc<JournalMethod::forget,JournalTarget::directory>([&](auto& i) {
@@ -81,7 +81,7 @@ namespace bsc {
             fileMap.attributesMap[path] = std::nullopt;
             fileMap.deleteMap[path].setDeleted(false);
             fileMap.deleteMap[path].setDeletionTime(fs::file_time_type::min());
-            //            LOGGER(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
+            //            logger.debug(IStorage::getResourceId(i.getChecksum(), i.getSize()) + " ::: " + i.getDestination());
         });
 
         funcMap.setFunc<JournalMethod::add,JournalTarget::transformer>([&](auto& i) {

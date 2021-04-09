@@ -118,7 +118,7 @@ namespace bsc {
 
         ThisType& constraint(const ConstraintFunc& func) {
             _constraint.push_back(func);
-//            LOGGER("adding constraint, size " + std::to_string(_constraint.size()))
+            //            logger.debug("adding constraint, size " + std::to_string(_constraint.size()));
             return *this;
         }
 
@@ -182,10 +182,10 @@ public:
             if (!chainLockId) {
                 //no chain lock id!
                 //@todo maybe rearrange function so it doesn't return here.
-//                LOGGER("no lock id")
+                //                logger.debug("no lock id");
                 return;
             }
-            LOGGER("chain lock id " + *chainLockId)
+            logger.debug("chain lock id " + *chainLockId);
             auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
             auto& chainLock = chainContext->getChainLock(*chainLockId);
             //@todo maybe use different mutex than chainLock mutex?
@@ -203,7 +203,7 @@ public:
                 chainLock.lock(instance);
                 guard.lock();
             }
-            LOGGER("LOCK OBTAINED " + *chainLockId)
+            logger.debug("LOCK OBTAINED " + *chainLockId);
         }
 
         static void releaseChainLock(const std::optional<ChainLockIdType>& chainLockId, InstanceType instance) {
@@ -211,17 +211,17 @@ public:
             if (chainLockId) {
                 auto chainContext = Context::getActiveContext()->get<GlobalChainContext>();
                 auto& chainLock = chainContext->getChainLock(*chainLockId);
-                LOGGER("RELEASE BEFORE " + *chainLockId)
+                logger.debug("RELEASE BEFORE " + *chainLockId);
                 std::unique_lock<std::recursive_mutex> guard(chainLock.getMutex());
                 //@todo check instance.
                 while (chainLock.isLocked() && chainLock.getInstance() != instance) {
                     chainLock.waitForUnlock();
                 }
                 chainLock.unlock();
-                LOGGER("RELEASE AFTER")
+                logger.debug("RELEASE AFTER");
             } else {
                 //@todo error handling
-                LOGGER("UNLOCK CALLED WITH NO CHAIN ID")
+                logger.debug("UNLOCK CALLED WITH NO CHAIN ID");
             }
         }
 
@@ -253,7 +253,7 @@ public:
 
         template<typename ActionId>
         ThisType& fireAction(ActionId actionId) {
-            LOGGER("assigning action ... ");
+            logger.debug("assigning action ... ");
             bool success;
 
             //@todo if constrained then event<ConstrainedActionEvent> -> actionId; actionId = constrainedActionId
@@ -338,11 +338,11 @@ public:
         fireNewAction(ActionManager::ActionType<const typename std::decay<EventType>::type&, Args...> newAction) {
 
             auto generatedActionId = generateActionId<unsigned long>();
-//            int status;
-//            auto realname = abi::__cxa_demangle(typeid(EventType).name(), 0, 0, &status);
+            //            int status;
+            //            auto realname = abi::__cxa_demangle(typeid(EventType).name(), 0, 0, &status);
 
-//            LOGGER("fire new action for type " + std::string(typeid(EventType).name()) + " .... " + realname )
-            LOGGER("assigning action with generated id " + std::to_string(generatedActionId));
+            //            logger.debug("fire new action for type " + std::string(typeid(EventType).name()) + " .... " + realname );
+            logger.debug("assigning action with generated id " + std::to_string(generatedActionId));
             logicManager.setAction<const typename std::decay<EventType>::type&, Args...>(generatedActionId, newAction);
             fireAction(generatedActionId);
             return *static_cast<ThisType*>(this);
@@ -386,7 +386,7 @@ public:
 
         template<typename GenericFunc, typename ... Evaluators>
         auto fireNewGenericAction(GenericFunc genericFunc, Evaluators... evaluators) {
-            LOGGER("fireNewGenericAction - normal")
+            logger.debug("fireNewGenericAction - normal");
             return fireNewAction([=](const typename std::decay<EventType>::type& e) {
                 genericFunc(evaluators(e)...);
             });
@@ -395,10 +395,10 @@ public:
 
         //@todo remove eventually if not needed
 //        template<typename GenericFunc, template<typename E> typename ... Evaluators>
-//        auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators<EventType>... evaluators) {
-//            LOGGER("fireNewGenericChainAction - template")
-//            //@todo check if RetType is void or already an event type
-//            using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators<EventType>, EventType, Args...>...>;
+        //        auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators<EventType>... evaluators) {
+        //            logger.debug("fireNewGenericChainAction - template");
+        //            //@todo check if RetType is void or already an event type
+        //            using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators<EventType>, EventType, Args...>...>;
 //            return fireNewChainAction([=](EventType e) {
 //                //@todo should I setDirect eventWrapper ID to something? I don't think it's ever fired as a standalone event, not wrapped in chainEvent...
 //                return EventWrapper<RetType>(genericFunc(evaluators(e)...));
@@ -411,7 +411,7 @@ public:
 
         template<typename GenericFunc, typename ... Evaluators>
         auto fireNewGenericChainAction(GenericFunc genericFunc, Evaluators... evaluators) {
-            LOGGER("fireNewGenericChainAction - normal")
+            logger.debug("fireNewGenericChainAction - normal");
             //@todo check if RetType is void or already an event type
             using RetType = std::invoke_result_t<GenericFunc, std::invoke_result_t<Evaluators, EventType, Args...>...>;
             if constexpr (std::is_same<void, RetType>::value) {
@@ -505,9 +505,9 @@ public:
                                                         auto... args) -> ChainEvent<typename std::decay<EventType>::type> {
                         ChainEvent<typename std::decay<EventType>::type> newEvent(event);
                         auto generatedLockId = lockIdGenerator(event.getBaseChainId(), *event.getActualEvent());
-//                        LOGGER("lockiiing")
+                        //                        logger.debug("lockiiing");
                         obtainChainLock(generatedLockId, event.getInstance(), true);
-//                        LOGGER("locked")
+                        //                        logger.debug("locked");
                         newEvent.setEventId(generatedChainId);
                         newEvent.setChainLockId(generatedLockId);
                         return newEvent;
@@ -539,16 +539,19 @@ public:
             if constexpr (!std::is_same<void, RetType>::value) { //Return Type of func is not void
                 std::function<ChainEvent<RetType>(const ChainEvent<EventType>&)> f =
                         [=, chainId = chainId](ChainEvent<EventType> chainedEvent) {
-//                            LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
-//                                   chainedEvent.getEventId())
+                            //                            logger.debug("chain action " + (chainId ? *chainId : "NO CHAIN ID"); + " stage : "
+                            //                            +
+                            //                                   chainedEvent.getEventId())
                             obtainChainLock(chainedEvent.getChainLockId(), chainedEvent.getInstance(), false);
                             if (chainedEvent.getActualEvent() && chainedEvent.getActualEvent()->isEventValid()) {
-//                                LOGGER("chained action" + *chainId)
+                                //                                logger.debug("chained action" + *chainId);
                                 auto value = func(*chainedEvent.getActualEvent(), setArgs...);
                                 ChainEvent<RetType> result(chainedEvent.getBaseChainId(), generatedChainId,
                                                            chainedEvent.getInstance(), value,
                                                            chainedEvent.getChainLockId());
-//                            LOGGER("storing chain result in chain context " + std::to_string(Context::getActiveContext()->get<ChainContext>()->use_count()) )
+                                //                            logger.debug("storing chain result in chain context " +
+                                //                            std::to_string(Context::getActiveContext()->get<ChainContext>()->use_count())
+                                //                            );
                                 Context::getActiveContext()->get<ChainContext>()->storeChainResult<RetType>(
                                         generatedChainId, value);
                                 return result;
@@ -562,8 +565,8 @@ public:
 
                 std::function<void(const ChainEvent<EventType>&)> f = [=, chainId = chainId](
                         const ChainEvent<EventType>& chainedEvent) {
-//                    LOGGER("chain action " + (chainId ? *chainId : "NO CHAIN ID") + " stage : " +
-//                           chainedEvent.getEventId())
+                    //                    logger.debug("chain action " + (chainId ? *chainId : "NO CHAIN ID"); + " stage : " +
+                    //                           chainedEvent.getEventId())
 
                     if (chainedEvent.getActualEvent()) {
                         func(*chainedEvent.getActualEvent(), setArgs...);
@@ -587,8 +590,8 @@ public:
                            const ChainIdType& generatedChainId, SetArgs... setArgs) {
             if (chainId) {
                 //@todo apply constraint?
-                if constexpr (!std::is_same<void, RetType>::value) { //Return Type of func is not void
-//                    LOGGER("generated chain id " + generatedChainId);
+                if constexpr (!std::is_same<void, RetType>::value) {// Return Type of func is not void
+                    //                    logger.debug("generated chain id " + generatedChainId);
                     logicManager.setActionExtended<ChainEvent<RetType>, const ChainEvent<EventType>&, Args...>(
                             generatedActionId, f);
                     logicManager.assignAction<ChainEvent<EventType>, Args...>(*chainId, generatedActionId);
@@ -606,7 +609,7 @@ public:
             } else {
 
                 //@todo exception!!!
-                LOGGER("FAILURE! NO EVENT CHAIN ID SET!")
+                logger.debug("FAILURE! NO EVENT CHAIN ID SET!");
                 //@todo generated chain if no chain setDirect! fix!
 //                auto generatedChainId = nextChainId();
                 if constexpr (!std::is_same<void, RetType>::value) {
@@ -627,12 +630,13 @@ public:
         ThisType& newChain(const ChainIdType& id) {
             chainId = id;
             return transform<ChainEvent<EventType>>([=](const auto& event) {
-//                LOGGER("starting chain " + id)
-                //@todo be careful - if new chain starts before previous one has finished, the chain context will be overwritten. !!!! --- but is it really? I think active context should belong to an event.
+                //                logger.debug("starting chain " + id);
+                //@todo be careful - if new chain starts before previous one has finished, the chain context will be overwritten. !!!! ---
+                //but is it really? I think active context should belong to an event.
                 auto chainContext = Context::getActiveContext()->set<ChainContext>(id);
 
                 ChainEvent r(id, id, chainContext->instanceGenerator().nextValue(), event, std::nullopt);
-//                LOGGER("new chain: " + id + " storing initial result " + r.getEventId())
+                //                logger.debug("new chain: " + id + " storing initial result " + r.getEventId());
                 chainContext->storeChainResult<EventType>(r.getEventId(), *r.getActualEvent());
                 //debug stuff @todo remove
                 auto activeContext = Context::getActiveContext();
@@ -650,7 +654,7 @@ public:
                     const typename std::decay<EventType>::type& event) -> NewEventType {
                 return transformer(event);
             };
-//            LOGGER("transforming action with generated id " + std::to_string(generatedActionId))
+            //            logger.debug("transforming action with generated id " + std::to_string(generatedActionId));
             logicManager.setActionExtended<NewEventType, EventType, Args...>(generatedActionId, f);
             fireAction(generatedActionId);
             return *static_cast<ThisType*>(this);

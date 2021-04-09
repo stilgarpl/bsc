@@ -33,7 +33,7 @@ namespace bsc {
         template<typename ... Args>
         static void allowed(const Role& role, Args... args) {
             //@todo check if id is valid, if not throw exception
-            LOGGER("Role is " + role.getRoleId());
+            logger.debug("Role is " + role.getRoleId());
             if (isRoleValid(role)) {
                 allowed(args...);
             } else {

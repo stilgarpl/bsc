@@ -45,11 +45,11 @@ namespace bsc {
                     const auto& properties = reader.readMetaData(file);
                     try {
                         auto targetPath = translator.translate(*pattern, properties) / file.filename();
-                        LOGGER("target path is " + targetPath.string());
+                        logger.debug("target path is " + targetPath.string());
                         if (actions.fileExistsPredicate(targetPath)) {
-                            LOGGER("File "s + file.string() + "already exists in location " + targetPath.string())
+                            logger.debug("File "s + file.string() + "already exists in location " + targetPath.string());
                             targetPath = actions.createValidTargetPathStrategy(targetPath, actions.fileExistsPredicate);
-                            LOGGER("New target path is "s + targetPath.string());
+                            logger.debug("New target path is "s + targetPath.string());
                         }
                         //@todo this if is mostly for skip action to work, but maybe I should throw on invalid target
                         // paths created?
@@ -73,7 +73,7 @@ namespace bsc {
             }
         } catch (const FileSortingException& e) {
             //@todo print error message?
-            ERROR("File sorting exception: "s + e.what());
+            logger.error("File sorting exception: "s + e.what());
         }
         return sortResult;
     }

@@ -13,16 +13,18 @@ namespace bsc {
     class AutoCaller {
     private:
         struct Caller {
-            Caller(const std::function<void(void)>& f) { f(); }
+            Caller(const std::function<void(void)>& f) {
+                f();
+            }
             // this is intentionally empty
             void init() const {};
         };
         inline const static Caller caller{fun};
         inline const static Type t{};
-        AutoCaller() = delete;
 
     public:
-        AutoCaller(int passAnythingHere) {
+        AutoCaller() = delete;
+        explicit AutoCaller(int passAnythingHere) {
             // this doesn't do anything, but it forces caller to instantiate
             caller.init();
         }

@@ -6,6 +6,6 @@ add_executable(bsc-test bsc/main_test.cpp)
 target_link_libraries(bsc-demo repo module_auth)
 target_link_libraries(bsc-control p2p_core module_command)
 target_link_libraries(bsc-daemon repo)
-target_link_libraries(bsc-test properties context)
+target_link_libraries(bsc-test properties context log)
 install(TARGETS bsc-demo bsc-daemon bsc-control bsc-test COMPONENT bsc)
 

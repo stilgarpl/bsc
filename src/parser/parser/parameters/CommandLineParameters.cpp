@@ -219,9 +219,9 @@ namespace bsc {
     char* CommandLineParameters::ArgumentParser::helpFilter(int key, const char* text, void* input) {
         if (text != nullptr) {
             using namespace std::string_literals;
-            //        LOGGER("TEXT FILTER IS : "s + text);
+            //        logger.debug("TEXT FILTER IS : "s + text);
         } else {
-            //        LOGGER("TEXT IS NULL");
+            //        logger.debug("TEXT IS NULL");
         }
         return nullptr;
     }

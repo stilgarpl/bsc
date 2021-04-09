@@ -69,38 +69,37 @@ void bsc::Connection::workSend(Poco::Net::StreamSocket& socket) {
                 {
                     std::stringstream ss;
                     ss << std::this_thread::get_id();
-//                    LOGGER("sending packet " + ss.str());
+                    //                    logger.debug("sending packet " + ss.str());
                     v = sendQueue.front();
                     {
                         cereal::BinaryOutputArchive oa(os);
                         oa << v;
                     }
-//                    LOGGER("packet sent " + std::to_string(v->getId()) + " " + typeid(*v).name())
+                    //                    logger.debug("packet sent " + std::to_string(v->getId()) + " " + typeid(*v).name());
 
-//                    LOGGER("packet sent" + std::to_string(v->getId()));
+                    //                    logger.debug("packet sent" + std::to_string(v->getId()));
                     //@todo replace this ptr with observer pattern
                     if (connectionSourcePtr != nullptr) {
                         connectionSourcePtr->sentPacket(v, this);
                     }
-                    LOGGER("packet sent.")
+                    logger.debug("packet sent.");
                     sendQueue.pop();
                 }
 
             }
             os.flush();
-//            std::this_thread::sleep_for(10ms);
-//            LOGGER("sending flushed");
+            //            std::this_thread::sleep_for(10ms);
+            //            logger.debug("sending flushed");
         } catch (const cereal::Exception& e) {
-            LOGGER(" C EXCEPTION")
-            LOGGER(e.what());
-            //socket.close();
+            logger.debug(" C EXCEPTION");
+            logger.debug(e.what());
+            // socket.close();
             stopReceiving();
             stopSending();
-            //cprocessor.stop();
-            // if not receiving, then it's ok!
-        }
-        catch (const Poco::IOException& e) {
-            LOGGER(" P EXCEPTION")
+            // cprocessor.stop();
+            //  if not receiving, then it's ok!
+        } catch (const Poco::IOException& e) {
+            logger.debug(" P EXCEPTION");
             //processor.stop();
             stopReceiving();
             stopSending();
@@ -110,9 +109,7 @@ void bsc::Connection::workSend(Poco::Net::StreamSocket& socket) {
         //  std::this_thread::sleep_for(400ms);
     }
 
-
-    LOGGER("stopped connection workSend")
-
+    logger.debug("stopped connection workSend");
 }
 
 void bsc::Connection::workReceive(Poco::Net::StreamSocket& socket) {
@@ -138,8 +135,9 @@ void bsc::Connection::workReceive(Poco::Net::StreamSocket& socket) {
                     std::this_thread::sleep_for(1ms);
                 }
                 if (receiving && socket.available()) {
-//                    LOGGER("receiving packet")
-                    //@todo missing packets issue: if there is more than one packet in the socket stream, only the first will be read and the rest will be discarded
+                    //                    logger.debug("receiving packet");
+                    //@todo missing packets issue: if there is more than one packet in the socket stream, only the first will be read and
+                    //the rest will be discarded
                     ///possible way to fix this is to implement a low level protocol buffer, that would get the bytes from cereal serializer and put them in the socket stream with additional data, like size and maybe CRC or sth.
                     ///and in the same way, it should first read the size bytes and then the rest of the message from the stream and when cereal does >> it should only give it ONE packet from the buffer at a time.
 
@@ -148,8 +146,8 @@ void bsc::Connection::workReceive(Poco::Net::StreamSocket& socket) {
                         BasePacketPtr v;
                         ia >> v;
 
-//                    ia(v);
-//                    LOGGER("packet received " + std::to_string(v->getId()) + " " + typeid(*v).name())
+                        //                    ia(v);
+                        //                    logger.debug("packet received " + std::to_string(v->getId()) + " " + typeid(*v).name());
                         {
                             std::lock_guard<std::mutex> g(receiveQueueLock);
                             receiveQueue.push(v);
@@ -161,10 +159,10 @@ void bsc::Connection::workReceive(Poco::Net::StreamSocket& socket) {
                 }
 
 //                if (!socket.poll(Poco::Timespan(1, 1), Poco::Net::Socket::SELECT_READ)) {
-//                    //socket is in a bad state, probably connection was closed.
-//                    LOGGER("TIMEOUT! CLOSING CONNECTION!")
-//                    stopReceiving();
-//                    stopSending();
+                //                    //socket is in a bad state, probably connection was closed.
+                //                    logger.debug("TIMEOUT! CLOSING CONNECTION!");
+                //                    stopReceiving();
+                //                    stopSending();
 //                    //@todo trigger event?
 //                }
             }
@@ -192,7 +190,7 @@ void bsc::Connection::workReceive(Poco::Net::StreamSocket& socket) {
         // std::this_thread::sleep_for(1ms);
 
     }
-    LOGGER("stopped connection workReceive")
+    logger.debug("stopped connection workReceive");
     processor.stop();
     connectionSourcePtr->connectionClosed(this);
 }
@@ -236,7 +234,7 @@ void bsc::Connection::stopReceiving() {
     try {
         getSocket().shutdown();
     } catch (const Poco::Net::NetException& e) {
-        LOGGER(e.what());
+        logger.debug(e.what());
     }
     if (receiveThread != nullptr && receiveThread->joinable() &&
         std::this_thread::get_id() != receiveThread->get_id()) {
@@ -266,10 +264,8 @@ bsc::Context::Ptr bsc::Connection::getConnectionContext() {
 
 bsc::Connection::~Connection() {
 
-    //   LOGGER("Closing connection")
-//    shutdown();
-
-
+    //   logger.debug("Closing connection");
+    //    shutdown();
 }
 
 void bsc::Connection::shutdown() {
@@ -285,7 +281,7 @@ bsc::NetAddressType bsc::Connection::getAddress() {
         return getSocket().peerAddress().toString();
     } catch (const Poco::Net::NetException& e) {
         using namespace std::string_literals;
-        ERROR("Network exception from POCO: "s + e.what());
+        logger.error("Network exception from POCO: "s + e.what());
         throw ConnectionException("Connection Exception: Can't get connection address");
     }
 }

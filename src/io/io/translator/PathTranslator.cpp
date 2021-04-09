@@ -17,7 +17,7 @@ namespace bsc {
 
             PathTranslationException a("Unable to translate pattern with properties. Pattern : " + pattern +
                                        ", properties: " + data.dump(2) + "renderer error" + e.what());
-            ERROR(a.what());
+            logger.error(a.what());
             throw a;
         }
     }

@@ -93,11 +93,10 @@ namespace bsc {
         std::string hash;
         ss << journalHistory.calculateChecksum();
 
-
         std::string source = ss.str();
-        hash = bsc::calculateSha1OfString(source);
-        //    LOGGER("string is " + source)
-        //    LOGGER("hash is " + hash);
+        hash               = bsc::calculateSha1OfString(source);
+        //    logger.debug("string is " + source);
+        //    logger.debug("hash is " + hash);
         checksum = hash;
         return checksum;
     }

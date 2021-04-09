@@ -70,7 +70,7 @@ namespace bsc {
     public:
         template<typename T>
         void operate(NetworkPacketPointer<T> ptr) {
-            //        LOGGER(std::string("operating o ") + typeid(T).name());
+            //        logger.debug(std::string("operating o ") + typeid(T).name());
             SpecificPacketEvent<T> packetEvent;
             packetEvent.setPacket(ptr);
             packetEvent.setConnection(connection);

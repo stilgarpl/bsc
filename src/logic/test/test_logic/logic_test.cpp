@@ -152,10 +152,8 @@ TEST_CASE("Basic logic test") {
     testaid::waitFor([&] { return setupLogic.getCounter().load() == 1000; }, 100ms);
     logicManager.stop();
     REQUIRE(setupLogic.getCounter().load() == 1000);
-    LOGGER("all ok")
+    logger.debug("all ok");
     logicManager.join();
-
-
 }
 
 
@@ -185,10 +183,8 @@ TEST_CASE("Chain logic test") {
     logicManager.stop();
     REQUIRE(setupLogic.getFirstCounter().load() == count);
     REQUIRE(setupLogic.getSecondCounter().load() == count);
-    LOGGER("all ok")
+    logger.debug("all ok");
     logicManager.join();
-
-
 }
 
 TEST_CASE("Invalid chain logic test") {

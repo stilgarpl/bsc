@@ -11,9 +11,9 @@ const bsc::ChainIdType& bsc::ChainContext::getChainId() const {
 
 bsc::ChainContext::ChainContext(const ChainIdType& chainId) : chainId(chainId) {
 
-//    LOGGER("chain context construct " + chainId)
+    //    logger.debug("chain context construct " + chainId);
 }
 
 bsc::ChainContext::~ChainContext() {
-//    LOGGER("chain context destruct " + chainId)
+    //    logger.debug("chain context destruct " + chainId);
 }

@@ -38,7 +38,7 @@ namespace bsc {
         template<typename T>
         static TypeIdType getClassId(T* t = nullptr) {
 
-            //  LOGGER("Class id for type " + std::string(typeid(T).name()) + " is " + std::to_string(getTypeId<T>()));
+            //  logger.debug("Class id for type " + std::string(typeid(T).name()) + " is " + std::to_string(getTypeId<T>()));
             return getTypeId<T>();
         }
 
@@ -51,8 +51,8 @@ namespace bsc {
             while (source.size() > 0) {
                 //take first element
                 auto& e = source.front();
-                //               LOGGER("e = " + std::to_string(e->getDependencyId()) + " " + (typeid(*e).name()));
-                //get its dependency list
+                //               logger.debug("e = " + std::to_string(e->getDependencyId()) + " " + (typeid(*e).name()));
+                // get its dependency list
                 //@todo check if null?
                 IDependency::ArrayType eDeps;
                 if (e->getRequiredDependencies() != nullptr) {
@@ -68,8 +68,9 @@ namespace bsc {
                         std::remove_if(eDeps.begin(), eDeps.end(), [&](IDependency::TypeIdType it) -> bool {
                             auto found = std::find_if(result.begin(), result.end(),
                                                       [&](std::shared_ptr<IDependencyManaged> jt) -> bool {
-                                                          // LOGGER("jt " + std::to_string(jt->getDependencyId()) + "  it :" + std::to_string(it));
-                                                          return jt->getDependencyId() == it;
+                                                                             // logger.debug("jt " + std::to_string(jt->getDependencyId()) +
+                                                                             // "  it :" + std::to_string(it));
+                                                                             return jt->getDependencyId() == it;
                                                       });
                             return found != result.end();
                         }), eDeps.end());

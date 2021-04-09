@@ -27,19 +27,19 @@ namespace bsc {
 
                                            }), observers.end());
             auto after = observers.size();
-            LOGGER("removed " + std::to_string(before - after))
+            logger.debug("removed " + std::to_string(before - after));
         }
 
         void notify(StateObject& object, stateIdType state) {
             std::unique_lock guard(observersLock);
-            LOGGER(std::string("notify: ") + typeid(StateObject).name() + " : " + std::to_string(observers.size()))
+            logger.debug(std::string("notify: ") + typeid(StateObject).name() + " : " + std::to_string(observers.size()));
             auto observersCopy = observers;
             guard.unlock(); //@todo not sure if I can run update() without this locked. we'll see.
             for (const auto& observer : observersCopy) {
                 auto& o = observer.get();
                 o.update(object, state);
             }
-            LOGGER("notified")
+            logger.debug("notified");
         }
 
         virtual ~DirectNotify() {

@@ -37,7 +37,7 @@ namespace bsc {
 
     TransferId TransferManager::beginTransfer(ResourceIdentificatorPtr resourceIdentificatorPtr) {
 
-        LOGGER("begin transfer")
+        logger.debug("begin transfer");
         //@todo find transfer by resource id?
 
         std::shared_ptr<RemoteTransferDescriptor> descriptor = std::make_shared<RemoteTransferDescriptor>();
@@ -49,7 +49,7 @@ namespace bsc {
 
             TransferId transferId = generateTransferId();
             transfers[transferId] = descriptor;
-            LOGGER("adding transfer " + std::to_string(transferId));
+            logger.debug("adding transfer " + std::to_string(transferId));
             //        BeginTransfer::Response::Ptr response = BeginTransfer::Response::getNew(event.getRequestId());
             //        response->setTransferId(transferId);
 
@@ -75,11 +75,11 @@ namespace bsc {
         //    if (remoteNodeContext != nullptr) {
         //        auto & remoteNode = remoteNodeContext->getRemoteNode();
         //        FinishTransfer::Response::Ptr res = FinishTransfer::Response::getNew(event.getRequestId());
-        //        LOGGER("sending finish response")
+        //        logger.debug("sending finish response");
         //        remoteNode.sendPacketToNode(res);
         //    } else {
-        //        LOGGER("no remote node context")
-        //        LOGGER("no node context either?")
+        //        logger.debug("no remote node context");
+        //        logger.debug("no node context either?");
         //    }
 
         //    auto connectionContext = event.context()->get<ConnectionContext>();
@@ -87,7 +87,7 @@ namespace bsc {
         //        FinishTransfer::Response::Ptr res = FinishTransfer::Response::getNew(event.getRequestId());
         //        connectionContext.getConnection().send(res);
         //    } else {
-        //        LOGGER("no connection context")
+        //        logger.debug("no connection context");
         //    }
 
         //    FinishTransfer::Response::Ptr res = FinishTransfer::Response::getNew(event.getRequestId());
@@ -160,53 +160,53 @@ namespace bsc {
         ret->setPayload([=](LocalTransferDescriptor& descriptorPtr) {
             // before anything, setDirect active context
             Context::setActiveContext(activeContext);
-            LOGGER("starting transfer...")
+            logger.debug("starting transfer...");
 
             const TransferSize MAX_CHUNK_SIZE =
                     NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>()->configuration().maxChunkSize;
-            //        LOGGER("download thread started")
+            //        logger.debug("download thread started");
             auto destinationStream = destination->getResourceOutputStream();
             // starting transfer
             BeginTransfer::Request::Ptr beginRequest = BeginTransfer::Request::getNew();
             beginRequest->setResourceId(source);
-            LOGGER("sending begin req")
+            logger.debug("sending begin req");
 
             BeginTransfer::Response::Ptr beginResponse = networkModule->sendPacketToNode(nodeId, beginRequest);
             if (beginResponse != nullptr) {
-                LOGGER("transfer manager -> STARTED")
+                logger.debug("transfer manager -> STARTED");
                 descriptorPtr.changeState(TransferState::STARTED);
                 auto transferId = beginResponse->getTransferId();
-                //            LOGGER("begin res received")
+                //            logger.debug("begin res received");
 
                 PropertiesTransfer::Request::Ptr propertiesRequest = PropertiesTransfer::Request::getNew();
                 propertiesRequest->setTransferId(transferId);
-                //            LOGGER("querying properties")
+                //            logger.debug("querying properties");
 
                 PropertiesTransfer::Response::Ptr propertiesResponse = networkModule->sendPacketToNode(nodeId, propertiesRequest);
                 if (propertiesResponse != nullptr) {
-                    //                LOGGER("got properties")
-                    LOGGER("transfer manager -> AA")
+                    //                logger.debug("got properties");
+                    logger.debug("transfer manager -> AA");
                     descriptorPtr.changeState(TransferState::ATTRIBUTES_ACCQUIRED);
                     auto resourceSize = propertiesResponse->getSize();
                     SHOW(resourceSize);
                     TransferSize chunk_count = resourceSize / MAX_CHUNK_SIZE;
-                    //                LOGGER("chunk count = " + std::to_string(chunk_count));
-                    LOGGER("transfer manager -> DOWNLOADING")
+                    //                logger.debug("chunk count = " + std::to_string(chunk_count));
+                    logger.debug("transfer manager -> DOWNLOADING");
                     descriptorPtr.changeState(TransferState::DOWNLOADING);
                     for (TransferSize i = 0; i < chunk_count + 1; ++i) {
 
                         DataTransfer::Request::Ptr dataRequest = DataTransfer::Request::getNew();
                         dataRequest->setTransferId(transferId);
                         dataRequest->setBegin(i * MAX_CHUNK_SIZE);
-                        //                    LOGGER("begin =" + std::to_string(i * MAX_CHUNK_SIZE));
+                        //                    logger.debug("begin =" + std::to_string(i * MAX_CHUNK_SIZE));
                         dataRequest->setEnd(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
-                        //                    LOGGER("begin =" + std::to_string(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize)));
-                        LOGGER("requesting data chunk ")
+                        //                    logger.debug("begin =" + std::to_string(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize)));
+                        logger.debug("requesting data chunk ");
                         auto response = networkModule->sendPacketToNode(nodeId, dataRequest);
                         if (response != nullptr) {
                             // SendFile::Response* response;
-                            LOGGER(std::to_string(response->getEnd()) + "/" + std::to_string(resourceSize) + " : " +
-                                   std::to_string(100 * response->getEnd() / resourceSize) + "%");
+                            logger.debug(std::to_string(response->getEnd()) + "/" + std::to_string(resourceSize) + " : " +
+                                         std::to_string(100 * response->getEnd() / resourceSize) + "%");
                             TransferManager::saveDataChunk(destinationStream,
                                                            response->getBegin(),
                                                            response->getEnd(),
@@ -214,7 +214,7 @@ namespace bsc {
                             descriptorPtr.setTransferredSize(std::min((i + 1) * MAX_CHUNK_SIZE, resourceSize));
                             //                         std::this_thread::sleep_for(3s);
                         } else {
-                            LOGGER("no response for request, transfer manager -> error")
+                            logger.debug("no response for request, transfer manager -> error");
                             descriptorPtr.changeState(TransferState::ERROR);
                             break;
                         }
@@ -223,12 +223,12 @@ namespace bsc {
 
                 destinationStream->flush();
                 FinishTransfer::Request::Ptr finishRequest = FinishTransfer::Request::getNew();
-                LOGGER("finishing transfer");
+                logger.debug("finishing transfer");
                 networkModule->sendPacketToNode(nodeId, finishRequest);
-                LOGGER("transfer manager -> FINISHED")
+                logger.debug("transfer manager -> FINISHED");
                 descriptorPtr.changeState(TransferState::FINISHED);
             }
-            LOGGER("transfer finished ");
+            logger.debug("transfer finished ");
         });
         if (start) {
             ret->startThread();
@@ -250,13 +250,13 @@ namespace bsc {
         // select best node.
         //@todo actual strategy to select the best node - for example, a object that takes this map and returns best nodeId
         for (auto&& [nodeId, response] : responseMap) {
-            //        LOGGER("response from " + nodeId)
+            //        logger.debug("response from " + nodeId);
             if (response->isExists()) {
                 // initiate transfer
                 return initiateTransfer(nodeId, source, destination, start);
             }
         }
-        LOGGER("no node has the resource?")
+        logger.debug("no node has the resource?");
         return nullptr;
     }
 
@@ -303,13 +303,13 @@ namespace bsc {
                                 std::chrono::duration_cast<std::chrono::milliseconds>(descriptor.getEndTime() - descriptor.getStartTime());
                         auto dataTransferred = descriptor.getTransferredSize();
                         auto speed           = dataTransferred / time.count();
-                        LOGGER(std::string("Transferred bytes: ") + std::to_string(dataTransferred) + " in " +
-                               std::to_string(time.count()) + "ms. Speed " + std::to_string(speed) + "KB/s")
+                        logger.debug(std::string("Transferred bytes: ") + std::to_string(dataTransferred) + " in " +
+                                     std::to_string(time.count()) + "ms. Speed " + std::to_string(speed) + "KB/s");
                     },
                     std::ref(*this));
         } else {
             //@todo error already started
-            LOGGER("thread already started!!!")
+            logger.debug("thread already started!!!");
         }
         // f(*this);
     }
@@ -377,17 +377,17 @@ namespace bsc {
     }
 
     void TransferManager::TransferQueue::update(TransferManager::LocalTransferDescriptor& object, TransferManager::TransferState state) {
-        LOGGER("transfer queue update start")
+        logger.debug("transfer queue update start");
         switch (state) {
 
             case TransferState::NOT_STARTED:
             case TransferState::PREPARED:
                 // does not apply
-                LOGGER("..")
+                logger.debug("..");
                 break;
             case TransferState::STARTED:
                 // if at least one transfer is started
-                LOGGER("transfer queue -> STARTED")
+                logger.debug("transfer queue -> STARTED");
                 changeState(TransferState::STARTED);
                 break;
             case TransferState::ATTRIBUTES_ACCQUIRED:
@@ -395,15 +395,15 @@ namespace bsc {
                 break;
             case TransferState::DOWNLOADING:
                 // if at least one transfer is in downloading state -- and since we got update, one definitely is
-                LOGGER("transfer queue -> DOWNLOADING")
+                logger.debug("transfer queue -> DOWNLOADING");
                 changeState(TransferState::DOWNLOADING);
                 break;
             case TransferState::FINISHED:
                 // when all transfers from queue are finished, the queue is finished.
                 if (countUnfinishedTransfers() == 0) {
-                    LOGGER("transfer queue -> FINISHED")
+                    logger.debug("transfer queue -> FINISHED");
                     changeState(TransferState::FINISHED);
-                    LOGGER("transfer queue finished")
+                    logger.debug("transfer queue finished");
                     finishReady.notify_all();
                 } else {
                     // start more transfers
@@ -421,7 +421,7 @@ namespace bsc {
                 break;
         }
 
-        LOGGER("transfer queue update done!")
+        logger.debug("transfer queue update done!");
         if (state == TransferState::FINISHED) {
         }
     }
@@ -432,9 +432,9 @@ namespace bsc {
     }
 
     void TransferManager::TransferQueue::start() {
-        //    LOGGER("transfers in not started :" + std::to_string(countTransfersNotInState(TransferState::NOT_STARTED)));
-        //    LOGGER("transfers in finished :" + std::to_string(countTransfersInState(TransferState::FINISHED)));
-        //    LOGGER("all transfers " + std::to_string(transfers.size()));
+        //    logger.debug("transfers in not started :" + std::to_string(countTransfersNotInState(TransferState::NOT_STARTED)));
+        //    logger.debug("transfers in finished :" + std::to_string(countTransfersInState(TransferState::FINISHED)));
+        //    logger.debug("all transfers " + std::to_string(transfers.size()));
         //    unsigned long  transfersToStart = std::min(countTransfersNotInState(TransferState::NOT_STARTED) -
         //    countTransfersInState(TransferState::FINISHED),MAX_CONCURRENT_TRANSFERS);
         std::lock_guard<std::recursive_mutex> g(startLock);
@@ -445,12 +445,12 @@ namespace bsc {
         auto transfersToStart =
                 std::min<decltype(transfers.size())>(std::max<decltype(transfers.size())>(MAX_CONCURRENT_TRANSFERS - transfersRunning, 0),
                                                      transfersNotStarted);
-        //    LOGGER("transfers to start " + std::to_string(transfersToStart));
-        LOGGER("Transfer queue start, transfers to start=" + std::to_string(transfersToStart))
+        //    logger.debug("transfers to start " + std::to_string(transfersToStart));
+        logger.debug("Transfer queue start, transfers to start=" + std::to_string(transfersToStart));
         //@todo actual transfer policy
         for (const auto& item : transfers) {
             if (!item->isStarted()) {
-                LOGGER("transfer not started, starting ")
+                logger.debug("transfer not started, starting ");
                 item->startThread();
                 transfersToStart--;
             }
@@ -459,7 +459,7 @@ namespace bsc {
             }
         }
         if (transfersToStart > 0) {
-            LOGGER("some transfers were not started " + std::to_string(transfersToStart))
+            logger.debug("some transfers were not started " + std::to_string(transfersToStart));
             throw TransferException("Some transfers were not started :" + std::to_string(transfersToStart));
         }
     }
@@ -500,9 +500,9 @@ namespace bsc {
             //@todo I'm not sure if this should be here or somewhere else
             std::unique_lock<std::mutex> g(finishLock);
             if (getCurrentState() == TransferState::FINISHED) {
-                LOGGER("transfer queue was finished, resetting")
+                logger.debug("transfer queue was finished, resetting");
                 changeState(TransferState::NOT_STARTED);
-                LOGGER("not started")
+                logger.debug("not started");
             }
         }
         auto transfer = manager.initiateTransfer(std::move(source), std::move(destination), false);
@@ -510,7 +510,7 @@ namespace bsc {
             transfer->registerStateObserver(*this);
             transfers.push_back(transfer);
         } else {
-            LOGGER("failed to initiate transfer!")
+            logger.debug("failed to initiate transfer!");
             throw TransferException("Failed to initiate transfer");
         }
     }
@@ -523,7 +523,7 @@ namespace bsc {
         });
 
         if (this->getCurrentState() == TransferState::ERROR) {
-            LOGGER("current state is error, terminating")
+            logger.debug("current state is error, terminating");
             throw TransferException("Transfer error");
         }
     }

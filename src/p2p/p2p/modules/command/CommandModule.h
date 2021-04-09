@@ -111,20 +111,20 @@ namespace bsc {
             void mapCommand(const std::string& commandName, RetType (ModuleType::*f)(Args... args)) {
                 auto command = std::make_shared<SpecificCommandData<ModuleType, RetType, Args...>>(commandName, f);
                 commands.push_back(command);
-                LOGGER("MAPPING COMMAND " + command->getCommandName());
+                logger.debug("MAPPING COMMAND " + command->getCommandName());
             }
 
             //        template<typename ModuleType, typename ParametersType, typename RetType, typename ... Args>
             //        void mapCommand(const std::string &commandName, RetType (ModuleType::*f)(Args... args),
             //        ParametersType parameters) {
             //            auto command = std::make_shared<SpecificCommandData<ModuleType, RetType,
-            //            Args...>>(commandName, f); commands.push_back(command); LOGGER("MAPPING COMMAND " +
+            //            Args...>>(commandName, f); commands.push_back(command); logger.debug("MAPPING COMMAND " +
             //            command->getCommandName());
             //        }
 
             void applyCommands(CommandModule& commandModule) {
                 for (const auto& item : commands) {
-                    LOGGER("APPLYING COMMAND " + item->getCommandName())
+                    logger.debug("APPLYING COMMAND " + item->getCommandName());
                     item->applyCommand(commandModule);
                 }
             }
@@ -300,16 +300,16 @@ namespace bsc {
                     }
                 } else {
                     // command is mapped to this module, execute
-                    LOGGER("Running module  command " + commandName);
+                    logger.debug("Running module  command " + commandName);
                     auto& map = getCommandMap();
                     if (!map.contains(commandName)) {
-                        LOGGER("FAILURE, NO SUCH COMMAND");
+                        logger.debug("FAILURE, NO SUCH COMMAND");
                         return CommandExecutionStatus::badCommand;
                     } else {
                         auto& commandSet = map[commandName];
                         if (!commandSet.hasCommand(arguments.size())) {
                             if (commandSet.commandCount() == 1) {
-                                LOGGER("FAILURE, WRONG ARGUMENTS");
+                                logger.debug("FAILURE, WRONG ARGUMENTS");
                                 auto commandArgumentCount = *commandSet.avaiableCommands().begin();
                                 return commandArgumentCount > arguments.size() ? CommandExecutionStatus::notEnoughArguments
                                                                                : CommandExecutionStatus::tooManyArguments;
@@ -436,7 +436,7 @@ namespace bsc {
 
             } else {
                 //@todo error handling
-                LOGGER("script does not exist")
+                logger.debug("script does not exist");
             }
         }
 
@@ -444,10 +444,12 @@ namespace bsc {
         /// Commands section
         ////////////////////////////////
 
-        void testingMethodInt(int a) { LOGGER("Command testing method INT " + std::to_string(a)); }
+        void testingMethodInt(int a) {
+            logger.debug("Command testing method INT " + std::to_string(a));
+        }
 
         void testingMethodIntFloat(int a, float b) {
-            LOGGER("Command testing method INT FLOAT " + std::to_string(a) + " " + std::to_string(b));
+            logger.debug("Command testing method INT FLOAT " + std::to_string(a) + " " + std::to_string(b));
         }
 
         struct CommandPP : public CommandLineParameters {

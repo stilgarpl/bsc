@@ -88,9 +88,7 @@ namespace bsc {
                                                    RepoEvaluators::getRepoId,
                                                    ChainEvaluators::chainResult(start)))
                 .unlockChain();
-        stage1.elseChain()
-                .fireNewGenericChainAction([]() { LOGGER("else chain!"); })
-                .unlockChain();
+        stage1.elseChain().fireNewGenericChainAction([]() { logger.debug("else chain!"); }).unlockChain();
 
         auto syncStart = when(TriggerConditions::trigger<std::string, std::string>("syncLocalRepo"));
 
@@ -110,17 +108,17 @@ namespace bsc {
                 .unlockChain();
 
         //    when(event<Tick>(100ms)).newChain("dupaChain").lockChain(LockConfiguration::chain()).fireNewChainAction([](auto e){
-        //        LOGGER("gen1")
+        //        logger.debug("gen1");
         //        std::this_thread::sleep_for(1s);
-        //        LOGGER("gen2")
+        //        logger.debug("gen2");
         //        return e;
         //    }).unlockChain();
-        //debug
+        // debug
         //    stage1.lockChain()
-        //            .fireNewGenericChainAction([]() { LOGGER("super secret generic action"); })
-        //            .fireNewGenericChainAction([]() { LOGGER("and one after that"); })
-        //            .fireNewGenericChainAction([]() { LOGGER("one more"); })
-        //            .fireNewGenericChainAction([]() { LOGGER("and last one"); })
+        //            .fireNewGenericChainAction([]() { logger.debug("super secret generic action"); });
+        //            .fireNewGenericChainAction([]() { logger.debug("and one after that"); });
+        //            .fireNewGenericChainAction([]() { logger.debug("one more"); });
+        //            .fireNewGenericChainAction([]() { logger.debug("and last one"); });
         //            .unlockChain();
         //
 
@@ -137,9 +135,9 @@ namespace bsc {
     }
 
     void RepoModule::printHistory() {
-        LOGGER("printing history")
+        logger.debug("printing history");
         selectedRepository->getJournal()->printHistory();
-        LOGGER("history printed")
+        logger.debug("history printed");
     }
 
     void RepoModule::loadRepository(const IRepository::RepoIdType& repoId) {
@@ -157,7 +155,7 @@ namespace bsc {
         //        ia >> ptr->getJournal();
         //    }
         repositoryManager.addRepository(ptr);
-        LOGGER(ptr->getJournal()->getChecksum());
+        logger.debug(ptr->getJournal()->getChecksum());
     }
 
     void RepoModule::saveRepository(const IRepository::RepoIdType& repoId) {
@@ -167,10 +165,8 @@ namespace bsc {
         auto repoPath = (configuration().getRepositoryDataPath() / (repoId + ".xml")).string();
         //    node.getConfigurationManager().saveData<JournalPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"),
         //                                                        rep->getJournal());
-        node.getConfigurationManager().saveData<RepositoryPtr>(
-                configuration().getRepositoryDataPath() / (repoId + ".xml"),
-                rep);
-        LOGGER("saving repository journal for repo " + repoId + " and checksum is " + rep->getJournal()->getChecksum())
+        node.getConfigurationManager().saveData<RepositoryPtr>(configuration().getRepositoryDataPath() / (repoId + ".xml"), rep);
+        logger.debug("saving repository journal for repo " + repoId + " and checksum is " + rep->getJournal()->getChecksum());
         //    {
         //        std::ofstream os(savePath);
         //        cereal::XMLOutputArchive oa(os);
@@ -188,7 +184,7 @@ namespace bsc {
     void RepoModule::selectRepository(const IRepository::RepoIdType& repoId) {
         selectedRepository = findRepository(repoId);
         if (selectedRepository == nullptr) {
-            LOGGER("SELECTED NULL REPOSITORY!")
+            logger.debug("SELECTED NULL REPOSITORY!");
         }
     }
 
@@ -208,32 +204,32 @@ namespace bsc {
 
         auto netModule = node.getModule<NetworkModule>();
         auto localRepo = findRepository(repoId);
-        LOGGER("downloading repo")
+        logger.debug("downloading repo");
         //@todo Repository is serializable. maybe request whole repository instead of just a journal? and then pass it to RepositoryManager to handle merging?
         auto req = JournalGroup::Request::getNew<Status::request>();
         req->setRepoId(repoId);
         auto res = netModule->sendPacketToNode(remoteId, req);
         if (res != nullptr) {
-            LOGGER("response received")
+            logger.debug("response received");
             auto remoteJournal = res->getJournal();
-            LOGGER("received journal with checksum " + res->getJournal()->getChecksum())
+            logger.debug("received journal with checksum " + res->getJournal()->getChecksum());
             if (localRepo != nullptr) {
-                LOGGER("merging journal")
+                logger.debug("merging journal");
                 //@todo this should not operate on journal directly! thread safety and other issues. journal should be hidden behind Repository.
                 localRepo->getJournal()->merge(remoteJournal);
             } else {
-                LOGGER("Creating new repo")
+                logger.debug("Creating new repo");
                 localRepo = createRepository(repoId);
                 //@todo definitely get rid of external setting of journal. Journal is internal property of Repository
                 localRepo->setJournal(remoteJournal);
             }
             //        localRepo->buildFileMap();
-            LOGGER("downloading storage")
+            logger.debug("downloading storage");
             localRepo->downloadStorage();
-            LOGGER("storage downloaded")
+            logger.debug("storage downloaded");
         } else {
             //@todo throw exception maybe
-            LOGGER("no response")
+            logger.debug("no response");
         }
     }
 
@@ -246,9 +242,9 @@ namespace bsc {
     }
 
     void RepoModule::updateAllFiles() {
-        LOGGER("updateAllFiles")
+        logger.debug("updateAllFiles");
         if (selectedRepository != nullptr) {
-            LOGGER("syncing repo ..." + selectedRepository->getRepositoryId())
+            logger.debug("syncing repo ..." + selectedRepository->getRepositoryId());
             selectedRepository->syncLocalChanges();
         }
     }
@@ -272,15 +268,14 @@ namespace bsc {
 
             // JournalGroup::Response* response;
             response->setRepoId(request->getRepoId());
-            LOGGER("requested repo " + request->getRepoId());
+            logger.debug("requested repo " + request->getRepoId());
 
             //@todo add way more error handling to the getting of the module that's not there or repo that's not there...
 
             auto repository = this->findRepository(request->getRepoId());
-            LOGGER("journal requested for repo: " + request->getRepoId() + " and journal checksum is " +
-                   repository->getJournal()->getChecksum())
+            logger.debug("journal requested for repo: " + request->getRepoId() + " and journal checksum is " +
+                         repository->getJournal()->getChecksum());
             response->setJournal(repository->getJournal());
-
 
             return response;
         });

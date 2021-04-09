@@ -13,12 +13,12 @@ namespace bsc {
     struct CommonEvaluators {
 
         static constexpr auto unwrapEvent = [](auto e, auto ... args) {
-            LOGGER("unwrapping event")
+            logger.debug("unwrapping event");
             return e.getPayload();
         };
 
         static constexpr auto passthrough = [](auto e, auto ... args) {
-            LOGGER("forwarding event")
+            logger.debug("forwarding event");
             return e;
         };
 

@@ -31,10 +31,10 @@ namespace bsc {
 
             if (packetToProcess != nullptr) {
                 if (packetFilter->filter(packetToProcess)) {
-//            LOGGER("processing packet " );
+                    //            logger.debug("processing packet " );
                     connectionSourcePtr->receivedPacket(packetToProcess, &connection);
                 } else {
-                    LOGGER(std::string("packet ") + typeid(*packetToProcess).name() + "was filtered ");
+                    logger.debug(std::string("packet ") + typeid(*packetToProcess).name() + "was filtered ");
                     connectionSourcePtr->droppedPacket(packetToProcess, &connection);
                 }
             } else {

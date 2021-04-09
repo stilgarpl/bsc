@@ -84,7 +84,7 @@ namespace bsc {
                 }
             } catch (const std::future_error& e) {
                 //broken promise
-                LOGGER(std::string("broken promise! ") + e.what());
+                logger.debug(std::string("broken promise! ") + e.what());
                 return std::shared_ptr<ReturnType>(nullptr);
             }
         }
@@ -103,9 +103,9 @@ namespace bsc {
             //future.wait();
             //@todo check if there is a way to do it without exceptions, maybe .valid() ?
             try {
-                //            LOGGER("getting future " + std::to_string(p->getId()))
+                //            logger.debug("getting future " + std::to_string(p->getId()));
                 auto ret = future.get();
-                //            LOGGER("future got" + std::to_string(p->getId()))
+                //            logger.debug("future got" + std::to_string(p->getId()));
                 // auto retStatus = ret->getStatus(); //debug
                 if (ret->getStatus() == Status::response) {
                     returnValue.response = std::static_pointer_cast<ResponseType>(ret);
@@ -114,9 +114,9 @@ namespace bsc {
                 }
                 return returnValue;
             } catch (const std::future_error& e) {
-                //broken promise
-                LOGGER("future error. broken promise! returning default value (null) " + std::to_string(p->getId()))
-                ERROR(std::string("Promise broken ") + e.what() + " ... " + e.code().message());
+                // broken promise
+                logger.debug("future error. broken promise! returning default value (null) " + std::to_string(p->getId()));
+                logger.error(std::string("Promise broken ") + e.what() + " ... " + e.code().message());
                 return returnValue;
             }
         }

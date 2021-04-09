@@ -9,7 +9,7 @@
 namespace bsc {
     ConnectionControl::Response::Ptr
     ConnectionProcessors::processConnectionControl(ConnectionControl::Request::Ptr request) {
-        LOGGER("diconnection processor")
+        logger.debug("diconnection processor");
         Context::getActiveContext()->get<RemoteNodeContext>()->getRemoteNode().disconnect();
 
         return nullptr;

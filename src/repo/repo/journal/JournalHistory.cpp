@@ -77,7 +77,7 @@ bool bsc::JournalHistory::merge(const bsc::JournalHistory& otherHistory) {
                     }
                 } else {
                     //@todo throw?
-                    LOGGER("MERGE FAILED!!!!!!")
+                    logger.debug("MERGE FAILED!!!!!!");
                     return false;
                 }
             }

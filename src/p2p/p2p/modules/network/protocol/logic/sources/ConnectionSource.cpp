@@ -7,17 +7,16 @@
 
 void bsc::ConnectionSource::newConnection(bsc::Connection* con) {
 
-    LOGGER("queue connection event");
+    logger.debug("queue connection event");
     auto event = std::make_shared<bsc::ConnectionEvent>();
     event->setEventId(bsc::ConnectionEvent::IdType::NEW_CONNECTION);
     event->setConnection(con);
     connSource.queueEvent(event);
-    //LOGGER("connection source: packet queue size " + std::to_string(packetSource.queueSize()))
-
+    // logger.debug("connection source: packet queue size " + std::to_string(packetSource.queueSize()));
 }
 
 void bsc::ConnectionSource::sentPacket(std::shared_ptr<bsc::BasePacket> p, bsc::Connection* connection) {
-    //lLOGGER()
+    // llogger.debug();
 
     auto event = std::make_shared<bsc::PacketEvent>();
     event->setEventId(bsc::PacketEvent::IdType::PACKET_SENT);
@@ -29,14 +28,14 @@ void bsc::ConnectionSource::sentPacket(std::shared_ptr<bsc::BasePacket> p, bsc::
 }
 
 void bsc::ConnectionSource::receivedPacket(std::shared_ptr<bsc::BasePacket> p, bsc::Connection* connection) {
-    //LOGGER("received Packet " + std::to_string(p->getId()) + " " + std::to_string((int) p->getStatus()));
+    // logger.debug("received Packet " + std::to_string(p->getId()) + " " + std::to_string((int) p->getStatus()));
 
     auto event = std::make_shared<bsc::PacketEvent>();
     event->setEventId(bsc::PacketEvent::IdType::PACKET_RECEIVED);
     event->setPacket(p);
     event->setConnection(connection);
     packetSource.queueEvent(event);
-    // LOGGER("packet source: packet queue size " + std::to_string(packetSource.queueSize()))
+    // logger.debug("packet source: packet queue size " + std::to_string(packetSource.queueSize()));
     PacketSourceWorker packetSourceWorker(*this, bsc::PacketEventId::PACKET_RECEIVED, connection);
     p->_operate(packetSourceWorker, p);
 }

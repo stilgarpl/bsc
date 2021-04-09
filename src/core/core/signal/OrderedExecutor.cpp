@@ -10,7 +10,7 @@ using namespace std::chrono_literals;
 void bsc::OrderedExecutor::execute(std::function<void(void)> task) {
     if (orderedExecutorThread == nullptr) {
         working = true;
-//        LOGGER("starting executor thread")
+        //        logger.debug("starting executor thread");
         orderedExecutorThread = std::make_unique<std::thread>(&OrderedExecutor::run, this);
     }
     std::lock_guard<std::mutex> lockGuard(queueLock);
@@ -23,11 +23,11 @@ void bsc::OrderedExecutor::run() {
     std::unique_lock<std::mutex> g(queueLock);
     while (working) {
         while (runQueue.empty() && working) {
-//            LOGGER("executor waiting")
+            //            logger.debug("executor waiting");
             taskReady.wait_for(g, 1s);
         }
         while (!runQueue.empty()) {
-//            LOGGER("processing task")
+            //            logger.debug("processing task");
             auto&[task, contextPtr] = runQueue.front();
 
             Context::setActiveContext(contextPtr);

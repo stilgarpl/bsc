@@ -29,7 +29,7 @@ namespace bsc {
         void generateEvent(Args... args) {
             std::unique_lock g(sourcesLock);
             if (active) {
-                //        LOGGER("generating event for type " + std::string(typeid(EventType).name()))
+                //        logger.debug("generating event for type " + std::string(typeid(EventType).name()));
                 auto& source = eventQueueSources.get<EventType, AutoSource>(std::ref(sourceManager));
                 //will only start the thread if not started already.
                 source.start();

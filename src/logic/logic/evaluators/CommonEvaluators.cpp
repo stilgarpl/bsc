@@ -6,7 +6,7 @@
 //
 //auto CommonEvaluators::unwrapEvent() {
 //    return [](auto e) {
-//        LOGGER("unwrapping event")
+//        logger.debug("unwrapping event");
 //        return e.getPayload();
 //    };
 //}

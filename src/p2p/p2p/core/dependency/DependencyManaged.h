@@ -75,9 +75,9 @@ namespace bsc {
                           ids.end());
             }
 
-            //        LOGGER("before merge");
+            //        logger.debug("before merge");
             //        for (auto &&r : required->getDependencyIdents()) {
-            //            LOGGER("r =" + std::to_string(r));
+            //            logger.debug("r =" + std::to_string(r));
             //        }
 
             if (ids.size() > 0) {
@@ -88,15 +88,14 @@ namespace bsc {
 
                 setRequired(depPack);
             } else {
-                //            LOGGER("NO DEPS")
-                //nothing changes.
+                //            logger.debug("NO DEPS");
+                // nothing changes.
             }
 
-            //        LOGGER("after merge");
+            //        logger.debug("after merge");
             //        for (auto &&r : required->getDependencyIdents()) {
-            //            LOGGER("r =" +std::to_string(r));
+            //            logger.debug("r =" +std::to_string(r));
             //        }
-
         }
     };
 }

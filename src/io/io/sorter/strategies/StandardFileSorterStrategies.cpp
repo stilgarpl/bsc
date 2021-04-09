@@ -12,8 +12,8 @@ namespace bsc {
     FileSortingStrategies::SortStrategy StandardFileSorterSortStrategies::copy = [](const std::filesystem::path& from,
                                                                                     const std::filesystem::path& to) {
         //@todo check for errors? throw ? anything? (copy may fail, permisions setting may fail, modification date may fail)
-        LOGGER("Copying " + from.string() + " to " + to.string());
-        LOGGER("Creating dirs: " + to.parent_path().string());
+        logger.debug("Copying " + from.string() + " to " + to.string());
+        logger.debug("Creating dirs: " + to.parent_path().string());
         auto modificationDate = fs::last_write_time(from);
         auto permissions      = fs::status(from).permissions();
         fs::create_directories(to.parent_path());
@@ -67,19 +67,19 @@ namespace bsc {
             auto parentPath   = target.parent_path();
             auto filenameStem = target.stem().string();
             std::smatch numberMatch;
-            LOGGER("trying to match " + regexString + " to " + filenameStem);
+            logger.debug("trying to match " + regexString + " to " + filenameStem);
             if (std::regex_search(filenameStem, numberMatch, numberRegex)) {
                 auto numberString = std::string(numberMatch[1].first, numberMatch[1].second);
-                LOGGER("Found number in name matching regex " + regexString + " with value " + numberString);
+                logger.debug("Found number in name matching regex " + regexString + " with value " + numberString);
                 index = fromString<int>(numberString);
                 // remove matched part from string (it will be replaced in next step)
                 filenameStem.erase(numberMatch[0].first, numberMatch[0].second);
             }
             do {
                 auto suffix = fmt::format(suffixFormat, index);
-                LOGGER("file name stem is :" + filenameStem);
+                logger.debug("file name stem is :" + filenameStem);
                 newPath = parentPath / (filenameStem + suffix + target.extension().string());
-                LOGGER("rename: trying " + newPath.string())
+                logger.debug("rename: trying " + newPath.string());
                 index++;
             } while (fileExists(newPath));
             return newPath;
@@ -106,23 +106,19 @@ namespace bsc {
 
     FileSortingStrategies::ErrorHandlingStrategy StandardFileSorterErrorHandlers::ignore =
             [](const fs::path& from, const std::exception& exception, std::list<SortFailure>& sortFailure) {
-                ERROR("Failed processing " + from.string() + " exception: " + exception.what());
+                logger.error("Failed processing " + from.string() + " exception: " + exception.what());
             };
 
     FileSortingStrategies::ErrorHandlingStrategy StandardFileSorterErrorHandlers::logAndContinue =
             [](const fs::path& from, const FileSortingException& exception, std::list<SortFailure>& sortFailure) {
-                sortFailure.push_back({.sourcePath      = from,
-                                       .destinationPath = exception.getDestinationPath(),
-                                       .errorMessage    = exception.what()});
-                ERROR("Failed processing " + from.string() + " exception: " + exception.what());
-            };
+        sortFailure.push_back({.sourcePath = from, .destinationPath = exception.getDestinationPath(), .errorMessage = exception.what()});
+        logger.error("Failed processing " + from.string() + " exception: " + exception.what());
+    };
 
     FileSortingStrategies::ErrorHandlingStrategy StandardFileSorterErrorHandlers::stop =
             [](const fs::path& from, const FileSortingException& exception, std::list<SortFailure>& sortFailure) {
-                sortFailure.push_back({.sourcePath      = from,
-                                       .destinationPath = exception.getDestinationPath(),
-                                       .errorMessage    = exception.what()});
-                ERROR("Failed processing " + from.string() + " exception: " + exception.what());
-                throw exception;
-            };
+        sortFailure.push_back({.sourcePath = from, .destinationPath = exception.getDestinationPath(), .errorMessage = exception.what()});
+        logger.error("Failed processing " + from.string() + " exception: " + exception.what());
+        throw exception;
+    };
 }// namespace bsc

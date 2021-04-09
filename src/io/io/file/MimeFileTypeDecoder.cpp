@@ -33,11 +33,11 @@ namespace bsc {
                 std::lock_guard g(magicLock);
                 magic_cookie = magic_open(MAGIC_MIME);
                 if (magic_cookie == nullptr) {
-                    ERROR("unable to initialize magic library");
+                    logger.error("unable to initialize magic library");
                     // throw exception
                 }
                 if (magic_load(magic_cookie, nullptr) != 0) {
-                    ERROR("cannot load magic database - "s + magic_error(magic_cookie));
+                    logger.error("cannot load magic database - "s + magic_error(magic_cookie));
                     magic_close(magic_cookie);
                     // throw exception
                 }

@@ -48,7 +48,7 @@ namespace bsc {
 
                                            }), observers.end());
             auto after = observers.size();
-            LOGGER("removed " + std::to_string(before - after))
+            logger.debug("removed " + std::to_string(before - after));
         }
 
         void notify(StateObject& object, stateIdType state) {

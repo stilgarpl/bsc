@@ -41,13 +41,13 @@ namespace bsc {
 
         void unregisterStateObserver(ObserverType& observer) {
 
-            LOGGER("unregistering observer ")
+            logger.debug("unregistering observer ");
             observer.setObservee(nullptr);
             notifyMethod->unregisterObserver(observer);
         }
 
         void onEnter(const StateIdType& id) {
-            //        LOGGER("LOGIC MACHINE ON ENTER" + std::to_string(id));
+            //        logger.debug("LOGIC MACHINE ON ENTER" + std::to_string(id));
             //@todo handle no logic manager!
             auto& lm     = LogicContext::getLogicManagerFromActiveContext();
             auto& source = lm.requireSource<LogicStateSource>();
@@ -56,7 +56,7 @@ namespace bsc {
         }
 
         void onLeave(const StateIdType& id) {
-            //        LOGGER("LOGIC MACHINE ON LEAVE" + std::to_string(id));
+            //        logger.debug("LOGIC MACHINE ON LEAVE" + std::to_string(id));
             //@todo handle no logic manager!
             auto& lm     = LogicContext::getLogicManagerFromActiveContext();
             auto& source = lm.requireSource<LogicStateSource>();
@@ -64,11 +64,11 @@ namespace bsc {
         }
 
         void onInvalidChange(const StateIdType& id) {
-            //        LOGGER("LOGIC MACHINE ON invalid CHANGE" + std::to_string(id));
+            //        logger.debug("LOGIC MACHINE ON invalid CHANGE" + std::to_string(id));
         }
 
         void onInvalidState(const StateIdType& id) {
-            //        LOGGER("LOGIC MACHINE ON invalid STATE" + std::to_string(id));
+            //        logger.debug("LOGIC MACHINE ON invalid STATE" + std::to_string(id));
         }
 
         //    LogicStateMachine() : StateMachine<StateIdType>(onEnter, onLeave) {};

@@ -17,17 +17,16 @@ void bsc::NetworkActions::updateNetworkInfo(const NetworkInfoEvent& event) {
     if (node.getModule<NetworkModule>()->getNetworkInfo() != nullptr &&
         node.getModule<NetworkModule>()->getNetworkInfo()->getNetworkId() ==
         event.getNetworkInfo().getNetworkId()) {
-        //     LOGGER("SAME NETWORK! " + event.getNetworkInfo().getNetworkId());
+        //     logger.debug("SAME NETWORK! " + event.getNetworkInfo().getNetworkId());
         *node.getModule<NetworkModule>()->getNetworkInfo() += event.getNetworkInfo();
 
     }
-    // LOGGER("received network info: " + event.getNetworkInfo().getNetworkId());
-
+    // logger.debug("received network info: " + event.getNetworkInfo().getNetworkId());
 }
 
 void bsc::NetworkActions::saveNetworkInfo(const ModuleEvent<NetworkModule>& event) {
     Context::Ptr context = Context::getActiveContext();
-    //    LOGGER("SAVE NETWORK INFO")
+    //    logger.debug("SAVE NETWORK INFO");
     auto nodeContext = context->get<NodeContext>();
 
     auto& node = nodeContext->getNode();
@@ -38,7 +37,7 @@ void bsc::NetworkActions::saveNetworkInfo(const ModuleEvent<NetworkModule>& even
 
 void bsc::NetworkActions::loadNetworkInfo(const ModuleEvent<NetworkModule>& event) {
     Context::Ptr context = Context::getActiveContext();
-//    LOGGER("LOAD NETWORK INFO")
+    //    logger.debug("LOAD NETWORK INFO");
     auto nodeContext = context->get<NodeContext>();
 
     auto& node = nodeContext->getNode();
@@ -47,16 +46,16 @@ void bsc::NetworkActions::loadNetworkInfo(const ModuleEvent<NetworkModule>& even
                 node.getConfigurationManager().loadData<NetworkInfo>("networkInfo.dat"));
     } catch (DataFileNotFoundException& e) {
         // data file not found
-            LOGGER("network data file not found")
-        } catch (cereal::Exception &e) {
-            LOGGER("cereal error during file load " + std::string(e.what()));
-        }
+        logger.debug("network data file not found");
+    } catch (cereal::Exception &e) {
+        logger.debug("cereal error during file load " + std::string(e.what()));
+    }
 
 }
 
 void bsc::NetworkActions::broadcastPacket(BasePacketPtr packet) {
     Context::Ptr context = Context::getActiveContext();
-    LOGGER("BROADCAST PACKET")
+    logger.debug("BROADCAST PACKET");
     auto nodeContext = context->get<NodeContext>();
 
     auto& node = nodeContext->getNode();

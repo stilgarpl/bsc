@@ -36,18 +36,17 @@ namespace bsc {
 
 
         {
-//        //@todo using enum TransferEvent::IdType;
-//        when(event<TransferEvent>(TransferEvent::IdType::REQUESTED)).fireAction("beginTransfer");
-//        when(event<TransferEvent>(TransferEvent::IdType::SENDING)).fireAction("sendData");
-//        when(event<TransferEvent>(TransferEvent::IdType::GET_PROPERTIES)).fireAction("sendProps");
-//        when(event<TransferEvent>(TransferEvent::IdType::FINISHING)).fireAction("finishTransfer");
-
-
+            //        //@todo using enum TransferEvent::IdType;
+            //        when(event<TransferEvent>(TransferEvent::IdType::REQUESTED)).fireAction("beginTransfer");
+            //        when(event<TransferEvent>(TransferEvent::IdType::SENDING)).fireAction("sendData");
+            //        when(event<TransferEvent>(TransferEvent::IdType::GET_PROPERTIES)).fireAction("sendProps");
+            //        when(event<TransferEvent>(TransferEvent::IdType::FINISHING)).fireAction("finishTransfer");
         }
-        when(state<TransferManager::LocalTransferDescriptor>(
-                TransferManager::TransferState::STARTED).entered()).fireStateChangeReaction(
-                [](TransferManager::LocalTransferDescriptor& descriptor) { LOGGER("transfer started!!!!...!!"); });
-//        when(event<LogicStateEvent<TransferManager::LocalTransferDescriptor,TransferStatus >>()).fireNewAction([](auto event){LOGGER("transfer state evennnnnt")});
+        when(state<TransferManager::LocalTransferDescriptor>(TransferManager::TransferState::STARTED).entered())
+                .fireStateChangeReaction(
+                        [](TransferManager::LocalTransferDescriptor& descriptor) { logger.debug("transfer started!!!!...!!"); });
+        //        when(event<LogicStateEvent<TransferManager::LocalTransferDescriptor,TransferStatus >>()).fireNewAction([](auto
+        //        event){logger.debug("transfer state evennnnnt")});
         return true;
     }
 

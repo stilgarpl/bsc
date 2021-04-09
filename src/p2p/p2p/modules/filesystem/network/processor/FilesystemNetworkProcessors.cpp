@@ -11,8 +11,8 @@ namespace bsc {
     std::function<ResponsePtr<TransferQuery>(
             RequestPtr<TransferQuery>)> FilesystemNetworkProcessors::queryProcessor = [](
             const TransferQuery::Request::Ptr& ptr) {
-//    LOGGER("Transfer Query Processor")
-        auto module = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>();
+            //    logger.debug("Transfer Query Processor");
+            auto module = NodeContext::getNodeFromActiveContext().getModule<FilesystemModule>();
         TransferQuery::Response::Ptr res = TransferQuery::Response::getNew();
 
         res->setResourceIdentificator(ptr->getResourceIdentificator());

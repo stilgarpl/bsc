@@ -269,38 +269,38 @@ namespace bsc {
         ////COMMANDS
         std::string testingMethod() {
             int a = 5;
-            LOGGER("Command testing method " + std::to_string(a));
+            logger.debug("Command testing method " + std::to_string(a));
             return "aaa";
         }
 
         void testingMethod2(const LogicStateEvent<NetworkModule, int>& event) {
             int a = event.getEventId();
-            LOGGER("Command testing method " + std::to_string(a));
+            logger.debug("Command testing method " + std::to_string(a));
         }
 
         static Tick testingMethod3(const Tick& tick) {
-            LOGGER("testing method 3!")
+            logger.debug("testing method 3!");
             return tick;
         }
 
         static Tick testingMethod3s(const Tick& tick, std::string s) {
-            LOGGER("testing method 3! " + s)
+            logger.debug("testing method 3! " + s);
             return tick;
         }
 
         static std::string testingMethod1s(std::string s) {
-            LOGGER("testing method 1s ! " + s)
+            logger.debug("testing method 1s ! " + s);
             return s;
         }
 
         static std::string testingMethod1xs(std::string s) {
-            LOGGER("ret testin XXXXXXXXX 1s ! " + s)
+            logger.debug("ret testin XXXXXXXXX 1s ! " + s);
             auto activeContext = Context::getActiveContext();
             return s;
         }
 
         static void testingMethod1i(int a) {
-            LOGGER("testing method 1i ! " + std::to_string(a));
+            logger.debug("testing method 1i ! " + std::to_string(a));
         }
 
         static IEvent<int> testingMethod4(const IEvent<std::string>& se) {

@@ -22,13 +22,13 @@ namespace bsc {
 
         template<typename TriggerIdType>
         void fireTrigger(TriggerIdType triggerId) {
-            LOGGER("firing trigger " + triggerId)
+            logger.debug("firing trigger " + triggerId);
             source.generateEvent<TriggerEvent<TriggerIdType>>(triggerId);
         }
 
         template<typename TriggerIdType, typename TriggerValueType>
         void fireTrigger(TriggerIdType triggerId, TriggerValueType value) {
-            LOGGER("firing trigger " + triggerId + " with value " + value)
+            logger.debug("firing trigger " + triggerId + " with value " + value);
             source.generateEvent<TriggerEvent<TriggerIdType, TriggerValueType>>(triggerId, value);
         }
 

@@ -41,10 +41,10 @@ namespace bsc {
             return true;
         } catch (const Poco::Net::ConnectionRefusedException&) {
             //@todo connection refused in connectionSource
-            LOGGER("Connection refused")
+            logger.debug("Connection refused");
             return false;
         } catch (const Poco::InvalidArgumentException&) {
-            LOGGER("Invalid connection argument")
+            logger.debug("Invalid connection argument");
             return false;
         }
     }
@@ -67,9 +67,9 @@ namespace bsc {
     }
 
     bool RemoteNode::connect() {
-        LOGGER("remote node trying to connect")
+        logger.debug("remote node trying to connect");
         for (const auto& knownAddress : remoteNodeInfo.getKnownAddresses()) {
-            LOGGER("trying address  " + knownAddress);
+            logger.debug("trying address  " + knownAddress);
             bool value = connectTo(knownAddress);
             if (value) return true;
         }
@@ -80,18 +80,20 @@ namespace bsc {
         std::unique_lock g(*connectionFetcher);
         //@todo if serialization supports optional, this should be changed to optional, but for now, it's shared_ptr
         remoteNodeInfo.setNodeInfo(std::make_shared<bsc::NodeInfo>(ni));
-//    LOGGER(std::string("setting node info, and the connection address is ") + connection->getAddress() + " but remembered adress is " + *address);
-        //@todo shouldn't this be through logic actions? or any other way? the problem is that we have to store the connection address between creating the connection and receiving node info
+        //    logger.debug(std::string("setting node info, and the connection address is ") + connection->getAddress() + " but remembered
+        //    adress is " + *address);
+        //@todo shouldn't this be through logic actions? or any other way? the problem is that we have to store the connection address
+        //between creating the connection and receiving node info
         auto connection = connectionFetcher->getConnection();
         if (connection != nullptr) {
             try {
                 remoteNodeInfo.addKnownAddress(connection->getAddress());
             } catch (const bsc::ConnectionException& e) {
-                ERROR("Error while setting known address. Connection is invalid. Disconnecting.");
+                logger.error("Error while setting known address. Connection is invalid. Disconnecting.");
                 disconnect();
             }
         } else {
-            ERROR("CONNECTION IS NULL")
+            logger.error("CONNECTION IS NULL");
         }
 
     }

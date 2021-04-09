@@ -41,7 +41,7 @@ public:
         fname = this->filenameFromId(id);
         fs::path filePath = getConfigPath() / fname;
         ::std::filesystem::create_directories(filePath.parent_path());
-        LOGGER("saving: " + filePath.string());
+        logger.debug("saving: " + filePath.string());
         std::ofstream os(filePath);
         cereal::JSONOutputArchive archive(os);
         archive << cereal::make_nvp("configuration", config);
@@ -52,7 +52,7 @@ public:
         std::optional<ConfigType> config;
         fs::path fname = this->filenameFromId(id);
         fs::path filePath = getConfigPath() / fname;
-        LOGGER("loading: " + filePath.string());
+        logger.debug("loading: " + filePath.string());
         if (::std::filesystem::exists(filePath)) {
             ConfigType temp;
             try {
@@ -61,7 +61,7 @@ public:
                 archive >> temp;
                 config = temp;
             } catch (...) {
-                LOGGER("failed to load file. " + filePath.string())
+                logger.debug("failed to load file. " + filePath.string());
             }
 
         }

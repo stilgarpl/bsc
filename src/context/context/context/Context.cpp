@@ -22,7 +22,7 @@ namespace bsc {
         if (hasActiveContext()) {
             return activeContext;
         } else {
-            //            ERROR("No active context")
+            //            logger.error("No active context");
             throw InvalidContextException("No active context");
         }
     }
