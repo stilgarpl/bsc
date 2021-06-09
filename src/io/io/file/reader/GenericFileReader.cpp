@@ -3,14 +3,11 @@
 //
 
 #include "GenericFileReader.h"
-//@todo remove this include and date.h from project when it is implemented in stdlib C++20
-#include "date.h"
 namespace bsc {
     bool bsc::GenericFileReader::isAlgorithmSuitableForFileType(const bsc::MimeFileType& type) { return true; }
 
     PropertiesMetaData bsc::GenericFileReader::readMetaData(fs::path path) {
         using namespace std::chrono;
-        using namespace date;
         PropertiesMetaData result = PropertiesMetaData::object();
         if (fs::exists(path)) {
             result["file"]["size"]      = std::to_string(fs::file_size(path));

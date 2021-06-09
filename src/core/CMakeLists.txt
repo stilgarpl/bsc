@@ -1,4 +1,5 @@
 find_package(Poco REQUIRED Crypto)
+find_package(OpenSSL REQUIRED)
 
 set(SOURCE_FILES core/thread/Runnable.cpp core/thread/Runnable.h core/signal/Signal.h core/uber/Uber.h core/utils/cereal_include.h core/signal/Executor.h core/utils/crypto.h core/utils/crypto.cpp core/signal/OrderedExecutionPolicy.h core/signal/DefaultExecutionPolicy.h core/signal/OrderedExecutor.cpp core/signal/OrderedExecutor.h core/signal/SimpleExecutor.cpp core/signal/SimpleExecutor.h core/signal/Executor.h core/signal/ThreadExecutor.cpp core/signal/ThreadExecutor.h core/signal/ThreadPoolExecutor.cpp core/signal/ThreadPoolExecutor.h core/signal/ExecutorPolicyTraits.h core/factory/Factory.h core/factory/FactoryContext.h core/thread/ThreadQueueProcessor.h core/io/InputOutputContext.cpp core/io/InputOutputContext.h core/getset/GetSet.h core/generator/Generator.h core/generator/SequenceAlgorithm.h core/generator/RandomAlgorithm.h core/generator/RandomHashStringAlgorithm.cpp core/generator/RandomHashStringAlgorithm.h core/factory/CopyFactory.h core/factory/ParsingFactory.h core/factory/AutoFactory.h core/factory/FactoryPtr.h core/text/TextUtils.cpp core/text/TextUtils.h)
 
@@ -17,9 +18,7 @@ if (BSC_USE_PCH)
 endif ()
 install(DIRECTORY core DESTINATION ${BSC_DESTINATION_INCLUDE}
         FILES_MATCHING PATTERN "*.h")
-#@todo fix when conan poco has components
-#target_link_libraries(core PUBLIC parser spdlog::spdlog Poco::Crypto)
-target_link_libraries(core PUBLIC log parser context Poco::Poco)
+target_link_libraries(core PUBLIC log parser context Poco::Crypto)
 install(TARGETS core COMPONENT core DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)
 if (BSC_ENABLE_TESTS)
     add_subdirectory(test)

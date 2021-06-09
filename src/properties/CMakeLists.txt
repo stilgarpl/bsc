@@ -7,7 +7,7 @@ target_include_directories(properties PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_S
 if (BSC_USE_PCH)
 
 endif ()
-target_link_libraries(properties PUBLIC context parser yaml-cpp::yaml-cpp)
+target_link_libraries(properties PUBLIC context parser yaml-cpp)
 install(DIRECTORY properties DESTINATION ${BSC_DESTINATION_INCLUDE}
         FILES_MATCHING PATTERN "*.h")
 install(TARGETS properties COMPONENT properties DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)

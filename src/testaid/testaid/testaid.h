@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <optional>
 
 namespace bsc {
     namespace fs = std::filesystem;

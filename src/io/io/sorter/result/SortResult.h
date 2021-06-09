@@ -9,15 +9,19 @@
 #include <functional>
 #include <list>
 #include <map>
+#include <optional>
+
 namespace bsc {
     namespace fs = std::filesystem;
     class SortResult;
     using ResultConsumer = std::function<void(const SortResult&)>;
+
     struct SortFailure {
         fs::path sourcePath{};
         std::optional<fs::path> destinationPath{};
         std::string errorMessage{};
     };
+
     class SortResult {
         std::map<fs::path, fs::path> sortedFilesMap;
         std::list<SortFailure> failedFilesList;

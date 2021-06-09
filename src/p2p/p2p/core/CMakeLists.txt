@@ -9,6 +9,5 @@ target_include_directories(p2p_core PUBLIC ${BSC_P2P_BUILD_INCLUDE} $<INSTALL_IN
 if (BSC_USE_PCH)
     target_precompile_headers(p2p_core REUSE_FROM logic)
 endif ()
-#target_link_libraries(p2p_core PUBLIC logic Poco::Net) @todo fix when conan poco has components
-target_link_libraries(p2p_core PUBLIC logic Poco::Poco)
+target_link_libraries(p2p_core PUBLIC logic Poco::Net)
 install(TARGETS p2p_core COMPONENT p2p DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)
