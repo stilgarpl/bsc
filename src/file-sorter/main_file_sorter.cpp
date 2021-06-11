@@ -3,8 +3,8 @@
 //
 #include <filesystem>
 #include <io/sorter/FileSorter.h>
-#include <io/sorter/fetchers/FilesystemFileListFetcher.h>
 #include <io/sorter/fetchers/FileListFetcher.h>
+#include <io/sorter/fetchers/FilesystemFileListFetcher.h>
 #include <io/sorter/mappers/FileSorterMimeMatcher.h>
 #include <io/sorter/mappers/FileSorterNameMatcher.h>
 #include <io/sorter/strategies/StandardFileSorterStrategies.h>
@@ -52,7 +52,6 @@ int main(int argc, char* argv[]) {
                 {.shortKey = 'm', .longKey = "mime", .argumentName = "mimetype=PATTERN", .doc = "Pair of mime type and path pattern"}};
         DefaultParameter<std::map<std::string, std::string>> nameMatchers = {
                 {.shortKey = 'n', .longKey = "name", .argumentName = "regex=PATTERN", .doc = "Pair of filename regex and path pattern"}};
-
         DefaultParameter<std::string> action       = {{.shortKey      = 'a',
                                                  .longKey       = "action",
                                                  .argumentName  = "ACTION",
@@ -81,11 +80,11 @@ int main(int argc, char* argv[]) {
     };
 
     const auto& parameters = CommandLineParser::defaultParse<FileSorterParameters>(argc, argv);
-    auto fetcher           = FileListFetcher(bsc::fetchers::filesystemFileListFetcher,FetcherConfig{.recursive=parameters.recursive()},{});
+    auto fetcher = FileListFetcher(bsc::fetchers::filesystemFileListFetcher, FetcherConfig{.recursive = parameters.recursive()}, {});
     FileSorter fileSorter(fetcher,
-                          {.sortStrategy                  = actionFactory.create(parameters.action(), {}),
+                          {.sortStrategy                  = actionFactory.create(parameters.action()),
                            .createValidTargetPathStrategy = fileExistsFactory.create(parameters.fileExists(), {parameters.renamePattern()}),
-                           .errorHandlerStrategy          = errorActionFactory.create(parameters.errorHandler(), {}),
+                           .errorHandlerStrategy          = errorActionFactory.create(parameters.errorHandler()),
                            .fileExistsPredicate           = StandardFileSorterPredicates::fileExistsPredicate});
     for (MimeFileTypeFactory factory; const auto& [mime, pattern] : parameters.mimeMatchers()) {
         fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create(mime)), pattern);

@@ -6,11 +6,13 @@
 #define BSC_FILESORTER_H
 
 #include <filesystem>
+#include <io/file/FileInfoDecoder.h>
 #include <io/sorter/fetchers/FileListFetcher.h>
 #include <io/sorter/mappers/FileSorterMapper.h>
 #include <io/sorter/result/SortResult.h>
 #include <io/sorter/strategies/StandardFileSorterStrategies.h>
 #include <io/sorter/strategies/Strategies.h>
+#include <io/translator/PathTranslator.h>
 #include <list>
 namespace bsc {
 
@@ -29,6 +31,8 @@ namespace bsc {
         const SortingStrategies actions;
         FileSorterMapper mapper;
         const FileListFetcher fileListFetcher;
+        const PathTranslator translator{};
+        const FileInfoDecoder decoder{};
 
     public:
         FileSorter(FileListFetcher fileListFetcher, SortingStrategies Actions);
@@ -38,6 +42,8 @@ namespace bsc {
         void addPattern(std::unique_ptr<FileSorterMapperMatcher> matcher, std::string pattern) {
             mapper.addPattern(std::move(matcher), std::move(pattern));
         }
+    private:
+        [[nodiscard]] std::vector<fs::path> fetchAllFiles(const std::vector<fs::path>& pathsToSort) const;
     };
 }// namespace bsc
 

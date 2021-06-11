@@ -4,50 +4,36 @@
 
 #include "FileSorter.h"
 #include <fmt/format.h>
-#include <io/file/FileInfoDecoder.h>
 #include <io/file/FileMetaDataReader.h>
-#include <io/file/MimeFileTypeDecoder.h>
-#include <io/translator/PathTranslator.h>
 #include <iostream>
 #include <log/log/Logger.h>
 #include <range/v3/to_container.hpp>
 #include <ranges>
 namespace bsc {
     SortResult FileSorter::sort(const std::vector<fs::path>& pathsToSort) {
-        SortResult sortResult;
         using namespace std::string_literals;
-        try {
+        using namespace std::ranges::views;
+        SortResult sortResult;
 
-            PathTranslator translator;
-            FileInfoDecoder decoder{};
-            MimeFileTypeDecoder mimeFileTypeDecoder;
-            std::vector<fs::path> fileList;
-
-            for (const auto& path : pathsToSort) {
-                auto list = fileListFetcher.listFiles(path);
-                fileList.reserve(fileList.size() + list.size());
-                for (const auto& item : list) {
-                    fileList.push_back(item);
-                }
-            }
-            std::ranges::sort(fileList);
-            auto decodeFileInfo       = [&decoder](const auto& file) { return decoder.decodeFileInfo(file); };
-            auto addMapperToFileInfo  = [this](const auto& fileInfo) { return std::make_tuple(fileInfo, mapper.map(fileInfo)); };
-            auto filterMappedPatterns = [](const auto& fileInfoWithPattern) { return std::get<1>(fileInfoWithPattern).has_value(); };
-            auto addProperties        = [](const auto& fileInfoWithPattern) {
-                struct FileInfoWithPatternAndProperties {
-                    FileInfo fileInfo;
-                    std::string pattern;
-                    PropertiesMetaData propertiesMetaData;
-                };
-                const auto& fileInfo = std::get<0>(fileInfoWithPattern);
-                FileMetaDataReader reader(fileInfo.mimeFileType);
-                return FileInfoWithPatternAndProperties{.fileInfo           = std::get<0>(fileInfoWithPattern),
-                                                        .pattern            = *std::get<1>(fileInfoWithPattern),
-                                                        .propertiesMetaData = reader.readMetaData(fileInfo.path)};
+        auto decodeFileInfo       = [this](const auto& file) { return decoder.decodeFileInfo(file); };
+        auto addMapperToFileInfo  = [this](const auto& fileInfo) { return std::make_tuple(fileInfo, mapper.map(fileInfo)); };
+        auto filterMappedPatterns = [](const auto& fileInfoWithPattern) { return std::get<1>(fileInfoWithPattern).has_value(); };
+        auto addProperties        = [](const auto& fileInfoWithPattern) {
+            struct FileInfoWithPatternAndProperties {
+                FileInfo fileInfo;
+                std::string pattern;
+                PropertiesMetaData propertiesMetaData;
             };
+            const auto& fileInfo = std::get<0>(fileInfoWithPattern);
+            FileMetaDataReader reader(fileInfo.mimeFileType);
+            return FileInfoWithPatternAndProperties{.fileInfo           = std::get<0>(fileInfoWithPattern),
+                                                    .pattern            = *std::get<1>(fileInfoWithPattern),
+                                                    .propertiesMetaData = reader.readMetaData(fileInfo.path)};
+        };
 
-            using namespace std::ranges::views;
+        try {
+            auto fileList = fetchAllFiles(pathsToSort);
+
             auto filePatternAndPropertiesList = fileList | transform(decodeFileInfo) | transform(addMapperToFileInfo) |
                                                 filter(filterMappedPatterns) | transform(addProperties);
 
@@ -83,6 +69,16 @@ namespace bsc {
             logger.error("File sorting exception: "s + e.what());
         }
         return sortResult;
+    }
+    std::vector<fs::path> FileSorter::fetchAllFiles(const std::vector<fs::path>& pathsToSort) const {
+        std::vector<fs::path> fileList;
+        for (const auto& path : pathsToSort) {
+            auto list = fileListFetcher.listFiles(path);
+            fileList.reserve(fileList.size() + list.size());
+            std::ranges::copy(list, std::back_inserter(fileList));
+        }
+        std::ranges::sort(fileList);
+        return fileList;
     }
     FileSorter::FileSorter(FileListFetcher fileListFetcher, SortingStrategies actions)
         : actions(std::move(actions)), fileListFetcher(std::move(fileListFetcher)) {

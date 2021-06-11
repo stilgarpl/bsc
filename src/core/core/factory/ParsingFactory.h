@@ -13,21 +13,21 @@
 #include <vector>
 namespace bsc {
 
-    //@todo this has the requirement of traits::argumentType = std::vector<std::string>>. try to find a way to enforce
-    //  it, maybe through concepts.
     template<typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
-    class ParsingFactory
-        : public AutoFactory<ParsingFactory<ProducedObjectType, FactorySpecialization>, ProducedObjectType, FactorySpecialization> {
+    class ParsingFactory : public TemplateAutoFactory<ParsingFactory, ProducedObjectType, FactorySpecialization> {
 
-        using SelectorType         = typename Factory<ProducedObjectType, FactorySpecialization>::SelectorType;
+        using Base         = TemplateAutoFactory<ParsingFactory, ProducedObjectType, FactorySpecialization>;
+        using SelectorType = typename Base::SelectorType;
+        //@todo maybe required type can be relaxed to any container of strings
         using RequiredArgumentType = std::vector<std::string>;
-        using ArgumentType         = typename Factory<ProducedObjectType, FactorySpecialization>::ArgumentType;
-        static_assert(std::is_same_v<ArgumentType, RequiredArgumentType>);
+        using ArgumentType         = typename Base::ArgumentType;
+        static_assert(std::is_same_v<ArgumentType, RequiredArgumentType>,
+                      "ParsingFactory requires argument type to be of type std::vector<std::string>");
         using Creator = std::function<ProducedObjectType(const ArgumentType&)>;
         std::map<SelectorType, Creator> creatorRegistry;
 
     public:
-        ProducedObjectType create(const SelectorType& selector, const ArgumentType& argument) const override {
+        ProducedObjectType create(const SelectorType& selector, const ArgumentType& argument = {}) const override {
             if (creatorRegistry.contains(selector)) {
                 return creatorRegistry.at(selector)(argument);
             }

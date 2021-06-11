@@ -9,7 +9,7 @@
 namespace bsc {
     namespace detail {}// namespace detail
 
-    fs::path PathTranslator::translate(const std::string& pattern, const PropertiesMetaData& properties) {
+    fs::path PathTranslator::translate(const std::string& pattern, const PropertiesMetaData& properties) const {
         const auto& data = properties;
         try {
             return inja::render(pattern, data);

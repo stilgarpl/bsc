@@ -22,6 +22,7 @@ namespace bsc {
         }
     }// namespace detail
 
+    //@todo add concept FactoryType is derived from Factory template
     template<typename FactoryType,
              typename ProducedObjectType,
              typename FactorySpecialization = NoFactorySpecialization,
@@ -31,6 +32,10 @@ namespace bsc {
     public:
         AutoFactory() : AutoCaller<FactoryType, detail::registerFactoryInFactoryContext<FactoryType>>({}){};
     };
+
+
+    template<template<typename, typename> class Factory ,typename ProducedObjectType, typename FactorySpecialization>
+    using TemplateAutoFactory = AutoFactory<Factory<ProducedObjectType, FactorySpecialization>, ProducedObjectType, FactorySpecialization>;
 
 }// namespace bsc
 

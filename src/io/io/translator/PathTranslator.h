@@ -11,7 +11,7 @@ namespace bsc {
     namespace fs = std::filesystem;
     class PathTranslator {
     public:
-        fs::path translate(const std::string& pattern, const PropertiesMetaData& properties);
+        [[nodiscard]] fs::path translate(const std::string& pattern, const PropertiesMetaData& properties) const;
     };
 
     class PathTranslationException : public std::domain_error {

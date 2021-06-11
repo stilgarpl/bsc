@@ -19,6 +19,7 @@ namespace bsc {
         // using ArgumentType = ...
     };
 
+    //@todo C++20 rewrite this with concepts
     template<typename T>
     class HasArgumentType {
         template<typename C>
@@ -61,8 +62,8 @@ namespace bsc {
 
         //@todo it would be awesome if ArgumentType could be a parameter pack... investigate if this is possible
         virtual ProducedObjectType create(const SelectorType& selector, const ArgumentType& argument) const = 0;
-        //@todo let's assume that ArgumentType is default constructible... if not, add a way to not have this overload
-        // for that case
+        //@todo C++20 let's assume that ArgumentType is default constructible... if not, add a way to not have this overload
+        // for that case, probably using concepts
         ProducedObjectType create(const SelectorType& selector) const { return create(selector, {}); }
     };
 
