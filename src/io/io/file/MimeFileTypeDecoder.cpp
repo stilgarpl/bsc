@@ -62,7 +62,7 @@ namespace bsc {
         };
     }// namespace detail
 
-    MimeFileType MimeFileTypeDecoder::getTypeForFile(const fs::path& path) {
+    MimeFileType MimeFileTypeDecoder::getTypeForFile(const fs::path& path) const {
 
         auto& decoderInstance = detail::FileTypeDecoderImplementation::instance();
         return MimeFileTypeFactory().create(decoderInstance.getMime(path));

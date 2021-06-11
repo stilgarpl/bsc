@@ -3,6 +3,7 @@
 //
 
 #include <catch2/catch.hpp>
+#include <io/file/FileInfoDecoder.h>
 #include <io/sorter/FileSorter.h>
 #include <io/sorter/fetchers/FilesystemFileListFetcher.h>
 #include <io/sorter/fetchers/StandardFileListFetcherConstraints.h>
@@ -110,11 +111,23 @@ TEST_CASE("Sort predicates test") {
 
 TEST_CASE("Sort fetchers test") {
     testaid::TestDirWithResources testDirWithResources;
-    SECTION("Filesystem fetcher test") {
+    SECTION("Filesystem fetcher test recursive") {
         std::set<fs::path> expectedResult = {"test.txt", "test.gif", "test.png", "png_with_wrong_extension.txt"};
-        auto path                         = testDirWithResources.getTestDirPath("sort");
+        auto path                         = testDirWithResources.getResourcePath("sort");
         FilesystemFileListFetcher fetcher;
-        auto result = fetcher.doListFiles(path);
+        auto result = fetcher({.recursive = true},path);
+        REQUIRE(result.size() == expectedResult.size());
+        for (const auto& item : result) {
+            REQUIRE(expectedResult.contains(item.filename()));
+        }
+    }
+
+    SECTION("Filesystem fetcher test not recursive") {
+        std::set<fs::path> expectedResult = {"test.gif", "test.png", "png_with_wrong_extension.txt"};
+        auto path                         = testDirWithResources.getResourcePath("sort");
+        FilesystemFileListFetcher fetcher;
+        auto result = fetcher({.recursive = false},path);
+        REQUIRE(result.size() == expectedResult.size());
         for (const auto& item : result) {
             REQUIRE(expectedResult.contains(item.filename()));
         }
@@ -124,7 +137,7 @@ TEST_CASE("Sort fetchers test") {
         std::vector<fs::path> expectedResult = {"file1", "file2.txt", "file5.zip"};
         fs::path path                        = {"any/path"};
         StaticFileListFetcher fetcher(expectedResult);
-        auto result = fetcher.doListFiles(path);
+        auto result = fetcher({},path);
         REQUIRE(expectedResult == result);
     }
 }
@@ -185,45 +198,48 @@ TEST_CASE("FileSorterMapper test") {
     MimeFileTypeFactory factory;
     auto path                       = testDirWithResources.getResourcePath("sort");
     auto pathSubdir                 = testDirWithResources.getResourcePath("sort/subdir");
-    const auto expectedTextPattern  = "text";
+    const auto expectedTextPatternLowPriority = "textLow";
+    const auto expectedTextPatternHighPriority = "textHigh";
     const auto expectedImagePattern = "img";
     const auto expectedGifPattern   = "gif";
 
     FileSorterMapper fileSorterMapperEmpty;
     FileSorterMapper fileSorterMapper;
-    fileSorterMapper.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("text/")), expectedTextPattern);
+    FileInfoDecoder fileInfoDecoder;
+    fileSorterMapper.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("text/")), expectedTextPatternHighPriority, 5);
+    fileSorterMapper.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("text/plain")), expectedTextPatternLowPriority, 1);
     fileSorterMapper.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("image/")), expectedImagePattern);
     fileSorterMapper.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("image/gif")), expectedGifPattern);
     SECTION("gif") {
         auto filenameGif = "test.gif";
-        auto result      = fileSorterMapper.map(path / filenameGif);
+        auto result      = fileSorterMapper.map( fileInfoDecoder.decodeFileInfo(path / filenameGif));
         REQUIRE(result);
         REQUIRE(result == expectedGifPattern);
     }
     SECTION("png") {
         auto filenamePng = "test.png";
-        auto result      = fileSorterMapper.map(path / filenamePng);
+        auto result      = fileSorterMapper.map(fileInfoDecoder.decodeFileInfo(path / filenamePng));
         REQUIRE(result);
         REQUIRE(result == expectedImagePattern);
     }
     SECTION("png-txt") {
         auto filenamePngTxt = "png_with_wrong_extension.txt";
-        auto result         = fileSorterMapper.map(path / filenamePngTxt);
+        auto result         = fileSorterMapper.map(fileInfoDecoder.decodeFileInfo(path / filenamePngTxt));
         REQUIRE(result);
         REQUIRE(result == expectedImagePattern);
     }
 
     SECTION("txt") {
         auto filenameTxt = "test.txt";
-        auto result      = fileSorterMapper.map(pathSubdir / filenameTxt);
+        auto result      = fileSorterMapper.map(fileInfoDecoder.decodeFileInfo(pathSubdir / filenameTxt));
         REQUIRE(result);
-        REQUIRE(result == expectedTextPattern);
+        REQUIRE(result == expectedTextPatternLowPriority);
     }
 
     SECTION("no mapper") {
 
         auto filenameGif = "test.gif";
-        auto result      = fileSorterMapperEmpty.map(path / filenameGif);
+        auto result      = fileSorterMapperEmpty.map(fileInfoDecoder.decodeFileInfo(path / filenameGif));
         REQUIRE(!result.has_value());
     }
 }
@@ -243,7 +259,6 @@ TEST_CASE("Path translator test") {
     SECTION("invalid property pattern") {
         std::string pattern   = "{{homedir}}/{{imagesdir}}";
         properties["homedir"] = "/home/test";
-        fs::path expectedPath = "/home/test/imagesdir";
         REQUIRE_THROWS_AS(pathTranslator.translate(pattern, properties), PathTranslationException);
     }
 }
@@ -253,7 +268,8 @@ TEST_CASE("File sorter test") {
     MimeFileTypeFactory factory;
     auto resourcePath    = testDirWithResources.getResourcePath("sort");
     auto destinationPath = testDirWithResources.getTestDirPath("destination");
-    FileSorter fileSorter(std::make_unique<FilesystemFileListFetcher>(),
+    FileListFetcher fetcher = FileListFetcher{bsc::fetchers::filesystemFileListFetcher, {.recursive=true}, {}};
+    FileSorter fileSorter(fetcher,
                           {.sortStrategy                  = StandardFileSorterSortStrategies::copy,
                            .createValidTargetPathStrategy = StandardCreateValidTargetPathStrategies::abort,
                            .errorHandlerStrategy          = StandardFileSorterErrorHandlers::stop,

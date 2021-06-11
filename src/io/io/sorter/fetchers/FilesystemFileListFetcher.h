@@ -10,10 +10,14 @@ namespace bsc {
     /**
      * lists all files that are in supplied path
      */
-    class FilesystemFileListFetcher : public FileListFetcher {
+    class FilesystemFileListFetcher {
     public:
-        std::vector<fs::path> doListFiles(const fs::path& path) override;
+        std::vector<fs::path> operator()(const FetcherConfig& config, const fs::path& path);
     };
+
+    namespace fetchers {
+        inline FilesystemFileListFetcher filesystemFileListFetcher{};
+    }
 }// namespace bsc
 
 #endif

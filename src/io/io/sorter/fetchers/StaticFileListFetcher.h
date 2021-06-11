@@ -7,16 +7,17 @@
 
 #include "FileListFetcher.h"
 namespace bsc {
-    class StaticFileListFetcher : public FileListFetcher {
+    class StaticFileListFetcher {
     private:
         const std::vector<fs::path> fileList;
 
     public:
-        StaticFileListFetcher(std::vector<fs::path> fileList);
+        explicit StaticFileListFetcher(std::vector<fs::path> fileList);
 
     public:
-        std::vector<fs::path> doListFiles(const fs::path& path) override;
+        std::vector<fs::path> operator()(const FetcherConfig& config, const fs::path& path);
     };
+
 }// namespace bsc
 
 #endif

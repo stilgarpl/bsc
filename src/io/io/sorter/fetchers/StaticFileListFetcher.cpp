@@ -4,8 +4,7 @@
 
 #include "StaticFileListFetcher.h"
 
-#include <utility>
 namespace bsc {
-    std::vector<fs::path> bsc::StaticFileListFetcher::doListFiles(const fs::path& path) { return fileList; }
+    std::vector<fs::path> bsc::StaticFileListFetcher::operator()(const FetcherConfig& config,const fs::path& path) { return fileList; }
     bsc::StaticFileListFetcher::StaticFileListFetcher(std::vector<fs::path> fileList) : fileList(std::move(fileList)) {}
 }// namespace bsc

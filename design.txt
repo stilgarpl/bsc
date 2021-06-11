@@ -798,10 +798,11 @@ Property<"mappers", std::list<MapperProperties>> mappers; // property dla sequen
 
 MapperProperties {
 
-type: (mime, pattern)
+type: (mime, regex)
 match: (application/text / "*.zip")
 action: move
 error: continue
+target: target path pattern
 
 }
 

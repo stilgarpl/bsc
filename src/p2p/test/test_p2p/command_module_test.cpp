@@ -36,8 +36,8 @@ public:
     }
 
     void rawCommand(CommandModule::ArgumentContainerTypeCRef arguments) {
-        value1 = arguments.size();
-        value2 = arguments.size();
+        value1 = static_cast<int>(arguments.size());
+        value2 = static_cast<int>(arguments.size());
     }
 
     void setupActions(SetupActionHelper& actionHelper) override {}

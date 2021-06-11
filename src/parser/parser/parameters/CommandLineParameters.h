@@ -289,7 +289,6 @@ namespace bsc {
                         value = parser.fromString<T>(text);
                     }
                 }
-
                 counter++;
             };
         }

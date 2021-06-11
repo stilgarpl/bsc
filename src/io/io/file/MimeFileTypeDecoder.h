@@ -14,7 +14,7 @@ namespace bsc {
     class MimeFileTypeDecoder {
 
     public:
-        MimeFileType getTypeForFile(const fs::path& path);
+        [[nodiscard]] MimeFileType getTypeForFile(const fs::path& path) const;
     };
 }// namespace bsc
 

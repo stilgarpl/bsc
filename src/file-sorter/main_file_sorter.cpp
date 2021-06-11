@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <io/sorter/FileSorter.h>
 #include <io/sorter/fetchers/FilesystemFileListFetcher.h>
+#include <io/sorter/fetchers/FileListFetcher.h>
 #include <io/sorter/mappers/FileSorterMimeMatcher.h>
 #include <io/sorter/mappers/FileSorterNameMatcher.h>
 #include <io/sorter/strategies/StandardFileSorterStrategies.h>
@@ -46,7 +47,7 @@ int main(int argc, char* argv[]) {
     static FileSortingStrategyFactories::CreateValidTargetPathStrategyFactory fileExistsFactory = makeFileExistsFactory();
     //@todo add way to list available strategies in help
     struct FileSorterParameters : CommandLineParameters {
-        Arguments<std::vector<std::filesystem::path>> targetPath          = {"PATHS..."};
+        Arguments<std::vector<std::filesystem::path>> targetPaths         = {"PATHS..."};
         DefaultParameter<std::map<std::string, std::string>> mimeMatchers = {
                 {.shortKey = 'm', .longKey = "mime", .argumentName = "mimetype=PATTERN", .doc = "Pair of mime type and path pattern"}};
         DefaultParameter<std::map<std::string, std::string>> nameMatchers = {
@@ -75,11 +76,13 @@ int main(int argc, char* argv[]) {
                                                         .argumentName = "PATTERN",
                                                         .doc          = "File rename pattern. Defaults to \" ({})\"",
                                                         .defaultValue = " ({})"}};
+        DefaultParameter<bool> recursive            = {
+                {.shortKey = 'r', .longKey = "recursive", .doc = "Sort directories recursively", .defaultValue = false}};
     };
 
     const auto& parameters = CommandLineParser::defaultParse<FileSorterParameters>(argc, argv);
-    auto fetcher           = std::make_unique<FilesystemFileListFetcher>();
-    FileSorter fileSorter(std::move(fetcher),
+    auto fetcher           = FileListFetcher(bsc::fetchers::filesystemFileListFetcher,FetcherConfig{.recursive=parameters.recursive()},{});
+    FileSorter fileSorter(fetcher,
                           {.sortStrategy                  = actionFactory.create(parameters.action(), {}),
                            .createValidTargetPathStrategy = fileExistsFactory.create(parameters.fileExists(), {parameters.renamePattern()}),
                            .errorHandlerStrategy          = errorActionFactory.create(parameters.errorHandler(), {}),
@@ -90,6 +93,6 @@ int main(int argc, char* argv[]) {
     for (const auto& [name, pattern] : parameters.nameMatchers()) {
         fileSorter.addPattern(std::make_unique<FileSorterNameMatcher>(name), pattern);
     }
-    fileSorter.sort(parameters.targetPath()) | StandardResultConsumers::printResult;
+    fileSorter.sort(parameters.targetPaths()) | StandardResultConsumers::printResult;
     return 0;
 }

@@ -2,6 +2,7 @@
 // Created by Krzysztof Tulidowicz on 09.04.2020.
 //
 #include <catch2/catch.hpp>
+#include <io/file/FileInfoDecoder.h>
 #include <io/file/FileMetaDataReader.h>
 #include <io/file/MimeFileType.h>
 #include <io/file/MimeFileTypeDecoder.h>
@@ -74,6 +75,43 @@ TEST_CASE("File type decoder test") {
         auto fileType = decoder.getTypeForFile(path / badPngFilename);
         REQUIRE(fileType.typeGroup == "image");
         REQUIRE(fileType.type == "png");
+    }
+}
+
+TEST_CASE("File info decoder test") {
+    testaid::TestDirWithResources testDirWithResources;
+    auto path                        = testDirWithResources.getResourcePath("mime");
+    const std::string gifFilename    = "test.gif";
+    const std::string pngFilename    = "test.png";
+    const std::string badPngFilename = "png_with_wrong_extension.txt";
+    const std::string txtFilename    = "test.txt";
+    FileInfoDecoder decoder;
+    SECTION("txt") {
+        auto fileInfo = decoder.decodeFileInfo(path / txtFilename);
+        REQUIRE(fileInfo.mimeFileType.typeGroup == "text");
+        REQUIRE(fileInfo.mimeFileType.type == "plain");
+        REQUIRE(fileInfo.path == path / txtFilename);
+    }
+
+    SECTION("gif") {
+        auto fileInfo = decoder.decodeFileInfo(path / gifFilename);
+        REQUIRE(fileInfo.mimeFileType.typeGroup == "image");
+        REQUIRE(fileInfo.mimeFileType.type == "gif");
+        REQUIRE(fileInfo.path == path / gifFilename);
+    }
+
+    SECTION("png") {
+        auto fileInfo = decoder.decodeFileInfo(path / pngFilename);
+        REQUIRE(fileInfo.mimeFileType.typeGroup == "image");
+        REQUIRE(fileInfo.mimeFileType.type == "png");
+        REQUIRE(fileInfo.path == path / pngFilename);
+    }
+
+    SECTION("bad png") {
+        auto fileInfo = decoder.decodeFileInfo(path / badPngFilename);
+        REQUIRE(fileInfo.mimeFileType.typeGroup == "image");
+        REQUIRE(fileInfo.mimeFileType.type == "png");
+        REQUIRE(fileInfo.path == path / badPngFilename);
     }
 }
 

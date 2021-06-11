@@ -5,6 +5,7 @@
 #ifndef BSC_DIRECTNOTIFY_H
 #define BSC_DIRECTNOTIFY_H
 
+#include "StateObserver.h"
 
 namespace bsc {
     template<typename StateObject, typename stateIdType>

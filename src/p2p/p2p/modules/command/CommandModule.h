@@ -75,7 +75,8 @@ namespace bsc {
 
             public:
                 SpecificCommandData(const std::string& commandName, RetType (ModuleType::*func)(Args...))
-                    : CommandData(commandName), func(func) {}
+                    : CommandData(commandName), func(func) {
+                }
 
                 void applyCommand(CommandModule& commandModule) override {
                     commandModule.mapCommand(commandName, func);
@@ -138,13 +139,21 @@ namespace bsc {
                 std::optional<CommandFunc> rawCommand;
 
             public:
-                void setCommand(std::size_t argumentCount, CommandFunc func) { commandMap[argumentCount] = func; }
+                void setCommand(std::size_t argumentCount, CommandFunc func) {
+                    commandMap[argumentCount] = func;
+                }
 
-                void setRawCommand(CommandFunc func) { rawCommand = func; }
+                void setRawCommand(CommandFunc func) {
+                    rawCommand = func;
+                }
 
-                bool hasCommand(std::size_t argumentCount) { return commandMap.contains(argumentCount) || rawCommand.has_value(); }
+                bool hasCommand(std::size_t argumentCount) {
+                    return commandMap.contains(argumentCount) || rawCommand.has_value();
+                }
 
-                std::size_t commandCount() { return commandMap.size() + (rawCommand.has_value() ? 1 : 0); }
+                std::size_t commandCount() {
+                    return commandMap.size() + (rawCommand.has_value() ? 1 : 0);
+                }
 
                 auto avaiableCommands() {
                     std::set<std::size_t> resultSet;
@@ -171,7 +180,9 @@ namespace bsc {
             bool isDefaultHandler = true;
 
         private:
-            auto& getCommandMap() { return commands; }
+            auto& getCommandMap() {
+                return commands;
+            }
 
             [[nodiscard]] const auto& getCommandMap() const {
                 // return commands.get<std::string, std::function<void(ArgumentContainerType)>>();
@@ -190,14 +201,13 @@ namespace bsc {
             }
 
         public:
-            explicit CommandGroup(CommandModule& parent) : parent(parent) {}
+            explicit CommandGroup(CommandModule& parent) : parent(parent) {
+            }
 
             CommandGroup& group(const std::string& name);
 
             template<ParametersClass ParametersType>
-            void handler(std::function<CommandExecutionStatus(const ParametersType&
-
-                                                              )> handlerFunc) {
+            void handler(std::function<CommandExecutionStatus(const ParametersType&)> handlerFunc) {
                 groupHandler = [handlerFunc](ArgumentContainerTypeCRef arguments,
                                              const CommandModule::CommandGroup& group) -> GroupHandlerResult {
                     auto parameters = CommandLineParser::defaultParse<ParametersType>(arguments, ParseConfiguration::silent);
@@ -279,9 +289,8 @@ namespace bsc {
                 if (groups.contains(commandName)) {
                     auto& thisGroup = groups[commandName];
                     //@todo optimize this, arguments are copied and copied...
-                    auto handlerResult = thisGroup->groupHandler
-                                                 ? thisGroup->groupHandler(arguments, *thisGroup)
-                                                 : GroupHandlerResult{CommandExecutionStatus::success, arguments};
+                    auto handlerResult = thisGroup->groupHandler ? thisGroup->groupHandler(arguments, *thisGroup)
+                                                                 : GroupHandlerResult{CommandExecutionStatus::success, arguments};
                     if (handlerResult.status == CommandExecutionStatus::success) {
                         ArgumentContainerTypeCRef realArguments = handlerResult.arguments;
                         if (!realArguments.empty()) {
@@ -351,10 +360,9 @@ namespace bsc {
 
     public:
         template<ParametersClass ParametersType>
-        void setDefaultGroupHandler(
-                std::function<CommandExecutionStatus(const ParametersType&, const CommandModule::CommandGroup&)
+        void setDefaultGroupHandler(std::function<CommandExecutionStatus(const ParametersType&, const CommandModule::CommandGroup&)
 
-                              > handlerFunc) {
+                                                  > handlerFunc) {
             //@todo unify duplicated code with CommandGroup
             defaultGroupHandler = [handlerFunc](ArgumentContainerTypeCRef arguments,
                                                 const CommandModule::CommandGroup& group) -> GroupHandlerResult {
@@ -367,9 +375,13 @@ namespace bsc {
 
         void prepareSubmodules() override;
 
-        CommandGroup& group(const std::string& name) { return defaultCommandGroup.group(name); }
+        CommandGroup& group(const std::string& name) {
+            return defaultCommandGroup.group(name);
+        }
 
-        CommandGroup& group() { return defaultCommandGroup; }
+        CommandGroup& group() {
+            return defaultCommandGroup;
+        }
 
         explicit CommandModule(INode& node);
 
@@ -381,9 +393,7 @@ namespace bsc {
         }
 
         template<typename ModuleType, typename ParametersType, typename RetType, typename... Args>
-        void mapCommand(std::string commandName,
-                        RetType (ModuleType::*f)(const ParametersType&, Args... args),
-                        ParametersType params) {
+        void mapCommand(std::string commandName, RetType (ModuleType::*f)(const ParametersType&, Args... args), ParametersType params) {
 
             group().mapCommand(commandName, f, params);
         }
@@ -458,9 +468,12 @@ namespace bsc {
 
         void parametersTestingCommand(const CommandPP& params);
 
-        void listCommands() {}
+        void listCommands() {
+        }
 
-        void sleep(int seconds) { std::this_thread::sleep_for(std::chrono::seconds(seconds)); }
+        void sleep(int seconds) {
+            std::this_thread::sleep_for(std::chrono::seconds(seconds));
+        }
     };
 }// namespace bsc
 

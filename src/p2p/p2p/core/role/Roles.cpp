@@ -3,6 +3,5 @@
 //
 
 #include "Roles.h"
-#include "RoleScope.h"
 
 thread_local bsc::RoleScope* bsc::Roles::activeScope = nullptr;
