@@ -233,7 +233,7 @@ TEST_CASE("FileSorterMapper test") {
         auto filenameTxt = "test.txt";
         auto result      = fileSorterMapper.map(fileInfoDecoder.decodeFileInfo(pathSubdir / filenameTxt));
         REQUIRE(result);
-        REQUIRE(result == expectedTextPatternLowPriority);
+        REQUIRE(result == expectedTextPatternHighPriority);
     }
 
     SECTION("no mapper") {

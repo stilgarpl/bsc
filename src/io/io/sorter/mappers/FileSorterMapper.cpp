@@ -9,8 +9,11 @@ namespace bsc {
     std::optional<std::string> FileSorterMapper::map(const FileInfo& from) {
         std::string_view bestMatch;
         MatchPrecision bestPrecision = MatchPrecision::none;
+        auto bestPriority = std::numeric_limits<decltype(MapperEntry::priority)>::min();
         for (const auto& [matcher, pattern, priority] : patterns) {
-            //@todo convert to std (max?) algorithm
+            if(bestPrecision == MatchPrecision::perfect || priority < bestPriority ) {
+                break;
+            }
             auto matchResult = matcher->matches(from.path);
             logger.info(fmt::format("Matching {} to {} with priority: {}", from.path.filename().string(), pattern, priority));
             switch (matchResult) {
@@ -18,14 +21,14 @@ namespace bsc {
                 case MatchPrecision::none:
                     logger.info("No match");
                     continue;
-                case MatchPrecision::perfect:// @todo it can't be better than perfect, we should break the loop// immediately.
+                case MatchPrecision::perfect:// @todo it can't be better than perfect, we should break the loop immediately.
                 default:
                     if (matchResult > bestPrecision) {
                         bestPrecision = matchResult;
                         bestMatch     = pattern;
+                        bestPriority = priority;
                     }
                     logger.info("Match found");
-                    break;
             }
         }
 
