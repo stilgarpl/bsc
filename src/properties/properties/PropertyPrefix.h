@@ -11,6 +11,7 @@
 
 namespace bsc {
 
+    //@todo add property prefix support to writer
     template<detail::StringLiteral lit>
     class PropertyPrefix {
         static inline const PropertyIdType propertyId     = {lit.value};

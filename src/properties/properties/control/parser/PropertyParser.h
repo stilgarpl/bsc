@@ -8,19 +8,13 @@
 #include "PropertyParserNodeType.h"
 #include <mutex>
 #include <properties/PropertyDefinitions.h>
+#include <properties/control/PropertyStackKeeper.h>
 namespace bsc {
     class PropertyParser {
     protected:
         std::recursive_mutex mutex;
 
     public:
-        class StackKeeper {
-            PropertyParser& propertyParser;
-
-        public:
-            explicit StackKeeper(PropertyParser& propertyParser);
-            virtual ~StackKeeper();
-        };
 
         /**
          * resets selected node to root node
@@ -60,17 +54,9 @@ namespace bsc {
          * @param idSequence
          * @return value of the selected node
          */
-        auto getValue(const PropertyIdSequence& idSequence) {
-            StackKeeper keeper(*this);// this will restore node to state before select
-            selectNode(idSequence);
-            return getValue();
-        }
+        PropertyValueType getValue(const PropertyIdSequence& idSequence);
 
-        auto getNodeType(const PropertyIdSequence& idSequence) {
-            StackKeeper keeper(*this);// this will restore node to state before select
-            selectNode(idSequence);
-            return getNodeType();
-        }
+        PropertyParserNodeType getNodeType(const PropertyIdSequence& idSequence);
 
         /**
          * pushes current node to the stack
@@ -89,7 +75,7 @@ namespace bsc {
 
         virtual bool hasEntry() = 0;
 
-        friend class PropertyParserController;
+        friend class PropertyController;
     };
 
     template<typename T>

@@ -1,4 +1,4 @@
-set(SOURCE_FILES test_properties/test_main.cpp test_properties/test_property.cpp test_properties/test_yaml_parser.cpp)
+set(SOURCE_FILES test_properties/test_main.cpp test_properties/test_property.cpp test_properties/test_yaml_parser.cpp test_properties/test_yaml_writer.cpp)
 
 add_executable(test_properties ${SOURCE_FILES})
 catch_discover_tests(test_properties WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})

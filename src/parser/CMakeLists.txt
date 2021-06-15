@@ -1,5 +1,5 @@
 find_package(argp REQUIRED)
-set(SOURCE_FILES parser/parameters/CommandLineParameters.cpp parser/parameters/CommandLineParameters.h parser/parser/fromString.h parser/cast/templateCast.h parser/parser/explode.h)
+set(SOURCE_FILES parser/parameters/CommandLineParameters.cpp parser/parameters/CommandLineParameters.h parser/parser/fromString.h parser/cast/templateCast.h parser/parser/explode.h parser/writer/toString.h parser/configuration/ParserConfiguration.h parser/concepts/concepts.h)
 
 add_library(parser ${SOURCE_FILES})
 target_include_directories(parser PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:${BSC_DESTINATION_INCLUDE}>)

@@ -5,7 +5,7 @@
 #include <context/context/Context.h>
 #include <properties/Property.h>
 #include <properties/PropertyContext.h>
-#include <properties/parser/YamlParser.h>
+#include <properties/control/parser/YamlParser.h>
 using namespace bsc;
 
 TEST_CASE("YamlParser test ") {

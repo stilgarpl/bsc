@@ -15,9 +15,18 @@
 #include <optional>
 #include <parser/parser/explode.h>
 #include <parser/parser/fromString.h>
-#include <properties/parser/PropertyParserController.h>
+#include <parser/writer/toString.h>
+#include <properties/control/PropertyController.h>
+#include <properties/control/writer/PropertyWriter.h>
 
 namespace bsc {
+
+    template<typename T>
+    concept PropertyValue = !IsContainerNotString<T> && (IsStringNotClass<T> || ParsedFromString<T>);
+    template<typename T>
+    concept PropertyClass = !IsContainerNotString<T> && IsClassNotString<T>;
+    template<typename T>
+    concept PropertyContainer = IsContainerNotString<T>;
 
     template<detail::StringLiteral lit, typename T = detail::DirectPropertyMapper>
     class Property final {
@@ -26,19 +35,23 @@ namespace bsc {
         static inline const PropertyIdType propertyId     = {lit.value};
         static inline const PropertyIdSequence idSequence = explode(propertyId, propertyDelimiter);
         static inline const Parser fromStringParser;
+        static inline const Writer toStringWriter;
 
     private:
         std::optional<T> value;
         std::any directValue{};
 
     public:
-        [[nodiscard]] bool hasValue() const { return value.has_value() || directValue.has_value(); }
+        [[nodiscard]] bool hasValue() const {
+            return value.has_value() || directValue.has_value();
+        }
 
-        constexpr auto getPropertyName() const { return propertyId; }
+        constexpr auto getPropertyName() const {
+            return propertyId;
+        }
 
-        explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> &&
-                (!IsContainerNotString<T> && (!std::is_class_v<T> || IsString<T>) ) {
-            PropertyParserController controller;
+        explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyValue<T> {
+            PropertyController controller;
             auto& parser = controller.parser();
 
             switch (parser.getNodeType(idSequence)) {
@@ -66,22 +79,31 @@ namespace bsc {
             }
         }
 
-        explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> &&
-                (!IsContainerNotString<T> && std::is_class_v<T> && !IsString<T>) {
-            PropertyParserController controller;
+        explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyClass<T> {
+            PropertyController controller;
             auto& parser = controller.parser();
             parser.selectNode(idSequence);
             value = T{};// it should create itself
         }
 
-        explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T>&& IsContainerNotString<T> {
-            PropertyParserController controller;
+        explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyContainer<T> {
+            PropertyController controller;
             auto& parser = controller.parser();
             parser.selectNode(idSequence);
+            if (parser.getNodeType() != PropertyParserNodeType::sequence) {
+                if (defaultValue.has_value()) {
+                    value = *defaultValue;
+                    return;
+                } else {
+                    //@todo better error?
+                    throw InvalidPropertyKeyException("Property key: " + propertyId +
+                                                      " does not exist and default value was not provided.");
+                }
+            }
             value = T{};
             while (parser.hasEntry()) {
                 {
-                    PropertyParser::StackKeeper keeper(parser);
+                    PropertyStackKeeper<PropertyParser> keeper(parser);
                     if constexpr (IsClassNotString<typename T::value_type>) {
                         value->insert(value->end(), typename T::value_type{});
                     } else {
@@ -93,16 +115,18 @@ namespace bsc {
         }
 
         explicit Property(const std::any& defaultValue) requires detail::IsDirect<T> {
-            PropertyParserController controller;
+            PropertyController controller;
             if (controller.parser().getNodeType(idSequence) == PropertyParserNodeType::scalar) {
                 value = detail::DirectPropertyMapper{.value = controller.parser().getValue(idSequence)};
             }
             directValue = defaultValue;
         }
 
-        Property() requires(!detail::IsDirect<T>) : Property(std::nullopt) {}
+        Property() requires(detail::IsNotDirect<T>) : Property(std::nullopt) {
+        }
 
-        Property() requires(detail::IsDirect<T>) : Property(std::any{}) {}
+        Property() requires(detail::IsDirect<T>) : Property(std::any{}) {
+        }
 
         explicit Property(const T& defaultValue) requires(!detail::IsDirect<T>) : Property(std::make_optional(defaultValue)){};
 
@@ -114,7 +138,7 @@ namespace bsc {
         }
 
         template<typename TrueT>
-        TrueT getValue() const requires(detail::IsDirect<T> && !(IsClassNotString<TrueT>) ) {
+        TrueT getValue() const requires(detail::IsDirect<T>&& PropertyValue<TrueT>) {
             if (!hasValue()) {
                 throw InvalidPropertyKeyException("Property key: " + propertyId + " does not exist and default value was not provided.");
             }
@@ -130,22 +154,22 @@ namespace bsc {
         }
 
         template<typename TrueT>
-        TrueT getValue() const requires(detail::IsDirect<T> && (IsClassNotString<TrueT> && !IsContainerNotString<TrueT>) ) {
-            PropertyParserController controller;
+        TrueT getValue() const requires(detail::IsDirect<T>&& PropertyClass<TrueT>) {
+            PropertyController controller;
             controller.parser().selectNode(idSequence);
             return TrueT{};
         }
 
         template<typename TrueT>
-        TrueT getValue() const requires(detail::IsDirect<T>&& IsContainerNotString<TrueT>) {
+        TrueT getValue() const requires(detail::IsDirect<T>&& PropertyContainer<TrueT>) {
             //@todo remove code duplication with non direct constructor
-            PropertyParserController controller;
+            PropertyController controller;
             auto& parser = controller.parser();
             parser.selectNode(idSequence);
             TrueT result = TrueT{};
             while (parser.hasEntry()) {
                 {
-                    PropertyParser::StackKeeper keeper(parser);
+                    PropertyStackKeeper<PropertyParser> keeper(parser);
                     if constexpr (IsClassNotString<typename TrueT::value_type>) {
                         result.insert(result.end(), typename TrueT::value_type{});
                     } else {
@@ -157,11 +181,41 @@ namespace bsc {
             return result;
         }
 
-        const auto& operator()() const { return getValue(); }
+        const auto& operator()() const {
+            return getValue();
+        }
 
         template<typename TrueT>
         operator TrueT() {
             return getValue<TrueT>();
+        }
+
+        auto& operator=(T t) {
+            this->value = std::move(t);
+            return *this;
+        }
+
+        void save(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyValue<T> {
+            PropertyStackKeeper stackKeeper(writer);
+            writer.selectNode(idSequence);
+            writer.setValue(toStringWriter.template toString(getValue()));
+        }
+
+        void save(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyClass<T> && IsWritablePropertyClass<T> {
+            PropertyStackKeeper stackKeeper(writer);
+            writer.selectNode(idSequence);
+            getValue().write(
+                    writer);//@todo make it a better design, pass a helper type that only needs a list of fields, like cereal archive
+        }
+
+        void save(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyContainer<T> {
+            PropertyStackKeeper stackKeeper(writer);
+            writer.selectNode(idSequence);
+            for (auto& item : getValue()) {
+                PropertyStackKeeper stackKeeper(writer);
+                item.save(writer);
+                writer.nextEntry();
+            }
         }
     };
 

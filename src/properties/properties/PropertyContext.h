@@ -6,7 +6,8 @@
 #define BSC_PROPERTYCONTEXT_H
 
 #include <context/context/AutoContextSetter.h>
-#include <properties/parser/PropertyParser.h>
+#include <properties/control/parser/PropertyParser.h>
+#include <properties/control/writer/PropertyWriter.h>
 #include <utility>
 namespace bsc {
 
@@ -17,7 +18,7 @@ namespace bsc {
 
     class PropertyContext final : public AutoContextSetter<PropertyContext> {
         std::unique_ptr<PropertyParser> propertyParser = nullptr;
-
+        std::unique_ptr<PropertyWriter> propertyWriter = nullptr;
     public:
         PropertyParser& getPropertyParser() {
             if (propertyParser == nullptr) {
@@ -34,6 +35,22 @@ namespace bsc {
         bool hasPropertyParser() { return propertyParser != nullptr; }
 
         void removePropertyParser() { propertyParser = nullptr; }
+
+        PropertyWriter& getPropertyWriter() {
+            if (propertyWriter == nullptr) {
+                throw PropertiesNotLoaded("Property writer is not set");
+            }
+            return *propertyWriter;
+        }
+
+        template<IsPropertyWriter WriterType, typename... Args>
+        void setPropertyWriter(Args&&... args) {
+            propertyWriter = std::make_unique<WriterType>(std::forward<Args...>(args...));
+        }
+
+        bool hasPropertyWriter() { return propertyWriter != nullptr; }
+
+        void removePropertyWriter() { propertyWriter = nullptr; }
     };
 }// namespace bsc
 

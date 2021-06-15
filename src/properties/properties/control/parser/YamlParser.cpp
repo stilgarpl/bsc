@@ -75,7 +75,6 @@ namespace bsc {
     }
     void YamlParser::push() {
         std::lock_guard g(mutex);
-
         idStack.push({.current = std::make_unique<decltype(root)>(*current), .sequenceCount = sequenceCount, .currentPath = currentPath});
     }
     void YamlParser::pop() {
@@ -88,11 +87,11 @@ namespace bsc {
     }
     YamlParser::YamlParser(const fs::path& yamlFile) {
         root = YAML::LoadFile(yamlFile);
-        resetNode();
+        YamlParser::resetNode();
     }
     YamlParser::YamlParser(const std::string& yamlText) {
         root = YAML::Load(yamlText);
-        resetNode();
+        YamlParser::resetNode();
     }
 
     std::size_t YamlParser::size() {

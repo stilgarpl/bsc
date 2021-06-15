@@ -128,6 +128,106 @@ TEST_CASE("Property context test") {
     REQUIRE(contextPtr->has<PropertyContext>() == true);
 }
 
+
+TEST_CASE("Property write test") {
+    PropertyTextLoader loader("");
+    class TestPropertyWriter : public PropertyWriter {
+    private:
+        PropertyIdSequence propertyId{};
+        PropertyValueType propertyValue{};
+    public:
+        void resetNode() override {
+        }
+        void selectNode(const PropertyIdSequence& id) override {
+            std::ranges::copy(id, std::back_inserter(propertyId));
+        }
+        void push() override {
+        }
+        void pop() override {
+        }
+        void setValue(const PropertyValueType& value) override {
+            this->propertyValue += value;
+            this->propertyValue += ":";
+        }
+
+        [[nodiscard]] const PropertyIdSequence& getPropertyId() const {
+            return propertyId;
+        }
+        [[nodiscard]] const PropertyValueType& getPropertyValue() const {
+            return propertyValue;
+        }
+        void nextEntry() override {
+        }
+        PropertyParserNodeType getNodeType() override {
+            return PropertyParserNodeType::scalar;
+        }
+    };
+
+
+    TestPropertyWriter writer;
+
+    SECTION("int property") {
+        Property<"property.int",int> intProperty(555);
+        intProperty.save(writer);
+
+        REQUIRE(writer.getPropertyId().size() == 2);
+        REQUIRE(writer.getPropertyId()[0] == "property");
+        REQUIRE(writer.getPropertyId()[1] == "int");
+        REQUIRE(writer.getPropertyValue() == "555:");
+    }
+    SECTION("float property") {
+        Property<"property.float",float> floatProperty(256.0);
+        floatProperty.save(writer);
+
+        REQUIRE(writer.getPropertyId().size() == 2);
+        REQUIRE(writer.getPropertyId()[0] == "property");
+        REQUIRE(writer.getPropertyId()[1] == "float");
+        REQUIRE(writer.getPropertyValue() == "256.000000:");
+    }
+    SECTION("string property") {
+        using namespace std::string_literals;
+        Property<"property.string",std::string> stringProperty("test string"s);
+        stringProperty.save(writer);
+
+        REQUIRE(writer.getPropertyId().size() == 2);
+        REQUIRE(writer.getPropertyId()[0] == "property");
+        REQUIRE(writer.getPropertyId()[1] == "string");
+        REQUIRE(writer.getPropertyValue() == "test string:");
+    }
+    SECTION("list property") {
+        using namespace std::string_literals;
+        std::list<Property<"a",std::string>> propertyList;
+        propertyList.emplace_back("prop1"s);
+        propertyList.emplace_back("prop2"s);
+        propertyList.emplace_back("prop3"s);
+
+        Property<"property.list",std::list<Property<"a",std::string>>> listProperty(propertyList);
+        listProperty.save(writer);
+
+        REQUIRE(writer.getPropertyId().size() == 5);
+        REQUIRE(writer.getPropertyId()[0] == "property");
+        REQUIRE(writer.getPropertyId()[1] == "list");
+        REQUIRE(writer.getPropertyId()[2] == "a");
+        REQUIRE(writer.getPropertyId()[3] == "a");
+        REQUIRE(writer.getPropertyId()[4] == "a");
+        REQUIRE(writer.getPropertyValue() == "prop1:prop2:prop3:");
+    }
+
+    SECTION("class property") {
+        //@todo implement class property writing and test
+    }
+}
+
+TEST_CASE("Assignable properties") {
+    PropertyTextLoader loader("");
+
+    Property<"property.path",int> intProperty {5};
+    REQUIRE(intProperty.getValue() == 5);
+    intProperty = 99;
+    REQUIRE(intProperty.getValue() == 99);
+
+}
+
 TEST_CASE("Property file test") {
 
     struct Nested {

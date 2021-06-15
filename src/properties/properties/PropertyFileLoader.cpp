@@ -5,11 +5,12 @@
 #include "PropertyFileLoader.h"
 #include "PropertyContext.h"
 #include "PropertyExceptions.h"
-#include <properties/parser/YamlParser.h>
+#include <properties/control/parser/YamlParser.h>
 
 namespace bsc {
 
     PropertyFileLoader::PropertyFileLoader(const fs::path& path) {
+        //@todo add support for different parsers - maybe add factory, like in Controller todo
         Context::getActiveContext()->get<PropertyContext>()->setPropertyParser<YamlParser>(path);
     }
 
