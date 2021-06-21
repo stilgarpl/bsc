@@ -7,7 +7,7 @@
 
 #include <mutex>
 #include <properties/PropertyDefinitions.h>
-#include <properties/control/parser/PropertyParserNodeType.h>
+#include <properties/control/PropertyNodeType.h>
 namespace bsc {
     class PropertyWriter {
     protected:
@@ -25,6 +25,12 @@ namespace bsc {
         virtual void selectNode(const PropertyIdSequence& propertyId) = 0;
 
         /**
+         * sets selected node type
+         * @param propertyNodeType
+         */
+        virtual void setNodeType(PropertyNodeType propertyNodeType) = 0;
+
+        /**
        * pushes current node to the stack
        */
         virtual void push() = 0;
@@ -40,14 +46,16 @@ namespace bsc {
          */
         virtual void setValue(const PropertyValueType& value) =0;
         virtual void nextEntry() = 0;
-        virtual PropertyParserNodeType getNodeType() =0;
+        virtual PropertyNodeType getNodeType() =0;
     };
+    class PropertySequencer;
 
     template<typename T>
     concept IsPropertyWriter = std::is_base_of_v<PropertyWriter, T>;
     template<typename T>
-    concept IsWritablePropertyClass = requires(T t, PropertyWriter& propertyWriter) {
-        t.write(propertyWriter);
+    concept IsWritablePropertyClass = requires(T t, PropertySequencer& propertySequencer) {
+        t.write(propertySequencer);
     };
+
 }// namespace bsc
 #endif// BSC_PROPERTYWRITER_H

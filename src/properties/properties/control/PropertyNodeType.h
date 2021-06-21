@@ -2,12 +2,12 @@
 // Created by Krzysztof Tulidowicz on 21.01.2021.
 //
 
-#ifndef BSC_PROPERTYPARSERNODETYPE_H
-#define BSC_PROPERTYPARSERNODETYPE_H
+#ifndef BSC_PROPERTYNODETYPE_H
+#define BSC_PROPERTYNODETYPE_H
 
 namespace bsc {
 
-    enum class PropertyParserNodeType {
+    enum class PropertyNodeType {
         invalid,
         empty,
         scalar,
@@ -16,4 +16,4 @@ namespace bsc {
     };
 }
 
-#endif// BSC_PROPERTYPARSERNODETYPE_H
+#endif// BSC_PROPERTYNODETYPE_H

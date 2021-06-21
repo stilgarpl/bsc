@@ -14,6 +14,7 @@ namespace bsc {
             std::unique_ptr<YAML::Node> current;
             std::size_t sequenceCount;
             std::string currentPath = {};
+            PropertyNodeType nodeType ;
         };
 
     private:
@@ -21,6 +22,7 @@ namespace bsc {
         std::stack<StackEntry> idStack{};
         std::unique_ptr<YAML::Node> current{};
         std::size_t sequenceCount = 0;
+        PropertyNodeType nodeType = PropertyNodeType::empty;
         //@todo this path is stored for debug and exception purposes. maybe it could be optimized ?
         std::string currentPath = {};
         bool isNodeNull();
@@ -31,10 +33,11 @@ namespace bsc {
         void pop() override;
         void setValue(const PropertyValueType& value) override;
         void nextEntry() override;
-        PropertyParserNodeType getNodeType() override;
+        PropertyNodeType getNodeType() override;
 
         std::string writeToString();
         YamlWriter();
+        void setNodeType(PropertyNodeType propertyNodeType) override;
     };
 }
 #endif// BSC_YAMLWRITER_H

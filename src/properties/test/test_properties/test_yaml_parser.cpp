@@ -37,21 +37,21 @@ TEST_CASE("YamlParser test ") {
 
     SECTION("selectNode test ") {
         auto rootType = yamlParser.getNodeType();
-        REQUIRE(rootType == PropertyParserNodeType::map);
+        REQUIRE(rootType == PropertyNodeType::map);
         yamlParser.selectNode({{"invoice"}});
         auto type  = yamlParser.getNodeType();
         auto value = yamlParser.getValue();
-        REQUIRE(type == PropertyParserNodeType::scalar);
+        REQUIRE(type == PropertyNodeType::scalar);
         REQUIRE(value == "34843");
         //        yamlParser.selectNode({"date"});
-        //        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::invalid);
+        //        REQUIRE(yamlParser.getNodeType() == PropertyNodeType::invalid);
         yamlParser.resetNode();
         yamlParser.selectNode({"date"});
-        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::scalar);
+        REQUIRE(yamlParser.getNodeType() == PropertyNodeType::scalar);
         REQUIRE(yamlParser.getValue() == "2001-01-23");
         yamlParser.resetNode();
         yamlParser.selectNode({"bill-to"});
-        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::map);
+        REQUIRE(yamlParser.getNodeType() == PropertyNodeType::map);
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"given"}}) == "Chris");
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"family"}}) == "Dumars");
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"address"}, {"lines"}}) == "458 Walkman Dr.\nSuite #292\n");
@@ -59,9 +59,9 @@ TEST_CASE("YamlParser test ") {
 
     SECTION("sequence test") {
         auto rootType = yamlParser.getNodeType();
-        REQUIRE(rootType == PropertyParserNodeType::map);
+        REQUIRE(rootType == PropertyNodeType::map);
         yamlParser.selectNode({{"sequence"}});
-        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::sequence);
+        REQUIRE(yamlParser.getNodeType() == PropertyNodeType::sequence);
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "t1");
         yamlParser.nextEntry();
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "t2");
@@ -72,12 +72,12 @@ TEST_CASE("YamlParser test ") {
 
     SECTION("nested sequence test") {
         auto rootType = yamlParser.getNodeType();
-        REQUIRE(rootType == PropertyParserNodeType::map);
+        REQUIRE(rootType == PropertyNodeType::map);
         yamlParser.selectNode({{"outerSequence"}});
-        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::sequence);
+        REQUIRE(yamlParser.getNodeType() == PropertyNodeType::sequence);
         yamlParser.push();
         yamlParser.selectNode({{"innerSequence"}});
-        REQUIRE(yamlParser.getNodeType() == PropertyParserNodeType::sequence);
+        REQUIRE(yamlParser.getNodeType() == PropertyNodeType::sequence);
         REQUIRE(yamlParser.hasEntry() == true);
         REQUIRE(yamlParser.bsc::PropertyParser::getValue({{"i"}}) == "a1");
         yamlParser.nextEntry();

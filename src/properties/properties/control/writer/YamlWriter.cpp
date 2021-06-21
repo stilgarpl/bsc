@@ -15,40 +15,44 @@ namespace bsc {
             idStack.pop();
         }
         current = std::make_unique<decltype(root)>(root);
-        root = *current;
+        root    = *current;
+        nodeType = PropertyNodeType::empty;
     }
     void YamlWriter::selectNode(const PropertyIdSequence& propertyId) {
         std::lock_guard g(mutex);
         if (!isNodeNull()) {
-        if (getNodeType() == PropertyParserNodeType::sequence) {
-            current = std::make_unique<decltype(root)>((*current)[sequenceCount]);
-            // sequence count is reset when selecting deeper node. if you want to continue iterating though this sequence, do push() before
-            // selecting inner node
-            currentPath += "[" + std::to_string(sequenceCount) + "]";
-            sequenceCount = 0;
-        }
+            if (getNodeType() == PropertyNodeType::sequence) {
+                current = std::make_unique<decltype(root)>((*current)[sequenceCount]);
+                // sequence count is reset when selecting deeper node. if you want to continue iterating though this sequence, do push()
+                // before selecting inner node
+                currentPath += "[" + std::to_string(sequenceCount) + "]";
+                sequenceCount = 0;
+            }
         }
         for (const auto& id : propertyId) {
             //@todo add validation if current is map type, else throw
-            auto newNode = std::make_unique<decltype(root)>();
+            auto newNode   = std::make_unique<decltype(root)>();
             (*current)[id] = *newNode;
-            current = std::move(newNode);
+            current        = std::move(newNode);
             currentPath += "/" + id;
         }
     }
     void YamlWriter::push() {
         std::lock_guard g(mutex);
-        idStack.push({.current = std::make_unique<decltype(root)>(*current), .sequenceCount = sequenceCount, .currentPath = currentPath});
+        idStack.push({.current       = std::make_unique<decltype(root)>(*current),
+                      .sequenceCount = sequenceCount,
+                      .currentPath   = currentPath,
+                      .nodeType      = nodeType});
     }
 
     void YamlWriter::pop() {
         std::lock_guard g(mutex);
-
-        current       = std::move(idStack.top().current);
-        sequenceCount = idStack.top().sequenceCount;
-        currentPath   = idStack.top().currentPath;
+        auto&& top    = idStack.top();
+        current       = std::move(top.current);
+        sequenceCount = top.sequenceCount;
+        currentPath   = top.currentPath;
+        nodeType      = top.nodeType;
         idStack.pop();
-
     }
     void YamlWriter::setValue(const PropertyValueType& value) {
         std::lock_guard g(mutex);
@@ -60,31 +64,24 @@ namespace bsc {
         sequenceCount++;
     }
 
-    PropertyParserNodeType YamlWriter::getNodeType() {
+    PropertyNodeType YamlWriter::getNodeType() {
         std::lock_guard g(mutex);
-        switch (current->Type()) {
-            case YAML::NodeType::value ::Map:
-                return PropertyParserNodeType::map;
-            case YAML::NodeType::value::Scalar:
-                return PropertyParserNodeType ::scalar;
-            case YAML::NodeType::value::Sequence:
-                return PropertyParserNodeType ::sequence;
-            case YAML::NodeType::value::Null:
-                return PropertyParserNodeType ::empty;
-            case YAML::NodeType::value::Undefined:
-            default:
-                return PropertyParserNodeType ::invalid;
-        }
+        return nodeType;
+
     }
     std::string YamlWriter::writeToString() {
+        std::lock_guard g(mutex);
         YAML::Emitter out;
         out << root;
         return out.c_str();
     }
     bool YamlWriter::isNodeNull() {
+        std::lock_guard g(mutex);
         return *current;
     }
     YamlWriter::YamlWriter() {
         YamlWriter::resetNode();
+    }
+    void YamlWriter::setNodeType(PropertyNodeType propertyNodeType) {
     }
 }// namespace bsc

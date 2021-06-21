@@ -5,7 +5,7 @@
 #ifndef BSC_PROPERTYPARSER_H
 #define BSC_PROPERTYPARSER_H
 
-#include "PropertyParserNodeType.h"
+#include "properties/control/PropertyNodeType.h"
 #include <mutex>
 #include <properties/PropertyDefinitions.h>
 #include <properties/control/PropertyStackKeeper.h>
@@ -41,7 +41,7 @@ namespace bsc {
          * returns the type of the node
          * @return type of the current node
          */
-        virtual PropertyParserNodeType getNodeType() = 0;
+        virtual PropertyNodeType getNodeType() = 0;
 
         /**
          * return string value of the current node - if that node is scalar, otherwise throws exception
@@ -56,7 +56,7 @@ namespace bsc {
          */
         PropertyValueType getValue(const PropertyIdSequence& idSequence);
 
-        PropertyParserNodeType getNodeType(const PropertyIdSequence& idSequence);
+        PropertyNodeType getNodeType(const PropertyIdSequence& idSequence);
 
         /**
          * pushes current node to the stack

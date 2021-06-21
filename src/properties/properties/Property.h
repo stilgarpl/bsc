@@ -56,8 +56,8 @@ namespace bsc {
 
             switch (parser.getNodeType(idSequence)) {
 
-                case PropertyParserNodeType::sequence:
-                case PropertyParserNodeType::map:
+                case PropertyNodeType::sequence:
+                case PropertyNodeType::map:
                     throw InvalidPropertyTypeException("Property key: " + propertyId + " has invalid node type");
                     break;
                 default:
@@ -67,8 +67,8 @@ namespace bsc {
                     } catch (StringParseException& e) {
                         // fallthrough
                     }
-                case PropertyParserNodeType::invalid:
-                case PropertyParserNodeType::empty:
+                case PropertyNodeType::invalid:
+                case PropertyNodeType::empty:
                     if (defaultValue.has_value()) {
                         value = defaultValue;
                     } else {
@@ -90,7 +90,7 @@ namespace bsc {
             PropertyController controller;
             auto& parser = controller.parser();
             parser.selectNode(idSequence);
-            if (parser.getNodeType() != PropertyParserNodeType::sequence) {
+            if (parser.getNodeType() != PropertyNodeType::sequence) {
                 if (defaultValue.has_value()) {
                     value = *defaultValue;
                     return;
@@ -116,7 +116,7 @@ namespace bsc {
 
         explicit Property(const std::any& defaultValue) requires detail::IsDirect<T> {
             PropertyController controller;
-            if (controller.parser().getNodeType(idSequence) == PropertyParserNodeType::scalar) {
+            if (controller.parser().getNodeType(idSequence) == PropertyNodeType::scalar) {
                 value = detail::DirectPropertyMapper{.value = controller.parser().getValue(idSequence)};
             }
             directValue = defaultValue;
@@ -128,7 +128,7 @@ namespace bsc {
         Property() requires(detail::IsDirect<T>) : Property(std::any{}) {
         }
 
-        explicit Property(const T& defaultValue) requires(!detail::IsDirect<T>) : Property(std::make_optional(defaultValue)){};
+//        explicit Property(const T& defaultValue) requires(!detail::IsDirect<T>) : Property(std::make_optional(defaultValue)){};
 
         const auto& getValue() const requires detail::IsNotDirect<T> {
             if (!hasValue()) {
@@ -195,29 +195,50 @@ namespace bsc {
             return *this;
         }
 
-        void save(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyValue<T> {
+        void write(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyValue<T> {
             PropertyStackKeeper stackKeeper(writer);
             writer.selectNode(idSequence);
             writer.setValue(toStringWriter.template toString(getValue()));
         }
 
-        void save(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyClass<T> && IsWritablePropertyClass<T> {
+        void write(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyClass<T> && IsWritablePropertyClass<T> {
             PropertyStackKeeper stackKeeper(writer);
             writer.selectNode(idSequence);
-            getValue().write(
-                    writer);//@todo make it a better design, pass a helper type that only needs a list of fields, like cereal archive
+            PropertySequencer sequencer(writer);
+            getValue().write(sequencer);
         }
 
-        void save(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyContainer<T> {
-            PropertyStackKeeper stackKeeper(writer);
-            writer.selectNode(idSequence);
-            for (auto& item : getValue()) {
+        void write(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyContainer<T>;
+    };
+
+    template<typename T>
+    struct IsPropertyT : std::false_type {};
+
+    template<detail::StringLiteral lit, typename T>
+    struct IsPropertyT<Property<lit, T>> : std::true_type {};
+
+    //    template<typename T>
+    //    constexpr bool is_pair_v = is_pair<T>::value;
+    template<typename T>
+    concept IsProperty = IsPropertyT<T>::value;
+
+    template<detail::StringLiteral lit, typename T>
+    void Property<lit, T>::write(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyContainer<T> {
+        PropertyStackKeeper stackKeeper(writer);
+        writer.selectNode(idSequence);
+        writer.setNodeType(PropertyNodeType::sequence);
+        for (auto& item : getValue()) {
+            if constexpr (IsProperty<typename T::value_type> || PropertyClass<typename T::value_type>) {
                 PropertyStackKeeper stackKeeper(writer);
-                item.save(writer);
+                item.write(writer);
+                writer.nextEntry();
+            } else {
+                // collection of simple types
+                writer.setValue(toStringWriter.template toString(item));
                 writer.nextEntry();
             }
         }
-    };
+    }
 
 }// namespace bsc
 

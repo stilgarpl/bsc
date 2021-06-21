@@ -32,7 +32,7 @@ namespace bsc {
         void selectNode(const PropertyIdSequence& propertyId) override;
         void nextEntry() override;
         bool hasEntry() override;
-        PropertyParserNodeType getNodeType() override;
+        PropertyNodeType getNodeType() override;
         PropertyValueType getValue() override;
         void push() override;
         void pop() override;

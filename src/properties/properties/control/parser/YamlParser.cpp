@@ -20,7 +20,7 @@ namespace bsc {
     }
     void YamlParser::selectNode(const PropertyIdSequence& propertyId) {
         std::lock_guard g(mutex);
-        if (getNodeType() == PropertyParserNodeType::sequence) {
+        if (getNodeType() == PropertyNodeType::sequence) {
             current = std::make_unique<decltype(root)>((*current)[sequenceCount]);
             // sequence count is reset when selecting deeper node. if you want to continue iterating though this sequence, do push() before
             // selecting inner node
@@ -39,35 +39,35 @@ namespace bsc {
         sequenceCount++;
     }
 
-    PropertyParserNodeType YamlParser::getNodeType() {
+    PropertyNodeType YamlParser::getNodeType() {
         std::lock_guard g(mutex);
         switch (current->Type()) {
             case YAML::NodeType::value ::Map:
-                return PropertyParserNodeType::map;
+                return PropertyNodeType::map;
             case YAML::NodeType::value::Scalar:
-                return PropertyParserNodeType ::scalar;
+                return PropertyNodeType ::scalar;
             case YAML::NodeType::value::Sequence:
-                return PropertyParserNodeType ::sequence;
+                return PropertyNodeType ::sequence;
             case YAML::NodeType::value::Null:
-                return PropertyParserNodeType ::empty;
+                return PropertyNodeType ::empty;
             case YAML::NodeType::value::Undefined:
             default:
-                return PropertyParserNodeType ::invalid;
+                return PropertyNodeType ::invalid;
         }
     }
     PropertyValueType YamlParser::getValue() {
         std::lock_guard g(mutex);
         switch (getNodeType()) {
 
-            case PropertyParserNodeType::invalid:
-            case PropertyParserNodeType::empty:
-            case PropertyParserNodeType::map:
+            case PropertyNodeType::invalid:
+            case PropertyNodeType::empty:
+            case PropertyNodeType::map:
                 //@todo throw
                 break;
-            case PropertyParserNodeType::scalar:
+            case PropertyNodeType::scalar:
                 return current->as<std::string>();
                 break;
-            case PropertyParserNodeType::sequence:
+            case PropertyNodeType::sequence:
                 return (*current)[sequenceCount].as<std::string>();
                 break;
         }

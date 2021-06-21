@@ -9,6 +9,7 @@
 #include <properties/PropertyFileLoader.h>
 #include <properties/PropertyTextLoader.h>
 #include <testaid/testaid.h>
+#include <properties/PropertySequencer.h>
 using namespace bsc;
 
 struct IProp {
@@ -24,14 +25,60 @@ struct NestedProp2 {
     int inner = Property<"testInner2">();
 };
 
+struct DefaultProp {
+    Property<"int", int> i{759};
+    Property<"string",std::string> s{"test string"};
+
+    void write(PropertySequencer& sequencer) const{
+        sequencer(i,s);
+    }
+};
+
 struct FullProp {
     int test  = Property<"test">();
     int test5 = Property<"test5">();
-    //    NestedProp testOuter1;
+//    NestedProp testOuter1; @todo this does not work yet, it doesn't restore stack to before PropertyPrefix
     Property<"testOuter2", NestedProp2> testOuter2;
     std::string stringTest = Property<"stringTest">();
     Property<"sequence", std::list<IProp>> sequence;
 };
+
+class TestPropertyWriter : public PropertyWriter {
+private:
+    PropertyIdSequence propertyId{};
+    PropertyValueType propertyValue{};
+public:
+    void resetNode() override {
+    }
+    void selectNode(const PropertyIdSequence& id) override {
+        std::ranges::copy(id, std::back_inserter(propertyId));
+    }
+    void push() override {
+    }
+    void pop() override {
+    }
+    void setValue(const PropertyValueType& value) override {
+        this->propertyValue += value;
+        this->propertyValue += ":";
+    }
+
+    [[nodiscard]] const PropertyIdSequence& getPropertyId() const {
+        return propertyId;
+    }
+    [[nodiscard]] const PropertyValueType& getPropertyValue() const {
+        return propertyValue;
+    }
+    void nextEntry() override {
+    }
+    PropertyNodeType getNodeType() override {
+        return PropertyNodeType::scalar;
+    }
+    void setNodeType(PropertyNodeType propertyNodeType) override {
+    }
+};
+
+
+
 
 TEST_CASE("Property text test") {
     {
@@ -42,6 +89,11 @@ TEST_CASE("Property text test") {
                                   "testOuter2:\n"
                                   "  testInner2: 99\n"
                                   "stringTest: string is with spaces\n"
+                                  "intSequence:\n"
+                                  "  - 5\n"
+                                  "  - 4\n"
+                                  "  - 3\n"
+                                  "  - 2\n"
                                   "sequence:\n"
                                   "  -  i: t1\n"
                                   "     a: 1\n"
@@ -94,7 +146,7 @@ TEST_CASE("Property text test") {
             REQUIRE(stringTest.getValue() == "string is with spaces");
         }
 
-        SECTION("Container property") {
+        SECTION("Class container property") {
             Property<"sequence", std::list<IProp>> listTest;
             REQUIRE(listTest.getPropertyName() == "sequence");
             auto& list = listTest.getValue();
@@ -103,6 +155,18 @@ TEST_CASE("Property text test") {
             for (int count = 1; const auto& item : list) {
                 REQUIRE(item.a == count);
                 REQUIRE(item.i.getValue() == "t" + std::to_string(count));
+                count++;
+            }
+        }
+
+        SECTION("Simple container property") {
+            Property<"intSequence", std::vector<int>> vectorTest;
+            REQUIRE(vectorTest.getPropertyName() == "intSequence");
+            auto& list = vectorTest.getValue();
+            REQUIRE(list.size() == 4);
+
+            for (int count = 0; const auto& item : list) {
+                REQUIRE(item == 5 - count);
                 count++;
             }
         }
@@ -116,10 +180,26 @@ TEST_CASE("Property text test") {
             FullProp fullProp{};
             REQUIRE(fullProp.test == 7);
             REQUIRE(fullProp.test5 == 5);
+//            REQUIRE(fullProp.testOuter1.inner == 9999999);
+            REQUIRE(fullProp.testOuter2().inner == 99);
+            REQUIRE(fullProp.stringTest == "string is with spaces");
         }
     }
 
     REQUIRE_THROWS_AS(Property<"test">().getValue<int>(), PropertiesNotLoaded);
+}
+
+TEST_CASE("PropertySequencer test") {
+    PropertyTextLoader loader("");
+    TestPropertyWriter fakeWriter;
+    PropertySequencer sequencer(fakeWriter);
+
+    SECTION("ints") {
+        Property<"a",int> a1(1),a2(2),a3(3);
+        sequencer(a1,a2,a3);
+        REQUIRE(fakeWriter.getPropertyId().size() == 3);
+        REQUIRE(fakeWriter.getPropertyValue() == "1:2:3:");
+    }
 }
 
 TEST_CASE("Property context test") {
@@ -131,44 +211,12 @@ TEST_CASE("Property context test") {
 
 TEST_CASE("Property write test") {
     PropertyTextLoader loader("");
-    class TestPropertyWriter : public PropertyWriter {
-    private:
-        PropertyIdSequence propertyId{};
-        PropertyValueType propertyValue{};
-    public:
-        void resetNode() override {
-        }
-        void selectNode(const PropertyIdSequence& id) override {
-            std::ranges::copy(id, std::back_inserter(propertyId));
-        }
-        void push() override {
-        }
-        void pop() override {
-        }
-        void setValue(const PropertyValueType& value) override {
-            this->propertyValue += value;
-            this->propertyValue += ":";
-        }
-
-        [[nodiscard]] const PropertyIdSequence& getPropertyId() const {
-            return propertyId;
-        }
-        [[nodiscard]] const PropertyValueType& getPropertyValue() const {
-            return propertyValue;
-        }
-        void nextEntry() override {
-        }
-        PropertyParserNodeType getNodeType() override {
-            return PropertyParserNodeType::scalar;
-        }
-    };
-
 
     TestPropertyWriter writer;
 
     SECTION("int property") {
         Property<"property.int",int> intProperty(555);
-        intProperty.save(writer);
+        intProperty.write(writer);
 
         REQUIRE(writer.getPropertyId().size() == 2);
         REQUIRE(writer.getPropertyId()[0] == "property");
@@ -177,7 +225,7 @@ TEST_CASE("Property write test") {
     }
     SECTION("float property") {
         Property<"property.float",float> floatProperty(256.0);
-        floatProperty.save(writer);
+        floatProperty.write(writer);
 
         REQUIRE(writer.getPropertyId().size() == 2);
         REQUIRE(writer.getPropertyId()[0] == "property");
@@ -187,14 +235,14 @@ TEST_CASE("Property write test") {
     SECTION("string property") {
         using namespace std::string_literals;
         Property<"property.string",std::string> stringProperty("test string"s);
-        stringProperty.save(writer);
+        stringProperty.write(writer);
 
         REQUIRE(writer.getPropertyId().size() == 2);
         REQUIRE(writer.getPropertyId()[0] == "property");
         REQUIRE(writer.getPropertyId()[1] == "string");
         REQUIRE(writer.getPropertyValue() == "test string:");
     }
-    SECTION("list property") {
+    SECTION("class list property") {
         using namespace std::string_literals;
         std::list<Property<"a",std::string>> propertyList;
         propertyList.emplace_back("prop1"s);
@@ -202,7 +250,7 @@ TEST_CASE("Property write test") {
         propertyList.emplace_back("prop3"s);
 
         Property<"property.list",std::list<Property<"a",std::string>>> listProperty(propertyList);
-        listProperty.save(writer);
+        listProperty.write(writer);
 
         REQUIRE(writer.getPropertyId().size() == 5);
         REQUIRE(writer.getPropertyId()[0] == "property");
@@ -213,8 +261,29 @@ TEST_CASE("Property write test") {
         REQUIRE(writer.getPropertyValue() == "prop1:prop2:prop3:");
     }
 
+    SECTION("simple vector property") {
+        using namespace std::string_literals;
+        std::vector<int> intSequence = {7,6,5,4};
+
+
+        Property<"property.vector.int",std::vector<int> > listProperty(intSequence);
+        listProperty.write(writer);
+
+        REQUIRE(writer.getPropertyId().size() == 3);
+        REQUIRE(writer.getPropertyId()[0] == "property");
+        REQUIRE(writer.getPropertyId()[1] == "vector");
+        REQUIRE(writer.getPropertyId()[2] == "int");
+        REQUIRE(writer.getPropertyValue() == "7:6:5:4:");
+    }
+
     SECTION("class property") {
-        //@todo implement class property writing and test
+        Property<"defaultProp",DefaultProp> defaultProp{{}};
+        defaultProp.write(writer);
+        REQUIRE(writer.getPropertyId().size() == 3);
+        REQUIRE(writer.getPropertyId()[0] == "defaultProp");
+        REQUIRE(writer.getPropertyId()[1] == "int");
+        REQUIRE(writer.getPropertyId()[2] == "string");
+        REQUIRE(writer.getPropertyValue() == "759:test string:");
     }
 }
 

@@ -12,7 +12,7 @@ namespace bsc {
         return getValue();
     }
 
-    PropertyParserNodeType PropertyParser::getNodeType(const PropertyIdSequence& idSequence) {
+    PropertyNodeType PropertyParser::getNodeType(const PropertyIdSequence& idSequence) {
         StackKeeper keeper(*this);// this will restore node to state before select
         selectNode(idSequence);
         return getNodeType();
