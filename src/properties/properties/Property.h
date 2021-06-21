@@ -128,7 +128,7 @@ namespace bsc {
         Property() requires(detail::IsDirect<T>) : Property(std::any{}) {
         }
 
-//        explicit Property(const T& defaultValue) requires(!detail::IsDirect<T>) : Property(std::make_optional(defaultValue)){};
+        //        explicit Property(const T& defaultValue) requires(!detail::IsDirect<T>) : Property(std::make_optional(defaultValue)){};
 
         const auto& getValue() const requires detail::IsNotDirect<T> {
             if (!hasValue()) {
@@ -229,8 +229,10 @@ namespace bsc {
         writer.setNodeType(PropertyNodeType::sequence);
         for (auto& item : getValue()) {
             if constexpr (IsProperty<typename T::value_type> || PropertyClass<typename T::value_type>) {
-                PropertyStackKeeper stackKeeper(writer);
-                item.write(writer);
+                {
+                    PropertyStackKeeper stackKeeper(writer);
+                    item.write(writer);
+                }
                 writer.nextEntry();
             } else {
                 // collection of simple types

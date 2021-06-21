@@ -7,9 +7,10 @@
 #include <properties/Property.h>
 #include <properties/PropertyContext.h>
 #include <properties/PropertyFileLoader.h>
-#include <properties/PropertyTextLoader.h>
-#include <testaid/testaid.h>
 #include <properties/PropertySequencer.h>
+#include <properties/PropertyTextLoader.h>
+#include <properties/control/writer/YamlWriter.h>
+#include <testaid/testaid.h>
 using namespace bsc;
 
 struct IProp {
@@ -264,10 +265,8 @@ TEST_CASE("Property write test") {
     SECTION("simple vector property") {
         using namespace std::string_literals;
         std::vector<int> intSequence = {7,6,5,4};
-
-
-        Property<"property.vector.int",std::vector<int> > listProperty(intSequence);
-        listProperty.write(writer);
+        Property<"property.vector.int",std::vector<int> > intVecProperty(intSequence);
+        intVecProperty.write(writer);
 
         REQUIRE(writer.getPropertyId().size() == 3);
         REQUIRE(writer.getPropertyId()[0] == "property");
@@ -285,6 +284,46 @@ TEST_CASE("Property write test") {
         REQUIRE(writer.getPropertyId()[2] == "string");
         REQUIRE(writer.getPropertyValue() == "759:test string:");
     }
+}
+
+TEST_CASE("Write properties to yaml") {
+    using namespace std::string_literals;
+    //given
+    auto expectedResult = "property:\n"
+"  int: 555\n"
+"  float: 256.000000\n"
+"  string: test string\n"
+"  list:\n"
+"    - a: prop1\n"
+"    - a: prop2\n"
+"    - a: prop3\n"
+"  vector:\n"
+"    int:\n"
+"      - 7\n"
+"      - 6\n"
+"      - 5\n"
+"      - 4\n"
+"defaultProp:\n"
+"  int: 759\n"
+"  string: test string";
+    PropertyTextLoader loader("");
+    Property<"property.int",int> intProperty(555);
+    Property<"property.float",float> floatProperty(256.0);
+    Property<"property.string",std::string> stringProperty("test string"s);
+    std::list<Property<"a",std::string>> propertyList;
+    propertyList.emplace_back("prop1"s);
+    propertyList.emplace_back("prop2"s);
+    propertyList.emplace_back("prop3"s);
+    Property<"property.list",std::list<Property<"a",std::string>>> listProperty(propertyList);
+    std::vector<int> intSequence = {7,6,5,4};
+    Property<"property.vector.int",std::vector<int> > intVecProperty(intSequence);
+    Property<"defaultProp",DefaultProp> defaultProp{{}};
+    //when
+    YamlWriter yamlWriter;
+    PropertySequencer propertySequencer(yamlWriter);
+    propertySequencer(intProperty,floatProperty,stringProperty, listProperty, intVecProperty, defaultProp);
+    auto result = yamlWriter.writeToString();
+    REQUIRE(result == expectedResult);
 }
 
 TEST_CASE("Assignable properties") {

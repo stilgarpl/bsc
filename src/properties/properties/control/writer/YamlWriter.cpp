@@ -20,7 +20,7 @@ namespace bsc {
     }
     void YamlWriter::selectNode(const PropertyIdSequence& propertyId) {
         std::lock_guard g(mutex);
-        if (!isNodeNull()) {
+
             if (getNodeType() == PropertyNodeType::sequence) {
                 current = std::make_unique<decltype(root)>((*current)[sequenceCount]);
                 // sequence count is reset when selecting deeper node. if you want to continue iterating though this sequence, do push()
@@ -28,14 +28,20 @@ namespace bsc {
                 currentPath += "[" + std::to_string(sequenceCount) + "]";
                 sequenceCount = 0;
             }
-        }
+
         for (const auto& id : propertyId) {
             //@todo add validation if current is map type, else throw
-            auto newNode   = std::make_unique<decltype(root)>();
-            (*current)[id] = *newNode;
-            current        = std::move(newNode);
-            currentPath += "/" + id;
+            if ((*current)[id]) {
+                current = std::make_unique<decltype(root)>((*current)[id]);
+                currentPath += "/" + id;
+            } else {
+                auto newNode   = std::make_unique<decltype(root)>();
+                (*current)[id] = *newNode;
+                current        = std::move(newNode);
+                currentPath += "/" + id;
+            }
         }
+        setNodeType(PropertyNodeType::empty); //@todo right value!!!!!!!!!!!!
     }
     void YamlWriter::push() {
         std::lock_guard g(mutex);
@@ -56,7 +62,11 @@ namespace bsc {
     }
     void YamlWriter::setValue(const PropertyValueType& value) {
         std::lock_guard g(mutex);
-        *current = value;
+        if (getNodeType() == PropertyNodeType::sequence) {
+            (*current)[sequenceCount] = value;
+        } else {
+            *current = value;
+        }
     }
 
     void YamlWriter::nextEntry() {
@@ -83,5 +93,6 @@ namespace bsc {
         YamlWriter::resetNode();
     }
     void YamlWriter::setNodeType(PropertyNodeType propertyNodeType) {
+        nodeType = propertyNodeType;
     }
 }// namespace bsc
