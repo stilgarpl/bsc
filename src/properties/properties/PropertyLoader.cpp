@@ -13,9 +13,17 @@ namespace bsc {
             Context::OwnPtr ownContext = Context::makeContext(true);
             context                    = ownContext;
             Context::setActiveContext(context);
+        } else {
+            context = Context::getActiveContext();
         }
         if (Context::getActiveContext()->get<PropertyContext>()->hasPropertyParser()) {
             throw PropertyContextAlreadyLoaded("Property context already loaded!");
         }
+    }
+    void PropertyLoader::enableOptions(std::initializer_list<PropertySetting> settings) {
+        context->get<PropertyContext>()->enableConfigurations(settings);
+    }
+    void PropertyLoader::disableOptions(std::initializer_list<PropertySetting> settings) {
+        context->get<PropertyContext>()->enableConfigurations(settings);
     }
 }// namespace bsc

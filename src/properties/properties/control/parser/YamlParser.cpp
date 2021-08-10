@@ -3,6 +3,7 @@
 //
 
 #include "YamlParser.h"
+#include "ParserExceptions.h"
 #include <libfyaml.h>
 #include <span>
 #include <yaml-cpp/yaml.h>
@@ -28,9 +29,11 @@ namespace bsc {
             sequenceCount = 0;
         }
         for (const auto& id : propertyId) {
-            //@todo add validation if current is map type, else throw
-            current = std::make_unique<decltype(root)>((*current)[id]);
-            currentPath += "/" + id;
+            const auto& nodeType = getNodeType();
+            if (nodeType == PropertyNodeType::map || nodeType == PropertyNodeType::sequence || nodeType == PropertyNodeType::empty) {
+                current = std::make_unique<decltype(root)>((*current)[id]);
+                currentPath += "/" + id;
+            }
         }
     }
 

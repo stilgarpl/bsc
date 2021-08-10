@@ -4,7 +4,6 @@
 // Created by Krzysztof Tulidowicz on 17.10.17.
 //
 
-
 #include "Repository.h"
 #include <repo/repository/transformer/rules/HomeDirRule.h>
 #include <repo/repository/transformer/rules/TmpRule.h>
@@ -19,7 +18,6 @@ namespace bsc {
         return repositoryId;
     }
 
-
     JournalPtr& Repository::getJournal() {
         return journal;
     }
@@ -28,43 +26,37 @@ namespace bsc {
         Repository::journal = journal;
     }
 
-    Repository::Repository(RepoIdType repositoryId, IStoragePtr storagePtr) : manipulator(*this),
-                                                                              repositoryId(std::move(repositoryId)),
-                                                                              storage(std::move(storagePtr)),
-                                                                              deployPack(strategyFactory.createPack(
-                                                                                      {
-                                                                                              .updatedInRepo = RepositoryAction::restore,
-                                                                                              .updatedInFilesystem = RepositoryAction::nop,
-                                                                                              .same = RepositoryAction::nop,
-                                                                                              .newInRepo = RepositoryAction::restore,
-                                                                                              .newInFilesystem = RepositoryAction::nop,
-                                                                                              .deletedInRepo = RepositoryAction::trash,
-                                                                                              .deletedInFilesystem = RepositoryAction::restore,
-                                                                                      })),
-                                                                              localSyncPack(strategyFactory.createPack(
-                                                                                      {
-                                                                                              .updatedInRepo = RepositoryAction::nop,
-                                                                                              .updatedInFilesystem = RepositoryAction::update,
-                                                                                              .same = RepositoryAction::nop,
-                                                                                              .newInRepo = RepositoryAction::nop,
-                                                                                              .newInFilesystem = RepositoryAction::persist,
-                                                                                              .deletedInRepo = RepositoryAction::nop,
-                                                                                              .deletedInFilesystem = RepositoryAction::remove,
-                                                                                      })),
-                                                                              fullPack(strategyFactory.createPack(
-                                                                                      {
-                                                                                              .updatedInRepo = RepositoryAction::restore,
-                                                                                              .updatedInFilesystem = RepositoryAction::update,
-                                                                                              .same = RepositoryAction::nop,
-                                                                                              .newInRepo = RepositoryAction::restore,
-                                                                                              .newInFilesystem = RepositoryAction::persist,
-                                                                                              .deletedInRepo = RepositoryAction::trash,
-                                                                                              .deletedInFilesystem = RepositoryAction::remove,
-                                                                                      })) {
+    Repository::Repository(RepoIdType repositoryId, IStoragePtr storagePtr)
+        : manipulator(*this), repositoryId(std::move(repositoryId)), storage(std::move(storagePtr)),
+          deployPack(strategyFactory.createPack({
+                  .updatedInRepo       = RepositoryAction::restore,
+                  .updatedInFilesystem = RepositoryAction::nop,
+                  .same                = RepositoryAction::nop,
+                  .newInRepo           = RepositoryAction::restore,
+                  .newInFilesystem     = RepositoryAction::nop,
+                  .deletedInRepo       = RepositoryAction::trash,
+                  .deletedInFilesystem = RepositoryAction::restore,
+          })),
+          localSyncPack(strategyFactory.createPack({
+                  .updatedInRepo       = RepositoryAction::nop,
+                  .updatedInFilesystem = RepositoryAction::update,
+                  .same                = RepositoryAction::nop,
+                  .newInRepo           = RepositoryAction::nop,
+                  .newInFilesystem     = RepositoryAction::persist,
+                  .deletedInRepo       = RepositoryAction::nop,
+                  .deletedInFilesystem = RepositoryAction::remove,
+          })),
+          fullPack(strategyFactory.createPack({
+                  .updatedInRepo       = RepositoryAction::restore,
+                  .updatedInFilesystem = RepositoryAction::update,
+                  .same                = RepositoryAction::nop,
+                  .newInRepo           = RepositoryAction::restore,
+                  .newInFilesystem     = RepositoryAction::persist,
+                  .deletedInRepo       = RepositoryAction::trash,
+                  .deletedInFilesystem = RepositoryAction::remove,
+          })) {
 
-
-
-//        pathTransformer->addRule(std::make_shared<HomeDirRule>(getenv("HOME")));
+        //        pathTransformer->addRule(std::make_shared<HomeDirRule>(getenv("HOME")));
     }
 
     const std::shared_ptr<IStorage>& Repository::getStorage() const {
@@ -88,19 +80,18 @@ namespace bsc {
     }
 
     void Repository::commit() {
-            manipulator.commit(*storage);
+        manipulator.commit(*storage);
     }
-
 
     void Repository::downloadStorage() {
 
-        auto& fileMap = fileMapRenderer.renderMap(journal);
+        auto& fileMap     = fileMapRenderer.renderMap(journal);
         bool hasResources = true;
         for (const auto& [path, value] : fileMap) {
             logger.debug("file " + path.string() + " => " + (value ? value->getResourceId() : std::string(" [X] ")));
             //@todo change this bool to actual transfer management
 
-            //check for resources.
+            // check for resources.
             if (value && !value->isDirectory()) {
                 logger.debug("checking if file should be downloaded");
                 if (!storage->hasResource(value->getResourceId())) {
@@ -115,16 +106,16 @@ namespace bsc {
         }
     }
 
-    void Repository::update(fs::path path, const RepositoryActionStrategyPack& strategyPack,
-                            std::set<UpdateOptions> updateOptions) {
-        //@todo change the name of this function to something else. it's about merging the state or journal and filesystem and updating one from the other or both
+    void Repository::update(fs::path path, const RepositoryActionStrategyPack& strategyPack, Flags<UpdateOptions> updateOptions) {
+        //@todo change the name of this function to something else. it's about merging the state or journal and filesystem and updating one
+        //from the other or both
         logger.debug("update: " + path.string());
         path             = fs::weakly_canonical(path);
-        auto& fileMap = fileMapRenderer.renderMap(journal);
+        auto& fileMap    = fileMapRenderer.renderMap(journal);
         auto& attributes = fileMap[path];
         if (fs::exists(path)) {
             if (fs::is_directory(path) || fs::is_regular_file(path)) {
-                //file exists in filesystem
+                // file exists in filesystem
                 auto currentFileTime = fs::last_write_time(path);
                 auto currentFileSize = !fs::is_directory(path) ? fs::file_size(path) : 0;
                 if (attributes) {
@@ -135,27 +126,29 @@ namespace bsc {
                         auto state = strategyPack.updatedInRepo->apply(path, attributes, manipulator);
                         deployMap.markDeployed(path, state);
                     } else {
-                        if (currentFileTime == attributes->getModificationTime() &&
-                            currentFileSize == attributes->getSize()) {
+                        if (currentFileTime == attributes->getModificationTime() && currentFileSize == attributes->getSize()) {
                             //@todo verify other things maybe
-                            //file appear identical, nothing to do.
+                            // file appear identical, nothing to do.
                             logger.debug("leaving alone " + path.string());
                             auto state = strategyPack.same->apply(path, attributes, manipulator);
                             deployMap.markDeployed(path, state);
                         } else {
                             logger.debug("updated file, persisting... " + path.string());
-                            //file in the filesystem is newer then the one in repository
+                            // file in the filesystem is newer then the one in repository
                             auto state = strategyPack.updatedInFilesystem->apply(path, attributes, manipulator);
                             deployMap.markDeployed(path, state);
 
                             //@todo this is mostly the same code as below, combine the two loops into a function or sth.
-                            if (fs::is_directory(path) && !fileMap.isSpecial(path) &&
-                                (updateOptions.contains(UpdateOptions::followUpdatedDirectories) ||
-                                 updateOptions.contains(UpdateOptions::followDirectories))) {
+                            if (fs::is_directory(path) && !fileMap.isSpecial(path)
+                                && (updateOptions == UpdateOptions::followUpdatedDirectories || UpdateOptions::followDirectories)) {
                                 logger.debug(path.string() + " is a directory, iterating over...");
-                                for (const auto &item : fs::directory_iterator(path)) {
-                                    //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
-                                    //@todo OR, BETTER ALTERNATIVE - update could return set of paths that it updated. then it could recurse safely here, and this if(!in map) won't be needed. updateAll would just remove all already checked items from items to check list. DO IT LIKE THIS
+                                for (const auto& item : fs::directory_iterator(path)) {
+                                    // make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if
+                                    // called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming
+                                    // that it will always be called from a loop.
+                                    //@todo OR, BETTER ALTERNATIVE - update could return set of paths that it updated. then it could recurse
+                                    //safely here, and this if(!in map) won't be needed. updateAll would just remove all already checked
+                                    //items from items to check list. DO IT LIKE THIS
                                     logger.debug(" item: " + item.path().string());
                                     if (!fileMap.contains(item)) {
                                         logger.debug("following directory " + path.string() + " to " + item.path().string());
@@ -166,9 +159,9 @@ namespace bsc {
                         }
                     }
                 } else {
-                    //not in the map
+                    // not in the map
                     if (!fileMap.isDeleted(path) || currentFileTime > fileMap.getDeletionTime(path)) {
-                        //this is new file that has the same path as deleted one. persist!
+                        // this is new file that has the same path as deleted one. persist!
                         logger.debug("new file, persisting " + path.string());
                         auto state = strategyPack.newInFilesystem->apply(path, manipulator);
                         deployMap.markDeployed(path, state);
@@ -177,18 +170,20 @@ namespace bsc {
                         //@todo delete file
                         if (fileMap.isDeleted(path)) {
                             logger.debug("trashing " + path.string());
-                            //file should be deleted, but let's check deletion time...
+                            // file should be deleted, but let's check deletion time...
                             auto state = strategyPack.deletedInRepo->apply(path, manipulator);
                             deployMap.markDeployed(path, state);
                         }
                     }
                 }
-                //@todo this iterates over all directories and files in path, which means that it will probably call some methods twice or even more times on some files. make sure it doesn't
-                if (fs::is_directory(path) && !fileMap.isSpecial(path) &&
-                    updateOptions.contains(UpdateOptions::followDirectories)) {
+                //@todo this iterates over all directories and files in path, which means that it will probably call some methods twice or
+                //even more times on some files. make sure it doesn't
+                if (fs::is_directory(path) && !fileMap.isSpecial(path) && updateOptions == UpdateOptions::followDirectories) {
                     logger.debug(path.string() + " is a directory, iterating over...");
-                    for (const auto &item : fs::directory_iterator(path)) {
-                        //make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be called from a loop.
+                    for (const auto& item : fs::directory_iterator(path)) {
+                        // make sure item is not in the fileMap - if it is, update will be called for it anyway... but only if called from
+                        // updateAll. @todo maybe add flag to force recursive behavior? or not -- if we are assuming that it will always be
+                        // called from a loop.
                         //@todo same as above, this check won't be needed if update() returns set of processed files.
                         logger.debug(" item: " + item.path().string());
                         if (!fileMap.contains(item)) {
@@ -201,16 +196,17 @@ namespace bsc {
                 logger.error("file type not supported for : " + path.string());
             }
         } else {
-            //file was removed or perhaps wasn't deployed yet...
+            // file was removed or perhaps wasn't deployed yet...
             if (attributes) {
                 if (deployMap.isDeployed(path)) {
-                    //file is in file map and was deployed but is not on filesystem, removing (user must have deleted it)
+                    // file is in file map and was deployed but is not on filesystem, removing (user must have deleted it)
                     logger.debug("deleting " + path.string());
                     auto state = strategyPack.deletedInFilesystem->apply(path, attributes, manipulator);
                     deployMap.markDeployed(path, state);
                 } else {
-                    //file wasn't deployed. must be a new file from another node. restore.
-                    //@todo this is duplicated code. move to strategies or sth. (three times as of writing this. seriously, do something about it)
+                    // file wasn't deployed. must be a new file from another node. restore.
+                    //@todo this is duplicated code. move to strategies or sth. (three times as of writing this. seriously, do something
+                    //about it)
                     logger.debug("not deployed " + path.string());
                     auto state = strategyPack.newInRepo->apply(path, attributes, manipulator);
                     deployMap.markDeployed(path, state);
@@ -221,7 +217,7 @@ namespace bsc {
                     //@todo add this to strategyPack?
                     deployMap.markDeployed(path, DeployState::notDeployed);
                 } else {
-                    //file is neither on file system nor in the map. someone trying to update unknown file?
+                    // file is neither on file system nor in the map. someone trying to update unknown file?
                     logger.debug("file unknown " + path.string());
                     //@todo add this to strategyPack?
                     //@todo add strategy for this ?
@@ -241,7 +237,6 @@ namespace bsc {
         }
     }
 
-
     void Repository::deploy() {
         for (const auto& i : fileMapRenderer.renderMap(journal)) {
             //@todo add force level, by using different pack
@@ -249,10 +244,12 @@ namespace bsc {
         }
     }
 
-    Repository::Repository(const IRepository::RepoIdType& repositoryId, const std::shared_ptr<IStorage>& storage,
-                           const JournalPtr& journal, const Repository::RepoDeployMap& deployMap) : Repository(repositoryId,
-                                                                                                               storage) {
-        this->journal = journal;
+    Repository::Repository(const IRepository::RepoIdType& repositoryId,
+                           const std::shared_ptr<IStorage>& storage,
+                           const JournalPtr& journal,
+                           const Repository::RepoDeployMap& deployMap)
+        : Repository(repositoryId, storage) {
+        this->journal   = journal;
         this->deployMap = deployMap;
     }
 
@@ -264,18 +261,16 @@ namespace bsc {
         return localSyncPack;
     }
 
-    const IRepository::RepositoryActionStrategyPack &Repository::getFullPack() const {
+    const IRepository::RepositoryActionStrategyPack& Repository::getFullPack() const {
         return fullPack;
     }
 
-    const PathTransformer &Repository::getPathTransformer() {
-        auto &fileMap = fileMapRenderer.renderMap(journal);
+    const PathTransformer& Repository::getPathTransformer() {
+        auto& fileMap = fileMapRenderer.renderMap(journal);
         return fileMap.getPathTransformer();
     }
 
-
-    //Repository::Repository() : Repository("", nullptr) {}
-
+    // Repository::Repository() : Repository("", nullptr) {}
 
     auto Repository::RepoDeployMap::begin() -> decltype(deployMap.begin()) {
         return deployMap.begin();
@@ -285,8 +280,7 @@ namespace bsc {
         return deployMap.end();
     }
 
-    auto
-            Repository::RepoDeployMap::operator[](const fs::path& path) -> decltype(deployMap[fs::current_path()]) {
+    auto Repository::RepoDeployMap::operator[](const fs::path& path) -> decltype(deployMap[fs::current_path()]) {
         return deployMap[path];
     }
 
@@ -297,7 +291,7 @@ namespace bsc {
         } else if (deployState == DeployState::notDeployed) {
             logger.debug("marking " + path.string() + " as not deployed");
             deployMap[path] = false;
-        }//else unchanged
+        }// else unchanged
     }
 
     bool Repository::RepoDeployMap::DeployAttributes::isDeployed() const {
@@ -309,18 +303,21 @@ namespace bsc {
         DeployAttributes::deployed = deployed;
     }
 
-    Repository::RepoDeployMap::DeployAttributes::DeployAttributes(bool deployed) : deployed(deployed) {}
+    Repository::RepoDeployMap::DeployAttributes::DeployAttributes(bool deployed) : deployed(deployed) {
+    }
 
     Repository::RepoDeployMap::DeployAttributes::DeployAttributes() = default;
 
-    //@todo maybe move actual implementation code from methods like repository.persist, delete, trash... etc. to those strategies? just a thought
+    //@todo maybe move actual implementation code from methods like repository.persist, delete, trash... etc. to those strategies? just a
+    //thought
 
     class StrategyPersist : public RepositoryActionStrategy {
         DeployState
         apply(const fs::path& path, const std::optional<RepositoryAttributes>& attributes, RepositoryManipulator& manipulator) override {
             manipulator.persist(path, attributes);
-            return DeployState::deployed;//it was UNCHANGED, but file is clearly in the filesystem, so it's deployed!
-            //UNCHANGED made some sense, because persisting the file doesn't actually deploy it, but new files weren't marked as deployed, so update thought they were deleted. and new files go through persist, so it should return deployed.
+            return DeployState::deployed;// it was UNCHANGED, but file is clearly in the filesystem, so it's deployed!
+            // UNCHANGED made some sense, because persisting the file doesn't actually deploy it, but new files weren't marked as deployed,
+            // so update thought they were deleted. and new files go through persist, so it should return deployed.
         }
     };
 
@@ -371,12 +368,11 @@ namespace bsc {
         }
     };
 
-    std::shared_ptr<RepositoryActionStrategy>
-    Repository::RepositoryActionStrategyFactory::create(RepositoryAction action) const {
+    std::shared_ptr<RepositoryActionStrategy> Repository::RepositoryActionStrategyFactory::create(RepositoryAction action) const {
         switch (action) {
             case RepositoryAction::persist:
             case RepositoryAction::update:
-                //update and persist are the same
+                // update and persist are the same
                 return std::make_shared<StrategyPersist>();
             case RepositoryAction::erase:
                 return std::make_shared<StrategyDelete>();
@@ -392,16 +388,15 @@ namespace bsc {
         }
     }
 
-
     Repository::RepositoryActionStrategyPack
     Repository::RepositoryActionStrategyFactory::createPack(Repository::RepoActionPack actionPack) const {
         RepositoryActionStrategyPack strategyPack;
-        strategyPack.updatedInRepo = create(actionPack.updatedInRepo);
+        strategyPack.updatedInRepo       = create(actionPack.updatedInRepo);
         strategyPack.updatedInFilesystem = create(actionPack.updatedInFilesystem);
-        strategyPack.same = create(actionPack.same);
-        strategyPack.newInRepo = create(actionPack.newInRepo);
-        strategyPack.newInFilesystem = create(actionPack.newInFilesystem);
-        strategyPack.deletedInRepo = create(actionPack.deletedInRepo);
+        strategyPack.same                = create(actionPack.same);
+        strategyPack.newInRepo           = create(actionPack.newInRepo);
+        strategyPack.newInFilesystem     = create(actionPack.newInFilesystem);
+        strategyPack.deletedInRepo       = create(actionPack.deletedInRepo);
         strategyPack.deletedInFilesystem = create(actionPack.deletedInFilesystem);
         return strategyPack;
     }

@@ -1,4 +1,4 @@
-set(SOURCE_FILES context/auto/AutoCaller.h context/context/Context.cpp context/registry/InitializerRegistry.h context/registry/Registry.h)
+set(SOURCE_FILES context/auto/AutoCaller.h context/context/Context.cpp context/registry/InitializerRegistry.h context/registry/Registry.h context/options/Flags.h)
 
 add_library(context ${SOURCE_FILES})
 target_include_directories(context PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:${BSC_DESTINATION_INCLUDE}>)

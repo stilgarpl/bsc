@@ -6,6 +6,7 @@
 #include <properties/Property.h>
 #include <properties/PropertyContext.h>
 #include <properties/control/writer/YamlWriter.h>
+#include <properties/control/parser//YamlParser.h>
 
 using namespace bsc;
 

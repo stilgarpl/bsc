@@ -8,22 +8,23 @@
 
 namespace bsc {
 
-    FileSorterMimeMatcher::FileSorterMimeMatcher(MimeFileType mimeFileType)
-        : expectedMimeType(std::move(mimeFileType)) {}
-    MatchPrecision FileSorterMimeMatcher::matches(const fs::path& path) {
-        if (fs::exists(path)) {
-            const auto& decodedMime = decoder.getTypeForFile(path);
-            if (expectedMimeType.typeGroup == decodedMime.typeGroup) {
-                if (!expectedMimeType.type.empty()) {
-                    if (expectedMimeType.type == decodedMime.type) {
-                        return MatchPrecision::perfect;
-                    }
+    namespace matchers {
+        FileSorterMapperMatcher fileSorterMimeMatcher(const MimeFileType& mimeFileType) {
+            MimeFileType expectedMimeType(mimeFileType);
+            return [expectedMimeType](const FileInfo& fileInfo) {
+                if (expectedMimeType.typeGroup == fileInfo.mimeFileType.typeGroup) {
+                    if (!expectedMimeType.type.empty()) {
+                        if (expectedMimeType.type == fileInfo.mimeFileType.type) {
+                            return MatchPrecision::perfect;
+                        }
 
-                } else {
-                    return MatchPrecision::partial;
+                    } else {
+                        return MatchPrecision::partial;
+                    }
                 }
-            }
+                return MatchPrecision::none;
+            };
         }
-        return MatchPrecision::none;
-    }
+    };// namespace matchers
+
 }// namespace bsc

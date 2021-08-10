@@ -6,17 +6,17 @@
 #define BSC_PROPERTYCONTROLLER_H
 
 #include "properties/control/parser/PropertyParser.h"
+#include <properties/PropertyContext.h>
 namespace bsc {
     class PropertyController {
-        PropertyParser& propertyParser;
-        const std::lock_guard<decltype(PropertyParser::mutex)> lockGuard;
+        PropertyContext& propertyContext;
+        const std::lock_guard<decltype(PropertyParser::mutex)> parserGuard;
 
     public:
-        //@todo this class can hold parser and emitter - constructor could take enum and construct it from the factory of supported parsers/emitters. Technically emitter could be a different type than parser, do I want to suport such case? And also -> when it has emitter, change to PropertyController
-        explicit PropertyController(PropertyParser& parser);
         PropertyController();
         virtual ~PropertyController();
-        auto& parser() { return propertyParser; }
+        auto& parser() { return propertyContext.getPropertyParser(); }
+        auto& configuration() {return propertyContext.getPropertyConfiguration();}
     };
 
 

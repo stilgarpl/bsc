@@ -115,7 +115,7 @@ TEST_CASE("Sort fetchers test") {
         std::set<fs::path> expectedResult = {"test.txt", "test.gif", "test.png", "png_with_wrong_extension.txt"};
         auto path                         = testDirWithResources.getResourcePath("sort");
         FilesystemFileListFetcher fetcher;
-        auto result = fetcher({.recursive = true},path);
+        auto result = fetcher({.recursive = true}, path);
         REQUIRE(result.size() == expectedResult.size());
         for (const auto& item : result) {
             REQUIRE(expectedResult.contains(item.filename()));
@@ -126,7 +126,7 @@ TEST_CASE("Sort fetchers test") {
         std::set<fs::path> expectedResult = {"test.gif", "test.png", "png_with_wrong_extension.txt"};
         auto path                         = testDirWithResources.getResourcePath("sort");
         FilesystemFileListFetcher fetcher;
-        auto result = fetcher({.recursive = false},path);
+        auto result = fetcher({.recursive = false}, path);
         REQUIRE(result.size() == expectedResult.size());
         for (const auto& item : result) {
             REQUIRE(expectedResult.contains(item.filename()));
@@ -137,7 +137,7 @@ TEST_CASE("Sort fetchers test") {
         std::vector<fs::path> expectedResult = {"file1", "file2.txt", "file5.zip"};
         fs::path path                        = {"any/path"};
         StaticFileListFetcher fetcher(expectedResult);
-        auto result = fetcher({},path);
+        auto result = fetcher({}, path);
         REQUIRE(expectedResult == result);
     }
 }
@@ -145,49 +145,50 @@ TEST_CASE("Sort fetchers test") {
 TEST_CASE("Sort mapper matchers test") {
     testaid::TestDirWithResources testDirWithResources;
     MimeFileTypeFactory factory;
+    FileInfoDecoder fileInfoDecoder;
     auto path     = testDirWithResources.getResourcePath("sort");
     auto filename = "test.gif";
     SECTION("FileSorterMimeMatcher") {
         SECTION("none - full") {
             auto expectedResult = MatchPrecision::none;
-            FileSorterMimeMatcher mimeMatcher(factory.create("text/plain"));
+            auto mimeMatcher    = matchers::fileSorterMimeMatcher(factory.create("text/plain"));
 
-            auto result = mimeMatcher.matches(path / filename);
+            auto result = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
         SECTION("none - partial") {
             auto expectedResult = MatchPrecision::none;
-            FileSorterMimeMatcher mimeMatcher(factory.create("text/"));
+            auto mimeMatcher    = matchers::fileSorterMimeMatcher(factory.create("text/"));
 
-            auto result = mimeMatcher.matches(path / filename);
+            auto result = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
         SECTION("partial") {
             auto expectedResult = MatchPrecision::partial;
-            FileSorterMimeMatcher mimeMatcher(factory.create("image/"));
+            auto mimeMatcher    = matchers::fileSorterMimeMatcher(factory.create("image/"));
 
-            auto result = mimeMatcher.matches(path / filename);
+            auto result = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
         SECTION("perfect") {
             auto expectedResult = MatchPrecision::perfect;
-            FileSorterMimeMatcher mimeMatcher(factory.create("image/gif"));
+            auto mimeMatcher    = matchers::fileSorterMimeMatcher(factory.create("image/gif"));
 
-            auto result = mimeMatcher.matches(path / filename);
+            auto result = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
     }
     SECTION("FileSorterNameMatcher") {
         SECTION("none") {
             auto expectedResult = MatchPrecision::none;
-            FileSorterNameMatcher nameMatcher("(.)+\\.jpg");
-            auto result = nameMatcher.matches(path / filename);
+            auto nameMatcher    = matchers::fileSorterNameMatcher("(.)+\\.jpg");
+            auto result         = nameMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
         SECTION("perfect") {
             auto expectedResult = MatchPrecision::perfect;
-            FileSorterNameMatcher nameMatcher("(.)+\\.gif");
-            auto result = nameMatcher.matches(path / filename);
+            auto nameMatcher    = matchers::fileSorterNameMatcher("(.)+\\.gif");
+            auto result         = nameMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
     }
@@ -196,23 +197,23 @@ TEST_CASE("Sort mapper matchers test") {
 TEST_CASE("FileSorterMapper test") {
     testaid::TestDirWithResources testDirWithResources;
     MimeFileTypeFactory factory;
-    auto path                       = testDirWithResources.getResourcePath("sort");
-    auto pathSubdir                 = testDirWithResources.getResourcePath("sort/subdir");
-    const auto expectedTextPatternLowPriority = "textLow";
+    auto path                                  = testDirWithResources.getResourcePath("sort");
+    auto pathSubdir                            = testDirWithResources.getResourcePath("sort/subdir");
+    const auto expectedTextPatternLowPriority  = "textLow";
     const auto expectedTextPatternHighPriority = "textHigh";
-    const auto expectedImagePattern = "img";
-    const auto expectedGifPattern   = "gif";
+    const auto expectedImagePattern            = "img";
+    const auto expectedGifPattern              = "gif";
 
     FileSorterMapper fileSorterMapperEmpty;
     FileSorterMapper fileSorterMapper;
     FileInfoDecoder fileInfoDecoder;
-    fileSorterMapper.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("text/")), expectedTextPatternHighPriority, 5);
-    fileSorterMapper.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("text/plain")), expectedTextPatternLowPriority, 1);
-    fileSorterMapper.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("image/")), expectedImagePattern);
-    fileSorterMapper.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("image/gif")), expectedGifPattern);
+    fileSorterMapper.addPattern(matchers::fileSorterMimeMatcher(factory.create("text/")), expectedTextPatternHighPriority, 5);
+    fileSorterMapper.addPattern(matchers::fileSorterMimeMatcher(factory.create("text/plain")), expectedTextPatternLowPriority, 1);
+    fileSorterMapper.addPattern(matchers::fileSorterMimeMatcher(factory.create("image/")), expectedImagePattern);
+    fileSorterMapper.addPattern(matchers::fileSorterMimeMatcher(factory.create("image/gif")), expectedGifPattern);
     SECTION("gif") {
         auto filenameGif = "test.gif";
-        auto result      = fileSorterMapper.map( fileInfoDecoder.decodeFileInfo(path / filenameGif));
+        auto result      = fileSorterMapper.map(fileInfoDecoder.decodeFileInfo(path / filenameGif));
         REQUIRE(result);
         REQUIRE(result == expectedGifPattern);
     }
@@ -266,9 +267,9 @@ TEST_CASE("Path translator test") {
 TEST_CASE("File sorter test") {
     testaid::TestDirWithResources testDirWithResources;
     MimeFileTypeFactory factory;
-    auto resourcePath    = testDirWithResources.getResourcePath("sort");
-    auto destinationPath = testDirWithResources.getTestDirPath("destination");
-    FileListFetcher fetcher = FileListFetcher{bsc::fetchers::filesystemFileListFetcher, {.recursive=true}, {}};
+    auto resourcePath       = testDirWithResources.getResourcePath("sort");
+    auto destinationPath    = testDirWithResources.getTestDirPath("destination");
+    FileListFetcher fetcher = FileListFetcher{bsc::fetchers::filesystemFileListFetcher, {.recursive = true}, {}};
     FileSorter fileSorter(fetcher,
                           {.sortStrategy                  = StandardFileSorterSortStrategies::copy,
                            .createValidTargetPathStrategy = StandardCreateValidTargetPathStrategies::abort,
@@ -277,7 +278,7 @@ TEST_CASE("File sorter test") {
 
                           });
     SECTION("images only") {
-        fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("image/")),
+        fileSorter.addPattern(matchers::fileSorterMimeMatcher(factory.create("image/")),
                               destinationPath.string() + "/Images/{{date.year}}/");
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
@@ -297,9 +298,9 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
     }
     SECTION("images and txt") {
-        fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("image/")),
+        fileSorter.addPattern(matchers::fileSorterMimeMatcher(factory.create("image/")),
                               destinationPath.string() + "/Images/{{date.year}}/");
-        fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create("text/")), destinationPath.string() + "/Text/");
+        fileSorter.addPattern(matchers::fileSorterMimeMatcher(factory.create("text/")), destinationPath.string() + "/Text/");
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
         REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
@@ -318,7 +319,7 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
         SECTION("second sort should end with error") {
             const auto& result = fileSorter.sort({resourcePath});
-            REQUIRE(result.getSortedFiles().size() == 0);
+            REQUIRE(result.getSortedFiles().empty());
         }
     }
 }

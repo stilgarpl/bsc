@@ -38,8 +38,7 @@ namespace bsc {
         FileSorter(FileListFetcher fileListFetcher, SortingStrategies Actions);
         //@todo consider replacing vector with span - it's not trivial, many places have {} initialization or just won't convert vector to span (temporaries)
         SortResult sort(const std::vector<fs::path>& pathToSort);
-        //@todo replace with better way to set up matchers and patterns:
-        void addPattern(std::unique_ptr<FileSorterMapperMatcher> matcher, std::string pattern) {
+        void addPattern(FileSorterMapperMatcher matcher, std::string pattern) {
             mapper.addPattern(std::move(matcher), std::move(pattern));
         }
     private:

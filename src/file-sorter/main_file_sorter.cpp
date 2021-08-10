@@ -86,11 +86,11 @@ int main(int argc, char* argv[]) {
                            .createValidTargetPathStrategy = fileExistsFactory.create(parameters.fileExists(), {parameters.renamePattern()}),
                            .errorHandlerStrategy          = errorActionFactory.create(parameters.errorHandler()),
                            .fileExistsPredicate           = StandardFileSorterPredicates::fileExistsPredicate});
-    for (MimeFileTypeFactory factory; const auto& [mime, pattern] : parameters.mimeMatchers()) {
-        fileSorter.addPattern(std::make_unique<FileSorterMimeMatcher>(factory.create(mime)), pattern);
+    for (MimeFileTypeFactory factory{}; const auto& [mime, pattern] : parameters.mimeMatchers()) {
+        fileSorter.addPattern(matchers::fileSorterMimeMatcher(factory.create(mime)), pattern);
     }
     for (const auto& [name, pattern] : parameters.nameMatchers()) {
-        fileSorter.addPattern(std::make_unique<FileSorterNameMatcher>(name), pattern);
+        fileSorter.addPattern(matchers::fileSorterNameMatcher(name), pattern);
     }
     fileSorter.sort(parameters.targetPaths()) | StandardResultConsumers::printResult;
     return 0;

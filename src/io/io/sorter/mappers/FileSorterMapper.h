@@ -19,18 +19,16 @@ namespace bsc {
     class FileSorterMapper {
 
         struct MapperEntry {
-            std::unique_ptr<FileSorterMapperMatcher> matcher;
+            FileSorterMapperMatcher matcher;
             std::string pattern;
             int32_t priority;
         };
 
         std::vector<MapperEntry> patterns;
-        //@todo instead of path matchers could get file info structure, with detected mime type and filename and other
-        // things so that it don't have to parse file again.
     public:
         std::optional<std::string> map(const FileInfo& from);
 
-        void addPattern(std::unique_ptr<FileSorterMapperMatcher> matcher, std::string pattern, int32_t priority = 0) {
+        void addPattern(FileSorterMapperMatcher matcher, std::string pattern, int32_t priority = 0) {
             MapperEntry entry{.matcher = std::move(matcher), .pattern = std::move(pattern), .priority = priority};
             patterns.insert(std::ranges::upper_bound(
                                     patterns,

@@ -9,14 +9,11 @@
 #include <string>
 
 namespace bsc {
-    class FileSorterNameMatcher final : public FileSorterMapperMatcher {
-        std::regex regex;
 
-    public:
-        explicit FileSorterNameMatcher(const std::string& regexPattern) : regex(regexPattern) {}
-        MatchPrecision matches(const fs::path& path) override;
-        ~FileSorterNameMatcher() override = default;
+    namespace matchers {
+        FileSorterMapperMatcher fileSorterNameMatcher(const std::string& regexPattern);
     };
+
 }// namespace bsc
 
 #endif

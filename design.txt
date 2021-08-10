@@ -863,3 +863,11 @@ lastly, pop state
 @todo maybe add context observers, that get triggered when active context is set? or just set for the first time? it could update LoggerContext
 
 writable properties -> register every property? save all of them? or PropertySaver.save(propertyObj); gathering properties -> during construction save if it's top property and only save those. what about properties that are not used? they will not be saved.
+
+
+Options on enum, like repository options.contains(ENUM1) || options.contains(ENUM2)
+options >> ENUM1 || ENUM2
+options ~ ENUM1 || ENUM2
+options ~ ENUM1 || ENUM2 && ENUM 3
+PROBLEM: () options ~ ENUM1 || ( ENUM2 && ENUM3) - how to handle parentheses\
+options.has(ENUM1).and(ENUM2).or(ENUM3)

@@ -6,6 +6,7 @@
 #include <list>
 #include <properties/Property.h>
 #include <properties/PropertyContext.h>
+#include <properties/PropertyEmptyLoader.h>
 #include <properties/PropertyFileLoader.h>
 #include <properties/PropertySequencer.h>
 #include <properties/PropertyTextLoader.h>
@@ -323,6 +324,7 @@ TEST_CASE("Write properties to yaml") {
     PropertySequencer propertySequencer(yamlWriter);
     propertySequencer(intProperty,floatProperty,stringProperty, listProperty, intVecProperty, defaultProp);
     auto result = yamlWriter.writeToString();
+    //then
     REQUIRE(result == expectedResult);
 }
 
@@ -393,4 +395,71 @@ TEST_CASE("Property file test") {
         REQUIRE(item.fieldB() == "b" + std::to_string(count));
         count++;
     }
+}
+
+TEST_CASE("Property options test") {
+    struct PropertiesStruct {
+        Property<"value.int",int> intValue;
+    };
+    PropertyTextLoader propertyTextLoader("invalid yaml text");
+    SECTION("exceptions") {
+        REQUIRE_THROWS_AS(PropertiesStruct(), InvalidPropertyKeyException);
+    }
+
+    SECTION("no exceptions") {
+        propertyTextLoader.enableOptions({PropertySetting::ignoreMissingProperty});
+        PropertiesStruct prop{};
+        REQUIRE(prop.intValue.hasValue() == false);
+    }
+}
+
+TEST_CASE("Writable properties") {
+    struct PropertiesStruct {
+        Property<"int",int> intValue;
+        Property<"float",float> floatValue;
+        Property<"string",std::string> stringValue;
+    };
+
+    struct PropertyAll{
+        Property<"value",PropertiesStruct> values;
+        Property<"list",std::list<int>> list;
+    };
+
+    PropertyEmptyLoader emptyLoader;
+    emptyLoader.enableOptions({PropertySetting::ignoreMissingProperty, PropertySetting::ignoreInvalidPropertyType});
+    PropertyAll allProperties;
+    //class property is always created
+    REQUIRE(allProperties.values.hasValue() == true);
+    //fields are empty
+    REQUIRE(allProperties.values->intValue.hasValue() == false);
+    REQUIRE(allProperties.values->floatValue.hasValue() == false);
+    REQUIRE(allProperties.values->stringValue.hasValue() == false);
+    //containers are always created
+    REQUIRE(allProperties.list.hasValue() == true);
+    REQUIRE(allProperties.list->empty() == true);
+
+    allProperties.values->intValue = 5;
+    allProperties.values->floatValue = 2.0f;
+    allProperties.values->stringValue = "test";
+    allProperties.list->push_back(1);
+    allProperties.list->push_back(2);
+    allProperties.list->push_back(3);
+    //class property is always created
+    REQUIRE(allProperties.values.hasValue() == true);
+    //fields are empty
+    REQUIRE(allProperties.values->intValue.hasValue() == true);
+    REQUIRE(allProperties.values->intValue() == 5);
+    REQUIRE(allProperties.values->floatValue.hasValue() == true);
+    REQUIRE(allProperties.values->floatValue() == 2.0f);
+    REQUIRE(allProperties.values->stringValue.hasValue() == true);
+    REQUIRE(allProperties.values->stringValue() == "test");
+    //containers are always created
+    REQUIRE(allProperties.list.hasValue() == true);
+    REQUIRE(allProperties.list->size() == 3);
+
+    SECTION("Yaml write") {
+
+    }
+
+
 }

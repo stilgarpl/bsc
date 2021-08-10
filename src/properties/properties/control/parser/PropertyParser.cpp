@@ -3,6 +3,7 @@
 //
 
 #include "PropertyParser.h"
+#include "ParserExceptions.h"
 
 namespace bsc {
     using StackKeeper = PropertyStackKeeper<PropertyParser>;

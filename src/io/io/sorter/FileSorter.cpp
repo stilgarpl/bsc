@@ -34,8 +34,11 @@ namespace bsc {
         try {
             auto fileList = fetchAllFiles(pathsToSort);
 
-            auto filePatternAndPropertiesList = fileList | transform(decodeFileInfo) | transform(addMapperToFileInfo) |
-                                                filter(filterMappedPatterns) | transform(addProperties);
+            auto filePatternAndPropertiesList = fileList
+                                                | transform(decodeFileInfo)
+                                                | transform(addMapperToFileInfo)
+                                                | filter(filterMappedPatterns)
+                                                | transform(addProperties);
 
             for (const auto& filePatternAndProperties : filePatternAndPropertiesList) {
                 const auto& file = filePatternAndProperties.fileInfo.path;
@@ -51,6 +54,7 @@ namespace bsc {
                     }
                     //@todo this if is mostly for skip action to work, but maybe I should throw on invalid target
                     // paths created?
+                    //@todo target path should not be a simple path but perhaps wrapper object with path and result? sort of like Either or expected ?
                     if (!targetPath.empty()) {
                         actions.sortStrategy(file, targetPath);
                         sortResult.sortedFilesMap[file] = targetPath;

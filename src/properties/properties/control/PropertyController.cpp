@@ -7,13 +7,12 @@
 #include <properties/PropertyContext.h>
 
 namespace bsc {
-    PropertyController::PropertyController(PropertyParser& parser) : propertyParser(parser), lockGuard(parser.mutex) {
-        propertyParser.push();
-    }
     PropertyController::PropertyController()
-        : PropertyController(Context::getActiveContext()->get<PropertyContext>()->getPropertyParser()) {}
-    PropertyController::~PropertyController() { propertyParser.pop(); }
-
-
+        : propertyContext(Context::getActiveContext()->get<PropertyContext>()), parserGuard(propertyContext.getPropertyParser().mutex) {
+        propertyContext.push();
+    }
+    PropertyController::~PropertyController() {
+        propertyContext.pop();
+    }
 
 }// namespace bsc

@@ -5,8 +5,8 @@
 #ifndef BSC_IREPOSITORY_H
 #define BSC_IREPOSITORY_H
 
-
 #include "RepositoryAttributes.h"
+#include <context/options/Flags.h>
 #include <memory>
 #include <repo/journal/Journal.h>
 #include <repo/repository/repository/DeployState.h>
@@ -71,8 +71,7 @@ namespace bsc {
         using RepoActionPack = RepoPack<RepositoryAction>;
 
 //update one file from the repository
-        virtual void update(fs::path path, const RepositoryActionStrategyPack& strategyPack,
-                            std::set<UpdateOptions> updateOptions) = 0;
+        virtual void update(fs::path path, const RepositoryActionStrategyPack& strategyPack, Flags<UpdateOptions> updateOptions) = 0;
 
         [[nodiscard]] virtual const RepositoryActionStrategyPack& getDeployPack() const = 0;
 

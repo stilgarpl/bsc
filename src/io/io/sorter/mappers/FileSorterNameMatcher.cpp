@@ -5,12 +5,19 @@
 #include "FileSorterNameMatcher.h"
 
 namespace bsc {
-    MatchPrecision FileSorterNameMatcher::matches(const fs::path& path) {
-        std::smatch match;
-        if (std::regex_search(path.filename().string(), regex)) {
-            return MatchPrecision ::perfect;
-        } else {
-            return MatchPrecision ::none;
+
+    namespace matchers{
+        FileSorterMapperMatcher fileSorterNameMatcher(const std::string& regexPattern) {
+            std::regex regex{regexPattern};
+            return [regex](const FileInfo& fileInfo) {
+              std::smatch match;
+              if (std::regex_search(fileInfo.path.filename().string(), regex)) {
+                  return MatchPrecision ::perfect;
+              } else {
+                  return MatchPrecision ::none;
+              }
+            };
         }
-    }
+    };
+
 }// namespace bsc

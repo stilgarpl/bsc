@@ -5,7 +5,6 @@
 #ifndef BSC_PROPERTY_H
 #define BSC_PROPERTY_H
 
-#include "Property.h"
 #include "PropertyContext.h"
 #include "PropertyDefinitions.h"
 #include "PropertyExceptions.h"
@@ -53,12 +52,15 @@ namespace bsc {
         explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyValue<T> {
             PropertyController controller;
             auto& parser = controller.parser();
-
+            auto& configuration = controller.configuration();
+            using enum PropertySetting;
             switch (parser.getNodeType(idSequence)) {
 
                 case PropertyNodeType::sequence:
                 case PropertyNodeType::map:
-                    throw InvalidPropertyTypeException("Property key: " + propertyId + " has invalid node type");
+                    if (configuration != PropertySetting::ignoreInvalidPropertyType) {
+                        throw InvalidPropertyTypeException("Property key: " + propertyId + " has invalid node type");
+                    }
                     break;
                 default:
                     try {
@@ -67,13 +69,17 @@ namespace bsc {
                     } catch (StringParseException& e) {
                         // fallthrough
                     }
+                    [[fallthrough]];
                 case PropertyNodeType::invalid:
+                    [[fallthrough]];
                 case PropertyNodeType::empty:
                     if (defaultValue.has_value()) {
                         value = defaultValue;
                     } else {
-                        throw InvalidPropertyKeyException("Property key: " + propertyId +
-                                                          " does not exist and default value was not provided.");
+                        if (configuration != PropertySetting::ignoreMissingProperty) {
+                            throw InvalidPropertyKeyException("Property key: " + propertyId
+                                                              + " does not exist and default value was not provided.");
+                        }
                     }
                     break;
             }
@@ -89,15 +95,18 @@ namespace bsc {
         explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyContainer<T> {
             PropertyController controller;
             auto& parser = controller.parser();
+            auto& configuration = controller.configuration();
             parser.selectNode(idSequence);
             if (parser.getNodeType() != PropertyNodeType::sequence) {
                 if (defaultValue.has_value()) {
                     value = *defaultValue;
                     return;
                 } else {
-                    //@todo better error?
-                    throw InvalidPropertyKeyException("Property key: " + propertyId +
-                                                      " does not exist and default value was not provided.");
+                    if (configuration != PropertySetting::ignoreMissingProperty) {
+                        //@todo better error?
+                        throw InvalidPropertyKeyException("Property key: " + propertyId
+                                                          + " does not exist and default value was not provided.");
+                    }
                 }
             }
             value = T{};
@@ -137,6 +146,13 @@ namespace bsc {
             return *value;
         }
 
+        auto* operator->() requires detail::IsNotDirect<T> {
+            if (!hasValue()) {
+                throw InvalidPropertyKeyException("Property key: " + propertyId + " does not exist and default value was not provided.");
+            }
+            return &*value;
+        }
+
         template<typename TrueT>
         TrueT getValue() const requires(detail::IsDirect<T>&& PropertyValue<TrueT>) {
             if (!hasValue()) {
@@ -146,7 +162,6 @@ namespace bsc {
                 return std::any_cast<TrueT>(directValue);
             }
             try {
-                Parser fromStringParser;
                 return fromStringParser.template fromString<TrueT>(value->value);
             } catch (StringParseException& e) {
                 return std::any_cast<TrueT>(directValue);

@@ -18,6 +18,7 @@
 #include <repo/repository/storage/IStorage.h>
 #include <repo/repository/storage/StorageFactorySpecialization.h>
 #include <repo/repository/transformer/PathTransformer.h>
+
 namespace bsc {
 
     class Repository : public IRepository {
@@ -133,8 +134,7 @@ namespace bsc {
     public:
 
         //update one file from the repository
-        void update(fs::path path, const RepositoryActionStrategyPack& strategyPack,
-                    std::set<UpdateOptions> updateOptions) override;
+        void update(fs::path path, const RepositoryActionStrategyPack& strategyPack, Flags<UpdateOptions> updateOptions) override;
 
         //update everything
         void syncLocalChanges() override;

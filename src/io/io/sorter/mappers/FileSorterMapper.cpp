@@ -14,7 +14,7 @@ namespace bsc {
             if(bestPrecision == MatchPrecision::perfect || priority < bestPriority ) {
                 break;
             }
-            auto matchResult = matcher->matches(from.path);
+            auto matchResult = matcher(from);
             logger.info(fmt::format("Matching {} to {} with priority: {}", from.path.filename().string(), pattern, priority));
             switch (matchResult) {
 

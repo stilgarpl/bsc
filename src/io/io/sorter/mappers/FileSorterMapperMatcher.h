@@ -5,6 +5,8 @@
 #ifndef BSC_FILESORTERMAPPERMATCHER_H
 #define BSC_FILESORTERMAPPERMATCHER_H
 #include <filesystem>
+#include <functional>
+#include <io/file/FileInfo.h>
 namespace bsc {
     namespace fs = std::filesystem;
 
@@ -14,12 +16,8 @@ namespace bsc {
         perfect = 64,
     };
 
-    //@todo convert to std::function like SortAction
-    class FileSorterMapperMatcher {
-    public:
-        virtual MatchPrecision matches(const fs::path& path) = 0;
-        virtual ~FileSorterMapperMatcher()                   = default;
-    };
+
+    using FileSorterMapperMatcher = std::function<MatchPrecision(const FileInfo& path)>;
 }// namespace bsc
 
 #endif

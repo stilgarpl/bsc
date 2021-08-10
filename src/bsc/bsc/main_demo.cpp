@@ -36,6 +36,7 @@ void setupModules(bsc::Node& node) {
 void setupCommands(CommandModule *cmd) {
     cmd->mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->setDefaultGroupHandler<bsc::DefaultCommandGroupParameters>(defaultCommandGroupHandler);
+    //@todo maybe add commandPath, like fs::path: "tt"_cmd / "t2"_cmd = testingMethodInt
     cmd->group("tt").mapCommand("t2", &CommandModule::testingMethodInt);
     cmd->group("tt").group("xx").mapCommand("tx", &CommandModule::testingMethodInt);
     //    cmd->group("tt").handler<CommandModule::CommandPP>([](auto properties) {
