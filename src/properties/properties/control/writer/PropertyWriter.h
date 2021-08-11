@@ -52,10 +52,12 @@ namespace bsc {
 
     template<typename T>
     concept IsPropertyWriter = std::is_base_of_v<PropertyWriter, T>;
+
     template<typename T>
     concept IsWritablePropertyClass = requires(T t, PropertySequencer& propertySequencer) {
         t.write(propertySequencer);
     };
+
 
 }// namespace bsc
 #endif// BSC_PROPERTYWRITER_H

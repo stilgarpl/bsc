@@ -3,3 +3,7 @@
 //
 
 #include "PropertyWriter.h"
+#include <properties/PropertySequencer.h>
+namespace bsc {
+
+}

@@ -218,7 +218,7 @@ TEST_CASE("Property write test") {
 
     SECTION("int property") {
         Property<"property.int",int> intProperty(555);
-        intProperty.write(writer);
+        writer << intProperty;
 
         REQUIRE(writer.getPropertyId().size() == 2);
         REQUIRE(writer.getPropertyId()[0] == "property");
@@ -227,7 +227,7 @@ TEST_CASE("Property write test") {
     }
     SECTION("float property") {
         Property<"property.float",float> floatProperty(256.0);
-        floatProperty.write(writer);
+        writer << floatProperty;
 
         REQUIRE(writer.getPropertyId().size() == 2);
         REQUIRE(writer.getPropertyId()[0] == "property");
@@ -237,7 +237,7 @@ TEST_CASE("Property write test") {
     SECTION("string property") {
         using namespace std::string_literals;
         Property<"property.string",std::string> stringProperty("test string"s);
-        stringProperty.write(writer);
+        writer << stringProperty;
 
         REQUIRE(writer.getPropertyId().size() == 2);
         REQUIRE(writer.getPropertyId()[0] == "property");
@@ -252,7 +252,7 @@ TEST_CASE("Property write test") {
         propertyList.emplace_back("prop3"s);
 
         Property<"property.list",std::list<Property<"a",std::string>>> listProperty(propertyList);
-        listProperty.write(writer);
+        writer << listProperty;
 
         REQUIRE(writer.getPropertyId().size() == 5);
         REQUIRE(writer.getPropertyId()[0] == "property");
@@ -267,7 +267,7 @@ TEST_CASE("Property write test") {
         using namespace std::string_literals;
         std::vector<int> intSequence = {7,6,5,4};
         Property<"property.vector.int",std::vector<int> > intVecProperty(intSequence);
-        intVecProperty.write(writer);
+        writer << intVecProperty;
 
         REQUIRE(writer.getPropertyId().size() == 3);
         REQUIRE(writer.getPropertyId()[0] == "property");
@@ -278,7 +278,7 @@ TEST_CASE("Property write test") {
 
     SECTION("class property") {
         Property<"defaultProp",DefaultProp> defaultProp{{}};
-        defaultProp.write(writer);
+        writer << defaultProp;
         REQUIRE(writer.getPropertyId().size() == 3);
         REQUIRE(writer.getPropertyId()[0] == "defaultProp");
         REQUIRE(writer.getPropertyId()[1] == "int");
@@ -418,11 +418,17 @@ TEST_CASE("Writable properties") {
         Property<"int",int> intValue;
         Property<"float",float> floatValue;
         Property<"string",std::string> stringValue;
+        void write(PropertySequencer& sequencer) const{
+            sequencer(intValue,floatValue,stringValue);
+        }
     };
 
-    struct PropertyAll{
+    struct PropertyAll {
         Property<"value",PropertiesStruct> values;
         Property<"list",std::list<int>> list;
+        void write(PropertySequencer& sequencer) const {
+            sequencer(values,list);
+        }
     };
 
     PropertyEmptyLoader emptyLoader;
@@ -458,7 +464,18 @@ TEST_CASE("Writable properties") {
     REQUIRE(allProperties.list->size() == 3);
 
     SECTION("Yaml write") {
-
+        YamlWriter writer;
+        writer << allProperties;
+        auto result = writer.writeToString();
+        auto expectedResult = "value:\n"
+                              "  int: 5\n"
+                              "  float: 2.000000\n"
+                              "  string: test\n"
+                              "list:\n"
+                              "  - 1\n"
+                              "  - 2\n"
+                              "  - 3";
+        REQUIRE(result == expectedResult);
     }
 
 

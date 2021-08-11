@@ -4,6 +4,8 @@
 #ifndef BSC_PROPERTYSEQUENCER_H
 #define BSC_PROPERTYSEQUENCER_H
 
+#include <properties/control/writer/PropertyWriter.h>
+
 #include "Property.h"
 
 namespace bsc {
@@ -16,9 +18,20 @@ namespace bsc {
 
         template<IsProperty ... Args>
         void operator() (Args... args) {
-            (args.write(writer),...);
+            ((writer << args), ...);
         }
     };
+
+    PropertyWriter& operator<<(PropertyWriter& writer, IsWritablePropertyClass auto const & writablePropertyClass)  {
+        PropertySequencer sequencer(writer);
+        writablePropertyClass.write(sequencer);
+        return writer;
+    }
+
+    struct BasePropertyClass {
+        virtual void write(PropertySequencer& sequencer) const = 0;
+    };
+
 }// namespace bsc
 
 #endif

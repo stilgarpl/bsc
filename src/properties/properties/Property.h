@@ -27,6 +27,10 @@ namespace bsc {
     template<typename T>
     concept PropertyContainer = IsContainerNotString<T>;
 
+    namespace detail{
+        struct PropertyAccessor;
+    }
+
     template<detail::StringLiteral lit, typename T = detail::DirectPropertyMapper>
     class Property final {
         //@todo C++20, constexpr
@@ -209,22 +213,22 @@ namespace bsc {
             this->value = std::move(t);
             return *this;
         }
-
-        void write(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyValue<T> {
-            PropertyStackKeeper stackKeeper(writer);
-            writer.selectNode(idSequence);
-            writer.setValue(toStringWriter.template toString(getValue()));
-        }
-
-        void write(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyClass<T> && IsWritablePropertyClass<T> {
-            PropertyStackKeeper stackKeeper(writer);
-            writer.selectNode(idSequence);
-            PropertySequencer sequencer(writer);
-            getValue().write(sequencer);
-        }
-
-        void write(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyContainer<T>;
+        friend struct detail::PropertyAccessor;
     };
+
+    namespace detail {
+        struct PropertyAccessor {
+            template<detail::StringLiteral lit, typename T>
+            static auto& getSequenceId(const Property<lit,T>& property) {
+                return property.idSequence;
+            }
+
+            template<detail::StringLiteral lit, typename T>
+            static auto& getToStringWriter(const Property<lit,T>& property) {
+                return property.toStringWriter;
+            }
+        };
+    }
 
     template<typename T>
     struct IsPropertyT : std::false_type {};
@@ -238,23 +242,41 @@ namespace bsc {
     concept IsProperty = IsPropertyT<T>::value;
 
     template<detail::StringLiteral lit, typename T>
-    void Property<lit, T>::write(PropertyWriter& writer) const requires detail::IsNotDirect<T> && PropertyContainer<T> {
+    PropertyWriter& operator<<(PropertyWriter& writer, const Property<lit, T>& property) requires detail::IsNotDirect<T> && PropertyContainer<T> {
         PropertyStackKeeper stackKeeper(writer);
-        writer.selectNode(idSequence);
+        writer.selectNode(detail::PropertyAccessor::getSequenceId(property));
         writer.setNodeType(PropertyNodeType::sequence);
-        for (auto& item : getValue()) {
+        for (auto& item : property.getValue()) {
             if constexpr (IsProperty<typename T::value_type> || PropertyClass<typename T::value_type>) {
                 {
-                    PropertyStackKeeper stackKeeper(writer);
-                    item.write(writer);
+                    PropertyStackKeeper stackKeeper1(writer);
+                    writer << item;
                 }
                 writer.nextEntry();
             } else {
                 // collection of simple types
-                writer.setValue(toStringWriter.template toString(item));
+                writer.setValue(detail::PropertyAccessor::getToStringWriter(property).template toString(item));
                 writer.nextEntry();
             }
         }
+        return writer;
+    }
+
+    template<detail::StringLiteral lit, typename T>
+    PropertyWriter& operator<<(PropertyWriter& writer, const Property<lit, T>& property) requires detail::IsNotDirect<T> && PropertyValue<T> {
+        PropertyStackKeeper stackKeeper(writer);
+        writer.selectNode(detail::PropertyAccessor::getSequenceId(property));
+        writer.setValue(detail::PropertyAccessor::getToStringWriter(property).template toString(property.getValue()));
+        return writer;
+    }
+
+    template<detail::StringLiteral lit, typename T>
+    PropertyWriter& operator<<(PropertyWriter& writer, const Property<lit, T>& property) requires detail::IsNotDirect<T> && PropertyClass<T> && IsWritablePropertyClass<T> {
+        PropertyStackKeeper stackKeeper(writer);
+        writer.selectNode(detail::PropertyAccessor::getSequenceId(property));
+        PropertySequencer sequencer(writer);
+        property.getValue().write(sequencer);
+        return writer;
     }
 
 }// namespace bsc
