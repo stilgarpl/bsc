@@ -47,6 +47,7 @@ namespace bsc {
         virtual void setValue(const PropertyValueType& value) =0;
         virtual void nextEntry() = 0;
         virtual PropertyNodeType getNodeType() =0;
+        friend class PropertyController;
     };
     class PropertySequencer;
 

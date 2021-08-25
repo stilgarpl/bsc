@@ -10,6 +10,7 @@
 namespace bsc {
     class PropertyLoader {
         Context::Ptr context;
+
     public:
         PropertyLoader();
         virtual ~PropertyLoader();

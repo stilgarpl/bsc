@@ -19,6 +19,8 @@ namespace bsc {
     };
 
     class PropertyContext final : public AutoContextSetter<PropertyContext> {
+    private:
+        std::recursive_mutex mutex;
         std::unique_ptr<PropertyParser> propertyParser = nullptr;
         std::unique_ptr<PropertyWriter> propertyWriter = nullptr;
         Flags<PropertySetting> propertySettings;
@@ -59,17 +61,7 @@ namespace bsc {
 
         void removePropertyWriter() { propertyWriter = nullptr; }
 
-        void push() {
-            if (hasPropertyParser()) {
-                propertyParser->push();
-            }
-        }
 
-        void pop() {
-            if (hasPropertyParser()) {
-                propertyParser->pop();
-            }
-        }
 
         void enableConfigurations(std::initializer_list<PropertySetting> settings) {
             propertySettings.enable(settings);
@@ -78,7 +70,26 @@ namespace bsc {
         void disableConfigurations(std::initializer_list<PropertySetting> settings) {
             propertySettings.disable(settings);
         }
+        friend class PropertyController;
 
+
+        void push() {
+            if (hasPropertyParser()) {
+                propertyParser->push();
+            }
+            if (hasPropertyWriter()) {
+                propertyWriter->push();
+            }
+        }
+
+        void pop() {
+            if (hasPropertyParser()) {
+                propertyParser->pop();
+            }
+            if (hasPropertyWriter()) {
+                propertyWriter->pop();
+            }
+        }
     };
 }// namespace bsc
 

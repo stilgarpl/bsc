@@ -8,7 +8,6 @@
 #include "PropertyContext.h"
 #include "PropertyDefinitions.h"
 #include "PropertyExceptions.h"
-#include "PropertyPrefix.h"
 #include <algorithm>
 #include <any>
 #include <optional>
@@ -37,16 +36,30 @@ namespace bsc {
         //@todo C++20 not possible yet, stdlibc++ does not have constexpr std::string
         static inline const PropertyIdType propertyId     = {lit.value};
         static inline const PropertyIdSequence idSequence = explode(propertyId, propertyDelimiter);
+        //@todo maybe parsers and writers should come from context, so they can be changed?
         static inline const Parser fromStringParser;
         static inline const Writer toStringWriter;
 
     private:
-        std::optional<T> value;
+        PropertyValuePtr<T> value;
         std::any directValue{};
+        const PropertyContext& context = PropertyController().context();
+
+        decltype(value) makeValue(T t) {
+            if (context.getPropertyConfiguration() == PropertySetting::globalProperties) {
+                //@todo implement global property storage
+                return std::make_shared<T>(t);
+//                return context.template makePropertyPtr<T>();
+            } else {
+                return std::make_shared<T>(t);
+            }
+        }
 
     public:
+
+
         [[nodiscard]] bool hasValue() const {
-            return value.has_value() || directValue.has_value();
+            return value || directValue.has_value();
         }
 
         constexpr auto getPropertyName() const {
@@ -68,7 +81,7 @@ namespace bsc {
                     break;
                 default:
                     try {
-                        value = fromStringParser.template fromString<T>(parser.getValue(idSequence));
+                        value = makeValue(fromStringParser.template fromString<T>(parser.getValue(idSequence)));
                         break;
                     } catch (StringParseException& e) {
                         // fallthrough
@@ -78,7 +91,7 @@ namespace bsc {
                     [[fallthrough]];
                 case PropertyNodeType::empty:
                     if (defaultValue.has_value()) {
-                        value = defaultValue;
+                        value = makeValue(*defaultValue);
                     } else {
                         if (configuration != PropertySetting::ignoreMissingProperty) {
                             throw InvalidPropertyKeyException("Property key: " + propertyId
@@ -93,7 +106,7 @@ namespace bsc {
             PropertyController controller;
             auto& parser = controller.parser();
             parser.selectNode(idSequence);
-            value = T{};// it should create itself
+            value = makeValue({});// it should create itself
         }
 
         explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyContainer<T> {
@@ -103,7 +116,7 @@ namespace bsc {
             parser.selectNode(idSequence);
             if (parser.getNodeType() != PropertyNodeType::sequence) {
                 if (defaultValue.has_value()) {
-                    value = *defaultValue;
+                    value = makeValue(*defaultValue);
                     return;
                 } else {
                     if (configuration != PropertySetting::ignoreMissingProperty) {
@@ -113,7 +126,7 @@ namespace bsc {
                     }
                 }
             }
-            value = T{};
+            value = makeValue({});
             while (parser.hasEntry()) {
                 {
                     PropertyStackKeeper<PropertyParser> keeper(parser);
@@ -130,7 +143,7 @@ namespace bsc {
         explicit Property(const std::any& defaultValue) requires detail::IsDirect<T> {
             PropertyController controller;
             if (controller.parser().getNodeType(idSequence) == PropertyNodeType::scalar) {
-                value = detail::DirectPropertyMapper{.value = controller.parser().getValue(idSequence)};
+                value = makeValue(detail::DirectPropertyMapper{.value = controller.parser().getValue(idSequence)});
             }
             directValue = defaultValue;
         }
@@ -162,7 +175,7 @@ namespace bsc {
             if (!hasValue()) {
                 throw InvalidPropertyKeyException("Property key: " + propertyId + " does not exist and default value was not provided.");
             }
-            if (!value.has_value()) {
+            if (!value) {
                 return std::any_cast<TrueT>(directValue);
             }
             try {
@@ -210,7 +223,7 @@ namespace bsc {
         }
 
         auto& operator=(T t) {
-            this->value = std::move(t);
+            this->value = makeValue(std::move(t));
             return *this;
         }
         friend struct detail::PropertyAccessor;

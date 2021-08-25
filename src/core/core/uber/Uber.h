@@ -54,7 +54,7 @@ namespace bsc {
     public:
 
         template<typename... Args, typename ... ConstructorArgs>
-        Container<Args...>& get(ConstructorArgs ... constructorArgs) {
+        auto& get(ConstructorArgs ... constructorArgs) {
             std::unique_lock<std::mutex> lock(containerLock);
             typedef Container<Args...> ContainerType;
             const static auto typeId = getTypeId<Args...>();
@@ -63,7 +63,7 @@ namespace bsc {
                 ref = std::make_shared<ContainerType>(constructorArgs...);
 
             }
-            ContainerType& result = *std::static_pointer_cast<ContainerType>(ref);
+            auto& result = *std::static_pointer_cast<ContainerType>(ref);
             return result;
 
         }

@@ -7,6 +7,7 @@
 #include <libfyaml.h>
 #include <span>
 #include <yaml-cpp/yaml.h>
+#include <ranges>
 
 namespace bsc {
 
@@ -18,6 +19,8 @@ namespace bsc {
             idStack.pop();
         }
         current = std::make_unique<decltype(root)>(root);
+        currentSequence = {};
+        currentPath = {};
     }
     void YamlParser::selectNode(const PropertyIdSequence& propertyId) {
         std::lock_guard g(mutex);
@@ -35,6 +38,7 @@ namespace bsc {
                 currentPath += "/" + id;
             }
         }
+        std::ranges::copy(propertyId,std::back_inserter(currentSequence));
     }
 
     void YamlParser::nextEntry() {
@@ -42,7 +46,7 @@ namespace bsc {
         sequenceCount++;
     }
 
-    PropertyNodeType YamlParser::getNodeType() {
+    PropertyNodeType YamlParser::getNodeType() const {
         std::lock_guard g(mutex);
         switch (current->Type()) {
             case YAML::NodeType::value ::Map:
@@ -58,7 +62,7 @@ namespace bsc {
                 return PropertyNodeType ::invalid;
         }
     }
-    PropertyValueType YamlParser::getValue() {
+    PropertyValueType YamlParser::getValue() const {
         std::lock_guard g(mutex);
         switch (getNodeType()) {
 
@@ -78,7 +82,7 @@ namespace bsc {
     }
     void YamlParser::push() {
         std::lock_guard g(mutex);
-        idStack.push({.current = std::make_unique<decltype(root)>(*current), .sequenceCount = sequenceCount, .currentPath = currentPath});
+        idStack.push({.current = std::make_unique<decltype(root)>(*current), .sequenceCount = sequenceCount, .currentPath = currentPath, .currentSequence = currentSequence });
     }
     void YamlParser::pop() {
         std::lock_guard g(mutex);
@@ -105,6 +109,9 @@ namespace bsc {
     bool YamlParser::hasEntry() {
         std::lock_guard g(mutex);
         return sequenceCount < current->size();
+    }
+    PropertyIdSequence YamlParser::getCurrentIdSequence() const {
+        return bsc::PropertyIdSequence();
     }
 
 }// namespace bsc

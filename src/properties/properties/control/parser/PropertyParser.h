@@ -12,7 +12,7 @@
 namespace bsc {
     class PropertyParser {
     protected:
-        std::recursive_mutex mutex;
+        mutable std::recursive_mutex mutex;
 
     public:
 
@@ -41,13 +41,19 @@ namespace bsc {
          * returns the type of the node
          * @return type of the current node
          */
-        virtual PropertyNodeType getNodeType() = 0;
+        virtual PropertyNodeType getNodeType() const = 0;
 
         /**
          * return string value of the current node - if that node is scalar, otherwise throws exception
          * @return value of the current node
          */
-        virtual PropertyValueType getValue() = 0;
+        virtual PropertyValueType getValue() const = 0;
+
+        /**
+         * returns current id sequence as set by selectNode
+         * @return
+         */
+        virtual PropertyIdSequence getCurrentIdSequence() const = 0;
 
         /**
          * gets value of the node chosen by the sequence. does not alter the currently selected node

@@ -13,6 +13,8 @@ namespace bsc {
     using PropertyIdType     = std::string;
     using PropertyIdSequence = std::vector<PropertyIdType>;
     using PropertyValueType  = std::string;
+    template<typename T>
+    using PropertyValuePtr = std::shared_ptr<T>;
 
     constexpr char propertyDelimiter = '.';
 

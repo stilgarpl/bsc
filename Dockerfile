@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:21.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -10,13 +10,13 @@ RUN apt-get update \
     make \
     clang \
     cmake \
-    g++-10 \
+    g++-11 \
     rsync \
     python3-pip \
-  && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100 \
-  && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-10 100 \
-  && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 \
-  && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-10 100 \
+  && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 100 \
+  && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-11 100 \
+  && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 \
+  && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-11 100 \
   && apt-get clean autoclean \
   && apt-get autoremove --yes \
   && rm -rf /var/lib/{apt,dpkg,cache,log}
@@ -45,7 +45,7 @@ RUN conan config init
 RUN conan profile update settings.compiler.libcxx=libstdc++11 default
 RUN pip3 install virtualenv
 COPY conan/conanfile.txt .
-RUN conan install . -s build_type=Debug -s compiler=gcc -s compiler.version=10 -s compiler.libcxx=libstdc++11 -g=cmake --build missing
-RUN conan install . -s build_type=Release -s compiler=gcc -s compiler.version=10 -s compiler.libcxx=libstdc++11 -g=cmake --build missing
+RUN conan install . -s build_type=Debug -s compiler=gcc -s compiler.version=11 -s compiler.libcxx=libstdc++11 -g=cmake --build missing
+RUN conan install . -s build_type=Release -s compiler=gcc -s compiler.version=11 -s compiler.libcxx=libstdc++11 -g=cmake --build missing
 USER root
 CMD ["/usr/sbin/sshd", "-D", "-e", "-f", "/etc/ssh/sshd_config_test_bsc"]

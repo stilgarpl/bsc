@@ -7,12 +7,11 @@
 #include <properties/PropertyContext.h>
 
 namespace bsc {
+    //@todo better locking of both writer and parser. maybe lock whole context instead?
     PropertyController::PropertyController()
-        : propertyContext(Context::getActiveContext()->get<PropertyContext>()), parserGuard(propertyContext.getPropertyParser().mutex) {
-        propertyContext.push();
+        : propertyContext(Context::getActiveContext()->get<PropertyContext>()), propertyGuard(propertyContext.mutex), contextKeeper(propertyContext) {
+
     }
-    PropertyController::~PropertyController() {
-        propertyContext.pop();
-    }
+
 
 }// namespace bsc

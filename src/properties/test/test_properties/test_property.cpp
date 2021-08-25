@@ -19,11 +19,7 @@ struct IProp {
     int a = Property<"a">();
 };
 
-struct NestedProp : PropertyPrefix<"testOuter"> {
-    int inner = Property<"testInner">();
-};
-
-struct NestedProp2 {
+struct NestedProp {
     int inner = Property<"testInner2">();
 };
 
@@ -40,7 +36,7 @@ struct FullProp {
     int test  = Property<"test">();
     int test5 = Property<"test5">();
 //    NestedProp testOuter1; @todo this does not work yet, it doesn't restore stack to before PropertyPrefix
-    Property<"testOuter2", NestedProp2> testOuter2;
+    Property<"testOuter2", NestedProp> testOuter2;
     std::string stringTest = Property<"stringTest">();
     Property<"sequence", std::list<IProp>> sequence;
 };
@@ -171,11 +167,6 @@ TEST_CASE("Property text test") {
                 REQUIRE(item == 5 - count);
                 count++;
             }
-        }
-
-        SECTION("Nested property with prefix") {
-            NestedProp nestedProp{};
-            REQUIRE(nestedProp.inner == 88);
         }
 
         SECTION("Full property mapping test") {

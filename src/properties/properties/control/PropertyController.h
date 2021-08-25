@@ -6,17 +6,19 @@
 #define BSC_PROPERTYCONTROLLER_H
 
 #include "properties/control/parser/PropertyParser.h"
+#include "properties/control/writer/PropertyWriter.h"
 #include <properties/PropertyContext.h>
 namespace bsc {
-    class PropertyController {
+    class PropertyController final {
         PropertyContext& propertyContext;
-        const std::lock_guard<decltype(PropertyParser::mutex)> parserGuard;
+        const std::scoped_lock<decltype(PropertyContext::mutex)> propertyGuard;
+        PropertyStackKeeper<PropertyContext> contextKeeper;
 
     public:
         PropertyController();
-        virtual ~PropertyController();
         auto& parser() { return propertyContext.getPropertyParser(); }
         auto& configuration() {return propertyContext.getPropertyConfiguration();}
+        auto& context() { return propertyContext;};
     };
 
 
