@@ -11,7 +11,7 @@
 namespace bsc {
     class PropertyWriter {
     protected:
-        std::recursive_mutex mutex;
+        mutable std::recursive_mutex mutex;
     public:
         /**
          * resets selected node to root node

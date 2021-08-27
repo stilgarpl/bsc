@@ -12,7 +12,7 @@ namespace bsc {
         Context::Ptr context;
 
     public:
-        PropertyLoader();
+        PropertyLoader(std::initializer_list<PropertySetting> settings);
         virtual ~PropertyLoader();
         void enableOptions(std::initializer_list<PropertySetting> settings);
         void disableOptions(std::initializer_list<PropertySetting> settings);

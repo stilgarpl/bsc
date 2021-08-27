@@ -10,7 +10,7 @@
 
 namespace bsc {
 
-    PropertyTextLoader::PropertyTextLoader(const std::string& text) {
+    PropertyTextLoader::PropertyTextLoader(const std::string& text, std::initializer_list<PropertySetting> settings) : PropertyLoader(settings){
         //@todo add support for other parser types -> factory like in other todos
         Context::getActiveContext()->get<PropertyContext>()->setPropertyParser<YamlParser>(text);
     }

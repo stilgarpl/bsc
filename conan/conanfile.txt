@@ -7,6 +7,7 @@ inja/3.0.0
 Exiv2/0.27@piponazo/stable
 yaml-cpp/0.6.3
 range-v3/0.11.0
+magic_enum/0.7.3
 
 [options]
 Poco:shared=False # False

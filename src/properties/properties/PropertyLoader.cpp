@@ -8,7 +8,7 @@
 
 namespace bsc {
     PropertyLoader::~PropertyLoader() { Context::getActiveContext()->get<PropertyContext>()->removePropertyParser(); }
-    PropertyLoader::PropertyLoader() {
+    PropertyLoader::PropertyLoader(std::initializer_list<PropertySetting> settings) {
         if (!Context::hasActiveContext() || !Context::getActiveContext()->has<PropertyContext>()) {
             Context::OwnPtr ownContext = Context::makeContext(true);
             context                    = ownContext;
@@ -19,6 +19,7 @@ namespace bsc {
         if (Context::getActiveContext()->get<PropertyContext>()->hasPropertyParser()) {
             throw PropertyContextAlreadyLoaded("Property context already loaded!");
         }
+        enableOptions(settings);
     }
     void PropertyLoader::enableOptions(std::initializer_list<PropertySetting> settings) {
         context->get<PropertyContext>()->enableConfigurations(settings);

@@ -8,6 +8,7 @@ namespace bsc {
     enum class PropertySetting {
         ignoreInvalidPropertyType,
         ignoreMissingProperty,
+        ignoreMissingFile,
         globalProperties,
     };
 }

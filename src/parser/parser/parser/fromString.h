@@ -6,19 +6,22 @@
 #define BSC_FROMSTRING_H
 
 #include <limits>
-#include <parser/configuration/ParserConfiguration.h>
 #include <parser/concepts/concepts.h>
+#include <parser/configuration/ParserConfiguration.h>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
+//@todo make it optional on cmake option to use magic_enum
+#include <magic_enum.hpp>
 
 namespace bsc {
 
     class StringParseException : public std::invalid_argument {
     public:
-        explicit StringParseException(const StringType& arg) : invalid_argument(arg) {}
+        explicit StringParseException(const StringType& arg) : invalid_argument(arg) {
+        }
     };
 
     class Parser {
@@ -26,14 +29,15 @@ namespace bsc {
         std::shared_ptr<ParserConfiguration> parserConfiguration = std::make_shared<ParserConfiguration>();
 
     public:
-        explicit Parser(const ParserConfiguration& parserConfiguration) : parserConfiguration(std::make_shared<ParserConfiguration>(parserConfiguration)) {}
+        explicit Parser(const ParserConfiguration& parserConfiguration)
+            : parserConfiguration(std::make_shared<ParserConfiguration>(parserConfiguration)) {
+        }
         Parser() = default;
 
     public:
         template<typename ParameterType>
         [[nodiscard]] std::remove_reference_t<ParameterType>
-        fromString(const StringType& value,
-                   std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) const  {
+        fromString(const StringType& value, std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) const {
             try {
                 return std::stol(value);
             } catch (std::invalid_argument& e) {
@@ -53,8 +57,18 @@ namespace bsc {
 
         template<typename ParameterType>
         [[nodiscard]] std::remove_reference_t<ParameterType>
-        fromString(const StringType& value,
-                   std::enable_if_t<std::is_convertible_v<ParameterType, StringType>, int> = 0) const {
+        fromString(const StringType& value, std::enable_if_t<std::is_enum_v<ParameterType>, int> = 0) const {
+            auto optionalEnum = magic_enum::enum_cast<ParameterType>(value);
+            if (optionalEnum) {
+                return *optionalEnum;
+            } else {
+                throw StringParseException("Enum parsing failed for value: " + value);
+            }
+        }
+
+        template<typename ParameterType>
+        [[nodiscard]] std::remove_reference_t<ParameterType>
+        fromString(const StringType& value, std::enable_if_t<std::is_convertible_v<ParameterType, StringType>, int> = 0) const {
             if (!value.empty()) {
                 return ParameterType(value);
             } else {
@@ -64,7 +78,7 @@ namespace bsc {
 
         template<typename ParameterType>
         [[nodiscard]] std::remove_reference_t<ParameterType> fromString(const StringType& value,
-                                                          int = 0) const requires IsPair<ParameterType> {
+                                                                        int = 0) const requires IsPair<ParameterType> {
             try {
 
                 std::stringstream inputStream(value);
@@ -95,12 +109,12 @@ namespace bsc {
     };
 
     template<>
-    [[nodiscard]] inline bool Parser::fromString<bool>(const StringType& value, int)const {
+    [[nodiscard]] inline bool Parser::fromString<bool>(const StringType& value, int) const {
         return true;
     }
 
     template<>
-    [[nodiscard]] inline int Parser::fromString<int>(const StringType& value, int) const{
+    [[nodiscard]] inline int Parser::fromString<int>(const StringType& value, int) const {
         try {
             return std::stoi(value);
         } catch (std::invalid_argument& e) {
@@ -109,7 +123,7 @@ namespace bsc {
     }
 
     template<>
-    [[nodiscard]] inline long Parser::fromString<long>(const StringType& value, int)const {
+    [[nodiscard]] inline long Parser::fromString<long>(const StringType& value, int) const {
         try {
             return std::stol(value);
         } catch (std::invalid_argument& e) {
@@ -118,7 +132,7 @@ namespace bsc {
     }
 
     template<>
-    [[nodiscard]] inline unsigned long Parser::fromString<unsigned long>(const StringType& value, int)const {
+    [[nodiscard]] inline unsigned long Parser::fromString<unsigned long>(const StringType& value, int) const {
         try {
             return std::stoul(value);
         } catch (std::invalid_argument& e) {
@@ -127,7 +141,7 @@ namespace bsc {
     }
 
     template<>
-    [[nodiscard]] inline float Parser::fromString<float>(const StringType& value, int) const{
+    [[nodiscard]] inline float Parser::fromString<float>(const StringType& value, int) const {
         try {
             return std::stof(value);
         } catch (std::invalid_argument& e) {
@@ -136,7 +150,7 @@ namespace bsc {
     }
 
     template<>
-    [[nodiscard]] inline double Parser::fromString<double>(const StringType& value, int) const{
+    [[nodiscard]] inline double Parser::fromString<double>(const StringType& value, int) const {
         try {
             return std::stod(value);
         } catch (std::invalid_argument& e) {
@@ -160,7 +174,7 @@ namespace bsc {
     }
 
     template<typename T>
-    concept ParsedFromString = requires(Parser parser, std::string s) {
+    concept ParsedFromString = requires(const Parser& parser, const std::string& s) {
         parser.fromString<T>(s);
     };
 

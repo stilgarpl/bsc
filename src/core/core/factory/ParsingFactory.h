@@ -11,6 +11,7 @@
 #include <parser/cast/templateCast.h>
 #include <set>
 #include <vector>
+#include <magic_enum.hpp>
 namespace bsc {
 
     template<typename ProducedObjectType, typename FactorySpecialization = NoFactorySpecialization>
@@ -34,6 +35,8 @@ namespace bsc {
             if constexpr (std::is_convertible_v<SelectorType, std::string>) {
                 //@todo right error message
                 throw FactoryInvalidSelector(selector);
+            } else if constexpr (std::is_enum_v<SelectorType>) {
+                throw FactoryInvalidSelector(std::string(magic_enum::enum_name(selector)));
             } else {
                 throw FactoryInvalidSelector(std::to_string(selector));
             }

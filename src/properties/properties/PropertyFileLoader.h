@@ -12,7 +12,7 @@ namespace bsc {
     class PropertyFileLoader final : PropertyLoader {
 
     public:
-        PropertyFileLoader(const fs::path& path);
+        PropertyFileLoader(const fs::path& path, std::initializer_list<PropertySetting> settings = {});
     };
 }// namespace bsc
 

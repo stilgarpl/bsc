@@ -3,7 +3,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options(-Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic -Wno-unused-but-set-variable)
     if (UNIX)
         message("GCC on Linux")
-        add_compile_options(-pthread -fconcepts)
+        add_compile_options(-pthread -fconcepts -fconcepts-diagnostics-depth=3)
         add_link_options(-lpthread)
     endif ()
 

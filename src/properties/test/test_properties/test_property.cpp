@@ -76,6 +76,11 @@ public:
 };
 
 
+enum class EnumProperty {
+    one,
+    two,
+    three,
+};
 
 
 TEST_CASE("Property text test") {
@@ -87,6 +92,7 @@ TEST_CASE("Property text test") {
                                   "testOuter2:\n"
                                   "  testInner2: 99\n"
                                   "stringTest: string is with spaces\n"
+                                  "enumProperty: two\n"
                                   "intSequence:\n"
                                   "  - 5\n"
                                   "  - 4\n"
@@ -176,6 +182,13 @@ TEST_CASE("Property text test") {
 //            REQUIRE(fullProp.testOuter1.inner == 9999999);
             REQUIRE(fullProp.testOuter2().inner == 99);
             REQUIRE(fullProp.stringTest == "string is with spaces");
+        }
+
+        SECTION("Enum property") {
+            Property<"enumProperty",EnumProperty> enumProperty;
+            REQUIRE(enumProperty.getPropertyName() == "enumProperty");
+            REQUIRE(enumProperty.getValue() == EnumProperty::two);
+
         }
     }
 
@@ -314,7 +327,9 @@ TEST_CASE("Write properties to yaml") {
     YamlWriter yamlWriter;
     PropertySequencer propertySequencer(yamlWriter);
     propertySequencer(intProperty,floatProperty,stringProperty, listProperty, intVecProperty, defaultProp);
-    auto result = yamlWriter.writeToString();
+    std::stringstream output;
+    output << yamlWriter;
+    auto result = output.str();
     //then
     REQUIRE(result == expectedResult);
 }
@@ -457,7 +472,9 @@ TEST_CASE("Writable properties") {
     SECTION("Yaml write") {
         YamlWriter writer;
         writer << allProperties;
-        auto result = writer.writeToString();
+        std::stringstream ss;
+        ss << writer;
+        auto result = ss.str();
         auto expectedResult = "value:\n"
                               "  int: 5\n"
                               "  float: 2.000000\n"

@@ -55,6 +55,9 @@ namespace bsc {
     concept IsString = std::is_convertible_v<T, std::string>;
 
     template<typename T>
+    concept IsEnum = std::is_enum_v<T>;
+
+    template<typename T>
     concept IsStringView = std::is_same_v<T, std::string_view>;
 
     template<typename T>

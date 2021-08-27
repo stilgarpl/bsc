@@ -62,10 +62,10 @@ namespace bsc {
                 } catch (const PathTranslationException& e) {
                     //@todo maybe better error handling?
                     FileSortingException exception("Path transforming failed: "s + e.what(), file);
-                    actions.errorHandlerStrategy(file, exception, sortResult.failedFilesList);
+                    actions.errorHandlerStrategy(exception, sortResult.failedFilesList);
                 } catch (const FileSortingException& e) {
                     FileSortingException exception(e.what(), file, e.getDestinationPath());
-                    actions.errorHandlerStrategy(file, exception, sortResult.failedFilesList);
+                    actions.errorHandlerStrategy(exception, sortResult.failedFilesList);
                 }
             }
         } catch (const FileSortingException& e) {

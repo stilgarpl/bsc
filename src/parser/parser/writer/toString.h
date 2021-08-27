@@ -6,7 +6,7 @@
 #define BSC_TOSTRING_H
 #include <parser/concepts/concepts.h>
 #include <parser/configuration/ParserConfiguration.h>
-
+#include <magic_enum.hpp>
 namespace bsc {
 
     class Writer {
@@ -33,6 +33,10 @@ namespace bsc {
             return static_cast<StringType>(t);
         }
 
+        template<IsEnum T>
+        StringType toString(T t) const {
+            return static_cast<StringType>(magic_enum::enum_name(t));
+        }
     };
 
 }

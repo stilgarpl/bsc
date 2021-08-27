@@ -14,7 +14,7 @@ namespace bsc {
     class PropertyTextLoader final : public PropertyLoader {
 
     public:
-        PropertyTextLoader(const std::string& text);
+        PropertyTextLoader(const std::string& text, std::initializer_list<PropertySetting> settings = {});
     };
 }// namespace bsc
 

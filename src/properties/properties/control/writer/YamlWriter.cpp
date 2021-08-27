@@ -79,7 +79,7 @@ namespace bsc {
         return nodeType;
 
     }
-    std::string YamlWriter::writeToString() {
+    std::string YamlWriter::writeToString() const {
         std::lock_guard g(mutex);
         YAML::Emitter out;
         out << root;

@@ -15,6 +15,8 @@
 #include <set>
 #include <span>
 #include <utility>
+#include <range/v3/to_container.hpp>
+#include <ranges>
 
 namespace bsc {
 
@@ -174,8 +176,8 @@ namespace bsc {
         const Parser parser{};
 
     public:
-        CommandLineParser(ParseConfiguration parseConfiguration, const Parser& parser)
-            : parseConfiguration(parseConfiguration), parser(parser) {}
+        CommandLineParser(ParseConfiguration parseConfiguration, Parser  parser)
+            : parseConfiguration(parseConfiguration), parser(std::move(parser)) {}
         CommandLineParser() = default;
 
         template<ParametersClass T>
@@ -302,7 +304,15 @@ namespace bsc {
 
     protected:
         void setValue(const T& v) { value = v; }
-
+        static auto makeDefaultAllowedValues() {
+            if constexpr (std::is_enum_v<T>) {
+                return AllowedValues(magic_enum::enum_values<T>() | std::views::transform([](auto& i){
+                                         return std::string(magic_enum::enum_name(i));
+                                     }) | ranges::to<typename AllowedValues::AllowedValuesSet>());
+            } else {
+                return AllowedValues{};
+            }
+        }
     public:
         //@todo maybe I should add callback here that will be called after this value is set?
         struct BaseParameterDefinition {
@@ -313,7 +323,8 @@ namespace bsc {
             bool optional = false;
             bool hidden   = false;
             std::optional<T> defaultValue{};
-            AllowedValues allowedValues{};
+            AllowedValues allowedValues = makeDefaultAllowedValues();
+
         };
 
         BaseParameter(BaseParameterDefinition def) : allowedValues(def.allowedValues) {
@@ -343,7 +354,7 @@ namespace bsc {
             std::optional<std::string_view> argumentName{};
             std::optional<std::string_view> doc{};
             std::optional<T> defaultValue{};
-            AllowedValues allowedValues{};
+            AllowedValues allowedValues = BaseParameter<T>::makeDefaultAllowedValues();
         };
 
         Parameter(ParameterDefinition def)// NOLINT
@@ -366,7 +377,7 @@ namespace bsc {
             std::optional<std::string_view> argumentName{};
             std::optional<std::string_view> doc{};
             T defaultValue{};
-            AllowedValues allowedValues{};
+            AllowedValues allowedValues = BaseParameter<T>::makeDefaultAllowedValues();
         };
 
         DefaultParameter(DefaultParameterDefinition def)// NOLINT

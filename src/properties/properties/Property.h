@@ -163,6 +163,13 @@ namespace bsc {
             return *value;
         }
 
+        auto& getValue() requires detail::IsNotDirect<T> {
+            if (!hasValue()) {
+                throw InvalidPropertyKeyException("Property key: " + propertyId + " does not exist and default value was not provided.");
+            }
+            return *value;
+        }
+
         auto* operator->() requires detail::IsNotDirect<T> {
             if (!hasValue()) {
                 throw InvalidPropertyKeyException("Property key: " + propertyId + " does not exist and default value was not provided.");
@@ -214,6 +221,10 @@ namespace bsc {
         }
 
         const auto& operator()() const {
+            return getValue();
+        }
+
+        auto& operator()()  {
             return getValue();
         }
 

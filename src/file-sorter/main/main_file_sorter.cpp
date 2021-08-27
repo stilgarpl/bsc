@@ -2,6 +2,7 @@
 // Created by Krzysztof Tulidowicz on 22.04.2020.
 //
 #include <filesystem>
+#include <fstream>
 #include <io/sorter/FileSorter.h>
 #include <io/sorter/fetchers/FileListFetcher.h>
 #include <io/sorter/fetchers/FilesystemFileListFetcher.h>
@@ -9,35 +10,15 @@
 #include <io/sorter/mappers/FileSorterNameMatcher.h>
 #include <io/sorter/strategies/StandardFileSorterStrategies.h>
 #include <parser/parameters/CommandLineParameters.h>
+#include <properties/PropertyFileLoader.h>
+#include <properties/control/writer/YamlWriter.h>
 #include <string>
 using namespace bsc;
 using namespace std::string_literals;
 
-auto makeActionFactory() {
-    static FileSortingStrategyFactories::SortStrategyFactory actionFactory;
-    actionFactory.registerCreator("copy", StandardFileSorterSortStrategies::copy);
-    actionFactory.registerCreator("move", StandardFileSorterSortStrategies::move);
-    actionFactory.registerCreator("pretend", StandardFileSorterSortStrategies::pretend);
-    return actionFactory;
-}
-
-auto makeErrorActionFactory() {
-    static FileSortingStrategyFactories::ErrorActionFactory errorActionFactory;
-    errorActionFactory.registerCreator("ignore", StandardFileSorterErrorHandlers::ignore);
-    errorActionFactory.registerCreator("continue", StandardFileSorterErrorHandlers::logAndContinue);
-    errorActionFactory.registerCreator("stop", StandardFileSorterErrorHandlers::stop);
-    return errorActionFactory;
-}
-
-auto makeFileExistsFactory() {
-    static FileSortingStrategyFactories::CreateValidTargetPathStrategyFactory fileExistsFactory;
-    fileExistsFactory.registerCreator("overwrite", StandardCreateValidTargetPathStrategies::overwrite);
-    fileExistsFactory.registerCreator("skip", StandardCreateValidTargetPathStrategies::skip);
-    fileExistsFactory.registerCreator("abort", StandardCreateValidTargetPathStrategies::abort);
-    //@todo maybe rename should be renamed to "addSuffix", because that's what it does. rename could be added as search-and-replace regex
-    fileExistsFactory.registerCreator("rename", StandardCreateValidTargetPathStrategies::rename);
-    return fileExistsFactory;
-}
+#include "../properties/Actions.h"
+#include "../properties/Factories.h"
+#include "../properties/FileSorterMapperProperties.h"
 
 int main(int argc, char* argv[]) {
     auto context = Context::makeContext();
@@ -52,12 +33,11 @@ int main(int argc, char* argv[]) {
                 {.shortKey = 'm', .longKey = "mime", .argumentName = "mimetype=PATTERN", .doc = "Pair of mime type and path pattern"}};
         DefaultParameter<std::map<std::string, std::string>> nameMatchers = {
                 {.shortKey = 'n', .longKey = "name", .argumentName = "regex=PATTERN", .doc = "Pair of filename regex and path pattern"}};
-        DefaultParameter<std::string> action       = {{.shortKey      = 'a',
+        DefaultParameter<SortAction> action       = {{.shortKey      = 'a',
                                                  .longKey       = "action",
                                                  .argumentName  = "ACTION",
                                                  .doc           = "Action to perform on files\nAvailable actions:\ncopy *\nmove\npretend",
-                                                 .defaultValue  = "copy",
-                                                 .allowedValues = actionFactory.getSelectors()}};
+                                                 .defaultValue  = SortAction::copy}};
         DefaultParameter<std::string> errorHandler = {{.shortKey     = 'e',
                                                        .longKey      = "error",
                                                        .argumentName = "ERROR HANDLER",
@@ -77,21 +57,53 @@ int main(int argc, char* argv[]) {
                                                         .defaultValue = " ({})"}};
         DefaultParameter<bool> recursive            = {
                 {.shortKey = 'r', .longKey = "recursive", .doc = "Sort directories recursively", .defaultValue = false}};
+        Parameter<fs::path> config = {{.shortKey = 'c', .longKey = "config", .argumentName = "PATH", .doc = "Configuration file location (load)"}};
+        Parameter<fs::path> saveConfig = {{.shortKey = 'C', .longKey = "save", .argumentName = "PATH", .doc = "Configuration file location (save)"}};
     };
 
+
     const auto& parameters = CommandLineParser::defaultParse<FileSorterParameters>(argc, argv);
+
+    fs::path configPath = parameters.config().has_value() ? parameters.config().value() : "";
+    bsc::PropertyFileLoader propertyLoader(configPath,{PropertySetting::ignoreMissingFile, PropertySetting::ignoreMissingProperty});
+
+    FileSorterProperties fileSorterProperties;
+
     auto fetcher = FileListFetcher(bsc::fetchers::filesystemFileListFetcher, FetcherConfig{.recursive = parameters.recursive()}, {});
     FileSorter fileSorter(fetcher,
                           {.sortStrategy                  = actionFactory.create(parameters.action()),
                            .createValidTargetPathStrategy = fileExistsFactory.create(parameters.fileExists(), {parameters.renamePattern()}),
                            .errorHandlerStrategy          = errorActionFactory.create(parameters.errorHandler()),
                            .fileExistsPredicate           = StandardFileSorterPredicates::fileExistsPredicate});
-    for (MimeFileTypeFactory factory{}; const auto& [mime, pattern] : parameters.mimeMatchers()) {
-        fileSorter.addPattern(matchers::fileSorterMimeMatcher(factory.create(mime)), pattern);
+
+    for (const auto& [mime, pattern] : parameters.mimeMatchers()) {
+        fileSorterProperties.addOrUpdateRule(MapperType::mime,mime, pattern, parameters.action(), parameters.errorHandler(), parameters.fileExists());
     }
+
     for (const auto& [name, pattern] : parameters.nameMatchers()) {
-        fileSorter.addPattern(matchers::fileSorterNameMatcher(name), pattern);
+        fileSorterProperties.addOrUpdateRule(MapperType::regex,name, pattern, parameters.action(), parameters.errorHandler(), parameters.fileExists());
     }
+
+    for (MimeFileTypeFactory factory{}; const auto& item : fileSorterProperties.rules()) {
+        switch (item.type()) {
+
+            case MapperType::regex:
+                fileSorter.addPattern(matchers::fileSorterNameMatcher(item.match()), item.pattern());
+                break;
+            case MapperType::mime:
+                fileSorter.addPattern(matchers::fileSorterMimeMatcher(factory.create(item.match())), item.pattern());
+                break;
+        }
+    }
+
+    if (parameters.saveConfig()) {
+        fs::path savePath = parameters.saveConfig().value();
+        std::ofstream out(savePath);
+        YamlWriter writer;
+        writer << fileSorterProperties;
+        out << writer << std::endl;
+    }
+
     fileSorter.sort(parameters.targetPaths()) | StandardResultConsumers::printResult;
     return 0;
 }

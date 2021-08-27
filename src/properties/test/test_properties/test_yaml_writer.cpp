@@ -15,7 +15,9 @@ TEST_CASE("Yaml writer test") {
 
     writer.selectNode({"a", "b"});
     writer.setValue("value");
-    auto result = writer.writeToString();
+    std::stringstream ss;
+    ss << writer;
+    auto result = ss.str();
 
     REQUIRE(!result.empty());
     REQUIRE(result == "a:\n  b: value");

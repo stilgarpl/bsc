@@ -6,7 +6,7 @@
 #include <properties/control/parser/YamlParser.h>
 
 namespace bsc {
-    PropertyEmptyLoader::PropertyEmptyLoader() {
+    PropertyEmptyLoader::PropertyEmptyLoader() : PropertyLoader({}) {
         using namespace std::string_literals;
         Context::getActiveContext()->get<PropertyContext>()->setPropertyParser<YamlParser>(""s);
     }

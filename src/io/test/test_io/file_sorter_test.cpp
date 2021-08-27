@@ -63,15 +63,15 @@ TEST_CASE("Sort error strategies test") {
     const FileSortingException exception("Exception", file);
     std::list<SortFailure> failures;
     SECTION("ignore strategy") {
-        REQUIRE_NOTHROW(StandardFileSorterErrorHandlers::ignore(file, exception, failures));
+        REQUIRE_NOTHROW(StandardFileSorterErrorHandlers::ignore(exception, failures));
         REQUIRE(failures.empty());
     }
     SECTION("continue strategy") {
-        REQUIRE_NOTHROW(StandardFileSorterErrorHandlers::logAndContinue(file, exception, failures));
+        REQUIRE_NOTHROW(StandardFileSorterErrorHandlers::logAndContinue(exception, failures));
         REQUIRE(!failures.empty());
     }
     SECTION("stop strategy") {
-        REQUIRE_THROWS_AS(StandardFileSorterErrorHandlers::stop(file, exception, failures), FileSortingException);
+        REQUIRE_THROWS_AS(StandardFileSorterErrorHandlers::stop(exception, failures), FileSortingException);
         REQUIRE(!failures.empty());
     }
 }

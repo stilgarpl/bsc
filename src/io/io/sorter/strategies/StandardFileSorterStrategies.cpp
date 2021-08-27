@@ -105,20 +105,20 @@ namespace bsc {
             PretendFileExistsPredicate();
 
     FileSortingStrategies::ErrorHandlingStrategy StandardFileSorterErrorHandlers::ignore =
-            [](const fs::path& from, const std::exception& exception, std::list<SortFailure>& sortFailure) {
-                logger.error("Failed processing " + from.string() + " exception: " + exception.what());
+            [](const FileSortingException& exception, std::list<SortFailure>& sortFailure) {
+                logger.error("Failed processing " + exception.getSourcePath().string() + " exception: " + exception.what());
             };
 
     FileSortingStrategies::ErrorHandlingStrategy StandardFileSorterErrorHandlers::logAndContinue =
-            [](const fs::path& from, const FileSortingException& exception, std::list<SortFailure>& sortFailure) {
-        sortFailure.push_back({.sourcePath = from, .destinationPath = exception.getDestinationPath(), .errorMessage = exception.what()});
-        logger.error("Failed processing " + from.string() + " exception: " + exception.what());
+            [](const FileSortingException& exception, std::list<SortFailure>& sortFailure) {
+        sortFailure.push_back({.sourcePath = exception.getSourcePath(), .destinationPath = exception.getDestinationPath(), .errorMessage = exception.what()});
+        logger.error("Failed processing " + exception.getSourcePath().string() + " exception: " + exception.what());
     };
 
     FileSortingStrategies::ErrorHandlingStrategy StandardFileSorterErrorHandlers::stop =
-            [](const fs::path& from, const FileSortingException& exception, std::list<SortFailure>& sortFailure) {
-        sortFailure.push_back({.sourcePath = from, .destinationPath = exception.getDestinationPath(), .errorMessage = exception.what()});
-        logger.error("Failed processing " + from.string() + " exception: " + exception.what());
+            [](const FileSortingException& exception, std::list<SortFailure>& sortFailure) {
+        sortFailure.push_back({.sourcePath = exception.getSourcePath(), .destinationPath = exception.getDestinationPath(), .errorMessage = exception.what()});
+        logger.error("Failed processing " + exception.getSourcePath().string() + " exception: " + exception.what());
         throw exception;
     };
 }// namespace bsc

@@ -26,6 +26,7 @@ namespace bsc {
         //@todo this path is stored for debug and exception purposes. maybe it could be optimized ?
         std::string currentPath = {};
         bool isNodeNull();
+        std::string writeToString() const;
     public:
         void resetNode() override;
         void selectNode(const PropertyIdSequence& propertyId) override;
@@ -35,9 +36,14 @@ namespace bsc {
         void nextEntry() override;
         PropertyNodeType getNodeType() override;
 
-        std::string writeToString();
+
         YamlWriter();
         void setNodeType(PropertyNodeType propertyNodeType) override;
+
+        friend std::ostream& operator<<(std::ostream& os, const YamlWriter& dt) {
+            os << dt.writeToString();
+            return os;
+        }
     };
 }
 #endif// BSC_YAMLWRITER_H
