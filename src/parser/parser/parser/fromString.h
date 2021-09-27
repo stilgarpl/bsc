@@ -39,7 +39,7 @@ namespace bsc {
         [[nodiscard]] std::remove_reference_t<ParameterType>
         fromString(const StringType& value, std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) const {
             try {
-                return std::stol(value);
+                return std::stoll(value);
             } catch (std::invalid_argument& e) {
                 throw StringParseException("Long parsing failed for value: " + value);
             }

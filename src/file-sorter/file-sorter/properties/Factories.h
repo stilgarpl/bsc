@@ -4,7 +4,7 @@
 #ifndef BSC_FACTORIES_H
 #define BSC_FACTORIES_H
 
-#include <io/sorter/strategies/Strategies.h>
+#include "io/sorter/strategies/Strategies.h"
 
 namespace bsc {
     template<>

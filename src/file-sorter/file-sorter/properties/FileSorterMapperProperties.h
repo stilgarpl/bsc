@@ -5,6 +5,7 @@
 #define BSC_FILESORTERMAPPERPROPERTIES_H
 
 #include "Actions.h"
+#include "io/sorter/mappers/FileSorterMapperMatcher.h"
 #include <list>
 #include <properties/Property.h>
 #include <properties/PropertySequencer.h>
@@ -14,6 +15,8 @@ namespace bsc {
     enum class MapperType {
         regex,
         mime,
+        size,
+        date,
     };
 
     struct ActionProperties : BasePropertyClass {
@@ -27,6 +30,7 @@ namespace bsc {
     struct FileSorterMapperProperties : BasePropertyClass{
         Property<"type", MapperType> type;
         Property<"match", std::string> match{};
+        Property<"mode", MapperMatcherMode> mode = {MapperMatcherMode::none};
         Property<"pattern", std::string> pattern{};
         Property<"on", ActionProperties> actions{};
         void write(PropertySequencer& sequencer) const override;
@@ -35,7 +39,7 @@ namespace bsc {
     struct FileSorterProperties : BasePropertyClass{
         Property<"rules", std::list<FileSorterMapperProperties>> rules{};
         Property<"version", std::string > version{"0.1"};
-        void addOrUpdateRule(MapperType mapper, std::string match, std::string pattern, SortAction sort, std::string errorAction, std::string fileExists);
+        void addOrUpdateRule(MapperType mapper, std::string match, std::string pattern, MapperMatcherMode mode, SortAction sort, std::string errorAction, std::string fileExists);
         void write(PropertySequencer& sequencer) const override;
     };
 }// namespace bsc

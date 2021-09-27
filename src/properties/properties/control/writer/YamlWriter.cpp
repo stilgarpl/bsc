@@ -87,7 +87,7 @@ namespace bsc {
     }
     bool YamlWriter::isNodeNull() {
         std::lock_guard g(mutex);
-        return *current;
+        return static_cast<bool>(*current);
     }
     YamlWriter::YamlWriter() {
         YamlWriter::resetNode();

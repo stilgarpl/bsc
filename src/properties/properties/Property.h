@@ -26,7 +26,7 @@ namespace bsc {
     template<typename T>
     concept PropertyContainer = IsContainerNotString<T>;
 
-    namespace detail{
+    namespace detail {
         struct PropertyAccessor;
     }
 
@@ -49,15 +49,13 @@ namespace bsc {
             if (context.getPropertyConfiguration() == PropertySetting::globalProperties) {
                 //@todo implement global property storage
                 return std::make_shared<T>(t);
-//                return context.template makePropertyPtr<T>();
+                //                return context.template makePropertyPtr<T>();
             } else {
                 return std::make_shared<T>(t);
             }
         }
 
     public:
-
-
         [[nodiscard]] bool hasValue() const {
             return value || directValue.has_value();
         }
@@ -66,9 +64,9 @@ namespace bsc {
             return propertyId;
         }
 
-        explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyValue<T> {
+        Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyValue<T> {
             PropertyController controller;
-            auto& parser = controller.parser();
+            auto& parser        = controller.parser();
             auto& configuration = controller.configuration();
             using enum PropertySetting;
             switch (parser.getNodeType(idSequence)) {
@@ -102,16 +100,16 @@ namespace bsc {
             }
         }
 
-        explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyClass<T> {
+        Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyClass<T> {
             PropertyController controller;
             auto& parser = controller.parser();
             parser.selectNode(idSequence);
             value = makeValue({});// it should create itself
         }
 
-        explicit Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyContainer<T> {
+        Property(const std::optional<T>& defaultValue) requires detail::IsNotDirect<T> && PropertyContainer<T> {
             PropertyController controller;
-            auto& parser = controller.parser();
+            auto& parser        = controller.parser();
             auto& configuration = controller.configuration();
             parser.selectNode(idSequence);
             if (parser.getNodeType() != PropertyNodeType::sequence) {
@@ -140,7 +138,7 @@ namespace bsc {
             }
         }
 
-        explicit Property(const std::any& defaultValue) requires detail::IsDirect<T> {
+        Property(const std::any& defaultValue) requires detail::IsDirect<T> {
             PropertyController controller;
             if (controller.parser().getNodeType(idSequence) == PropertyNodeType::scalar) {
                 value = makeValue(detail::DirectPropertyMapper{.value = controller.parser().getValue(idSequence)});
@@ -224,7 +222,7 @@ namespace bsc {
             return getValue();
         }
 
-        auto& operator()()  {
+        auto& operator()() {
             return getValue();
         }
 
@@ -243,16 +241,16 @@ namespace bsc {
     namespace detail {
         struct PropertyAccessor {
             template<detail::StringLiteral lit, typename T>
-            static auto& getSequenceId(const Property<lit,T>& property) {
+            static auto& getSequenceId(const Property<lit, T>& property) {
                 return property.idSequence;
             }
 
             template<detail::StringLiteral lit, typename T>
-            static auto& getToStringWriter(const Property<lit,T>& property) {
+            static auto& getToStringWriter(const Property<lit, T>& property) {
                 return property.toStringWriter;
             }
         };
-    }
+    }// namespace detail
 
     template<typename T>
     struct IsPropertyT : std::false_type {};
@@ -266,7 +264,8 @@ namespace bsc {
     concept IsProperty = IsPropertyT<T>::value;
 
     template<detail::StringLiteral lit, typename T>
-    PropertyWriter& operator<<(PropertyWriter& writer, const Property<lit, T>& property) requires detail::IsNotDirect<T> && PropertyContainer<T> {
+    PropertyWriter& operator<<(PropertyWriter& writer,
+                               const Property<lit, T>& property) requires detail::IsNotDirect<T> && PropertyContainer<T> {
         PropertyStackKeeper stackKeeper(writer);
         writer.selectNode(detail::PropertyAccessor::getSequenceId(property));
         writer.setNodeType(PropertyNodeType::sequence);
@@ -287,7 +286,8 @@ namespace bsc {
     }
 
     template<detail::StringLiteral lit, typename T>
-    PropertyWriter& operator<<(PropertyWriter& writer, const Property<lit, T>& property) requires detail::IsNotDirect<T> && PropertyValue<T> {
+    PropertyWriter& operator<<(PropertyWriter& writer,
+                               const Property<lit, T>& property) requires detail::IsNotDirect<T> && PropertyValue<T> {
         PropertyStackKeeper stackKeeper(writer);
         writer.selectNode(detail::PropertyAccessor::getSequenceId(property));
         writer.setValue(detail::PropertyAccessor::getToStringWriter(property).template toString(property.getValue()));
@@ -295,7 +295,9 @@ namespace bsc {
     }
 
     template<detail::StringLiteral lit, typename T>
-    PropertyWriter& operator<<(PropertyWriter& writer, const Property<lit, T>& property) requires detail::IsNotDirect<T> && PropertyClass<T> && IsWritablePropertyClass<T> {
+    PropertyWriter&
+    operator<<(PropertyWriter& writer,
+               const Property<lit, T>& property) requires detail::IsNotDirect<T> && PropertyClass<T> && IsWritablePropertyClass<T> {
         PropertyStackKeeper stackKeeper(writer);
         writer.selectNode(detail::PropertyAccessor::getSequenceId(property));
         PropertySequencer sequencer(writer);

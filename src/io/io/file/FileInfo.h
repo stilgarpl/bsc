@@ -10,6 +10,9 @@ namespace bsc {
     struct FileInfo {
         const MimeFileType mimeFileType;
         const fs::path path;
+        const std::uintmax_t fileSize;
+        const fs::file_status fileStatus;
+        const fs::file_time_type fileModificationTime;
     };
 }
 #endif// BSC_FILEINFO_H

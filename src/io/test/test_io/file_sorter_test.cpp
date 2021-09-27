@@ -2,6 +2,8 @@
 // Created by Krzysztof Tulidowicz on 20.04.2020.
 //
 
+#include "io/sorter/mappers/FileSorterDateMatcher.h"
+#include "io/sorter/mappers/FileSorterSizeMatcher.h"
 #include <catch2/catch.hpp>
 #include <io/file/FileInfoDecoder.h>
 #include <io/sorter/FileSorter.h>
@@ -189,6 +191,37 @@ TEST_CASE("Sort mapper matchers test") {
             auto expectedResult = MatchPrecision::perfect;
             auto nameMatcher    = matchers::fileSorterNameMatcher("(.)+\\.gif");
             auto result         = nameMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
+            REQUIRE(result == expectedResult);
+        }
+    }
+    SECTION("FileSorterSizeMatcher") {
+        SECTION("none") {
+            auto expectedResult = MatchPrecision::none;
+            auto sizeMatcher    = matchers::fileSorterSizeMatcher(1000, bsc::MapperMatcherMode::greater);
+            auto result         = sizeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
+            REQUIRE(result == expectedResult);
+        }
+        SECTION("perfect") {
+            auto expectedResult = MatchPrecision::perfect;
+            auto sizeMatcher    = matchers::fileSorterSizeMatcher(1000, bsc::MapperMatcherMode::less);
+            auto result         = sizeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
+            REQUIRE(result == expectedResult);
+        }
+    }
+    SECTION("FileSorterDateMatcher") {
+        using namespace std::chrono_literals;
+        auto actualFileDate = fs::last_write_time(path / filename);
+        auto dateInThePast = actualFileDate - 10min;
+        SECTION("none") {
+            auto expectedResult = MatchPrecision::none;
+            auto dateMatcher    = matchers::fileSorterDateMatcher(dateInThePast, bsc::MapperMatcherMode::less);
+            auto result         = dateMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
+            REQUIRE(result == expectedResult);
+        }
+        SECTION("perfect") {
+            auto expectedResult = MatchPrecision::perfect;
+            auto dateMatcher    = matchers::fileSorterDateMatcher(dateInThePast, bsc::MapperMatcherMode::greater);
+            auto result         = dateMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
     }

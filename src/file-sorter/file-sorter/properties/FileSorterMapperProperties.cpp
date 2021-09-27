@@ -7,35 +7,35 @@
 
 namespace bsc {
     void FileSorterProperties::write(PropertySequencer& sequencer) const {
-        sequencer(version,rules);
+        sequencer(version, rules);
     }
     void FileSorterProperties::addOrUpdateRule(MapperType mapper,
                                                std::string match,
                                                std::string pattern,
+                                               MapperMatcherMode mode,
                                                SortAction sort,
                                                std::string errorAction,
                                                std::string fileExists) {
 
-        auto result = std::ranges::find_if(this->rules(),[&mapper, &match](auto& i) {
-            return i.type() == mapper && i.match() == match;
-        });
+        auto result = std::ranges::find_if(this->rules(), [&mapper, &match](auto& i) { return i.type() == mapper && i.match() == match; });
         FileSorterMapperProperties* ptr;
         if (result != std::end(this->rules())) {
             ptr = &*result;
         } else {
-            ptr = &this->rules().emplace_back();
-            ptr->type = mapper;
+            ptr        = &this->rules().emplace_back();
+            ptr->type  = mapper;
             ptr->match = match;
+            ptr->mode  = mode;
         }
-        ptr->pattern = std::move(pattern);
-        ptr->actions().sort = sort;
+        ptr->pattern              = std::move(pattern);
+        ptr->actions().sort       = sort;
         ptr->actions().fileExists = std::move(fileExists);
-        ptr->actions().error = std::move(errorAction);
+        ptr->actions().error      = std::move(errorAction);
     }
     void FileSorterMapperProperties::write(PropertySequencer& sequencer) const {
-        sequencer(type,match,pattern,actions);
+        sequencer(type, match, mode, pattern, actions);
     }
     void ActionProperties::write(PropertySequencer& sequencer) const {
-        sequencer(sort,error,fileExists);
+        sequencer(sort, error, fileExists);
     }
-}
+}// namespace bsc
