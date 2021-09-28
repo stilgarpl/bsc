@@ -25,6 +25,7 @@ namespace bsc {
             const FileSortingStrategies::ErrorHandlingStrategy errorHandlerStrategy =
                     StandardFileSorterErrorHandlers::stop;
             const FileSortingStrategies::FileExistsPredicate fileExistsPredicate = StandardFileSorterPredicates::fileExistsPredicate;
+            const bool preservePaths = false;
         };
 
     private:
@@ -38,7 +39,7 @@ namespace bsc {
         FileSorter(FileListFetcher fileListFetcher, SortingStrategies Actions);
         //@todo consider replacing vector with span - it's not trivial, many places have {} initialization or just won't convert vector to span (temporaries)
         SortResult sort(const std::vector<fs::path>& pathToSort);
-        void addPattern(FileSorterMapperMatcher matcher, std::string pattern) {
+        void addPattern(std::vector<FileSorterMapperMatcher> matcher, std::string pattern) {
             mapper.addPattern(std::move(matcher), std::move(pattern));
         }
     private:

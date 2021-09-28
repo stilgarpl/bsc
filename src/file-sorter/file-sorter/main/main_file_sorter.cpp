@@ -37,7 +37,10 @@ int main(int argc, char* argv[]) {
         DefaultParameter<std::map<std::string, std::string>> sizeLessMatchers = {
                 {.shortKey = 's', .longKey = "size", .argumentName = "size=PATTERN", .doc = "Pair of size (less than) and path pattern"}};
         DefaultParameter<std::map<std::string, std::string>> sizeGreaterMatchers = {
-                {.shortKey = 'S', .longKey = "SIZE", .argumentName = "size=PATTERN", .doc = "Pair of size (greater than) and path pattern"}};
+                {.shortKey     = 'S',
+                 .longKey      = "SIZE",
+                 .argumentName = "size=PATTERN",
+                 .doc          = "Pair of size (greater than) and path pattern"}};
         DefaultParameter<SortAction> action        = {{.shortKey     = 'a',
                                                        .longKey      = "action",
                                                        .argumentName = "ACTION",
@@ -66,6 +69,8 @@ int main(int argc, char* argv[]) {
                 {.shortKey = 'c', .longKey = "config", .argumentName = "PATH", .doc = "Configuration file location (load)"}};
         Parameter<fs::path> saveConfig = {
                 {.shortKey = 'C', .longKey = "save", .argumentName = "PATH", .doc = "Configuration file location (save)"}};
+        DefaultParameter<bool> preservePaths = {
+                {.shortKey = 'P', .longKey = "preserve-paths", .doc = "Preserve relative paths", .defaultValue = false}};
     };
 
     const auto& parameters = CommandLineParser::defaultParse<FileSorterParameters>(argc, argv);
@@ -80,30 +85,51 @@ int main(int argc, char* argv[]) {
                           {.sortStrategy                  = actionFactory.create(parameters.action()),
                            .createValidTargetPathStrategy = fileExistsFactory.create(parameters.fileExists(), {parameters.renamePattern()}),
                            .errorHandlerStrategy          = errorActionFactory.create(parameters.errorHandler()),
-                           .fileExistsPredicate           = StandardFileSorterPredicates::fileExistsPredicate});
+                           .fileExistsPredicate           = StandardFileSorterPredicates::fileExistsPredicate,
+                           .preservePaths                 = parameters.preservePaths()});
 
     for (const auto& [mime, pattern] : parameters.mimeMatchers()) {
-        fileSorterProperties
-                .addOrUpdateRule(MapperType::mime, mime, pattern, bsc::MapperMatcherMode::none, parameters.action(), parameters.errorHandler(), parameters.fileExists());
+        fileSorterProperties.addOrUpdateRule(MapperType::mime,
+                                             mime,
+                                             pattern,
+                                             bsc::MapperMatcherMode::none,
+                                             parameters.action(),
+                                             parameters.errorHandler(),
+                                             parameters.fileExists());
     }
 
     for (const auto& [name, pattern] : parameters.nameMatchers()) {
-        fileSorterProperties
-                .addOrUpdateRule(MapperType::regex, name, pattern, bsc::MapperMatcherMode::none,  parameters.action(), parameters.errorHandler(), parameters.fileExists());
+        fileSorterProperties.addOrUpdateRule(MapperType::regex,
+                                             name,
+                                             pattern,
+                                             bsc::MapperMatcherMode::none,
+                                             parameters.action(),
+                                             parameters.errorHandler(),
+                                             parameters.fileExists());
     }
 
     for (const auto& [size, pattern] : parameters.sizeLessMatchers()) {
-        fileSorterProperties
-                .addOrUpdateRule(MapperType::size, size, pattern, bsc::MapperMatcherMode::less,  parameters.action(), parameters.errorHandler(), parameters.fileExists());
+        fileSorterProperties.addOrUpdateRule(MapperType::size,
+                                             size,
+                                             pattern,
+                                             bsc::MapperMatcherMode::less,
+                                             parameters.action(),
+                                             parameters.errorHandler(),
+                                             parameters.fileExists());
     }
 
     for (const auto& [size, pattern] : parameters.sizeGreaterMatchers()) {
-        fileSorterProperties
-                .addOrUpdateRule(MapperType::size, size, pattern, bsc::MapperMatcherMode::greater,  parameters.action(), parameters.errorHandler(), parameters.fileExists());
+        fileSorterProperties.addOrUpdateRule(MapperType::size,
+                                             size,
+                                             pattern,
+                                             bsc::MapperMatcherMode::greater,
+                                             parameters.action(),
+                                             parameters.errorHandler(),
+                                             parameters.fileExists());
     }
 
     for (FileSorterPatternFactory factory{}; const auto& property : fileSorterProperties.rules()) {
-        fileSorter.addPattern(factory.createPatternMatcher(property), property.pattern());
+        fileSorter.addPattern(factory.createPatternMatchers(property), property.pattern());
     }
 
     if (parameters.saveConfig()) {

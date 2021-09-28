@@ -11,6 +11,7 @@
 #include <optional>
 #include <utility>
 #include <vector>
+#include <list>
 namespace bsc {
     namespace fs = std::filesystem;
     /**
@@ -19,7 +20,7 @@ namespace bsc {
     class FileSorterMapper {
 
         struct MapperEntry {
-            FileSorterMapperMatcher matcher;
+            std::vector<FileSorterMapperMatcher> matcher;
             std::string pattern;
             int32_t priority;
         };
@@ -28,7 +29,7 @@ namespace bsc {
     public:
         std::optional<std::string> map(const FileInfo& from);
 
-        void addPattern(FileSorterMapperMatcher matcher, std::string pattern, int32_t priority = 0) {
+        void addPattern(std::vector<FileSorterMapperMatcher> matcher, std::string pattern, int32_t priority = 0) {
             MapperEntry entry{.matcher = std::move(matcher), .pattern = std::move(pattern), .priority = priority};
             patterns.insert(std::ranges::upper_bound(
                                     patterns,
@@ -36,6 +37,7 @@ namespace bsc {
                                     [](auto& first, auto& second) { return first.priority > second.priority; }),
                             std::move(entry));
         }
+        MatchPrecision accumulateMatchers(const std::vector<FileSorterMapperMatcher>& vector1, const FileInfo& info);
     };
 
 }// namespace bsc

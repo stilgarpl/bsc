@@ -10,7 +10,7 @@ namespace bsc {
     namespace fs = std::filesystem;
 
     struct FetcherConfig {
-        bool recursive;
+        bool recursive = false;
     };
 
     class FileListFetcher final {

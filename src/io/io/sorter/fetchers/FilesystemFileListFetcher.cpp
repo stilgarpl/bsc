@@ -4,7 +4,7 @@
 
 #include "FilesystemFileListFetcher.h"
 namespace bsc {
-    std::vector<fs::path> bsc::FilesystemFileListFetcher::operator()(const FetcherConfig& config, const fs::path& path) {
+    std::vector<fs::path> bsc::FilesystemFileListFetcher::operator()(const FetcherConfig& config, const fs::path& path) const {
 
         if (!fs::exists(path)) {
             return {};

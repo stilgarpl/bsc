@@ -240,10 +240,10 @@ TEST_CASE("FileSorterMapper test") {
     FileSorterMapper fileSorterMapperEmpty;
     FileSorterMapper fileSorterMapper;
     FileInfoDecoder fileInfoDecoder;
-    fileSorterMapper.addPattern(matchers::fileSorterMimeMatcher(factory.create("text/")), expectedTextPatternHighPriority, 5);
-    fileSorterMapper.addPattern(matchers::fileSorterMimeMatcher(factory.create("text/plain")), expectedTextPatternLowPriority, 1);
-    fileSorterMapper.addPattern(matchers::fileSorterMimeMatcher(factory.create("image/")), expectedImagePattern);
-    fileSorterMapper.addPattern(matchers::fileSorterMimeMatcher(factory.create("image/gif")), expectedGifPattern);
+    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("text/"))}, expectedTextPatternHighPriority, 5);
+    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("text/plain"))}, expectedTextPatternLowPriority, 1);
+    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/"))}, expectedImagePattern);
+    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/gif"))}, expectedGifPattern);
     SECTION("gif") {
         auto filenameGif = "test.gif";
         auto result      = fileSorterMapper.map(fileInfoDecoder.decodeFileInfo(path / filenameGif));
@@ -311,7 +311,7 @@ TEST_CASE("File sorter test") {
 
                           });
     SECTION("images only") {
-        fileSorter.addPattern(matchers::fileSorterMimeMatcher(factory.create("image/")),
+        fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/"))},
                               destinationPath.string() + "/Images/{{date.year}}/");
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
@@ -331,9 +331,9 @@ TEST_CASE("File sorter test") {
         REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
     }
     SECTION("images and txt") {
-        fileSorter.addPattern(matchers::fileSorterMimeMatcher(factory.create("image/")),
+        fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/"))},
                               destinationPath.string() + "/Images/{{date.year}}/");
-        fileSorter.addPattern(matchers::fileSorterMimeMatcher(factory.create("text/")), destinationPath.string() + "/Text/");
+        fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("text/"))}, destinationPath.string() + "/Text/");
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
         REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));

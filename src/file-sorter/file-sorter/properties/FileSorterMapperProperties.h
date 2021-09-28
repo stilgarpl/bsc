@@ -27,19 +27,24 @@ namespace bsc {
         void write(PropertySequencer& sequencer) const override;
     };
 
-    struct FileSorterMapperProperties : BasePropertyClass{
+    struct MatcherProperties : BasePropertyClass {
         Property<"type", MapperType> type;
         Property<"match", std::string> match{};
         Property<"mode", MapperMatcherMode> mode = {MapperMatcherMode::none};
+        void write(PropertySequencer& sequencer) const override;
+    };
+
+    struct FileSorterMapperProperties : BasePropertyClass {
+        Property<"matcher",std::list<MatcherProperties>> matchers;
         Property<"pattern", std::string> pattern{};
         Property<"on", ActionProperties> actions{};
         void write(PropertySequencer& sequencer) const override;
     };
 
     struct FileSorterProperties : BasePropertyClass{
-        Property<"rules", std::list<FileSorterMapperProperties>> rules{};
+        Property<"rules", std::list<FileSorterMapperProperties>> rules;
         Property<"version", std::string > version{"0.1"};
-        void addOrUpdateRule(MapperType mapper, std::string match, std::string pattern, MapperMatcherMode mode, SortAction sort, std::string errorAction, std::string fileExists);
+        FileSorterMapperProperties& addOrUpdateRule(MapperType mapper, std::string match, std::string pattern, MapperMatcherMode mode, SortAction sort, std::string errorAction, std::string fileExists);
         void write(PropertySequencer& sequencer) const override;
     };
 }// namespace bsc

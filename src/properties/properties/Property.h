@@ -56,6 +56,7 @@ namespace bsc {
         }
 
     public:
+        using Type = T;
         [[nodiscard]] bool hasValue() const {
             return value || directValue.has_value();
         }

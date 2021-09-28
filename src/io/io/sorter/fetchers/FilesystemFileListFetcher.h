@@ -12,11 +12,11 @@ namespace bsc {
      */
     class FilesystemFileListFetcher {
     public:
-        std::vector<fs::path> operator()(const FetcherConfig& config, const fs::path& path);
+        std::vector<fs::path> operator()(const FetcherConfig& config, const fs::path& path) const;
     };
 
     namespace fetchers {
-        inline FilesystemFileListFetcher filesystemFileListFetcher{};
+        inline const FilesystemFileListFetcher filesystemFileListFetcher{};
     }
 }// namespace bsc
 

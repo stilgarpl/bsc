@@ -4,6 +4,7 @@
 
 #include "FileSorterMapper.h"
 #include <fmt/format.h>
+#include <ranges>
 namespace bsc {
 
     std::optional<std::string> FileSorterMapper::map(const FileInfo& from) {
@@ -14,7 +15,7 @@ namespace bsc {
             if(bestPrecision == MatchPrecision::perfect || priority < bestPriority ) {
                 break;
             }
-            auto matchResult = matcher(from);
+            auto matchResult = accumulateMatchers(matcher, from);
             logger.info(fmt::format("Matching {} to {} with priority: {}", from.path.filename().string(), pattern, priority));
             switch (matchResult) {
 
@@ -37,5 +38,12 @@ namespace bsc {
         } else {
             return std::string(bestMatch);
         }
+    }
+    MatchPrecision FileSorterMapper::accumulateMatchers(const std::vector<FileSorterMapperMatcher>& matchers, const FileInfo& info) {
+        MatchPrecision result = MatchPrecision::perfect;
+        for (const auto& matcher : matchers) {
+            result = std::min(matcher(info), result);
+        }
+        return result;
     }
 }// namespace bsc

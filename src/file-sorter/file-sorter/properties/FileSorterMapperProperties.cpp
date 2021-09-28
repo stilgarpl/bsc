@@ -9,33 +9,43 @@ namespace bsc {
     void FileSorterProperties::write(PropertySequencer& sequencer) const {
         sequencer(version, rules);
     }
-    void FileSorterProperties::addOrUpdateRule(MapperType mapper,
-                                               std::string match,
-                                               std::string pattern,
-                                               MapperMatcherMode mode,
-                                               SortAction sort,
-                                               std::string errorAction,
-                                               std::string fileExists) {
+    FileSorterMapperProperties& FileSorterProperties::addOrUpdateRule(MapperType mapper,
+                                                                      std::string match,
+                                                                      std::string pattern,
+                                                                      MapperMatcherMode mode,
+                                                                      SortAction sort,
+                                                                      std::string errorAction,
+                                                                      std::string fileExists) {
 
-        auto result = std::ranges::find_if(this->rules(), [&mapper, &match](auto& i) { return i.type() == mapper && i.match() == match; });
+        auto found = std::ranges::find_if(this->rules(), [&mapper, &match](auto& j) {
+            auto& matchers = j.matchers();
+            return std::ranges::find_if(matchers, [&mapper, &match](auto& i) { return i.type() == mapper && i.match() == match; })
+                           != std::end(matchers)
+                   && matchers.size() == 1;
+        });
         FileSorterMapperProperties* ptr;
-        if (result != std::end(this->rules())) {
-            ptr = &*result;
+        if (found != std::end(this->rules())) {
+            ptr = &*found;
         } else {
-            ptr        = &this->rules().emplace_back();
-            ptr->type  = mapper;
-            ptr->match = match;
-            ptr->mode  = mode;
+            ptr           = &this->rules().emplace_back();
+            auto& matcher = ptr->matchers().emplace_back();
+            matcher.type  = mapper;
+            matcher.match = std::move(match);
+            matcher.mode  = mode;
         }
         ptr->pattern              = std::move(pattern);
         ptr->actions().sort       = sort;
         ptr->actions().fileExists = std::move(fileExists);
         ptr->actions().error      = std::move(errorAction);
+        return *ptr;
     }
     void FileSorterMapperProperties::write(PropertySequencer& sequencer) const {
-        sequencer(type, match, mode, pattern, actions);
+        sequencer(matchers, pattern, actions);
     }
     void ActionProperties::write(PropertySequencer& sequencer) const {
         sequencer(sort, error, fileExists);
+    }
+    void MatcherProperties::write(PropertySequencer& sequencer) const {
+        sequencer(type, match, mode);
     }
 }// namespace bsc

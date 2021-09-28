@@ -52,6 +52,7 @@ namespace bsc {
     };
 
     using FileSorterMapperMatcher = std::function<MatchPrecision(const FileInfo& path)>;
+
 }// namespace bsc
 
 #endif

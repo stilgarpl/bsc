@@ -43,9 +43,14 @@ namespace bsc {
             for (const auto& filePatternAndProperties : filePatternAndPropertiesList) {
                 const auto& file = filePatternAndProperties.fileInfo.path;
                 try {
+                    fs::path offset{};
+                    if (actions.preservePaths) {
+                        offset = file.relative_path().parent_path();
+                    }
                     //@todo add global properties, like current time or computer name etc.
-                    auto targetPath = translator.translate(filePatternAndProperties.pattern, filePatternAndProperties.propertiesMetaData) /
+                    auto targetPath = translator.translate(filePatternAndProperties.pattern, filePatternAndProperties.propertiesMetaData) / offset /
                                       file.filename();
+                    targetPath = fs::weakly_canonical(targetPath);
                     logger.debug("target path is " + targetPath.string());
                     if (actions.fileExistsPredicate(targetPath)) {
                         logger.debug("File "s + file.string() + "already exists in location " + targetPath.string());
