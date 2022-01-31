@@ -875,3 +875,4 @@ options.has(ENUM1).and(ENUM2).or(ENUM3)
 Property should store value in shared_ptr instead of optional - if (flags.has(global_properties)) - shared_ptr points at value stored in a global(context) registry instead @todo global properties
 
 Logic chains - leaf chain nodes should be easy to identify. chain branches should be easily identified. chain interruptions or finishing all the branches to leafs should be doable. Clean after finish @todo logic chains
+

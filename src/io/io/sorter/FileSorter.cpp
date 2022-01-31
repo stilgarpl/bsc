@@ -22,55 +22,52 @@ namespace bsc {
             struct FileInfoWithPatternAndProperties {
                 FileInfo fileInfo;
                 std::string pattern;
+                FileSortingStrategies strategies;
                 PropertiesMetaData propertiesMetaData;
             };
             const auto& fileInfo = std::get<0>(fileInfoWithPattern);
             FileMetaDataReader reader(fileInfo.mimeFileType);
             return FileInfoWithPatternAndProperties{.fileInfo           = std::get<0>(fileInfoWithPattern),
-                                                    .pattern            = *std::get<1>(fileInfoWithPattern),
-                                                    .propertiesMetaData = reader.readMetaData(fileInfo.path)};
+                                                           .pattern            = std::get<1>(fileInfoWithPattern)->pattern,
+                                                           .strategies         = std::get<1>(fileInfoWithPattern)->strategies,
+                                                           .propertiesMetaData = reader.readMetaData(fileInfo.path)};
         };
 
         try {
-            auto fileList = fetchAllFiles(pathsToSort);
+            auto fileList                     = fetchAllFiles(pathsToSort);
 
-            auto filePatternAndPropertiesList = fileList
-                                                | transform(decodeFileInfo)
-                                                | transform(addMapperToFileInfo)
-                                                | filter(filterMappedPatterns)
-                                                | transform(addProperties);
+            auto filePatternAndPropertiesList = fileList | transform(decodeFileInfo) | transform(addMapperToFileInfo)
+                                                | filter(filterMappedPatterns) | transform(addProperties);
 
             for (const auto& filePatternAndProperties : filePatternAndPropertiesList) {
                 const auto& file = filePatternAndProperties.fileInfo.path;
                 try {
-                    fs::path offset{};
-                    if (actions.preservePaths) {
-                        offset = file.relative_path().parent_path();
-                    }
+
                     //@todo add global properties, like current time or computer name etc.
-                    auto targetPath = translator.translate(filePatternAndProperties.pattern, filePatternAndProperties.propertiesMetaData) / offset /
-                                      file.filename();
+                    auto targetPath = translator.translate(filePatternAndProperties.pattern, filePatternAndProperties.propertiesMetaData)
+                                      / actions.relativePathBuilder(file) / file.filename();
                     targetPath = fs::weakly_canonical(targetPath);
                     logger.debug("target path is " + targetPath.string());
                     if (actions.fileExistsPredicate(targetPath)) {
                         logger.debug("File "s + file.string() + "already exists in location " + targetPath.string());
-                        targetPath = actions.createValidTargetPathStrategy(targetPath, actions.fileExistsPredicate);
+                        targetPath = filePatternAndProperties.strategies.createValidTargetPathStrategy(targetPath, actions.fileExistsPredicate);
                         logger.debug("New target path is "s + targetPath.string());
                     }
                     //@todo this if is mostly for skip action to work, but maybe I should throw on invalid target
                     // paths created?
-                    //@todo target path should not be a simple path but perhaps wrapper object with path and result? sort of like Either or expected ?
+                    //@todo target path should not be a simple path but perhaps wrapper object with path and result? sort of like Either or
+                    // expected ?
                     if (!targetPath.empty()) {
-                        actions.sortStrategy(file, targetPath);
+                        filePatternAndProperties.strategies.sortStrategy(file, targetPath);
                         sortResult.sortedFilesMap[file] = targetPath;
                     }
                 } catch (const PathTranslationException& e) {
                     //@todo maybe better error handling?
                     FileSortingException exception("Path transforming failed: "s + e.what(), file);
-                    actions.errorHandlerStrategy(exception, sortResult.failedFilesList);
+                    filePatternAndProperties.strategies.errorHandlerStrategy(exception, sortResult.failedFilesList);
                 } catch (const FileSortingException& e) {
                     FileSortingException exception(e.what(), file, e.getDestinationPath());
-                    actions.errorHandlerStrategy(exception, sortResult.failedFilesList);
+                    filePatternAndProperties.strategies.errorHandlerStrategy(exception, sortResult.failedFilesList);
                 }
             }
         } catch (const FileSortingException& e) {
@@ -89,7 +86,7 @@ namespace bsc {
         std::ranges::sort(fileList);
         return fileList;
     }
-    FileSorter::FileSorter(FileListFetcher fileListFetcher, SortingStrategies actions)
+    FileSorter::FileSorter(FileListFetcher fileListFetcher, GlobalSortingStrategies actions)
         : actions(std::move(actions)), fileListFetcher(std::move(fileListFetcher)) {
     }
 

@@ -36,8 +36,9 @@ namespace bsc {
 
     public:
         template<typename ParameterType>
-        [[nodiscard]] std::remove_reference_t<ParameterType>
-        fromString(const StringType& value, std::enable_if_t<std::numeric_limits<ParameterType>::is_integer, int> = 0) const {
+        [[nodiscard]] std::remove_cvref_t<ParameterType>
+        fromString(const StringType& value,
+                   std::enable_if_t<std::numeric_limits<std::remove_cvref_t<ParameterType>>::is_integer, int> = 0) const {
             try {
                 return std::stoll(value);
             } catch (std::invalid_argument& e) {
@@ -56,8 +57,8 @@ namespace bsc {
         }
 
         template<typename ParameterType>
-        [[nodiscard]] std::remove_reference_t<ParameterType>
-        fromString(const StringType& value, std::enable_if_t<std::is_enum_v<ParameterType>, int> = 0) const {
+        [[nodiscard]] std::remove_reference_t<ParameterType> fromString(const StringType& value,
+                                                                        std::enable_if_t<std::is_enum_v<ParameterType>, int> = 0) const {
             auto optionalEnum = magic_enum::enum_cast<ParameterType>(value);
             if (optionalEnum) {
                 return *optionalEnum;
@@ -80,7 +81,6 @@ namespace bsc {
         [[nodiscard]] std::remove_reference_t<ParameterType> fromString(const StringType& value,
                                                                         int = 0) const requires IsPair<ParameterType> {
             try {
-
                 std::stringstream inputStream(value);
                 StringType first, second;
                 getline(inputStream, first, parserConfiguration->pairDelimiter);
@@ -174,7 +174,7 @@ namespace bsc {
     }
 
     template<typename T>
-    concept ParsedFromString = requires(const Parser& parser, const std::string& s) {
+    concept ParsedFromString = requires(const Parser& parser, const StringType& s) {
         parser.fromString<T>(s);
     };
 

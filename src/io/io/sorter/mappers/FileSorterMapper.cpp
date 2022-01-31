@@ -7,36 +7,44 @@
 #include <ranges>
 namespace bsc {
 
-    std::optional<std::string> FileSorterMapper::map(const FileInfo& from) {
-        std::string_view bestMatch;
+    std::optional<FileSorterMappingResult> FileSorterMapper::map(const FileInfo& from) {
+        //        std::string_view bestMatch;
+        const MapperEntry* bestMatch = nullptr;
         MatchPrecision bestPrecision = MatchPrecision::none;
-        auto bestPriority = std::numeric_limits<decltype(MapperEntry::priority)>::min();
-        for (const auto& [matcher, pattern, priority] : patterns) {
-            if(bestPrecision == MatchPrecision::perfect || priority < bestPriority ) {
+        auto bestPriority            = std::numeric_limits<decltype(MapperEntry::priority)>::min();
+        for (const auto& entry : patterns) {
+            bool foundBest = false;
+            if (entry.priority < bestPriority) {
                 break;
             }
-            auto matchResult = accumulateMatchers(matcher, from);
-            logger.info(fmt::format("Matching {} to {} with priority: {}", from.path.filename().string(), pattern, priority));
+            auto matchResult = accumulateMatchers(entry.matcher, from);
+            logger.info(fmt::format("Matching {} to {} with priority: {}", from.path.filename().string(), entry.pattern, entry.priority));
             switch (matchResult) {
 
                 case MatchPrecision::none:
                     logger.info("No match");
                     continue;
-                case MatchPrecision::perfect:// @todo it can't be better than perfect, we should break the loop immediately.
+
+                case MatchPrecision::perfect:
+                    foundBest = true;
+                    [[fallthrough]];
                 default:
                     if (matchResult > bestPrecision) {
                         bestPrecision = matchResult;
-                        bestMatch     = pattern;
-                        bestPriority = priority;
+                        bestMatch     = &entry;
+                        bestPriority  = entry.priority;
                     }
                     logger.info("Match found");
             }
+            if (foundBest) {
+                break;
+            }
         }
 
-        if (bestPrecision == MatchPrecision::none) {
+        if (bestPrecision == MatchPrecision::none || bestMatch == nullptr) {
             return std::nullopt;
         } else {
-            return std::string(bestMatch);
+            return FileSorterMappingResult{.pattern = std::string(bestMatch->pattern), .strategies = bestMatch->strategies};
         }
     }
     MatchPrecision FileSorterMapper::accumulateMatchers(const std::vector<FileSorterMapperMatcher>& matchers, const FileInfo& info) {

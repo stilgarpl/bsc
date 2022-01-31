@@ -4,6 +4,10 @@
 #ifndef BSC_CONCEPTS_H
 #define BSC_CONCEPTS_H
 
+#include <concepts>
+#include <utility>
+#include <string>
+
 namespace bsc {
     //@todo C++20 all of those SFINAE enable_if can be replaced by concepts, but concepts do not quite work yet in
     // current

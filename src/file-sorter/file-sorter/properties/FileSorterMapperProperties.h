@@ -18,12 +18,17 @@ namespace bsc {
         size,
         date,
     };
+    struct FileExistsProperties : BasePropertyClass {
+        Property<"action", std::string> action{"rename"};
+        Property<"pattern", std::string> pattern{"({})"};
+        void write(PropertySequencer& sequencer) const override;
+    };
 
     struct ActionProperties : BasePropertyClass {
-        Property<"sort",SortAction> sort{SortAction::copy};
+        Property<"sort", SortAction> sort{SortAction::copy};
         //@todo maybe convert those strings to enums? "continue" action stands in the way - maybe rename to keepgoing
-        Property<"error",std::string> error {"continue"};
-        Property<"fileExists",std::string> fileExists{"rename"};
+        Property<"error", std::string> error{"continue"};
+        Property<"fileExists", FileExistsProperties> fileExists{};
         void write(PropertySequencer& sequencer) const override;
     };
 
@@ -35,16 +40,23 @@ namespace bsc {
     };
 
     struct FileSorterMapperProperties : BasePropertyClass {
-        Property<"matcher",std::list<MatcherProperties>> matchers;
+        Property<"matcher", std::list<MatcherProperties>> matchers;
         Property<"pattern", std::string> pattern{};
         Property<"on", ActionProperties> actions{};
         void write(PropertySequencer& sequencer) const override;
     };
 
-    struct FileSorterProperties : BasePropertyClass{
+    struct FileSorterProperties : BasePropertyClass {
         Property<"rules", std::list<FileSorterMapperProperties>> rules;
-        Property<"version", std::string > version{"0.1"};
-        FileSorterMapperProperties& addOrUpdateRule(MapperType mapper, std::string match, std::string pattern, MapperMatcherMode mode, SortAction sort, std::string errorAction, std::string fileExists);
+        Property<"version", std::string> version{"0.1"};
+        FileSorterMapperProperties& addOrUpdateRule(MapperType mapper,
+                                                    std::string match,
+                                                    std::string pattern,
+                                                    MapperMatcherMode mode,
+                                                    SortAction sort,
+                                                    std::string errorAction,
+                                                    std::string fileExists,
+                                                    std::string renamePattern);
         void write(PropertySequencer& sequencer) const override;
     };
 }// namespace bsc

@@ -30,11 +30,8 @@ namespace bsc {
     class ModeComparator {
 
     public:
-        bool compare(const T& t1, const T& t2, MapperMatcherMode comparison) {
+        bool compare(const T& t1, const T& t2, MapperMatcherMode comparison) const{
             switch (comparison) {
-                default:
-                case MapperMatcherMode::none:
-                    return true;
                 case MapperMatcherMode::equal:
                     return std::equal_to{}(t1, t2);
                 case MapperMatcherMode::greater:
@@ -47,6 +44,8 @@ namespace bsc {
                     return std::less_equal{}(t1, t2);
                 case MapperMatcherMode::notEqual:
                     return std::not_equal_to{}(t1, t2);
+                default:
+                    return true;
             }
         }
     };

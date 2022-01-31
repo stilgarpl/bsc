@@ -12,15 +12,24 @@
 namespace bsc {
 
     struct FileSortingStrategies {
-        using SortStrategy                  = std::function<void(const fs::path& from, const fs::path& to)>;
-        using FileExistsPredicate           = std::function<bool(const fs::path& target)>;
-        using CreateValidTargetPathStrategy = std::function<fs::path(
-                const fs::path& target,
-                const FileExistsPredicate& fileExistPredicate)>;// takes path to existing file and returns @todo think
-                                                                // of return type and abort() implementation. maybe it
-                                                                // should return optional<path>?
-        using ErrorHandlingStrategy = std::function<
-                void(const FileSortingException& exception, std::list<SortFailure>& sortFailure)>;
+        using SortStrategy        = std::function<void(const fs::path& from, const fs::path& to)>;
+        using FileExistsPredicate = std::function<bool(const fs::path& target)>;
+        using CreateValidTargetPathStrategy =
+                std::function<fs::path(const fs::path& target,
+                                       const FileExistsPredicate& fileExistPredicate)>;// takes path to existing file and returns @todo
+                                                                                       // think of return type and abort() implementation.
+                                                                                       // maybe it should return optional<path>?
+        using ErrorHandlingStrategy = std::function<void(const FileSortingException& exception, std::list<SortFailure>& sortFailure)>;
+        using RelativePathBuilder   = std::function<fs::path(const fs::path&)>;
+
+
+        const FileSortingStrategies::SortStrategy sortStrategy;
+        const FileSortingStrategies::CreateValidTargetPathStrategy createValidTargetPathStrategy;
+        const FileSortingStrategies::ErrorHandlingStrategy errorHandlerStrategy;
+        FileSortingStrategies();
+        FileSortingStrategies(const SortStrategy& sortStrategy,
+                              const CreateValidTargetPathStrategy& createValidTargetPathStrategy,
+                              const ErrorHandlingStrategy& errorHandlerStrategy);
     };
 
 }// namespace bsc

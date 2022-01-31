@@ -134,3 +134,4 @@ conan/*.junk
 
 build
 *.kdev4
+CMakeUserPresets.json

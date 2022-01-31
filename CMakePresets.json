@@ -1,0 +1,69 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "description": "Default build using Ninja generator",
+      "generator": "CodeBlocks - Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+      },
+      "environment": {
+      },
+      "vendor": {
+        "Clion": {
+          "autoFormat": true
+        }
+      }
+    },
+    {
+      "name": "gcc",
+      "displayName": "GCC",
+      "description": "Default configuration for GCC compiler",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS_DEBUG_INIT": "-Wall -Wextra -Wno-unused-local-typedefs -Wno-unused-parameter -pedantic -Wno-unused-but-set-variable"
+      }
+    },
+    {
+      "name": "windows-only",
+      "inherits": "default",
+      "displayName": "Windows-only configuration",
+      "description": "This build is only available on Windows",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default"
+    },
+    {
+      "name": "default-gcc",
+      "configurePreset": "gcc"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "output": {"outputOnFailure": true},
+      "execution": {"noTestsAction": "error", "stopOnFailure": true}
+    }
+  ],
+  "vendor": {
+    "example.com/ExampleIDE/1.0": {
+      "autoFormat": false
+    }
+  }
+}

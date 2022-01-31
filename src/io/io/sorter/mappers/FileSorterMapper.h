@@ -5,6 +5,7 @@
 #ifndef BSC_FILESORTERMAPPER_H
 #define BSC_FILESORTERMAPPER_H
 #include "FileSorterMapperMatcher.h"
+#include "io/sorter/strategies/Strategies.h"
 #include <algorithm>
 #include <filesystem>
 #include <io/file/FileInfo.h>
@@ -14,6 +15,12 @@
 #include <list>
 namespace bsc {
     namespace fs = std::filesystem;
+
+    struct FileSorterMappingResult {
+        std::string pattern;
+        FileSortingStrategies strategies;
+    };
+
     /**
      * mapper that matches something about the file (mime type, filename) to destination path where it should be
      */
@@ -23,14 +30,15 @@ namespace bsc {
             std::vector<FileSorterMapperMatcher> matcher;
             std::string pattern;
             int32_t priority;
+            FileSortingStrategies strategies;
         };
 
-        std::vector<MapperEntry> patterns;
+        std::list<MapperEntry> patterns;
     public:
-        std::optional<std::string> map(const FileInfo& from);
+        std::optional<FileSorterMappingResult> map(const FileInfo& from);
 
-        void addPattern(std::vector<FileSorterMapperMatcher> matcher, std::string pattern, int32_t priority = 0) {
-            MapperEntry entry{.matcher = std::move(matcher), .pattern = std::move(pattern), .priority = priority};
+        void addPattern(std::vector<FileSorterMapperMatcher> matcher, std::string pattern, FileSortingStrategies strategies, int32_t priority = 0) {
+            MapperEntry entry{.matcher = std::move(matcher), .pattern = std::move(pattern), .priority = priority, .strategies = std::move(strategies)};
             patterns.insert(std::ranges::upper_bound(
                                     patterns,
                                     entry,

@@ -4,6 +4,7 @@
 #include <catch2/catch.hpp>
 #include <map>
 #include <parser/writer/toString.h>
+#include <list>
 
 using namespace bsc;
 
@@ -90,6 +91,17 @@ TEST_CASE("ToString writer test") {
             auto result = writer.toString(testInt);
             // then
             REQUIRE(result == "4.000000");
+        }
+    }
+
+    SECTION("containers") {
+        SECTION("list of ints") {
+            //given
+            std::list<int> ints = {1,4,3,6};
+            //when
+            auto result = writer.toString(ints);
+            //then
+            REQUIRE(result == "1436");
         }
     }
 }

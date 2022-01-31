@@ -129,7 +129,7 @@ TEST_CASE("Parsing factory test") {
     }
 }
 
-TEST_CASE("Autoregistering factories") {
+TEST_CASE("Auto registering factories") {
     class Aa {};
     // registered factory will be CopyFactory<Aa>, not AaFactory, because that's what the parameter is CopyFactory: AutoFactory - if it's a
     // problem, add parameter to Copy/Parsing factories.

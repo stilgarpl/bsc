@@ -12,11 +12,11 @@
 #include <memory>
 #include <optional>
 #include <parser/parser/fromString.h>
+#include <range/v3/to_container.hpp>
+#include <ranges>
 #include <set>
 #include <span>
 #include <utility>
-#include <range/v3/to_container.hpp>
-#include <ranges>
 
 namespace bsc {
 
@@ -32,7 +32,8 @@ namespace bsc {
 
     class ValueNotAllowed : public std::domain_error {
     public:
-        const std::set<std::string> allowedValues;
+        using AllowedValuesType = std::set<std::string>;
+        const AllowedValuesType allowedValues;
 
         explicit ValueNotAllowed(const std::string& arg);
         ValueNotAllowed(const std::string& arg, std::remove_cvref_t<decltype(allowedValues)> a);
@@ -46,7 +47,7 @@ namespace bsc {
 
         class ArgumentParser {
         public:
-            using OptionParseFunc   = std::function<void(const char*, Parser&)>;
+            using OptionParseFunc    = std::function<void(const char*, Parser&)>;
             using ArgumentParseFunc  = std::function<void(const std::string&, Parser&)>;
             using ArgumentsParseFunc = std::function<void(const std::span<std::string>&, Parser&)>;
 
@@ -77,7 +78,9 @@ namespace bsc {
             decltype(rawArguments)::size_type requiredArgumentsCount = 0;
             Parser stringParser{};
 
-            void incrementRequiredArguments() { ++requiredArgumentsCount; }
+            void incrementRequiredArguments() {
+                ++requiredArgumentsCount;
+            }
             void parseNamedArguments();
 
         public:
@@ -86,13 +89,19 @@ namespace bsc {
             void prepareParser(ParseConfiguration configuration, const Parser&);
             void parse(int argc, char* argv[]);
             static char* helpFilter(int key, const char* text, void* input);
-            auto& getParsedArguments() { return rawArguments; }
+            auto& getParsedArguments() {
+                return rawArguments;
+            }
             auto getRemainingArguments() {
                 return std::span<std::string>(rawArguments.begin() + requiredArgumentsCount, rawArguments.end());
             };
-            auto& getCommandName() { return commandName; }
+            auto& getCommandName() {
+                return commandName;
+            }
 
-            auto getRequiredArgumentsCount() const { return requiredArgumentsCount; }
+            [[nodiscard]] auto getRequiredArgumentsCount() const {
+                return requiredArgumentsCount;
+            }
 
             friend class CommandLineParameters::ParserBuilder;
             friend class CommandLineParser;
@@ -163,11 +172,19 @@ namespace bsc {
 
         friend class CommandLineParser;
 
-        [[nodiscard]] const std::vector<std::string>& arguments() const { return parser->getParsedArguments(); }
-        [[nodiscard]] std::span<std::string> remainingArguments() const { return parser->getRemainingArguments(); }
-        [[nodiscard]] auto getRequiredArgumentsCount() const { return parser->getRequiredArgumentsCount(); }
+        [[nodiscard]] const std::vector<std::string>& arguments() const {
+            return parser->getParsedArguments();
+        }
+        [[nodiscard]] std::span<std::string> remainingArguments() const {
+            return parser->getRemainingArguments();
+        }
+        [[nodiscard]] auto getRequiredArgumentsCount() const {
+            return parser->getRequiredArgumentsCount();
+        }
 
-        [[nodiscard]] const std::string& commandName() const { return parser->getCommandName(); }
+        [[nodiscard]] const std::string& commandName() const {
+            return parser->getCommandName();
+        }
     };
 
     class CommandLineParser {
@@ -176,8 +193,9 @@ namespace bsc {
         const Parser parser{};
 
     public:
-        CommandLineParser(ParseConfiguration parseConfiguration, Parser  parser)
-            : parseConfiguration(parseConfiguration), parser(std::move(parser)) {}
+        CommandLineParser(ParseConfiguration parseConfiguration, Parser parser)
+            : parseConfiguration(parseConfiguration), parser(std::move(parser)) {
+        }
         CommandLineParser() = default;
 
         template<ParametersClass T>
@@ -233,6 +251,7 @@ namespace bsc {
     template<typename T>
     class BaseParameter {
     public:
+        using ValueType = std::optional<T>;
         class AllowedValues {
         public:
             using AllowedValuesSet = std::set<std::string>;
@@ -254,22 +273,24 @@ namespace bsc {
                 getter = func;
             }
 
-            AllowedValues()                     = default;
-            AllowedValues(const AllowedValues&) = default;
-            AllowedValues(AllowedValues&&)      = default;
-            AllowedValuesSet get() { return getter(); }
+            AllowedValues()                         = default;
+            AllowedValues(const AllowedValues&)     = default;
+            AllowedValues(AllowedValues&&) noexcept = default;
+            AllowedValuesSet get() const {
+                return getter();
+            }
         };
 
     protected:
-        std::optional<T> value;
-
+        ValueType value;
+        using OptionParseFunc = CommandLineParameters::ArgumentParser::OptionParseFunc;
     private:
         int counter = 0;
         AllowedValues allowedValues{};
 
-        CommandLineParameters::ArgumentParser::OptionParseFunc makeParseFunction() {
+        OptionParseFunc makeParseFunction() {
             return [this](const char* input, Parser& parser) {
-                std::string text = input != nullptr ? input : "";
+                std::string text        = input != nullptr ? input : "";
                 //@todo maybe this should be optimized so it is only called once
                 const auto& validValues = this->allowedValues.get();
                 //@todo case sensitive or not
@@ -284,35 +305,46 @@ namespace bsc {
                     // overwrite.
                     if constexpr (IsContainerNotString<T>) {
                         auto tempValue = parser.fromString<T>(text);
-                        std::for_each(tempValue.begin(), tempValue.end(), [this](auto& i) {
-                            value->insert(value->end(), i);
-                        });
+                        std::for_each(tempValue.begin(), tempValue.end(), [this](auto& i) { value->insert(value->end(), i); });
                     } else {
                         value = parser.fromString<T>(text);
                     }
                 }
-                counter++;
+                increaseCounter();
             };
         }
 
         int makeFlags(bool optional, bool hidden) {
             int flags = 0;
-            if (optional) flags |= OPTION_ARG_OPTIONAL;
-            if (hidden) flags |= OPTION_HIDDEN;
+            if (optional)
+                flags |= OPTION_ARG_OPTIONAL;
+            if (hidden)
+                flags |= OPTION_HIDDEN;
             return flags;
         }
 
     protected:
-        void setValue(const T& v) { value = v; }
+        void setValue(const T& v) {
+            value = v;
+        }
         static auto makeDefaultAllowedValues() {
             if constexpr (std::is_enum_v<T>) {
-                return AllowedValues(magic_enum::enum_values<T>() | std::views::transform([](auto& i){
-                                         return std::string(magic_enum::enum_name(i));
-                                     }) | ranges::to<typename AllowedValues::AllowedValuesSet>());
+                return AllowedValues(magic_enum::enum_values<T>()
+                                     | std::views::transform([](auto& i) { return std::string(magic_enum::enum_name(i)); })
+                                     | ranges::to<typename AllowedValues::AllowedValuesSet>());
             } else {
                 return AllowedValues{};
             }
         }
+
+        void increaseCounter() {
+            counter++;
+        }
+
+        auto getAllowedValues() const {
+            return allowedValues.get();
+        }
+
     public:
         //@todo maybe I should add callback here that will be called after this value is set?
         struct BaseParameterDefinition {
@@ -324,10 +356,10 @@ namespace bsc {
             bool hidden   = false;
             std::optional<T> defaultValue{};
             AllowedValues allowedValues = makeDefaultAllowedValues();
-
         };
 
-        BaseParameter(BaseParameterDefinition def) : allowedValues(def.allowedValues) {
+        BaseParameter(BaseParameterDefinition def, const CommandLineParameters::ArgumentParser::OptionParseFunc& parseFunc)
+            : allowedValues(def.allowedValues) {
             value         = def.defaultValue;
             auto& builder = bsc::CommandLineParameters::parserBuilder();
             builder.addOption({.shortKey     = def.shortKey,
@@ -335,12 +367,19 @@ namespace bsc {
                                .argumentName = def.argumentName,
                                .flags        = makeFlags(def.optional, def.hidden),
                                .doc          = def.doc},
-                              makeParseFunction());
+                              parseFunc);
         }
 
-        const decltype(value)& operator()() const { return value; }
+        BaseParameter(BaseParameterDefinition def) : BaseParameter(def, makeParseFunction()) {
+        }
 
-        [[nodiscard]] auto count() const { return counter; }
+        const decltype(value)& operator()() const {
+            return value;
+        }
+
+        [[nodiscard]] auto count() const {
+            return counter;
+        }
     };
 
     template<typename T>
@@ -363,7 +402,8 @@ namespace bsc {
                                 .argumentName  = def.argumentName,
                                 .doc           = def.doc,
                                 .defaultValue  = def.defaultValue,
-                                .allowedValues = def.allowedValues}) {}
+                                .allowedValues = def.allowedValues}) {
+        }
     };
 
     template<typename T>
@@ -386,9 +426,12 @@ namespace bsc {
                                 .argumentName  = def.argumentName,
                                 .doc           = def.doc,
                                 .defaultValue  = std::move(def.defaultValue),
-                                .allowedValues = def.allowedValues}) {}
+                                .allowedValues = def.allowedValues}) {
+        }
 
-        const auto& operator()() const { return *this->value; }// NOLINT
+        const auto& operator()() const {
+            return *this->value;
+        }// NOLINT
     };
 
     template<typename T>
@@ -399,13 +442,16 @@ namespace bsc {
                           const char* argumentName,
                           const char* doc,
                           const std::optional<T>& defaultValue)
-            : BaseParameter<T>(shortKey, longKey, doc, argumentName, defaultValue, true, false) {}
+            : BaseParameter<T>(shortKey, longKey, doc, argumentName, defaultValue, true, false) {
+        }
 
         OptionalParameter(char shortKey, const char* argumentName, const char* doc)
-            : BaseParameter<T>(shortKey, argumentName, doc, true, false) {}
+            : BaseParameter<T>(shortKey, argumentName, doc, true, false) {
+        }
 
         OptionalParameter(const char* longKey, const char* argumentName, const char* doc)
-            : BaseParameter<T>(longKey, argumentName, doc, true, false) {}
+            : BaseParameter<T>(longKey, argumentName, doc, true, false) {
+        }
     };
 
     template<typename T>
@@ -465,13 +511,16 @@ namespace bsc {
     class RequiredParameter : public BaseParameter<T> {
     public:
         RequiredParameter(char shortKey, const char* longKey, const char* argumentName, const char* doc)
-            : BaseParameter<T>(shortKey, longKey, argumentName, doc, false, false) {}
+            : BaseParameter<T>(shortKey, longKey, argumentName, doc, false, false) {
+        }
 
         RequiredParameter(char shortKey, const char* argumentName, const char* doc)
-            : BaseParameter<T>(shortKey, argumentName, doc, false, false) {}
+            : BaseParameter<T>(shortKey, argumentName, doc, false, false) {
+        }
 
         RequiredParameter(const char* longKey, const char* argumentName, const char* doc)
-            : BaseParameter<T>(longKey, argumentName, doc, false, false) {}
+            : BaseParameter<T>(longKey, argumentName, doc, false, false) {
+        }
     };
 
     using Flag = Parameter<bool>;
@@ -503,7 +552,9 @@ namespace bsc {
             builder.addArgument(makeParseFunction(), name);
         }
 
-        const auto& operator()() const { return *this->value; }
+        const auto& operator()() const {
+            return *this->value;
+        }
     };
 
     /**
@@ -536,7 +587,9 @@ namespace bsc {
             builder.addArguments(makeParseFunction(), name);
         }
 
-        const auto& operator()() const { return *this->value; }
+        const auto& operator()() const {
+            return *this->value;
+        }
     };
 }// namespace bsc
 

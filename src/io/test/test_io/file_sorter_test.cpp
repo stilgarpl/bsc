@@ -155,28 +155,28 @@ TEST_CASE("Sort mapper matchers test") {
             auto expectedResult = MatchPrecision::none;
             auto mimeMatcher    = matchers::fileSorterMimeMatcher(factory.create("text/plain"));
 
-            auto result = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
+            auto result         = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
         SECTION("none - partial") {
             auto expectedResult = MatchPrecision::none;
             auto mimeMatcher    = matchers::fileSorterMimeMatcher(factory.create("text/"));
 
-            auto result = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
+            auto result         = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
         SECTION("partial") {
             auto expectedResult = MatchPrecision::partial;
             auto mimeMatcher    = matchers::fileSorterMimeMatcher(factory.create("image/"));
 
-            auto result = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
+            auto result         = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
         SECTION("perfect") {
             auto expectedResult = MatchPrecision::perfect;
             auto mimeMatcher    = matchers::fileSorterMimeMatcher(factory.create("image/gif"));
 
-            auto result = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
+            auto result         = mimeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
     }
@@ -211,7 +211,7 @@ TEST_CASE("Sort mapper matchers test") {
     SECTION("FileSorterDateMatcher") {
         using namespace std::chrono_literals;
         auto actualFileDate = fs::last_write_time(path / filename);
-        auto dateInThePast = actualFileDate - 10min;
+        auto dateInThePast  = actualFileDate - 10min;
         SECTION("none") {
             auto expectedResult = MatchPrecision::none;
             auto dateMatcher    = matchers::fileSorterDateMatcher(dateInThePast, bsc::MapperMatcherMode::less);
@@ -230,6 +230,7 @@ TEST_CASE("Sort mapper matchers test") {
 TEST_CASE("FileSorterMapper test") {
     testaid::TestDirWithResources testDirWithResources;
     MimeFileTypeFactory factory;
+    FileSortingStrategies strategies{};
     auto path                                  = testDirWithResources.getResourcePath("sort");
     auto pathSubdir                            = testDirWithResources.getResourcePath("sort/subdir");
     const auto expectedTextPatternLowPriority  = "textLow";
@@ -240,34 +241,37 @@ TEST_CASE("FileSorterMapper test") {
     FileSorterMapper fileSorterMapperEmpty;
     FileSorterMapper fileSorterMapper;
     FileInfoDecoder fileInfoDecoder;
-    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("text/"))}, expectedTextPatternHighPriority, 5);
-    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("text/plain"))}, expectedTextPatternLowPriority, 1);
-    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/"))}, expectedImagePattern);
-    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/gif"))}, expectedGifPattern);
+    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("text/"))}, expectedTextPatternHighPriority, strategies, 5);
+    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("text/plain"))},
+                                expectedTextPatternLowPriority,
+                                strategies,
+                                1);
+    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/"))}, expectedImagePattern, strategies);
+    fileSorterMapper.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/gif"))}, expectedGifPattern, strategies);
     SECTION("gif") {
         auto filenameGif = "test.gif";
         auto result      = fileSorterMapper.map(fileInfoDecoder.decodeFileInfo(path / filenameGif));
         REQUIRE(result);
-        REQUIRE(result == expectedGifPattern);
+        REQUIRE(result->pattern == expectedGifPattern);
     }
     SECTION("png") {
         auto filenamePng = "test.png";
         auto result      = fileSorterMapper.map(fileInfoDecoder.decodeFileInfo(path / filenamePng));
         REQUIRE(result);
-        REQUIRE(result == expectedImagePattern);
+        REQUIRE(result->pattern == expectedImagePattern);
     }
     SECTION("png-txt") {
         auto filenamePngTxt = "png_with_wrong_extension.txt";
         auto result         = fileSorterMapper.map(fileInfoDecoder.decodeFileInfo(path / filenamePngTxt));
         REQUIRE(result);
-        REQUIRE(result == expectedImagePattern);
+        REQUIRE(result->pattern == expectedImagePattern);
     }
 
     SECTION("txt") {
         auto filenameTxt = "test.txt";
         auto result      = fileSorterMapper.map(fileInfoDecoder.decodeFileInfo(pathSubdir / filenameTxt));
         REQUIRE(result);
-        REQUIRE(result == expectedTextPatternHighPriority);
+        REQUIRE(result->pattern == expectedTextPatternHighPriority);
     }
 
     SECTION("no mapper") {
@@ -300,19 +304,29 @@ TEST_CASE("Path translator test") {
 TEST_CASE("File sorter test") {
     testaid::TestDirWithResources testDirWithResources;
     MimeFileTypeFactory factory;
-    auto resourcePath       = testDirWithResources.getResourcePath("sort");
-    auto destinationPath    = testDirWithResources.getTestDirPath("destination");
-    FileListFetcher fetcher = FileListFetcher{bsc::fetchers::filesystemFileListFetcher, {.recursive = true}, {}};
-    FileSorter fileSorter(fetcher,
-                          {.sortStrategy                  = StandardFileSorterSortStrategies::copy,
-                           .createValidTargetPathStrategy = StandardCreateValidTargetPathStrategies::abort,
-                           .errorHandlerStrategy          = StandardFileSorterErrorHandlers::stop,
-                           .fileExistsPredicate           = StandardFileSorterPredicates::fileExistsPredicate
+    FileSortingStrategies strategies{StandardFileSorterSortStrategies::copy,
+                                     StandardCreateValidTargetPathStrategies::abort,
+                                     StandardFileSorterErrorHandlers::stop};
+    auto resourcePath    = testDirWithResources.getResourcePath("sort");
+    auto destinationPath = testDirWithResources.getTestDirPath("destination");
+    auto fetcher         = FileListFetcher{bsc::fetchers::filesystemFileListFetcher, {.recursive = true}, {}};
+    FileSorter fileSorter(fetcher, {.fileExistsPredicate = StandardFileSorterPredicates::fileExistsPredicate});
+    using namespace std::chrono;
 
-                          });
+
+    auto fileDate = fs::last_write_time(resourcePath);
+
+    //@todo workaround for missing clock converters in GCC: (remove when C++20 is complete) (replace with clock_cast)
+    auto fileClockEpoch   = 6437660400;
+    auto secondsInSysTime = floor<seconds>(fileDate).time_since_epoch().count() + fileClockEpoch;
+    auto dpInSysDays      = floor<days>(system_clock::from_time_t(secondsInSysTime));
+    //end of workaround
+
+    auto year = std::to_string(static_cast<int>(std::chrono::year_month_day(floor<std::chrono::days>(dpInSysDays)).year()));
     SECTION("images only") {
         fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/"))},
-                              destinationPath.string() + "/Images/{{date.year}}/");
+                              destinationPath.string() + "/Images/{{date.year}}/",
+                              strategies);
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
         REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
@@ -320,20 +334,23 @@ TEST_CASE("File sorter test") {
         const auto& result = fileSorter.sort({resourcePath});
         REQUIRE(result.getSortedFiles().size() == 3);
         REQUIRE(fs::exists(destinationPath / "Images"));
-        REQUIRE(fs::exists(destinationPath / "Images" / "2021" / "test.gif"));
-        REQUIRE(!fs::is_directory(destinationPath / "Images" / "2021" / "test.gif"));
+        REQUIRE(fs::exists(destinationPath / "Images" / year / "test.gif"));
+        REQUIRE(!fs::is_directory(destinationPath / "Images" / year / "test.gif"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
         REQUIRE(!fs::is_directory(destinationPath / "Images" / "2020" / "test.png"));
-        REQUIRE(fs::exists(destinationPath / "Images" / "2021" / "png_with_wrong_extension.txt"));
-        REQUIRE(fs::exists(resourcePath / "test.gif"));
-        REQUIRE(fs::exists(resourcePath / "test.png"));
-        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
-        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
+        REQUIRE(fs::exists(destinationPath / "Images" / year / "png_with_wrong_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "test.gif"));                    // was not moved
+        REQUIRE(fs::exists(resourcePath / "test.png"));                    // was not moved
+        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));// was not moved
+        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));         // was not moved
     }
     SECTION("images and txt") {
         fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/"))},
-                              destinationPath.string() + "/Images/{{date.year}}/");
-        fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("text/"))}, destinationPath.string() + "/Text/");
+                              destinationPath.string() + "/Images/{{date.year}}/",
+                              strategies);
+        fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("text/"))},
+                              destinationPath.string() + "/Text/",
+                              strategies);
         REQUIRE(fs::exists(resourcePath / "test.gif"));
         REQUIRE(fs::exists(resourcePath / "test.png"));
         REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
@@ -341,19 +358,64 @@ TEST_CASE("File sorter test") {
         const auto& result = fileSorter.sort({resourcePath});
         REQUIRE(result.getSortedFiles().size() == 4);
         REQUIRE(fs::exists(destinationPath / "Images"));
-        //@todo replace "2020" with current year, "2020" in png stays, it's taken from exif
-        REQUIRE(fs::exists(destinationPath / "Images" / "2021" / "test.gif"));
+        //@todo replace "2021" with current year, "2020" in png stays, it's taken from exif
+        REQUIRE(fs::exists(destinationPath / "Images" / year / "test.gif"));
         REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
-        REQUIRE(fs::exists(destinationPath / "Images" / "2021" / "png_with_wrong_extension.txt"));
+        REQUIRE(fs::exists(destinationPath / "Images" / year / "png_with_wrong_extension.txt"));
         REQUIRE(fs::exists(destinationPath / "Text" / "test.txt"));
-        REQUIRE(fs::exists(resourcePath / "test.gif"));
-        REQUIRE(fs::exists(resourcePath / "test.png"));
-        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
-        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));// was not moved
+        REQUIRE(fs::exists(resourcePath / "test.gif"));                    // was not moved
+        REQUIRE(fs::exists(resourcePath / "test.png"));                    // was not moved
+        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));// was not moved
+        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));         // was not moved
         SECTION("second sort should end with error") {
             const auto& result = fileSorter.sort({resourcePath});
             REQUIRE(result.getSortedFiles().empty());
         }
+    }
+
+    SECTION("multimatcher: images bigger than") {
+        fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/")),
+                               matchers::fileSorterSizeMatcher(1000, MapperMatcherMode::greater)},
+                              destinationPath.string() + "/Images/{{date.year}}/",
+                              FileSortingStrategies());
+        REQUIRE(fs::exists(resourcePath / "test.gif"));
+        REQUIRE(fs::exists(resourcePath / "test.png"));
+        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
+        const auto& result = fileSorter.sort({resourcePath});
+        REQUIRE(result.getSortedFiles().size() == 1);
+        REQUIRE(fs::exists(destinationPath / "Images"));
+        REQUIRE(!fs::exists(destinationPath / "Images" / "2021" / "test.gif"));
+        REQUIRE(!fs::is_directory(destinationPath / "Images" / "2021" / "test.gif"));
+        REQUIRE(fs::exists(destinationPath / "Images" / "2020" / "test.png"));
+        REQUIRE(!fs::is_directory(destinationPath / "Images" / "2020" / "test.png"));
+        REQUIRE(!fs::exists(destinationPath / "Images" / "2021" / "png_with_wrong_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "test.gif"));                    // was not moved
+        REQUIRE(fs::exists(resourcePath / "test.png"));                    // was not moved
+        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));// was not moved
+        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));         // was not moved
+    }
+
+    SECTION("multimatcher: images with wrong txt extension") {
+        fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/")), matchers::fileSorterNameMatcher("(.)+\\.txt")},
+                              destinationPath.string() + "/Images/{{date.year}}/",
+                              FileSortingStrategies());
+        REQUIRE(fs::exists(resourcePath / "test.gif"));
+        REQUIRE(fs::exists(resourcePath / "test.png"));
+        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));
+        const auto& result = fileSorter.sort({resourcePath});
+        REQUIRE(result.getSortedFiles().size() == 1);
+        REQUIRE(fs::exists(destinationPath / "Images"));
+        REQUIRE(!fs::exists(destinationPath / "Images" / year / "test.gif"));
+        REQUIRE(!fs::is_directory(destinationPath / "Images" / year / "test.gif"));
+        REQUIRE(!fs::exists(destinationPath / "Images" / "2020" / "test.png"));
+        REQUIRE(!fs::is_directory(destinationPath / "Images" / "2020" / "test.png"));
+        REQUIRE(fs::exists(destinationPath / "Images" / year / "png_with_wrong_extension.txt"));
+        REQUIRE(fs::exists(resourcePath / "test.gif"));                    // was not moved
+        REQUIRE(fs::exists(resourcePath / "test.png"));                    // was not moved
+        REQUIRE(fs::exists(resourcePath / "png_with_wrong_extension.txt"));// was not moved
+        REQUIRE(fs::exists(resourcePath / "subdir" / "test.txt"));         // was not moved
     }
 }
 
@@ -388,13 +450,13 @@ TEST_CASE("Target strategy test ") {
         SECTION("number finding test") {
             const auto predicate2 = StandardFileSorterPredicates::pretendFileExistsPredicate;
             // this file does not exist, so it's ok, it won't be renamed, but other two should be.
-            auto testGif9        = resourcePath / "test (9).gif";
-            auto expectedResult1 = resourcePath / "test (9).gif";
-            auto expectedResult2 = resourcePath / "test (10).gif";
-            auto expectedResult3 = resourcePath / "test (11).gif";
-            auto result          = action(testGif9, predicate2);
-            auto result2         = action(testGif9, predicate2);
-            auto result3         = action(testGif9, predicate2);
+            auto testGif9         = resourcePath / "test (9).gif";
+            auto expectedResult1  = resourcePath / "test (9).gif";
+            auto expectedResult2  = resourcePath / "test (10).gif";
+            auto expectedResult3  = resourcePath / "test (11).gif";
+            auto result           = action(testGif9, predicate2);
+            auto result2          = action(testGif9, predicate2);
+            auto result3          = action(testGif9, predicate2);
             REQUIRE(result == expectedResult1);
             REQUIRE(result2 == expectedResult2);
             REQUIRE(result3 == expectedResult3);

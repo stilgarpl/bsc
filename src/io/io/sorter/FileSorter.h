@@ -18,30 +18,27 @@ namespace bsc {
 
     class FileSorter {
     public:
-        struct SortingStrategies {
-            const FileSortingStrategies::SortStrategy sortStrategy = StandardFileSorterSortStrategies::copy;
-            const FileSortingStrategies::CreateValidTargetPathStrategy createValidTargetPathStrategy =
-                    StandardCreateValidTargetPathStrategies::rename();
-            const FileSortingStrategies::ErrorHandlingStrategy errorHandlerStrategy =
-                    StandardFileSorterErrorHandlers::stop;
-            const FileSortingStrategies::FileExistsPredicate fileExistsPredicate = StandardFileSorterPredicates::fileExistsPredicate;
-            const bool preservePaths = false;
+        struct GlobalSortingStrategies {
+            const FileSortingStrategies::FileExistsPredicate fileExistsPredicate    = StandardFileSorterPredicates::fileExistsPredicate;
+            const FileSortingStrategies::RelativePathBuilder relativePathBuilder = StandardRelativePathBuilders::none;
         };
 
     private:
-        const SortingStrategies actions;
+        const GlobalSortingStrategies actions;
         FileSorterMapper mapper;
         const FileListFetcher fileListFetcher;
         const PathTranslator translator{};
         const FileInfoDecoder decoder{};
 
     public:
-        FileSorter(FileListFetcher fileListFetcher, SortingStrategies Actions);
-        //@todo consider replacing vector with span - it's not trivial, many places have {} initialization or just won't convert vector to span (temporaries)
+        FileSorter(FileListFetcher fileListFetcher, GlobalSortingStrategies Actions);
+        //@todo consider replacing vector with span - it's not trivial, many places have {} initialization or just won't convert vector to
+        //span (temporaries)
         SortResult sort(const std::vector<fs::path>& pathToSort);
-        void addPattern(std::vector<FileSorterMapperMatcher> matcher, std::string pattern) {
-            mapper.addPattern(std::move(matcher), std::move(pattern));
+        void addPattern(std::vector<FileSorterMapperMatcher> matcher, std::string pattern, FileSortingStrategies strategies) {
+            mapper.addPattern(std::move(matcher), std::move(pattern), strategies);
         }
+
     private:
         [[nodiscard]] std::vector<fs::path> fetchAllFiles(const std::vector<fs::path>& pathsToSort) const;
     };

@@ -7,6 +7,7 @@
 #include <io/sorter/strategies/Strategies.h>
 #include <regex>
 namespace bsc {
+    //@todo those structs should probably be converted to namespaces
     struct StandardFileSorterSortStrategies {
         static FileSortingStrategies::SortStrategy copy;
         static FileSortingStrategies::SortStrategy move;
@@ -30,6 +31,12 @@ namespace bsc {
     struct StandardFileSorterPredicates {
         static FileSortingStrategies::FileExistsPredicate fileExistsPredicate;
         static FileSortingStrategies::FileExistsPredicate pretendFileExistsPredicate;
+    };
+
+    struct StandardRelativePathBuilders {
+        static FileSortingStrategies::RelativePathBuilder none;
+        static FileSortingStrategies::RelativePathBuilder preserve;
+        static FileSortingStrategies::RelativePathBuilder parentDirectory;
     };
 
 }// namespace bsc

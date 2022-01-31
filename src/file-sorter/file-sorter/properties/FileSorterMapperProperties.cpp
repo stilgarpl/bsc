@@ -15,7 +15,8 @@ namespace bsc {
                                                                       MapperMatcherMode mode,
                                                                       SortAction sort,
                                                                       std::string errorAction,
-                                                                      std::string fileExists) {
+                                                                      std::string fileExists,
+                                                                      std::string renamePattern) {
 
         auto found = std::ranges::find_if(this->rules(), [&mapper, &match](auto& j) {
             auto& matchers = j.matchers();
@@ -35,7 +36,8 @@ namespace bsc {
         }
         ptr->pattern              = std::move(pattern);
         ptr->actions().sort       = sort;
-        ptr->actions().fileExists = std::move(fileExists);
+        ptr->actions().fileExists().action = std::move(fileExists);
+        ptr->actions().fileExists().pattern = std::move(renamePattern);
         ptr->actions().error      = std::move(errorAction);
         return *ptr;
     }
@@ -47,5 +49,8 @@ namespace bsc {
     }
     void MatcherProperties::write(PropertySequencer& sequencer) const {
         sequencer(type, match, mode);
+    }
+    void FileExistsProperties::write(PropertySequencer& sequencer) const {
+        sequencer(action, pattern);
     }
 }// namespace bsc

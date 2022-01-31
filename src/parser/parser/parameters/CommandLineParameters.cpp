@@ -148,7 +148,7 @@ namespace bsc {
                             std::string parameterName =
                                     (failedOption != self->argpOptions.end() && failedOption->name != nullptr)
                                             ? failedOption->name
-                                    : key < 128 ? std::string(1, key)
+                                    : key < 128 ? std::string(1, static_cast<char>(key))
                                                 : "unknown";
                             argp_error(state,
                                        "Parameter [%s] : Value \"%s\" is not allowed. Allowed values: %s",
