@@ -3,6 +3,7 @@
 //
 
 #include <catch2/catch.hpp>
+#include <list>
 #include <map>
 #include <parser/parser/fromString.h>
 
@@ -13,6 +14,28 @@ enum class TestEnum {
     two,
     three,
 };
+
+struct CustomClassType {
+    int a,b,c;
+    std::string x;
+};
+
+namespace bsc {
+
+    template<>
+    class ParserImplementation<CustomClassType> {
+    public:
+                [[nodiscard]] CustomClassType
+                parse(const StringType& value) {
+                    Parser parser;
+                    auto list = parser.fromString<std::vector<int>>(value);
+                    if (list.size() != 3) {
+                        throw StringParseException("Failed to parse CustomClassType");
+                    }
+                    return CustomClassType{list[0], list[1], list[2], "parsed"};
+                };
+    };
+}
 
 TEST_CASE("FromString parser test") {
     SECTION("Default parser configuration") {
@@ -66,6 +89,16 @@ TEST_CASE("FromString parser test") {
         REQUIRE_THROWS_MATCHES(parser.fromString<int>("qqq"),
                                StringParseException,
                                Catch::Matchers::Message("Integer parsing failed for value: qqq"));
+    }
+
+    SECTION("Custom parser implementation") {
+        Parser parser;
+        auto result = parser.fromString<CustomClassType>("4,99,1");
+        REQUIRE(result.a == 4);
+        REQUIRE(result.b == 99);
+        REQUIRE(result.c == 1);
+        REQUIRE(result.x == "parsed");
+
     }
 
 }

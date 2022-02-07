@@ -78,6 +78,9 @@ namespace bsc {
         std::to_string(t);
     };
 
+    template <typename T>
+    concept IsBool = std::same_as<std::remove_cvref_t<T>, bool>;
+
 }// namespace bsc
 
 #endif// BSC_CONCEPTS_H
