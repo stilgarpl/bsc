@@ -13,6 +13,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <memory>
 //@todo make it optional on cmake option to use magic_enum
 #include <magic_enum.hpp>
 

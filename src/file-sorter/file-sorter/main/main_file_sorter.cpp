@@ -79,7 +79,7 @@ struct FileSorterParameters : CommandLineParameters {
 };
 
 void addOrUpdateRules(FileSorterProperties& properties,
-                      std::map<std::string, std::string> matchers,
+                      const std::map<std::string, std::string>& matchers,
                       MapperType type,
                       MapperMatcherMode mode,
                       const FileSorterParameters& parameters);

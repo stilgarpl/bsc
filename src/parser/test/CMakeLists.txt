@@ -1,4 +1,4 @@
-set(SOURCE_FILES test_parser/test_main.cpp test_parser/fromString_test.cpp test_parser/templateCast_test.cpp test_parser/parameters_test.cpp test_parser/explode_test.cpp test_parser/toString_test.cpp)
+set(SOURCE_FILES test_parser/test_main.cpp test_parser/fromString_test.cpp test_parser/templateCast_test.cpp test_parser/parameters_test.cpp test_parser/explode_test.cpp test_parser/toString_test.cpp test_parser/parametrized_value_test.cpp)
 
 add_executable(test_parser ${SOURCE_FILES})
 catch_discover_tests(test_parser WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
