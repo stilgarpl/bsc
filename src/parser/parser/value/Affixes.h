@@ -4,6 +4,7 @@
 #ifndef BSC_AFFIXES_H
 #define BSC_AFFIXES_H
 
+#include <magic_enum.hpp>
 #include <ranges>
 #include <string>
 namespace bsc {
@@ -26,30 +27,6 @@ namespace bsc {
         };
 
         constexpr static const inline SignAffix signAffix{};
-
-        //@todo move to other file
-        enum class SiPrefix {
-            y = -24,
-            z = -21,
-            a = -18,
-            f = -15,
-            p = -12,
-            n = -9,
-            u = -6,
-            m = -3,
-            c = -2,
-            d = -1,
-            da = 1,
-            h = 2,
-            k = 3,
-            M = 6,
-            G = 9,
-            T = 12,
-            P = 15,
-            E = 18,
-            Z = 21,
-            Y = 24,
-        };
 
         template<typename EnumType ,bool Optional = true> requires std::is_enum_v<EnumType>
         struct EnumAffix {

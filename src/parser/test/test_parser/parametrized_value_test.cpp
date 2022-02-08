@@ -1,8 +1,10 @@
 //
 // Created by Krzysztof Tulidowicz on 01.02.22.
 //
-#include "parser/value/ParametrizedValue.h"
+
+#include "constant/standard/World.h"
 #include "parser/value/Affixes.h"
+#include "parser/value/ParametrizedValue.h"
 #include <catch2/catch.hpp>
 #include <map>
 #include <parser/parser/explode.h>
@@ -35,13 +37,13 @@ TEST_CASE("Parametrized value test") {
     }
 
     SECTION("SI int") {
-        constexpr affixes::EnumAffix<affixes::SiPrefix> siEnumAffix;
+        constexpr affixes::EnumAffix<SiPrefix> siEnumAffix;
 
         ParametrizedValue<int, affixes::noAffix, siEnumAffix> value("5k") ;
         REQUIRE(value.getValue().has_value() == true);
         REQUIRE(value.getValue().value() == 5);
         REQUIRE(value.getPostfix().has_value() == true);
-        REQUIRE(value.getPostfix().value() == affixes::SiPrefix::k);
+        REQUIRE(value.getPostfix().value() == SiPrefix::k);
     }
 
 }
@@ -49,7 +51,7 @@ TEST_CASE("Parametrized value test") {
 TEST_CASE("Affixes test") {
 
     SECTION("si enum") {
-        affixes::EnumAffix<affixes::SiPrefix> siEnumAffix;
+        affixes::EnumAffix<SiPrefix> siEnumAffix;
         REQUIRE(siEnumAffix.pattern == "(y|z|a|f|p|n|u|m|c|d|da|h|k|M|G|T|P|E|Z|Y)");
     }
 

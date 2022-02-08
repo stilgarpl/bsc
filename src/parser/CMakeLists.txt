@@ -13,7 +13,7 @@ if (BSC_USE_PCH)
             <parser/cast/templateCast.h>
             <parser/parser/explode.h>)
 endif ()
-target_link_libraries(parser PUBLIC argp::argp fmt::fmt-header-only PRIVATE magic_enum::magic_enum  )
+target_link_libraries(parser PUBLIC argp::argp fmt::fmt-header-only constant PRIVATE magic_enum::magic_enum  )
 install(DIRECTORY parser DESTINATION ${BSC_DESTINATION_INCLUDE}
         FILES_MATCHING PATTERN "*.h")
 install(TARGETS parser COMPONENT parser DESTINATION ${BSC_DESTINATION_LIB} EXPORT ${PROJECT_NAME}Targets)
