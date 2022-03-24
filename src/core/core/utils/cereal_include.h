@@ -5,9 +5,6 @@
 #ifndef BSC_CEREAL_INCLUDE_H
 #define BSC_CEREAL_INCLUDE_H
 
-//@todo there is a bug in 1.3.0, this is a workaround. remove when upgraded to 1.3.1
-#define CEREAL_THREAD_SAFE 1
-
 #include <cereal/cereal.hpp>
 #include <cereal/access.hpp>
 #include <cereal/archives/binary.hpp>

@@ -5,20 +5,12 @@
 #define BSC_PARAMETRIZEDVALUE_H
 
 #include "parser/parser/fromString.h"
-#include <concepts>
 #include <fmt/format.h>
 #include <regex>
+#include "Affix.h"
 #include <string_view>
 
 namespace bsc {
-
-    template<typename T>
-    concept Affix = requires(T) {
-        { T::present } -> std::convertible_to<bool>;
-        { T::optional } -> std::convertible_to<bool>;
-        { T::pattern } -> std::convertible_to<std::string>;
-        typename T::ValueType;
-    };
 
     namespace detail {
         class ParametrizedValueRegexFactory {
@@ -41,69 +33,32 @@ namespace bsc {
             }
         };
 
-        template<typename ValueType>
-        class ParametrizedValuePrefixBase {
-        private:
-            std::optional<ValueType> value;
-
-        protected:
-
-            void setPrefix( std::optional<ValueType> v) {
-                value = std::move(v);
-            }
-
-        public:
-
-            const auto& getPrefix() {
-                return value;
-            }
-        };
-
-        template<>
-        class ParametrizedValuePrefixBase<void> {};
-
-        template<typename ValueType>
-        class ParametrizedValuePostfixBase {
-        private:
-            std::optional<ValueType> value;
-
-        protected:
-
-            void setPostfix( std::optional<ValueType> v) {
-                value = std::move(v);
-            }
-
-        public:
-            const auto& getPostfix() {
-                return value;
-            }
-        };
-
-        template<>
-        class ParametrizedValuePostfixBase<void> {};
-
     }// namespace detail
 
-    template<typename ValueType, Affix auto prefix, Affix auto postfix>
-    class ParametrizedValue : public detail::ParametrizedValuePrefixBase<typename decltype(prefix)::ValueType>,
-                              public detail::ParametrizedValuePostfixBase<typename decltype(postfix)::ValueType> {
+    template<typename ValueType, Affix PrefixType, Affix PostfixType>
+    class ParametrizedValue {
 
     private:
+        static constexpr bool hasPrefixValue = (!std::is_void_v<typename PrefixType::ValueType>);
+        static constexpr bool hasPostfixValue = (!std::is_void_v<typename PostfixType::ValueType>);
+
+        PrefixType prefix;
+        PostfixType postfix;
         constexpr static std::string_view valueRegexPattern =
                 detail::ParametrizedValueRegexFactory::makeRegexForType<std::remove_cvref_t<ValueType>>();
         std::optional<std::remove_cvref_t<ValueType>> value;
 
-        template<Affix AffixType>
-        static constexpr bool affixNotVoid(AffixType affix) {
-            if constexpr (std::is_same_v<void, typename AffixType::ValueType>) {
-                return false;
-            } else {
-                return true;
-            }
+        void setPrefix(std::optional<typename PrefixType::ValueType> v) requires hasPrefixValue {
+            prefix.value = v;
         }
 
-        static std::string makePattern() {
+        void setPostfix(std::optional<typename PostfixType::ValueType> v) requires hasPostfixValue {
+            postfix.value = v;
+        }
+
+        std::string makePattern() {
             using namespace std::string_literals;
+            //@todo make it static for type, we only need one pattern per ParametrizedValue type
             std::string pattern = fmt::format("((?:{}){})((?:{}))((?:{}){})",
                                               prefix.present ? prefix.pattern : "",
                                               prefix.optional ? "?" : "",
@@ -113,13 +68,24 @@ namespace bsc {
             return pattern;
         }
 
-        inline static const std::string regexPattern = makePattern();
+        //@todo make it static for type, we only need one pattern per ParametrizedValue type
+        const std::string regexPattern = makePattern();
 
     public:
+
+
+        const auto & getPrefix() requires (!std::is_void_v<typename PrefixType::ValueType>) {
+            return prefix.value;
+        }
+
+        const auto & getPostfix() requires (!std::is_void_v<typename PostfixType::ValueType>) {
+            return postfix.value;
+        }
+
         explicit ParametrizedValue(std::string textToParse) : ParametrizedValue(textToParse, Parser{}) {
         }
 
-        ParametrizedValue(std::string textToParse, const Parser& fromStringParser) {
+        ParametrizedValue(const std::string& textToParse, const Parser& fromStringParser) {
             std::smatch match;
             std::regex pattern{regexPattern};
             if (std::regex_match(textToParse, match, pattern)) {
@@ -128,15 +94,15 @@ namespace bsc {
                 auto& postfixValue = match[3];
 
                 value              = fromStringParser.template fromString<ValueType>(valueText.str());
-                if constexpr (affixNotVoid(prefix)) {
+                if constexpr (hasPrefixValue) {
                     if (!prefixValue.str().empty()) {
-                        this->setPrefix(fromStringParser.template fromString<typename decltype(prefix)::ValueType>(prefixValue.str()));
+                        this->setPrefix(fromStringParser.template fromString<typename PrefixType::ValueType>(prefixValue.str()));
                     }
                 }
                 
-                if constexpr (affixNotVoid(postfix)) {
+                if constexpr (hasPostfixValue) {
                     if (!postfixValue.str().empty()) {
-                        this->setPostfix(fromStringParser.template fromString<typename decltype(postfix)::ValueType>(postfixValue.str()));
+                        this->setPostfix(fromStringParser.template fromString<typename PostfixType::ValueType>(postfixValue.str()));
                     }
                 }
             }

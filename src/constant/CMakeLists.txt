@@ -1,4 +1,4 @@
-set(SOURCE_FILES constant/standard/World.h constant/dummy.cpp)
+set(SOURCE_FILES constant/standard/World.h constant/dummy.cpp ../math/math/arithmetic.h)
 
 add_library(constant ${SOURCE_FILES})
 set_target_properties(constant PROPERTIES LINKER_LANGUAGE CXX)
