@@ -5,15 +5,33 @@
 #define BSC_AFFIX_H
 #include <concepts>
 #include <string>
-
-namespace bsc {
+#include <exception>
+#include <stdexcept>
+namespace bsc::affixes {
     template<typename T>
-    concept Affix = requires(T) {
-        { T::present } -> std::convertible_to<bool>;
-        { T::optional } -> std::convertible_to<bool>;
-        { T::pattern } -> std::convertible_to<std::string>;
-        typename T::ValueType;
-    };
+        concept IsAffix = requires(T) {
+                            { T::present } -> std::convertible_to<bool>;
+                            { T::optional } -> std::convertible_to<bool>;
+                            { T::pattern } -> std::convertible_to<std::string>; //IMPORTANT, pattern can't have capturing groups!
+                            typename T::ValueType;
+                        };
+
+        class EmptyAffixException : public std::out_of_range {
+        public:
+            explicit EmptyAffixException(const std::string& arg) : out_of_range(arg) {
+            }
+        };
+
+        template<typename AffixType, typename T>
+        concept IsRelationalAffix = IsAffix<AffixType> && requires(AffixType a, T t) {
+                                                            { a.compare(t, t) } -> std::same_as<bool>;
+                                                        };
+
+        template<typename AffixType, typename T>
+        concept IsValueTransformAffix = IsAffix<AffixType> && requires(AffixType a, T const& t) { a.transform(t); };
+
+        template<typename AffixType>
+        concept IsValueAffix = IsAffix<AffixType> && requires(AffixType a) { a.value; };
 }
 
 #endif// BSC_AFFIX_H

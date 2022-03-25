@@ -13,21 +13,6 @@ namespace bsc {
 
     namespace affixes {
 
-        template<typename AffixType, typename T>
-        concept IsRelationalAffix = Affix<AffixType> && requires(AffixType a, T t, T k) {
-            { a.compare(t, k) } -> std::same_as<bool>;
-        };
-
-        template<typename AffixType, typename T>
-        concept IsValueTransformAffix = Affix<AffixType> && requires(AffixType a, T t, typename AffixType::ValueType k) {
-            a.transform(t, k);
-        };
-
-        template<typename AffixType>
-        concept IsValueAffix = Affix<AffixType> && requires(AffixType a) {
-            a.value;
-        };
-
         template<typename valueType>
         struct BaseAffix {
             using ValueType = valueType;
@@ -59,8 +44,39 @@ namespace bsc {
             }
         };
 
+        struct RelationAffix : public BaseAffix<std::string> {
+            const bool present                      = true;
+            const bool optional                     = true;
+            static inline const std::string pattern = "(?:<|<=|=|>|>=)";
+
+        private:
+            bool comparator(std::string_view operand, auto t1, auto t2) const{
+                if (operand == "<") {
+                    return t1 < t2;
+                } else if (operand == "<=") {
+                    return t1 <= t2;
+                } else if (operand == ">") {
+                    return t1 > t2;
+                } else if (operand == ">=") {
+                    return t1 >= t2;
+                } else if (operand == "=") {
+                    return t1 == t2;
+                } else if (operand == "!=") {
+                    return t1 != t2;
+                }
+
+                return t1 == t2;// default operation is equality
+            }
+
+        public:
+            bool compare(const auto& t, const auto& k) const {
+                //@todo C++23 use monadic interface
+                return comparator(value.has_value() ? *value : "", t, k);
+            }
+        };
+
         template<typename EnumType, bool Optional = true>
-        requires std::is_enum_v<EnumType>
+            requires std::is_enum_v<EnumType>
         struct EnumAffix : BaseAffix<EnumType> {
             const bool present  = true;
             const bool optional = Optional;
@@ -69,7 +85,7 @@ namespace bsc {
             static auto constructPattern() {
                 //@todo C++20 GCC12 make this constexpr
                 using namespace std::string_literals;
-                std::string result = "(";
+                std::string result = "(?:";
                 for (bool first = true; const auto& name : magic_enum::enum_names<EnumType>()) {
                     result += (first ? ""s : "|"s) + std::string(name);
                     first = false;
@@ -80,14 +96,6 @@ namespace bsc {
 
         public:
             static inline const std::string pattern = constructPattern();
-        };
-
-        template<Affix AffixType, auto transformator>
-        struct TransformAffix : public AffixType {
-            template<typename T>
-            auto transform(const T& t) {
-                return transformator(t, *this->value);
-            }
         };
 
     }// namespace affixes

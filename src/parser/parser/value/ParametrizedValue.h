@@ -24,23 +24,29 @@ namespace bsc {
 
             template<std::integral T>
             constexpr static std::string_view makeRegexForType() {
-                return "[+-]?[[:digit:]]+";
+                return "[[:digit:]]+";
             }
 
             template<std::floating_point T>
             constexpr static std::string_view makeRegexForType() {
-                return "[+-]?[[:digit:]]+(?:\\.[[:digit:]]+)?";
+                return "[[:digit:]]+(?:\\.[[:digit:]]+)?";
             }
         };
 
     }// namespace detail
 
-    template<typename ValueType, Affix PrefixType, Affix PostfixType>
+    template<typename ValueType, affixes::IsAffix PrefixType, affixes::IsAffix PostfixType>
     class ParametrizedValue {
 
     private:
         static constexpr bool hasPrefixValue = (!std::is_void_v<typename PrefixType::ValueType>);
         static constexpr bool hasPostfixValue = (!std::is_void_v<typename PostfixType::ValueType>);
+
+        static constexpr bool isPrefixTransform = affixes::IsValueTransformAffix<PrefixType, ValueType>;
+        static constexpr bool isPostfixTransform = affixes::IsValueTransformAffix<PostfixType, ValueType>;
+
+        static constexpr bool isPrefixCompare = affixes::IsRelationalAffix<PrefixType, ValueType>;
+        static constexpr bool isPostfixCompare = affixes::IsRelationalAffix<PostfixType, ValueType>;
 
         PrefixType prefix;
         PostfixType postfix;
@@ -108,8 +114,35 @@ namespace bsc {
             }
         }
 
-        const auto& getValue() const {
+        const auto& getRawValue() const {
             return value;
+        }
+
+        auto getValue() const -> ValueType  {
+            //@todo this should be computed during parsing phase and stored as a field, not computed on every call. future optimization, get it working first
+            if constexpr (isPrefixTransform && isPostfixTransform) {
+                return postfix.transform(prefix.transform(*value));
+            }
+            if constexpr (isPrefixTransform ) {
+                return prefix.transform(*value);
+            }
+            if constexpr (isPostfixTransform) {
+                return postfix.transform(*value);
+            }
+            return *value; //@todo handle errors?
+        }
+
+        bool compare(ValueType v) const requires (isPrefixCompare or isPostfixCompare){
+            bool result = false;
+            if (value.has_value() ) {
+                if constexpr (isPrefixCompare) {
+                    result = result or prefix.compare(v, getValue());
+                }
+                if constexpr (isPostfixCompare) {
+                    result = result or postfix.compare(getValue(), v);
+                }
+            }
+            return result;
         }
     };
 }// namespace bsc
