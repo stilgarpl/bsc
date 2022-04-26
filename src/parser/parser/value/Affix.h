@@ -4,9 +4,10 @@
 #ifndef BSC_AFFIX_H
 #define BSC_AFFIX_H
 #include <concepts>
-#include <string>
 #include <exception>
+#include <optional>
 #include <stdexcept>
+#include <string>
 namespace bsc::affixes {
     template<typename T>
         concept IsAffix = requires(T) {
@@ -32,6 +33,18 @@ namespace bsc::affixes {
 
         template<typename AffixType>
         concept IsValueAffix = IsAffix<AffixType> && requires(AffixType a) { a.value; };
+
+        template<typename valueType>
+        struct BaseAffix {
+            using ValueType = valueType;
+            std::optional<ValueType> value;
+        };
+
+        template<>
+        struct BaseAffix<void> {
+            using ValueType = void;
+        };
+
 }
 
 #endif// BSC_AFFIX_H

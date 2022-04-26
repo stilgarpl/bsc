@@ -1,7 +1,7 @@
 //
 // Created by Krzysztof Tulidowicz on 22.04.2020.
 //
-#include "core/optional/optional.h"
+#include "../../../optional/optional/optional.h"
 #include "file-sorter/properties/Actions.h"
 #include "file-sorter/properties/Factories.h"
 #include "file-sorter/properties/FileSorterMapperProperties.h"

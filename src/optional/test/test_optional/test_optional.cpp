@@ -2,8 +2,9 @@
 // Created by Krzysztof Tulidowicz on 11.02.2021.
 //
 
-#include "core/optional/optional.h"
+#include "optional/optional.h"
 #include <catch2/catch.hpp>
+#include <optional>
 
 using namespace bsc;
 

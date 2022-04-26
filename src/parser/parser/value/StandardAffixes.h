@@ -13,17 +13,6 @@ namespace bsc {
 
     namespace affixes {
 
-        template<typename valueType>
-        struct BaseAffix {
-            using ValueType = valueType;
-            std::optional<ValueType> value;
-        };
-
-        template<>
-        struct BaseAffix<void> {
-            using ValueType = void;
-        };
-
         struct NoAffix : BaseAffix<void> {
             const bool present  = false;
             const bool optional = true;

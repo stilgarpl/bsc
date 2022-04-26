@@ -19,7 +19,7 @@ namespace bsc {
             //@todo C++20 those methods should be constexpr when std::string is constexpr (in GCC 12)
             template<typename T>
             constexpr static std::string_view makeRegexForType() {
-                return "";//@todo implement
+                return "(?:.*)";
             }
 
             template<std::integral T>

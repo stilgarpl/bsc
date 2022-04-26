@@ -81,6 +81,17 @@ namespace bsc::optional {
         };
     }
 
+    template<typename Callable>
+    auto orElseChainGet(Callable callable) {
+        return [callable](IsOptional auto& optional) {
+            if (optional.has_value()) {
+                return optional;
+            } else {
+                return callable();
+            };
+        };
+    }
+
     template<typename Exception>
     auto orElseThrow(Exception exception) {
         return [exception](IsOptional auto& optional) {

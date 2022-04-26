@@ -7,6 +7,7 @@
 #include <concepts>
 #include <utility>
 #include <string>
+#include <chrono>
 
 namespace bsc {
     //@todo C++20 all of those SFINAE enable_if can be replaced by concepts, but concepts do not quite work yet in
@@ -22,6 +23,16 @@ namespace bsc {
     //    constexpr bool is_pair_v = is_pair<T>::value;
     template<typename T>
     concept IsPair = IsPairT<T>::value;
+
+    template<typename T>
+    struct IsTimePointT : std::false_type {};
+
+    template<typename T, typename U>
+    struct IsTimePointT<std::chrono::time_point<T,U>> : std::true_type {};
+
+    template<typename T>
+    concept IsTimePoint = IsTimePointT<T>::value;
+
 
     template<typename T, typename _ = void>
     struct IsContainerNotStringCheck : std::false_type {};

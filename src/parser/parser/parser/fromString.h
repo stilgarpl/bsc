@@ -17,6 +17,9 @@
 //@todo make it optional on cmake option to use magic_enum
 #include <magic_enum.hpp>
 
+#include "detail/date.h"
+#include "detail/tz.h"
+
 namespace bsc {
 
     class StringParseException : public std::invalid_argument {
@@ -34,18 +37,18 @@ namespace bsc {
             //@todo parserConfiguration can be removed since we have parser reference
             std::shared_ptr<ParserConfiguration> parserConfiguration = std::make_shared<ParserConfiguration>();
 
-
         public:
             explicit DefaultParserImplementation(Parser* p, std::shared_ptr<ParserConfiguration> parserConfiguration)
                 : parser(p), parserConfiguration(std::move(parserConfiguration)) {
             }
 
-        public: //I'd prefer this to be private, but concept HasDefaultImplementation does not work with private (it doesn't see friend)
+        public:// I'd prefer this to be private, but concept HasDefaultImplementation does not work with private (it doesn't see friend)
             friend class Parser;
 
             template<typename ParameterType>
-            [[nodiscard]] std::remove_reference_t<ParameterType>
-            fromStringImpl(const StringType& value) const requires std::is_floating_point_v<ParameterType> {
+            [[nodiscard]] std::remove_reference_t<ParameterType> fromStringImpl(const StringType& value) const
+                requires std::is_floating_point_v<ParameterType>
+            {
                 try {
                     //@todo use "if constexpr" to determine the size of ParameterType and use appropriate std function
                     return std::stod(value);
@@ -56,13 +59,15 @@ namespace bsc {
 
             template<IsBool ParameterType>
             [[nodiscard]] bool fromStringImpl(const StringType& value) const {
-                //@todo maybe check if string is not empty and then if it has values like "false" or something
+                //@todo maybe check if string is not empty and then if it has values like "false" or something -- this could be selected by
+                //ParserConfiguration flag
                 return true;
             }
 
             template<typename ParameterType>
-            [[nodiscard]] std::remove_reference_t<ParameterType>
-            fromStringImpl(const StringType& value) const requires std::is_integral_v<ParameterType> &&(!IsBool<ParameterType>) {
+            [[nodiscard]] std::remove_reference_t<ParameterType> fromStringImpl(const StringType& value) const
+                requires std::is_integral_v<ParameterType> && (!IsBool<ParameterType>)
+            {
                 try {
                     //@todo use "if constexpr" to determine the size of ParameterType and use appropriate std function
                     return std::stoll(value);
@@ -72,8 +77,9 @@ namespace bsc {
             }
 
             template<typename ParameterType>
-            [[nodiscard]] std::remove_reference_t<ParameterType>
-            fromStringImpl(const StringType& value) const requires std::is_enum_v<ParameterType> {
+            [[nodiscard]] std::remove_reference_t<ParameterType> fromStringImpl(const StringType& value) const
+                requires std::is_enum_v<ParameterType>
+            {
                 auto optionalEnum = magic_enum::enum_cast<ParameterType>(value);
                 if (optionalEnum) {
                     return *optionalEnum;
@@ -83,8 +89,9 @@ namespace bsc {
             }
 
             template<typename ParameterType>
-            [[nodiscard]] std::remove_reference_t<ParameterType>
-            fromStringImpl(const StringType& value) const requires std::is_convertible_v<ParameterType, StringType> {
+            [[nodiscard]] std::remove_reference_t<ParameterType> fromStringImpl(const StringType& value) const
+                requires std::is_convertible_v<ParameterType, StringType>
+            {
                 if (!value.empty()) {
                     return ParameterType(value);
                 } else {
@@ -109,27 +116,91 @@ namespace bsc {
 
             template<IsContainerNotString ParameterType>
             [[nodiscard]] std::remove_reference_t<ParameterType> fromStringImpl(const StringType& value) const;
+
+            template<typename Duration>
+            static const char* selectTimeFormatPrecision() {
+                //@todo maybe move it somewhere else
+                if (auto dur = Duration{1}; dur >= std::chrono::years{1}) {
+                    return "%Y";
+                } else if (dur >= std::chrono::months{1}) {
+                    return "%Y-%m";
+                } else if (dur >= std::chrono::days{1}) {
+                    return "%F";
+                } else if (dur >= std::chrono::minutes{1}) {
+                    return "%F %R";
+                } else if (dur >= std::chrono::seconds{1}) {
+                    return "%F %T";
+                }
+
+                return "%c";
+            }
+
+            template<IsTimePoint ParameterType>
+            [[nodiscard]] std::remove_reference_t<ParameterType> fromStringImpl(const StringType& value, std::string format = selectTimeFormatPrecision<typename ParameterType::duration>()) const {
+                //@todo C++23 C++26 change format to string_view when chrono::parse supports it...
+                //chrono date library is stupid with incomplete dates, so...
+                //@todo try to make it less ugly
+                {
+                    std::stringstream ss{value};
+                    ParameterType result;
+                    //parsing full timepoint
+                    ss >> date::parse(format, result);
+                    if (ss.good()) return result;
+                }
+                {
+                    std::stringstream ss{value};
+                    ParameterType result;
+                    //parsing incomplete date (year and month)
+                    using namespace date;
+                    date::year_month ym{};
+                    ss >> date::parse(format, ym);
+                    date::year_month_day tempYmd = ym / 1;
+                    std::chrono::sys_days tempSd = tempYmd.operator sys_days();
+                    if (ss.good()) {
+                        result = ParameterType(tempSd);
+                        return result;
+                    }
+                }
+                {
+                    std::stringstream ss{value};
+                    ParameterType result;
+                    //parsing incomplete date (year)
+                    using namespace date;
+                    date::year y{};
+                    ss >> date::parse(format, y);
+                    date::year_month_day tempYmd = y / 1 / 1;
+                    if (ss.good()) {
+                        result = ParameterType(tempYmd.operator sys_days());
+                        return result;
+                    }
+                }
+                    using namespace std::string_literals;
+                    throw StringParseException("Unable to parse date with format: "s + format);
+
+            }
         };
 
-
-        template<typename T>
-        concept HasDefaultParserImplementation = requires(const DefaultParserImplementation& parser, const StringType& s) {
-            parser.fromStringImpl<T>(s);
-        };
+        template<typename T, typename ... Args>
+        concept HasDefaultParserImplementation =
+                requires(const DefaultParserImplementation& parser, const StringType& s, Args ... args ) {
+                    {parser.fromStringImpl<T>(s, args...)} -> std::same_as<std::remove_reference_t<T>>;
+                };
     }// namespace detail
 
     template<typename ParameterType>
     class ParserImplementation {
+    public:
+        explicit ParserImplementation(const Parser&){ };
         //        [[nodiscard]] std::remove_reference_t<ParameterType>
         //        parse(const StringType& value) {
         //
         //        }
     };
 
-    template<typename ParameterType>
-    concept HasCustomParserImplementation = requires(ParserImplementation<ParameterType> p, StringType s) {
-        {p.parse(s)} -> std::same_as<std::remove_reference_t<ParameterType>>;
-    };
+    template<typename ParameterType, typename ... Args>
+    concept HasCustomParserImplementation = requires(ParserImplementation<ParameterType> p, StringType s, Args ... args) {
+                                                { p.parse(s, args...) } -> std::same_as<std::remove_reference_t<ParameterType>>;
+                                            };
 
     class Parser {
     private:
@@ -138,33 +209,32 @@ namespace bsc {
 
     public:
         explicit Parser(const ParserConfiguration& parserConfiguration)
-            : parserConfiguration(std::make_shared<ParserConfiguration>(parserConfiguration)), defaultParserImplementation{this,
-                                                                                                       this->parserConfiguration} {
+            : parserConfiguration(std::make_shared<ParserConfiguration>(parserConfiguration)) {
         }
         Parser() = default;
-        template<typename ParameterType>
-        [[nodiscard]] std::remove_cvref_t<ParameterType> fromString(StringType value)
-                const requires detail::HasDefaultParserImplementation<std::remove_cvref_t<ParameterType>> || HasCustomParserImplementation<std::remove_cvref_t<ParameterType>> {
+        template<typename ParameterType, typename ... Args>
+        [[nodiscard]] std::remove_cvref_t<ParameterType> fromString(StringType value, Args... args) const
+            requires detail::HasDefaultParserImplementation<std::remove_cvref_t<ParameterType>, Args...>
+                     || HasCustomParserImplementation<std::remove_cvref_t<ParameterType>, Args...>
+        {
             if constexpr (HasCustomParserImplementation<std::remove_cvref_t<ParameterType>>) {
-                ParserImplementation<ParameterType> impl;
-                return impl.parse(value);
+                ParserImplementation<ParameterType> impl(*this);
+                return impl.parse(value, args...);
             } else {
-                return defaultParserImplementation.fromStringImpl<std::remove_cvref_t<ParameterType>>(std::move(value));
+                return defaultParserImplementation.fromStringImpl<std::remove_cvref_t<ParameterType>>(std::move(value), args...);
             }
         }
     };
 
     template<typename ParameterType>
-    [[nodiscard]] auto fromString(const StringType& value) {
+    [[nodiscard]] auto fromString(const StringType& value, auto... args) {
         static Parser parser;
         return parser.fromString<ParameterType>(value);
     }
 
     template<typename T>
-    concept ParsedFromString = requires(const Parser& parser, const StringType& s) {
-        parser.fromString<T>(s);
-    }
-    || HasCustomParserImplementation<T>;
+    concept ParsedFromString =
+            requires(const Parser& parser, const StringType& s) { parser.fromString<T>(s); } || HasCustomParserImplementation<T>;
 
     namespace detail {
         template<IsContainerNotString ParameterType>
@@ -179,7 +249,7 @@ namespace bsc {
 
             return container;
         }
-    }
+    }// namespace detail
 
 }// namespace bsc
 

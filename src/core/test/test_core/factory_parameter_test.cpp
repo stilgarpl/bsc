@@ -10,7 +10,7 @@
 #include <core/factory/ParsingFactory.h>
 #include <list>
 #include <sstream>
-#include <core/optional/optional.h>
+#include "optional/optional.h"
 
 using namespace bsc;
 

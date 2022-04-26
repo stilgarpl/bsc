@@ -542,8 +542,8 @@ TEST_CASE("Matchers and constraints test") {
         using namespace std::chrono_literals;
         testaid::TestDirWithResources testDirWithResources;
         auto realPath = testDirWithResources.getResourcePath("sort") / "test.gif";
-        auto p1       = date(before(fs::last_write_time(realPath) + 1h));
-        auto p2       = date(before(fs::last_write_time(realPath) - 1h));
+        auto p1       = bsc::StandardFileListFetcherConstraints::date(before(fs::last_write_time(realPath) + 1h));
+        auto p2       = bsc::StandardFileListFetcherConstraints::date(before(fs::last_write_time(realPath) - 1h));
         REQUIRE(p1(realPath) == true);
         REQUIRE(p2(realPath) == false);
     }

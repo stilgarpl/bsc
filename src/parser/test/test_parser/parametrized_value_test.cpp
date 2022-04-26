@@ -4,8 +4,10 @@
 
 #include "constant/standard/World.h"
 #include "math/arithmetic.h"
+#include "parser/value/DateTimeValue.h"
 #include "parser/value/ModifierAffixes.h"
 #include "parser/value/ParametrizedValue.h"
+#include "parser/value/SiAffix.h"
 #include "parser/value/StandardAffixes.h"
 #include <catch2/catch.hpp>
 #include <map>
@@ -83,12 +85,8 @@ TEST_CASE("Parametrized value test") {
     }
 
     SECTION("SI int") {
-        constexpr auto multiplyPown = []<typename EnumType>(EnumType v, auto i) {
-            return math::pown(10ll, static_cast<std::underlying_type_t<EnumType>>(v)) * i;
-        };
-        using SiEnumPrefix = affixes::TransformAffix<affixes::EnumAffix<SiPrefix>, multiplyPown>;
 
-        ParametrizedValue<int, affixes::NoAffix, SiEnumPrefix> value("5k");
+        ParametrizedValue<int, affixes::NoAffix, affixes::SiEnumPrefix> value("5k");
         REQUIRE(value.getRawValue().has_value() == true);
         REQUIRE(value.getRawValue().value() == 5);
         REQUIRE(value.getPostfix().has_value() == true);
@@ -97,12 +95,8 @@ TEST_CASE("Parametrized value test") {
     }
 
     SECTION("double SI int") {
-        constexpr auto multiplyPown = []<typename EnumType>(EnumType v, auto i) {
-            return math::pown(10ll, static_cast<std::underlying_type_t<EnumType>>(v)) * i;
-        };
-        using SiEnumPrefix = affixes::TransformAffix<affixes::EnumAffix<SiPrefix>, multiplyPown>;
 
-        ParametrizedValue<int, SiEnumPrefix, SiEnumPrefix> value("k5k");
+        ParametrizedValue<int, affixes::SiEnumPrefix, affixes::SiEnumPrefix> value("k5k");
         REQUIRE(value.getRawValue().has_value() == true);
         REQUIRE(value.getRawValue().value() == 5);
         REQUIRE(value.getPrefix().has_value() == true);
@@ -113,12 +107,8 @@ TEST_CASE("Parametrized value test") {
     }
 
     SECTION("SI int relation") {
-        constexpr auto multiplyPown = []<typename EnumType>(EnumType v, auto i) {
-            return math::pown(10ll, static_cast<std::underlying_type_t<EnumType>>(v)) * i;
-        };
-        using SiEnumPrefix = affixes::TransformAffix<affixes::EnumAffix<SiPrefix>, multiplyPown>;
 
-        ParametrizedValue<int, affixes::RelationAffix, SiEnumPrefix> value(">=5k");
+        ParametrizedValue<int, affixes::RelationAffix, affixes::SiEnumPrefix> value(">=5k");
         REQUIRE(value.getRawValue().has_value() == true);
         REQUIRE(value.getRawValue().value() == 5);
         REQUIRE(value.getPrefix().has_value() == true);
@@ -130,6 +120,22 @@ TEST_CASE("Parametrized value test") {
         REQUIRE(value.compare(4999) == false);
         REQUIRE(value.compare(5000) == true);
         REQUIRE(value.compare(900000) == true);
+    }
+
+    SECTION("DateTime relation") {
+        ParametrizedValue<DateTimeValue, affixes::RelationAffix, affixes::NoAffix> value(">2020-05");
+        REQUIRE(value.getRawValue().has_value() == true);
+        REQUIRE(value.getRawValue().value() == fromString<DateTimeValue>("2020-05"));
+        REQUIRE(value.getPrefix().has_value() == true);
+        REQUIRE(value.getPrefix().value() == ">");
+        REQUIRE(value.getValue() ==  fromString<DateTimeValue>("2020-05"));
+        REQUIRE(value.compare(fromString<DateTimeValue>("2020-05")) == false);
+        REQUIRE(value.compare(fromString<DateTimeValue>("2020-05-28")) == false);
+        REQUIRE(value.compare(fromString<DateTimeValue>("2020-06-01")) == true);
+        REQUIRE(value.compare(fromString<DateTimeValue>("2021")) == true);
+        REQUIRE(value.compare(fromString<DateTimeValue>("2020")) == false);
+        REQUIRE(value.compare(fromString<DateTimeValue>("2019")) == false);
+
     }
 }
 
@@ -205,31 +211,31 @@ TEST_CASE("TransformAffix test") {
 
 TEST_CASE("RelationAffix test") {
 
-        affixes::RelationAffix relationAffix;
-        SECTION("<=") {
-            relationAffix.value = "<=";
-            REQUIRE(relationAffix.compare(118, 120) == true);
-            REQUIRE(relationAffix.compare(0, 0) == true);
-            REQUIRE(relationAffix.compare(2.0, 1) == false);
-            REQUIRE(relationAffix.compare(2.0, 3.0) == true);
-            REQUIRE(relationAffix.compare(2.0, 2) == true);
-        }
-        SECTION("==") {
-            relationAffix.value = "=";
-            REQUIRE(relationAffix.compare(118, 120) == false);
-            REQUIRE(relationAffix.compare(0, 0) == true);
-            REQUIRE(relationAffix.compare(2.0, 1) == false);
-            REQUIRE(relationAffix.compare(2.0, 3.0) == false);
-            REQUIRE(relationAffix.compare(2.0, 2) == true);
-        }
-        SECTION("!=") {
-            relationAffix.value = "!=";
-            REQUIRE(relationAffix.compare(118, 120) == true);
-            REQUIRE(relationAffix.compare(0, 0) == false);
-            REQUIRE(relationAffix.compare(2.0, 1) == true);
-            REQUIRE(relationAffix.compare(2.0, 3.0) == true);
-            REQUIRE(relationAffix.compare(2.0, 2) == false);
-        }
+    affixes::RelationAffix relationAffix;
+    SECTION("<=") {
+        relationAffix.value = "<=";
+        REQUIRE(relationAffix.compare(118, 120) == true);
+        REQUIRE(relationAffix.compare(0, 0) == true);
+        REQUIRE(relationAffix.compare(2.0, 1) == false);
+        REQUIRE(relationAffix.compare(2.0, 3.0) == true);
+        REQUIRE(relationAffix.compare(2.0, 2) == true);
+    }
+    SECTION("==") {
+        relationAffix.value = "=";
+        REQUIRE(relationAffix.compare(118, 120) == false);
+        REQUIRE(relationAffix.compare(0, 0) == true);
+        REQUIRE(relationAffix.compare(2.0, 1) == false);
+        REQUIRE(relationAffix.compare(2.0, 3.0) == false);
+        REQUIRE(relationAffix.compare(2.0, 2) == true);
+    }
+    SECTION("!=") {
+        relationAffix.value = "!=";
+        REQUIRE(relationAffix.compare(118, 120) == true);
+        REQUIRE(relationAffix.compare(0, 0) == false);
+        REQUIRE(relationAffix.compare(2.0, 1) == true);
+        REQUIRE(relationAffix.compare(2.0, 3.0) == true);
+        REQUIRE(relationAffix.compare(2.0, 2) == false);
+    }
 }
 
 TEST_CASE("Affix concepts") {
@@ -261,3 +267,4 @@ TEST_CASE("Affix concepts") {
     REQUIRE(affixes::IsValueAffix<affixes::SignAffix> == true);
     REQUIRE(affixes::IsValueAffix<SiAffix> == true);
 }
+
