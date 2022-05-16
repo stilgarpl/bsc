@@ -48,8 +48,8 @@ namespace bsc {
         static constexpr bool isPrefixCompare = affixes::IsRelationalAffix<PrefixType, ValueType>;
         static constexpr bool isPostfixCompare = affixes::IsRelationalAffix<PostfixType, ValueType>;
 
-        PrefixType prefix;
-        PostfixType postfix;
+        PrefixType prefix{};
+        PostfixType postfix{};
         constexpr static std::string_view valueRegexPattern =
                 detail::ParametrizedValueRegexFactory::makeRegexForType<std::remove_cvref_t<ValueType>>();
         std::optional<std::remove_cvref_t<ValueType>> value;
@@ -88,7 +88,7 @@ namespace bsc {
             return postfix.value;
         }
 
-        explicit ParametrizedValue(std::string textToParse) : ParametrizedValue(textToParse, Parser{}) {
+        ParametrizedValue(const std::string& textToParse) : ParametrizedValue(textToParse, Parser{}) {
         }
 
         ParametrizedValue(const std::string& textToParse, const Parser& fromStringParser) {
@@ -122,14 +122,15 @@ namespace bsc {
             //@todo this should be computed during parsing phase and stored as a field, not computed on every call. future optimization, get it working first
             if constexpr (isPrefixTransform && isPostfixTransform) {
                 return postfix.transform(prefix.transform(*value));
-            }
+            } else
             if constexpr (isPrefixTransform ) {
                 return prefix.transform(*value);
-            }
+            } else
             if constexpr (isPostfixTransform) {
                 return postfix.transform(*value);
+            } else {
+                return *value;//@todo handle errors?
             }
-            return *value; //@todo handle errors?
         }
 
         bool compare(ValueType v) const requires (isPrefixCompare or isPostfixCompare){

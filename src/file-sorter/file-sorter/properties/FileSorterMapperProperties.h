@@ -35,7 +35,6 @@ namespace bsc {
     struct MatcherProperties : BasePropertyClass {
         Property<"type", MapperType> type;
         Property<"match", std::string> match{};
-        Property<"mode", MapperMatcherMode> mode = {MapperMatcherMode::none};
         void write(PropertySequencer& sequencer) const override;
     };
 
@@ -52,7 +51,6 @@ namespace bsc {
         FileSorterMapperProperties& addOrUpdateRule(MapperType mapper,
                                                     std::string match,
                                                     std::string pattern,
-                                                    MapperMatcherMode mode,
                                                     SortAction sort,
                                                     std::string errorAction,
                                                     std::string fileExists,

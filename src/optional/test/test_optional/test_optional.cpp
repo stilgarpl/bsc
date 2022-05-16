@@ -164,3 +164,65 @@ TEST_CASE("Optional concept") {
         REQUIRE(true);
     }
 }
+
+TEST_CASE("Optional ofNullable") {
+
+        SECTION("raw pointer") {
+            SECTION("null") {
+                int * a = nullptr;
+                auto result = optional::ofNullable(a);
+                REQUIRE(result.has_value() == false);
+            }
+            SECTION("value") {
+                auto a = new int(5);
+                auto result = optional::ofNullable(a);
+                REQUIRE(result.has_value() == true);
+                REQUIRE(*result.value() == 5);
+                delete a;
+            }
+        }
+
+        SECTION("smart pointer") {
+            SECTION("null") {
+                std::shared_ptr<int> a = nullptr;
+                auto result = optional::ofNullable(std::move(a));
+                REQUIRE(result.has_value() == false);
+            }
+            SECTION("value") {
+                auto  a = std::make_shared<int>(5);
+                auto result = optional::ofNullable(a);
+                REQUIRE(result.has_value() == true);
+                REQUIRE(*result.value() == 5);
+            }
+        }
+
+}
+
+int throwableFunction(int a) {
+    if (a==5) {
+        throw a;
+    } else {
+        return a;
+    }
+}
+
+TEST_CASE("Optional ofThrowable") {
+
+    SECTION("throws") {
+        auto result = optional::ofThrowable(&throwableFunction, 5);
+        REQUIRE(result.has_value() == false);
+    }
+
+    SECTION("doesn't throw") {
+        auto result = optional::ofThrowable(&throwableFunction, 11);
+        REQUIRE(result.has_value() == true);
+        REQUIRE(*result == 11);
+    }
+}
+
+TEST_CASE("Optional of") {
+
+    auto result = optional::of(5);
+    REQUIRE(result.has_value() == true);
+    REQUIRE(result.value() == 5);
+}

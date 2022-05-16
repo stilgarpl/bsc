@@ -33,7 +33,7 @@ TEST_CASE("DateTimeValue parser test") {
     auto value1 = bsc::fromString<bsc::DateTimeValue>(currentYear);
     auto value2 = bsc::fromString<bsc::DateTimeValue>(currentYear + "-04-25");
     auto value3 = bsc::fromString<bsc::DateTimeValue>(currentYear + "-05-09");
-    auto value4 = bsc::fromString<bsc::DateTimeValue>(currentYear + "-5-09"); //does not work with -5-9
+    auto value4 = bsc::fromString<bsc::DateTimeValue>(currentYear + "-5-9");
     bsc::DateTimeValue d1{std::chrono::file_clock ::now()};
     REQUIRE(value1 == d1);
     REQUIRE(d1 >= value1);

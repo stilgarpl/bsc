@@ -85,13 +85,22 @@ TEST_CASE("Parametrized value test") {
     }
 
     SECTION("SI int") {
-
-        ParametrizedValue<int, affixes::NoAffix, affixes::SiEnumPrefix> value("5k");
-        REQUIRE(value.getRawValue().has_value() == true);
-        REQUIRE(value.getRawValue().value() == 5);
-        REQUIRE(value.getPostfix().has_value() == true);
-        REQUIRE(value.getPostfix().value() == SiPrefix::k);
-        REQUIRE(value.getValue() == 5000);
+        SECTION("with suffix") {
+            ParametrizedValue<int, affixes::NoAffix, affixes::SiEnumPrefix> value("5k");
+            REQUIRE(value.getRawValue().has_value() == true);
+            REQUIRE(value.getRawValue().value() == 5);
+            REQUIRE(value.getPostfix().has_value() == true);
+            REQUIRE(value.getPostfix().value() == SiPrefix::k);
+            REQUIRE(value.getValue() == 5000);
+        }
+        SECTION("without suffix") {
+            ParametrizedValue<int, affixes::NoAffix, affixes::SiEnumPrefix> value("5");
+            REQUIRE(value.getRawValue().has_value() == true);
+            REQUIRE(value.getRawValue().value() == 5);
+            REQUIRE(value.getPostfix().has_value() == true); //@todo I'd prefer if this didn't have value, but I need default value for neutral transform
+            REQUIRE(value.getPostfix().value() == SiPrefix::null);
+            REQUIRE(value.getValue() == 5);
+        }
     }
 
     SECTION("double SI int") {
@@ -143,7 +152,7 @@ TEST_CASE("Affixes test") {
 
     SECTION("si enum") {
         affixes::EnumAffix<SiPrefix> siEnumAffix;
-        REQUIRE(siEnumAffix.pattern == "(?:y|z|a|f|p|n|u|m|c|d|da|h|k|M|G|T|P|E|Z|Y)");
+        REQUIRE(siEnumAffix.pattern == "(?:y|z|a|f|p|n|u|m|c|d|null|da|h|k|M|G|T|P|E|Z|Y)");
     }
 
     SECTION("sign affix") {

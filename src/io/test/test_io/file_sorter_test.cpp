@@ -197,30 +197,28 @@ TEST_CASE("Sort mapper matchers test") {
     SECTION("FileSorterSizeMatcher") {
         SECTION("none") {
             auto expectedResult = MatchPrecision::none;
-            auto sizeMatcher    = matchers::fileSorterSizeMatcher(1000, bsc::MapperMatcherMode::greater);
+            auto sizeMatcher    = matchers::fileSorterSizeMatcher({">1000"});
             auto result         = sizeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
         SECTION("perfect") {
             auto expectedResult = MatchPrecision::perfect;
-            auto sizeMatcher    = matchers::fileSorterSizeMatcher(1000, bsc::MapperMatcherMode::less);
+            auto sizeMatcher    = matchers::fileSorterSizeMatcher({"<1000"});
             auto result         = sizeMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
     }
     SECTION("FileSorterDateMatcher") {
         using namespace std::chrono_literals;
-        auto actualFileDate = fs::last_write_time(path / filename);
-        auto dateInThePast  = actualFileDate - 10min;
         SECTION("none") {
             auto expectedResult = MatchPrecision::none;
-            auto dateMatcher    = matchers::fileSorterDateMatcher(dateInThePast, bsc::MapperMatcherMode::less);
+            auto dateMatcher    = matchers::fileSorterDateMatcher({"<2018"});
             auto result         = dateMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
         SECTION("perfect") {
             auto expectedResult = MatchPrecision::perfect;
-            auto dateMatcher    = matchers::fileSorterDateMatcher(dateInThePast, bsc::MapperMatcherMode::greater);
+            auto dateMatcher    = matchers::fileSorterDateMatcher({">2018"});
             auto result         = dateMatcher(fileInfoDecoder.decodeFileInfo(path / filename));
             REQUIRE(result == expectedResult);
         }
@@ -374,8 +372,7 @@ TEST_CASE("File sorter test") {
     }
 
     SECTION("multimatcher: images bigger than") {
-        fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/")),
-                               matchers::fileSorterSizeMatcher(1000, MapperMatcherMode::greater)},
+        fileSorter.addPattern({matchers::fileSorterMimeMatcher(factory.create("image/")), matchers::fileSorterSizeMatcher({">1000"})},
                               destinationPath.string() + "/Images/{{date.year}}/",
                               FileSortingStrategies());
         REQUIRE(fs::exists(resourcePath / "test.gif"));

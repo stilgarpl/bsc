@@ -16,6 +16,7 @@ namespace bsc {
         m = -3,
         c = -2,
         d = -1,
+        null = 0,
         da = 1,
         h = 2,
         k = 3,

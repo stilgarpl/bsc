@@ -40,18 +40,20 @@ namespace bsc {
 
         private:
             bool comparator(std::string_view operand, auto t1, auto t2) const{
-                if (operand == "<") {
-                    return t1 < t2;
-                } else if (operand == "<=") {
-                    return t1 <= t2;
-                } else if (operand == ">") {
-                    return t1 > t2;
-                } else if (operand == ">=") {
-                    return t1 >= t2;
-                } else if (operand == "=") {
-                    return t1 == t2;
-                } else if (operand == "!=") {
-                    return t1 != t2;
+                if (!operand.empty()) {
+                    if (operand == "<") {
+                        return t1 < t2;
+                    } else if (operand == "<=") {
+                        return t1 <= t2;
+                    } else if (operand == ">") {
+                        return t1 > t2;
+                    } else if (operand == ">=") {
+                        return t1 >= t2;
+                    } else if (operand == "=") {
+                        return t1 == t2;
+                    } else if (operand == "!=") {
+                        return t1 != t2;
+                    }
                 }
 
                 return t1 == t2;// default operation is equality
@@ -64,9 +66,9 @@ namespace bsc {
             }
         };
 
-        template<typename EnumType, bool Optional = true>
+        template<typename EnumType, bool Optional = true, auto defaultValue = std::nullopt>
             requires std::is_enum_v<EnumType>
-        struct EnumAffix : BaseAffix<EnumType> {
+        struct EnumAffix : BaseAffix<EnumType, defaultValue> {
             const bool present  = true;
             const bool optional = Optional;
 

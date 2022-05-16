@@ -9,7 +9,8 @@
 namespace bsc::optional {
 
     template<typename T>
-    concept IsOptional = std::same_as<std::remove_cvref_t<T>, std::optional<typename std::remove_cvref_t<T>::value_type>>;
+    concept IsOptional = std::same_as < std::remove_cvref_t<T>,
+    std::optional < typename std::remove_cvref_t<T>::value_type >> ;
 
     template<typename T, typename Callable>
     auto operator|(const std::optional<T>& opt, Callable callable) {
@@ -29,7 +30,7 @@ namespace bsc::optional {
     auto filter(Predicate predicate) {
         return [predicate](IsOptional auto& optional) {
             if (optional.has_value() && predicate(*optional)) {
-                    return optional;
+                return optional;
             }
             return decltype(optional){std::nullopt};
         };
@@ -101,6 +102,33 @@ namespace bsc::optional {
                 throw exception;
             };
         };
+    }
+
+    template<typename Nullable>
+    auto ofNullable(Nullable&& nullable) {
+        if (nullable == nullptr) {
+            return std::optional<std::remove_cvref_t<Nullable>>(std::nullopt);
+        } else {
+            return std::optional<std::remove_cvref_t<Nullable>>(std::forward<Nullable>(nullable));
+        }
+    }
+
+    template<typename T>
+    auto of(T t) requires (!IsOptional<T>) {
+        return std::optional(t);
+    }
+
+    auto ofThrowable(auto callable, auto... args) {
+        using ReturnType = std::invoke_result_t<decltype(callable), decltype(args)...>;
+        try {
+            if constexpr (IsOptional<ReturnType>) {
+                return callable(args...);
+            } else {
+                return std::optional(callable(args...));
+            }
+        } catch (...) {
+            return std::optional<ReturnType >{std::nullopt};
+        }
     }
 }// namespace bsc::optional
 

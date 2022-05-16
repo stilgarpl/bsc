@@ -12,7 +12,6 @@ namespace bsc {
     FileSorterMapperProperties& FileSorterProperties::addOrUpdateRule(MapperType mapper,
                                                                       std::string match,
                                                                       std::string pattern,
-                                                                      MapperMatcherMode mode,
                                                                       SortAction sort,
                                                                       std::string errorAction,
                                                                       std::string fileExists,
@@ -32,7 +31,6 @@ namespace bsc {
             auto& matcher = ptr->matchers().emplace_back();
             matcher.type  = mapper;
             matcher.match = std::move(match);
-            matcher.mode  = mode;
         }
         ptr->pattern              = std::move(pattern);
         ptr->actions().sort       = sort;
@@ -48,7 +46,7 @@ namespace bsc {
         sequencer(sort, error, fileExists);
     }
     void MatcherProperties::write(PropertySequencer& sequencer) const {
-        sequencer(type, match, mode);
+        sequencer(type, match);
     }
     void FileExistsProperties::write(PropertySequencer& sequencer) const {
         sequencer(action, pattern);

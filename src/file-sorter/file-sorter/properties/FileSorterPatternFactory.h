@@ -15,7 +15,6 @@ namespace bsc {
     class FileSorterPatternFactory {
     private:
         MimeFileTypeFactory mimeFileTypeFactory{};
-        Parser parser;
 
     public:
         [[nodiscard]] std::vector<FileSorterMapperMatcher> createPatternMatchers(const FileSorterMapperProperties& properties) const {
@@ -30,13 +29,12 @@ namespace bsc {
                         result.push_back(matchers::fileSorterMimeMatcher(mimeFileTypeFactory.create(matcher.match())));
                         break;
                     case MapperType::size:
-                        result.push_back(
-                                matchers::fileSorterSizeMatcher(parser.fromString<std::uintmax_t>(matcher.match()), matcher.mode()));
+                        result.push_back(matchers::fileSorterSizeMatcher(matcher.match()));
                         break;
-                        //                case MapperType::date:
-                        // @todo c++20 get date and cast it to file_clock
-                        //                    return matchers::fileSorterDateMatcher(, properties.mode());
-//                        break;
+                    case MapperType::date:
+                        result.push_back(matchers::fileSorterDateMatcher(matcher.match()));
+
+                        break;
                     default:
                         throw std::domain_error("unsupported");
                 }

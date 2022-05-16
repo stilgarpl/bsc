@@ -17,7 +17,7 @@ namespace bsc {
     namespace detail {
         enum class Precision { years, months, days, minutes, seconds, nanoseconds };
 
-        constexpr static const char* selectTimePrecisionFormat(Precision precision) {
+        constexpr static auto selectTimePrecisionFormat(Precision precision) {
             using enum Precision;
             switch (precision) {
                 case years:
@@ -105,7 +105,7 @@ namespace bsc {
 
         friend std::ostream& operator<<(std::ostream& os, const DateTimeValue& self) {
             using namespace std::string_literals;
-            os << fmt::format("{0:"s+detail::selectTimePrecisionFormat(self.precision)+"}", self.timePoint);
+            os << fmt::format(fmt::runtime("{0:"s+detail::selectTimePrecisionFormat(self.precision)+"}"), self.timePoint);
             return os;
         }
     };

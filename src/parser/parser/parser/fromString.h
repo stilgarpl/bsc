@@ -140,38 +140,35 @@ namespace bsc {
                 //@todo C++23 C++26 change format to string_view when chrono::parse supports it...
                 //chrono date library is stupid with incomplete dates, so...
                 //@todo try to make it less ugly
+                using SystemTimePoint = std::chrono::sys_time<std::chrono::nanoseconds>;
                 {
                     std::stringstream ss{value};
-                    ParameterType result;
+                    SystemTimePoint result;
                     //parsing full timepoint
                     ss >> date::parse(format, result);
-                    if (ss.good()) return result;
+                    if (!ss.fail()) return std::chrono::time_point_cast<typename ParameterType::duration> (date::clock_cast<typename ParameterType::clock>(result));
                 }
                 {
                     std::stringstream ss{value};
-                    ParameterType result;
                     //parsing incomplete date (year and month)
                     using namespace date;
                     date::year_month ym{};
                     ss >> date::parse(format, ym);
                     date::year_month_day tempYmd = ym / 1;
                     std::chrono::sys_days tempSd = tempYmd.operator sys_days();
-                    if (ss.good()) {
-                        result = ParameterType(tempSd);
-                        return result;
+                    if (!ss.fail()) {
+                        return std::chrono::time_point_cast<typename ParameterType::duration> (date::clock_cast<typename ParameterType::clock>(tempSd));
                     }
                 }
                 {
                     std::stringstream ss{value};
-                    ParameterType result;
                     //parsing incomplete date (year)
                     using namespace date;
                     date::year y{};
                     ss >> date::parse(format, y);
                     date::year_month_day tempYmd = y / 1 / 1;
-                    if (ss.good()) {
-                        result = ParameterType(tempYmd.operator sys_days());
-                        return result;
+                    if (!ss.fail()) {
+                        return std::chrono::time_point_cast<typename ParameterType::duration> (date::clock_cast<typename ParameterType::clock>(tempYmd.operator sys_days()));
                     }
                 }
                     using namespace std::string_literals;

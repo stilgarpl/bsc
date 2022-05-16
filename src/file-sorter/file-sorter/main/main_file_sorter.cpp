@@ -28,10 +28,10 @@ struct FileSorterParameters : CommandLineParameters {
             {.shortKey = 'm', .longKey = "mime", .argumentName = "mimetype=PATTERN", .doc = "Pair of mime type and path pattern"}};
     DefaultParameter<std::map<std::string, std::string>> nameMatchers = {
             {.shortKey = 'n', .longKey = "name", .argumentName = "regex=PATTERN", .doc = "Pair of filename regex and path pattern"}};
-    DefaultParameter<std::map<std::string, std::string>> sizeLessMatchers = {
-            {.shortKey = 's', .longKey = "size", .argumentName = "size=PATTERN", .doc = "Pair of size (less than) and path pattern"}};
-    DefaultParameter<std::map<std::string, std::string>> sizeGreaterMatchers = {
-            {.shortKey = 'S', .longKey = "SIZE", .argumentName = "size=PATTERN", .doc = "Pair of size (greater than) and path pattern"}};
+    DefaultParameter<std::map<std::string, std::string>> sizeMatchers = {
+            {.shortKey = 's', .longKey = "size", .argumentName = "size=PATTERN", .doc = "Pair of size and path pattern"}};
+    DefaultParameter<std::map<std::string, std::string>> dateMatchers = {
+            {.shortKey = 'd', .longKey = "date", .argumentName = "date=PATTERN", .doc = "Pair of date and path pattern"}};
     FactoryParameter<FileSortingStrategies::SortStrategy> action                = {{.shortKey     = 'a',
                                                                                     .longKey      = "action",
                                                                                     .argumentName = "ACTION",
@@ -81,7 +81,6 @@ struct FileSorterParameters : CommandLineParameters {
 void addOrUpdateRules(FileSorterProperties& properties,
                       const std::map<std::string, std::string>& matchers,
                       MapperType type,
-                      MapperMatcherMode mode,
                       const FileSorterParameters& parameters);
 
 int main(int argc, char* argv[]) {
@@ -104,10 +103,10 @@ int main(int argc, char* argv[]) {
 
     FileSorterProperties fileSorterProperties{};
 
-    addOrUpdateRules(fileSorterProperties, parameters.mimeMatchers(), MapperType::mime, MapperMatcherMode::none, parameters);
-    addOrUpdateRules(fileSorterProperties, parameters.nameMatchers(), MapperType::regex, MapperMatcherMode::none, parameters);
-    addOrUpdateRules(fileSorterProperties, parameters.sizeLessMatchers(), MapperType::size, MapperMatcherMode::less, parameters);
-    addOrUpdateRules(fileSorterProperties, parameters.sizeGreaterMatchers(), MapperType::size, MapperMatcherMode::greater, parameters);
+    addOrUpdateRules(fileSorterProperties, parameters.mimeMatchers(), MapperType::mime, parameters);
+    addOrUpdateRules(fileSorterProperties, parameters.nameMatchers(), MapperType::regex, parameters);
+    addOrUpdateRules(fileSorterProperties, parameters.sizeMatchers(), MapperType::size, parameters);
+    addOrUpdateRules(fileSorterProperties, parameters.dateMatchers(), MapperType::date, parameters);
 
     for (FileSorterPatternFactory factory{}; const auto& property : fileSorterProperties.rules()) {
         fileSorter.addPattern(factory.createPatternMatchers(property),
@@ -132,17 +131,16 @@ int main(int argc, char* argv[]) {
 void addOrUpdateRules(FileSorterProperties& properties,
                       const std::map<std::string, std::string>& matchers,
                       MapperType type,
-                      MapperMatcherMode mode,
                       const FileSorterParameters& parameters) {
 
     for (const auto& [matcher, pattern] : matchers) {
-        properties.addOrUpdateRule(type,
-                                   matcher,
-                                   pattern,
-                                   mode,
-                                   parameters.action.getSelector() | optional::orElseThrow(std::invalid_argument("no action selector")),
-                                   parameters.errorHandler.getSelector() | optional::orElseThrow(std::invalid_argument("no error selector")),
-                                   parameters.fileExists.getSelector() | optional::orElseThrow(std::invalid_argument("no file exist selector")),
-                                   parameters.renamePattern());
+        properties.addOrUpdateRule(
+                type,
+                matcher,
+                pattern,
+                parameters.action.getSelector() | optional::orElseThrow(std::invalid_argument("no action selector")),
+                parameters.errorHandler.getSelector() | optional::orElseThrow(std::invalid_argument("no error selector")),
+                parameters.fileExists.getSelector() | optional::orElseThrow(std::invalid_argument("no file exist selector")),
+                parameters.renamePattern());
     }
 }

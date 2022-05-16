@@ -6,11 +6,10 @@
 
 namespace bsc {
     namespace matchers{
-        FileSorterMapperMatcher fileSorterDateMatcher(fs::file_time_type datetime, MapperMatcherMode mode) {
-            return [datetime, mode](const FileInfo& fileInfo){
-                static ModeComparator<decltype(datetime)> modeComparator{};
-                auto result = modeComparator.compare(fileInfo.fileModificationTime, datetime, mode);
-                if (result) {
+        FileSorterMapperMatcher fileSorterDateMatcher(const FileDateValue& datetime) {
+            return [datetime](const FileInfo& fileInfo){
+                //@todo get rid of clock cast
+                if (datetime.compare(date::clock_cast<std::chrono::system_clock>(fileInfo.fileModificationTime))) {
                     return MatchPrecision::perfect;
                 } else {
                     return MatchPrecision::none;

@@ -9,7 +9,7 @@
 #include "math/arithmetic.h"
 namespace bsc::affixes{
 
-    using SiEnumPrefix = affixes::TransformAffix<affixes::EnumAffix<SiPrefix>, []<typename EnumType>(EnumType v, auto i) {
+    using SiEnumPrefix = affixes::TransformAffix<affixes::EnumAffix<SiPrefix, true, SiPrefix::null>, []<typename EnumType>(EnumType v, auto i) {
         return math::pown(10ll, static_cast<std::underlying_type_t<EnumType>>(v)) * i;}>;
 }
 

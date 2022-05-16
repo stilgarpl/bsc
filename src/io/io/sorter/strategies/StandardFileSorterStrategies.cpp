@@ -56,7 +56,7 @@ namespace bsc {
     StandardCreateValidTargetPathStrategies::rename(const std::string& suffixFormat) {
         // calculate what possible here, so it doesn't have to be calculated when lambda is run.
         //@todo validate regex or add error handling.  I've noticed that invalid suffixFormat sends this into an infinite loop.
-        std::string regexString = fmt::format(TextUtils::escapeAllRegexCharacters(suffixFormat), "([0-9]+)") + '$';
+        std::string regexString = fmt::format(fmt::runtime(TextUtils::escapeAllRegexCharacters(suffixFormat)), "([0-9]+)") + '$';
         auto numberRegex        = std::regex(regexString);
         return [numberRegex, regexString, suffixFormat](const fs::path& target,
                                                         const FileSortingStrategies::FileExistsPredicate& fileExists) {
@@ -76,7 +76,7 @@ namespace bsc {
                 filenameStem.erase(numberMatch[0].first, numberMatch[0].second);
             }
             do {
-                auto suffix = fmt::format(suffixFormat, index);
+                auto suffix = fmt::format(fmt::runtime(suffixFormat), index);
                 logger.debug("file name stem is :" + filenameStem);
                 newPath = parentPath / (filenameStem + suffix + target.extension().string());
                 logger.debug("rename: trying " + newPath.string());

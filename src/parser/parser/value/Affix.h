@@ -34,10 +34,10 @@ namespace bsc::affixes {
         template<typename AffixType>
         concept IsValueAffix = IsAffix<AffixType> && requires(AffixType a) { a.value; };
 
-        template<typename valueType>
+        template<typename valueType, auto defaultValue = std::nullopt>
         struct BaseAffix {
             using ValueType = valueType;
-            std::optional<ValueType> value;
+            std::optional<ValueType> value = defaultValue;
         };
 
         template<>
