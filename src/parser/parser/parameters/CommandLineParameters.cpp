@@ -263,4 +263,6 @@ namespace bsc {
     ValueNotAllowed::ValueNotAllowed(const std::string& arg) : ValueNotAllowed(arg, {}) {}
     ValueNotAllowed::ValueNotAllowed(const std::string& arg, std::remove_cvref_t<decltype(allowedValues)> a)
         : domain_error(arg), allowedValues(std::move(a)) {}
+    InsufficientGrouping::InsufficientGrouping(const std::string& arg) : domain_error(arg) {
+    }
 }// namespace bsc

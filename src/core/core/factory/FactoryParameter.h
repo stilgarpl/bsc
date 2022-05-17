@@ -91,7 +91,7 @@ namespace bsc {
                     validateSelector(text, *selectorValue);
                 }
 
-                this->increaseCounter();
+                this->incrementCounter();
             };
         }
 

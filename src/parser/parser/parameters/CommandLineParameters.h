@@ -93,7 +93,10 @@ namespace bsc {
                 return rawArguments;
             }
             auto getRemainingArguments() {
-                return std::span<std::string>(rawArguments.begin() + requiredArgumentsCount, rawArguments.end());
+                //@todo I'm not sure about that std::min and rawArgumentSize, but it should not throw segfault when required arguments were
+                //not provided
+                return std::span<std::string>(rawArguments.begin() + std::min(rawArguments.size(), requiredArgumentsCount),
+                                              rawArguments.end());
             };
             auto& getCommandName() {
                 return commandName;
@@ -144,10 +147,10 @@ namespace bsc {
 
         const std::shared_ptr<ArgumentParser> parser;
 
-        template<typename T>
+        template<typename T, typename GroupByType>
         friend class BaseParameter;
 
-        template<typename T>
+        template<typename T, typename GroupByType>
         friend class Parameter;
 
         template<typename T>
@@ -248,10 +251,75 @@ namespace bsc {
         }
     };
 
-    template<typename T>
-    class BaseParameter {
+
+    class InsufficientGrouping : std::domain_error {
     public:
+        InsufficientGrouping(const std::string& arg);
+    };
+
+    template<typename T, typename GroupByType>
+    class GroupingStorage {
+        struct GroupingEntry {
+            std::optional<typename GroupByType::Type::value_type> key;
+            std::optional<T> value;
+        };
+        std::vector<GroupingEntry> groupingStorage;
+    protected:
+
+        void nextGroupingEntry(typename GroupByType::Type::value_type key)  {
+            auto& last = getLastGroupingEntry();
+            if (!last.key.has_value()) {
+                last.key.template emplace(std::move(key));
+                groupingStorage.push_back({.key = std::nullopt, .value = std::nullopt});
+            } else {
+                groupingStorage.push_back({.key = key, .value = std::nullopt});
+            }
+        }
+
+        GroupingEntry& getLastGroupingEntry() {
+            if (groupingStorage.empty()) {
+                groupingStorage.push_back({.key = std::nullopt, .value = std::nullopt});
+            }
+            return groupingStorage.back();
+        }
+    public:
+
+        auto getGroupingMap() const {
+            std::map<typename GroupByType::Type::value_type, T> result;
+            for (const auto& [key, value] : groupingStorage) {
+                if (!key.has_value() != !value.has_value()) {
+                    //@todo better error message
+                    throw InsufficientGrouping("Groupping error");
+                }
+                if (key.has_value() && value.has_value()) {
+                    result[*key] = *value;
+                }
+            }
+            return result;
+        }
+    };
+
+    class NoGroup {
+
+    };
+
+    template<typename T>
+    class GroupingStorage<T, NoGroup> {
+
+    };
+
+    class BaseBaseParameter {
+
+    };
+
+
+    template<typename T, typename GroupByType = NoGroup>
+    class BaseParameter : public GroupingStorage<T, GroupByType>, public BaseBaseParameter {
+    public:
+        static_assert(std::same_as<GroupByType, NoGroup> || std::is_base_of_v<BaseBaseParameter, GroupByType> );
+        constexpr static bool groupingEnabled = std::is_base_of_v<BaseBaseParameter, GroupByType>;
         using ValueType = std::optional<T>;
+        using Type      = T;
         class AllowedValues {
         public:
             using AllowedValuesSet = std::set<std::string>;
@@ -269,7 +337,9 @@ namespace bsc {
                 getter = [set]() { return set; };
             }
             template<typename Func>
-            AllowedValues(Func func) requires std::is_invocable_r_v<AllowedValuesSet, Func> {
+            AllowedValues(Func func)
+                requires std::is_invocable_r_v<AllowedValuesSet, Func>
+            {
                 getter = func;
             }
 
@@ -284,33 +354,49 @@ namespace bsc {
     protected:
         ValueType value;
         using OptionParseFunc = CommandLineParameters::ArgumentParser::OptionParseFunc;
+        using CallbackFunc    = std::function<void(const T&)>;
+
     private:
         int counter = 0;
         AllowedValues allowedValues{};
+        std::vector<CallbackFunc> callbacks;
+
+        void runAllCallbacks(const T& t) {
+            std::ranges::for_each(callbacks, [&t](const auto& callback) { return callback(t); });
+        }
+
+    protected:
+        void addCallback(CallbackFunc func) {
+            callbacks.push_back(func);
+        }
+
+    private:
 
         OptionParseFunc makeParseFunction() {
             return [this](const char* input, Parser& parser) {
-                std::string text        = input != nullptr ? input : "";
-                //@todo maybe this should be optimized so it is only called once
-                const auto& validValues = this->allowedValues.get();
+                std::string text = input != nullptr ? input : "";
                 //@todo case sensitive or not
-                if (!validValues.empty() && !validValues.contains(text)) {
+                //@todo maybe this should be optimized so it is only called once
+                if (const auto& validValues = this->allowedValues.get(); !validValues.empty() && !validValues.contains(text)) {
                     using namespace std::string_literals;
                     throw ValueNotAllowed("Value "s + text + " is not allowed.", validValues);
                 }
                 if (!value) {
                     value = parser.fromString<T>(text);
+                    runAllCallbacks(*value);
                 } else {
                     // if parameter is mentioned multiple times and it's a container, combine options. otherwise,
                     // overwrite.
                     if constexpr (IsContainerNotString<T>) {
                         auto tempValue = parser.fromString<T>(text);
-                        std::for_each(tempValue.begin(), tempValue.end(), [this](auto& i) { value->insert(value->end(), i); });
+                        std::ranges::for_each(tempValue, [this](auto& i) { value->insert(value->end(), i); });
+                        runAllCallbacks(tempValue);
                     } else {
                         value = parser.fromString<T>(text);
+                        runAllCallbacks(*value);
                     }
                 }
-                increaseCounter();
+                incrementCounter();
             };
         }
 
@@ -337,7 +423,7 @@ namespace bsc {
             }
         }
 
-        void increaseCounter() {
+        void incrementCounter() {
             counter++;
         }
 
@@ -346,7 +432,6 @@ namespace bsc {
         }
 
     public:
-        //@todo maybe I should add callback here that will be called after this value is set?
         struct BaseParameterDefinition {
             std::optional<char> shortKey{};
             std::optional<std::string_view> longKey{};
@@ -356,6 +441,8 @@ namespace bsc {
             bool hidden   = false;
             std::optional<T> defaultValue{};
             AllowedValues allowedValues = makeDefaultAllowedValues();
+            GroupByType* groupBy        = nullptr;
+            CallbackFunc callback{};
         };
 
         BaseParameter(BaseParameterDefinition def, const CommandLineParameters::ArgumentParser::OptionParseFunc& parseFunc)
@@ -368,7 +455,34 @@ namespace bsc {
                                .flags        = makeFlags(def.optional, def.hidden),
                                .doc          = def.doc},
                               parseFunc);
+            if (def.callback) {
+                addCallback(def.callback);
+            }
+            if constexpr (groupingEnabled) {
+                if (def.groupBy != nullptr) {
+                    def.groupBy->addCallback(makeKeyGroupByCallback());
+                    addCallback(makeValueGroupByCallback());
+                }
+            }
         }
+
+        auto makeKeyGroupByCallback() requires groupingEnabled {
+            return [this](const auto& keys) {
+                //@todo get last element of a collection in a portable way
+                this->nextGroupingEntry(*keys.rbegin());
+            };
+        }
+
+        CallbackFunc makeValueGroupByCallback() requires groupingEnabled {
+            return [this](const Type& tempValue) {
+                auto& groupedValue = this->getLastGroupingEntry().value;
+                if (!groupedValue.has_value() && ! tempValue.empty()) {
+                    groupedValue.template emplace();
+                }
+                std::ranges::for_each(tempValue, [this, &groupedValue](auto& i) { groupedValue->insert(groupedValue->end(), i); });
+            };
+        }
+
 
         BaseParameter(BaseParameterDefinition def) : BaseParameter(def, makeParseFunction()) {
         }
@@ -380,29 +494,36 @@ namespace bsc {
         [[nodiscard]] auto count() const {
             return counter;
         }
+
+        template<typename TT, typename TG>
+        friend class BaseParameter;
     };
 
-    template<typename T>
-    class Parameter : public BaseParameter<T> {
+    template<typename T, typename GroupByType = NoGroup>
+    class Parameter : public BaseParameter<T, GroupByType> {
 
     public:
-        using AllowedValues = typename BaseParameter<T>::AllowedValues;
+        using AllowedValues = typename BaseParameter<T, GroupByType>::AllowedValues;
         struct ParameterDefinition {
             std::optional<char> shortKey{};
             std::optional<std::string_view> longKey{};
             std::optional<std::string_view> argumentName{};
             std::optional<std::string_view> doc{};
             std::optional<T> defaultValue{};
-            AllowedValues allowedValues = BaseParameter<T>::makeDefaultAllowedValues();
+            AllowedValues allowedValues = BaseParameter<T, GroupByType>::makeDefaultAllowedValues();
+            GroupByType* groupBy        = nullptr;
+            typename BaseParameter<T, GroupByType>::CallbackFunc callback{};
         };
 
         Parameter(ParameterDefinition def)// NOLINT
-            : BaseParameter<T>({.shortKey      = def.shortKey,
+            : BaseParameter<T, GroupByType>({.shortKey      = def.shortKey,
                                 .longKey       = def.longKey,
                                 .argumentName  = def.argumentName,
                                 .doc           = def.doc,
                                 .defaultValue  = def.defaultValue,
-                                .allowedValues = def.allowedValues}) {
+                                .allowedValues = def.allowedValues,
+                                .groupBy = def.groupBy,
+                                .callback      = def.callback}) {
         }
     };
 
