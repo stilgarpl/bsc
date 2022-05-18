@@ -24,7 +24,7 @@ namespace bsc {
 
         template<typename FactoryType>
         struct FactoryBaseParameterDefinition<FactoryType, true> {
-            std::function<typename FactoryType::ArgumentType(void)> argumentFetcher = [] {return typename FactoryType::ArgumentType{};};
+            std::function<typename FactoryType::ArgumentType(void)> argumentFetcher = [] { return typename FactoryType::ArgumentType{}; };
         };
 
     }// namespace detail
@@ -51,7 +51,7 @@ namespace bsc {
     class FactoryParameter : public BaseParameter<T> {
         using ValueType = typename RemoveContainerType<T, IsContainerNotString<T>>::Type;
         FactoryPtr<ValueType> factory;
-        using FactoryType = typename FactoryPtr<ValueType>::FactoryType;
+        using FactoryType       = typename FactoryPtr<ValueType>::FactoryType;
         using SelectorType      = typename FactoryType::SelectorType;
         using SelectorValueType = std::conditional_t<IsContainerNotString<T>, std::list<SelectorType>, SelectorType>;
 
@@ -95,6 +95,26 @@ namespace bsc {
             };
         }
 
+    private:
+        typename BaseParameter<T>::OptionFinishFunc makeFinishFunction()  {
+            return [this]() {
+                auto& result = this->value;
+                if (selectorValue) {
+                    if constexpr (IsContainerNotString<T>) {
+                        result.template emplace();
+
+                        std::ranges::for_each(*this->selectorValue,
+                                              [this, &result](auto& selector) { result->insert(result->end(), this->createObject(selector)); });
+                    } else {
+                        result = this->createObject(*selectorValue);
+
+                    }
+                    this->runAllCallbacks(*result);
+                }
+            };
+        }
+
+    public:
         void validateSelector(const std::string& text, const SelectorType& selector) const {
             if (!validSelectors.contains(selector)) {
                 using namespace std::string_literals;
@@ -105,9 +125,7 @@ namespace bsc {
 
         template<IsContainerNotString ContainerType>
         void validateSelector(const std::string& text, const ContainerType& selectorContainer) const {
-            std::ranges::for_each(selectorContainer,[text, this](auto&& selector) {
-                return validateSelector(text,selector);
-            });
+            std::ranges::for_each(selectorContainer, [text, this](auto&& selector) { return validateSelector(text, selector); });
         }
 
         FactoryParameter(ParameterDefinition def)// NOLINT
@@ -117,34 +135,16 @@ namespace bsc {
                                 .doc           = def.doc,
                                 .defaultValue  = def.defaultValue,
                                 .allowedValues = selectorsToAllowedValues(def.factory->getSelectors())},
-                               makeParseFunction()),
-              factory(def.factory), selectorValue(def.defaultSelector), validSelectors(factory->getSelectors()), factoryDetails(def.factoryDetails) {
+                               this->makeParseFunction(), this->makeFinishFunction()),
+              factory(def.factory), selectorValue(def.defaultSelector), validSelectors(factory->getSelectors()),
+              factoryDetails(def.factoryDetails) {
             if (def.defaultSelector) {
-                validateSelector(toString(*def.defaultSelector), *def.defaultSelector );
+                validateSelector(toString(*def.defaultSelector), *def.defaultSelector);
             }
         }
 
         const auto& getSelector() const {
             return selectorValue;
-        }
-
-
-        typename BaseParameter<T>::ValueType operator()() const {
-            typename BaseParameter<T>::ValueType result;
-            if (selectorValue) {
-                if constexpr (IsContainerNotString<T>) {
-                    result.template emplace();
-
-                    std::ranges::for_each(*this->selectorValue, [this, &result](auto& selector) {
-                        result->insert(result->end(), this->createObject(selector));
-                    });
-                } else {
-                    result = this->createObject(*selectorValue);
-                }
-                return result;
-            } else {
-                throw NoSelector("No selector provided for this factory");
-            }
         }
 
     private:
@@ -162,10 +162,8 @@ namespace bsc {
             } else {
                 return this->factory->create(selector);
             }
-
         }
         decltype(ParameterDefinition::factoryDetails) factoryDetails;
-
     };
 }// namespace bsc
 

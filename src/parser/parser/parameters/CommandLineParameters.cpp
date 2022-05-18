@@ -22,7 +22,8 @@ namespace bsc {
 
     void CommandLineParameters::ParserBuilder::addOption(
             CommandLineParameters::ParserBuilder::ParserOptions parserOptions,
-            CommandLineParameters::ArgumentParser::OptionParseFunc parserFunction) {
+            CommandLineParameters::ArgumentParser::OptionParseFunc parserFunction,
+            CommandLineParameters::ArgumentParser::OptionFinishFunc finishFunc) {
         // if there is no argument name provided, then argument will be optional
         int flags = parserOptions.argumentName.has_value() ? parserOptions.flags
                                                            : parserOptions.flags | OPTION_ARG_OPTIONAL;
@@ -34,6 +35,7 @@ namespace bsc {
                                .group = 0};
         parser->argpOptions.push_back(arg);
         parser->parseMap[arg.key] = std::move(parserFunction);
+        parser->finishMap[arg.key] = std::move(finishFunc);
     }
 
     void CommandLineParameters::ParserBuilder::addGroup(const char* doc) {
@@ -112,19 +114,23 @@ namespace bsc {
 
                 break;
             case ARGP_KEY_SUCCESS:
+                for (const auto& [finisherKey,finisher] : self->finishMap) {
+                    finisher();
+                }
+                break;
 
+            case ARGP_KEY_ERROR:
                 break;
 
             case ARGP_KEY_FINI:
                 break;
-            case ARGP_KEY_ERROR:
-                break;
+
 
             default:
                 if (self->parseMap.contains(key)) {
                     try {
                         self->parseMap[key](arg, self->stringParser);
-                    } catch (StringParseException& e) {
+                    } catch (StringParseException const& e) {
                         if (self->parseConfiguration == ParseConfiguration::simple) {
                             argp_error(state,
                                        "Argument \"%s\" parse failed for '%c' with error: [%s]",
@@ -134,7 +140,7 @@ namespace bsc {
                         } else {
                             throw e;
                         }
-                    } catch (ValueNotAllowed& e) {
+                    } catch (ValueNotAllowed const& e) {
                         if (self->parseConfiguration == ParseConfiguration::simple) {
                             using namespace std::string_literals;
                             std::string allowedValues = std::accumulate(
@@ -142,9 +148,8 @@ namespace bsc {
                                     e.allowedValues.end(),
                                     ""s,
                                     [](const auto& a, const auto& b) { return a.empty() ? b : a + ", " + b; });
-                            auto failedOption = std::find_if(self->argpOptions.begin(),
-                                                             self->argpOptions.end(),
-                                                             [&key](argp_option& option) { return option.key == key; });
+                            auto failedOption = std::ranges::find_if(self->argpOptions,
+                                                             [&key](argp_option const& option) { return option.key == key; });
                             std::string parameterName =
                                     (failedOption != self->argpOptions.end() && failedOption->name != nullptr)
                                             ? failedOption->name

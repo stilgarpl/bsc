@@ -9,7 +9,7 @@ namespace bsc {
     void FileSorterProperties::write(PropertySequencer& sequencer) const {
         sequencer(version, rules);
     }
-    FileSorterMapperProperties& FileSorterProperties::addOrUpdateRule(MapperType mapper,
+    FileSorterMapperProperties& FileSorterProperties::addOrUpdateRule(MapperType mapperType,
                                                                       std::string match,
                                                                       std::string pattern,
                                                                       SortAction sort,
@@ -17,27 +17,22 @@ namespace bsc {
                                                                       std::string fileExists,
                                                                       std::string renamePattern) {
 
-        auto found = std::ranges::find_if(this->rules(), [&mapper, &match](auto& j) {
-            auto& matchers = j.matchers();
-            return std::ranges::find_if(matchers, [&mapper, &match](auto& i) { return i.type() == mapper && i.match() == match; })
-                           != std::end(matchers)
-                   && matchers.size() == 1;
-        });
-        FileSorterMapperProperties* ptr;
-        if (found != std::end(this->rules())) {
-            ptr = &*found;
-        } else {
-            ptr           = &this->rules().emplace_back();
-            auto& matcher = ptr->matchers().emplace_back();
-            matcher.type  = mapper;
-            matcher.match = std::move(match);
-        }
-        ptr->pattern              = std::move(pattern);
-        ptr->actions().sort       = sort;
-        ptr->actions().fileExists().action = std::move(fileExists);
-        ptr->actions().fileExists().pattern = std::move(renamePattern);
-        ptr->actions().error      = std::move(errorAction);
-        return *ptr;
+        auto found = std::ranges::find_if(this->rules(), [&pattern](FileSorterMapperProperties& j) { return j.pattern() == pattern; });
+        FileSorterMapperProperties& ptr = found != std::end(this->rules())?
+                                                                           *std::to_address(found) :
+                                                                           this->rules().emplace_back();
+
+        //@todo think about merging same matchers.
+        auto& matcher                       = ptr.matchers().emplace_back();
+        matcher.type                        = mapperType;
+        matcher.match                       = std::move(match);
+
+        ptr.pattern                        = std::move(pattern);
+        ptr.actions().sort                 = sort;
+        ptr.actions().fileExists().action  = std::move(fileExists);
+        ptr.actions().fileExists().pattern = std::move(renamePattern);
+        ptr.actions().error                = std::move(errorAction);
+        return ptr;
     }
     void FileSorterMapperProperties::write(PropertySequencer& sequencer) const {
         sequencer(matchers, pattern, actions);

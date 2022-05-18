@@ -22,6 +22,7 @@ namespace bsc {
         Property<"action", std::string> action{"rename"};
         Property<"pattern", std::string> pattern{"({})"};
         void write(PropertySequencer& sequencer) const override;
+        virtual ~FileExistsProperties() = default;
     };
 
     struct ActionProperties : BasePropertyClass {
@@ -30,12 +31,14 @@ namespace bsc {
         Property<"error", std::string> error{"continue"};
         Property<"fileExists", FileExistsProperties> fileExists{};
         void write(PropertySequencer& sequencer) const override;
+        virtual ~ActionProperties() = default;
     };
 
     struct MatcherProperties : BasePropertyClass {
         Property<"type", MapperType> type;
         Property<"match", std::string> match{};
         void write(PropertySequencer& sequencer) const override;
+        virtual ~MatcherProperties() = default;
     };
 
     struct FileSorterMapperProperties : BasePropertyClass {
@@ -43,12 +46,13 @@ namespace bsc {
         Property<"pattern", std::string> pattern{};
         Property<"on", ActionProperties> actions{};
         void write(PropertySequencer& sequencer) const override;
+        virtual ~FileSorterMapperProperties() = default;
     };
 
     struct FileSorterProperties : BasePropertyClass {
         Property<"rules", std::list<FileSorterMapperProperties>> rules;
         Property<"version", std::string> version{"0.1"};
-        FileSorterMapperProperties& addOrUpdateRule(MapperType mapper,
+        FileSorterMapperProperties& addOrUpdateRule(MapperType mapperType,
                                                     std::string match,
                                                     std::string pattern,
                                                     SortAction sort,
@@ -56,6 +60,7 @@ namespace bsc {
                                                     std::string fileExists,
                                                     std::string renamePattern);
         void write(PropertySequencer& sequencer) const override;
+        virtual ~FileSorterProperties() = default;
     };
 }// namespace bsc
 
